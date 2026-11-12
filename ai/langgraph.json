@@ -1,0 +1,6 @@
+{
+  "node_version": "24",
+  "graphs": {
+    "weaponProof": "./src/graph/WeaponProofGraph.ts:weaponProofGraph"
+  }
+}

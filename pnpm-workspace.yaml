@@ -1,4 +1,5 @@
 packages:
+  - ai
   - shared
   - webapp
 
@@ -16,18 +17,41 @@ minimumReleaseAgeIgnoreMissingTime: false
 # code from a git repository or a tarball URL instead of the registry.
 trustPolicy: no-downgrade
 blockExoticSubdeps: true
+# Reviewed 2026-11-12 and let through by exact version. `chokidar@4.0.3` (a dependency of `@langchain/langgraph-cli`) has the
+# same sole maintainer as 4.0.0 and 4.0.1; those two carry npm provenance and 4.0.2 and 4.0.3, published by hand, do not,
+# which the policy reads as a downgrade. Its tarball has no install script, one dependency (`readdirp`), no network or
+# process code, an MIT licence and no OSV advisory, and the change from 4.0.1 is a small event-argument fix.
+trustPolicyExclude:
+  - chokidar@4.0.3
 
 # Revalidate the registry's metadata behind the lockfile rather than taking it on trust, and fail an install that meets
 # an install script nobody has reviewed (the `allowBuilds` list below is the review).
 trustLockfile: false
 strictDepBuilds: true
 
+# workerd's postinstall only validates the binary, or downloads a fallback if the platform package is missing; the optional
+# @cloudflare/workerd-* platform package supplies the binary, so the script is denied here as it is in personal-site.
 allowBuilds:
   esbuild: true
+  workerd: false
 
 # Every external dependency is declared here once, exact-pinned, and each package says `catalog:`. A version changes in
 # one place for every package that uses it. Chosen 2026-11-12: the newest stable release at least seven days old.
 catalog:
+  # LangChain core types and the fake chat model used so tests never touch the network (`ai`).
+  "@langchain/core": 1.3.4
+  # The graph runtime (`ai`).
+  "@langchain/langgraph": 1.6.1
+  # Local Agent Server and Studio link: `langgraphjs dev` (`ai`).
+  "@langchain/langgraph-cli": 1.6.0
+  # Client for the Agent Server, to call a running graph from a test or the Worker (`ai`).
+  "@langchain/langgraph-sdk": 1.12.10
+  # Local model through Ollama, for the evals only (`ai/evals`, a devDependency; never imported by code the Worker bundles).
+  # 1.3.0 was published 2026-06-17.
+  "@langchain/ollama": 1.3.0
+  # LangSmith client for the evals' vitest wrapper and result export (`ai/evals`). 0.11.8 is the version already installed
+  # through `@langchain/core`; 0.12.0 (2026-11-10) is inside the seven-day window.
+  langsmith: 0.11.8
   # React 19 aware lint rules for the webapp; the legacy eslint-plugin-react is deliberately not used.
   "@eslint-react/eslint-plugin": 5.28.8
   # ESLint's recommended JavaScript rules, in every package's base config.
@@ -52,6 +76,10 @@ catalog:
   eslint: 10.14.0
   # Switches off the ESLint rules Prettier owns.
   eslint-config-prettier: 10.1.8
+  # Cloudflare's CLI, used only for a `--dry-run` bundle to measure the Worker size (`ai` spike).
+  wrangler: 4.157.0
+  # Schemas for model output; the shared vocabulary uses it too.
+  zod: 4.6.7
   # Rules of hooks, for the webapp.
   eslint-plugin-react-hooks: 7.1.1
   # Browser and Node global definitions for ESLint.
