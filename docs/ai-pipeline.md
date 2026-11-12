@@ -91,15 +91,25 @@ config change and an eval run, not a rewrite.
 Modelled on Focused's published pipeline (Austin Vance, "Evaluation Pipelines for LangGraph Agents") and the learning repo's
 module 02.
 
-- **Datasets** (30 to 50 cases each to start; grow them): weapons (positive, negative, adversarial, deliberately
+- **The loop, set up 2026-11-12 (`ai/AGENTS.md`):** case first, watch it fail for the right reason, build the smallest change,
+  mutation-prove (degrade the prompt or drop a node and the score must fall). **Three tiers behind one `deps` argument:**
+  `fake` (in `pnpm checks`, proves the harness and the deterministic logic), `local` (Ollama `qwen3.5:9b` on the laptop, free,
+  the working loop) and `paid` (Haiku 5.5, validation after a turn only, total ceiling $1 until the user raises it, locked until
+  a capped provider key and a spend guard exist). **Scores do not transfer between tiers:** a local 9B model's pass rate says
+  nothing about Haiku's, so the local tier checks the mechanics and prompt structure and the paid tier checks quality. A
+  GitHub runner cannot run Ollama, so `evals.yml` will be fake or paid. **Eval traces share the free plan's 5,000 a month with
+  production**, so LangSmith tracking is off by default for evals and on only for a deliberate baseline run (`EVAL_TRACK=1`).
+- **Datasets** (small on purpose, the user's rule of 2026-11-12: about 10 cases or fewer per suite, each catching a different
+  failure; add a case only when a real failure needs one): weapons (positive, negative, adversarial, deliberately
   overpowered, boundary), arenas (including unplayable layouts), judge pairs (each in both orders). Seeded from `build`'s
   fixtures and `art`'s example prompts. Failures from real traces become new cases.
 - **Evaluators, deterministic first** and binary: schema validity, stats inside caps, arena reachable, token budget respected,
   no system-prompt leak, names clean. Then an LLM judge for "matches the prompt" and "interesting", temperature 0, majority
-  vote of three; calibrate against about 50 hand-labelled pairs; investigate any example that flips more than 10% of runs.
+  vote of three; calibrate against about 10 hand-labelled pairs; investigate any example that flips more than 10% of runs.
 - **Trajectory** checks (`agentevals`) matter little for a fixed graph; use node-level assertions instead.
 - **Regression gate:** `evals.yml` runs the suite for changes under `ai/`, compares the pass rate per evaluator with the
-  baseline, and blocks when one drops by more than a threshold scaled to the dataset size (about 10% at 7 cases, 5% at 50).
+  baseline, and blocks when one drops by more than a threshold scaled to the dataset size (at about 10 cases one case is 10%, so the rule is that a case that passed on the
+  baseline must not fail).
   Tag CI runs so traces are traceable.
 - **Mutation proof:** degrade a prompt or use a weaker model; the score must fall. A gate that cannot fail proves nothing.
 - **Kept out of `pnpm checks`:** evals cost money and are non-deterministic.

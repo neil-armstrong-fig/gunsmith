@@ -9,7 +9,7 @@ has a known weakness. Owners: `ai` for the AI spend, `build` for the Durable Obj
 | Item | Value |
 | ---- | ----- |
 | Global AI ceiling | **$20 a month** |
-| Global daily soft cap | **$1 a day** (paused until 00:00 UTC) |
+| Global daily soft cap | **$1 a day** (paused until 00:00 UTC). The $20 month is the hard cap, so the AI may stop early in a month; accepted, tune after launch |
 | Alerts | 50%, 80%, 100% of the month |
 | Credits per player | 10 a day, reset 00:00 UTC |
 | Credit prices | weapon 1, arena 1, edit 1, rejected prompt 0.5, reuse free |
@@ -66,7 +66,7 @@ library and the built-in weapon and arena pool; guests are unaffected.
 | Cost per edit | Sonnet 5.5 $0.0128 (cached $0.0094); Haiku 5.5 $0.0007 (cached $0.0006). Estimate | 2026-11-12 |
 | Cost per arena judgement | Haiku 5.5 $0.00014. Estimate | 2026-11-12 |
 | Generations per day the soft cap buys | See "Budget arithmetic" below. The $20 month, not the $1 day, is the binding limit | 2026-11-12 |
-| Fixed monthly costs (Plus, Paid) | Plus $39 per seat (option 1). Workers Paid $5 plus container usage (option 2 only, plus an external Postgres and Redis). See `docs/ai-hosting.md` | 2026-11-12 |
+| Fixed monthly costs (Plus, Paid) | None added by the chosen option 3. Plus ($39 per seat, option 1) declined for now; Workers Paid ($5) only if the real graph's CPU or `build`'s spike needs it. See `docs/ai-hosting.md` | 2026-11-12 |
 
 ## Budget arithmetic (2026-11-12, estimates until the evals measure real tokens)
 
@@ -88,9 +88,11 @@ a best case: the cache lasts 5 minutes, so a quiet game will often miss.
 
 Findings:
 
-- **The daily cap cannot be the binding limit as written.** $1 a day for 30 days is $30, above the $20 month. The month
-  sustains about $0.67 a day. Either the daily cap drops to about $0.65, or it stays as a burst limit and the monthly counter is
-  the real ceiling. Decide with the user; the config is one number.
+- **Decided by the user, 2026-11-12: keep $1 a day, with the $20 month as a hard cap.** $1 a day for 30 days is $30, so a
+  busy month will hit the monthly cap before it ends, and **the AI shuts off early for the rest of the month. That is accepted**;
+  tune both numbers after launch. Consequence for the build: the monthly counter and the provider hard cap are the real
+  ceiling, the daily counter only paces spend, and the AI-off banner must say when it will return (the first of the month,
+  00:00 UTC, for a monthly stop; 00:00 UTC for a daily one).
 - **On Sonnet 5.5 the budget buys "a handful" of heavy users (about 4 to 5 a day) or about 14 to 18 casual ones.** That
   triggers the "decide the response before building" clause in `TODO-ai.md`.
 - **Response (proposed, `ai`'s call on models):** make **Haiku 5.5 the default generator**, which is about 17 times cheaper per

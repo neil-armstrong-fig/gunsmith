@@ -1,8 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1400" viewBox="0 0 1920 1400" role="img" aria-labelledby="title desc">
 <title id="title">Gunsmith — industrial arena concept sheet</title>
-<desc id="desc">A1 art direction: slate surfaces, blue and orange striped teams, four weapons, structural tiles, a three-level reveal arena and standing versus crouched vision studies. Concept only.</desc>
+<desc id="desc">A1 art direction: slate surfaces, blue and orange striped teams, four weapons, structural tiles, a three-level reveal arena and forward-cone versus crouched vision studies. Concept only.</desc>
 <defs>
 <pattern id="hatch" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M-2 2L2-2M0 10L10 0M8 12L12 8" stroke="#91A2B2" stroke-width="1"/></pattern>
+<pattern id="dim-terrain" width="32" height="32" patternUnits="userSpaceOnUse"><rect width="32" height="32" fill="#19222D"/><path d="M32 0H0V32" fill="none" stroke="#30404F" stroke-width="1"/></pattern>
+<pattern id="lit-terrain" width="16" height="16" patternUnits="userSpaceOnUse"><rect width="16" height="16" fill="#30404F"/><path d="M16 0H0V16" fill="none" stroke="#465A6B" stroke-width="1"/></pattern>
 <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="#91A2B2" stroke-opacity=".12"/></pattern>
 <g id="rifle"><path d="M9 26H19V22H42L47 26H59V32H39L35 40H27L29 32H19L13 37H8Z" fill="#18212B" stroke="#91A2B2" stroke-width="2"/><path d="M23 26H42M48 28H58" stroke="#62B5FF" stroke-width="2"/></g>
 <g id="beam"><path d="M7 26H17V20H39L45 24H58V28H46V36H58V40H43L38 34H28L24 43H17L19 33H7Z" fill="#18212B" stroke="#91A2B2" stroke-width="2"/><path d="M28 25H39M47 28V36" stroke="#B6A0FF" stroke-width="3"/></g>
@@ -13,7 +15,20 @@
 <g id="crouch"><circle cx="27" cy="32" r="13" fill="#30404F" stroke="#596572" stroke-width="2"/><path d="M21 21H33V26H21Z" fill="#62B5FF"/><circle cx="29" cy="32" r="6" fill="#596572"/><use href="#rifle" transform="translate(12 12) scale(.65)"/></g>
 <g id="wall"><rect x="2" y="2" width="60" height="60" fill="#18212B" stroke="#91A2B2" stroke-width="2"/><path d="M9 19V9H19M45 9H55V19M55 45V55H45M19 55H9V45" fill="none" stroke="#91A2B2" stroke-width="2"/></g>
 <g id="cover"><rect x="4" y="10" width="56" height="44" fill="#596572" stroke="#91A2B2" stroke-width="2"/><rect x="9" y="15" width="46" height="34" fill="url(#hatch)"/></g>
-<g id="ramp"><rect x="2" y="2" width="60" height="60" fill="#30404F" stroke="#91A2B2" stroke-width="2"/><path d="M8 50H56M8 42H56M8 34H56M8 26H56M24 18L32 10L40 18M32 10V30" fill="none" stroke="#91A2B2" stroke-width="2"/></g>
+<g id="stairs">
+<rect x="6" y="0" width="52" height="128" fill="#18212B" stroke="#91A2B2" stroke-width="2"/>
+<rect x="10" y="2" width="44" height="18" fill="#596572" stroke="#E5EAF0" stroke-width="2"/>
+<rect x="10" y="108" width="44" height="18" fill="#596572" stroke="#E5EAF0" stroke-width="2"/>
+<rect x="12" y="24" width="40" height="8" fill="#465A6B" stroke="#91A2B2" stroke-width="1"/>
+<rect x="12" y="34" width="40" height="8" fill="#465A6B" stroke="#91A2B2" stroke-width="1"/>
+<rect x="12" y="44" width="40" height="8" fill="#30404F" stroke="#91A2B2" stroke-width="1"/>
+<rect x="12" y="54" width="40" height="8" fill="#30404F" stroke="#91A2B2" stroke-width="1"/>
+<rect x="12" y="64" width="40" height="8" fill="#30404F" stroke="#91A2B2" stroke-width="1"/>
+<rect x="12" y="74" width="40" height="8" fill="#202B36" stroke="#91A2B2" stroke-width="1"/>
+<rect x="12" y="84" width="40" height="8" fill="#202B36" stroke="#91A2B2" stroke-width="1"/>
+<rect x="12" y="94" width="40" height="8" fill="#202B36" stroke="#91A2B2" stroke-width="1"/>
+<path d="M8 22V106M56 22V106" stroke="#E5EAF0" stroke-width="2"/>
+</g>
 </defs>
 <rect width="1920" height="1400" fill="#10151B"/>
 <style>text{font-family:Arial,sans-serif;fill:#E5EAF0} .mono{font-family:monospace;fill:#A7B3C2;font-size:16px} .label{font-size:20px;font-weight:600} .small{font-size:16px;fill:#A7B3C2} .section{font-family:monospace;font-size:18px;fill:#62B5FF;letter-spacing:2px}</style>
@@ -50,7 +65,7 @@
 <rect x="48" y="222" width="700" height="335" fill="#19222D"/>
 <rect x="772" y="222" width="1100" height="335" fill="#19222D"/>
 <text x="70" y="255" class="section">01 / PLAYERS</text>
-<text x="794" y="255" class="section">02 / WEAPON SILHOUETTES</text>
+<text x="794" y="255" class="section">02 / EXAMPLE WEAPON FORMS</text>
 <use href="#stand" transform="translate(82 278) scale(2.4)"/>
 <text x="82" y="467" class="mono">STAND / 1 STRIPE</text>
 <use href="#stand" transform="translate(82 483) scale(1)"/>
@@ -84,7 +99,7 @@
 <text x="1594" y="457" class="mono">DRUM LAUNCHER</text>
 <use href="#launcher" transform="translate(1594 483) scale(1)"/>
 <use href="#launcher" transform="translate(1688 498) scale(0.5)"/>
-<text x="794" y="543" class="small">Concept examples only / no behaviour enum or manifest keys added</text>
+<text x="794" y="543" class="small">Examples, not a fixed catalogue / see prompt-built oddities for visual variation</text>
 <rect x="48" y="581" width="1160" height="755" fill="#19222D"/>
 <text x="70" y="618" class="section">03 / THREE-LEVEL ARENA — REVEAL OVERVIEW</text>
 <text x="70" y="650" class="small">Full arena shown for inspection. This is not a live player view.</text>
@@ -120,29 +135,26 @@
 <use href="#cover" transform="translate(530 990) scale(0.6875)"/>
 <use href="#cover" transform="translate(882 946) scale(0.6875)"/>
 <use href="#cover" transform="translate(970 1034) scale(0.6875)"/>
-<use href="#ramp" transform="translate(574 1034) scale(0.6875)"/>
-<use href="#ramp" transform="translate(882 946) scale(0.6875)"/>
+<use href="#stairs" transform="translate(574 1034) scale(0.6875)"/>
+<use href="#stairs" transform="translate(882 946) scale(0.6875)"/>
 <path d="M250 710v12" fill="none" stroke="#91A2B2" stroke-width="2"/>
 <path d="M540 782v12" fill="none" stroke="#91A2B2" stroke-width="2"/>
 <path d="M550 782v12" fill="none" stroke="#91A2B2" stroke-width="2"/>
 <path d="M850 827v12" fill="none" stroke="#91A2B2" stroke-width="2"/>
 <path d="M860 827v12" fill="none" stroke="#91A2B2" stroke-width="2"/>
 <path d="M870 827v12" fill="none" stroke="#91A2B2" stroke-width="2"/>
-<text x="238" y="749" class="mono">L1</text>
-<text x="494" y="835" class="mono">L2</text>
-<text x="816" y="881" class="mono">L3</text>
 <use href="#stand" transform="translate(175 1017) scale(1.2)"/>
 <use href="#orange" transform="translate(940 762) scale(1.2)"/>
-<path d="M360 808l14 14-14 14-14-14Z" fill="none" stroke="#8AD4B0" stroke-width="2"/>
-<path d="M355 822h10" fill="none" stroke="#8AD4B0" stroke-width="2"/>
+<path d="M348 792l14 14-14 14-14-14Z" fill="none" stroke="#8AD4B0" stroke-width="2"/>
+<path d="M343 806h10" fill="none" stroke="#8AD4B0" stroke-width="2"/>
 <path d="M625 893l14 14-14 14-14-14Z" fill="none" stroke="#8AD4B0" stroke-width="2"/>
 <path d="M620 907h10" fill="none" stroke="#8AD4B0" stroke-width="2"/>
 <path d="M840 908l14 14-14 14-14-14Z" fill="none" stroke="#8AD4B0" stroke-width="2"/>
 <path d="M835 922h10" fill="none" stroke="#8AD4B0" stroke-width="2"/>
-<path d="M1010 1038l14 14-14 14-14-14Z" fill="none" stroke="#8AD4B0" stroke-width="2"/>
-<path d="M1005 1052h10" fill="none" stroke="#8AD4B0" stroke-width="2"/>
-<text x="90" y="1202" class="mono">Solid = wall     Hatched = cover     Striped arrow = ramp     Diamond = pickup</text>
-<text x="90" y="1236" class="small">Level brightness + 1 / 2 / 3 edge ticks. All three levels connect via ramps.</text>
+<path d="M1034 1008l14 14-14 14-14-14Z" fill="none" stroke="#8AD4B0" stroke-width="2"/>
+<path d="M1029 1022h10" fill="none" stroke="#8AD4B0" stroke-width="2"/>
+<text x="90" y="1202" class="mono">Solid = wall   Hatched = cover   Treads + landings = stairs   Diamond = pickup</text>
+<text x="90" y="1236" class="small">Stairs span both connected levels. Every other height edge blocks movement.</text>
 <text x="90" y="1282" class="mono">CLOSING RING</text>
 <path d="M280 1278l10-8 10 8m12 0 10-8 10 8m12 0 10-8 10 8" fill="none" stroke="#FF5B62" stroke-width="3"/>
 <text x="412" y="1282" class="small">Coral chevrons mark danger; hatch the unsafe side.</text>
@@ -154,9 +166,9 @@
 <use href="#cover" transform="translate(1460 652) scale(1)"/>
 <use href="#cover" transform="translate(1545 670) scale(0.5)"/>
 <text x="1460" y="746" class="mono">COVER</text>
-<use href="#ramp" transform="translate(1660 652) scale(1)"/>
-<use href="#ramp" transform="translate(1745 670) scale(0.5)"/>
-<text x="1660" y="746" class="mono">RAMP</text>
+<use href="#stairs" transform="translate(1660 640) scale(0.72)"/>
+<use href="#stairs" transform="translate(1745 669) scale(0.36)"/>
+<text x="1660" y="746" class="mono">STAIRS / 2 LANDINGS</text>
 <rect x="1260" y="773" width="64" height="64" fill="#202B36" stroke="#91A2B2"/>
 <path d="M1268 777v10" fill="none" stroke="#91A2B2" stroke-width="2"/>
 <rect x="1345" y="790" width="32" height="32" fill="#202B36" stroke="#91A2B2"/>
@@ -174,18 +186,22 @@
 <text x="1791" y="814" class="mono">L3</text>
 <rect x="1232" y="900" width="640" height="436" fill="#19222D"/>
 <text x="1254" y="938" class="section">05 / VISION AND FOG</text>
-<rect x="1260" y="964" width="270" height="206" fill="#151B23" stroke="#596572"/>
-<rect x="1570" y="964" width="270" height="206" fill="#151B23" stroke="#596572"/>
+<rect x="1260" y="964" width="270" height="206" fill="url(#dim-terrain)" stroke="#596572"/>
+<rect x="1570" y="964" width="270" height="206" fill="url(#dim-terrain)" stroke="#596572"/>
+<path d="M1276 987H1308V1011M1586 987H1618V1011M1276 1144H1308M1586 1144H1618" fill="none" stroke="#465A6B" stroke-width="3"/>
 <clipPath id="vision-clip"><rect x="1261" y="965" width="185" height="204"/></clipPath>
-<circle cx="1370" cy="1067" r="89" fill="#202B36" stroke="#30404F" stroke-width="4" clip-path="url(#vision-clip)"/>
+<path d="M1325 1067L1412 1017A100 100 0 0 1 1412 1117Z" fill="url(#lit-terrain)" stroke="#30404F" stroke-width="4" clip-path="url(#vision-clip)"/>
 <rect x="1446" y="982" width="14" height="158" fill="#18212B" stroke="#91A2B2"/>
-<use href="#stand" transform="translate(1338 1035) scale(1)"/>
-<use href="#crouch" transform="translate(1673 1035) scale(1)"/>
-<text x="1260" y="1200" class="mono">STAND / 360°</text>
-<text x="1570" y="1200" class="mono">CROUCH / NO VISION</text>
-<text x="1254" y="1232" class="small">Wall clips vision. Aim does not set its direction.</text>
-<text x="1254" y="1260" class="small">Hidden opponent: no marker, outline or glow.</text>
-<text x="1254" y="1294" class="small">Study only; engine supplies the visible region.</text>
+<use href="#stand" transform="translate(1298 1035) scale(1)"/>
+<path d="M1388 1059l8 8-8 8-8-8Z" fill="none" stroke="#8AD4B0" stroke-width="2"/>
+<path d="M1635 1067L1774 987A160 160 0 0 1 1774 1147Z" fill="url(#lit-terrain)" stroke="#30404F" stroke-width="4"/>
+<use href="#crouch" transform="translate(1608 1035) scale(1)"/>
+<path d="M1710 1059l8 8-8 8-8-8Z" fill="none" stroke="#8AD4B0" stroke-width="2"/>
+<text x="1260" y="1200" class="mono">STAND / FORWARD CONE</text>
+<text x="1570" y="1200" class="mono">CROUCH / LONGER RANGE</text>
+<text x="1254" y="1232" class="small">Weapon + stance set cone. Aim rotates it.</text>
+<text x="1254" y="1260" class="small">Outside: dim terrain. Inside: detail + entities.</text>
+<text x="1254" y="1294" class="small">Walls clip vision; crouch range is illustrative.</text>
 <path d="M48 1357H1872" fill="none" stroke="#596572" stroke-width="1"/>
 <text x="48" y="1384" class="mono">ORIGINAL VECTOR GEOMETRY / 2 PX OUTLINE AT 64 PX / NO GLOBAL BLOOM</text>
 <text x="1272" y="1384" class="mono">NEXT: MANIFEST REVIEW WITH BUILD</text>

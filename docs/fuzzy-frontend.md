@@ -1,4 +1,6 @@
-# The fuzzy frontend
+# The fuzzy frontend (tried and dropped 2026-11-12)
+
+> **Status: not used.** See the first demo note below. Kept for the screen map and the reasoning. The ledger and the "Fakes to build" table describe code that no longer exists.
 
 Source: [Fuzzy Frontend](https://neilarmstrong.dev/blog/fuzzy-frontend/). Read in full on 2026-11-12.
 
@@ -80,10 +82,32 @@ service). Add a row per screen or system.
 
 | Area | Status | Still fuzzy | Closed by |
 | ---- | ------ | ----------- | --------- |
-| (nothing built yet) | | | |
+| One-page shell (rail, stage, side panel), step jumper | fuzzy | Plain Tailwind and no icons; the stage is a fixed three-column grid that wraps the three arena levels when narrow | Acceptance specs for the jumper and for each screen's path |
+| Pre-round: prompt entry, blind arena, reveal of the opponent's first | fuzzy | Opponent is scripted; no 60 s window or countdown; guests can type but only get the built-in pool | Spec for the order rules, then a real second player |
+| Generation progress | fuzzy | Items run one after another (about ten seconds); the real pipeline may run them in parallel | Spec with the fake adapter's failures (rejection, timeout, AI off, over the limit) |
+| Reveal | fuzzy | Power rating is a stand-in formula in `webapp/src/game/power/`; the arena is flat coloured squares; no 30 s timer | The `engine/` power rating, then art |
+| Credits and the ledger | fuzzy | Fake ledger in `localStorage`; charge up front, refund the difference; no D1 | `CreditLedger` contract suite shared with the D1 one |
+| Library, account, history | fuzzy | Redux only, so a reload forgets them (credits survive); no rename; history is partly invented | Specs for save, favourite, slot limit; the API |
+| Private room, public queue, spectating | fuzzy | Buttons stand in for the opponent joining; the queue finds someone after 2.5 s; spectating shows nothing | Real rooms and the matchmaker (Phase E) |
+| Match, round end, match end | fuzzy | **No simulation:** two stand-in buttons win or lose a round; the arena canvas is a WASD square with no walls, shooting, fog, heights or ring | The playable core, then Phase D |
 
 ## Demo notes
 
 Record here, after each demo, what felt wrong, what the user cut or asked for, and the decision. Newest first.
 
-- (none yet)
+- 2026-11-12, **the user's reaction, and the cut.** After the self-review below, the user looked at it and said it was "a
+  bunch of menus": the game should take up the whole screen with menus appearing as required (unlike janggi, it does not
+  need to be "always on board"), and the amount of code in `shared/` was worrying. Decision: **the method was tried and
+  dropped for this project.** All of Phase A was deleted, `shared/` went back to tool config, and development restarts
+  slowly, test first, building a fun game before anything around it (`TODO-build.md`). What the attempt taught: a clickable
+  shell of menus is cheap to build and says almost nothing about whether the game is fun; the contracts it forced
+  (schemas, adapters, ledgers) were drafted before any consumer needed them and became code to carry. If the method is
+  used again, point it at the game's feel first, not its surrounding flow. The rest of this file is kept for the history.
+- 2026-11-12, `build` (self-review, not yet shown to the user): clicked sign in, private room, both weapon prompts and the blind
+  arena prompt, generation, reveal, a 2 to 1 match, match end and history in a real browser, then used the jumper for
+  "prompt over the limit". It works end to end. Found and fixed while clicking: the fake picker gave a ricochet SMG prompt a
+  plain slug thrower (generic words were tried first), and weapon colour swatches were missing (Tailwind drops theme
+  variables only an inline style names). **Felt wrong, not fixed:** the reveal stacks three arena levels vertically in a
+  1200 px window; generation is slow to watch with six rows in sequence; the guest path through the pre-round is a dead end
+  of "built-in" notes, so a guest would want a clearer nudge; there is no way to see a weapon's sound yet. The game is not
+  yet ready for the user's first look: it has no playable round.

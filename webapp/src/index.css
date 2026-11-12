@@ -1,1 +1,31 @@
 @import "tailwindcss";
+
+/* The art palette (`docs/art/README.md`). Tokens proposed by `art` until the M2 review; components use these, not hex. */
+/* `static` so every token is emitted even where only an inline style names it (a weapon's glow colour). */
+@theme static {
+  --color-gs-background: #10151b;
+  --color-gs-fog: #151b23;
+  --color-gs-floor-l1: #202b36;
+  --color-gs-floor-l2: #30404f;
+  --color-gs-floor-l3: #465a6b;
+  --color-gs-wall: #18212b;
+  --color-gs-cover: #596572;
+  --color-gs-edge: #91a2b2;
+  --color-gs-team-blue: #62b5ff;
+  --color-gs-team-orange: #ff9b54;
+  --color-gs-ui-surface: #19222d;
+  --color-gs-ui-text: #e5eaf0;
+  --color-gs-ui-muted: #a7b3c2;
+  --color-gs-warning: #f2c66d;
+  --color-gs-success: #8ad4b0;
+  --color-gs-ring: #ff5b62;
+  --color-gs-weapon-blue: #62b5ff;
+  --color-gs-weapon-orange: #ff9b54;
+  --color-gs-weapon-violet: #b6a0ff;
+  --color-gs-weapon-mint: #8ad4b0;
+}
+
+body {
+  background-color: var(--color-gs-background);
+  color: var(--color-gs-ui-text);
+}

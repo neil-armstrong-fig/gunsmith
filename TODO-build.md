@@ -3,77 +3,91 @@
 Your checklist. The shared path is `TODO.md`; read it and `TODO-ai.md` and `TODO-art.md` first, every fresh session
 (the sync protocol is at the top of `TODO.md`). Decisions behind every item are in `docs/`.
 
-**The order matters.** A **fuzzy frontend** comes first (`docs/fuzzy-frontend.md`, after
-https://neilarmstrong.dev/blog/fuzzy-frontend/): every screen and path clickable end to end, fake data, no backend, as
-fast as possible, so a rough game can be seen and judged within the first sitting. ATDD follows straight after, area by
-area. The fuzzy frontend is **not thrown away**; it becomes the product.
+**The order changed on 2026-11-12, at the user's request: build a fun game first, then build everything else around it.**
+Three rules follow:
 
-**What the others are waiting for from you:** `ai` needs the contracts in `HANDOFF.md` (schemas, `AiAdapter`,
-`CreditLedger`, the power rating and arena validator); `art` needs the asset manifest and `docs/art/` stubs. Produce them
-as soon as the fuzzy frontend has shaped them, and say so in `TODO.md`'s status board.
+1. **Test first, from the first spec.** Every mechanic starts as an acceptance spec watched to fail (`AGENTS.md`). The
+   fuzzy-frontend method was tried and dropped (`docs/fuzzy-frontend.md`, demo note).
+2. **The game is the whole screen.** The canvas fills the window; menus appear over it only when needed. No page of
+   menus, no side panels, no step jumper until a spec needs one.
+3. **Nothing moves to `shared/` until a second package needs it.** No pre-emptive contracts: schemas, adapters and
+   ledgers come back, test-first, when the game and the AI genuinely need the same shape.
 
-## Phase 0: minimal scaffold (target: well under an hour). Milestone M1
+**What the others are waiting for from you:** `ai` needs the weapon and arena shapes; `art` needs the asset manifest.
+Both are withdrawn until the game is fun (`HANDOFF.md` delivery log, 2026-11-12). Say in `TODO.md` when they return.
 
-Just enough to run React with react-three-fiber. The full standards work is Phase C.
+## Phase 0: minimal scaffold. Done
 
-- [x] `git init` (the user ran it), `.nvmrc` (26.13.1, the current LTS), `.editorconfig`, `.gitignore` (ignore `.dev.vars`,
-      `.wrangler/`, `.alchemy/`, `.playwright-mcp/`, `test-results/`, `.claude/settings.local.json`, `.claude/worktrees/`),
-      `LICENSE` decision (private for now: no LICENSE file). No commit yet; waiting for the user to ask.
-- [x] pnpm workspace with `webapp/` and `shared/` only (more packages arrive in Phase C). Exact-pinned `catalog:` with the
-      7-day release-age policy (janggi's policy block). Versions are the newest stable at least 7 days old on 2026-11-12;
-      TypeScript held at 6.0.3 (see `AGENTS.md` gotchas). `@react-three/drei` skipped: nothing uses it yet.
-- [x] `webapp/`: Vite, React 19, strict TypeScript, Tailwind v4, Redux Toolkit, `three`, `@react-three/fiber`. An
-      orthographic top-down canvas that draws a square and moves it with WASD (`src/react/arena/`).
-- [x] `pnpm start` works on port 3000. Config is port 3000 with `strictPort`; verified in a browser on 3100 only, because
-      janggi's dev server held 3000 (not killed). Re-confirm on 3000 once it is free.
+- [x] `git init`, `.nvmrc` (26.13.1), `.editorconfig`, `.gitignore`, no LICENSE (private for now).
+- [x] pnpm workspace with `webapp/` and `shared/` (tool config only), exact-pinned `catalog:`, 7-day release-age policy,
+      TypeScript held at 6.0.3.
+- [x] `webapp/`: Vite, React 19, strict TypeScript, Tailwind v4, react-three-fiber; a full-screen orthographic canvas with
+      a square moved by WASD (`src/react/arena/`, `DirectionFromKeys` unit-tested and mutation-proved).
+- [x] `pnpm start` on port 3000 (verified on 3100 while janggi held 3000; re-confirm when it is free).
+- [x] 2026-11-12: a fuzzy frontend (15 menu screens, a fake AI and ledger, schemas in `shared/`) was built, looked at and
+      deleted at the user's request. The palette tokens in `src/index.css` survive.
 
-## Phase A: the fuzzy frontend (target: a clickable whole game in the first day or two). Milestone M1
+## Phase 1: the game, test first. Milestone M1 (redefined: the game is fun)
 
-Build it screen by screen from the map in `docs/fuzzy-frontend.md`. Every screen exists and every path works; fake data and
-a fake opponent; rough visuals are fine. Keep the ledger in `docs/fuzzy-frontend.md` current.
+Set-up, then one spec per mechanic. Each spec is watched to fail for the right reason, then made to pass, then
+mutation-proved (`AGENTS.md`). The simulation lives in `engine/` from the start: deterministic, a fixed timestep, a seeded
+RNG, no `Date.now()` or `Math.random()`. The webapp renders it and sends input.
 
-- [ ] **Step jumper:** a dev hotkey (backtick) opens a menu to jump to any screen or state (rejected prompt, AI off,
-      generation timeout, round end, match end, spectator, and the rest listed in the doc).
-- [ ] **Fake world, in the browser:** a fake server (in-memory plus `localStorage`) for sign-in, credits, library and rooms,
-      and a **fake `AiAdapter`** (fixture weapons and arenas, simulated delay, pipeline-progress events, failure modes).
-      Shape them as the real interfaces from the start (`HANDOFF.md`).
-- [ ] **Fixture content** in `shared/`: hand-written valid weapons (a mild one, a broken overpowered one, one per behavior)
-      and three arenas (flat, two-storey, three-storey), typed by a first draft of the zod schemas (`docs/schemas.md`).
-- [ ] **Screens** (all clickable): landing; practice arena; fake Google sign-in; private room (code, waiting, spectators,
-      host sets spectator delay); public queue; pre-round prompt entry; generation progress; reveal; match HUD; round end;
-      match end; library; spectator view; match history; account and credits; AI-off banner; error states.
-- [ ] **Playable core, even if rough:** WASD move, mouse aim, shoot, reload, crouch, keys 1 and 2, pick up and drop a custom
-      weapon, health, round and match score, a scripted opponent that wanders and shoots, practice dummies. Fog drawn from a
-      visibility polygon with three height levels. The closing ring after the round timer.
-- [ ] **Rough sound:** Web Audio gunshots from a weapon's `sound` block; silence elsewhere until `art`'s files arrive.
-- [ ] **Asset manifest** (`webapp/src/assets/manifest`): every sprite, tile, icon and sound has a stable key, size, format
-      and placeholder (`docs/art/asset-manifest.md`). Tell `art`.
-- [ ] **Demo checkpoint:** run the whole flow once, record what felt wrong in `docs/fuzzy-frontend.md`, tell the user it is
-      ready for a first look, and agree what to cut or add before Phase B.
+- [x] **`acceptance-tests/`** (janggi's skeleton, three layers for now, `withDslOnly`, desktop only) with its `AGENTS.md`.
+      `@playwright/test` 1.64.0 approved.
+- [x] **`engine/`** package with its `AGENTS.md`, created by the walking spec. Bring up a seeded RNG, a visibility-polygon
+      library and a grid pathfinder when each is needed. Property tests (`fast-check`) are deferred at the user's request.
+- [x] **Canvas state hook** for the DSL: `data-ready` on the arena (read-only, tiny, shipped code). More arrive per spec.
+- [ ] Specs, in this order (add or reorder as playing it shows what is fun):
+  - [x] The practice arena fills the window (`FillingTheWindow.test.ts`, three window sizes; mutation-proved on the
+        container and on the canvas; 15 of 15 on repeat).
+  - [x] WASD moves the player; walls stop them (`WalkingAround.test.ts`; engine: 33 unit tests, all mutants caught; four
+        game mutations each caught by the right spec). Fixed 1/60 s step, circle-vs-grid collision written by hand.
+  - [x] Aiming with the mouse; clicking fires a shot (`AimingAtTheMouse.test.ts`, `FiringAShot.test.ts`; first pass: one
+        bullet type, a fixed fire rate, bullets die on walls). Engine: 72 unit tests; webapp: 33; 22 acceptance specs.
+  - [ ] A practice dummy takes damage and dies.
+  - [ ] Reload, magazine and reserve; keys 1 and 2 switch weapon.
+  - [ ] Health, and a scripted opponent that wanders and shoots; a hit; a round win.
+  - [ ] Best of three.
+  - [ ] Dim arena outside a detailed forward cone, set by equipped weapon and standing/crouched stance. Rotate it
+        with aim through 360°; reveal terrain detail and players/items only in the unoccluded cone. Three height levels
+        and longer-range, substantially slower crouch follow `HANDOFF.md`. Cone ownership is settled.
+  - [ ] The closing ring after the round timer.
+  - [ ] Pick up and drop a custom weapon; rough Web Audio gunshots.
+- [ ] **Demo checkpoint:** when the core is playable, tell the user it is ready for a first look. Agree what to cut or add
+      before menus. Record the reaction in `docs/fuzzy-frontend.md`'s demo notes (kept for the history).
 
-## Contracts (Milestone M2)
+### Research-informed playtests (as each mechanic lands)
 
-- [ ] Draft schemas, fixtures, `AiAdapter` and fake, `CreditLedger` and fake, credit config, asset manifest: all in the
-      places `HANDOFF.md` names. Tick the first four "What is ready" rows there.
-- [ ] Ask `ai` and `art` to review them now; record their sign-off in the delivery log before changing anything again.
+Source facts, hypotheses and five small setups: `docs/art/gameplay-research.md`. These support Phase 1, not a new
+up-front architecture phase; use hand-authored fixtures and keep rule changes as proposals until played/reviewed.
 
-## Phase B: ATDD fast follow (starts as soon as the fuzzy frontend has been looked at). Milestone M3
+- [ ] Tune the user's intended crouch tradeoff: substantially slower movement in exchange for longer vision,
+      quieter movement and cover protection. Verify vulnerability while repositioning and reasons to stand.
+- [ ] Play contested pickups with swapped player/spawn assignments; compare legal walking routes through stairs,
+      not straight-line distances. Test central weighting for the highest-rated weapon, retaining random placement
+      and minimum spacing. Test single-stair camping against a two-route arena.
+- [ ] Finalise/validate arenas after player/AI definitions: legal routes, stair connections, spawn/pickup access and
+      ring escape time, including blocked/dead-end approaches. Apply the same checks to built-ins and hand-author/
+      playtest them as the quality reference. Compare contrasting weapons and oddity skins for explainable deaths.
+- [ ] When vision lands, cover weapon/stance changes, cone edges, a full turn/angle wrap, walls and height. Check dim
+      terrain outside versus detailed terrain/entities inside the cone; visibility is directional, not globally
+      symmetric. Multiplayer checks retain current state/effects and exclude hidden entity/effect data. Preserve
+      failures as reproducible fixtures.
 
-Bring each area into focus **test first**: write the acceptance test, watch it fail for the right reason, make it pass.
-One area at a time, keeping the flow clickable. Close each ledger row only when its spec exists and has been watched to fail.
+## Phase 2: menus around the game (after the user has played it)
 
-- [ ] `acceptance-tests/` with the four layers and `withDslOnly`, desktop project only, lint-enforced boundaries (copy
-      janggi's skeleton: `acceptance-criteria-mapping`, `dsl`, the `*Dsl`/`*Playwright` pairing).
-- [ ] The **canvas state hook** for the DSL (read-only, tiny) and a `FakeApi` Playwright route stand-in as in janggi.
-- [ ] Specs, in this order: start a practice match; move, aim and shoot; switch weapon with 1 and 2; pick up and drop a
-      custom weapon; crouch; a hit and a round win; best of three; the pre-round flow with the fake adapter (including
-      rejection, timeout and AI-off); the reveal screen; library save, favourite, rename and slot limit; credits and daily reset.
-- [ ] Mutation-prove each new spec (`AGENTS.md`).
+Overlays on the full-screen canvas, each added test-first when the game needs it. Likely first: pause and settings,
+the round end and match end overlays. Then the pre-round (prompt, generation, reveal), library, account, rooms. The old
+screen map is in `docs/fuzzy-frontend.md` for reference only; do not rebuild it wholesale.
+
+- [ ] Contracts for `ai` and `art` (schemas, `AiAdapter`, `CreditLedger`, asset manifest), drafted test-first, only once the
+      game needs them. Ask `ai` and `art` to review (M2).
 
 ## Phase C: full project standards. Milestone M3
 
-- [ ] Add the remaining packages: `engine/`, `acceptance-tests/`, `api/`, `infra/`, and an empty `ai/` with the interfaces from
-      `HANDOFF.md` for `ai`.
+- [ ] Add the remaining packages: `api/`, `infra/`, and an empty `ai/` with the interfaces from `HANDOFF.md` for `ai`
+      (`engine/` and `acceptance-tests/` arrive in Phase 1).
 - [ ] `shared/config/`: ESLint base with `restrictedImports` (the table in `AGENTS.md`), Prettier, tsconfig base, vitest
       base; copy janggi's and adapt. Pin TypeScript per the gotcha in `AGENTS.md` (check TS 7 and typescript-eslint first).
 - [ ] Per-package `AGENTS.md` files and the nested webapp ones (`react/`, `redux/`), copied from janggi and adapted; strip
@@ -84,11 +98,12 @@ One area at a time, keeping the flow clickable. Close each ledger row only when 
       live) and `property-tests.yml`. `evals.yml` is `ai`'s.
 - [ ] The layering inside `webapp/src`: `react/` → `redux/` → `game/`, with `audio/` beside `redux/`; per-frame state outside Redux.
 
-## Phase D: the engine, properly. Milestone M3
+## Phase D: the engine, hardened. Milestone M3
 
-Extract and harden what the fuzzy frontend proved. Never fuzzy: test-first from the start.
+The engine is born in Phase 1, test-first. This phase hardens it as the game settles; these rows are what has to be true by
+the end, ticked as Phase 1 reaches them.
 
-- [ ] Simulation rules move from the webapp into `engine/`: fixed timestep, seeded RNG, no wall clock or `Math.random`.
+- [ ] Simulation rules live in `engine/`: fixed timestep, seeded RNG, no wall clock or `Math.random`.
 - [ ] Movement and circle-vs-grid collision; projectile and hitscan weapons for each behavior in the enum; damage, health,
       reload, ammo and reserve; round and match logic; the closing ring.
 - [ ] **Visibility:** line of sight against walls and three height levels, with crouch, shared by the server (what to send)
@@ -97,8 +112,8 @@ Extract and harden what the fuzzy frontend proved. Never fuzzy: test-first from 
 - [ ] **Power rating** (deterministic, visible on the reveal screen) and **hard caps** per stat, in code; no nerfing inside the caps.
 - [ ] **Arena validator:** bounds, spawn reachability by flood fill, minimum open space, wall and height limits.
 - [ ] **Output moderation in code:** length and charset limits plus a blocklist for AI-written names and descriptions.
-- [ ] `pnpm test:properties`: fast-check properties for the validator, caps and visibility (symmetry; no leaks through
-      indestructible walls).
+- [ ] `pnpm test:properties`: fast-check properties for the validator, caps and visibility (directional cone/height cases;
+      symmetry only for geometric subproblems with matching assumptions; no leaks through indestructible walls).
 - [ ] Final zod schemas for weapon (with `sound` block) and arena in `shared/`, replacing the draft; keep `docs/schemas.md`
       in step. Tell `ai` and `art` if anything they use changed.
 

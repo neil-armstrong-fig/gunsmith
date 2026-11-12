@@ -14,20 +14,39 @@ datasets (A5), and final files named exactly as the manifest says.
 
 ## A1: palette and art direction. Milestone M1
 
-- [ ] `docs/art/README.md`: palette as named colour tokens (the webapp will use them as Tailwind `@theme` tokens), shape
+- [x] `docs/art/README.md`: palette as named colour tokens (the webapp will use them as Tailwind `@theme` tokens), shape
       language, line weights, glow rules, and how fog, height levels and crouch should read. Team colours should differ
       without relying on red versus green alone (accessibility is out of scope for now, but do not make it harder later).
-- [ ] Concept sheet: the player (standing and crouched), the default rifle, three example custom weapons, a floor/wall/cover
+- [x] Concept sheet: the player (standing and crouched), the default rifle, three example custom weapons, a floor/wall/cover
       tile set, and a three-level arena mock.
+
+*Delivered 2026-11-12: industrial arena direction and SVG/PNG concept sheet under `docs/art/`; visual and SVG checks passed.*
+
+*Revised 2026-11-12: explicit stair flights with landings on both levels, no in-arena level text, forward-cone fog. Build/AI contract follow-up is in `HANDOFF.md`.*
+
+*Extended 2026-11-12: longer crouch cone; prompt-malleable visual grammar; six generated oddity concepts with two variants each and documented prompt interpretations.*
+
+## Research delivered to the game session
+
+- [x] Source comparable designs and original visibility/generation references; submit five fixture-based playtests
+      and concrete follow-up to build (`docs/art/gameplay-research.md`, 2026-11-12). No mechanics changed or models called.
+
+- [x] Record research feedback: central weapon weighting proposal, substantial crouch slowdown, generated/built-in
+      arena quality checks, and clarification that fog visibility updates as you look (2026-11-12).
+
+- [x] Correct vision presentation and cone ownership: dim map outside, detailed terrain and players/items inside
+      the rotating equipped-weapon/stance cone. Updated SVG/PNG and active design/handoff guidance (2026-11-12).
 
 ## A2: sprites. Milestone M3
 
+- [ ] Review the visual-schema proposal with build/AI at M2; translate all six oddities into top-down compositions
+      using only the agreed grammar and verify 64 px/32 px readability (`docs/art/visual-schema-proposal.md`).
 - [ ] Player (standing and crouched, with a held-weapon variant per behavior class), default rifle, practice dummy.
 - [ ] Pickup glows, projectiles and muzzle flashes per behavior, hit and death effects.
 
 ## A3: tiles. Milestone M3
 
-- [ ] Floor, indestructible wall, penetrable cover, three height levels (edges and ramps), spawn and pickup markers, the
+- [ ] Floor, indestructible wall, penetrable cover, three height levels (edges and paired stairs), spawn and pickup markers, the
       closing ring's edge, the fog texture.
 
 ## A4: interface. Milestone M3
@@ -59,5 +78,5 @@ datasets (A5), and final files named exactly as the manifest says.
 
 ## Always
 
-- [ ] After each delivery, add a line to the delivery log in `HANDOFF.md` listing the manifest keys delivered, so `build`
+- [x] After each delivery, add a line to the delivery log in `HANDOFF.md` listing the manifest keys delivered, so `build`
       can wire them in; then tick the row here.
