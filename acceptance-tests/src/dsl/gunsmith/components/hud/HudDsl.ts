@@ -30,6 +30,33 @@ export class HudDsl {
     }
   }
 
+  /** The health the screen shows the player. */
+  async getHealth(): Promise<number> {
+    try {
+      return await this.hud.getHealth();
+    } catch (error) {
+      throw new DslError("Failed to read the health on the screen", error);
+    }
+  }
+
+  /** Waits until the screen shows exactly `health`. */
+  async waitForHealth(health: number): Promise<void> {
+    try {
+      await this.hud.waitForHealth(health);
+    } catch (error) {
+      throw new DslError(`Failed to see ${health} health on the screen`, error);
+    }
+  }
+
+  /** Waits until the screen shows the health the game itself says the player has, however often they are being hit. */
+  async waitForHealthToMatchTheGame(): Promise<void> {
+    try {
+      await this.hud.waitForHealthToMatchTheGame();
+    } catch (error) {
+      throw new DslError("Failed to see the screen show the player's health as the game has it", error);
+    }
+  }
+
   /** Waits until the screen shows exactly `rounds` in the magazine. */
   async waitForRounds(rounds: number): Promise<void> {
     try {

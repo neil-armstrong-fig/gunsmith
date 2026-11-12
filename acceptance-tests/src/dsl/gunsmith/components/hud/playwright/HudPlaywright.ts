@@ -29,6 +29,28 @@ export class HudPlaywright extends BasePage {
     };
   }
 
+  /** The health the screen shows the player. */
+  async getHealth(): Promise<number> {
+    return await this.numberIn("player-health");
+  }
+
+  /** Waits until the screen shows exactly `health`. */
+  async waitForHealth(health: number): Promise<void> {
+    await expect(this.page.getByTestId("player-health")).toHaveText(String(health));
+  }
+
+  /**
+   * Waits until the screen shows the health the game itself says the player has. For a player who is still being hit, where
+   * a fixed number would be stale by the time it was waited for.
+   */
+  async waitForHealthToMatchTheGame(): Promise<void> {
+    await expect
+      .poll(async () => (await this.getHealth()) === (await this.readGameState()).player.health, {
+        intervals: [25, 50, 100],
+      })
+      .toBe(true);
+  }
+
   async waitForRounds(rounds: number): Promise<void> {
     await expect(this.page.getByTestId("ammo-rounds")).toHaveText(String(rounds));
   }

@@ -3,6 +3,7 @@ packages:
   - engine
   - shared
   - webapp
+  - docs/art/concepts/audio
 
 # Refuse `pnpm add` commands that would bypass an existing catalog version.
 catalogMode: strict
@@ -30,6 +31,8 @@ allowBuilds:
 # Every external dependency is declared here once, exact-pinned, and each package says `catalog:`. A version changes in
 # one place for every package that uses it. Chosen 2026-11-12: the newest stable release at least seven days old.
 catalog:
+  # Offline Web Audio for art's Node-only TypeScript renderer (approved 2026-11-12).
+  node-web-audio-api: 2.2.0
   # React 19 aware lint rules for the webapp; the legacy eslint-plugin-react is deliberately not used.
   "@eslint-react/eslint-plugin": 5.28.8
   # ESLint's recommended JavaScript rules, in every package's base config.

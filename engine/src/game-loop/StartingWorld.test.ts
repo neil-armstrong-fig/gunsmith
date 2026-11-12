@@ -1,5 +1,7 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import {DUMMY_HEALTH} from "@gunsmith/engine/dummy/DummyHealth";
+import {OPPONENT_HEALTH} from "@gunsmith/engine/health/OpponentHealth";
+import {PLAYER_HEALTH} from "@gunsmith/engine/health/PlayerHealth";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import {MARKSMAN_RIFLE} from "@gunsmith/engine/weapon/weapons/MarksmanRifle";
 import {RIFLE} from "@gunsmith/engine/weapon/weapons/Rifle";
@@ -57,4 +59,30 @@ it("starts with the rifle in hand and no reload under way", () => {
 
   expect(player.equippedIndex).toBe(0);
   expect(player.reloadRemainingSeconds).toBeUndefined();
+});
+
+it("starts the player at full health", () => {
+  expect(startingWorld(arenaFrom(["###", "#.#", "###"])).player.health).toBe(PLAYER_HEALTH);
+});
+
+it("starts the round playing", () => {
+  expect(startingWorld(arenaFrom(["###", "#.#", "###"])).round).toBe("playing");
+});
+
+it("starts with no opponent when none is asked for", () => {
+  expect(startingWorld(arenaFrom(["###", "#.#", "###"])).opponent).toBeUndefined();
+});
+
+it("stands an opponent at full health, facing west with the weapons full, where it is asked to", () => {
+  const {opponent, player} = startingWorld(arenaFrom(["#####", "#...#", "#...#", "#...#", "#####"]), [], {
+    x: 3.5,
+    y: 1.5,
+  });
+
+  expect(opponent?.position).toEqual({x: 3.5, y: 1.5});
+  expect(opponent?.health).toBe(OPPONENT_HEALTH);
+  expect(opponent?.aim).toEqual({x: -1, y: 0});
+  expect(opponent?.cooldownSeconds).toBe(0);
+  expect(opponent?.equippedIndex).toBe(0);
+  expect(opponent?.loadout).toEqual(player.loadout);
 });

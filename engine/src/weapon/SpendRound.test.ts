@@ -21,6 +21,7 @@ function playerHolding(equippedIndex: number): Player {
       {weapon: WEAPON, rounds: 7, reserve: 12},
     ],
     equippedIndex,
+    health: 100,
   };
 }
 

@@ -40,7 +40,10 @@ it("reports no bullets when none are in the air", () => {
 });
 
 it("reports where each bullet in the air is", () => {
-  const flying = {...world, bullets: [{position: {x: 1, y: 2}, direction: {x: 1, y: 0}, damage: 25, speed: 20}]};
+  const flying = {
+    ...world,
+    bullets: [{position: {x: 1, y: 2}, direction: {x: 1, y: 0}, damage: 25, speed: 20, shooter: "player" as const}],
+  };
 
   expect(snapshotOf(flying).bullets).toEqual([{x: 1, y: 2}]);
 });
@@ -93,4 +96,25 @@ it("reports whether the weapon in hand is being reloaded", () => {
 
   expect(snapshotOf(reloading).weapon.reloading).toBe(true);
   expect(snapshotOf(world).weapon.reloading).toBe(false);
+});
+
+it("reports the player's health", () => {
+  expect(snapshotOf({...world, player: {...world.player, health: 65}}).player.health).toBe(65);
+});
+
+it("reports no opponent when the world has none", () => {
+  expect(snapshotOf(world).opponent).toBeUndefined();
+});
+
+it("reports where the opponent stands and how much health it has left", () => {
+  const withOpponent = startingWorld(world.arena, [], {x: 3.5, y: 1.5});
+  const hurt = {...withOpponent, opponent: withOpponent.opponent && {...withOpponent.opponent, health: 40}};
+
+  expect(snapshotOf(hurt).opponent).toEqual({x: 3.5, y: 1.5, health: 40});
+});
+
+it("reports where the round stands", () => {
+  expect(snapshotOf(world).round).toBe("playing");
+  expect(snapshotOf({...world, round: "won"}).round).toBe("won");
+  expect(snapshotOf({...world, round: "lost"}).round).toBe("lost");
 });

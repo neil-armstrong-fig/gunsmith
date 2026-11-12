@@ -13,27 +13,35 @@ const WEAPON: Weapon = {
 };
 
 it("sends the bullet the way the player is aiming", () => {
-  expect(fireBullet(FROM, {x: 0, y: 1}, WEAPON).direction).toEqual({x: 0, y: 1});
+  expect(fireBullet("player", {from: FROM, aim: {x: 0, y: 1}, weapon: WEAPON}).direction).toEqual({x: 0, y: 1});
 });
 
 it("starts the bullet just outside the player, along the aim", () => {
-  const bullet = fireBullet(FROM, {x: 1, y: 0}, WEAPON);
+  const bullet = fireBullet("player", {from: FROM, aim: {x: 1, y: 0}, weapon: WEAPON});
 
   expect(bullet.position.y).toBe(5);
   expect(bullet.position.x - FROM.x).toBeGreaterThan(PLAYER_RADIUS + 0.01);
 });
 
 it("starts a bullet aimed down and to the west south-west of the player", () => {
-  const bullet = fireBullet(FROM, {x: -Math.SQRT1_2, y: -Math.SQRT1_2}, WEAPON);
+  const bullet = fireBullet("player", {from: FROM, aim: {x: -Math.SQRT1_2, y: -Math.SQRT1_2}, weapon: WEAPON});
 
   expect(bullet.position.x).toBeLessThan(FROM.x);
   expect(bullet.position.y).toBeLessThan(FROM.y);
 });
 
 it("gives the bullet the damage of the weapon that fired it", () => {
-  expect(fireBullet(FROM, {x: 1, y: 0}, {...WEAPON, bulletDamage: 50}).damage).toBe(50);
+  expect(fireBullet("player", {from: FROM, aim: {x: 1, y: 0}, weapon: {...WEAPON, bulletDamage: 50}}).damage).toBe(50);
 });
 
 it("gives the bullet the speed of the weapon that fired it", () => {
-  expect(fireBullet(FROM, {x: 1, y: 0}, {...WEAPON, bulletSpeed: 30}).speed).toBe(30);
+  expect(fireBullet("player", {from: FROM, aim: {x: 1, y: 0}, weapon: {...WEAPON, bulletSpeed: 30}}).speed).toBe(30);
+});
+
+it("marks the bullet as the player's when the player fired it", () => {
+  expect(fireBullet("player", {from: FROM, aim: {x: 1, y: 0}, weapon: WEAPON}).shooter).toBe("player");
+});
+
+it("marks the bullet as the opponent's when the opponent fired it", () => {
+  expect(fireBullet("opponent", {from: FROM, aim: {x: 1, y: 0}, weapon: WEAPON}).shooter).toBe("opponent");
 });

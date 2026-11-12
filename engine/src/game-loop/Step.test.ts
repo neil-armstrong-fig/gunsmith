@@ -1,6 +1,9 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import {fireBullet} from "@gunsmith/engine/bullet/FireBullet";
 import {DUMMY_HEALTH} from "@gunsmith/engine/dummy/DummyHealth";
+import {disarmOpponent} from "@gunsmith/engine/opponent/DisarmOpponent";
+import {PLAYER_HEALTH} from "@gunsmith/engine/health/PlayerHealth";
+import {OPPONENT_HEALTH} from "@gunsmith/engine/health/OpponentHealth";
 import type {Player} from "@gunsmith/engine/player/types/Player";
 import {PLAYER_SPEED} from "@gunsmith/engine/player/walking/PlayerSpeed";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
@@ -209,7 +212,9 @@ it("starts a new bullet at the muzzle of the player where they now stand, and do
   const east = {x: 20, y: 4.5};
   const after = step(centred(), {...IDLE, direction: {x: 1, y: 0}, aimAt: east, firing: true}, TICK);
 
-  expect(after.bullets[0]?.position).toEqual(fireBullet(after.player.position, after.player.aim, RIFLE).position);
+  expect(after.bullets[0]?.position).toEqual(
+    fireBullet("player", {from: after.player.position, aim: after.player.aim, weapon: RIFLE}).position,
+  );
 });
 
 // The player starts at (7.5, 4.5) facing east; four tiles east of that is a dummy on the same row.
@@ -425,4 +430,193 @@ it("lets the switch land first when it is asked for with a reload, so the reload
 
   expect(after.player.equippedIndex).toBe(1);
   expect(after.player.reloadRemainingSeconds).toBe(MARKSMAN_RIFLE.reloadSeconds);
+});
+
+// The opponent stands four tiles east of the player on the same row, in the open. A sparring opponent has no rounds and
+// no reserve, so it can be shot at without shooting back.
+function sparring(): World {
+  return disarmOpponent(startingWorld(arena, [], {x: 11.5, y: 4.5}));
+}
+
+// The same, with the opponent armed as it starts a match.
+function duel(): World {
+  return startingWorld(arena, [], {x: 11.5, y: 4.5});
+}
+
+function opponentOf(world: World): Player {
+  const {opponent} = world;
+  if (!opponent) {
+    throw new Error("The world has no opponent.");
+  }
+
+  return opponent;
+}
+
+it("hurts the opponent the player shoots at, by the damage of the weapon", () => {
+  const after = shoot(sparring(), 1, 30);
+
+  expect(opponentOf(after).health).toBe(OPPONENT_HEALTH - RIFLE.bulletDamage);
+});
+
+it("does not hurt the opponent who is not in the line of fire", () => {
+  const aside = startingWorld(arena, [], {x: 11.5, y: 7});
+
+  expect(opponentOf(shoot(aside, 1, 30)).health).toBe(OPPONENT_HEALTH);
+});
+
+it("leaves the player unhurt by their own shots", () => {
+  expect(shoot(sparring(), 60, 30).player.health).toBe(PLAYER_HEALTH);
+});
+
+it("stops the opponent's health at zero", () => {
+  const dead = shoot(sparring(), 180, 0);
+
+  expect(opponentOf(dead).health).toBe(0);
+});
+
+it("keeps the round playing while the opponent still has health", () => {
+  expect(shoot(sparring(), 1, 30).round).toBe("playing");
+});
+
+it("wins the round when the opponent runs out of health", () => {
+  expect(shoot(sparring(), 180, 0).round).toBe("won");
+});
+
+// An opponent's bullet is on the row of the player, two tiles to the east and flying west.
+function shotAtPlayer(playerHealth: number): World {
+  const world = sparring();
+  const bullet = {
+    position: {x: 9.5, y: 4.5},
+    direction: {x: -1, y: 0},
+    damage: RIFLE.bulletDamage,
+    speed: RIFLE.bulletSpeed,
+    shooter: "opponent",
+  } as const;
+
+  return {...world, player: {...world.player, health: playerHealth}, bullets: [bullet]};
+}
+
+it("hurts the player an opponent's bullet reaches, by that bullet's damage", () => {
+  const after = playTicks(shotAtPlayer(100), IDLE, 30);
+
+  expect(after.player.health).toBe(100 - RIFLE.bulletDamage);
+  expect(after.bullets).toEqual([]);
+});
+
+it("keeps the round playing while the player still has health", () => {
+  expect(playTicks(shotAtPlayer(100), IDLE, 30).round).toBe("playing");
+});
+
+it("loses the round when the player runs out of health", () => {
+  const after = playTicks(shotAtPlayer(RIFLE.bulletDamage), IDLE, 30);
+
+  expect(after.player.health).toBe(0);
+  expect(after.round).toBe("lost");
+});
+
+it("never ends a round with no opponent in it", () => {
+  expect(shoot(centred(), 60, 60).round).toBe("playing");
+});
+
+it("freezes the world once the round is over, but lets the clock run", () => {
+  const won = shoot(sparring(), 180, 0);
+  const after = step(won, {...firingAt(EAST), direction: {x: 0, y: 1}, reload: true, switchTo: 2}, TICK);
+
+  expect(after.player).toEqual(won.player);
+  expect(after.bullets).toEqual(won.bullets);
+  expect(after.opponent).toEqual(won.opponent);
+  expect(after.round).toBe("won");
+  expect(after.elapsedSeconds).toBeCloseTo(won.elapsedSeconds + TICK, 9);
+});
+
+it("does not hurt anyone once the round is over, though bullets are still in the air", () => {
+  const lost = playTicks(shotAtPlayer(RIFLE.bulletDamage), IDLE, 30);
+  const another = {...lost, bullets: [{...shotAtPlayer(100).bullets[0], position: {x: 8.2, y: 4.5}}]} as World;
+  const after = playTicks(another, IDLE, 30);
+
+  expect(after.player.health).toBe(0);
+  expect(after.bullets).toEqual(another.bullets);
+});
+
+it("turns the opponent to face the player, wherever they stand", () => {
+  const world = duel();
+  const north = {...world, player: {...world.player, position: {x: 11.5, y: 7.5}}};
+  const after = step(north, IDLE, TICK);
+
+  expect(opponentOf(after).aim.x).toBeCloseTo(0, 9);
+  expect(opponentOf(after).aim.y).toBeCloseTo(1, 9);
+});
+
+it("keeps the opponent where it stands", () => {
+  const after = playTicks(duel(), IDLE, 60);
+
+  expect(opponentOf(after).position).toEqual({x: 11.5, y: 4.5});
+});
+
+it("has the opponent open fire at the start of a match, with a bullet marked as its own", () => {
+  const after = step(duel(), IDLE, TICK);
+
+  expect(after.bullets).toHaveLength(1);
+  expect(after.bullets[0]?.shooter).toBe("opponent");
+  expect(after.bullets[0]?.direction.x).toBeCloseTo(-1, 9);
+});
+
+it("spends a round of the opponent's own for each shot it fires", () => {
+  const after = step(duel(), IDLE, TICK);
+
+  expect(opponentOf(after).loadout[0]?.rounds).toBe(RIFLE.magazineSize - 1);
+  expect(after.player.loadout[0]?.rounds).toBe(RIFLE.magazineSize);
+});
+
+it("has the opponent hold its fire between bursts", () => {
+  const resting = {...duel(), elapsedSeconds: 1};
+
+  expect(step(resting, IDLE, TICK).bullets).toEqual([]);
+});
+
+const wallInTheMiddle = ["###############", ...Array.from({length: 7}, () => "#.....#.......#"), "###############"];
+
+it("has the opponent hold its fire when a wall stands between it and the player", () => {
+  const world = duel();
+  const behindWall = {
+    ...world,
+    player: {...world.player, position: {x: 1.5, y: 4.5}},
+    arena: arenaFrom(wallInTheMiddle),
+  };
+
+  expect(step(behindWall, IDLE, TICK).bullets).toEqual([]);
+});
+
+it("hurts a player who stands still in front of the opponent", () => {
+  const after = playTicks(duel(), IDLE, 60);
+
+  expect(after.player.health).toBeLessThan(PLAYER_HEALTH);
+});
+
+it("loses the round for a player who stands still long enough", () => {
+  const after = playTicks(duel(), IDLE, 300);
+
+  expect(after.player.health).toBe(0);
+  expect(after.round).toBe("lost");
+});
+
+it("has the opponent reload when it has run dry", () => {
+  const world = duel();
+  const dry = {
+    ...world,
+    elapsedSeconds: 1,
+    opponent: {...opponentOf(world), loadout: opponentOf(world).loadout.map(carried => ({...carried, rounds: 0}))},
+  };
+
+  expect(opponentOf(step(dry, IDLE, TICK)).reloadRemainingSeconds).toBeDefined();
+});
+
+it("does not let the opponent fire while it reloads", () => {
+  const world = duel();
+  const dry = {
+    ...world,
+    opponent: {...opponentOf(world), loadout: opponentOf(world).loadout.map(carried => ({...carried, rounds: 0}))},
+  };
+
+  expect(step(dry, IDLE, TICK).bullets).toEqual([]);
 });

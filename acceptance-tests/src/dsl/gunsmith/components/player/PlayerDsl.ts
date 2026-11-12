@@ -29,6 +29,24 @@ export class PlayerDsl {
     }
   }
 
+  /** How much health the player has left. */
+  async getHealth(): Promise<number> {
+    try {
+      return await this.player.getHealth();
+    } catch (error) {
+      throw new DslError("Failed to read the player's health", error);
+    }
+  }
+
+  /** Waits until the player has less health than `health`. */
+  async waitForHealthBelow(health: number): Promise<void> {
+    try {
+      await this.player.waitForHealthBelow(health);
+    } catch (error) {
+      throw new DslError(`Failed to see the player drop below ${health} health`, error);
+    }
+  }
+
   /** Where the player's centre is, in tiles. */
   async getPosition(): Promise<Point> {
     try {

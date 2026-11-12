@@ -1,13 +1,14 @@
 import type {Bullet} from "@gunsmith/engine/bullet/types/Bullet";
-import type {Point} from "@gunsmith/engine/geometry/types/Point";
+import type {Shooter} from "@gunsmith/engine/bullet/types/Shooter";
+import type {ShotRequest} from "@gunsmith/engine/bullet/types/ShotRequest";
 import {PLAYER_RADIUS} from "@gunsmith/engine/player/PlayerRadius";
-import type {Weapon} from "@gunsmith/engine/weapon/types/Weapon";
 
-/** How far past the edge of the player's circle a bullet starts, so it never begins inside the one who fired it. */
+/** How far past the edge of the shooter's circle a bullet starts, so it never begins inside the one who fired it. */
 const MUZZLE_GAP = 0.1;
 
-/** A new bullet leaving a player at `from`, who is facing `aim`, from `weapon`: it has that weapon's damage and speed. */
-export function fireBullet(from: Point, aim: Point, weapon: Weapon): Bullet {
+/** A new bullet leaving `shooter`, who is facing `aim`, from `weapon`: it has that weapon's damage and speed. */
+export function fireBullet(shooter: Shooter, shot: ShotRequest): Bullet {
+  const {from, aim, weapon} = shot;
   const distance = PLAYER_RADIUS + MUZZLE_GAP;
 
   return {
@@ -15,5 +16,6 @@ export function fireBullet(from: Point, aim: Point, weapon: Weapon): Bullet {
     direction: {x: aim.x, y: aim.y},
     damage: weapon.bulletDamage,
     speed: weapon.bulletSpeed,
+    shooter,
   };
 }

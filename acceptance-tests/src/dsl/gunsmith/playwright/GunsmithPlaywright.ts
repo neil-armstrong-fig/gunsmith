@@ -13,6 +13,14 @@ export class GunsmithPlaywright extends BasePage {
     await expect(this.page.getByTestId("arena")).toHaveAttribute("data-ready", "true");
   }
 
+  async openDuel(): Promise<void> {
+    await this.openScenario("duel");
+  }
+
+  async openSparring(): Promise<void> {
+    await this.openScenario("sparring");
+  }
+
   async resizeWindowTo(size: Size): Promise<void> {
     await this.page.setViewportSize(size);
   }
@@ -31,5 +39,10 @@ export class GunsmithPlaywright extends BasePage {
     const {elapsedSeconds} = await this.readGameState();
 
     await this.waitForGameState(state => state.elapsedSeconds >= elapsedSeconds + seconds);
+  }
+
+  private async openScenario(scenario: string): Promise<void> {
+    await this.page.goto(`/?scenario=${scenario}`);
+    await expect(this.page.getByTestId("arena")).toHaveAttribute("data-ready", "true");
   }
 }

@@ -12,7 +12,7 @@ src/
   react/                     top layer: everything drawn, and the logic only one component uses, beneath that component
   store/                     middle layer: Zustand stores; may import game/ and the engine, never react/
     game/                    the game store: the engine's `World` and nothing else
-  game/                      bottom layer: plain data and logic (the practice arena), no React, no store
+  game/                      bottom layer: plain data and logic (the arenas and which match to open), no React, no store
 ```
 
 An import may only point down: `react/` → `store/` → `game/`. ESLint enforces it (`eslint.config.js`): `game/` may not
@@ -33,6 +33,8 @@ store/game/
     select-ammo-readout/       a reactive selector for components
       SelectAmmoReadout.ts, SelectAmmoReadout.test.ts
       types/AmmoReadout.ts
+    select-player-health/      the player's health, a plain number
+    select-round/              where the round stands, a plain string
     game-state/                `gameState()`, the one-off read for `useFrame`
       GameState.ts
 ```
@@ -60,7 +62,13 @@ selector and `useShallow`: `useGameStore(useShallow(selectAmmoReadout))` re-rend
 is a few times a second at most. A per-frame value is never bound to a component (react-three-fiber's own guidance: state
 managers are fine for updates that are not rapid). The decision and its sources are in `docs/state-management.md`.
 
-The HUD is plain React over the canvas (`react/components/dom/ammo-hud/`), styled with Tailwind and the `--color-gs-*` tokens. Anything
+**Which match opens** is chosen once, from the page's query (`game/scenario/`): none is the practice range with its dummies,
+`?scenario=duel` is the duel (an opponent who shoots back), `?scenario=sparring` the same arena with an opponent who cannot
+shoot. It is a selector only, never a way to write state; it goes when a menu picks the match. `worldOfScenario` builds the
+world and is also what "Play again" puts in the store.
+
+The HUD is plain React over the canvas (`react/components/dom/ammo-hud/`, `health-hud/`, and the `round-banner/` overlay that
+appears when a round is won or lost), styled with Tailwind and the `--color-gs-*` tokens. Anything
 animated on a timer (the reload fill) is a CSS animation, so React never sees a per-frame value.
 
 ## Folders inside `react/`

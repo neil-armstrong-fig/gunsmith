@@ -12,6 +12,8 @@ export interface Player {
   loadout: readonly CarriedWeapon[];
   /** Which weapon in `loadout` is in hand (an index, so slot 1 is 0). */
   equippedIndex: number;
+  /** What is left; at zero the fighter is out of the round. */
+  health: number;
   /** How long until the reload of the weapon in hand is done; absent when it is not being reloaded. */
   reloadRemainingSeconds?: number | undefined;
 }

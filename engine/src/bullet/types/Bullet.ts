@@ -1,8 +1,9 @@
+import type {Shooter} from "@gunsmith/engine/bullet/types/Shooter";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
 
 /**
  * A shot in flight. It is a point: it moves at its own `speed` along `direction`, takes its own `damage` off what it
- * hits, and is gone when it touches a wall or a dummy. Both come from the weapon that fired it.
+ * hits, and is gone when it touches a wall, a dummy or the fighter on the other side. Damage and speed come from the weapon that fired it.
  */
 export interface Bullet {
   position: Point;
@@ -12,4 +13,6 @@ export interface Bullet {
   damage: number;
   /** How fast it flies, in tiles per second. */
   speed: number;
+  /** Whose it is: it hurts the other side, never its own. */
+  shooter: Shooter;
 }

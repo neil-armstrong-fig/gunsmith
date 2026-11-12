@@ -137,6 +137,37 @@ interface. Build implements the schema and renderer; AI reviews generation/eval 
 
 Newest first. One line each: date, who, what, where.
 
+- 2026-11-12, `build`: **Health, a scripted opponent and a round win, test first (slices 1 and 2 of 3).** `engine/` gains
+  `health/`, `round/` (`playing | won | lost`), `opponent/` (a brain that returns an `Input`, so the opponent is played by the
+  same rules as the player: it faces the player, fires 0.5 s bursts every 2 s while no wall is between them, reloads when dry)
+  and `game-loop/fighter/` (both fighters share `PrepareFighter` and `ShootFighter`); a `Bullet` carries its `shooter` and
+  `advanceBullets` returns the damage that landed on each fighter; a finished round freezes the world but not the clock. The
+  state hook's snapshot (`shared/src/state-hook/types/`) gained the player's `health`, `opponent` (`x`, `y`, `health`) and
+  `round`. The page picks its match from the query: none is the practice range (no opponent, so the 43 old specs are
+  unchanged), `?scenario=duel` the armed opponent, `?scenario=sparring` the same arena with one that cannot shoot (a
+  temporary seam until a menu chooses). New DOM: `health-hud/` and a `round-banner/` overlay with a "Play again" button. New
+  specs `BeatingTheOpponent`, `FightingBack`, `HealthOnTheScreen`; DSL `gunsmith.opponent`, `gunsmith.round`,
+  `startDuel`/`startSparring`. 284 engine, 82 webapp, 55 acceptance (new ones pass at `--repeat-each=10`); `pnpm checks`
+  green; 28 + 31 engine, 17 webapp and 11 browser mutants killed. Slice 3 (a simple opponent AI: a small state machine, planned with a web search first) is next. No contract changed;
+  nothing for `ai` or `art` to wire (the opponent is a disc, no manifest key yet). Uncommitted, for the user's review.
+
+- 2026-11-12, `art`: **TypeScript/Node audio regeneration**, user-approved `node-web-audio-api@2.2.0` (dev only).
+  Replaced the Python sources with native Web Audio graphs under `docs/art/concepts/audio/src/`; regenerated all 14 WAVs
+  (same 13 candidate mappings as audition 01, plus mixed audition), measurements and listening guide. The private
+  `@gunsmith/audio-studies` tooling workspace reuses shared config and runs in `pnpm checks`; root changes register
+  its path, pin the approved dependency and update the lockfile. No game-runtime/schema/manifest change. Command:
+  `pnpm --filter @gunsmith/audio-studies render`. Test watched red first, all 3 header/crouch/determinism mutants killed;
+  final `pnpm checks` green (274 engine, 78 webapp, 1 audio integration test), including native decoding and repeatability.
+  Fresh listening review, full tracks, variants and production encoding remain pending; no browser gameplay suite run.
+
+- 2026-11-12, `build`: **Webapp folder pass, at the user's direction.** Components now sit in `react/components/dom/<name>/`
+  or `react/components/three/<name>/` (the canvas host `arena-canvas` is `three/`; below a top-level component, children share
+  its kind and are flat). `currentWorld()` is now `gameState()`. The game store keeps `UseGameStore.ts` at the top and its
+  reads in `store/game/selectors/<name>/` folders (`select-ammo-readout/`, `game-state/`). A blank line goes between sibling
+  JSX elements, DOM and r3f alike, written up in the new `webapp/src/react/AGENTS.md` (which the root file already pointed
+  to). Eight pressed-together siblings fixed. `pnpm checks` green, 43 acceptance specs green. No contract changed; nothing
+  for `ai` or `art` to wire. Next for `build`: health, a scripted opponent and a round win (`TODO-build.md`).
+
 - 2026-11-12, `build`: **Zustand replaces the planned Redux, and the ammo HUD is plain React.** Redux was never installed;
   `zustand` 5.0.16 (the version react-three-fiber already uses; 5.1.0 was under seven days old) is the one state library.
   `webapp/src` is now `react/` → `store/` → `game/`, enforced by ESLint. The game store (`store/game/`) holds the engine's
@@ -155,6 +186,11 @@ Newest first. One line each: date, who, what, where.
   Technical WAV/repeat/reproducibility checks pass; `pnpm checks` passes (193 engine, 62 webapp tests); no browser gameplay
   acceptance run for this offline art delivery. Listening not signed off.
 
+- 2026-11-12, `ai`: **user ruling on shields and armour, for `build` and `art`:** no standalone shields or armour, but the weapon
+  itself may be a shield that has a direction and could reflect bullets, if defined correctly. Moderation now accepts shields as
+  weapons and rejects worn armour (4 eval cases, `evals:local` 21 of 21, mutation-proved; `ai/` worktree, uncommitted). Nothing
+  else changed: a shield that reflects bullets is a behaviour class the engine, the weapon schema and `art`'s visual grammar do not
+  have, so add it to the behaviour vocabulary when the weapon schema is drafted. Not a contract change; no money spent.
 - 2026-11-12, `ai`: **loop 1b done: moderation probed with 46 borderline requests** (in the `ai/` worktree, uncommitted).
   One real failure (weapon keywords round an off-topic ask) became a case and a one-sentence prompt fix; removing it makes that
   case fall; local evals 18 of 18, root `pnpm checks` exits 0. The "say no" rule and data-block paragraph remain unproven on

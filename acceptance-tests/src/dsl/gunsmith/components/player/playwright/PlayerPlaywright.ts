@@ -24,6 +24,17 @@ export class PlayerPlaywright extends BasePage {
     await this.page.keyboard.up(KEY_FOR[heading]);
   }
 
+  async getHealth(): Promise<number> {
+    const {player} = await this.readGameState();
+
+    return player.health;
+  }
+
+  /** Waits until the player has less health than `health`. */
+  async waitForHealthBelow(health: number): Promise<void> {
+    await this.waitForGameState(({player}) => player.health < health);
+  }
+
   async getPosition(): Promise<Point> {
     const {player} = await this.readGameState();
 

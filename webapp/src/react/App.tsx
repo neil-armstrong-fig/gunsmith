@@ -1,4 +1,6 @@
 import {AmmoHud} from "@src/react/components/dom/ammo-hud/AmmoHud";
+import {HealthHud} from "@src/react/components/dom/health-hud/HealthHud";
+import {RoundBanner} from "@src/react/components/dom/round-banner/RoundBanner";
 import {ArenaCanvas} from "@src/react/components/three/arena-canvas/ArenaCanvas";
 import type {JSX} from "react";
 
@@ -9,6 +11,10 @@ export function App(): JSX.Element {
       <ArenaCanvas />
 
       <AmmoHud />
+
+      <HealthHud />
+
+      <RoundBanner />
     </>
   );
 }

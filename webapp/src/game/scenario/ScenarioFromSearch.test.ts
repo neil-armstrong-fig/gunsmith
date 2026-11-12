@@ -1,0 +1,25 @@
+import {scenarioFromSearch} from "@src/game/scenario/ScenarioFromSearch";
+
+it("asks for the practice range when the query is empty", () => {
+  expect(scenarioFromSearch("")).toBe("practice");
+});
+
+it("asks for the duel when the query says so", () => {
+  expect(scenarioFromSearch("?scenario=duel")).toBe("duel");
+});
+
+it("finds the scenario among other parameters", () => {
+  expect(scenarioFromSearch("?a=1&scenario=duel&b=2")).toBe("duel");
+});
+
+it("falls back to the practice range for a scenario it does not know", () => {
+  expect(scenarioFromSearch("?scenario=chess")).toBe("practice");
+});
+
+it("asks for the practice range when it is named", () => {
+  expect(scenarioFromSearch("?scenario=practice")).toBe("practice");
+});
+
+it("asks for the sparring match when the query says so", () => {
+  expect(scenarioFromSearch("?scenario=sparring")).toBe("sparring");
+});

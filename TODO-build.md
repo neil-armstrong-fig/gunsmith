@@ -32,12 +32,24 @@ Both are withdrawn until the game is fun (`HANDOFF.md` delivery log, 2026-11-12)
 ### Where things stand (end of the 2026-11-12 sessions)
 
 The player walks (WASD, walls stop them), aims with the mouse and clicks to fire bullets that die on walls or on one of
-three practice dummies, which are removed at zero health, all in a full-screen arena. The player carries two weapons (keys
+three practice dummies, which are removed at zero health, all in a full-screen arena. **There is now a duel** (`?scenario=duel`,
+2026-11-12): a scripted opponent who faces the player and shoots bursts when no wall is between them, a health HUD, and a
+round that is won or lost with a "Play again" overlay. `?scenario=sparring` is the same arena with an opponent who cannot
+shoot; the practice range (no query) has no opponent, so the old specs are unchanged. The player carries two weapons (keys
 1 and 2): a rifle (25 damage, 12 rounds) and a marksman rifle (50 damage, 5 rounds); R reloads, shots spend rounds, and the
 ammunition shows in a plain-React HUD (`react/components/dom/ammo-hud/`). Four packages: `webapp/`, `engine/`, `acceptance-tests/`, `shared/` (tool
-config plus the state-hook snapshot types). `pnpm checks` is green: engine 193 unit tests, webapp 62, and 43 acceptance
-specs (the weapon and dummy specs pass 150 of 150 at `--repeat-each=10`). Every spec and unit test has been mutation-proved. Read `engine/AGENTS.md`, `webapp/AGENTS.md` and
-`acceptance-tests/AGENTS.md` first.
+config plus the state-hook snapshot types). `pnpm checks` is green: engine 284 unit tests, webapp 82, and 55 acceptance
+specs (the weapon, HUD, dummy, sparring and duel specs pass at `--repeat-each=10`). Every spec and unit test has been mutation-proved. Read
+`engine/AGENTS.md`, `webapp/AGENTS.md`, `webapp/src/react/AGENTS.md` and `acceptance-tests/AGENTS.md` first.
+
+**The webapp's shape (settled with the user, 2026-11-12).** State is Zustand only (`docs/state-management.md`). Layers run
+`react/` → `store/` → `game/`, lint-enforced. `store/game/` is the game store: `UseGameStore.ts` at the top (the slice-like
+file, state `{world, setWorld}` and nothing else, pinned by a test and a lint allow-list), reads in
+`selectors/<name>/` folders (`select-ammo-readout/`, `game-state/`). Components live in `react/components/dom/<name>/` or
+`react/components/three/<name>/`; `three/arena-canvas/` hosts the `<Canvas>`, and everything beneath a top-level component
+shares its kind, flat. JSX gets a blank line between sibling elements, DOM and r3f alike. The loop writes the world once a
+frame; `useFrame` reads it with `gameState()`; the ammo HUD (`dom/ammo-hud/`) reads a selector with `useShallow`. A new
+state-bearing feature (health, the round) goes into the engine's `World` first, and the HUD reads it through a new selector.
 
 **Starting a session.** Run `ps -axo command | grep -c "[p]ermission-prompt-tool"` (macOS `pgrep -a` does not show
 arguments) and `lsof -i :3100` before starting a server. Re-read a shared doc right before editing it; other sessions
@@ -75,6 +87,9 @@ scripted opponent). `fast-check` is deferred at the user's request.
   (`FiringAShot` checks `bullets.count()` is 0 after `waitForNoBullets`). Mutate the helper to prove it.
 - **Chained `fire()` clicks inside the 0.2 s cool-down are swallowed**: to shoot repeatedly, `startFiring()` (hold the
   button) and wait on game state, never on a count of clicks.
+- **zsh and globs:** `grep --include=*.md` fails with "no matches found" because zsh expands the glob. Quote it
+  (`--include='*.md'`) or walk the tree in Python. The user also stages changes in their editor, so `git status` shows `A`/`M`
+  in the first column for your work: that is theirs, and you still never write to the index.
 - **Mutation scripts** live in the scratchpad and are gone with the session; the shape that worked: back the file up, apply
   one replacement that must match exactly once, grep that it landed, run the tests, restore from the backup. One file per
   call; Python, not `sed -i`. **Check that the runner can fail before trusting it:** `vitest --reporter=json` writes to a
@@ -145,7 +160,45 @@ RNG, no `Date.now()` or `Math.random()`. The webapp renders it and sends input.
         mutants, 17 of 17 browser mutants (each by the right spec). Not covered by a spec, only by engine unit tests: firing
         while reloading, and an empty reserve leaving a reload with nothing to do. The specs were written after the webapp
         wiring, so they were proved by mutation, not watched red first.
-  - [ ] **Next:** health, and a scripted opponent that wanders and shoots; a hit; a round win.
+  - [x] Health, a scripted opponent and a round win (2026-11-12; slices 1 and 2). `BeatingTheOpponent` (sparring: a hit
+        lowers the opponent's health, shooting it to zero wins the round and shows "You won", "Play again" starts a fresh
+        round), `FightingBack` (duel: the opponent's shots take the player's health, standing still loses the round, "You
+        lost") and `HealthOnTheScreen` (the HUD matches the game's own account). Engine: `health/`, `round/`, `opponent/`
+        (`OpponentInput` brain, `burst/`, `sight/HasClearLine`, `DisarmOpponent`), `game-loop/fighter/` (both fighters go
+        through `PrepareFighter` and `ShootFighter`), `Bullet.shooter`, damage to each fighter returned by `advanceBullets`.
+        Decisions (stated, to be set by play): both start at 100 health and the opponent carries the player's weapons with
+        finite ammunition and reloads when dry; its aim is exact (no error yet), bursts are 0.5 s on and 1.5 s off; both
+        falling in one step loses; a finished round freezes everything but the clock. Mutation: 28 + 31 engine, 17 webapp
+        unit and 11 browser mutants killed by the right tests; survivors were equivalent (`disarmOpponent` twice is
+        idempotent), and one real gap (`HasClearLine` with a flipped y direction) was closed with steep-angle tests. Not
+        covered by a spec: the opponent disc's drawing and the health bar's width (CSS), like the reload fill.
+  - [ ] **Next: give the opponent a simple AI** (slice 3; replaces "it wanders"). The point is a bot that is somewhat
+        engaging to test weapons and maps against, not a clever one. **Start in plan mode, and do a web search first** for very
+        simple shooter-bot AI (finite state machines in arena shooters, simple bot behaviours for top-down 2D games, cheap
+        tricks such as reaction delay, aim error, strafing and retreating to reload), then propose a design as stated defaults
+        to confirm, with the sources named. Keep it small. A starting sketch to test against what the search finds:
+        - **A handful of states, a finite state machine:** *wander* (walk to a random open floor point, re-pick on arrival or
+          after a few seconds), *engage* (it sees the player: turn, close to a good range for the weapon in its hand, strafe
+          sideways, fire in bursts), *reload* (break line of sight or back off, then reload). Maybe *search* (go to where it
+          last saw the player). Cut anything the search shows is not worth its cost.
+        - **Beatable and legible, not perfect:** a reaction delay before it opens fire, aim error that shrinks the closer it
+          is or the longer it has seen you, a cap on how often it changes its mind. The exact aim of slice 2 goes.
+        - **Weapon- and map-agnostic**, because it exists to test them: it reads range, fire interval and magazine from the
+          `Weapon` it holds, and picks waypoints from the arena's open floor with no hand-authored navigation. Steering is
+          straight lines that slide along walls; a grid pathfinder (BFS or A\*) only if the search or a playtest shows
+          pillars trap it, and then ask before adding any dependency (a hand-written one is a few dozen lines).
+        - **Deterministic:** the brain's memory (state, goal, timers, last-seen point) lives in `World`, plain data, and
+          randomness comes from a seeded generator whose seed lives in `World` too (a ~10-line mulberry32 in
+          `engine/random/`, no dependency; `pure-rand` 8.4.2 was not checked for whether its state is plain data). Same seed and
+          inputs, same world, so a match replays and the server and client agree. `Math.random` only in the webapp, to
+          pick a seed per page load.
+        - **Difficulty is a few named tunables** (reaction seconds, aim error, preferred range, burst length), one constant
+          each, so a weapon or a map can be tried against an easier or harder bot.
+        - **Tests:** engine unit tests carry exact behaviour per state and the transitions between them (each state entered
+          and left for the right reason, mutation-proved). Acceptance specs assert properties only (it moves, it comes at you
+          when it sees you, it takes cover to reload, it hurts a player who stands still), because Playwright's timing
+          decides how many ticks pass between actions. Sparring stays a still, unarmed target (the win specs aim at where it
+          stands); give the duel's "lost" wait a longer timeout.
   - [ ] Best of three.
   - [ ] Dim arena outside a detailed forward cone, set by equipped weapon and standing/crouched stance. Rotate it
         with aim through 360°; reveal terrain detail and players/items only in the unoccluded cone. Three height levels

@@ -73,13 +73,15 @@ for build's manifest. No runtime integration or generated-weapon synthesis belon
 
 User priority (2026-11-12): audio audition → full audio pack → top-down studies. Shared milestone order is unchanged.
 
-- [x] Confirm local audio output: Python standard-library synthesis produces original 48 kHz PCM WAVs without services,
-      dependencies, sampled material or model spend. Source is in `docs/art/concepts/audio/`.
+- [x] Confirm local audio output; now converted to TypeScript/Node and regenerated with the user-approved dev-only
+      `node-web-audio-api@2.2.0`. Source is in `docs/art/concepts/audio/src/`; no browser, Python, sampled material or model spend.
 - [x] First audition: two 15-second / eight-bar industrial electronic sketches at 128 BPM (driving match, calmer menu),
       all 11 effect candidates from `docs/art/audio.md`, a mixed audition, listening guide and technical measurements.
       These are concepts using planned names, not registered manifest keys or files wired into the game.
-- [x] Technical verification: 14 WAVs pass format/duration/headroom/boundary checks; music passes three-repeat seam
-      checks; re-render hashes match. `pnpm checks` passes (193 engine + 62 webapp tests). Listening remains separate.
+- [x] Technical verification: 14 WAVs pass format/duration/headroom/decode checks; music passes three-repeat seams;
+      re-render hashes match. A test-first Node integration test now covers the art tool; fresh listening remains separate.
+- [x] Migration verified: all three header/crouch/determinism mutants killed; final `pnpm checks` green
+      (274 engine tests, 78 webapp tests, 1 audio integration test). Shared config reused in the art tooling workspace.
 - [ ] Listening review: three repeats of both music sketches, cue identity, fatigue and masking on headphones/speakers.
       Numerical continuity is checked; perceived quality is not signed off.
 - [ ] Refine the mix/effects, add footstep variants; recheck combat masking with build's generated weapon-shot synth.

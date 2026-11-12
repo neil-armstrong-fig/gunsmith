@@ -4,4 +4,6 @@ export interface PlayerSnapshot {
   y: number;
   /** The way the player faces, in degrees: 0 is east, 90 is north, and it runs from -180 to 180. */
   aimDegrees: number;
+  /** What is left; at zero the round is lost. */
+  health: number;
 }

@@ -4,7 +4,9 @@ import {ArenaDsl} from "@src/dsl/gunsmith/components/arena/ArenaDsl";
 import {BulletsDsl} from "@src/dsl/gunsmith/components/bullets/BulletsDsl";
 import {DummiesDsl} from "@src/dsl/gunsmith/components/dummies/DummiesDsl";
 import {HudDsl} from "@src/dsl/gunsmith/components/hud/HudDsl";
+import {OpponentDsl} from "@src/dsl/gunsmith/components/opponent/OpponentDsl";
 import {PlayerDsl} from "@src/dsl/gunsmith/components/player/PlayerDsl";
+import {RoundDsl} from "@src/dsl/gunsmith/components/round/RoundDsl";
 import {WeaponDsl} from "@src/dsl/gunsmith/components/weapon/WeaponDsl";
 import {GunsmithPlaywright} from "@src/dsl/gunsmith/playwright/GunsmithPlaywright";
 import type {Size} from "@src/dsl/gunsmith/types/Size";
@@ -19,6 +21,8 @@ export class GunsmithDsl {
   readonly dummies: DummiesDsl;
   readonly weapon: WeaponDsl;
   readonly hud: HudDsl;
+  readonly opponent: OpponentDsl;
+  readonly round: RoundDsl;
 
   constructor(page: Page) {
     this.gunsmith = new GunsmithPlaywright(page);
@@ -29,6 +33,8 @@ export class GunsmithDsl {
     this.dummies = new DummiesDsl(page);
     this.weapon = new WeaponDsl(page);
     this.hud = new HudDsl(page);
+    this.opponent = new OpponentDsl(page);
+    this.round = new RoundDsl(page);
   }
 
   /** Opens the game and waits until the arena is on screen. */
@@ -38,6 +44,24 @@ export class GunsmithDsl {
       await this.gunsmith.open();
     } catch (error) {
       throw new DslError("Failed to open the game", error);
+    }
+  }
+
+  /** Opens the duel in place of the practice range: the player and one opponent in an arena. */
+  async startDuel(): Promise<void> {
+    try {
+      await this.gunsmith.openDuel();
+    } catch (error) {
+      throw new DslError("Failed to open the duel", error);
+    }
+  }
+
+  /** Opens a sparring match: the duel's arena, with an opponent who stands and takes it and never shoots. */
+  async startSparring(): Promise<void> {
+    try {
+      await this.gunsmith.openSparring();
+    } catch (error) {
+      throw new DslError("Failed to open the sparring match", error);
     }
   }
 

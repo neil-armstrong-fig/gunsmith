@@ -1,0 +1,33 @@
+import {beforeEach, expect, given, then, when} from "@src/acceptance-criteria-mapping/AcceptanceCriteriaMapping";
+
+given("a duel has just begun", () => {
+  beforeEach(async ({gunsmith}) => {
+    await gunsmith.startDuel();
+  });
+
+  when("the player stands still in front of the opponent", () => {
+    then("the opponent's shots take health off the player", async ({gunsmith}) => {
+      const fullHealth = await gunsmith.player.getHealth();
+
+      await gunsmith.player.waitForHealthBelow(fullHealth);
+
+      expect(await gunsmith.player.getHealth()).toBeLessThan(fullHealth);
+      expect(await gunsmith.round.getState()).toBe("playing");
+    });
+
+    then("the opponent is not hurt by its own shots", async ({gunsmith}) => {
+      const fullHealth = (await gunsmith.opponent.get()).health;
+
+      await gunsmith.player.waitForHealthBelow(await gunsmith.player.getHealth());
+
+      expect((await gunsmith.opponent.get()).health).toBe(fullHealth);
+    });
+
+    then("the round is lost in the end, and the screen says so", async ({gunsmith}) => {
+      await gunsmith.round.waitForState("lost");
+
+      expect(await gunsmith.player.getHealth()).toBe(0);
+      expect(await gunsmith.round.getBannerMessage()).toBe("You lost");
+    });
+  });
+});

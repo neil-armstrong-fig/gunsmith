@@ -19,7 +19,14 @@ const SPEED = 20;
 const DAMAGE = 25;
 
 function bulletAt(x: number, y: number, directionX: number, directionY: number, changes: Partial<Bullet> = {}): Bullet {
-  return {position: {x, y}, direction: {x: directionX, y: directionY}, damage: DAMAGE, speed: SPEED, ...changes};
+  return {
+    position: {x, y},
+    direction: {x: directionX, y: directionY},
+    damage: DAMAGE,
+    speed: SPEED,
+    shooter: "player",
+    ...changes,
+  };
 }
 
 it("moves a bullet along its direction at the bullet speed", () => {
@@ -218,4 +225,191 @@ it("does not change the dummies it was given", () => {
   fly([bulletAt(1.5, 1.5, 1, 0)], dummies, 0.1);
 
   expect(dummies).toEqual(before);
+});
+
+// The fighters below have a radius of 0.4 (`PLAYER_RADIUS`). The player's bullets can hurt the opponent and the dummies,
+// the opponent's bullets can hurt the player, and neither side's bullets hurt their own.
+
+const OPPONENT_SHOT: Partial<Bullet> = {shooter: "opponent"};
+
+it("hurts the opponent that a player's bullet reaches, and uses the bullet up", () => {
+  const flight = advanceBullets(hall, {
+    bullets: [bulletAt(1.5, 1.5, 1, 0)],
+    dummies: [],
+    opponentPosition: {x: 3.5, y: 1.5},
+    seconds: 0.1,
+  });
+
+  expect(flight.opponentDamage).toBe(DAMAGE);
+  expect(flight.playerDamage).toBe(0);
+  expect(flight.bullets).toEqual([]);
+});
+
+it("hurts the player that an opponent's bullet reaches, and uses the bullet up", () => {
+  const flight = advanceBullets(hall, {
+    bullets: [bulletAt(1.5, 1.5, 1, 0, OPPONENT_SHOT)],
+    dummies: [],
+    playerPosition: {x: 3.5, y: 1.5},
+    seconds: 0.1,
+  });
+
+  expect(flight.playerDamage).toBe(DAMAGE);
+  expect(flight.opponentDamage).toBe(0);
+  expect(flight.bullets).toEqual([]);
+});
+
+it("does no damage when nobody is there to be hit", () => {
+  const flight = advanceBullets(hall, {bullets: [bulletAt(1.5, 1.5, 1, 0)], dummies: [], seconds: 0.1});
+
+  expect(flight.playerDamage).toBe(0);
+  expect(flight.opponentDamage).toBe(0);
+});
+
+it("lets a player's bullet pass through the player", () => {
+  const flight = advanceBullets(hall, {
+    bullets: [bulletAt(1.5, 1.5, 1, 0)],
+    dummies: [],
+    playerPosition: {x: 1.7, y: 1.5},
+    seconds: 0.01,
+  });
+
+  expect(flight.playerDamage).toBe(0);
+  expect(flight.bullets).toHaveLength(1);
+});
+
+it("lets an opponent's bullet pass through the opponent", () => {
+  const flight = advanceBullets(hall, {
+    bullets: [bulletAt(1.5, 1.5, 1, 0, OPPONENT_SHOT)],
+    dummies: [],
+    opponentPosition: {x: 1.7, y: 1.5},
+    seconds: 0.01,
+  });
+
+  expect(flight.opponentDamage).toBe(0);
+  expect(flight.bullets).toHaveLength(1);
+});
+
+it("lets an opponent's bullet pass through a dummy", () => {
+  const flight = fly([bulletAt(1.5, 1.5, 1, 0, OPPONENT_SHOT)], [dummyAt(3.5, 1.5)], 0.1);
+
+  expect(flight.dummies).toEqual([dummyAt(3.5, 1.5)]);
+  expect(flight.bullets).toHaveLength(1);
+});
+
+it("lets an opponent's bullet pass through where the opponent stands", () => {
+  const flight = advanceBullets(hall, {
+    bullets: [bulletAt(1.5, 1.5, 1, 0, OPPONENT_SHOT)],
+    dummies: [],
+    opponentPosition: {x: 3.5, y: 1.5},
+    seconds: 0.1,
+  });
+
+  expect(flight.opponentDamage).toBe(0);
+});
+
+it("hurts the opponent only if it is inside the radius, on either side of the path", () => {
+  const damageWhen = (y: number): number =>
+    advanceBullets(hall, {
+      bullets: [bulletAt(1.5, 1.5, 1, 0)],
+      dummies: [],
+      opponentPosition: {x: 3.5, y},
+      seconds: 0.1,
+    }).opponentDamage;
+
+  expect(damageWhen(1.89)).toBe(DAMAGE);
+  expect(damageWhen(1.11)).toBe(DAMAGE);
+  expect(damageWhen(1.91)).toBe(0);
+  expect(damageWhen(1.09)).toBe(0);
+});
+
+it("does not reach an opponent further than the bullet flies this step", () => {
+  const flight = advanceBullets(hall, {
+    bullets: [bulletAt(1.5, 1.5, 1, 0)],
+    dummies: [],
+    opponentPosition: {x: 3, y: 1.5},
+    seconds: 0.05,
+  });
+
+  expect(flight.opponentDamage).toBe(0);
+  expect(flight.bullets).toHaveLength(1);
+});
+
+it("does not hurt an opponent standing behind a wall", () => {
+  const flight = advanceBullets(hall, {
+    bullets: [bulletAt(1.5, 2.5, 1, 0)],
+    dummies: [],
+    opponentPosition: {x: 4.5, y: 2.5},
+    seconds: 0.2,
+  });
+
+  expect(flight.opponentDamage).toBe(0);
+  expect(flight.bullets).toEqual([]);
+});
+
+it("does not hurt the player standing behind a wall", () => {
+  const flight = advanceBullets(hall, {
+    bullets: [bulletAt(1.5, 2.5, 1, 0, OPPONENT_SHOT)],
+    dummies: [],
+    playerPosition: {x: 4.5, y: 2.5},
+    seconds: 0.2,
+  });
+
+  expect(flight.playerDamage).toBe(0);
+});
+
+it("hurts an opponent standing in front of a wall", () => {
+  const flight = advanceBullets(hall, {
+    bullets: [bulletAt(1.5, 2.5, 1, 0)],
+    dummies: [],
+    opponentPosition: {x: 2.3, y: 2.5},
+    seconds: 0.2,
+  });
+
+  expect(flight.opponentDamage).toBe(DAMAGE);
+});
+
+it("hurts only the dummy when the dummy is nearer than the opponent", () => {
+  const flight = advanceBullets(hall, {
+    bullets: [bulletAt(1.5, 1.5, 1, 0)],
+    dummies: [dummyAt(2.5, 1.5)],
+    opponentPosition: {x: 4.5, y: 1.5},
+    seconds: 0.2,
+  });
+
+  expect(flight.dummies[0]?.health).toBe(100 - DAMAGE);
+  expect(flight.opponentDamage).toBe(0);
+});
+
+it("hurts only the opponent when the opponent is nearer than the dummy", () => {
+  const flight = advanceBullets(hall, {
+    bullets: [bulletAt(1.5, 1.5, 1, 0)],
+    dummies: [dummyAt(4.5, 1.5)],
+    opponentPosition: {x: 2.5, y: 1.5},
+    seconds: 0.2,
+  });
+
+  expect(flight.dummies[0]?.health).toBe(100);
+  expect(flight.opponentDamage).toBe(DAMAGE);
+});
+
+it("adds up the damage of every bullet that lands on the opponent in the same step", () => {
+  const flight = advanceBullets(hall, {
+    bullets: [bulletAt(1.5, 1.5, 1, 0), bulletAt(1.5, 1.5, 1, 0, {damage: 50})],
+    dummies: [],
+    opponentPosition: {x: 3.5, y: 1.5},
+    seconds: 0.1,
+  });
+
+  expect(flight.opponentDamage).toBe(DAMAGE + 50);
+});
+
+it("adds up the damage of every bullet that lands on the player in the same step", () => {
+  const flight = advanceBullets(hall, {
+    bullets: [bulletAt(1.5, 1.5, 1, 0, OPPONENT_SHOT), bulletAt(1.5, 1.5, 1, 0, {...OPPONENT_SHOT, damage: 50})],
+    dummies: [],
+    playerPosition: {x: 3.5, y: 1.5},
+    seconds: 0.1,
+  });
+
+  expect(flight.playerDamage).toBe(DAMAGE + 50);
 });

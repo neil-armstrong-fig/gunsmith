@@ -1,14 +1,18 @@
 import {DUMMY_HEALTH} from "@gunsmith/engine/dummy/DummyHealth";
+import {OPPONENT_HEALTH} from "@gunsmith/engine/health/OpponentHealth";
+import {PLAYER_HEALTH} from "@gunsmith/engine/health/PlayerHealth";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
 import type {World} from "@gunsmith/engine/game-loop/types/World";
+import type {Player} from "@gunsmith/engine/player/types/Player";
 import {STARTING_LOADOUT} from "@gunsmith/engine/loadout/StartingLoadout";
 
 /**
- * A match about to begin: the player in the middle of the arena's centre tile, facing east, with the rifle in hand and
- * both weapons full, and a dummy at full health at each of `dummyPositions`.
+ * A match about to begin: the player in the middle of the arena's centre tile, facing east, with the rifle in hand,
+ * both weapons full and full health, a dummy at full health at each of `dummyPositions`, and, when `opponentPosition`
+ * is given, an opponent standing there at full health, facing west, with the same weapons. The round is under way.
  */
-export function startingWorld(arena: Arena, dummyPositions: readonly Point[] = []): World {
+export function startingWorld(arena: Arena, dummyPositions: readonly Point[] = [], opponentPosition?: Point): World {
   return {
     arena,
     player: {
@@ -17,9 +21,27 @@ export function startingWorld(arena: Arena, dummyPositions: readonly Point[] = [
       cooldownSeconds: 0,
       loadout: STARTING_LOADOUT,
       equippedIndex: 0,
+      health: PLAYER_HEALTH,
     },
+    opponent: opponentAt(opponentPosition),
     bullets: [],
     dummies: dummyPositions.map(position => ({position, health: DUMMY_HEALTH})),
     elapsedSeconds: 0,
+    round: "playing",
+  };
+}
+
+function opponentAt(position: Point | undefined): Player | undefined {
+  if (!position) {
+    return undefined;
+  }
+
+  return {
+    position,
+    aim: {x: -1, y: 0},
+    cooldownSeconds: 0,
+    loadout: STARTING_LOADOUT,
+    equippedIndex: 0,
+    health: OPPONENT_HEALTH,
   };
 }
