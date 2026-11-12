@@ -1,7 +1,7 @@
 import {FakeListChatModel} from "@langchain/core/utils/testing";
 import {Annotation, END, START, StateGraph} from "@langchain/langgraph";
-import {weaponProofSchema} from "@src/graph/WeaponProof";
-import type {WeaponProof} from "@src/graph/WeaponProof";
+import {weaponProofSchema} from "@gunsmith/ai/graph/WeaponProof";
+import type {WeaponProof} from "@gunsmith/ai/graph/WeaponProof";
 
 const FIXED_REPLY = JSON.stringify({name: "Proof Rifle", damage: 20, rateOfFire: 6});
 
@@ -10,7 +10,7 @@ const WeaponProofState = Annotation.Root({
   weapon: Annotation<WeaponProof | undefined>(),
 });
 
-// One node, no network: a fake model returns a fixed reply, which is `unknown` until zod has parsed it.
+/** One node, no network: a fake model returns a fixed reply, which is `unknown` until zod has parsed it. */
 export const weaponProofGraph = new StateGraph(WeaponProofState)
   .addNode("generate", generate)
   .addEdge(START, "generate")

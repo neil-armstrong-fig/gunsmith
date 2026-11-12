@@ -3,7 +3,7 @@ import type {EvalScore} from "@evals/types/EvalScore";
 
 const KEY = "outcomeMatches";
 
-// Did the pipeline create or reject, as the case expects? Cases that test a safety property accept either.
+/** Did the pipeline create or reject, as the case expects? Cases that test a safety property accept either. */
 export function outcomeMatches({evalCase, outcome}: EvalInput): EvalScore {
   if (evalCase.expectation === "either") {
     return {key: KEY, score: 1, comment: "either outcome is acceptable"};

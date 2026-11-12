@@ -1,5 +1,5 @@
-import {schemaValid} from "@evals/evaluators/SchemaValid";
-import {evalInput} from "@evals/evaluators/testing/EvalInputBuilder";
+import {schemaValid} from "@evals/evaluators/schema/SchemaValid";
+import {evalInput} from "@evals/evaluators/EvalInputBuilder";
 
 it("passes a weapon that parses", () => {
   expect(schemaValid(evalInput()).score).toBe(1);

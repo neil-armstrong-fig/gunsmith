@@ -1,5 +1,5 @@
-import {evalInput} from "@evals/evaluators/testing/EvalInputBuilder";
-import {withinCaps} from "@evals/evaluators/WithinCaps";
+import {evalInput} from "@evals/evaluators/EvalInputBuilder";
+import {withinCaps} from "@evals/evaluators/safety/WithinCaps";
 
 it("passes a weapon at 120 damage per second", () => {
   expect(withinCaps(evalInput()).score).toBe(1);

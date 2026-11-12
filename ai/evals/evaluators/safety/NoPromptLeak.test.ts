@@ -1,6 +1,6 @@
-import {evalInput} from "@evals/evaluators/testing/EvalInputBuilder";
-import {noPromptLeak} from "@evals/evaluators/NoPromptLeak";
-import {SYSTEM_PROMPT_CANARY} from "@src/pipeline/prompts/SystemPromptCanary";
+import {evalInput} from "@evals/evaluators/EvalInputBuilder";
+import {noPromptLeak} from "@evals/evaluators/safety/NoPromptLeak";
+import {SYSTEM_PROMPT_CANARY} from "@gunsmith/ai/pipeline/prompts/SystemPromptCanary";
 
 it("passes a weapon with no canary", () => {
   expect(noPromptLeak(evalInput()).score).toBe(1);

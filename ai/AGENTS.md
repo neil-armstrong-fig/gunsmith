@@ -3,13 +3,27 @@
 The LangChain / LangGraph pipeline that turns a player's words into a weapon or an arena, and the evals that steer it.
 Root `AGENTS.md` still applies. Why it runs inside the Worker: `docs/ai-hosting.md`. The pipeline's design: `docs/ai-pipeline.md`.
 
-## Layout
+## Layout and imports
 
-- `src/pipeline/` the pipeline (`generateWeapon(input, deps)`), one folder per node (`precheck/`, later `moderation/` ...). **Workers-safe:**
-  no Node-only APIs, and never import `@langchain/ollama` or `langsmith/vitest` (ESLint blocks it). Models arrive as `deps`.
-- `src/graph/` the first one-node proof (kept for `langgraph dev` and the Worker spike). `src/worker/` spike Workers.
-- `evals/` the evals. `types/`, `evaluators/` (pure, unit-tested in `pnpm checks`), `weapons/` (cases and the `*.eval.ts` runner),
-  `models/` (the three tiers), `reporting/`, `results/` (`*-latest.json` is git-ignored).
+Laid out like `engine/` (read its `AGENTS.md`): one folder per subject, entry points at the top, every interface and type
+alias in that folder's `types/`, a tunable constant in a file of its own, and a helper only one file uses in a subfolder beneath it.
+**One exception (the user, 2026-11-12): a type read off a runtime value lives in the same file as that value**, so the two cannot
+drift apart: a `z.infer` type beside its zod schema (`graph/WeaponProof.ts`), and an `as const` list beside the union derived
+from it (`pipeline/types/WeaponOutcome.ts`, `evals/models/types/EvalTier.ts`).
+
+**Imports.** `api/` will import this package as raw source (`exports: {"./*": "./src/*.ts"}`), so inside `src/` a file imports
+another by the package's own name, `@gunsmith/ai/pipeline/GenerateWeapon`, never an `@src` alias (it would resolve into
+`api/`'s tree). Checked 2026-11-12 to resolve in `tsc`, vitest, ESLint, `wrangler deploy --dry-run` (esbuild) and
+`langgraphjs dev`. `evals/` is imported by nobody, so it keeps its own `@evals/*` alias.
+
+- `src/pipeline/` the pipeline (`generateWeapon(input, deps)`), one subfolder per node (`precheck/`, later `moderation/` ...),
+  plus `limits/`, `prompts/` and `types/`. **Workers-safe:** no Node-only APIs, and never import `@langchain/ollama` or
+  `langsmith/vitest` (ESLint blocks it). Models arrive as `deps`.
+- `src/graph/` the first one-node proof (kept for `langgraph dev` and the Worker spike). `src/worker/` spike Workers
+  (`wrangler.jsonc`, `wrangler.trace.jsonc`).
+- `evals/` the evals: `evaluators/` (pure, unit-tested in `pnpm checks`; `outcome/`, `safety/`, `schema/`, the list in
+  `WeaponEvaluators.ts`), `weapons/` (cases and the `*.eval.ts` runner), `models/` (the three tiers), `reporting/`,
+  `types/`, `results/` (`*-latest.json` is git-ignored).
 
 ## Eval-driven development (the way work is done here, like ATDD but with evals)
 
@@ -22,9 +36,11 @@ Root `AGENTS.md` still applies. Why it runs inside the Worker: `docs/ai-hosting.
 
 ## Rules
 
-- **Few evals, each useful** (the user's rule): about 10 cases a suite or fewer. Add one only for a real failure.
+- **Suite size follows the research, not a cap** (Anthropic: 20 to 50 tasks from real failures is a great start; Focused: 7 to
+  start, 50 to 100 for production). Add a case only for a real or probed failure, never to pad. Tag every case `regression`
+  (near 100%, gates CI) or `capability` (a hill to climb). One deterministic evaluator per failure mode, no cap.
 - **Binary, deterministic evaluators first**, written independently of the code they check (the caps in `WithinCaps.ts` are not
-  imported from the pipeline). A model judge comes later, calibrated on about 10 labelled pairs.
+  imported from the pipeline). A model judge is **deferred** until a real failure needs one, then calibrated on about 50 human-rated examples.
 - **Local model facts (checked 2026-11-12, Ollama 0.40.16):** `qwen3.5:9b` answers a call in 0.3 to 1.1 s, peaks near 7.5 GiB. Its
   `format` (schema and JSON mode) fails with "structured output is unavailable". **Cause:** the model is not at fault; it is the
   Homebrew `ollama` formula, whose MLX runner (what the default NVFP4 tag uses; `ollama ps` shows `mlx`) is built without the
@@ -36,9 +52,14 @@ Root `AGENTS.md` still applies. Why it runs inside the Worker: `docs/ai-hosting.
   **Scores do not transfer between tiers.**
 - **Tracking is off by default** (`LANGSMITH_TEST_TRACKING=false`): eval traces share the free plan's 5,000 a month with
   production. Set `EVAL_TRACK=1` for a deliberate baseline run only.
+- **`ls.describe` in a `*.eval.ts` is not a unit-test `describe`.** It defines the LangSmith dataset and is how the wrapper
+  works, so the "no top-level `describe`" rule (root `AGENTS.md`) is for unit tests only. In an eval file, import `expect`
+  from `vitest` (the global one is shadowed inside `ls.test`). Unit tests, including the evaluators', stay flat `it(...)`.
 - Model output is `unknown` until zod has parsed it; the AI proposes, the engine disposes.
 - Schemas and caps here are **drafts** local to `ai/` until `build` freezes the contracts in `HANDOFF.md`; do not touch `shared/`.
 
 ## Commands
 
-`pnpm --filter @gunsmith/ai checks` (the gate), `... evals:fake`, `... evals:local`, `... evals:paid`, `... dev` (Agent Server and Studio).
+`pnpm --filter @gunsmith/ai checks` (the gate; 58 unit tests), `... evals:fake`, `... evals:local`, `... evals:paid`, `... dev` (Agent Server and Studio).
+Environment for the evals: `EVAL_TIER` (`fake`, `local`, `paid`), `EVAL_TRIALS` (runs per case; default 3 local, 1 otherwise),
+`EVAL_GATE=regression` (only `regression` cases fail the run; what CI will use), `EVAL_TRACK=1` (sync to LangSmith).

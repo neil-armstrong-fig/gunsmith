@@ -1,6 +1,6 @@
 import type {EvalInput} from "@evals/types/EvalInput";
 import type {EvalScore} from "@evals/types/EvalScore";
-import {weaponProofSchema} from "@src/graph/WeaponProof";
+import {weaponProofSchema} from "@gunsmith/ai/graph/WeaponProof";
 
 const KEY = "withinCaps";
 
@@ -8,7 +8,7 @@ const KEY = "withinCaps";
 // the pipeline rather than agreeing with it. `build`'s engine owns the real rating; replace this when it lands.
 const MAX_DAMAGE_PER_SECOND = 150;
 
-// The AI proposes, the engine disposes: whatever a model said, no created weapon may exceed the caps.
+/** The AI proposes, the engine disposes: whatever a model said, no created weapon may exceed the caps. */
 export function withinCaps({outcome}: EvalInput): EvalScore {
   if (outcome.status === "rejected") {
     return {key: KEY, score: 1, comment: "rejected, nothing to rate"};

@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
   "scripts": {
     "build": "pnpm checks",
     "checks": "pnpm lint && pnpm format:check && pnpm type-check && pnpm test",
@@ -18,13 +21,13 @@
     "evals:paid": "EVAL_TIER=paid vitest run --config vitest.evals.config.ts"
   },
   "dependencies": {
-    "@gunsmith/shared": "workspace:*",
     "@langchain/core": "catalog:",
     "@langchain/langgraph": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@eslint/js": "catalog:",
+    "@gunsmith/shared": "workspace:*",
     "@langchain/langgraph-cli": "catalog:",
     "@langchain/ollama": "catalog:",
     "@langchain/langgraph-sdk": "catalog:",

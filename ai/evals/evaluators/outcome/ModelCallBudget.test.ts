@@ -1,5 +1,5 @@
-import {evalInput} from "@evals/evaluators/testing/EvalInputBuilder";
-import {modelCallBudget} from "@evals/evaluators/ModelCallBudget";
+import {evalInput} from "@evals/evaluators/EvalInputBuilder";
+import {modelCallBudget} from "@evals/evaluators/outcome/ModelCallBudget";
 
 it("passes when the calls are within the allowance", () => {
   expect(modelCallBudget(evalInput({outcome: {modelCalls: 3}})).score).toBe(1);

@@ -3,7 +3,7 @@ import type {EvalScore} from "@evals/types/EvalScore";
 
 const KEY = "modelCallBudget";
 
-// A request may cost at most the model calls its case allows; a rejection that needs no model must cost none.
+/** A request may cost at most the model calls its case allows; a rejection that needs no model must cost none. */
 export function modelCallBudget({evalCase, outcome}: EvalInput): EvalScore {
   if (outcome.modelCalls <= evalCase.maxModelCalls) {
     return {key: KEY, score: 1};

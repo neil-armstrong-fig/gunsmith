@@ -1,4 +1,4 @@
-import {tokenPrecheck} from "@src/pipeline/precheck/TokenPrecheck";
+import {tokenPrecheck} from "@gunsmith/ai/pipeline/precheck/TokenPrecheck";
 
 it("accepts a short prompt", () => {
   expect(tokenPrecheck("a mild rifle", 150)).toEqual({accepted: true});

@@ -1,4 +1,4 @@
-import {weaponProofGraph} from "@src/graph/WeaponProofGraph";
+import {weaponProofGraph} from "@gunsmith/ai/graph/WeaponProofGraph";
 
 it("returns a weapon that passed the schema, without a network call", async () => {
   const result = await weaponProofGraph.invoke({prompt: "a mild rifle"});

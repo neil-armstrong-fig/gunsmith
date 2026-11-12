@@ -1,12 +1,12 @@
 import {FakeListChatModel} from "@langchain/core/utils/testing";
 import {ChatOllama} from "@langchain/ollama";
-import type {EvalTier} from "@evals/models/EvalTier";
-import type {WeaponPipelineDeps} from "@src/pipeline/types/WeaponPipelineDeps";
+import type {EvalTier} from "@evals/models/types/EvalTier";
+import type {WeaponPipelineDeps} from "@gunsmith/ai/pipeline/types/WeaponPipelineDeps";
 
 const LOCAL_BASE_URL = "http://127.0.0.1:11434";
 const LOCAL_MODEL = "qwen3.5:9b";
 
-// The models for one eval run. Only this file (and `ai/evals`) may import `@langchain/ollama`: `src/` is what the Worker bundles.
+/** The models for one eval run. Only this file (and `ai/evals`) may import `@langchain/ollama`: `src/` is what the Worker bundles. */
 export function createEvalModels(tier: EvalTier): WeaponPipelineDeps {
   if (tier === "fake") {
     return createFakeModels();

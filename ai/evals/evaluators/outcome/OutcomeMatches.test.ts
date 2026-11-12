@@ -1,5 +1,5 @@
-import {outcomeMatches} from "@evals/evaluators/OutcomeMatches";
-import {evalInput} from "@evals/evaluators/testing/EvalInputBuilder";
+import {outcomeMatches} from "@evals/evaluators/outcome/OutcomeMatches";
+import {evalInput} from "@evals/evaluators/EvalInputBuilder";
 
 it("passes when a created weapon was expected and created", () => {
   expect(outcomeMatches(evalInput()).score).toBe(1);
