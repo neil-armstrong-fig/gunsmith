@@ -16,7 +16,7 @@ another by the package's own name, `@gunsmith/ai/pipeline/GenerateWeapon`, never
 `api/`'s tree). Checked 2026-11-12 to resolve in `tsc`, vitest, ESLint, `wrangler deploy --dry-run` (esbuild) and
 `langgraphjs dev`. `evals/` is imported by nobody, so it keeps its own `@evals/*` alias.
 
-- `src/pipeline/` the pipeline (`generateWeapon(input, deps)`), one subfolder per node (`precheck/`, later `moderation/` ...),
+- `src/pipeline/` the pipeline (`generateWeapon(input, deps)`), one subfolder per node (`precheck/`, `moderation/`, later `generate/` ...),
   plus `limits/`, `prompts/` and `types/`. **Workers-safe:** no Node-only APIs, and never import `@langchain/ollama` or
   `langsmith/vitest` (ESLint blocks it). Models arrive as `deps`.
 - `src/graph/` the first one-node proof (kept for `langgraph dev` and the Worker spike). `src/worker/` spike Workers
@@ -47,6 +47,12 @@ another by the package's own name, `@gunsmith/ai/pipeline/GenerateWeapon`, never
   xgrammar library (Homebrew/homebrew-core issue 302645, open). GGUF tags (`-q4_K_M`) run on llama.cpp and are reported to
   support `format`; so does the official app or `ollama-binary` cask. Either way, ask for structure with
   `withStructuredOutput(schema, {method: "functionCalling"})`, always with `think: false`; it does not enforce the schema's limits.
+- **What moves the moderation score (measured 2026-11-12, loop 1b).** ~45 borderline probes against `qwen3.5:9b` found one real
+  failure, weapon words stuffed round an off-topic ask (now a case); the "say no" rule and the data-block paragraph changed no
+  verdict when deleted, because the property name `isWeaponRequest` carries most of the decision, so they are unproven defence in
+  depth (they may matter on Haiku; re-probe on the paid tier). Replacing the task and removing the "weapon words alone" sentence
+  both make evals fall. A case joins only from a probe that fails; probe with a throwaway `*.eval.ts` that writes to a file
+  (`console.log` is swallowed), and remember a probe run never "fails", so read its WRONG lines, not the exit code.
 - **Three tiers behind one `deps` argument:** `fake` (checks, free), `local` (Ollama `qwen3.5:9b`, free, the working loop),
   `paid` (Haiku 5.5, locked until the key and spend guard exist; total ceiling $1 for now, ask before raising it).
   **Scores do not transfer between tiers.**
@@ -60,6 +66,6 @@ another by the package's own name, `@gunsmith/ai/pipeline/GenerateWeapon`, never
 
 ## Commands
 
-`pnpm --filter @gunsmith/ai checks` (the gate; 58 unit tests), `... evals:fake`, `... evals:local`, `... evals:paid`, `... dev` (Agent Server and Studio).
+`pnpm --filter @gunsmith/ai checks` (the gate; 67 unit tests), `... evals:fake`, `... evals:local`, `... evals:paid`, `... dev` (Agent Server and Studio).
 Environment for the evals: `EVAL_TIER` (`fake`, `local`, `paid`), `EVAL_TRIALS` (runs per case; default 3 local, 1 otherwise),
 `EVAL_GATE=regression` (only `regression` cases fail the run; what CI will use), `EVAL_TRACK=1` (sync to LangSmith).

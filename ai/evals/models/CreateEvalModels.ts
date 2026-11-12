@@ -25,7 +25,9 @@ export function createEvalModels(tier: EvalTier): WeaponPipelineDeps {
 function createFakeModels(): WeaponPipelineDeps {
   return {
     generator: new FakeListChatModel({responses: [JSON.stringify({name: "Proof Rifle", damage: 20, rateOfFire: 6})]}),
-    moderator: new FakeListChatModel({responses: [JSON.stringify({isWeaponRequest: true})]}),
+    moderator: new FakeListChatModel({
+      responses: [JSON.stringify({isWeaponRequest: true, reason: "A weapon request."})],
+    }),
   };
 }
 
