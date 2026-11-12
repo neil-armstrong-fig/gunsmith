@@ -4,7 +4,7 @@ packages:
   - engine
   - shared
   - webapp
-  - docs/art/concepts/audio
+  - webapp/audio
 
 # Refuse `pnpm add` commands that would bypass an existing catalog version.
 catalogMode: strict

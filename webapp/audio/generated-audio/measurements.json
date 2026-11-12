@@ -1,0 +1,114 @@
+{
+  "sampleRate": 48000,
+  "sampleBits": 16,
+  "bpm": 128,
+  "duration": 15,
+  "key": "D minor",
+  "engine": "node-web-audio-api@2.2.0",
+  "seed": 8231,
+  "files": {
+    "sfx-pickup": {
+      "seconds": 0.38,
+      "channels": 1,
+      "peakDbfs": -5.68,
+      "rmsDbfs": -24.24,
+      "sha256": "ec52c4cd420fe504ef749d4beb95df0b839c53d256be8c5013eb73e080ef7cb4"
+    },
+    "sfx-drop": {
+      "seconds": 0.34,
+      "channels": 1,
+      "peakDbfs": -5.68,
+      "rmsDbfs": -24.01,
+      "sha256": "f68534049d49bfa1b68b682699bc82899baec3b98aa502542bc7beba548bac19"
+    },
+    "sfx-reload": {
+      "seconds": 0.82,
+      "channels": 1,
+      "peakDbfs": -5.68,
+      "rmsDbfs": -28.55,
+      "sha256": "fae3248b467102eee7ec5fe8e04b750e0e06890bcba8f8768a77fe07a6576705"
+    },
+    "sfx-hit": {
+      "seconds": 0.2,
+      "channels": 1,
+      "peakDbfs": -5.68,
+      "rmsDbfs": -25.22,
+      "sha256": "dab6e83a0cbb64fc1ad5e2224ab49b705acea3cf7535cf6949d7f44fc12eb820"
+    },
+    "sfx-death": {
+      "seconds": 1.35,
+      "channels": 1,
+      "peakDbfs": -5.68,
+      "rmsDbfs": -23.86,
+      "sha256": "efaf205ee20b77853c355e1b693dd1e1fc3bd34c60e637af58039ef8d5ca2dbe"
+    },
+    "sfx-ring-warning": {
+      "seconds": 2.8,
+      "channels": 1,
+      "peakDbfs": -5.68,
+      "rmsDbfs": -28.72,
+      "sha256": "c63de6aa28889fe8001c2728187fdc8f20306c641a92b170fa2bb8fcff1a877f"
+    },
+    "sfx-ui-click": {
+      "seconds": 0.065,
+      "channels": 1,
+      "peakDbfs": -5.68,
+      "rmsDbfs": -25.53,
+      "sha256": "b158f454736ac2785171737beffd93b05c294fda6b4a776aa91969eb4144ea2e"
+    },
+    "sfx-round-start": {
+      "seconds": 1.35,
+      "channels": 1,
+      "peakDbfs": -5.68,
+      "rmsDbfs": -26.67,
+      "sha256": "91a47f7535899c7c3d278dc42ddf112e3b4ff900100df47771e5f088bb4b9896"
+    },
+    "sfx-round-end": {
+      "seconds": 1.65,
+      "channels": 1,
+      "peakDbfs": -5.68,
+      "rmsDbfs": -26.38,
+      "sha256": "2b970fa89c17f1f3c041bd628ecc4ad39f1ea41a6a6acb5d2072c0ab99adbdc9"
+    },
+    "sfx-step-stand": {
+      "seconds": 0.24,
+      "channels": 1,
+      "peakDbfs": -6.75,
+      "rmsDbfs": -26.04,
+      "sha256": "1045fcf211591856b590ddb21a7c83e6a8b8c47662cbc6888cfb4d434a64e147"
+    },
+    "sfx-step-crouch": {
+      "seconds": 0.24,
+      "channels": 1,
+      "peakDbfs": -16.48,
+      "rmsDbfs": -34.92,
+      "sha256": "2627139f4efff8477abf1d5150e133e89e0e5d6cd010d594a9268217999983c6"
+    },
+    "music-loop-match": {
+      "seconds": 15,
+      "channels": 2,
+      "peakDbfs": -12.04,
+      "rmsDbfs": -30.93,
+      "sha256": "2e9fd220ce2e76388743a3e20573e33b3ec4e8edfd3df7ab54ccf8e7feadaafa",
+      "seamJumpDbfs": -90.31,
+      "threeRepeatsSeconds": 45
+    },
+    "music-loop-menu": {
+      "seconds": 15,
+      "channels": 2,
+      "peakDbfs": -12.04,
+      "rmsDbfs": -33.21,
+      "sha256": "8fdcd267c7c558bd0c800452e41bf1e1bf16b8b540938e6cdedd39c5e2fde94b",
+      "seamJumpDbfs": -180,
+      "threeRepeatsSeconds": 45
+    },
+    "audition-mix": {
+      "seconds": 15,
+      "channels": 2,
+      "peakDbfs": -4.18,
+      "rmsDbfs": -28.44,
+      "sha256": "ad63ade8022307cf0a135b3c6710c440aaa4834e03012945347fb410d5155462"
+    }
+  },
+  "listeningReview": "pending; regenerated with native Web Audio; measurements do not prove perceived quality"
+}

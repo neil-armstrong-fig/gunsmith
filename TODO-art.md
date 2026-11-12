@@ -3,8 +3,9 @@
 Your checklist. The shared path is `TODO.md`; read it and `TODO-build.md` and `TODO-ai.md` first, every fresh session
 (the sync protocol is at the top of `TODO.md`). Briefs are in `docs/art/`.
 
-Write **only** under the asset folders named in `HANDOFF.md` (`webapp/public/assets/`, `docs/art/`). No code, no schemas,
-no config. Style: clean flat vector, neon, geometric; blueprint touches suit the name. Desktop only.
+Work **only** under the folders named in `HANDOFF.md`: `webapp/public/assets/`, `docs/art/`, `webapp/audio/`.
+The user authorised audio generators and their local tool config under `webapp/audio/`; game-runtime code, schemas
+and shared config remain build-owned. Style: clean flat vector, neon, geometric; blueprint touches suit the name. Desktop only.
 
 ## Resume here after clearing context (2026-11-12)
 
@@ -30,7 +31,7 @@ contracts were withdrawn. Do not restore them or assume older schema paths still
 **Still open:** fixed modest defaults versus AI-selected weaknesses for unspecified weapon stats; exact balance numbers;
 final visual grammar/asset manifest. Cone ownership and dim-map presentation are settled, not blockers.
 
-**Next useful art work:** get listening feedback on `docs/art/concepts/audio/README.md` (match, menu and mixed
+**Next useful art work:** get listening feedback on `webapp/audio/README.md` (match, menu and mixed
 auditions), refine the mix and cues, then expand to 60-second menu and 90-second match loops. Add step variants and
 recheck masking with build's weapon synthesiser. Production encoding and wiring await manifest/encoder review.
 After the audio pack, translate the six oddities into top-down 64 px/32 px studies. Final sprites/tiles/UI still wait
@@ -41,8 +42,8 @@ for build's manifest. No runtime integration or generated-weapon synthesis belon
 `docs/art/visual-schema-proposal.md` (future JSON visual grammar, not implemented), `docs/art/gameplay-research.md`
 (nine sources, five playtests and user feedback). The oddities PNG is a profile-view identity study, not game sprites.
 
-**Boundaries:** no runtime/schema/config edits by art; code belongs to build/AI. Update this checklist, art's row in
-`TODO.md` and the delivery log in `HANDOFF.md`. Do not commit or push unless asked.
+**Boundaries:** audio scripts/config under `webapp/audio/` belong to art; game runtime, schemas and shared config belong
+to build/AI. Update this checklist, art's row in `TODO.md` and the delivery log in `HANDOFF.md`. Do not commit or push unless asked.
 
 ## A1: palette and art direction. Milestone M1
 
@@ -74,7 +75,7 @@ for build's manifest. No runtime integration or generated-weapon synthesis belon
 User priority (2026-11-12): audio audition → full audio pack → top-down studies. Shared milestone order is unchanged.
 
 - [x] Confirm local audio output; now converted to TypeScript/Node and regenerated with the user-approved dev-only
-      `node-web-audio-api@2.2.0`. Source is in `docs/art/concepts/audio/src/`; no browser, Python, sampled material or model spend.
+      `node-web-audio-api@2.2.0`. Source is in `webapp/audio/generator-scripts/`; no browser, Python, sampled material or model spend.
 - [x] First audition: two 15-second / eight-bar industrial electronic sketches at 128 BPM (driving match, calmer menu),
       all 11 effect candidates from `docs/art/audio.md`, a mixed audition, listening guide and technical measurements.
       These are concepts using planned names, not registered manifest keys or files wired into the game.
@@ -82,6 +83,9 @@ User priority (2026-11-12): audio audition → full audio pack → top-down stud
       re-render hashes match. A test-first Node integration test now covers the art tool; fresh listening remains separate.
 - [x] Migration verified: all three header/crouch/determinism mutants killed; final `pnpm checks` green
       (274 engine tests, 78 webapp tests, 1 audio integration test). Shared config reused in the art tooling workspace.
+- [x] User-directed relocation after the AI merge: generator source in `webapp/audio/generator-scripts/`, WAVs and
+      measurements in `webapp/audio/generated-audio/`. CLI regeneration preserves all 14 WAV hashes; links and workspace
+      registration updated. `pnpm checks` green (324 engine, 82 webapp, 67 AI, 1 audio test).
 - [ ] Listening review: three repeats of both music sketches, cue identity, fatigue and masking on headphones/speakers.
       Numerical continuity is checked; perceived quality is not signed off.
 - [ ] Refine the mix/effects, add footstep variants; recheck combat masking with build's generated weapon-shot synth.

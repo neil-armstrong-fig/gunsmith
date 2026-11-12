@@ -1,0 +1,25 @@
+{
+  "name": "@gunsmith/audio-studies",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./*": "./generator-scripts/*.ts"
+  },
+  "scripts": {
+    "render": "node generator-scripts/RenderAudio.ts",
+    "checks": "pnpm lint && pnpm format:check && pnpm type-check && pnpm test",
+    "lint": "eslint --max-warnings=0 .",
+    "format:check": "prettier --check generator-scripts generated-audio/measurements.json *.js *.json README.md",
+    "type-check": "tsc --noEmit",
+    "test": "node --test generator-scripts/RenderAudio.test.ts"
+  },
+  "devDependencies": {
+    "@gunsmith/shared": "workspace:*",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "node-web-audio-api": "catalog:",
+    "prettier": "catalog:",
+    "typescript": "catalog:"
+  }
+}

@@ -12,7 +12,7 @@ pnpm workspace, `@gunsmith/*`, no build step for `shared/` and `engine/` (consum
 | `shared/` | Vocabulary, wire types, the weapon and arena zod schemas, fixtures, the credit config, base tool config | nothing |
 | `engine/` | Deterministic simulation: fixed timestep, seeded RNG, movement, collision, projectiles, visibility, power rating and caps, arena validator, output moderation | shared |
 | `ai/` | LangChain / LangGraph pipeline, judges, token pre-check, evals (separate vitest config) | shared, engine |
-| `webapp/` | Vite, React 19, Redux Toolkit, Tailwind v4, react-three-fiber | shared, engine |
+| `webapp/` | Vite, React 19, Zustand, Tailwind v4, react-three-fiber | shared, engine |
 | `api/` | The Worker: auth, credits, library, ratings, the `Match` and `Matchmaker` Durable Objects, kill switch | shared, engine (and `ai/` only if hosting decision says so) |
 | `acceptance-tests/` | Playwright DSL and specs | shared |
 | `infra/` | Alchemy: Worker with static assets, D1, Durable Object namespaces, rate limiters | itself |
@@ -58,7 +58,7 @@ validation). It is shared code, not a service.
 | Site on GitHub Pages, API on a sibling host, `SameSite=Lax` cookie across hosts | One Worker with static assets; `/api/*` runs the Worker first | Everything on Cloudflare; same-origin cookie; no CORS |
 | Turn-based `GameRoom`; actions applied as they arrive | Server-authoritative fixed tick (20 Hz), input validation, client prediction and interpolation | A real-time shooter |
 | Hibernating Durable Object, nothing in memory | A ticking object stays awake for a match | A tick loop cannot hibernate; measured by the free-plan spike |
-| Redux for nearly all state | Redux for UI, lobby, library, credits only; the running simulation lives outside Redux, read in `useFrame` | 60 fps state must not go through a reducer |
+| Redux for nearly all state | Zustand throughout, in two stores: a game store holding only the engine's `World` (written once a frame, read with `getState()` in `useFrame`), and a later app store for UI, lobby, library and credits | 60 fps state must not re-render React; one library for both (`docs/state-management.md`) |
 | Rules visible to both clients | Fog enforced on the server; snapshots omit hidden opponents; sounds carry only a quantised direction | Otherwise fog is cosmetic and trivially cheated |
 | "Never enable Workers Paid" | Try the free plan first, accept Workers Paid with budgets and a kill switch if the spike says so | A tick loop plus AI |
 | Component tests via DOM | The canvas is not in the DOM; the DSL reads a tiny read-only state hook | react-three-fiber |

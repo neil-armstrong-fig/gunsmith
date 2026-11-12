@@ -11,25 +11,47 @@ waits on you. **O1 needs nothing from `build` and can start immediately.**
 **What the others need from you:** a decision on where the pipeline runs (it decides whether `api/` imports `ai/`), the
 kill-switch flag's shape, and a review of the contracts before they freeze (Milestone M2).
 
-## Resume here (context-clear checkpoint, 2026-11-12, after the moderation node)
+## Resume here (context-clear checkpoint, 2026-11-12, after generate, validate, rate and repair)
 
 **State.** O1 is closed, the eval harness is built, and the **moderation node is built, probed and committed** by the user on the
 branch `worktree-ai-hosting-proof` (worktree `.claude/worktrees/ai-hosting-proof`): `02f0885` "Add moderation prompt / evals", then
 `3abc33a` merging main (`678000c`, the zustand HUD; I resolved `pnpm-workspace.yaml` by keeping the one `zod` and adding
-`zustand`, took main's lockfile and ran `pnpm install` to re-add `ai`). Tree clean. **Not on main yet** (main has no `ai/`).
-Merging into main is the user's go-ahead: tell `build` first (`pnpm-workspace.yaml`, the lockfile), `git merge main` in the
-worktree, `pnpm install`, root `pnpm checks`, then merge into main from the main checkout. This file and the other docs I edit
-(`TODO.md`, `HANDOFF.md`) live as uncommitted edits in the **main checkout**, so expect a doc merge conflict there.
+`zustand`, took main's lockfile and ran `pnpm install` to re-add `ai`). Tree clean at that commit. **Merged into main on 2026-11-12 by `build`** (`8c52f5f`, a merge of the branch's committed work; conflicts only
+in `pnpm-workspace.yaml`, both sides kept, and the lockfile, taken from main and completed with `pnpm install`; root `pnpm checks`
+exit 0 with `ai` 67, `engine` 324, `webapp` 82). The worktree's uncommitted edits were left alone. **Next time you work in the worktree,
+run `git merge main` there first**: main now has the opponent bot, the health HUD and a `Bullet.shooter` field (`engine/`
+changed; `ai/` imports `@gunsmith/engine`, so re-run `pnpm checks` and `pnpm evals:local`). This file and the other docs I edit
+(`TODO.md`, `HANDOFF.md`) live as edits in the **main checkout**.
 **Verified at `3abc33a`:** root `pnpm checks` exits 0 (`ai` 67 unit tests, `engine` 193, `webapp` 62); `pnpm evals:local` is
 **21 of 21 strict**; the fake tier is 17 of 21 by design (its moderator always says yes, so the four cases that need a "no" fail).
 
+**This session's work (loop 2), in the worktree and UNCOMMITTED for the user's review; main's `ai/` is still the older committed
+state, byte-identical to the worktree's base `3abc33a`, so these edits apply cleanly on top of it.** The weapon pipeline is now
+real end to end: `precheck`, `moderation`, `generate`, `validate` (zod only), `rate` (the one damage-per-second cap, 150, refuses and
+never clamps), then at most one `repair` that is shown its first answer and the faults, then `validate` and `rate` again. A new
+outcome status `invalid` means a weapon request that produced no valid weapon even after the repair. The draft weapon schema is
+`name` plus the six numbers `engine/`'s `Weapon` plays with (`src/pipeline/weapon/`, limits in `WEAPON_LIMITS`), local to `ai/`.
+Layout: `generate/`, `validate/`, `rate/`, `repair/`, `check/`, and shared `ask/` (the one model call, its loose reply schema
+under `ask/reply/`), `blocks/` and `request/` (data blocks), `invalid/`. Evaluators moved to the new shape and `invalid`;
+`nodePath` now fails a "created" weapon that was not validated and rated. **Verified:** `pnpm --filter @gunsmith/ai checks` exit 0
+(134 unit tests, was 67); root `pnpm checks` exit 0 in the worktree (engine 193, webapp 62: the worktree's stale base, not main's
+324 and 82); `pnpm evals:local` **21 of 21 strict**, also under `EVAL_GATE=regression`; `evals:fake` 17 of 21 by design.
+**Red first:** with `generate` wired and nothing after it, 4 cases fell for the right reasons (stat override 2000 damage a
+second; a pasted 56-character name; the reflective shield 200 a second; the bare shield 0 damage); the first attempt fell 12 of 21
+for a wrong reason (an untyped reply schema made the model write numbers as text), which is why the reply shape keeps its types.
+**Mutation:** 36 of 37 unit-test mutants killed by the right tests; two real test gaps (name pattern, name minimum) found and
+fixed; one survivor, the repair prompt's sentence naming its two blocks, which no test or case steers. Eval-level: dropping
+validate and rate falls 4 cases, dropping repair falls the 2 shield cases, and removing the first answer or the "change as little
+as you can" sentence alone falls none (either is enough on `qwen3.5:9b`; both removed reproduces the original red). The `rate` tests
+were written with the code, so they were proved by mutation, not watched red first. Findings are in `docs/ai-pipeline.md`
+("What building generate, validate, rate and repair taught") and `ai/AGENTS.md`.
+
 **What is real:** the proofs (one-node graph in workerd, `langgraph dev`, Studio on the EU account, trace flush needs
 `ctx.waitUntil`), the `ai/` package fitted to `engine/`'s conventions, the eval harness (21 weapon cases tagged
-`regression`/`capability`, 7 deterministic evaluators, 3 model tiers, trials, a regression-only gate), the token pre-check and the
-**moderation node** (`src/pipeline/moderation/`: one cheap-model call by function calling, zod-parsed, player text in a
-`<request>` block, fail closed). **What is a stub:** everything past moderation. `generateWeapon` then returns one fixed weapon and
-ignores the generator, so the "created" cases pass trivially and the overpowered, stat-override, role-play and
-instructions-as-name cases cannot be red yet.
+`regression`/`capability`, 7 deterministic evaluators, 3 model tiers, trials, a regression-only gate), the token pre-check, the
+**moderation node** and now **generate, validate, rate and repair** (above). **What is still a draft:** the weapon schema and the
+cap (`build`'s engine power rating replaces the cap), no `sound` block, no visual block, no shield behaviour, the pipeline is a
+function and not yet a LangGraph `StateGraph`, and nothing has run on a paid model.
 
 **Moderation rulings and findings.** The user ruled: no standalone shields or armour, but a weapon may itself be a directional
 shield that reflects bullets (so a shield is accepted as a weapon, worn armour rejected). Loop 1b: 46 borderline probes found one
@@ -45,12 +67,15 @@ provider key exist yet**. Paid ceiling: $1 total, locked until a capped key and 
 script (gone with the session); the shape is in `TODO-build.md` "Gotchas learned" (back up, one exact replacement, `grep`, run,
 restore and `cmp` in a `finally`; for evals read the failing case names, as a run can "pass" with a case red only in the report).
 
-**Next, in order:** (1) real `generate` (the strong model, structured output, the weapon schema draft in `ai/`), then `validate`
-(zod), `repair` (once), `rate` (caps), watching the overpowered, stat-override, role-play and instructions-as-name cases go red then
-green, each mutation-proved; (2) a small Haiku run once the user makes a capped key, which also re-probes moderation;
-(3) O3 cost control and the shutdown drill (needs `build`'s ledger); (4) arenas and the judge (need the stairs and cone revision).
+**Next, in order:** (0) the user reviews and commits the loop 2 work in VS Code; then `git merge main` in the worktree (main has the
+bot, health HUD and `Bullet.shooter`; `ai/` imports none of it, but re-run `pnpm checks` and `pnpm evals:local`) and land it in main
+with `build`; (1) a small Haiku run once the user makes a capped key, which re-probes moderation and decides whether the repair's
+first-answer block and its "change as little" sentence both earn their place (the first answer echoes model output, which is a
+small injection surface, so drop it if the sentence alone holds on Haiku); (2) the real `StateGraph` and the `AiAdapter` result
+mapping (`invalid` is a typed failure there); (3) O3 cost control and the shutdown drill (needs `build`'s ledger); (4) arenas and the
+judge (need the stairs and cone revision).
 
-**Waiting on the user:** the merge-to-main go-ahead; the cone-prompt owner and omitted-stat policy (from `art`); making the provider
+**Waiting on the user:** the cone-prompt owner and omitted-stat policy (from `art`); making the provider
 key with its own cap; the canary moves to a secret before open-sourcing. **Waiting on `build`:** the weapon and arena contracts
 (withdrawn; the schemas and caps in `ai/` are drafts), a root `pnpm evals` script, and a **shield behaviour** (directional,
 reflects bullets) in the weapon vocabulary once the schema is drafted (`HANDOFF.md`).
@@ -69,7 +94,7 @@ Focused, Hamel Husain); a type read off a runtime value lives beside that value 
       *Done 2026-11-12, but not as written: the user declined Plus, so options 1 and 2 were not deployed (no real proof of
       either). The proof is of option 3 and of the graph under `langgraph dev`: one-node graph passing with a mutation check,
       served by the local Agent Server, run in workerd, bundle 2.79 MiB. Decision: option 3 (`docs/ai-hosting.md`). The
-      proof is the `ai/` package on the branch `worktree-ai-hosting-proof` (committed by the user, not yet merged into main).*
+      proof is the `ai/` package, merged into main as `8c52f5f`.*
 - [ ] **Owed from O1:** re-measure CPU time with the real graph (free plan allows 10 ms). *Trace flush on Workers: checked
       2026-11-12 against a local fake LangSmith endpoint (use `ctx.waitUntil(awaitAllCallbacks())` on every path; recheck with
       a real key). Studio: verified 2026-11-12 on the EU account (graph drawn, form built, a run returned the weapon; use
@@ -157,8 +182,14 @@ tiers behind one `deps` argument: fake (in `pnpm checks`), local Ollama `qwen3.5
       passive protection are a no. Mutation: removing the shield wording drops exactly the two shield cases; the armour guard fell
       only when the prompt told the model armour is a weapon. `evals:local` 21 of 21. **Owed to `build`/`art`:** a reflecting, directional shield is a
       weapon behaviour the engine, weapon schema and visual grammar do not have yet (`HANDOFF.md`).
-- [ ] Loop 2: real `generate`, validate, repair, rate (caps), watching the overpowered and injection cases for real; mutation
-      proof of each.
+- [x] Loop 2, **done 2026-11-12** (uncommitted in the `ai/` worktree): real `generate`, `validate`, `rate`, `repair`, each test
+      first and mutation-proved (details in "Resume here"). Cases that fell with `generate` alone: "tries to set stats directly",
+      "asks for its own instructions as the name", "directional shield that reflects bullets", "bare shield"; all four green with
+      the full pipeline (`evals:local` 21 of 21 strict). The stat-override and instructions-as-name cases are green because `validate`
+      and `rate` refuse what the model writes, not because the model behaves; the reflective shield is green only through `repair`.
+      **Owed:** a shield is not representable (no damage), so "bare shield" passes by the repair inventing a 1-point bullet;
+      `build` owes a real shield behaviour. The generate prompt's wording is unsteered by any case (every adversarial case is
+      `either`); add a sentence only when a probe shows a failure.
 - [ ] Paid tier: spend guard (estimate before a run, abort over the ceiling, cache by model plus prompt hash), after the user
       makes a provider key with its own hard cap (`MANUAL-SETUP-STEPS.md` step 8). Haiku only, ceiling $1 total for now.
 - [ ] Later: a model judge for "matches the prompt", arena suite, `evals.yml` (a GitHub runner cannot run Ollama, so CI is fake

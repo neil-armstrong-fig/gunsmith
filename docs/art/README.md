@@ -1,7 +1,7 @@
 # Art direction
 
 Owner: `art` (Codex). Read `HANDOFF.md`, `TODO.md` and all three persona checklists first. You write **only** under
-`docs/art/` and `webapp/public/assets/`.
+`docs/art/`, `webapp/public/assets/` and `webapp/audio/`.
 
 ## Direction (A1, 2026-11-12)
 
@@ -134,6 +134,9 @@ sans-serif/monospace fallbacks so it remains self-contained without network requ
 - The industrial-arena SVG geometry is original. The companion oddities PNG is an OpenAI-generated exploration,
   with provenance and example prompts in `concepts/prompt-built-oddities.md`. No third-party stock images or audio are included.
   Repository licensing remains private/pending; this is provenance, not a new public licence grant.
+- The [audio audition](../../webapp/audio/README.md) is original local synthesis: oscillators and seeded noise rendered by
+  its included TypeScript source and dev-only `node-web-audio-api` (BSD-3-Clause). No sampled recordings, third-party music
+  or voices. Repository licensing remains pending; the dependency preserves its own licence notices.
 
 ## Deliverables and where they go
 
@@ -148,12 +151,13 @@ new keys; ask `build` to add one in `TODO.md` blockers.
 | Brand (logo, favicon set, social image) | `webapp/public/assets/brand/` | SVG and PNG |
 | Static sounds | `webapp/public/assets/audio/` | per `docs/art/audio.md` |
 | Copy | `docs/art/copy.md` | Markdown |
+| Audio auditions | `webapp/audio/generated-audio/` | WAV and measurements; TypeScript source in `webapp/audio/generator-scripts/` |
 | Concept sheets and process | `docs/art/concepts/` | PNG or SVG |
 
 ## Working rules
 
 - Every delivery is listed in the delivery log in `HANDOFF.md` with the manifest keys it covers.
-- Keep source files (layered or generator scripts) in `docs/art/concepts/` if they are small, so assets can be regenerated.
+- Keep visual source files in `docs/art/concepts/`; audio generation scripts live in `webapp/audio/generator-scripts/`.
 - Check readability at the game's real scale: a player is a few tens of pixels across on screen.
 - Licences: only original or properly licensed material; record any font or asset licence here.
 

@@ -37,8 +37,9 @@ three practice dummies, which are removed at zero health, all in a full-screen a
 round that is won or lost with a "Play again" overlay. `?scenario=sparring` is the same arena with an opponent who cannot
 shoot; the practice range (no query) has no opponent, so the old specs are unchanged. The player carries two weapons (keys
 1 and 2): a rifle (25 damage, 12 rounds) and a marksman rifle (50 damage, 5 rounds); R reloads, shots spend rounds, and the
-ammunition shows in a plain-React HUD (`react/components/dom/ammo-hud/`). Four packages: `webapp/`, `engine/`, `acceptance-tests/`, `shared/` (tool
-config plus the state-hook snapshot types). `pnpm checks` is green: engine 284 unit tests, webapp 82, and 55 acceptance
+ammunition shows in a plain-React HUD (`react/components/dom/ammo-hud/`). Five packages: `webapp/`, `engine/`, `acceptance-tests/`, `shared/` (tool
+config plus the state-hook snapshot types) and `ai/` (merged in from `ai`'s worktree on 2026-11-12, `8c52f5f`; `ai` owns it, read
+`ai/AGENTS.md` before touching it). `pnpm checks` is green: engine 324 unit tests, webapp 82, `ai` 67, and 55 acceptance
 specs (the weapon, HUD, dummy, sparring and duel specs pass at `--repeat-each=10`). Every spec and unit test has been mutation-proved. Read
 `engine/AGENTS.md`, `webapp/AGENTS.md`, `webapp/src/react/AGENTS.md` and `acceptance-tests/AGENTS.md` first.
 
@@ -50,6 +51,12 @@ file, state `{world, setWorld}` and nothing else, pinned by a test and a lint al
 shares its kind, flat. JSX gets a blank line between sibling elements, DOM and r3f alike. The loop writes the world once a
 frame; `useFrame` reads it with `gameState()`; the ammo HUD (`dom/ammo-hud/`) reads a selector with `useShallow`. A new
 state-bearing feature (health, the round) goes into the engine's `World` first, and the HUD reads it through a new selector.
+
+**Owed to `ai` (small, do it with the next root-script change):** a root `pnpm evals` script. `AGENTS.md` and `ai`'s TODO both
+assume it; today only `ai`'s own `evals:fake|local|paid` exist, and root `package.json` has `checks` and no more. It should run
+the evals outside `pnpm checks` (they cost money and are non-deterministic). Also: when `api/` is scaffolded, add `@gunsmith/ai`
+to its `allowedPackages`. The `ai` package reads `@gunsmith/engine`, so an engine change can break `ai`'s `pnpm checks`: run the
+root `pnpm checks`, not just the engine's, before saying a change is done.
 
 **Starting a session.** Run `ps -axo command | grep -c "[p]ermission-prompt-tool"` (macOS `pgrep -a` does not show
 arguments) and `lsof -i :3100` before starting a server. Re-read a shared doc right before editing it; other sessions
@@ -237,7 +244,7 @@ screen map is in `docs/fuzzy-frontend.md` for reference only; do not rebuild it 
 
 ## Phase C: full project standards. Milestone M3
 
-- [ ] Add the remaining packages: `api/`, `infra/`, and an empty `ai/` with the interfaces from `HANDOFF.md` for `ai`
+- [ ] Add the remaining packages: `api/` and `infra/` (`ai/` arrived on 2026-11-12, merged from its worktree; `api/` adds `@gunsmith/ai` to its `allowedPackages`), with the interfaces from `HANDOFF.md` for `ai`
       (`engine/` and `acceptance-tests/` arrive in Phase 1).
 - [ ] `shared/config/`: ESLint base with `restrictedImports` (the table in `AGENTS.md`), Prettier, tsconfig base, vitest
       base; copy janggi's and adapt. Pin TypeScript per the gotcha in `AGENTS.md` (check TS 7 and typescript-eslint first).

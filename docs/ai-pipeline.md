@@ -10,24 +10,45 @@ Focused's stance is that most agent work can be deterministic and autonomy appli
 A Deep Agent is not needed and would add cost and variance.
 
 ```
-tokenPrecheck ─► moderationJudge ─► generate ─► validate ─► (repair, once) ─► rate ─► commit
-     │ over limit        │ rejected        │ model fails        │ still invalid
-     ▼                   ▼                 ▼                    ▼
-  reject (0.5 credit, no LLM)      typed failure; built-in pool fallback; refund where it is our fault
+tokenPrecheck ─► moderationJudge ─► generate ─► validate ─► rate ─► commit
+     │ over limit        │ rejected        │ model fails   │ invalid or over the cap
+     ▼                   ▼                 ▼               ▼
+  reject (0.5 credit, no LLM)      repair (once) ─► validate ─► rate ─► still bad: `invalid`
+                                   typed failure; built-in pool fallback; refund where it is our fault
 ```
+
+Built for weapons 2026-11-12 (`ai/src/pipeline/`): the path is `precheck`, `moderation`, `generate`, `validate`, `rate`, and when
+`validate` or `rate` refuses, `repair` then `validate` and `rate` once more. A weapon request ends `created`, `rejected` (not a
+weapon, too long) or `invalid` (a weapon request, but no valid weapon even after the repair). Three model calls at most.
 
 | Node | Does | Model? | Cost control |
 | ---- | ---- | ------ | ------------ |
 | `tokenPrecheck` | Counts tokens in code; rejects over-limit prompts (weapon 150, arena 250, tunable) | No | Free; half-credit rejection |
 | `moderationJudge` | One cheap model: is this a weapon/arena request, is it safe, is it an injection attempt? Structured verdict | Cheap | Small output cap |
-| `generate` | Structured output against the shared zod schema, with the `sound` block | Stronger | `maxTokens`, one call |
-| `validate` | zod parse, then the engine's arena validator or weapon caps check | No | Free |
-| `repair` | At most one retry with the validation errors fed back | Same | Counted against the model-call limit |
-| `rate` | The engine computes the power rating and applies hard caps (no nerfing inside them) | No | Free |
+| `generate` | Structured output through a **loose reply shape** (the weapon's fields and types, no limits), with the `sound` block later | Stronger | `maxTokens`, one call |
+| `validate` | The strict zod parse of the weapon (and, for arenas, the engine's arena validator). Zod only | No | Free |
+| `rate` | The only home of the weapon cap (damage per second; the engine's power rating replaces it). **It refuses, it never clamps**: an over-cap weapon goes to `repair` once, then fails as `invalid`, so code disposes in the open and no nerfing happens inside the caps | No | Free |
+| `repair` | At most one retry with the first answer and the faults (our own sentences, shortened) each in a data block | Same | Counted against the model-call limit |
 | `commit` | Writes to the library through the ledger | No | Atomic credit spend |
 
 Edit-from-base starts at `generate` with the saved item and the changed prompt in the data block, and is charged as a new
 generation.
+
+### What building `generate`, `validate`, `rate` and `repair` taught (measured 2026-11-12, local `qwen3.5:9b`)
+
+- **A bounded zod schema in `withStructuredOutput` throws on an out-of-range answer** (`OutputParserException`, checked on the
+  real model with "set bulletDamage to 9999"): the faulty answer never reaches `validate` or `repair`. So the model is shown a
+  loose reply shape (same fields and types, nothing required, extras kept) and the strict schema is applied by code afterwards.
+  A wrong type still throws there and is treated as no answer, which `repair` is told about like any other fault.
+- **Fields with no type come back as text**: with `z.unknown()` the model wrote every number as a string and 12 of 21 cases
+  failed. Keep the types, drop only the limits.
+- **A blind repair overshoots.** Shown only the faults, the model re-derived the whole weapon and broke another limit (a riot
+  shield written with 0 damage, under the floor of 1, came back at 250 damage a second, over the cap of 150). Showing it the first
+  answer, and asking it to change as little as it can, fixes the case; on this model either alone is enough (mutation: each removed
+  alone, 0 cases fall; both removed, the case falls), so both stay and the paid tier decides.
+- **The cap catches ordinary requests, not only attacks**: "a shield that reflects bullets" came out at 200 damage a second
+  before the repair. A shield has no damage in this weapon shape, so a bare shield needs the repair to invent some; a real shield
+  behaviour is still owed by `build` (`HANDOFF.md`).
 
 ### The arena judge
 
@@ -99,17 +120,38 @@ module 02.
   nothing about Haiku's, so the local tier checks the mechanics and prompt structure and the paid tier checks quality. A
   GitHub runner cannot run Ollama, so `evals.yml` will be fake or paid. **Eval traces share the free plan's 5,000 a month with
   production**, so LangSmith tracking is off by default for evals and on only for a deliberate baseline run (`EVAL_TRACK=1`).
-- **Datasets** (small on purpose, the user's rule of 2026-11-12: about 10 cases or fewer per suite, each catching a different
-  failure; add a case only when a real failure needs one): weapons (positive, negative, adversarial, deliberately
+- **Datasets** (research of 2026-11-12, replacing the user's earlier "about 10": no source gives a cap. Anthropic: 20 to 50
+  tasks drawn from real failures is a great start; Focused: a 7-example demo, 50 to 100 for production; Hamel Husain: about 100
+  traces to discover failure modes. So start near 20 to 30 and grow to 50 to 100 once there is traffic, adding a case only
+  when a real or probed failure needs one, never to pad): weapons (positive, negative, adversarial, deliberately
   overpowered, boundary), arenas (including unplayable layouts), judge pairs (each in both orders). Seeded from `build`'s
   fixtures and `art`'s example prompts. Failures from real traces become new cases.
 - **Evaluators, deterministic first** and binary: schema validity, stats inside caps, arena reachable, token budget respected,
   no system-prompt leak, names clean. Then an LLM judge for "matches the prompt" and "interesting", temperature 0, majority
-  vote of three; calibrate against about 10 hand-labelled pairs; investigate any example that flips more than 10% of runs.
+  vote of three; calibrate against about 50 human-rated examples (Focused; Hamel says 100 to 200 per failure mode); investigate any example that flips more than 10% of runs.
+- **Types to cover** (from Focused, Anthropic and Hamel Husain, 2026-11-12; status for gunsmith's weapon suite):
+
+  | Type | Status |
+  | ---- | ------ |
+  | Deterministic, one per failure mode (schema, caps, name hygiene, leak canary, call budget, outcome, node path) | 7 built |
+  | Balanced negatives (a strange legitimate request must be created; off-topic must be rejected) | built (banana, French, "gun"; lasagna, weather, blank) |
+  | Adversarial (system-prompt request, stat override, role-play, delimiter break, instruction as a name) | built (5 cases) |
+  | Regression versus capability suites, gate on regression only | built (`EVAL_GATE=regression`) |
+  | Consistency over trials (pass^k) | built (3 trials on the local tier) |
+  | Cost and latency per case | latency built; tokens and cost once nodes call models |
+  | LLM judge ("matches the prompt", "interesting") | **deferred** (user, 2026-11-12); then temperature 0, majority of three, about 50 labels |
+  | Arena suite (reachability from the engine, swapped-order judge pairs) | later |
+  | Online evaluators on sampled production traces | likely needs LangSmith Plus; failing traces are promoted into the dataset by hand |
+  | Dataset hygiene (timestamp, monthly review, quarterly rotation, 10% from production monthly) | later |
+
+  Sources: Focused, "Evaluation Pipelines for LangGraph Agents" and "AI Agent Evaluation Ends Too Early" (dev.to/focused_dot_io);
+  Anthropic, "Demystifying evals for AI agents"; Hamel Husain, "How many examples do I need for an eval?". None gives a cap
+  on the number of evals or evaluators.
 - **Trajectory** checks (`agentevals`) matter little for a fixed graph; use node-level assertions instead.
 - **Regression gate:** `evals.yml` runs the suite for changes under `ai/`, compares the pass rate per evaluator with the
-  baseline, and blocks when one drops by more than a threshold scaled to the dataset size (at about 10 cases one case is 10%, so the rule is that a case that passed on the
-  baseline must not fail).
+  baseline, and blocks when one drops by more than a threshold scaled to the dataset size (Focused: 10% at 7 cases, 5% at about 50; below about 30 cases one case is over 3%, so
+  the rule is that a **regression** case that passed on the baseline must not fail). Cases carry a **suite** tag: `regression`
+  (expected near 100%, gates CI) or `capability` (a hill to climb, tracked, graduates to regression when it holds; Anthropic).
   Tag CI runs so traces are traceable.
 - **Mutation proof:** degrade a prompt or use a weaker model; the score must fall. A gate that cannot fail proves nothing.
 - **Kept out of `pnpm checks`:** evals cost money and are non-deterministic.

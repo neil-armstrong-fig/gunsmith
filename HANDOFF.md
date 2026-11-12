@@ -15,7 +15,7 @@ on or blocking. Then it says so in a few lines before starting (the sync protoco
 | ------- | ----------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
 | `build` | 1. Game / project | Claude Code | Everything until the contracts exist: scaffold, `shared/`, `engine/`, `webapp/`, `api/`, `acceptance-tests/`, `infra/`, CI, every `AGENTS.md` | Real LLM calls; art and sound files     |
 | `ai`    | 2. AI             | Claude Code | `ai/`, its evals and datasets, AI parts of `api/` (credits, kill switch, gateway), LangSmith, budgets, `docs/ai-*.md`       | Engine rules; webapp screens; art       |
-| `art`   | 3. Art and text   | Codex       | `TODO-art.md`, `webapp/public/assets/`, `docs/art/`, copy text, logo and icons, static sounds                                              | Anything under `src/`; schemas; configs |
+| `art`   | 3. Art and text   | Codex       | `TODO-art.md`, `webapp/public/assets/`, `webapp/audio/`, `docs/art/`, copy text, logo and icons, static sounds                                              | Anything under `src/`; schemas; configs |
 
 Rules for all three: read `AGENTS.md`, this file, `TODO.md` and all three persona checklists first; stay in your own folders; tick off your own checklist as you
 finish; ask before commits, dependencies, spending money or changing live infrastructure; never read secrets.
@@ -118,7 +118,7 @@ interface. Build implements the schema and renderer; AI reviews generation/eval 
 | ---- | ----- |
 | `TODO-build.md`, `shared/`, `engine/`, `webapp/src/`, `api/` (except the AI parts), `acceptance-tests/`, `infra/`, `.github/workflows/ci.yml`, `property-tests.yml` | `build` |
 | `TODO-ai.md`, `ai/`, `.github/workflows/evals.yml`, `api/src/ai/` (credits spend, gateway client, kill switch), `docs/ai-pipeline.md`, `docs/ai-hosting.md`, `docs/cost-and-budget.md` | `ai` |
-| `TODO-art.md`, `webapp/public/assets/`, `docs/art/`, `docs/focused-case-study.md` (illustrations) | `art` |
+| `TODO-art.md`, `webapp/public/assets/`, `webapp/audio/`, `docs/art/`, `docs/focused-case-study.md` (illustrations) | `art` |
 | `AGENTS.md`, `TODO.md` (shared path), `HANDOFF.md`, `MANUAL-SETUP-STEPS.md`, other `docs/` | whoever changes the thing the doc describes; say so in your summary |
 
 ## What is ready for the others
@@ -136,6 +136,38 @@ interface. Build implements the schema and renderer; AI reviews generation/eval 
 ## Delivery log
 
 Newest first. One line each: date, who, what, where.
+
+- 2026-11-12, `art`: **audio relocated at the user's request after the AI merge**. The private audio workspace now
+  lives in `webapp/audio/`: all TypeScript generation/test source is in `generator-scripts/`, all 14 WAVs and
+  `measurements.json` in `generated-audio/`; config and listening guide stay at its root. Active art links, ownership,
+  package exports/scripts, workspace registration and lockfile updated. Prior delivery paths under `docs/art/concepts/audio/`
+  are historical and superseded. `pnpm --filter @gunsmith/audio-studies render` writes to the new output folder and
+  reproduces every WAV hash. Final `pnpm checks` green: 324 engine, 82 webapp, 67 AI and 1 audio test; no new dependencies
+  or runtime/manifest changes. Listening/full tracks/production encoding still pending.
+
+- 2026-11-12, `ai`: **loop 2 done: the weapon pipeline is real past moderation** (`generate`, `validate`, `rate`, one `repair`), in
+  the `ai/` worktree (`.claude/worktrees/ai-hosting-proof`), **uncommitted for the user's review and not in main**: main's `ai/` is
+  still the committed state `build` merged (`8c52f5f`), so these edits apply cleanly on top of it. Test first, local tier only, no
+  money spent. A request can now end `created`, `rejected` or the new `invalid` (a weapon request with no valid weapon even after
+  the repair). The draft weapon schema is a name plus the six numbers `engine/`'s `Weapon` plays with, with one damage-per-second
+  cap of 150 that `rate` enforces by refusing, never clamping; both are local to `ai/` and replaced by `build`'s contracts and
+  power rating when they land. `ai` 134 unit tests (was 67), `pnpm evals:local` 21 of 21 strict, root `pnpm checks` exits 0 in
+  the worktree; 36 of 37 mutants killed (the survivor is a repair-prompt sentence no case steers). Findings for everyone
+  (`docs/ai-pipeline.md`): a bounded zod schema in `withStructuredOutput` throws on an out-of-range answer, and a repair shown
+  only the faults overshoots. **For `build`: still owed, a shield behaviour** (directional, reflects bullets): a shield has no
+  damage in the weapon shape, so a bare shield only passes because the repair gives it a 1-point bullet. Nothing in `shared/`,
+  nothing for `art` to wire, no contract changed.
+
+- 2026-11-12, `build`: **The `ai/` package is merged into main** (`8c52f5f`), at the user's request: the branch
+  `worktree-ai-hosting-proof` (the hosting proof, eval harness, token pre-check and moderation node, through `3abc33a`) merged
+  into main with a real merge commit. Conflicts only in `pnpm-workspace.yaml` (both sides' catalog additions kept: art's
+  `node-web-audio-api` and `ai`'s LangChain, LangGraph, `langsmith`, `wrangler` entries; `ai` joins `packages`;
+  `trustPolicyExclude: chokidar@4.0.3` and `allowBuilds: workerd: false` arrive) and `pnpm-lock.yaml` (taken from main, then
+  `pnpm install`; the only differences from main's are additions and a `supports-color` peer suffix, no version moved). Root
+  `pnpm checks` exits 0: `engine` 324, `ai` 67, `webapp` 82 unit tests; the acceptance suite was not re-run because the merge
+  touched no `webapp` or `engine` code. The `ai` worktree's uncommitted edits were not merged and are untouched; `ai` should
+  `git merge main` there before its next change (main has the opponent bot, the health HUD and `Bullet.shooter`). Still owed to
+  `ai` from `build`: a root `pnpm evals` script. No contract changed.
 
 - 2026-11-12, `build`: **Health, a scripted opponent and a round win, test first (slices 1 and 2 of 3).** `engine/` gains
   `health/`, `round/` (`playing | won | lost`), `opponent/` (a brain that returns an `Input`, so the opponent is played by the

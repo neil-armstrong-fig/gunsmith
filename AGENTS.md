@@ -5,8 +5,8 @@ each match. Built with React and react-three-fiber, hosted on Cloudflare, with t
 LangSmith. It follows the janggi model (`/Users/neilarmstrong/Development/Personal/janggi`) for structure, standards
 and acceptance-test-driven development.
 
-> **Status: the game's core is being built, test first.** Four of the seven packages exist (`webapp/`,
-> `engine/`, `acceptance-tests/`, `shared/`); `ai/`, `api/` and `infra/` are planned. `pnpm checks`, `pnpm start`,
+> **Status: the game's core is being built, test first.** Five of the seven packages exist (`webapp/`,
+> `engine/`, `acceptance-tests/`, `shared/`, `ai/`); `api/` and `infra/` are planned. `pnpm checks`, `pnpm start`,
 > `pnpm acceptance-tests` and `pnpm install-browsers` work today; the other commands, CI and deployment below are
 > **planned** and become true as `build` builds them (see `TODO-build.md`). Where this file describes a package or command
 > that does not exist yet, read "will be". Delete this note when the last of the seven packages lands.
