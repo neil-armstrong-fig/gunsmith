@@ -1,8 +1,13 @@
+import {DUMMY_HEALTH} from "@gunsmith/engine/dummy/DummyHealth";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
+import type {Point} from "@gunsmith/engine/geometry/types/Point";
 import type {World} from "@gunsmith/engine/game-loop/types/World";
 
-/** A match about to begin: the player in the middle of the arena's centre tile, facing east, with the weapon ready. */
-export function startingWorld(arena: Arena): World {
+/**
+ * A match about to begin: the player in the middle of the arena's centre tile, facing east, with the weapon ready, and a
+ * dummy at full health at each of `dummyPositions`.
+ */
+export function startingWorld(arena: Arena, dummyPositions: readonly Point[] = []): World {
   return {
     arena,
     player: {
@@ -11,6 +16,7 @@ export function startingWorld(arena: Arena): World {
       cooldownSeconds: 0,
     },
     bullets: [],
+    dummies: dummyPositions.map(position => ({position, health: DUMMY_HEALTH})),
     elapsedSeconds: 0,
   };
 }

@@ -64,4 +64,21 @@ export class PlayerDsl {
       throw new DslError("Failed to fire", error);
     }
   }
+
+  /** Presses the mouse button and keeps it down until `stopFiring`, so the weapon fires at its own steady rate. */
+  async startFiring(): Promise<void> {
+    try {
+      await this.player.startFiring();
+    } catch (error) {
+      throw new DslError("Failed to start firing", error);
+    }
+  }
+
+  async stopFiring(): Promise<void> {
+    try {
+      await this.player.stopFiring();
+    } catch (error) {
+      throw new DslError("Failed to stop firing", error);
+    }
+  }
 }

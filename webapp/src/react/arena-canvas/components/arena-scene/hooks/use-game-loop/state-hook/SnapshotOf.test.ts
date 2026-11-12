@@ -42,3 +42,22 @@ it("reports where each bullet in the air is", () => {
 
   expect(snapshotOf(flying).bullets).toEqual([{x: 1, y: 2}]);
 });
+
+it("reports no dummies when the world has none", () => {
+  expect(snapshotOf(world).dummies).toEqual([]);
+});
+
+it("reports where each dummy stands and how much health it has left", () => {
+  const withDummies = {
+    ...world,
+    dummies: [
+      {position: {x: 1.5, y: 2.5}, health: 100},
+      {position: {x: 3.5, y: 1.5}, health: 25},
+    ],
+  };
+
+  expect(snapshotOf(withDummies).dummies).toEqual([
+    {x: 1.5, y: 2.5, health: 100},
+    {x: 3.5, y: 1.5, health: 25},
+  ]);
+});

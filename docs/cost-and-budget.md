@@ -101,6 +101,23 @@ Findings:
 - **A request for `build`, not an edit:** the credit prices and limits live in `shared/`. If Sonnet stays in the mix, lower
   daily credits or raise prices there. Not needed if Haiku holds up.
 
+## What eval-driven development costs on Haiku alone (estimate, 2026-11-12)
+
+Haiku 5.5 at $0.10 in and $0.50 out per million tokens (the pricing page, fetched 2026-11-12), the token assumptions above
+(moderation 500 in and 60 out, generation 1,650 and 600, a repair re-sends the prompt plus the bad output, 20% of created weapons
+need one), and nine weapon cases (seven reach generation, one is rejected by moderation, one is stopped by the free pre-check):
+
+| | One 9-case run | With a 3-vote judge later | 10 runs a day | 30 runs a day | $1 buys |
+| - | -------------- | ------------------------- | ------------- | ------------- | ------- |
+| Haiku 5.5 | about $0.005 | about $0.008 | about $1.40 a month | about $4.20 a month | about 216 runs |
+| Sonnet 5.5 (for scale) | about $0.09 | about $0.16 | about $28 a month | about $83 a month | about 11 runs |
+
+Findings: Haiku-only is affordable, roughly half a cent a run, so the local model is for speed and an unmetered loop, not
+because money forces it. It is not free at volume: 100 runs a day is about $14 a month, inside the $20 only if the game itself
+spends nothing, so the eval spend needs its own ceiling (the user's current one is $1 total) and result caching (a re-run with
+the same model, prompt and case is free). An arena suite costs about twice as much a case (bigger prompt and output). The
+estimates use guessed token counts; replace them with measured usage once a paid run exists.
+
 ## Sources
 
 - [Cloudflare budget alerts](https://developers.cloudflare.com/billing/manage/budget-alerts/) (informational, email only)

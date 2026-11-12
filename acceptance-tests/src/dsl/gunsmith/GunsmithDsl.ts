@@ -2,6 +2,7 @@ import type {Page} from "@playwright/test";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
 import {ArenaDsl} from "@src/dsl/gunsmith/components/arena/ArenaDsl";
 import {BulletsDsl} from "@src/dsl/gunsmith/components/bullets/BulletsDsl";
+import {DummiesDsl} from "@src/dsl/gunsmith/components/dummies/DummiesDsl";
 import {PlayerDsl} from "@src/dsl/gunsmith/components/player/PlayerDsl";
 import {GunsmithPlaywright} from "@src/dsl/gunsmith/playwright/GunsmithPlaywright";
 import type {Size} from "@src/dsl/gunsmith/types/Size";
@@ -13,6 +14,7 @@ export class GunsmithDsl {
   readonly arena: ArenaDsl;
   readonly player: PlayerDsl;
   readonly bullets: BulletsDsl;
+  readonly dummies: DummiesDsl;
 
   constructor(page: Page) {
     this.gunsmith = new GunsmithPlaywright(page);
@@ -20,6 +22,7 @@ export class GunsmithDsl {
     this.arena = new ArenaDsl(page);
     this.player = new PlayerDsl(page);
     this.bullets = new BulletsDsl(page);
+    this.dummies = new DummiesDsl(page);
   }
 
   /** Opens the game and waits until the arena is on screen. */

@@ -41,6 +41,8 @@ given("a match has just begun", () => {
     then("the bullet is gone once it reaches the wall", async ({gunsmith}) => {
       await gunsmith.bullets.waitForABullet();
       await gunsmith.bullets.waitForNoBullets();
+
+      expect(await gunsmith.bullets.count()).toBe(0);
     });
   });
 
