@@ -35,6 +35,8 @@ the one-line wrapper on the `*Dsl` beside it.
 react-three-fiber draws to a `<canvas>`, so a spec cannot find a player or a wall by role. The DSL reads game state
 through deliberate, read-only hooks the webapp ships (`data-ready` on the arena today). Keep each one tiny. A spec that
 reads the canvas before `data-ready` is `true` sees the browser's default 300 by 150, which is how that hook was found.
+What is drawn over the canvas is ordinary DOM (the ammunition display): read it by test id, as `gunsmith.hud` does, and
+check it against the state hook, which is the game's own account of the same thing.
 
 ## Running
 

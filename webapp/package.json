@@ -23,7 +23,8 @@
     "@react-three/fiber": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "three": "catalog:"
+    "three": "catalog:",
+    "zustand": "catalog:"
   },
   "devDependencies": {
     "@eslint-react/eslint-plugin": "catalog:",

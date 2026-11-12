@@ -6,11 +6,43 @@ Your checklist. The shared path is `TODO.md`; read it and `TODO-build.md` and `T
 Write **only** under the asset folders named in `HANDOFF.md` (`webapp/public/assets/`, `docs/art/`). No code, no schemas,
 no config. Style: clean flat vector, neon, geometric; blueprint touches suit the name. Desktop only.
 
-**What you are waiting for from `build`:** the asset manifest (stable keys, sizes, formats, placeholders). **A1 needs
-nothing and can start immediately.** Until the manifest exists, make concept sheets, not final files.
+## Resume here after clearing context (2026-11-12)
 
-**What the others need from you:** a review of the manifest before it freezes (Milestone M2), example prompts for `ai`'s
-datasets (A5), and final files named exactly as the manifest says.
+**State:** A1, six oddity explorations, the visual-schema proposal, sourced game research and the first audio
+audition pack are delivered. The user prioritised sound/music: original local synthesis, industrial electronic,
+with a driving soundtrack during play. Audio is art's next work ahead of top-down studies.
+Build is on M1: a fun full-screen game, test-first, one mechanic at a time. The fuzzy frontend and pre-emptive shared
+contracts were withdrawn. Do not restore them or assume older schema paths still exist. AI waits for real consumers.
+
+**Decisions to preserve:**
+
+- Industrial arena: slate, blue/orange teams with distinct stripes, flat geometric forms and sparse neon.
+- Stairs are the only height transitions, visibly connecting both landings. No L1/L2/L3 text inside the arena.
+- Terrain remains **dimly visible outside the cone**. The current cone reveals detail, players and items; walls/height
+  occlude it. The **equipped weapon** defines its base angle/range; stance modifies it. Aim rotates it through 360°.
+- Crouch extends range at the same angle and substantially slows movement; it also remains quieter/protected by cover.
+- Arena finalisation follows resolved player/AI definitions. Check legal routes through stairs, spawn/pickup access and
+  ring escape. Built-ins meet the same checks and must be deliberately authored/playtested.
+- Central weighting for the strongest-rated weapon is a **proposal to test**, retaining randomness and fair routes.
+- Art must be malleable to AI prompts, with many silhouettes rather than a fixed weapon catalogue. Development-time
+  schema/renderer changes are allowed; generation changes only strict JSON, never executable code at runtime.
+
+**Still open:** fixed modest defaults versus AI-selected weaknesses for unspecified weapon stats; exact balance numbers;
+final visual grammar/asset manifest. Cone ownership and dim-map presentation are settled, not blockers.
+
+**Next useful art work:** get listening feedback on `docs/art/concepts/audio/README.md` (match, menu and mixed
+auditions), refine the mix and cues, then expand to 60-second menu and 90-second match loops. Add step variants and
+recheck masking with build's weapon synthesiser. Production encoding and wiring await manifest/encoder review.
+After the audio pack, translate the six oddities into top-down 64 px/32 px studies. Final sprites/tiles/UI still wait
+for build's manifest. No runtime integration or generated-weapon synthesis belongs to art.
+
+**References:** `docs/art/README.md` (current style/mechanics), `docs/art/concepts/industrial-arena.svg` and `.png`
+(updated arena/vision sheet), `docs/art/concepts/prompt-built-oddities.md` and `.png` (six prompts, variants and limitations),
+`docs/art/visual-schema-proposal.md` (future JSON visual grammar, not implemented), `docs/art/gameplay-research.md`
+(nine sources, five playtests and user feedback). The oddities PNG is a profile-view identity study, not game sprites.
+
+**Boundaries:** no runtime/schema/config edits by art; code belongs to build/AI. Update this checklist, art's row in
+`TODO.md` and the delivery log in `HANDOFF.md`. Do not commit or push unless asked.
 
 ## A1: palette and art direction. Milestone M1
 
@@ -37,6 +69,25 @@ datasets (A5), and final files named exactly as the manifest says.
 - [x] Correct vision presentation and cone ownership: dim map outside, detailed terrain and players/items inside
       the rotating equipped-weapon/stance cone. Updated SVG/PNG and active design/handoff guidance (2026-11-12).
 
+## A6: sound and music. Audition now (M1); production originally M4
+
+User priority (2026-11-12): audio audition → full audio pack → top-down studies. Shared milestone order is unchanged.
+
+- [x] Confirm local audio output: Python standard-library synthesis produces original 48 kHz PCM WAVs without services,
+      dependencies, sampled material or model spend. Source is in `docs/art/concepts/audio/`.
+- [x] First audition: two 15-second / eight-bar industrial electronic sketches at 128 BPM (driving match, calmer menu),
+      all 11 effect candidates from `docs/art/audio.md`, a mixed audition, listening guide and technical measurements.
+      These are concepts using planned names, not registered manifest keys or files wired into the game.
+- [x] Technical verification: 14 WAVs pass format/duration/headroom/boundary checks; music passes three-repeat seam
+      checks; re-render hashes match. `pnpm checks` passes (193 engine + 62 webapp tests). Listening remains separate.
+- [ ] Listening review: three repeats of both music sketches, cue identity, fatigue and masking on headphones/speakers.
+      Numerical continuity is checked; perceived quality is not signed off.
+- [ ] Refine the mix/effects, add footstep variants; recheck combat masking with build's generated weapon-shot synth.
+- [ ] After feedback, expand menu to 60 seconds and match to 90 seconds with seamless musical returns.
+- [ ] Production: confirm manifest mappings, encode Ogg Vorbis + MP3, verify browser decoding/loop seams and hand off
+      to build for test-first playback/ducking/volume integration. WAV masters do not prove compressed loops seamless.
+      Weapon gunshots remain build/AI-owned synthesis; art supplies static cues only.
+
 ## A2: sprites. Milestone M3
 
 - [ ] Review the visual-schema proposal with build/AI at M2; translate all six oddities into top-down compositions
@@ -60,13 +111,6 @@ datasets (A5), and final files named exactly as the manifest says.
       also seed `ai`'s datasets; include some weak, some broken, some adversarial-looking-but-harmless), rejection and
       error messages, the AI-off banner, the credits explanation, legal pages (privacy and terms) matching
       `docs/privacy-and-data.md`.
-
-## A6: static sounds. Milestone M4
-
-- [ ] `docs/art/audio.md` is the brief. Pickup, drop, reload, footsteps (standing and crouched), hit, death, ring warning,
-      UI, round start and end, and a music loop. Weapon gunshots are **not** yours: they are synthesised in the browser from
-      the weapon's `sound` block.
-- [ ] Confirm that Codex can output audio at all (unverified). If not, say so in `TODO.md`'s blockers and brief another tool.
 
 ## A7: brand. Milestone M6
 

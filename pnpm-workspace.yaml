@@ -104,3 +104,6 @@ catalog:
   vite: 8.3.5
   # Unit test runner, on node.
   vitest: 5.1.0
+  # The one client-state library: the game store holds the engine's World, a later app store holds UI state. 5.0.16 is the
+  # newest eligible (2026-11-12): 5.1.0 (2026-11-06) is under seven days old. It is the version react-three-fiber already uses.
+  zustand: 5.0.16

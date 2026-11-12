@@ -8,7 +8,7 @@ enforces the rules. The catch: weapons are a shared pool at random spots, so a w
 can end up in your opponent's hands.
 
 - **Play:** WASD to move, mouse to aim, Ctrl or C to crouch, 1 and 2 to switch weapon.
-- **Stack:** React 19, react-three-fiber, Redux Toolkit, Tailwind v4; Cloudflare Workers, Durable Objects and D1;
+- **Stack:** React 19, react-three-fiber, Zustand, Tailwind v4; Cloudflare Workers, Durable Objects and D1;
   LangChain, LangGraph and LangSmith for the AI pipeline.
 - **Method:** acceptance-test driven, modelled on [janggi](../janggi). It is also a case study in cost-controlled,
   eval-driven AI engineering (`docs/focused-case-study.md`).
