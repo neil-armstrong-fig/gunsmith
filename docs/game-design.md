@@ -20,9 +20,9 @@ Code, not the AI, enforces every rule.
 | **weapon** | A numeric-stats-plus-behavior item with a `sound` block. Each player defines two; four are in the arena. |
 | **default rifle** | The mid-stat assault rifle everyone starts with (key 1). Unlimited ammo, with reload. |
 | **pickup** | A custom weapon lying in the arena. |
-| **vision** | What a player can currently see: a 360° radius blocked by walls and height. |
-| **fog** | Everything outside vision. Enforced on the server. |
-| **crouch** | Ctrl or C: hide behind cover; you lose vision but gain protection. |
+| **vision** | Detailed terrain and players/items revealed in a forward cone set by the equipped weapon and stance, following aim and blocked by walls/height. |
+| **fog** | Dim, low-detail terrain outside the cone; players/items there remain concealed. Dynamic visibility is enforced on the server. |
+| **crouch** | Ctrl or C: hide behind cover and increase forward vision range. |
 | **closing ring** | The battle-royale-style ring of fire that closes toward a random point after the round timer. |
 | **power rating** | A code-computed number shown on the reveal screen for each weapon. |
 | **credit** | The daily AI currency. 10 a day, reset at 00:00 UTC. |
@@ -70,15 +70,26 @@ drop keys are decided in the fuzzy frontend and kept in one key-binding config. 
 
 - A **tile grid** (size *tunable*) of floor, indestructible wall, penetrable cover and similar classes, with **up to three
   height levels (stories)** on the first pass.
+- **Stairs** are the only way to change height. Each connection has a visible stair flight and landing on both levels;
+  players cannot walk across other height boundaries. No L1/L2/L3 labels appear on the arena during play.
 - **Indestructible walls** block every weapon, always. Cover blocks some weapons and is penetrated by others.
-- The arena prompt may suggest where weapons should be (for example overpowered ones out of reach or in the middle); code
-  enforces even spacing and fairness, and the validator checks that both spawns are reachable.
+- After the player/AI definitions are resolved, code finalises and validates the arena and places spawns/pickups.
+  Fairness uses traversable routes through stairs, not straight-line distance alone, including access to pickups and
+  escape from the closing ring. The prompt may suggest placement; code enforces the constraints.
+- Built-in arenas meet the same checks and are deliberately authored and playtested as the game's quality reference.
+- Placement proposal to test: weight the highest-rated weapon towards contested central space, while retaining
+  randomness and fair routes from both spawns. This must not override minimum spacing or force a fixed centre spawn.
 
 ## Vision, height, crouch and sound
 
-- **Vision** is a 360° radius, independent of aim, blocked by walls and by height. **Higher ground** extends vision and sees
-  over lower cover; **lower ground cannot see up**.
-- **Crouch** hides you behind cover: it removes your vision but protects you, depending on whether the incoming weapon
+- **Vision:** the arena remains dimly visible at low detail outside a forward cone. Inside it, terrain detail and
+  players/items are revealed, subject to walls and height. The equipped weapon defines the cone's base angle/range
+  from its prompt; standing versus crouching modifies it. As you aim/spin through 360°, the detailed cone sweeps around
+  with you. Dim terrain does not reveal hidden players/items. The omitted-stat policy remains pending in `HANDOFF.md`.
+  **Higher ground** extends vision and sees over lower cover; **lower ground cannot see up**.
+- **Crouch** hides you behind cover and increases forward vision range. Keep the same cone angle and aim direction;
+  walls and height still block vision. Crouching **substantially slows movement**, leaving you easier to hit; this
+  is its intended tradeoff. The range bonus and slowdown are tunable. Protection depends on whether the incoming weapon
   penetrates that cover.
 - **Sound:** a hidden opponent can be heard within a hearing range. The server sends only a **direction quantised to about
   8 sectors**, never a position. Crouching is quieter. Weapon sounds are synthesised in the browser from the weapon's

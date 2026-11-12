@@ -1,8 +1,9 @@
 # Weapon and arena schemas (draft)
 
-The data the AI produces and the engine consumes. **Draft:** `build` writes the real zod schemas in `shared/` during the
-fuzzy frontend and updates this file when it does. Numbers are placeholders until the engine and the free-plan spike
-set them; the *shape* is what `ai` and `art` plug into. Code, not the AI, enforces the caps (`engine/`), and the model's
+The data the AI produces and the engine consumes. **Draft, design only.** A first version was coded in `shared/src` on
+2026-11-12 and **deleted the same day** at the user's request (game first, nothing in `shared/` until it is shared). The
+field lists below and the "As built" notes record what that attempt settled; they are a starting point to re-derive
+test-first, not code that exists. The *shape* is what `ai` and `art` plug into. Code, not the AI, enforces the caps (`engine/`), and the model's
 output is `unknown` until a schema has parsed it.
 
 ## Principles
@@ -76,3 +77,23 @@ arenas (unreachable spawn, no spawn, out of bounds). `ai` seeds its datasets fro
 A deterministic function in `engine/` from a weapon's stats (damage × fire rate, range, penetration, behavior weights,
 spread, reload and ammo). It is displayed on the reveal screen, not used to scale anything. The formula is documented in
 `engine/AGENTS.md` and covered by property tests (monotonic in damage, bounded).
+
+## As built (where the code differs from the draft above)
+
+- **Ramps are a tile, not a list.** An arena has no `ramps` field. `r` is a ramp up to the next level: the same cell on the
+  level above must be floor (`.`). `_` is "nothing on this level, look down". The tile codes are `. # + r _`
+  (`arenas/ArenaTile.ts`). The schema checks only the grid's shape (levels declared match drawn, `height` rows, `width`
+  characters, known codes); that the levels fit together and the spawns are reachable is the `engine/` validator's.
+  `art` proposes paired stair endpoints; whether the data needs the pair is open (`HANDOFF.md`, M2).
+- **Hints are zones from a closed list** (`arenas/HintZone.ts`: centre, north, south, east, west, corners), at most four
+  per list, and optional.
+- **Spawn and pickup placement is not in the schema at all.** Code places both, evenly and from a seed.
+- **`colour` is one of four weapon tokens** (`weapons/WeaponColour.ts`: blue, orange, violet, mint), matching `art`'s palette.
+- **Strict objects.** An extra field is a failed parse, so a stray model field is refused rather than dropped.
+- **Text** is plain letters, digits, spaces and `' . , ! ? & : ; ( ) -`, trimmed (`schemas/PlainText.ts`). The blocklist is
+  `engine/`'s and does not exist yet.
+- **No visual-description fields.** `art` asks for a bounded vocabulary so generated weapons can look as different as they
+  play; none is added until `art` and `ai` agree it with `build` at M2.
+- **Fixtures** are in `weapons/fixtures/` and `arenas/fixtures/`: eight valid weapons (one per behavior, a mild one, a
+  broken one), boundary weapons (every stat and sound parameter at its cap and floor), invalid weapons and arenas, and
+  three valid arenas. Arenas that parse but are unplayable arrive with the validator.

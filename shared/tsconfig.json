@@ -1,7 +1,7 @@
 {
   "extends": "./config/tsconfig.base.json",
   "compilerOptions": {
-    "types": ["node"]
+    "types": ["node", "vitest/globals"]
   },
   "include": ["src", "config", "*.ts", "*.js"]
 }

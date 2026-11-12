@@ -1,5 +1,7 @@
 packages:
+  - acceptance-tests
   - ai
+  - engine
   - shared
   - webapp
 
@@ -56,10 +58,10 @@ catalog:
   "@eslint-react/eslint-plugin": 5.28.8
   # ESLint's recommended JavaScript rules, in every package's base config.
   "@eslint/js": 10.0.1
+  # Drives the browser for the acceptance specs. 1.65.0 is newer but under seven days old; 1.64.0 is the newest eligible (2026-11-12).
+  "@playwright/test": 1.64.0
   # The react-three-fiber renderer: the arena canvas.
   "@react-three/fiber": 9.8.2
-  # The store, slices and thunks.
-  "@reduxjs/toolkit": 2.14.0
   # Tailwind CSS's first-party Vite integration.
   "@tailwindcss/vite": 4.3.4
   # Node.js declarations; the current LTS line (26).
@@ -78,7 +80,7 @@ catalog:
   eslint-config-prettier: 10.1.8
   # Cloudflare's CLI, used only for a `--dry-run` bundle to measure the Worker size (`ai` spike).
   wrangler: 4.157.0
-  # Schemas for model output; the shared vocabulary uses it too.
+  # Schemas for model output (`ai`). `shared` takes it only when a second package needs a schema.
   zod: 4.6.7
   # Rules of hooks, for the webapp.
   eslint-plugin-react-hooks: 7.1.1
@@ -90,8 +92,6 @@ catalog:
   react: 19.3.1
   # React's DOM renderer.
   react-dom: 19.3.1
-  # Binds the store to React.
-  react-redux: 9.3.1
   # Tailwind CSS v4, the utility styles.
   tailwindcss: 4.3.4
   # The 3D library react-three-fiber drives; used here orthographically for the top-down 2D view.

@@ -18,12 +18,11 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@gunsmith/engine": "workspace:*",
     "@gunsmith/shared": "workspace:*",
     "@react-three/fiber": "catalog:",
-    "@reduxjs/toolkit": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "react-redux": "catalog:",
     "three": "catalog:"
   },
   "devDependencies": {

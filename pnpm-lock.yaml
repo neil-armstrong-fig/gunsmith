@@ -185,12 +185,12 @@ catalogs:
     '@langchain/ollama':
       specifier: 1.3.0
       version: 1.3.0
+    '@playwright/test':
+      specifier: 1.64.0
+      version: 1.64.0
     '@react-three/fiber':
       specifier: 9.8.2
       version: 9.8.2
-    '@reduxjs/toolkit':
-      specifier: 2.14.0
-      version: 2.14.0
     '@tailwindcss/vite':
       specifier: 4.3.4
       version: 4.3.4
@@ -233,9 +233,6 @@ catalogs:
     react-dom:
       specifier: 19.3.1
       version: 19.3.1
-    react-redux:
-      specifier: 9.3.1
-      version: 9.3.1
     tailwindcss:
       specifier: 4.3.4
       version: 4.3.4
@@ -265,6 +262,42 @@ importers:
 
   .: {}
 
+  acceptance-tests:
+    devDependencies:
+      '@eslint/js':
+        specifier: 'catalog:'
+        version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
+      '@gunsmith/shared':
+        specifier: workspace:*
+        version: link:../shared
+      '@playwright/test':
+        specifier: 'catalog:'
+        version: 1.64.0
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.6.6
+      eslint:
+        specifier: 'catalog:'
+        version: 10.14.0(jiti@2.7.0)(supports-color@10.2.2)
+      eslint-config-prettier:
+        specifier: 'catalog:'
+        version: 10.1.8(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
+      globals:
+        specifier: 'catalog:'
+        version: 17.14.0
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.10
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+      typescript-eslint:
+        specifier: 'catalog:'
+        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
+      vitest:
+        specifier: 'catalog:'
+        version: 5.1.0(@types/node@26.6.6)(vite@8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
+
   ai:
     dependencies:
       '@gunsmith/shared':
@@ -272,10 +305,10 @@ importers:
         version: link:../shared
       '@langchain/core':
         specifier: 'catalog:'
-        version: 1.3.4(ws@8.21.0)
+        version: 1.3.4(ws@8.22.1)
       '@langchain/langgraph':
         specifier: 'catalog:'
-        version: 1.6.1(@langchain/core@1.3.4(ws@8.21.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(zod@4.6.7)
+        version: 1.6.1(@langchain/core@1.3.4(ws@8.22.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(zod@4.6.7)
       zod:
         specifier: 'catalog:'
         version: 4.6.7
@@ -285,13 +318,13 @@ importers:
         version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       '@langchain/langgraph-cli':
         specifier: 'catalog:'
-        version: 1.6.0(@langchain/core@1.3.4(ws@8.21.0))(@langchain/langgraph-checkpoint@1.2.2(@langchain/core@1.3.4(ws@8.21.0)))(@langchain/langgraph-sdk@1.12.10(@langchain/core@1.3.4(ws@8.21.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(@langchain/langgraph@1.6.1(@langchain/core@1.3.4(ws@8.21.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(zod@4.6.7))(supports-color@10.2.2)(typescript@6.0.3)(ws@8.21.0)
+        version: 1.6.0(@langchain/core@1.3.4(ws@8.22.1))(@langchain/langgraph-checkpoint@1.2.2(@langchain/core@1.3.4(ws@8.22.1)))(@langchain/langgraph-sdk@1.12.10(@langchain/core@1.3.4(ws@8.22.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(@langchain/langgraph@1.6.1(@langchain/core@1.3.4(ws@8.22.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(zod@4.6.7))(supports-color@10.2.2)(typescript@6.0.3)(ws@8.22.1)
       '@langchain/langgraph-sdk':
         specifier: 'catalog:'
-        version: 1.12.10(@langchain/core@1.3.4(ws@8.21.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        version: 1.12.10(@langchain/core@1.3.4(ws@8.22.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@langchain/ollama':
         specifier: 'catalog:'
-        version: 1.3.0(@langchain/core@1.3.4(ws@8.21.0))
+        version: 1.3.0(@langchain/core@1.3.4(ws@8.22.1))
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6
@@ -306,7 +339,7 @@ importers:
         version: 17.14.0
       langsmith:
         specifier: 'catalog:'
-        version: 0.11.8(ws@8.21.0)
+        version: 0.11.8(ws@8.22.1)
       prettier:
         specifier: 'catalog:'
         version: 3.9.10
@@ -322,6 +355,39 @@ importers:
       wrangler:
         specifier: 'catalog:'
         version: 4.157.0(@types/node@26.6.6)
+
+  engine:
+    devDependencies:
+      '@eslint/js':
+        specifier: 'catalog:'
+        version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
+      '@gunsmith/shared':
+        specifier: workspace:*
+        version: link:../shared
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.6.6
+      eslint:
+        specifier: 'catalog:'
+        version: 10.14.0(jiti@2.7.0)(supports-color@10.2.2)
+      eslint-config-prettier:
+        specifier: 'catalog:'
+        version: 10.1.8(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
+      globals:
+        specifier: 'catalog:'
+        version: 17.14.0
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.10
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+      typescript-eslint:
+        specifier: 'catalog:'
+        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
+      vitest:
+        specifier: 'catalog:'
+        version: 5.1.0(@types/node@26.6.6)(vite@8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
 
   shared:
     devDependencies:
@@ -355,24 +421,21 @@ importers:
 
   webapp:
     dependencies:
+      '@gunsmith/engine':
+        specifier: workspace:*
+        version: link:../engine
       '@gunsmith/shared':
         specifier: workspace:*
         version: link:../shared
       '@react-three/fiber':
         specifier: 'catalog:'
         version: 9.8.2(@types/react@19.3.0)(immer@11.2.9)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(three@0.187.0)
-      '@reduxjs/toolkit':
-        specifier: 'catalog:'
-        version: 2.14.0(@types/react@19.3.0)(react-redux@9.3.1(@types/react@19.3.0)(react@19.3.1)(redux@5.0.1))(react@19.3.1)
       react:
         specifier: 'catalog:'
         version: 19.3.1
       react-dom:
         specifier: 'catalog:'
         version: 19.3.1(react@19.3.1)
-      react-redux:
-        specifier: 'catalog:'
-        version: 9.3.1(@types/react@19.3.0)(react@19.3.1)(redux@5.0.1)
       three:
         specifier: 'catalog:'
         version: 0.187.0
@@ -1158,6 +1221,11 @@ packages:
   '@oxc-project/types@0.156.0':
     resolution: {integrity: sha512-1Duyg48TdJNdyhEB8Xn1L36bT9Pv6GUtlKjHxOys8xkaF/rQq3XJE+bAurSK/AgIz5mGFsb77cn9Pb20+WCScw==}
 
+  '@playwright/test@1.64.0':
+    resolution: {integrity: sha512-oTN9FNYuN6bqQMwiho6jJKLCG2/QOYCixGXuCjRmzOq23eODeukuY2XiAVoVpAECbuezMt1MHQjAiQxK8F+Y+g==}
+    engines: {node: '>=20'}
+    hasBin: true
+
   '@poppinss/colors@4.1.6':
     resolution: {integrity: sha512-H9xkIdFswbS8n1d6vmRd8+c10t2Qe+rZITbbDHHkQixH5+2x1FDGmi/0K+WgWiqQFKPSlIYB7jlH6Kpfn6Fleg==}
 
@@ -1190,20 +1258,6 @@ packages:
       react-dom:
         optional: true
       react-native:
-        optional: true
-
-  '@reduxjs/toolkit@2.14.0':
-    resolution: {integrity: sha512-m/PxMwRe0xLL6XUsAgy0YjInklHcfi9uMwFhJk+QINqjxqPvyc89T5cMjszA5bDmTE0gwGc7zr9LRO4gL+mhaw==}
-    peerDependencies:
-      '@types/react': '*'
-      react: ^16.9.0 || ^17.0.0 || ^18 || ^19
-      react-redux: ^7.2.1 || ^8.1.3 || ^9.0.0
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      react:
-        optional: true
-      react-redux:
         optional: true
 
   '@rolldown/binding-android-arm-eabi@1.2.16':
@@ -1324,9 +1378,6 @@ packages:
 
   '@standard-schema/spec@1.1.0':
     resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
-
-  '@standard-schema/utils@0.3.0':
-    resolution: {integrity: sha512-e7Mew686owMaPJVNNLs55PUvgz371nKgwsc4vxE49zsODpJEnxgxRo2y/OKrqueavXgZNMDVj3DdHFlaSAeU8g==}
 
   '@tailwindcss/node@4.3.4':
     resolution: {integrity: sha512-b7QK/QG04v3j04NbpG82XLCedRyulnkuwUDwRa9oK/ypnJIzMapz2Wg+0TltVczjUzDaJJHIa1+jj9aMUOFMTQ==}
@@ -1466,9 +1517,6 @@ packages:
 
   '@types/triple-beam@1.3.5':
     resolution: {integrity: sha512-6WaYesThRMCl19iryMYP7/x2OVgCtbIVflDGFpWnb9irXI3UjYE4AzmYuiUKY1AJstGijoY+MgUszMgRxIYTYw==}
-
-  '@types/use-sync-external-store@0.0.6':
-    resolution: {integrity: sha512-zFDAD+tlpf2r4asuHEj0XH6pY6i0g5NeAHPn+15wk3BV6JA69eERFXC1gyGThDkVa1zCyKr5jox1+2LbV/AMLg==}
 
   '@types/webxr@0.5.24':
     resolution: {integrity: sha512-h8fgEd/DpoS9CBrjEQXR+dIDraopAEfu4wYVNY2tEPwk60stPWhvZMf4Foo5FakuQ7HFZoa8WceaWFervK2Ovg==}
@@ -2385,6 +2433,16 @@ packages:
     resolution: {integrity: sha512-qcJu88Q2IWqJsDD529JKMdwGm/dvInW4HvQnRwiH9JtihJvzGOscDtHE3x1pBKeUOTysQ8kVmLnJ2kJu7yhcGA==}
     engines: {node: '>=12'}
 
+  playwright-core@1.64.0:
+    resolution: {integrity: sha512-T9r+MZkTECl2+oUcZ26YgZzTrYidTsIhYYkJix+6iDOymOb1FB2RLLSOxRGnZGv5DStt+aduIVbt+E8WygXYpg==}
+    engines: {node: '>=20'}
+    hasBin: true
+
+  playwright@1.64.0:
+    resolution: {integrity: sha512-kVzTnYFYEyQ9RGzBjNCd2+yEqWmVbxl3AHPynv3qQ6JTjv4a+kwRcnqQwIpuP3NnrnIrE/Q6wWAIAvMfIE2/Yg==}
+    engines: {node: '>=20'}
+    hasBin: true
+
   postcss-modules-extract-imports@3.1.0:
     resolution: {integrity: sha512-k3kNe0aNFQDAZGbin48pL2VNidTF0w4/eASDsxlyspobzU3wZQLOGj7L9gfRe0Jo9/4uud09DsjFNH7winGv8Q==}
     engines: {node: ^10 || ^12 || >= 14}
@@ -2454,18 +2512,6 @@ packages:
     peerDependencies:
       react: ^19.3.1
 
-  react-redux@9.3.1:
-    resolution: {integrity: sha512-vxMLT0lalUjbZPkoTepWyKAZbjIIFssNx/CEL9lTfwQBU6XpkGSmCNdcCIrkOBUgB68uftZMnbXVb6DwGnhRKQ==}
-    peerDependencies:
-      '@types/react': ^18.2.25 || ^19
-      react: ^18.0 || ^19
-      redux: ^5.0.0
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      redux:
-        optional: true
-
   react-use-measure@2.1.7:
     resolution: {integrity: sha512-KrvcAo13I/60HpwGO5jpW7E9DfusKyLPLvuHlUyP5zqnmAPhNc6qTRjUQrdTADl0lpPpDVU2/Gg51UlOGHXbdg==}
     peerDependencies:
@@ -2486,17 +2532,6 @@ packages:
   readdirp@4.1.2:
     resolution: {integrity: sha512-GDhwkLfywWL2s6vEjyhri+eXmfH6j1L7JE27WhqLeYzoh/A3DBaYGEj2H/HFZCn/kMfim73FXxEJTw06WtxQwg==}
     engines: {node: '>= 14.18.0'}
-
-  redux-thunk@3.1.0:
-    resolution: {integrity: sha512-NW2r5T6ksUKXCabzhL9z+h206HQw/NJkcLm1GPImRQ8IzfXwRGqjVhKJGauHirT0DAuyy6hjdnMZaRoAcy0Klw==}
-    peerDependencies:
-      redux: ^5.0.0
-
-  redux@5.0.1:
-    resolution: {integrity: sha512-M9/ELqF6fy8FwmkpnF0S3YKOqMyoWJ4+CS5Efg2ct3oY9daQvd/Pc71FpGZsVsbl3Cpb+IIcjBDUnnyBdQbq4w==}
-
-  reselect@5.3.0:
-    resolution: {integrity: sha512-XGoLeRAVzUTcJ1qkxPQhDJyIZ5d6zzZD9nT7AEZOaaU9UbWclhycElmhO+VD5bFeLuzhPBaOV2oXC8uG35ZSpg==}
 
   rolldown@1.2.16:
     resolution: {integrity: sha512-bWvlMpFKiTfDKfnK7FC2MPgPeWCf/Kpwsq49ApdW+FQaBZb6O6dZ4MAPbPUjp7hYQrw/RobqCzn64BRrQecGHw==}
@@ -2823,6 +2858,18 @@ packages:
 
   ws@8.21.0:
     resolution: {integrity: sha512-Vsp28b7DRcimFQvrqu2Wek3z1iYxDCWqHYB8Qsnk/S4RfaCQzPGPyBNuVjJV3cd6UiKtUtp6sNM77gWvzcCH+g==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
+
+  ws@8.22.1:
+    resolution: {integrity: sha512-oyL6OPYme/CmiFvNuGzeoxCJ4nOrZE2O1FwM9MWM1AsGri6nLXB2pg+lNA8aLeXMSav0J6eIVS1j6vUPzUtK9g==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
@@ -3283,7 +3330,7 @@ snapshots:
     dependencies:
       '@hono/node-server': 2.1.6(hono@4.13.16)
       hono: 4.13.16
-      ws: 8.21.0
+      ws: 8.22.1
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -3451,12 +3498,12 @@ snapshots:
 
   '@keyv/serialize@1.1.1': {}
 
-  '@langchain/core@1.3.4(ws@8.21.0)':
+  '@langchain/core@1.3.4(ws@8.22.1)':
     dependencies:
       '@cfworker/json-schema': 4.1.6
       '@standard-schema/spec': 1.1.0
       js-tiktoken: 1.0.21
-      langsmith: 0.11.8(ws@8.21.0)
+      langsmith: 0.11.8(ws@8.22.1)
       mustache: 4.2.0
       p-queue: 6.6.2
       zod: 4.6.7
@@ -3467,15 +3514,15 @@ snapshots:
       - openai
       - ws
 
-  '@langchain/langgraph-api@1.6.0(@langchain/core@1.3.4(ws@8.21.0))(@langchain/langgraph-checkpoint@1.2.2(@langchain/core@1.3.4(ws@8.21.0)))(@langchain/langgraph-sdk@1.12.10(@langchain/core@1.3.4(ws@8.21.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(@langchain/langgraph@1.6.1(@langchain/core@1.3.4(ws@8.21.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(zod@4.6.7))(supports-color@10.2.2)(typescript@6.0.3)(ws@8.21.0)':
+  '@langchain/langgraph-api@1.6.0(@langchain/core@1.3.4(ws@8.22.1))(@langchain/langgraph-checkpoint@1.2.2(@langchain/core@1.3.4(ws@8.22.1)))(@langchain/langgraph-sdk@1.12.10(@langchain/core@1.3.4(ws@8.22.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(@langchain/langgraph@1.6.1(@langchain/core@1.3.4(ws@8.22.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(zod@4.6.7))(supports-color@10.2.2)(typescript@6.0.3)(ws@8.22.1)':
     dependencies:
       '@babel/code-frame': 7.29.7
       '@hono/node-server': 2.1.6(hono@4.13.16)
       '@hono/node-ws': 1.3.1(@hono/node-server@2.1.6(hono@4.13.16))(hono@4.13.16)
       '@hono/zod-validator': 0.7.6(hono@4.13.16)(zod@4.6.7)
-      '@langchain/core': 1.3.4(ws@8.21.0)
-      '@langchain/langgraph': 1.6.1(@langchain/core@1.3.4(ws@8.21.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(zod@4.6.7)
-      '@langchain/langgraph-checkpoint': 1.2.2(@langchain/core@1.3.4(ws@8.21.0))
+      '@langchain/core': 1.3.4(ws@8.22.1)
+      '@langchain/langgraph': 1.6.1(@langchain/core@1.3.4(ws@8.22.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(zod@4.6.7)
+      '@langchain/langgraph-checkpoint': 1.2.2(@langchain/core@1.3.4(ws@8.22.1))
       '@langchain/langgraph-ui': 1.6.0
       '@langchain/protocol': 0.0.20
       '@types/json-schema': 7.0.15
@@ -3484,7 +3531,7 @@ snapshots:
       dotenv: 16.6.1
       exit-hook: 4.0.0
       hono: 4.13.16
-      langsmith: 0.11.8(ws@8.21.0)
+      langsmith: 0.11.8(ws@8.22.1)
       open: 10.2.0
       semver: 7.8.6
       stacktrace-parser: 0.1.11
@@ -3495,7 +3542,7 @@ snapshots:
       winston-console-format: 1.0.8
       zod: 4.6.7
     optionalDependencies:
-      '@langchain/langgraph-sdk': 1.12.10(@langchain/core@1.3.4(ws@8.21.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@langchain/langgraph-sdk': 1.12.10(@langchain/core@1.3.4(ws@8.22.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
     transitivePeerDependencies:
       - '@opentelemetry/api'
       - '@opentelemetry/exporter-trace-otlp-proto'
@@ -3507,15 +3554,15 @@ snapshots:
       - utf-8-validate
       - ws
 
-  '@langchain/langgraph-checkpoint@1.2.2(@langchain/core@1.3.4(ws@8.21.0))':
+  '@langchain/langgraph-checkpoint@1.2.2(@langchain/core@1.3.4(ws@8.22.1))':
     dependencies:
-      '@langchain/core': 1.3.4(ws@8.21.0)
+      '@langchain/core': 1.3.4(ws@8.22.1)
 
-  '@langchain/langgraph-cli@1.6.0(@langchain/core@1.3.4(ws@8.21.0))(@langchain/langgraph-checkpoint@1.2.2(@langchain/core@1.3.4(ws@8.21.0)))(@langchain/langgraph-sdk@1.12.10(@langchain/core@1.3.4(ws@8.21.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(@langchain/langgraph@1.6.1(@langchain/core@1.3.4(ws@8.21.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(zod@4.6.7))(supports-color@10.2.2)(typescript@6.0.3)(ws@8.21.0)':
+  '@langchain/langgraph-cli@1.6.0(@langchain/core@1.3.4(ws@8.22.1))(@langchain/langgraph-checkpoint@1.2.2(@langchain/core@1.3.4(ws@8.22.1)))(@langchain/langgraph-sdk@1.12.10(@langchain/core@1.3.4(ws@8.22.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(@langchain/langgraph@1.6.1(@langchain/core@1.3.4(ws@8.22.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(zod@4.6.7))(supports-color@10.2.2)(typescript@6.0.3)(ws@8.22.1)':
     dependencies:
       '@babel/code-frame': 7.29.7
       '@commander-js/extra-typings': 13.1.0(commander@13.1.0)
-      '@langchain/langgraph-api': 1.6.0(@langchain/core@1.3.4(ws@8.21.0))(@langchain/langgraph-checkpoint@1.2.2(@langchain/core@1.3.4(ws@8.21.0)))(@langchain/langgraph-sdk@1.12.10(@langchain/core@1.3.4(ws@8.21.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(@langchain/langgraph@1.6.1(@langchain/core@1.3.4(ws@8.21.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(zod@4.6.7))(supports-color@10.2.2)(typescript@6.0.3)(ws@8.21.0)
+      '@langchain/langgraph-api': 1.6.0(@langchain/core@1.3.4(ws@8.22.1))(@langchain/langgraph-checkpoint@1.2.2(@langchain/core@1.3.4(ws@8.22.1)))(@langchain/langgraph-sdk@1.12.10(@langchain/core@1.3.4(ws@8.22.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(@langchain/langgraph@1.6.1(@langchain/core@1.3.4(ws@8.22.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(zod@4.6.7))(supports-color@10.2.2)(typescript@6.0.3)(ws@8.22.1)
       chokidar: 4.0.3
       commander: 13.1.0
       create-langgraph: 1.1.5(supports-color@10.2.2)
@@ -3525,7 +3572,7 @@ snapshots:
       exit-hook: 4.0.0
       extract-zip: 2.0.1(supports-color@10.2.2)
       ignore: 7.0.14
-      langsmith: 0.11.8(ws@8.21.0)
+      langsmith: 0.11.8(ws@8.22.1)
       open: 10.2.0
       package-manager-detector: 1.9.0
       stacktrace-parser: 0.1.11
@@ -3551,9 +3598,9 @@ snapshots:
       - utf-8-validate
       - ws
 
-  '@langchain/langgraph-sdk@1.12.10(@langchain/core@1.3.4(ws@8.21.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+  '@langchain/langgraph-sdk@1.12.10(@langchain/core@1.3.4(ws@8.22.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
-      '@langchain/core': 1.3.4(ws@8.21.0)
+      '@langchain/core': 1.3.4(ws@8.22.1)
       '@langchain/protocol': 0.0.20
       '@types/json-schema': 7.0.15
       p-queue: 9.3.5
@@ -3570,11 +3617,11 @@ snapshots:
       esbuild-plugin-tailwindcss: 2.2.0
       zod: 4.6.7
 
-  '@langchain/langgraph@1.6.1(@langchain/core@1.3.4(ws@8.21.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(zod@4.6.7)':
+  '@langchain/langgraph@1.6.1(@langchain/core@1.3.4(ws@8.22.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(zod@4.6.7)':
     dependencies:
-      '@langchain/core': 1.3.4(ws@8.21.0)
-      '@langchain/langgraph-checkpoint': 1.2.2(@langchain/core@1.3.4(ws@8.21.0))
-      '@langchain/langgraph-sdk': 1.12.10(@langchain/core@1.3.4(ws@8.21.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@langchain/core': 1.3.4(ws@8.22.1)
+      '@langchain/langgraph-checkpoint': 1.2.2(@langchain/core@1.3.4(ws@8.22.1))
+      '@langchain/langgraph-sdk': 1.12.10(@langchain/core@1.3.4(ws@8.22.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@langchain/protocol': 0.0.20
       '@standard-schema/spec': 1.1.0
       zod: 4.6.7
@@ -3582,14 +3629,18 @@ snapshots:
       - react
       - react-dom
 
-  '@langchain/ollama@1.3.0(@langchain/core@1.3.4(ws@8.21.0))':
+  '@langchain/ollama@1.3.0(@langchain/core@1.3.4(ws@8.22.1))':
     dependencies:
-      '@langchain/core': 1.3.4(ws@8.21.0)
+      '@langchain/core': 1.3.4(ws@8.22.1)
       ollama: 0.6.4
 
   '@langchain/protocol@0.0.20': {}
 
   '@oxc-project/types@0.156.0': {}
+
+  '@playwright/test@1.64.0':
+    dependencies:
+      playwright: 1.64.0
 
   '@poppinss/colors@4.1.6':
     dependencies:
@@ -3622,19 +3673,6 @@ snapshots:
     transitivePeerDependencies:
       - '@types/react'
       - immer
-
-  '@reduxjs/toolkit@2.14.0(@types/react@19.3.0)(react-redux@9.3.1(@types/react@19.3.0)(react@19.3.1)(redux@5.0.1))(react@19.3.1)':
-    dependencies:
-      '@standard-schema/spec': 1.1.0
-      '@standard-schema/utils': 0.3.0
-      immer: 11.2.9
-      redux: 5.0.1
-      redux-thunk: 3.1.0(redux@5.0.1)
-      reselect: 5.3.0
-    optionalDependencies:
-      '@types/react': 19.3.0
-      react: 19.3.1
-      react-redux: 9.3.1(@types/react@19.3.0)(react@19.3.1)(redux@5.0.1)
 
   '@rolldown/binding-android-arm-eabi@1.2.16':
     optional: true
@@ -3697,8 +3735,6 @@ snapshots:
   '@speed-highlight/core@1.2.24': {}
 
   '@standard-schema/spec@1.1.0': {}
-
-  '@standard-schema/utils@0.3.0': {}
 
   '@tailwindcss/node@4.3.4':
     dependencies:
@@ -3819,8 +3855,6 @@ snapshots:
       meshoptimizer: 1.1.1
 
   '@types/triple-beam@1.3.5': {}
-
-  '@types/use-sync-external-store@0.0.6': {}
 
   '@types/webxr@0.5.24': {}
 
@@ -4463,7 +4497,8 @@ snapshots:
 
   ignore@7.0.14: {}
 
-  immer@11.2.9: {}
+  immer@11.2.9:
+    optional: true
 
   imurmurhash@0.1.4: {}
 
@@ -4528,11 +4563,11 @@ snapshots:
 
   kuler@2.0.0: {}
 
-  langsmith@0.11.8(ws@8.21.0):
+  langsmith@0.11.8(ws@8.22.1):
     dependencies:
       p-queue: 6.6.2
     optionalDependencies:
-      ws: 8.21.0
+      ws: 8.22.1
 
   levn@0.4.1:
     dependencies:
@@ -4733,6 +4768,12 @@ snapshots:
 
   picomatch@4.0.7: {}
 
+  playwright-core@1.64.0: {}
+
+  playwright@1.64.0:
+    dependencies:
+      playwright-core: 1.64.0
+
   postcss-modules-extract-imports@3.1.0(postcss@8.5.32):
     dependencies:
       postcss: 8.5.32
@@ -4803,15 +4844,6 @@ snapshots:
       react: 19.3.1
       scheduler: 0.28.0
 
-  react-redux@9.3.1(@types/react@19.3.0)(react@19.3.1)(redux@5.0.1):
-    dependencies:
-      '@types/use-sync-external-store': 0.0.6
-      react: 19.3.1
-      use-sync-external-store: 1.7.0(react@19.3.1)
-    optionalDependencies:
-      '@types/react': 19.3.0
-      redux: 5.0.1
-
   react-use-measure@2.1.7(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
     dependencies:
       react: 19.3.1
@@ -4827,14 +4859,6 @@ snapshots:
       util-deprecate: 1.0.2
 
   readdirp@4.1.2: {}
-
-  redux-thunk@3.1.0(redux@5.0.1):
-    dependencies:
-      redux: 5.0.1
-
-  redux@5.0.1: {}
-
-  reselect@5.3.0: {}
 
   rolldown@1.2.16:
     dependencies:
@@ -5130,6 +5154,8 @@ snapshots:
   wrappy@1.0.2: {}
 
   ws@8.21.0: {}
+
+  ws@8.22.1: {}
 
   wsl-utils@0.1.0:
     dependencies:

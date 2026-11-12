@@ -81,13 +81,14 @@ before finishing work in `engine/src/`, and `pnpm evals` before finishing work i
 This project is Acceptance Test Driven. **Write the acceptance test first**, watch it fail for the
 right reason, then make it pass. See `acceptance-tests/AGENTS.md` (written by `build`, modelled on janggi's).
 
-**The one exception is the fuzzy frontend** (`docs/fuzzy-frontend.md`, after https://neilarmstrong.dev/blog/fuzzy-frontend/).
-First, get every screen and path clickable end to end with fake data, as fast as possible, so a rough game can be seen
-and judged early; that phase is built without tests-first and is not thrown away. ATDD is the **fast follow**: as soon as
-the fuzzy frontend has been looked at, each area is brought into focus test-first, one at a time, with the flow staying
-clickable. Anything built fuzzy is logged in the ledger in `docs/fuzzy-frontend.md`, and a ledger row is closed only
-when its acceptance spec exists and has been watched to fail. Engine, API and AI work are never fuzzy: they are
-test-first from the start.
+**There is no exception.** A fuzzy-frontend phase (every screen clickable with fakes, built without tests,
+`docs/fuzzy-frontend.md`) was tried on 2026-11-12 and dropped at the user's request: it produced a pile of menus and
+contracts around a game that was not yet fun. The order now is **a fun game first, then everything built around it**:
+the canvas fills the whole screen, menus appear over it only when needed, and each mechanic starts as an acceptance spec.
+Do not build screens or fakes ahead of the game.
+
+**Nothing goes in `shared/` until a second package needs it.** No pre-emptive schemas, adapters or constants. Code
+lives in the one package that uses it, and moves to `shared/` only when another package genuinely imports it.
 
 **A passing test proves nothing until you have watched it fail.** For a test written after the code,
 or cover you inherited, the way to prove it is **mutation**: break what the test claims to cover, run
@@ -148,6 +149,11 @@ Prettier owns formatting (`pnpm format`). What it won't tell you:
 - **Name a folder for its subject, not its shape.** `visibility/`, `weapons/`, `pre-round/` say what's
   inside; `buttons/`, `helpers/`, `styles/` describe the files' form and leave a reader no wiser.
   `utils/` is a shape name too — the last resort, not the default home for a plain function.
+- **A domain folder is its root file and nothing else loose.** `<domain>/` holds the entry point (the handful that say what
+  the domain does), a `<domain>/types/` folder for every interface and type alias (never beside the file that uses it),
+  and a subfolder named for its subject for each helper only the root file uses (`player/walking/PlayerSpeed.ts` serves
+  `MovePlayer.ts`). A constant or helper two domains share stays at the root of the domain that owns it
+  (`player/PlayerRadius.ts`), or rises to the nearest common ancestor of its callers and no further.
 - **A union of literals is read off the list, not written twice.** Declare it `as const` and derive
   the type from it (`(typeof X)[number]`), so the two can't drift apart. A union with no runtime list
   to keep it honest stays a plain `type`.
@@ -207,17 +213,16 @@ Enforced by ESLint (`no-restricted-imports`, in `shared/config/eslint.base.js`) 
 | ------------------- | ----------------------------------------------------------------------------------- |
 | `shared/`           | nothing else in the workspace — it is the bottom of the graph                       |
 | `engine/`           | itself and `@gunsmith/shared`                                                       |
-| `ai/`               | itself, `@gunsmith/shared` and `@gunsmith/engine` (to validate and rate its output) |
+| `ai/`               | itself, `@gunsmith/shared` and `@gunsmith/engine` (to validate and rate its output); only `api/` imports it |
 | `webapp/`           | itself, `@gunsmith/shared` and `@gunsmith/engine`                                   |
 | `acceptance-tests/` | itself and `@gunsmith/shared`                                                       |
-| `api/`              | itself, `@gunsmith/shared` and `@gunsmith/engine`; nothing imports it               |
+| `api/`              | itself, `@gunsmith/shared`, `@gunsmith/engine` and `@gunsmith/ai`; nothing imports it |
 | `infra/`            | itself only; nothing imports it                                                     |
 
-`api/` reaching `ai/` is **undecided**: if the AI runs as its own LangGraph server (`docs/ai-hosting.md`), `api/` calls it
-over HTTP through a client in `shared/` and never imports `ai/`; if it runs inside the Worker, add `@gunsmith/ai` to
-`api/`'s `allowedPackages`. `ai` settles it; until then `api/` may not import `ai/`. **Provisional (2026-11-12):** `ai`
-recommends the LangSmith Deployment option, so HTTP and no import; the table above does not change until the user approves
-the spend (`docs/ai-hosting.md`).
+`api/` imports `ai/` **(decided 2026-11-12, `docs/ai-hosting.md`)**: the pipeline runs inside the Worker with LangChain.js
+and LangGraph.js, because the user declined LangSmith Plus, which a hosted LangGraph deployment needs. Add `@gunsmith/ai` to
+`api/`'s `allowedPackages` when `api/` is scaffolded. `ai/` must stay Workers-safe (no Node-only APIs; `nodejs_compat`
+only), and the graph stays host-agnostic (`langgraph.json`) so a hosted deployment remains an option later.
 
 A workspace package added later is **denied by default**; add it to `allowedPackages` in that
 package's `eslint.config.js` to permit it. Packages enforce their own internal layering too — see the
@@ -328,8 +333,10 @@ These are janggi's, carried over until each is re-checked against the versions a
 - On Linux/WSL, Chromium needs system libraries once:
   `pnpm --filter @gunsmith/acceptance-tests exec playwright install-deps chromium` (needs sudo), or
   every acceptance test fails on browser launch with `libnspr4.so`.
-- **LangSmith on Workers:** environment variables are not read, so pass the tracing config to the client explicitly, and
-  flush before the isolate ends (`docs/ai-pipeline.md`). Avoid streaming until it is verified.
+- **LangSmith on Workers:** with `nodejs_compat_populate_process_env` the tracing variables are read (checked 2026-11-12;
+  without the flag, pass the config to the client explicitly). **Flush on every request path with
+  `ctx.waitUntil(awaitAllCallbacks())`**: an unflushed trace is lost and the orphaned batch can hang the next request that
+  awaits a flush (`docs/ai-hosting.md`). Avoid streaming until it is verified.
 - **Cloudflare has no hard spend cap.** Budget alerts are email only. The kill switch is ours (`docs/cost-and-budget.md`).
 
 ## CI and deployment (planned)

@@ -47,8 +47,14 @@ Spectators receive a **full view delayed** by the host's setting (a ring buffer 
 
 ## Visibility
 
-- 360° radius, independent of aim. Blocked by walls and by height; higher ground extends vision and sees over lower cover;
-  lower ground cannot see up. Crouching removes vision.
+- The equipped weapon's prompt configures the base forward-cone angle/range; standing/crouching modifies it. The cone
+  follows aim throughout 360° rotation. Walls/height clip detailed vision; higher ground extends vision and sees over
+  lower cover, lower ground cannot see up. Crouching increases range with the same angle/occlusion.
+- Separate **terrain presentation** from **dynamic entity visibility**: known static arena layout may remain dimly
+  visible outside the cone. Terrain detail, players and items are revealed inside the current unoccluded cone.
+  A dim terrain layer never licenses sending hidden opponent, pickup, projectile or exact-position effect data.
+- Tests rotate/move the cone, switch weapon/stance, check the dim-versus-detailed terrain and assert which entities
+  are visible. Newly visible entities use current pose/weapon/effect state; concealed ones leave no stale marker.
 - Computed in `engine/` on a tile grid with three height levels (a visibility polygon or shadow-cast over tiles). It is the
   single source for the server's snapshot filter, the client's fog shader and the tests.
 - Property tests: visibility is symmetric where it should be, never passes an indestructible wall, and a hidden entity
