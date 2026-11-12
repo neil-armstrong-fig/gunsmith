@@ -9,20 +9,74 @@ habit and review (`AGENTS.md` at the root, "Code style").
 ```
 src/
   Main.tsx, index.css        the entry and the palette tokens
-  react/                     everything drawn, and the logic only one component uses, beneath that component
+  react/                     top layer: everything drawn, and the logic only one component uses, beneath that component
+  store/                     middle layer: Zustand stores; may import game/ and the engine, never react/
+    game/                    the game store: the engine's `World` and nothing else
+  game/                      bottom layer: plain data and logic (the practice arena), no React, no store
 ```
 
-There is no `game/` folder today. It was the home of plain, React-free logic (the clock, the camera fit, the snapshot), but
-every piece had exactly one caller, so each now sits beneath that caller. A `game/` layer comes back when logic is shared
-by several components, as `react/` -> `redux/` -> `game/` in the root `AGENTS.md` describes.
+An import may only point down: `react/` → `store/` → `game/`. ESLint enforces it (`eslint.config.js`): `game/` may not
+import the store, React, the renderer or Zustand; `store/` may not import `react/`. A piece of logic only one component
+uses still sits beneath that component, not in `game/`; `game/` is for data shared by several layers.
 
-Per-frame state stays out of Redux (there is no Redux yet): the running world lives in a ref, read inside `useFrame`.
-Per-frame values never go through React state.
+## State: Zustand, one library, a store per domain
+
+Zustand is the only state library. A store is a folder under `store/` named for its subject (`store/game/`), laid out
+like a Redux slice: **the store itself at the top** (`UseGameStore.ts` exports `useGameStore`, with its test beside it and
+its state type in `types/`), and everything that reads from it in sub-folders, each with its own `types/`:
+
+```
+store/game/
+  UseGameStore.ts, UseGameStore.test.ts
+  types/GameStore.ts
+  selectors/                   reads, each in a folder of its own
+    select-ammo-readout/       a reactive selector for components
+      SelectAmmoReadout.ts, SelectAmmoReadout.test.ts
+      types/AmmoReadout.ts
+    game-state/                `gameState()`, the one-off read for `useFrame`
+      GameState.ts
+```
+
+Redux terms: `useGameStore` is the store (and `getState()` / `setState` live on it), `setWorld` is the one action, `GameStore`
+is `RootState` plus the actions, and a selector is `(state) => derived value`, as in Redux. `gameState()` is the imperative
+read, `store.getState().world`, that does not subscribe. New kinds of thing get a sub-folder named for what they are
+(`selectors/` today), never files loose beside the store. The shape follows large Zustand codebases (Lobe Chat keeps a
+folder per domain with the store, its initial state and its selectors) and the Redux style guide's feature folders alike:
+group by subject, not by file type. Add a `slices/` folder inside a store only when that store has several slices.
+Middleware, if any, goes on the composed store, never on a slice.
+
+**The game store holds what the engine's `World` holds, and nothing else.** Its state is `{world, setWorld}`.
+
+- A value worked out from the world (ammunition, health shown on screen) is a **selector**, never stored state.
+- Menus, lobby, library, credits and meta state do **not** go here: they go in an app store (`store/app/`), built when a
+  screen needs it, with the same conventions. Two stores because a Zustand `set` runs every mounted selector of its
+  store: a world written 60 times a second must not share a store with the whole UI.
+- It is enforced, not only written: lint lets `store/game/` import only `zustand`, the engine, `@src/game/**` and its own
+  folder, and `UseGameStore.test.ts` pins the store's exact keys, so adding state is a deliberate edit.
+
+**Reading it.** The loop writes the world once per frame (`setWorld`), and only when a step ran. `useFrame` and the loop
+read it with `gameState()`, which does not subscribe and causes no render. A React component reads slow values with a
+selector and `useShallow`: `useGameStore(useShallow(selectAmmoReadout))` re-renders only when the readout changes, which
+is a few times a second at most. A per-frame value is never bound to a component (react-three-fiber's own guidance: state
+managers are fine for updates that are not rapid). The decision and its sources are in `docs/state-management.md`.
+
+The HUD is plain React over the canvas (`react/components/dom/ammo-hud/`), styled with Tailwind and the `--color-gs-*` tokens. Anything
+animated on a timer (the reload fill) is a CSS animation, so React never sees a per-frame value.
 
 ## Folders inside `react/`
 
 - **One folder per component**, named in kebab-case for its file: `arena-canvas/ArenaCanvas.tsx`. Its children go in its
   `components/` folder, each in a folder of its own, however deep. The tree reads like the screen.
+- **`react/components/` splits into `dom/` and `three/`.** A top-level component is `components/dom/<name>/` when it
+  renders DOM (HTML, styled with Tailwind) and `components/three/<name>/` when it renders react-three-fiber objects inside
+  a `<Canvas>`, so the path says which world it lives in. `react/components/three/arena-canvas/` hosts the `<Canvas>`: it is
+  `three/` even though it renders a `<div>`, because it goes straight into a canvas and holds nothing but the minimum DOM
+  needed to set it up (the sized wrapper and its `data-ready` hook). Anything else DOM, such as the HUD, is its own `dom/`
+  component beside it, never inside it.
+- **Below a top-level component, children share its kind, so there is no further split.** Everything under `arena-canvas/`
+  is three: `arena-canvas/components/arena-scene/components/bullets/`, flat. A DOM component's children are DOM. If a
+  `three/` tree ever needed DOM, that is a new top-level `dom/` component, not a child. Hooks, pure helpers and types are
+  not components: they keep the rules below, wherever they sit.
 - **A hook sits beneath the thing that calls it**, in `hooks/<kebab-name>/`. `use-game-loop/` belongs to `arena-scene/`,
   and `use-wasd-movement/` beneath `use-game-loop/`, because that is its only caller. A hook two components share rises
   to their nearest common ancestor and no further.

@@ -25,6 +25,21 @@
   --color-gs-weapon-mint: #8ad4b0;
 }
 
+/* The reload fill on the ammunition bar: sweeps left to right once. Its duration is set inline from the weapon's reload time. */
+@theme {
+  --animate-reload-fill: reload-fill 1s linear forwards;
+
+  @keyframes reload-fill {
+    from {
+      transform: scaleX(0);
+    }
+
+    to {
+      transform: scaleX(1);
+    }
+  }
+}
+
 body {
   background-color: var(--color-gs-background);
   color: var(--color-gs-ui-text);

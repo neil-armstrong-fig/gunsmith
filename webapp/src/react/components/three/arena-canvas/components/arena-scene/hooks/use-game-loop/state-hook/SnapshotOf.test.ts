@@ -1,0 +1,96 @@
+import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
+import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
+import {MARKSMAN_RIFLE} from "@gunsmith/engine/weapon/weapons/MarksmanRifle";
+import {RIFLE} from "@gunsmith/engine/weapon/weapons/Rifle";
+import {snapshotOf} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/state-hook/SnapshotOf";
+
+const world = startingWorld(arenaFrom(["#####", "#...#", "#...#", "#...#", "#####"]));
+
+it("reports the arena's size in tiles", () => {
+  expect(snapshotOf(world).arena).toEqual({width: 5, height: 5});
+});
+
+it("reports where the player's centre is", () => {
+  expect(snapshotOf(world).player).toMatchObject({x: 2.5, y: 2.5});
+});
+
+it("reports the game clock", () => {
+  expect(snapshotOf({...world, elapsedSeconds: 3.5}).elapsedSeconds).toBe(3.5);
+});
+
+it("hands back a copy, so reading it cannot change the game", () => {
+  const snapshot = snapshotOf(world);
+  snapshot.player.x = 99;
+
+  expect(world.player.position.x).toBe(2.5);
+});
+
+it("reports the way the player faces in degrees, 0 being east and 90 north", () => {
+  const facing = (x: number, y: number): number =>
+    snapshotOf({...world, player: {...world.player, aim: {x, y}}}).player.aimDegrees;
+
+  expect(facing(1, 0)).toBe(0);
+  expect(facing(0, 1)).toBe(90);
+  expect(facing(0, -1)).toBe(-90);
+  expect(facing(-Math.SQRT1_2, Math.SQRT1_2)).toBeCloseTo(135, 9);
+});
+
+it("reports no bullets when none are in the air", () => {
+  expect(snapshotOf(world).bullets).toEqual([]);
+});
+
+it("reports where each bullet in the air is", () => {
+  const flying = {...world, bullets: [{position: {x: 1, y: 2}, direction: {x: 1, y: 0}, damage: 25, speed: 20}]};
+
+  expect(snapshotOf(flying).bullets).toEqual([{x: 1, y: 2}]);
+});
+
+it("reports no dummies when the world has none", () => {
+  expect(snapshotOf(world).dummies).toEqual([]);
+});
+
+it("reports where each dummy stands and how much health it has left", () => {
+  const withDummies = {
+    ...world,
+    dummies: [
+      {position: {x: 1.5, y: 2.5}, health: 100},
+      {position: {x: 3.5, y: 1.5}, health: 25},
+    ],
+  };
+
+  expect(snapshotOf(withDummies).dummies).toEqual([
+    {x: 1.5, y: 2.5, health: 100},
+    {x: 3.5, y: 1.5, health: 25},
+  ]);
+});
+
+it("reports which slot the weapon in hand is in, counting from one", () => {
+  const holding = (equippedIndex: number): number =>
+    snapshotOf({...world, player: {...world.player, equippedIndex}}).weapon.slot;
+
+  expect(holding(0)).toBe(1);
+  expect(holding(1)).toBe(2);
+});
+
+it("reports the rounds in the magazine and in the reserve of the weapon in hand, not of the other", () => {
+  const loadout = [
+    {weapon: RIFLE, rounds: 3, reserve: 4},
+    {weapon: MARKSMAN_RIFLE, rounds: 1, reserve: 2},
+  ];
+
+  expect(snapshotOf({...world, player: {...world.player, loadout, equippedIndex: 0}}).weapon).toMatchObject({
+    rounds: 3,
+    reserve: 4,
+  });
+  expect(snapshotOf({...world, player: {...world.player, loadout, equippedIndex: 1}}).weapon).toMatchObject({
+    rounds: 1,
+    reserve: 2,
+  });
+});
+
+it("reports whether the weapon in hand is being reloaded", () => {
+  const reloading = {...world, player: {...world.player, reloadRemainingSeconds: 0.5}};
+
+  expect(snapshotOf(reloading).weapon.reloading).toBe(true);
+  expect(snapshotOf(world).weapon.reloading).toBe(false);
+});

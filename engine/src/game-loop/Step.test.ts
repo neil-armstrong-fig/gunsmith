@@ -1,13 +1,14 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import {fireBullet} from "@gunsmith/engine/bullet/FireBullet";
-import {BULLET_SPEED} from "@gunsmith/engine/bullet/flight/BulletSpeed";
 import {DUMMY_HEALTH} from "@gunsmith/engine/dummy/DummyHealth";
+import type {Player} from "@gunsmith/engine/player/types/Player";
 import {PLAYER_SPEED} from "@gunsmith/engine/player/walking/PlayerSpeed";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import {step} from "@gunsmith/engine/game-loop/Step";
 import type {Input} from "@gunsmith/engine/game-loop/types/Input";
 import type {World} from "@gunsmith/engine/game-loop/types/World";
-import {BULLET_DAMAGE} from "@gunsmith/engine/weapon/damage/BulletDamage";
+import {MARKSMAN_RIFLE} from "@gunsmith/engine/weapon/weapons/MarksmanRifle";
+import {RIFLE} from "@gunsmith/engine/weapon/weapons/Rifle";
 
 const arena = arenaFrom([
   "###############",
@@ -23,7 +24,7 @@ const arena = arenaFrom([
 const TICK = 1 / 60;
 
 function walking(x: number, y: number): Input {
-  return {direction: {x, y}, firing: false};
+  return {direction: {x, y}, firing: false, reload: false};
 }
 
 function centred(): World {
@@ -124,7 +125,7 @@ it("plays the same way every time from the same inputs", () => {
   expect(play()).toEqual(play());
 });
 
-const IDLE: Input = {direction: {x: 0, y: 0}, firing: false};
+const IDLE: Input = {direction: {x: 0, y: 0}, firing: false, reload: false};
 
 function firingAt(target: {x: number; y: number}): Input {
   return {...IDLE, aimAt: target, firing: true};
@@ -182,7 +183,10 @@ it("flies a bullet on at the bullet speed on later steps", () => {
   const fired = step(centred(), firingAt({x: 7.5, y: 14}), TICK);
   const later = step(fired, IDLE, TICK);
 
-  expect((later.bullets[0]?.position.y ?? 0) - (fired.bullets[0]?.position.y ?? 0)).toBeCloseTo(BULLET_SPEED * TICK, 9);
+  expect((later.bullets[0]?.position.y ?? 0) - (fired.bullets[0]?.position.y ?? 0)).toBeCloseTo(
+    RIFLE.bulletSpeed * TICK,
+    9,
+  );
 });
 
 it("removes a bullet when it hits the wall", () => {
@@ -203,9 +207,9 @@ it("does not fire a bullet that would start inside a wall", () => {
 
 it("starts a new bullet at the muzzle of the player where they now stand, and does not move it until the next step", () => {
   const east = {x: 20, y: 4.5};
-  const after = step(centred(), {direction: {x: 1, y: 0}, aimAt: east, firing: true}, TICK);
+  const after = step(centred(), {...IDLE, direction: {x: 1, y: 0}, aimAt: east, firing: true}, TICK);
 
-  expect(after.bullets[0]?.position).toEqual(fireBullet(after.player.position, after.player.aim).position);
+  expect(after.bullets[0]?.position).toEqual(fireBullet(after.player.position, after.player.aim, RIFLE).position);
 });
 
 // The player starts at (7.5, 4.5) facing east; four tiles east of that is a dummy on the same row.
@@ -230,7 +234,7 @@ function shoot(world: World, heldTicks: number, idleTicks: number): World {
 it("hurts a dummy the player shoots at", () => {
   const after = shoot(withDummyEast(), 1, 30);
 
-  expect(after.dummies[0]?.health).toBe(DUMMY_HEALTH - BULLET_DAMAGE);
+  expect(after.dummies[0]?.health).toBe(DUMMY_HEALTH - RIFLE.bulletDamage);
 });
 
 it("uses up the bullet that hit the dummy, well before the wall would have", () => {
@@ -259,4 +263,166 @@ it("does not change the dummies of the world it was given", () => {
   shoot(world, 60, 0);
 
   expect(world).toEqual(before);
+});
+
+// The weapons: the player carries the rifle in slot 1 and the marksman rifle in slot 2, both full.
+
+const EAST = {x: 20, y: 4.5};
+
+function withPlayer(world: World, changes: Partial<Player>): World {
+  return {...world, player: {...world.player, ...changes}};
+}
+
+/** The world with `rounds` in the magazine of the weapon at `index`. */
+function withRounds(world: World, index: number, rounds: number): World {
+  const loadout = world.player.loadout.map((carried, at) => {
+    if (at === index) {
+      return {...carried, rounds};
+    }
+
+    return carried;
+  });
+
+  return withPlayer(world, {loadout});
+}
+
+/** Plays `ticks` steps of `input`. */
+function playTicks(world: World, input: Input, ticks: number): World {
+  let later = world;
+  for (let tick = 0; tick < ticks; tick += 1) {
+    later = step(later, input, TICK);
+  }
+
+  return later;
+}
+
+it("spends a round from the magazine when it fires", () => {
+  const after = step(centred(), firingAt(EAST), TICK);
+
+  expect(after.player.loadout[0]?.rounds).toBe(RIFLE.magazineSize - 1);
+});
+
+it("spends no round when the trigger is not held", () => {
+  expect(step(centred(), IDLE, TICK).player.loadout[0]?.rounds).toBe(RIFLE.magazineSize);
+});
+
+it("spends nothing from the weapon that is not equipped", () => {
+  expect(step(centred(), firingAt(EAST), TICK).player.loadout[1]?.rounds).toBe(MARKSMAN_RIFLE.magazineSize);
+});
+
+it("fires the last round in the magazine", () => {
+  const after = step(withRounds(centred(), 0, 1), firingAt(EAST), TICK);
+
+  expect(after.bullets).toHaveLength(1);
+  expect(after.player.loadout[0]?.rounds).toBe(0);
+});
+
+it("does not fire with an empty magazine, however long the trigger is held", () => {
+  const after = playTicks(withRounds(centred(), 0, 0), firingAt(EAST), 60);
+
+  expect(after.bullets).toEqual([]);
+  expect(after.player.loadout[0]?.rounds).toBe(0);
+});
+
+it("stops firing when the magazine runs out, and has fired exactly the magazine", () => {
+  const after = playTicks(centred(), firingAt(EAST), 600);
+
+  expect(after.player.loadout[0]?.rounds).toBe(0);
+  expect(after.player.loadout[0]?.reserve).toBe(RIFLE.startingReserve);
+});
+
+it("equips the weapon in slot 2 when asked", () => {
+  expect(step(centred(), {...IDLE, switchTo: 2}, TICK).player.equippedIndex).toBe(1);
+});
+
+it("keeps the first weapon equipped when it is asked for a slot it does not have", () => {
+  expect(step(centred(), {...IDLE, switchTo: 9}, TICK).player.equippedIndex).toBe(0);
+});
+
+it("fires a bullet with the damage and speed of the weapon in hand", () => {
+  const [bullet] = step(centred(), {...firingAt(EAST), switchTo: 2}, TICK).bullets;
+
+  expect(bullet?.damage).toBe(MARKSMAN_RIFLE.bulletDamage);
+  expect(bullet?.speed).toBe(MARKSMAN_RIFLE.bulletSpeed);
+});
+
+it("fires a bullet from the rifle with the rifle's damage and speed to begin with", () => {
+  const [bullet] = step(centred(), firingAt(EAST), TICK).bullets;
+
+  expect(bullet?.damage).toBe(RIFLE.bulletDamage);
+  expect(bullet?.speed).toBe(RIFLE.bulletSpeed);
+});
+
+it("spends the round from the weapon in hand, and cools down for that weapon's fire interval", () => {
+  const after = step(centred(), {...firingAt(EAST), switchTo: 2}, TICK);
+
+  expect(after.player.loadout[1]?.rounds).toBe(MARKSMAN_RIFLE.magazineSize - 1);
+  expect(after.player.loadout[0]?.rounds).toBe(RIFLE.magazineSize);
+  expect(after.player.cooldownSeconds).toBe(MARKSMAN_RIFLE.fireIntervalSeconds);
+});
+
+it("does not let a switch dodge the cool-down of the shot just fired", () => {
+  const fired = step(centred(), firingAt(EAST), TICK);
+
+  expect(step(fired, {...firingAt(EAST), switchTo: 2}, TICK).bullets).toHaveLength(1);
+});
+
+it("hurts a dummy by the damage of the weapon that shot it", () => {
+  const switched = step(withDummyEast(), {...IDLE, switchTo: 2}, TICK);
+
+  expect(shoot(switched, 1, 30).dummies[0]?.health).toBe(DUMMY_HEALTH - MARKSMAN_RIFLE.bulletDamage);
+});
+
+it("starts a reload when asked, and the magazine is not filled yet", () => {
+  const after = step(withRounds(centred(), 0, 3), {...IDLE, reload: true}, TICK);
+
+  expect(after.player.reloadRemainingSeconds).toBe(RIFLE.reloadSeconds);
+  expect(after.player.loadout[0]?.rounds).toBe(3);
+});
+
+it("fills the magazine from the reserve once the reload time has passed, and not before", () => {
+  const started = step(withRounds(centred(), 0, 3), {...IDLE, reload: true}, TICK);
+  const justBefore = playTicks(started, IDLE, Math.floor((RIFLE.reloadSeconds - 0.1) / TICK));
+  const justAfter = playTicks(started, IDLE, Math.ceil((RIFLE.reloadSeconds + 0.1) / TICK));
+
+  expect(justBefore.player.loadout[0]?.rounds).toBe(3);
+  expect(justBefore.player.reloadRemainingSeconds).toBeDefined();
+  expect(justAfter.player.loadout[0]).toEqual({
+    weapon: RIFLE,
+    rounds: RIFLE.magazineSize,
+    reserve: RIFLE.startingReserve - (RIFLE.magazineSize - 3),
+  });
+  expect(justAfter.player.reloadRemainingSeconds).toBeUndefined();
+});
+
+it("does not fire while reloading, even with the trigger held", () => {
+  const after = playTicks(withRounds(centred(), 0, 3), {...firingAt(EAST), reload: true}, 30);
+
+  expect(after.bullets).toEqual([]);
+  expect(after.player.loadout[0]?.rounds).toBe(3);
+});
+
+it("fires on the very step the reload finishes", () => {
+  const nearlyDone = withPlayer(withRounds(centred(), 0, 0), {reloadRemainingSeconds: 0.001});
+  const after = step(nearlyDone, firingAt(EAST), TICK);
+
+  expect(after.bullets).toHaveLength(1);
+  expect(after.player.loadout[0]?.rounds).toBe(RIFLE.magazineSize - 1);
+});
+
+it("cancels a reload when the weapon is switched", () => {
+  const reloading = withPlayer(withRounds(centred(), 0, 3), {reloadRemainingSeconds: 1});
+  const after = step(reloading, {...IDLE, switchTo: 2}, TICK);
+
+  expect(after.player.equippedIndex).toBe(1);
+  expect(after.player.reloadRemainingSeconds).toBeUndefined();
+  expect(after.player.loadout[0]?.rounds).toBe(3);
+});
+
+it("lets the switch land first when it is asked for with a reload, so the reload is the new weapon's", () => {
+  const reloading = withPlayer(withRounds(withRounds(centred(), 0, 3), 1, 1), {reloadRemainingSeconds: 1});
+  const after = step(reloading, {...IDLE, switchTo: 2, reload: true}, TICK);
+
+  expect(after.player.equippedIndex).toBe(1);
+  expect(after.player.reloadRemainingSeconds).toBe(MARKSMAN_RIFLE.reloadSeconds);
 });

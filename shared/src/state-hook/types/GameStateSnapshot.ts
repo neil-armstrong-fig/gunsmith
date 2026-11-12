@@ -2,11 +2,14 @@ import type {ArenaSnapshot} from "@gunsmith/shared/state-hook/types/ArenaSnapsho
 import type {BulletSnapshot} from "@gunsmith/shared/state-hook/types/BulletSnapshot";
 import type {DummySnapshot} from "@gunsmith/shared/state-hook/types/DummySnapshot";
 import type {PlayerSnapshot} from "@gunsmith/shared/state-hook/types/PlayerSnapshot";
+import type {WeaponSnapshot} from "@gunsmith/shared/state-hook/types/WeaponSnapshot";
 
 /** What the state hook returns: a copy of the game as it is now, for an acceptance spec to read. */
 export interface GameStateSnapshot {
   arena: ArenaSnapshot;
   player: PlayerSnapshot;
+  /** The weapon in the player's hands. */
+  weapon: WeaponSnapshot;
   /** The shots in the air right now. */
   bullets: BulletSnapshot[];
   /** The practice dummies still standing. */

@@ -21,9 +21,9 @@ Update the one-line status for your persona at the end of each session.
 
 | Persona | Checklist | Current focus | Last updated |
 | ------- | --------- | ------------- | ------------ |
-| `build` | `TODO-build.md` | Game first, test first, full-screen. Done and committed: `acceptance-tests/` and `engine/` packages; the player walks with walls, aims with the mouse and fires bullets that die on walls, and shoots practice dummies that take damage and fall (27 specs, 117 engine and 40 webapp unit tests, all mutation-proved). Contracts and menus are withdrawn until the game is fun. Next: reload and weapon switching, then health, a scripted opponent and a round win | 2026-11-12 |
-| `ai` | `TODO-ai.md` | O1 decided: pipeline runs inside the Worker (no Plus); budget $1 a day, $20 month hard cap. Proof `ai/` package waits on the user's review in a worktree. Waiting for the contracts (M2) | 2026-11-12 |
-| `art` | `TODO-art.md` | Vision clarified: dim terrain outside rotating weapon/stance cone, detailed terrain + entities inside. Concept and game handoff corrected | 2026-11-12 |
+| `build` | `TODO-build.md` | Game first, test first, full-screen. Done and committed: `acceptance-tests/` and `engine/` packages; the player walks with walls, aims with the mouse, fires bullets that die on walls, shoots practice dummies that fall, carries two weapons (keys 1 and 2, R reloads, ammunition shown as pips) with a real `Weapon` type (43 specs, 193 engine and 62 webapp unit tests, all mutation-proved); state is Zustand (a game-only game store, a plain-React ammo HUD, layering lint-enforced). Contracts and menus are withdrawn until the game is fun. Next: health, a scripted opponent and a round win | 2026-11-12 |
+| `ai` | `TODO-ai.md` | O1 decided: pipeline runs inside the Worker (no Plus); budget $1 a day, $20 month hard cap. Eval-driven setup built (17 weapon cases, 7 evaluators, local Ollama tier); `ai/` committed on branch `worktree-ai-hosting-proof`, not yet merged to main. Main merged into the branch; the moderation node is built and probed with 46 borderline requests (local evals 18 of 18), uncommitted for the user's review. Pipeline past moderation is a stub. Next: real `generate`, `validate`, `repair`, `rate`. Waiting for the contracts (M2) | 2026-11-12 |
+| `art` | `TODO-art.md` | Sound/music prioritised: original industrial electronic local-synth audition delivered (2 × 15 s music, 11 effects, mixed audition). Listening feedback next, then full loops/step variants, then top-down studies. Production awaits manifest/encoding; no runtime changes | 2026-11-12 |
 
 ## The path
 
@@ -57,7 +57,7 @@ One line each: who is asking whom for what, and since when. Delete the line when
 
 - 2026-11-12, `ai` to `build`: **the pipeline runs inside the Worker, so `api/` will import `ai/`** (`AGENTS.md` table and
   `HANDOFF.md` updated; add `@gunsmith/ai` to `api/`'s `allowedPackages` when you scaffold it). No HTTP client in `shared/`.
-  Heads-up for `pnpm-workspace.yaml`: the `ai` package (on the uncommitted worktree `.claude/worktrees/ai-hosting-proof`, not
+  Heads-up for `pnpm-workspace.yaml`: the `ai` package (committed on the branch `worktree-ai-hosting-proof` in `.claude/worktrees/ai-hosting-proof`, not
   yet in main) adds catalog entries (`@langchain/core`, `@langchain/langgraph`, `-cli`, `-sdk`, `wrangler`, `zod`),
   `trustPolicyExclude: chokidar@4.0.3` and `allowBuilds: workerd: false`. It merges only after the user's review, and I will
   tell you first because it touches your `pnpm-workspace.yaml`, lockfile and `shared/`.

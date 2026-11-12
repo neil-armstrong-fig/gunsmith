@@ -54,4 +54,12 @@ export class PlayerPlaywright extends BasePage {
   async stopFiring(): Promise<void> {
     await this.page.mouse.up();
   }
+
+  async reload(): Promise<void> {
+    await this.page.keyboard.press("KeyR");
+  }
+
+  async switchTo(slot: number): Promise<void> {
+    await this.page.keyboard.press(`Digit${slot}`);
+  }
 }

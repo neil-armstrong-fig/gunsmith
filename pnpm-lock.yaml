@@ -233,6 +233,9 @@ catalogs:
     vitest:
       specifier: 5.1.0
       version: 5.1.0
+    zustand:
+      specifier: 5.0.16
+      version: 5.0.16
 
 importers:
 
@@ -357,6 +360,9 @@ importers:
       three:
         specifier: 'catalog:'
         version: 0.187.0
+      zustand:
+        specifier: 'catalog:'
+        version: 5.0.16(@types/react@19.3.0)(immer@11.2.9)(react@19.3.1)(use-sync-external-store@1.7.0(react@19.3.1))
     devDependencies:
       '@eslint-react/eslint-plugin':
         specifier: 'catalog:'

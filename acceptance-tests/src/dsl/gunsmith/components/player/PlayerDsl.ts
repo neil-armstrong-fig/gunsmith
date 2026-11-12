@@ -81,4 +81,22 @@ export class PlayerDsl {
       throw new DslError("Failed to stop firing", error);
     }
   }
+
+  /** Taps the reload key (R). */
+  async reload(): Promise<void> {
+    try {
+      await this.player.reload();
+    } catch (error) {
+      throw new DslError("Failed to reload", error);
+    }
+  }
+
+  /** Taps the number key of the weapon in `slot` (1 or 2). */
+  async switchTo(slot: number): Promise<void> {
+    try {
+      await this.player.switchTo(slot);
+    } catch (error) {
+      throw new DslError(`Failed to switch to the weapon in slot ${slot}`, error);
+    }
+  }
 }

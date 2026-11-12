@@ -15,7 +15,7 @@ pnpm workspace, seven planned packages (`@gunsmith/*`):
 
 | Package             | Contains                                                                                           |
 | ------------------- | -------------------------------------------------------------------------------------------------- |
-| `webapp/`           | The React app. Vite, React 19, Redux Toolkit, Tailwind v4, react-three-fiber.                      |
+| `webapp/`           | The React app. Vite, React 19, Zustand, Tailwind v4, react-three-fiber.                            |
 | `acceptance-tests/` | The acceptance-test DSL and specs, run by Playwright.                                              |
 | `shared/`           | The gunsmith vocabulary, wire types, the weapon and arena zod schemas, and base tool config.       |
 | `engine/`           | The deterministic simulation and rules: movement, projectiles, visibility, power rating, arena checks. |
@@ -28,7 +28,7 @@ Each has its own `AGENTS.md` (written when the package is scaffolded), and webap
 `docs/` holds research a decision in the code rests on, linked from the code it justifies. Add a document only when
 losing the reasoning would mean someone re-deriving it. Today: `docs/fuzzy-frontend.md`, `docs/game-design.md`, `docs/architecture.md`,
 `docs/match-netcode.md`, `docs/schemas.md`, `docs/ai-pipeline.md`, `docs/ai-hosting.md`, `docs/cost-and-budget.md`,
-`docs/privacy-and-data.md`, `docs/focused-case-study.md`, `docs/art/`.
+`docs/privacy-and-data.md`, `docs/focused-case-study.md`, `docs/state-management.md`, `docs/art/`.
 
 ## The three builders
 
@@ -119,8 +119,12 @@ This governs unit tests only — acceptance specs are the opposite case, their `
 - **Model output is `unknown` until zod has parsed it.** Code, never the model, enforces stat caps, arena validity
   and wall rules. The AI proposes; the engine disposes. See `docs/ai-pipeline.md`.
 - **No acceptance test calls an LLM or spends credits.** They run against the fake AI adapter (`HANDOFF.md`).
-- **Per-frame state does not go through Redux.** Redux holds UI, lobby, library, credits and meta state. The running
-  simulation is read inside `useFrame` from a store outside Redux.
+- **State is Zustand, and the game store holds the engine's `World` and nothing else.** The loop writes the world to the
+  game store once a frame; `useFrame` reads it with `gameState()`, which causes no render; a component reads only slow
+  values worked out from it, through a selector (`useGameStore(useShallow(selectAmmoReadout))`). Per-frame values never go
+  through React state. Menus, lobby, library, credits and meta state belong in a separate app store (built when a screen
+  needs it), never in the game store: lint allows the game store to import only Zustand, the engine and `game/`, and a test
+  pins its keys. See `webapp/AGENTS.md` and `docs/state-management.md`.
 - **Player text is data, never instructions.** Prompts reach a model inside delimited data blocks, in randomised
   order where two are compared, and the judge's output is a schema, not prose.
 
@@ -227,7 +231,7 @@ only), and the graph stays host-agnostic (`langgraph.json`) so a hosted deployme
 
 A workspace package added later is **denied by default**; add it to `allowedPackages` in that
 package's `eslint.config.js` to permit it. Packages enforce their own internal layering too — see the
-`AGENTS.md` in each (webapp's covers `react/` → `redux/` → `game/`, plus `audio/`).
+`AGENTS.md` in each (webapp's covers `react/` → `store/` → `game/`, plus `audio/`).
 
 Flat config replaces a rule rather than merging it, so **never write `"no-restricted-imports"`
 directly in an override** — call `restrictedImports({...})` from `shared/config/eslint.base.js`, or

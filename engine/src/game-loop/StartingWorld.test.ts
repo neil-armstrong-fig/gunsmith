@@ -1,6 +1,8 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import {DUMMY_HEALTH} from "@gunsmith/engine/dummy/DummyHealth";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
+import {MARKSMAN_RIFLE} from "@gunsmith/engine/weapon/weapons/MarksmanRifle";
+import {RIFLE} from "@gunsmith/engine/weapon/weapons/Rifle";
 
 it("stands the player in the middle of the centre tile", () => {
   const world = startingWorld(arenaFrom(["#####", "#...#", "#...#", "#...#", "#####"]));
@@ -39,4 +41,20 @@ it("stands a dummy at full health at each place it is asked to", () => {
     {position: {x: 1.5, y: 1.5}, health: DUMMY_HEALTH},
     {position: {x: 3.5, y: 3.5}, health: DUMMY_HEALTH},
   ]);
+});
+
+it("carries the rifle in slot 1 and the marksman rifle in slot 2, each with a full magazine and its whole reserve", () => {
+  const {player} = startingWorld(arenaFrom(["###", "#.#", "###"]));
+
+  expect(player.loadout).toEqual([
+    {weapon: RIFLE, rounds: RIFLE.magazineSize, reserve: RIFLE.startingReserve},
+    {weapon: MARKSMAN_RIFLE, rounds: MARKSMAN_RIFLE.magazineSize, reserve: MARKSMAN_RIFLE.startingReserve},
+  ]);
+});
+
+it("starts with the rifle in hand and no reload under way", () => {
+  const {player} = startingWorld(arenaFrom(["###", "#.#", "###"]));
+
+  expect(player.equippedIndex).toBe(0);
+  expect(player.reloadRemainingSeconds).toBeUndefined();
 });

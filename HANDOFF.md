@@ -137,6 +137,55 @@ interface. Build implements the schema and renderer; AI reviews generation/eval 
 
 Newest first. One line each: date, who, what, where.
 
+- 2026-11-12, `build`: **Zustand replaces the planned Redux, and the ammo HUD is plain React.** Redux was never installed;
+  `zustand` 5.0.16 (the version react-three-fiber already uses; 5.1.0 was under seven days old) is the one state library.
+  `webapp/src` is now `react/` → `store/` → `game/`, enforced by ESLint. The game store (`store/game/`) holds the engine's
+  `World` and nothing else (lint allow-list plus a key-pinning test); the loop writes it once a frame and `useFrame` reads it
+  with `gameState()`. The practice arena moved to `game/practice/`. The canvas `AmmoPips` is replaced by `react/components/dom/ammo-hud/`
+  (Tailwind, a CSS reload fill) with a new spec `AmmoOnTheScreen` and DSL `gunsmith.hud`. 193 engine, 62 webapp, 43 acceptance;
+  `pnpm checks` green; store, selector and HUD mutants killed (one equivalent survivor: a redundant extra `setWorld`). No
+  contract changed and nothing for `ai` or `art` to wire. `docs/state-management.md` records the decision.
+
+- 2026-11-12, `art`: **audio audition 01** in `docs/art/concepts/audio/` (original local Python synthesis): 15-second
+  match/menu sketches, all 11 static effect candidates and a mixed audition, source, listening guide and measurements.
+  Candidate mappings: `music-loop-menu`, `music-loop-match`, `sfx-pickup`, `sfx-drop`, `sfx-reload`, `sfx-step-stand`,
+  `sfx-step-crouch`, `sfx-hit`, `sfx-death`, `sfx-ring-warning`, `sfx-ui-click`, `sfx-round-start`, `sfx-round-end`.
+  No production keys registered or runtime changes. User chose industrial electronic, driving match music, local synthesis;
+  A6 now leads art's queue. Listening review, full-length loops/step variants, Ogg/MP3 and manifest integration remain open.
+  Technical WAV/repeat/reproducibility checks pass; `pnpm checks` passes (193 engine, 62 webapp tests); no browser gameplay
+  acceptance run for this offline art delivery. Listening not signed off.
+
+- 2026-11-12, `ai`: **loop 1b done: moderation probed with 46 borderline requests** (in the `ai/` worktree, uncommitted).
+  One real failure (weapon keywords round an off-topic ask) became a case and a one-sentence prompt fix; removing it makes that
+  case fall; local evals 18 of 18, root `pnpm checks` exits 0. The "say no" rule and data-block paragraph remain unproven on
+  `qwen3.5:9b`. Open for the user: do shields and armor count as weapons? Nothing for `build` or `art`; no money spent.
+- 2026-11-12, `ai`: **main merged into `worktree-ai-hosting-proof` (`ee7a571`, no conflicts) and the moderation node built, test
+  first**, in the `ai/` worktree, uncommitted for the user's review; still not merged into main. `ai/src/pipeline/moderation/`
+  (one cheap-model call by function calling, zod-parsed, player text in a `<request>` data block, fail closed). Local evals 17 of
+  17 strict; `ai` 67, `engine` 117, `webapp` 40 unit tests; root `pnpm checks` exits 0. Eight mutants killed, four prompt mutants
+  survived (the cases do not yet steer prompt wording; `ai/AGENTS.md`). Nothing in `shared/`, nothing for `build` or `art` to
+  wire, no contract changed, no money spent.
+- 2026-11-12, `ai`: **context-clear checkpoint** (`TODO-ai.md`, "Resume here"). The user committed `ai/` on the branch
+  `worktree-ai-hosting-proof` (`f25ad50`, on top of a WIP commit and a merge of main); **not merged into main**, which has moved on
+  (`46315d5`). Weapon pipeline: real token pre-check, then a stub; 17 eval cases, 7 evaluators, local Ollama tier. For `build`
+  before the merge: `pnpm-workspace.yaml` (add `ai`; LangChain, LangGraph, `langsmith`, `wrangler` catalog entries; one `zod`;
+  `trustPolicyExclude: chokidar@4.0.3`; `allowBuilds: workerd: false`), the lockfile, and a root `pnpm evals` script are the
+  touch points. Nothing in `shared/`. The weapon and arena schemas in `ai/` are drafts until `build`'s contracts land.
+- 2026-11-12, `art`: context-clear checkpoint in `TODO-art.md` consolidates all user decisions, delivered files,
+  remaining defaults question and next task (top-down oddity studies). Dim-map, weapon/stance cone, stair and crouch
+  decisions are settled. Production waits for a manifest; visual-schema work remains a proposal. No runtime changes.
+- 2026-11-12, `build`: **Reload, magazine, reserve and weapon switching, test first.** The weapon is now a real type:
+  `engine/` gains `weapon/` (`Weapon`, `Rifle`, `MarksmanRifle`, `TriggerPull`, `SpendRound`, `ReloadWeapon`) and `loadout/`
+  (`SwitchWeapon`, `EquippedWeapon`, `StartingLoadout`, `CarriedWeapon`); a `Bullet` carries its own damage and speed, so the
+  loose damage, fire-interval and bullet-speed constants are gone. Keys 1 and 2 switch weapon (rifle 25 damage and 12 rounds,
+  marksman rifle 50 damage and 5), R reloads (manual, no auto-reload; one cool-down shared by both), ammunition shows as pips
+  along the top wall. The state hook's snapshot (`shared/src/state-hook/types/`) gained `weapon` (`slot`, `rounds`, `reserve`,
+  `reloading`). New DSL: `gunsmith.weapon`, `player.reload()`, `player.switchTo(slot)`; new specs `ReloadingTheWeapon` and
+  `SwitchingWeapons` (10). 193 engine and 60 webapp unit tests and 37 acceptance specs; 45 of 46 engine, 16 of 16 webapp and
+  17 of 17 browser mutants killed (one equivalent survivor); `pnpm checks` green. The weapon numbers are placeholders set in
+  `Rifle.ts` and `MarksmanRifle.ts`. This is the shape the weapon schema will take when `ai` needs it, but nothing moved to
+  `shared/` and no contract changed: nothing for `ai` or `art` to wire (the weapons have no manifest keys yet).
+
 - 2026-11-12, `build`: **Practice dummies, test first.** Three dummies stand in the practice arena; a bullet that reaches
   one hurts it (100 health, 25 a bullet) and enough bullets remove it. `engine/` gains `dummy/` (`HurtDummies`, health and
   radius tunables), `bullet/hit/` (an exact ray-against-circle test, so a graze is not missed) and `weapon/damage/`;
@@ -222,11 +271,14 @@ Newest first. One line each: date, who, what, where.
   there, `langgraph dev` serves the graph, and the graph runs in workerd (2.79 MiB bundle, 2 to 4 ms per request). It also
   carries `trustPolicyExclude: chokidar@4.0.3` and `workerd: false` in its `pnpm-workspace.yaml`. Waiting for the user's review
   before anything merges into main; `build` will be told before it does. No money spent, no model called, nothing deployed.
+- 2026-11-12, `ai`: **evals re-based on the research** (Focused, Anthropic, Hamel Husain; no source gives a cap, so the
+  "about 10" rule was dropped): 17 weapon cases tagged `regression` or `capability`, 7 evaluators, 3 trials on the local tier
+  (pass^k), a regression-only gate (`EVAL_GATE=regression`), the LLM judge deferred. In the `ai/` worktree, uncommitted.
 - 2026-11-12, `ai`: **main merged into the `ai/` worktree and `ai/` fitted to `engine/`'s conventions** (self-named imports and an
   `exports` map so `api/` can import it as raw source, types in `types/`, doc comments). Root `pnpm checks` exits 0 there. For
   `build`: when `ai/` merges, `pnpm-workspace.yaml` gains `ai` in `packages` and the catalog entries for LangChain, LangGraph,
   `langsmith`, `wrangler` (the one `zod` entry stays), plus `trustPolicyExclude: chokidar@4.0.3` and `allowBuilds: workerd: false`.
-  The AI code is left **uncommitted** for the user's review in VS Code (two branch commits exist, to be undone).
+  (Superseded: the user has since committed it on the branch; see the newest `ai` entry.)
 - 2026-11-12, `ai`: **eval-driven development set up** in the `ai/` worktree (not merged): `evals/` harness with five
   deterministic evaluators, nine weapon cases, three model tiers (fake, local Ollama, capped paid), the first red-green (token
   pre-check), `ai/AGENTS.md`. Adds two dev dependencies (`@langchain/ollama`, `langsmith`) to the worktree's catalog, which will
