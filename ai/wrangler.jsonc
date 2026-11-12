@@ -1,0 +1,7 @@
+{
+  // Spike only (docs/ai-hosting.md, option 3). Used with `wrangler deploy --dry-run`, which builds and deploys nothing.
+  "name": "gunsmith-ai-proof",
+  "main": "src/worker/ProofWorker.ts",
+  "compatibility_date": "2026-11-01",
+  "compatibility_flags": ["nodejs_compat", "nodejs_compat_populate_process_env"],
+}

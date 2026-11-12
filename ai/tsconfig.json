@@ -1,0 +1,10 @@
+{
+  "extends": "../shared/config/tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node", "vitest/globals"],
+    "paths": {
+      "@evals/*": ["./evals/*"]
+    }
+  },
+  "include": ["src", "evals", "vitest.config.ts", "vitest.evals.config.ts", "eslint.config.js", "prettier.config.js"]
+}
