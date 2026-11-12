@@ -14,7 +14,7 @@ from the engine would agree with it whatever the engine did.
 One folder per subject. Each has its entry points at the top, its types in `types/`, and a subfolder for a helper only an
 entry point uses. Tiles are the unit; `x` grows to the east and `y` to the north.
 
-- `geometry/types/Point.ts`.
+- `geometry/types/`: `Point`, `Ray` (a start and a unit direction) and `Circle` (a centre and a radius).
 - `arena/`: `ArenaFrom` (reads a drawing: `#` wall, `.` floor, first row on top) and `IsSolid` (outside the arena counts
   as solid). `types/Arena.ts` is a width, a height and a flat list of solid tiles.
 - `movement/`: `PushOutOfWalls`, circle against the tile grid. It resolves overlap along the line from the wall's nearest
@@ -22,13 +22,20 @@ entry point uses. Tiles are the unit; `x` grows to the east and `y` to the north
   `step` is called with a fixed `TICK_SECONDS` from the webapp.
 - `player/`: `MovePlayer`, `AimPlayer`, and `PlayerRadius` (the body, shared with `bullet/`). `walking/PlayerSpeed.ts` is
   `MovePlayer`'s; `types/Player.ts`.
-- `bullet/`: `FireBullet` (a bullet leaves the muzzle, just outside the player) and `AdvanceBullets` (flies them on,
-  sampling the path every 0.1 tile so a one-tile wall cannot be jumped, and drops a bullet that touches a wall).
-  `flight/BulletSpeed.ts`; `types/Bullet.ts`.
+- `bullet/`: `FireBullet` (a bullet leaves the muzzle, just outside the player) and `AdvanceBullets` (flies them on and
+  returns a `BulletFlight`: the bullets still in the air and the dummies still standing). A bullet is gone when it meets a
+  wall or a dummy, whichever is nearer; a wall is found by sampling the path every 0.1 tile (so a one-tile wall cannot be
+  jumped), a dummy by an exact ray-against-circle test (`hit/DistanceToCircle`, so a graze is not missed between samples).
+  Every bullet is judged against the dummies as they stood at the start of the step, so two landing together both count.
+  `flight/` (`BulletSpeed`, `DistanceToWall`), `hit/` (`DistanceToCircle`, `NearestDummyHit`), `types/` (`Bullet`,
+  `BulletFlight`, `FlightRequest`, `DummyHit`).
+- `dummy/`: the practice target. `HurtDummies` takes the damage off each dummy that was hit (once per bullet) and drops
+  the ones left with no health; `DummyHealth` and `DummyRadius` are tunables; `types/Dummy.ts`. A dummy does not move, and
+  the player does not collide with one yet.
 - `weapon/`: `TriggerPull` (the cool-down: a held trigger fires at a steady rate). `firing/FireInterval.ts`;
-  `types/TriggerResult.ts`.
-- `game-loop/`: the body of the game loop: `startingWorld` and `step` (walk, turn, fly the bullets on, then pull the trigger, so a shot
-  fired this step first moves on the next). The loop that calls `step` at a fixed rate lives in the caller (the webapp's
+  `damage/BulletDamage.ts` (what one bullet takes off, a constant until there is a `Weapon` type); `types/TriggerResult.ts`.
+- `game-loop/`: the body of the game loop: `startingWorld(arena, dummyPositions)` and `step` (walk, turn, fly the bullets
+  on and hurt what they reach, then pull the trigger, so a shot fired this step first moves on the next). The loop that calls `step` at a fixed rate lives in the caller (the webapp's
   `useGameLoop` today, the server's match later), because the engine has no clock. `types/World.ts` and `types/Input.ts`.
 
 Several entry points here have a single caller (`AdvanceBullets`, `AimPlayer`, `TriggerPull`, `PushOutOfWalls` are called

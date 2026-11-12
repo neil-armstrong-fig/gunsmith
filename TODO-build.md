@@ -22,12 +22,81 @@ Both are withdrawn until the game is fun (`HANDOFF.md` delivery log, 2026-11-12)
 - [x] pnpm workspace with `webapp/` and `shared/` (tool config only), exact-pinned `catalog:`, 7-day release-age policy,
       TypeScript held at 6.0.3.
 - [x] `webapp/`: Vite, React 19, strict TypeScript, Tailwind v4, react-three-fiber; a full-screen orthographic canvas with
-      a square moved by WASD (`src/react/arena/`, `DirectionFromKeys` unit-tested and mutation-proved).
+      a square moved by WASD (now `src/react/arena-canvas/`, `DirectionFromKeys` unit-tested and mutation-proved).
 - [x] `pnpm start` on port 3000 (verified on 3100 while janggi held 3000; re-confirm when it is free).
 - [x] 2026-11-12: a fuzzy frontend (15 menu screens, a fake AI and ledger, schemas in `shared/`) was built, looked at and
       deleted at the user's request. The palette tokens in `src/index.css` survive.
 
 ## Phase 1: the game, test first. Milestone M1 (redefined: the game is fun)
+
+### Where things stand (end of the 2026-11-12 sessions)
+
+The player walks (WASD, walls stop them), aims with the mouse and clicks to fire bullets that die on walls or on one of
+three practice dummies, which take 25 damage a hit and are removed at zero health, all in a full-screen arena. Four
+packages: `webapp/`, `engine/`, `acceptance-tests/`, `shared/` (tool config plus the state-hook snapshot types).
+`pnpm checks` is green: engine 117 unit tests, webapp 40, and 27 acceptance specs (the suite passes 270 of 270 at
+`--repeat-each=10`). Every spec and unit test has been mutation-proved. Read `engine/AGENTS.md`, `webapp/AGENTS.md` and
+`acceptance-tests/AGENTS.md` first.
+
+**Starting a session.** Run `ps -axo command | grep -c "[p]ermission-prompt-tool"` (macOS `pgrep -a` does not show
+arguments) and `lsof -i :3100` before starting a server. Re-read a shared doc right before editing it; other sessions
+leave uncommitted edits in `TODO*.md`, `HANDOFF.md` and `docs/`.
+
+**How to run the specs.** Port 3000 may be held by janggi, so use another:
+`pnpm --filter @gunsmith/webapp exec vite --port 3100 --strictPort` in the background, then
+`WEBAPP_URL=http://localhost:3100 pnpm acceptance-tests`, then `pkill -f "vite.*--port 3100"`. `pnpm install-browsers`
+once. Repeat a suite with `pnpm --filter @gunsmith/acceptance-tests exec playwright test --repeat-each=15` to check for flakes.
+
+**Shape of the work, one mechanic at a time:** engine unit tests first (red), then the engine code; the acceptance spec and
+DSL next (red, for the right reason); then the webapp; then mutate the real code and confirm the right tests fall.
+`engine/` is the rules (deterministic, no clock); the webapp's `useGameLoop` hook feeds it fixed 1/60 s steps; specs read
+the game only through the state hook (`window.gunsmithState`, `shared/src/state-hook/`) and never sleep (they wait on
+`elapsedSeconds`). Bring up any dependency that would replace code before writing it, with version and release age; the
+likely ones are a seeded RNG (`pure-rand`), a visibility-polygon library (for the fog) and a grid pathfinder (for the
+scripted opponent). `fast-check` is deferred at the user's request.
+
+**Gotchas learned.**
+- **zsh does not word-split an unquoted `$VAR`.** A mutation script that looped over `$FILES` silently failed to back
+  anything up and left seven mutations stacked in the source. Use arrays or one file per call, and `cmp` after every
+  restore. Never chain a `sed -i` ahead of `&&` on macOS (it needs `-i ''`); use `perl -pi` or Python.
+- **A perl replacement string interpolates `@src`** as an empty array. Use Python for import rewrites.
+- **A fast click cannot be reproduced by an acceptance spec** (Playwright's down then up spans a frame), so the click
+  latch (`use-firing/trigger/FiringLatch.ts`) is covered by unit tests only.
+- **A bullet is in the air for only 0.17 to 0.5 s.** `BulletsPlaywright` installs an in-page recorder at load so
+  `waitForABullet` cannot miss one. Do the same for any other short-lived thing a spec must see.
+- The MCP browser may be held by another session; `pnpm --filter @gunsmith/acceptance-tests exec playwright screenshot
+  --viewport-size=1600,900 --wait-for-timeout=1500 <url> <file>` takes a picture with our own install.
+- **Read and wait on the game through `BasePage`**: `readGameState()` and `waitForGameState(check)`. The check runs in the
+  test (an `expect.poll`), so it can use anything in scope. A function given to `page.waitForFunction` or `evaluate` is
+  serialised into the page and cannot see module constants, so reserve those for what must run in the page (the bullet
+  recorder, which catches a state that comes and goes between two looks).
+- **A wait must not be a spec's only assertion**: a helper that never waited would pass it. Assert the state after the wait
+  (`FiringAShot` checks `bullets.count()` is 0 after `waitForNoBullets`). Mutate the helper to prove it.
+- **Chained `fire()` clicks inside the 0.2 s cool-down are swallowed**: to shoot repeatedly, `startFiring()` (hold the
+  button) and wait on game state, never on a count of clicks.
+- **Mutation scripts** live in the scratchpad and are gone with the session; the shape that worked: back the file up, apply
+  one replacement that must match exactly once, grep that it landed, run the tests, restore from the backup. One file per
+  call; Python, not `sed -i`.
+
+**Folder rule (user's, in `AGENTS.md` Code style).** Types go in `<domain>/types/`; a domain's entry points stay at its top;
+a helper only one file uses sits in a subject-named subfolder beneath that file; something shared sits at its callers'
+nearest common folder and no higher. The 2026-11-12 sweep (every import mapped, single-caller files and types checked)
+left only the engine's domain entry points, deliberately, and `dsl/gunsmith/types/Point.ts`. The sweep script was a scratch
+file and is not in the repo; recreate it, or turn it into a lint rule, before the codebase is much bigger.
+
+**Known rough, not yet fixed.**
+- Tunables are placeholders in one constant each: `PLAYER_SPEED` 6, `PLAYER_RADIUS` 0.4, `BULLET_SPEED` 20,
+  `FIRE_INTERVAL_SECONDS` 0.2, `TICK_SECONDS` 1/60, the practice arena 24 by 14 with four pillars. Set them by play.
+- Colours are placeholders (the floor reads darker than the palette's). The player, barrel, bullets and dummies were
+  looked at once in a screenshot (2026-11-12) and read fine. Console noise: a favicon 404 and a three.js `Clock`
+  deprecation warning from react-three-fiber.
+- `pnpm start` on port 3000 has not been confirmed (janggi held it).
+- There is one built-in weapon and no player health. Dummies (100 health, 25 a bullet, radius 0.4, three in
+  `PracticeDummies.ts`) do not move, do not block the player, and do not come back once shot, so reloading the page is the
+  only way to restore them. `Dummies.tsx` (discs fading as they are hurt) has no spec, because the canvas is not in the DOM:
+  the specs cover the state it draws from.
+- The tunables `BULLET_DAMAGE`, `FIRE_INTERVAL_SECONDS` and `BULLET_SPEED` are loose constants waiting for a `Weapon` type.
+
 
 Set-up, then one spec per mechanic. Each spec is watched to fail for the right reason, then made to pass, then
 mutation-proved (`AGENTS.md`). The simulation lives in `engine/` from the start: deterministic, a fixed timestep, a seeded
@@ -45,8 +114,31 @@ RNG, no `Date.now()` or `Math.random()`. The webapp renders it and sends input.
         game mutations each caught by the right spec). Fixed 1/60 s step, circle-vs-grid collision written by hand.
   - [x] Aiming with the mouse; clicking fires a shot (`AimingAtTheMouse.test.ts`, `FiringAShot.test.ts`; first pass: one
         bullet type, a fixed fire rate, bullets die on walls). Engine: 72 unit tests; webapp: 33; 22 acceptance specs.
-  - [ ] A practice dummy takes damage and dies.
-  - [ ] Reload, magazine and reserve; keys 1 and 2 switch weapon.
+  - [x] A practice dummy takes damage and dies (`ShootingADummy.test.ts`: one shot lowers its health, firing on removes
+        it, the others untouched, a shot where there is no dummy hurts none). Engine: the bullet's flight decides hits
+        (nearest of wall and dummy, an exact ray-against-circle test), `dummy/HurtDummies`; `dummies` in `World` and in
+        the state-hook snapshot; DSL `gunsmith.dummies` and `player.startFiring`/`stopFiring`. About twenty engine mutants,
+        three snapshot mutants and six browser mutants (game, hook and dummy size) were each caught by the right tests
+        (one survivor, `alongRay <= 0` in `DistanceToCircle`, is equivalent: with the start outside the circle and
+        `alongRay` at 0 the half-chord is already negative, so the result cannot change). The weapon is
+        still a constant.
+  - [ ] **Next:** reload, magazine and reserve; keys 1 and 2 switch weapon (this is when a real `Weapon` type appears,
+        and with it the bullet damage and fire interval move onto it). A starting sketch, to be proposed to the user as
+        stated defaults rather than asked about, and to be confirmed or changed at the plan:
+        - **Engine, unit tests first.** `weapon/types/Weapon.ts` (fire interval, damage, magazine size, reload seconds, bullet
+          speed) and two built-in weapons with visibly different damage, so a spec can tell them apart by how much health a
+          dummy loses. The player carries two weapons, which one is equipped, rounds in the magazine, a reserve, and a reload
+          timer. `Input` gains `reload` and a slot to switch to. `TriggerPull` takes the weapon's interval; a `Bullet` carries
+          its damage and speed, so `AdvanceBullets` stops reading the constants; an empty magazine does not fire; reloading
+          moves rounds from the reserve; switching cancels a reload; an empty reserve leaves the reload with nothing to do.
+        - **Specs (one criterion each):** firing until the magazine is empty stops the bullets; reload refills it after a
+          delay and not before; the empty weapon fires again afterwards; key 2 swaps to a weapon that does different damage to
+          a dummy; switching mid-reload cancels the reload. Hold the trigger with `startFiring()`, wait on game state.
+        - **State hook and DSL:** a small `weapon` block in the snapshot (slot, rounds in the magazine, reserve, reloading),
+          `player.reload()` (the R key) and `player.switchTo(slot)`; add both verbs to the `then` lint regex in
+          `acceptance-tests/eslint.config.js`. Draw the ammo somewhere the screenshot can show; no HUD component yet.
+        - Then delete the loose `BULLET_DAMAGE`, `FIRE_INTERVAL_SECONDS` and `BULLET_SPEED` constants, and update
+          `engine/AGENTS.md`.
   - [ ] Health, and a scripted opponent that wanders and shoots; a hit; a round win.
   - [ ] Best of three.
   - [ ] Dim arena outside a detailed forward cone, set by equipped weapon and standing/crouched stance. Rotate it

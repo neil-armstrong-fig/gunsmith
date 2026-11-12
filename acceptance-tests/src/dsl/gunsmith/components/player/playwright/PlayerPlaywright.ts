@@ -1,7 +1,6 @@
 import type {Page} from "@playwright/test";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
 import {screenPositionOfTile} from "@src/dsl/gunsmith/components/player/playwright/screen/ScreenPositionOfTile";
-import {readGameState} from "@src/dsl/gunsmith/playwright/state-hook/ReadGameState";
 import type {Heading} from "@src/dsl/gunsmith/components/player/types/Heading";
 import type {Point} from "@src/dsl/gunsmith/types/Point";
 
@@ -26,7 +25,7 @@ export class PlayerPlaywright extends BasePage {
   }
 
   async getPosition(): Promise<Point> {
-    const {player} = await readGameState(this.page);
+    const {player} = await this.readGameState();
 
     return {x: player.x, y: player.y};
   }
@@ -38,13 +37,21 @@ export class PlayerPlaywright extends BasePage {
   }
 
   async getAimDegrees(): Promise<number> {
-    const {player} = await readGameState(this.page);
+    const {player} = await this.readGameState();
 
     return player.aimDegrees;
   }
 
   async fire(): Promise<void> {
     await this.page.mouse.down();
+    await this.page.mouse.up();
+  }
+
+  async startFiring(): Promise<void> {
+    await this.page.mouse.down();
+  }
+
+  async stopFiring(): Promise<void> {
     await this.page.mouse.up();
   }
 }

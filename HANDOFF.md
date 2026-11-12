@@ -137,6 +137,24 @@ interface. Build implements the schema and renderer; AI reviews generation/eval 
 
 Newest first. One line each: date, who, what, where.
 
+- 2026-11-12, `build`: **Practice dummies, test first.** Three dummies stand in the practice arena; a bullet that reaches
+  one hurts it (100 health, 25 a bullet) and enough bullets remove it. `engine/` gains `dummy/` (`HurtDummies`, health and
+  radius tunables), `bullet/hit/` (an exact ray-against-circle test, so a graze is not missed) and `weapon/damage/`;
+  `advanceBullets` now takes the dummies and returns a `BulletFlight` (a bullet is gone at the nearer of a wall and a dummy).
+  The state hook's snapshot (`shared/src/state-hook/types/`) gained `dummies` (`x`, `y`, `health`). New DSL: `gunsmith.dummies`
+  and `player.startFiring`/`stopFiring`; new spec `ShootingADummy.test.ts`. 117 engine and 40 webapp unit tests and 27
+  acceptance specs, all mutation-proved; `pnpm checks` green. The acceptance DSL's `*Playwright` classes now read and wait
+  on the game through two `BasePage` helpers (`readGameState`, `waitForGameState`), and `FiringAShot` asserts the bullet
+  count after its wait. Nothing for `ai` or `art` to wire; no contract changed (the dummy is the only new sprite-to-be: a
+  disc, no manifest key yet).
+
+- 2026-11-12, `build`: **Housekeeping after the first commit.** Renamed the engine's `simulation/` to `game-loop/` and the
+  webapp hook to `useGameLoop` (the engine holds one turn of the loop, `step`; the caller runs it at a fixed rate). Swept
+  every package for the folder rule and moved single-caller files beneath their callers (the webapp's `game/` folder is
+  gone; the acceptance DSL's base files now live in `dsl/gunsmith/`). `AGENTS.md` status note updated (four of seven
+  packages exist). `TODO-build.md` now opens Phase 1 with where things stand, how to run the specs, gotchas and the next
+  step (practice dummies and damage). No contract changed; nothing for `ai` or `art` to wire.
+
 - 2026-11-12, `build`: **Aiming and shooting, first pass, test first.** `engine/` gains `player/AimPlayer`, `bullet/`
   (`FireBullet`, `AdvanceBullets`: flying bullets that die on walls) and `weapon/TriggerPull` (steady fire rate); `Input`
   now carries `aimAt` and `firing`. The state hook's snapshot (`shared/src/state-hook/types/`) gained `aimDegrees` and
@@ -204,6 +222,11 @@ Newest first. One line each: date, who, what, where.
   there, `langgraph dev` serves the graph, and the graph runs in workerd (2.79 MiB bundle, 2 to 4 ms per request). It also
   carries `trustPolicyExclude: chokidar@4.0.3` and `workerd: false` in its `pnpm-workspace.yaml`. Waiting for the user's review
   before anything merges into main; `build` will be told before it does. No money spent, no model called, nothing deployed.
+- 2026-11-12, `ai`: **main merged into the `ai/` worktree and `ai/` fitted to `engine/`'s conventions** (self-named imports and an
+  `exports` map so `api/` can import it as raw source, types in `types/`, doc comments). Root `pnpm checks` exits 0 there. For
+  `build`: when `ai/` merges, `pnpm-workspace.yaml` gains `ai` in `packages` and the catalog entries for LangChain, LangGraph,
+  `langsmith`, `wrangler` (the one `zod` entry stays), plus `trustPolicyExclude: chokidar@4.0.3` and `allowBuilds: workerd: false`.
+  The AI code is left **uncommitted** for the user's review in VS Code (two branch commits exist, to be undone).
 - 2026-11-12, `ai`: **eval-driven development set up** in the `ai/` worktree (not merged): `evals/` harness with five
   deterministic evaluators, nine weapon cases, three model tiers (fake, local Ollama, capped paid), the first red-green (token
   pre-check), `ai/AGENTS.md`. Adds two dev dependencies (`@langchain/ollama`, `langsmith`) to the worktree's catalog, which will

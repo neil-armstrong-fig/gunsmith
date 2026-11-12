@@ -22,7 +22,10 @@ the one-line wrapper on the `*Dsl` beside it.
 - **`<Thing>Dsl.ts`** is what a spec may say. It holds no locators, takes a `Page` only to build its own `*Playwright`
   in the constructor (never keeps it), and wraps each call in `try`/`catch` that rethrows a `DslError` naming the
   intention.
-- **`playwright/<Thing>Playwright.ts`** holds the locators, clicks and waits. It catches nothing.
+- **`playwright/<Thing>Playwright.ts`** holds the locators, clicks and waits. It catches nothing. It extends `BasePage`
+  and reads the game with `this.readGameState()` and waits on it with `this.waitForGameState(check)` (polled from the
+  test, so the check may use anything in scope). Only something that must run inside the page, such as the bullet recorder,
+  uses `page.evaluate` or `waitForFunction`. A spec must never rest on a wait alone: assert the state after it.
 - A thing's parts go in its `components/` folder, mirroring the app's own tree: `GunsmithDsl` owns `arena`, and so on.
 - **An action is a verb** (`resizeWindowTo`), a query is not (`getSize`). The verbs are listed in the `then` lint rule
   in `eslint.config.js`, so a `then` cannot arrange anything. Add a new action there too.

@@ -9,6 +9,7 @@ export function snapshotOf(world: World): GameStateSnapshot {
     arena: {width: world.arena.width, height: world.arena.height},
     player: {x: position.x, y: position.y, aimDegrees: (Math.atan2(aim.y, aim.x) * 180) / Math.PI},
     bullets: world.bullets.map(bullet => ({x: bullet.position.x, y: bullet.position.y})),
+    dummies: world.dummies.map(dummy => ({x: dummy.position.x, y: dummy.position.y, health: dummy.health})),
     elapsedSeconds: world.elapsedSeconds,
   };
 }

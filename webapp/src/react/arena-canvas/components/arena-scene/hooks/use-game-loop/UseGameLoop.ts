@@ -1,5 +1,6 @@
 import {useFrame} from "@react-three/fiber";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
+import type {Point} from "@gunsmith/engine/geometry/types/Point";
 import {step} from "@gunsmith/engine/game-loop/Step";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import type {World} from "@gunsmith/engine/game-loop/types/World";
@@ -15,12 +16,13 @@ import {useEffect, useRef} from "react";
 import type {RefObject} from "react";
 
 /**
- * Runs the match: every frame it plays however many fixed steps the time since the last one owes, with the keys, mouse
- * and trigger as they are right now as the player's input. The world lives in a ref, not state: it changes every frame,
- * and per-frame values stay out of React and Redux. It also puts the acceptance specs' read-only state hook on the page.
+ * Runs the match, with a dummy standing at each of `dummyPositions`: every frame it plays however many fixed steps the
+ * time since the last one owes, with the keys, mouse and trigger as they are right now as the player's input. The world
+ * lives in a ref, not state: it changes every frame, and per-frame values stay out of React and Redux. It also puts the
+ * acceptance specs' read-only state hook on the page.
  */
-export function useGameLoop(arena: Arena): RefObject<World> {
-  const worldRef = useRef<World>(startingWorld(arena));
+export function useGameLoop(arena: Arena, dummyPositions: readonly Point[]): RefObject<World> {
+  const worldRef = useRef<World>(startingWorld(arena, dummyPositions));
   const leftoverSecondsRef = useRef(0);
   const directionRef = useWasdMovement();
   const pointerRef = useMousePointer();

@@ -1,11 +1,13 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import {fireBullet} from "@gunsmith/engine/bullet/FireBullet";
 import {BULLET_SPEED} from "@gunsmith/engine/bullet/flight/BulletSpeed";
+import {DUMMY_HEALTH} from "@gunsmith/engine/dummy/DummyHealth";
 import {PLAYER_SPEED} from "@gunsmith/engine/player/walking/PlayerSpeed";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import {step} from "@gunsmith/engine/game-loop/Step";
 import type {Input} from "@gunsmith/engine/game-loop/types/Input";
 import type {World} from "@gunsmith/engine/game-loop/types/World";
+import {BULLET_DAMAGE} from "@gunsmith/engine/weapon/damage/BulletDamage";
 
 const arena = arenaFrom([
   "###############",
@@ -204,4 +206,57 @@ it("starts a new bullet at the muzzle of the player where they now stand, and do
   const after = step(centred(), {direction: {x: 1, y: 0}, aimAt: east, firing: true}, TICK);
 
   expect(after.bullets[0]?.position).toEqual(fireBullet(after.player.position, after.player.aim).position);
+});
+
+// The player starts at (7.5, 4.5) facing east; four tiles east of that is a dummy on the same row.
+function withDummyEast(): World {
+  return startingWorld(arena, [{x: 11.5, y: 4.5}]);
+}
+
+/** Holds the trigger toward the east for `heldTicks` steps, then lets go for `idleTicks` more. */
+function shoot(world: World, heldTicks: number, idleTicks: number): World {
+  let later = world;
+  for (let tick = 0; tick < heldTicks; tick += 1) {
+    later = step(later, firingAt({x: 20, y: 4.5}), TICK);
+  }
+
+  for (let tick = 0; tick < idleTicks; tick += 1) {
+    later = step(later, IDLE, TICK);
+  }
+
+  return later;
+}
+
+it("hurts a dummy the player shoots at", () => {
+  const after = shoot(withDummyEast(), 1, 30);
+
+  expect(after.dummies[0]?.health).toBe(DUMMY_HEALTH - BULLET_DAMAGE);
+});
+
+it("uses up the bullet that hit the dummy, well before the wall would have", () => {
+  // The dummy is two tiles from the muzzle; the wall is six. After 0.1 s a free bullet would be two tiles out, past the dummy.
+  const near = startingWorld(arena, [{x: 9.5, y: 4.5}]);
+
+  expect(shoot(near, 1, 6).bullets).toEqual([]);
+  expect(shoot(startingWorld(arena), 1, 6).bullets).toHaveLength(1);
+});
+
+it("takes the dummy out of the world once enough shots have landed", () => {
+  expect(withDummyEast().dummies).toHaveLength(1);
+  expect(shoot(withDummyEast(), 180, 0).dummies).toEqual([]);
+});
+
+it("does not hurt a dummy that is not in the line of fire", () => {
+  const aside = startingWorld(arena, [{x: 11.5, y: 7}]);
+
+  expect(shoot(aside, 1, 30).dummies[0]?.health).toBe(DUMMY_HEALTH);
+});
+
+it("does not change the dummies of the world it was given", () => {
+  const world = withDummyEast();
+  const before = structuredClone(world);
+
+  shoot(world, 60, 0);
+
+  expect(world).toEqual(before);
 });

@@ -3,7 +3,6 @@ import {STATE_HOOK_NAME} from "@gunsmith/shared/state-hook/StateHookName";
 import type {BulletSnapshot} from "@gunsmith/shared/state-hook/types/BulletSnapshot";
 import type {GameStateSnapshot} from "@gunsmith/shared/state-hook/types/GameStateSnapshot";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
-import {readGameState} from "@src/dsl/gunsmith/playwright/state-hook/ReadGameState";
 import type {Point} from "@src/dsl/gunsmith/types/Point";
 
 /** Where the in-page recorder keeps what it has seen. */
@@ -67,18 +66,11 @@ export class BulletsPlaywright extends BasePage {
   }
 
   async waitForNoBullets(): Promise<void> {
-    await this.page.waitForFunction<boolean, string>(hookName => {
-      const read: unknown = Reflect.get(window, hookName);
-      if (typeof read !== "function") {
-        return false;
-      }
-
-      return (read() as GameStateSnapshot).bullets.length === 0;
-    }, STATE_HOOK_NAME);
+    await this.waitForGameState(({bullets}) => bullets.length === 0);
   }
 
   async count(): Promise<number> {
-    const {bullets} = await readGameState(this.page);
+    const {bullets} = await this.readGameState();
 
     return bullets.length;
   }

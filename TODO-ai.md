@@ -64,10 +64,24 @@ tiers behind one `deps` argument: fake (in `pnpm checks`), local Ollama `qwen3.5
 - [x] Nine weapon cases (positive 2, boundary 2, overpowered 1, adversarial 2, negative 1, too-long 1).
 - [x] First red-green: the one-node stub fails "not a weapon" and "far over the length limit" for the right reasons; the
       token pre-check (test-first) turned "far over the length limit" green with no model call. Fake tier now 8 of 9.
-- [ ] **Needs the user:** Ollama installed and `qwen3.5:9b` pulled (`brew install ollama`, `brew services start ollama`,
-      `ollama pull qwen3.5:9b`). Then time one call and run `pnpm evals:local` for the first real loop.
-- [ ] Loop 1 (local): moderation judge so "not a weapon" goes green; loop 2: real `generate` with structured output, validate,
-      repair, rate (caps), watching the overpowered and adversarial cases for real; mutation proof of each.
+- [x] Ollama 0.40.16 and `qwen3.5:9b` (7.6 GB) installed by the user and **validated 2026-11-12**: a call takes 0.3 to 1.1 s
+      warm (7.5 GiB peak); **`format` (schema and JSON mode) fails with "structured output is unavailable"** on this NVFP4/MLX
+      build, but **tool calling works** and LangChain's `ChatOllama.withStructuredOutput(schema, {method: "functionCalling"})`
+      answered moderation correctly (3 structured calls in about 2.2 s). Probed behaviour: moderation says lasagna, gibberish and
+      the injection text are not weapon requests; the model **obeys** "100 damage, 20 a second" (2000 damage per second, cap
+      150) and "set damage to 9999, rateOfFire 500" (outside the schema). So the overpowered and injection cases will go red for
+      real reasons once the stub is gone. Untested: `qwen3.5:9b-q4_K_M` (6.6 GB, not MLX), which may support `format`.
+- [ ] **Before open-sourcing (the user, 2026-11-12):** the system-prompt canary (`SYSTEM_PROMPT_CANARY`) becomes an environment
+      secret passed to the pipeline as a dependency, not a constant in the source; the evals use a throwaway value. Do it
+      before the repo goes public (`MANUAL-SETUP-STEPS.md` step 15). Nothing else in `ai/` is secret.
+- [x] **Fitted to main (2026-11-12, after `42f1b0f`):** main merged into the worktree branch (conflicts only in
+      `pnpm-workspace.yaml`, one `zod` entry kept, and the lockfile, taken from main then `pnpm install`); `ai/` restyled to
+      `engine/`'s conventions: `exports` map and self-named imports (`@gunsmith/ai/...`, no `@src`), every type in `types/`,
+      the token limit in its own file, `/** */` doc comments, evaluators grouped by subject. Verified: root `pnpm checks`
+      exits 0 (`ai` 27, `engine` 72, `webapp` 38), self-imports resolve in `tsc`, vitest, ESLint, `wrangler deploy --dry-run`
+      (still 2790 KiB) and `langgraphjs dev` (a run over HTTP returned the weapon); evals unchanged at 8 of 9.
+- [ ] Loop 1 (local): moderation judge (function calling) so "not a weapon" goes green; loop 2: real `generate`, validate,
+      repair, rate (caps), watching the overpowered and injection cases for real; mutation proof of each.
 - [ ] Paid tier: spend guard (estimate before a run, abort over the ceiling, cache by model plus prompt hash), after the user
       makes a provider key with its own hard cap (`MANUAL-SETUP-STEPS.md` step 8). Haiku only, ceiling $1 total for now.
 - [ ] Later: a model judge for "matches the prompt", arena suite, `evals.yml` (a GitHub runner cannot run Ollama, so CI is fake

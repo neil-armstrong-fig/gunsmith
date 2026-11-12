@@ -1,6 +1,5 @@
 import type {Page} from "@playwright/test";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
-import {readGameState} from "@src/dsl/gunsmith/playwright/state-hook/ReadGameState";
 import type {Size} from "@src/dsl/gunsmith/types/Size";
 
 export class ArenaPlaywright extends BasePage {
@@ -18,7 +17,7 @@ export class ArenaPlaywright extends BasePage {
   }
 
   async getSizeInTiles(): Promise<Size> {
-    const {arena} = await readGameState(this.page);
+    const {arena} = await this.readGameState();
 
     return {width: arena.width, height: arena.height};
   }

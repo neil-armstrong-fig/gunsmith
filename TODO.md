@@ -21,7 +21,7 @@ Update the one-line status for your persona at the end of each session.
 
 | Persona | Checklist | Current focus | Last updated |
 | ------- | --------- | ------------- | ------------ |
-| `build` | `TODO-build.md` | Game first, test first, full-screen. Done: acceptance-tests and engine packages; specs for filling the window and walking with walls (WASD, collision in `engine/`). Aiming with the mouse and shooting (first pass). Next: practice dummies and damage | 2026-11-12 |
+| `build` | `TODO-build.md` | Game first, test first, full-screen. Done and committed: `acceptance-tests/` and `engine/` packages; the player walks with walls, aims with the mouse and fires bullets that die on walls, and shoots practice dummies that take damage and fall (27 specs, 117 engine and 40 webapp unit tests, all mutation-proved). Contracts and menus are withdrawn until the game is fun. Next: reload and weapon switching, then health, a scripted opponent and a round win | 2026-11-12 |
 | `ai` | `TODO-ai.md` | O1 decided: pipeline runs inside the Worker (no Plus); budget $1 a day, $20 month hard cap. Proof `ai/` package waits on the user's review in a worktree. Waiting for the contracts (M2) | 2026-11-12 |
 | `art` | `TODO-art.md` | Vision clarified: dim terrain outside rotating weapon/stance cone, detailed terrain + entities inside. Concept and game handoff corrected | 2026-11-12 |
 

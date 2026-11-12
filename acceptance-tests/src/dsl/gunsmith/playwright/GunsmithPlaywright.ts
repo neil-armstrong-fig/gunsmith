@@ -1,10 +1,7 @@
 import type {Page} from "@playwright/test";
 import {expect} from "@playwright/test";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
-import {readGameState} from "@src/dsl/gunsmith/playwright/state-hook/ReadGameState";
 import type {Size} from "@src/dsl/gunsmith/types/Size";
-import {STATE_HOOK_NAME} from "@gunsmith/shared/state-hook/StateHookName";
-import type {GameStateSnapshot} from "@gunsmith/shared/state-hook/types/GameStateSnapshot";
 
 export class GunsmithPlaywright extends BasePage {
   constructor(page: Page) {
@@ -31,18 +28,8 @@ export class GunsmithPlaywright extends BasePage {
 
   /** Waits until the game's own clock has run `seconds` further, however long that takes on the wall clock. */
   async waitForGameSeconds(seconds: number): Promise<void> {
-    const {elapsedSeconds} = await readGameState(this.page);
+    const {elapsedSeconds} = await this.readGameState();
 
-    await this.page.waitForFunction(
-      ([hookName, until]) => {
-        const read: unknown = Reflect.get(window, String(hookName));
-        if (typeof read !== "function") {
-          return false;
-        }
-
-        return (read() as GameStateSnapshot).elapsedSeconds >= Number(until);
-      },
-      [STATE_HOOK_NAME, elapsedSeconds + seconds],
-    );
+    await this.waitForGameState(state => state.elapsedSeconds >= elapsedSeconds + seconds);
   }
 }
