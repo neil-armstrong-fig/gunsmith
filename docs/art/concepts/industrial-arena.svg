@@ -1,0 +1,192 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1400" viewBox="0 0 1920 1400" role="img" aria-labelledby="title desc">
+<title id="title">Gunsmith — industrial arena concept sheet</title>
+<desc id="desc">A1 art direction: slate surfaces, blue and orange striped teams, four weapons, structural tiles, a three-level reveal arena and standing versus crouched vision studies. Concept only.</desc>
+<defs>
+<pattern id="hatch" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M-2 2L2-2M0 10L10 0M8 12L12 8" stroke="#91A2B2" stroke-width="1"/></pattern>
+<pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="#91A2B2" stroke-opacity=".12"/></pattern>
+<g id="rifle"><path d="M9 26H19V22H42L47 26H59V32H39L35 40H27L29 32H19L13 37H8Z" fill="#18212B" stroke="#91A2B2" stroke-width="2"/><path d="M23 26H42M48 28H58" stroke="#62B5FF" stroke-width="2"/></g>
+<g id="beam"><path d="M7 26H17V20H39L45 24H58V28H46V36H58V40H43L38 34H28L24 43H17L19 33H7Z" fill="#18212B" stroke="#91A2B2" stroke-width="2"/><path d="M28 25H39M47 28V36" stroke="#B6A0FF" stroke-width="3"/></g>
+<g id="shotgun"><path d="M6 23H18L22 19H57V29H31V35H57V44H22L18 36H6Z" fill="#18212B" stroke="#91A2B2" stroke-width="2"/><path d="M29 24H53M29 39H53" stroke="#FF9B54" stroke-width="3"/></g>
+<g id="launcher"><path d="M7 25H19V19H58V32H39L35 44H25L25 33H7Z" fill="#18212B" stroke="#91A2B2" stroke-width="2"/><circle cx="29" cy="31" r="12" fill="#30404F" stroke="#91A2B2" stroke-width="2"/><circle cx="29" cy="31" r="5" fill="none" stroke="#8AD4B0" stroke-width="2"/><path d="M45 23H56" stroke="#8AD4B0" stroke-width="3"/></g>
+<g id="stand"><circle cx="27" cy="32" r="18" fill="#30404F" stroke="#91A2B2" stroke-width="2"/><path d="M21 16H33V22H21Z" fill="#62B5FF"/><circle cx="29" cy="31" r="8" fill="#596572"/><use href="#rifle" x="5" y="10" transform="translate(12 5) scale(.7)"/></g>
+<g id="orange"><circle cx="27" cy="32" r="18" fill="#30404F" stroke="#91A2B2" stroke-width="2"/><path d="M19 16H25V23H19ZM29 16H35V23H29Z" fill="#FF9B54"/><circle cx="29" cy="31" r="8" fill="#596572"/><use href="#rifle" x="5" y="10" transform="translate(12 5) scale(.7)"/></g>
+<g id="crouch"><circle cx="27" cy="32" r="13" fill="#30404F" stroke="#596572" stroke-width="2"/><path d="M21 21H33V26H21Z" fill="#62B5FF"/><circle cx="29" cy="32" r="6" fill="#596572"/><use href="#rifle" transform="translate(12 12) scale(.65)"/></g>
+<g id="wall"><rect x="2" y="2" width="60" height="60" fill="#18212B" stroke="#91A2B2" stroke-width="2"/><path d="M9 19V9H19M45 9H55V19M55 45V55H45M19 55H9V45" fill="none" stroke="#91A2B2" stroke-width="2"/></g>
+<g id="cover"><rect x="4" y="10" width="56" height="44" fill="#596572" stroke="#91A2B2" stroke-width="2"/><rect x="9" y="15" width="46" height="34" fill="url(#hatch)"/></g>
+<g id="ramp"><rect x="2" y="2" width="60" height="60" fill="#30404F" stroke="#91A2B2" stroke-width="2"/><path d="M8 50H56M8 42H56M8 34H56M8 26H56M24 18L32 10L40 18M32 10V30" fill="none" stroke="#91A2B2" stroke-width="2"/></g>
+</defs>
+<rect width="1920" height="1400" fill="#10151B"/>
+<style>text{font-family:Arial,sans-serif;fill:#E5EAF0} .mono{font-family:monospace;fill:#A7B3C2;font-size:16px} .label{font-size:20px;font-weight:600} .small{font-size:16px;fill:#A7B3C2} .section{font-family:monospace;font-size:18px;fill:#62B5FF;letter-spacing:2px}</style>
+
+<text x="48" y="61" class="label" style="font-size:42px">GUNSMITH</text>
+<text x="48" y="94" class="mono">A1 / INDUSTRIAL ARENA / 12 NOV 2026</text>
+<text x="1280" y="57" class="mono">CONCEPT / NOT PRODUCTION ASSETS</text>
+<text x="1280" y="86" class="small">Slate. Strong silhouettes. Sparse neon.</text>
+<path d="M48 119H1872" fill="none" stroke="#596572" stroke-width="1"/>
+<rect x="48" y="143" width="138" height="26" fill="#202B36"/>
+<text x="48" y="194" class="mono">L1</text>
+<rect x="202" y="143" width="138" height="26" fill="#30404F"/>
+<text x="202" y="194" class="mono">L2</text>
+<rect x="356" y="143" width="138" height="26" fill="#465A6B"/>
+<text x="356" y="194" class="mono">L3</text>
+<rect x="510" y="143" width="138" height="26" fill="#18212B"/>
+<text x="510" y="194" class="mono">WALL</text>
+<rect x="664" y="143" width="138" height="26" fill="#596572"/>
+<text x="664" y="194" class="mono">COVER</text>
+<rect x="818" y="143" width="138" height="26" fill="#151B23"/>
+<text x="818" y="194" class="mono">FOG</text>
+<rect x="972" y="143" width="138" height="26" fill="#62B5FF"/>
+<text x="972" y="194" class="mono">BLUE</text>
+<rect x="1126" y="143" width="138" height="26" fill="#FF9B54"/>
+<text x="1126" y="194" class="mono">ORANGE</text>
+<rect x="1280" y="143" width="138" height="26" fill="#B6A0FF"/>
+<text x="1280" y="194" class="mono">VIOLET</text>
+<rect x="1434" y="143" width="138" height="26" fill="#8AD4B0"/>
+<text x="1434" y="194" class="mono">MINT</text>
+<rect x="1588" y="143" width="138" height="26" fill="#FF5B62"/>
+<text x="1588" y="194" class="mono">RING</text>
+<rect x="1742" y="143" width="138" height="26" fill="#E5EAF0"/>
+<text x="1742" y="194" class="mono">TEXT</text>
+<rect x="48" y="222" width="700" height="335" fill="#19222D"/>
+<rect x="772" y="222" width="1100" height="335" fill="#19222D"/>
+<text x="70" y="255" class="section">01 / PLAYERS</text>
+<text x="794" y="255" class="section">02 / WEAPON SILHOUETTES</text>
+<use href="#stand" transform="translate(82 278) scale(2.4)"/>
+<text x="82" y="467" class="mono">STAND / 1 STRIPE</text>
+<use href="#stand" transform="translate(82 483) scale(1)"/>
+<use href="#stand" transform="translate(170 498) scale(0.5)"/>
+<use href="#crouch" transform="translate(306 278) scale(2.4)"/>
+<text x="306" y="467" class="mono">CROUCH</text>
+<use href="#crouch" transform="translate(306 483) scale(1)"/>
+<use href="#crouch" transform="translate(394 498) scale(0.5)"/>
+<use href="#orange" transform="translate(530 278) scale(2.4)"/>
+<text x="530" y="467" class="mono">2 STRIPES</text>
+<use href="#orange" transform="translate(530 483) scale(1)"/>
+<use href="#orange" transform="translate(618 498) scale(0.5)"/>
+<text x="70" y="543" class="small">64 px + 32 px samples below / aim faces right</text>
+<use href="#rifle" transform="translate(802 292) scale(3.1)"/>
+<rect x="802" y="420" width="48" height="3" fill="#62B5FF"/>
+<text x="802" y="457" class="mono">DEFAULT RIFLE</text>
+<use href="#rifle" transform="translate(802 483) scale(1)"/>
+<use href="#rifle" transform="translate(896 498) scale(0.5)"/>
+<use href="#beam" transform="translate(1066 292) scale(3.1)"/>
+<rect x="1066" y="420" width="48" height="3" fill="#B6A0FF"/>
+<text x="1066" y="457" class="mono">FORK BEAM</text>
+<use href="#beam" transform="translate(1066 483) scale(1)"/>
+<use href="#beam" transform="translate(1160 498) scale(0.5)"/>
+<use href="#shotgun" transform="translate(1330 292) scale(3.1)"/>
+<rect x="1330" y="420" width="48" height="3" fill="#FF9B54"/>
+<text x="1330" y="457" class="mono">WIDE SHOTGUN</text>
+<use href="#shotgun" transform="translate(1330 483) scale(1)"/>
+<use href="#shotgun" transform="translate(1424 498) scale(0.5)"/>
+<use href="#launcher" transform="translate(1594 292) scale(3.1)"/>
+<rect x="1594" y="420" width="48" height="3" fill="#8AD4B0"/>
+<text x="1594" y="457" class="mono">DRUM LAUNCHER</text>
+<use href="#launcher" transform="translate(1594 483) scale(1)"/>
+<use href="#launcher" transform="translate(1688 498) scale(0.5)"/>
+<text x="794" y="543" class="small">Concept examples only / no behaviour enum or manifest keys added</text>
+<rect x="48" y="581" width="1160" height="755" fill="#19222D"/>
+<text x="70" y="618" class="section">03 / THREE-LEVEL ARENA — REVEAL OVERVIEW</text>
+<text x="70" y="650" class="small">Full arena shown for inspection. This is not a live player view.</text>
+<rect x="90" y="682" width="1056" height="484" fill="#202B36" stroke="#91A2B2"/>
+<rect x="442" y="770" width="616" height="308" fill="#30404F" stroke="#91A2B2"/>
+<rect x="750" y="814" width="264" height="176" fill="#465A6B" stroke="#91A2B2"/>
+<rect x="90" y="682" width="1056" height="484" fill="url(#grid)"/>
+<use href="#wall" transform="translate(90 682) scale(0.6875)"/>
+<use href="#wall" transform="translate(134 682) scale(0.6875)"/>
+<use href="#wall" transform="translate(178 682) scale(0.6875)"/>
+<use href="#wall" transform="translate(222 682) scale(0.6875)"/>
+<use href="#wall" transform="translate(398 682) scale(0.6875)"/>
+<use href="#wall" transform="translate(442 682) scale(0.6875)"/>
+<use href="#wall" transform="translate(970 682) scale(0.6875)"/>
+<use href="#wall" transform="translate(1014 682) scale(0.6875)"/>
+<use href="#wall" transform="translate(1058 682) scale(0.6875)"/>
+<use href="#wall" transform="translate(1102 682) scale(0.6875)"/>
+<use href="#wall" transform="translate(90 1122) scale(0.6875)"/>
+<use href="#wall" transform="translate(134 1122) scale(0.6875)"/>
+<use href="#wall" transform="translate(178 1122) scale(0.6875)"/>
+<use href="#wall" transform="translate(1102 1122) scale(0.6875)"/>
+<use href="#wall" transform="translate(1102 1078) scale(0.6875)"/>
+<use href="#wall" transform="translate(90 902) scale(0.6875)"/>
+<use href="#wall" transform="translate(90 946) scale(0.6875)"/>
+<use href="#wall" transform="translate(310 814) scale(0.6875)"/>
+<use href="#wall" transform="translate(310 858) scale(0.6875)"/>
+<use href="#wall" transform="translate(310 902) scale(0.6875)"/>
+<use href="#wall" transform="translate(750 858) scale(0.6875)"/>
+<use href="#wall" transform="translate(750 902) scale(0.6875)"/>
+<use href="#cover" transform="translate(222 814) scale(0.6875)"/>
+<use href="#cover" transform="translate(222 990) scale(0.6875)"/>
+<use href="#cover" transform="translate(486 814) scale(0.6875)"/>
+<use href="#cover" transform="translate(530 990) scale(0.6875)"/>
+<use href="#cover" transform="translate(882 946) scale(0.6875)"/>
+<use href="#cover" transform="translate(970 1034) scale(0.6875)"/>
+<use href="#ramp" transform="translate(574 1034) scale(0.6875)"/>
+<use href="#ramp" transform="translate(882 946) scale(0.6875)"/>
+<path d="M250 710v12" fill="none" stroke="#91A2B2" stroke-width="2"/>
+<path d="M540 782v12" fill="none" stroke="#91A2B2" stroke-width="2"/>
+<path d="M550 782v12" fill="none" stroke="#91A2B2" stroke-width="2"/>
+<path d="M850 827v12" fill="none" stroke="#91A2B2" stroke-width="2"/>
+<path d="M860 827v12" fill="none" stroke="#91A2B2" stroke-width="2"/>
+<path d="M870 827v12" fill="none" stroke="#91A2B2" stroke-width="2"/>
+<text x="238" y="749" class="mono">L1</text>
+<text x="494" y="835" class="mono">L2</text>
+<text x="816" y="881" class="mono">L3</text>
+<use href="#stand" transform="translate(175 1017) scale(1.2)"/>
+<use href="#orange" transform="translate(940 762) scale(1.2)"/>
+<path d="M360 808l14 14-14 14-14-14Z" fill="none" stroke="#8AD4B0" stroke-width="2"/>
+<path d="M355 822h10" fill="none" stroke="#8AD4B0" stroke-width="2"/>
+<path d="M625 893l14 14-14 14-14-14Z" fill="none" stroke="#8AD4B0" stroke-width="2"/>
+<path d="M620 907h10" fill="none" stroke="#8AD4B0" stroke-width="2"/>
+<path d="M840 908l14 14-14 14-14-14Z" fill="none" stroke="#8AD4B0" stroke-width="2"/>
+<path d="M835 922h10" fill="none" stroke="#8AD4B0" stroke-width="2"/>
+<path d="M1010 1038l14 14-14 14-14-14Z" fill="none" stroke="#8AD4B0" stroke-width="2"/>
+<path d="M1005 1052h10" fill="none" stroke="#8AD4B0" stroke-width="2"/>
+<text x="90" y="1202" class="mono">Solid = wall     Hatched = cover     Striped arrow = ramp     Diamond = pickup</text>
+<text x="90" y="1236" class="small">Level brightness + 1 / 2 / 3 edge ticks. All three levels connect via ramps.</text>
+<text x="90" y="1282" class="mono">CLOSING RING</text>
+<path d="M280 1278l10-8 10 8m12 0 10-8 10 8m12 0 10-8 10 8" fill="none" stroke="#FF5B62" stroke-width="3"/>
+<text x="412" y="1282" class="small">Coral chevrons mark danger; hatch the unsafe side.</text>
+<rect x="1232" y="581" width="640" height="295" fill="#19222D"/>
+<text x="1254" y="618" class="section">04 / STRUCTURE AT 64 + 32 PX</text>
+<use href="#wall" transform="translate(1260 652) scale(1)"/>
+<use href="#wall" transform="translate(1345 670) scale(0.5)"/>
+<text x="1260" y="746" class="mono">WALL</text>
+<use href="#cover" transform="translate(1460 652) scale(1)"/>
+<use href="#cover" transform="translate(1545 670) scale(0.5)"/>
+<text x="1460" y="746" class="mono">COVER</text>
+<use href="#ramp" transform="translate(1660 652) scale(1)"/>
+<use href="#ramp" transform="translate(1745 670) scale(0.5)"/>
+<text x="1660" y="746" class="mono">RAMP</text>
+<rect x="1260" y="773" width="64" height="64" fill="#202B36" stroke="#91A2B2"/>
+<path d="M1268 777v10" fill="none" stroke="#91A2B2" stroke-width="2"/>
+<rect x="1345" y="790" width="32" height="32" fill="#202B36" stroke="#91A2B2"/>
+<text x="1391" y="814" class="mono">L1</text>
+<rect x="1460" y="773" width="64" height="64" fill="#30404F" stroke="#91A2B2"/>
+<path d="M1468 777v10" fill="none" stroke="#91A2B2" stroke-width="2"/>
+<path d="M1477 777v10" fill="none" stroke="#91A2B2" stroke-width="2"/>
+<rect x="1545" y="790" width="32" height="32" fill="#30404F" stroke="#91A2B2"/>
+<text x="1591" y="814" class="mono">L2</text>
+<rect x="1660" y="773" width="64" height="64" fill="#465A6B" stroke="#91A2B2"/>
+<path d="M1668 777v10" fill="none" stroke="#91A2B2" stroke-width="2"/>
+<path d="M1677 777v10" fill="none" stroke="#91A2B2" stroke-width="2"/>
+<path d="M1686 777v10" fill="none" stroke="#91A2B2" stroke-width="2"/>
+<rect x="1745" y="790" width="32" height="32" fill="#465A6B" stroke="#91A2B2"/>
+<text x="1791" y="814" class="mono">L3</text>
+<rect x="1232" y="900" width="640" height="436" fill="#19222D"/>
+<text x="1254" y="938" class="section">05 / VISION AND FOG</text>
+<rect x="1260" y="964" width="270" height="206" fill="#151B23" stroke="#596572"/>
+<rect x="1570" y="964" width="270" height="206" fill="#151B23" stroke="#596572"/>
+<clipPath id="vision-clip"><rect x="1261" y="965" width="185" height="204"/></clipPath>
+<circle cx="1370" cy="1067" r="89" fill="#202B36" stroke="#30404F" stroke-width="4" clip-path="url(#vision-clip)"/>
+<rect x="1446" y="982" width="14" height="158" fill="#18212B" stroke="#91A2B2"/>
+<use href="#stand" transform="translate(1338 1035) scale(1)"/>
+<use href="#crouch" transform="translate(1673 1035) scale(1)"/>
+<text x="1260" y="1200" class="mono">STAND / 360°</text>
+<text x="1570" y="1200" class="mono">CROUCH / NO VISION</text>
+<text x="1254" y="1232" class="small">Wall clips vision. Aim does not set its direction.</text>
+<text x="1254" y="1260" class="small">Hidden opponent: no marker, outline or glow.</text>
+<text x="1254" y="1294" class="small">Study only; engine supplies the visible region.</text>
+<path d="M48 1357H1872" fill="none" stroke="#596572" stroke-width="1"/>
+<text x="48" y="1384" class="mono">ORIGINAL VECTOR GEOMETRY / 2 PX OUTLINE AT 64 PX / NO GLOBAL BLOOM</text>
+<text x="1272" y="1384" class="mono">NEXT: MANIFEST REVIEW WITH BUILD</text>
+</svg>

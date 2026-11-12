@@ -1,0 +1,49 @@
+{
+  "name": "@gunsmith/webapp",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "vite",
+    "start:preview": "pnpm compile && vite preview",
+    "build": "pnpm checks && pnpm compile",
+    "compile": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "checks": "pnpm lint && pnpm format:check && pnpm type-check && pnpm test",
+    "lint": "eslint --max-warnings=0 .",
+    "lint:fix": "eslint --max-warnings=0 --fix .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@gunsmith/shared": "workspace:*",
+    "@react-three/fiber": "catalog:",
+    "@reduxjs/toolkit": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "react-redux": "catalog:",
+    "three": "catalog:"
+  },
+  "devDependencies": {
+    "@eslint-react/eslint-plugin": "catalog:",
+    "@eslint/js": "catalog:",
+    "@tailwindcss/vite": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@types/three": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-prettier": "catalog:",
+    "eslint-plugin-react-hooks": "catalog:",
+    "globals": "catalog:",
+    "prettier": "catalog:",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:",
+    "typescript-eslint": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

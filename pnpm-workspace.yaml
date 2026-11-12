@@ -1,0 +1,78 @@
+packages:
+  - shared
+  - webapp
+
+# Refuse `pnpm add` commands that would bypass an existing catalog version.
+catalogMode: strict
+
+# Supply chain, copied from janggi. Nothing installs that has not had time to be noticed if it is malicious. Nothing
+# updates dependencies automatically: a version is changed by hand, in the catalog below.
+# Refuse every release, direct or transitive, less than seven days old, and fail rather than quietly pick an older one.
+minimumReleaseAge: 10080
+minimumReleaseAgeStrict: true
+minimumReleaseAgeIgnoreMissingTime: false
+
+# Refuse a package whose publisher is less trusted than the one that published its earlier releases, and one that pulls
+# code from a git repository or a tarball URL instead of the registry.
+trustPolicy: no-downgrade
+blockExoticSubdeps: true
+
+# Revalidate the registry's metadata behind the lockfile rather than taking it on trust, and fail an install that meets
+# an install script nobody has reviewed (the `allowBuilds` list below is the review).
+trustLockfile: false
+strictDepBuilds: true
+
+allowBuilds:
+  esbuild: true
+
+# Every external dependency is declared here once, exact-pinned, and each package says `catalog:`. A version changes in
+# one place for every package that uses it. Chosen 2026-11-12: the newest stable release at least seven days old.
+catalog:
+  # React 19 aware lint rules for the webapp; the legacy eslint-plugin-react is deliberately not used.
+  "@eslint-react/eslint-plugin": 5.28.8
+  # ESLint's recommended JavaScript rules, in every package's base config.
+  "@eslint/js": 10.0.1
+  # The react-three-fiber renderer: the arena canvas.
+  "@react-three/fiber": 9.8.2
+  # The store, slices and thunks.
+  "@reduxjs/toolkit": 2.14.0
+  # Tailwind CSS's first-party Vite integration.
+  "@tailwindcss/vite": 4.3.4
+  # Node.js declarations; the current LTS line (26).
+  "@types/node": 26.6.6
+  # React 19 type declarations.
+  "@types/react": 19.3.0
+  # React DOM type declarations.
+  "@types/react-dom": 19.3.0
+  # three.js type declarations, in step with `three`.
+  "@types/three": 0.187.0
+  # Vite's React plugin.
+  "@vitejs/plugin-react": 6.2.1
+  # The linter, in every package.
+  eslint: 10.14.0
+  # Switches off the ESLint rules Prettier owns.
+  eslint-config-prettier: 10.1.8
+  # Rules of hooks, for the webapp.
+  eslint-plugin-react-hooks: 7.1.1
+  # Browser and Node global definitions for ESLint.
+  globals: 17.14.0
+  # Formats every package.
+  prettier: 3.9.10
+  # The UI.
+  react: 19.3.1
+  # React's DOM renderer.
+  react-dom: 19.3.1
+  # Binds the store to React.
+  react-redux: 9.3.1
+  # Tailwind CSS v4, the utility styles.
+  tailwindcss: 4.3.4
+  # The 3D library react-three-fiber drives; used here orthographically for the top-down 2D view.
+  three: 0.187.0
+  # Compiler; held at 6.0.3 (checked 2026-11-12): typescript-eslint 8.72 still declares `typescript <6.1.0`, so TS 7 cannot be linted.
+  typescript: 6.0.3
+  # TypeScript-aware ESLint parser and rules.
+  typescript-eslint: 8.72.1
+  # Dev server and bundler for the webapp.
+  vite: 8.3.5
+  # Unit test runner, on node.
+  vitest: 5.1.0

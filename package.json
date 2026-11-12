@@ -1,0 +1,22 @@
+{
+  "name": "gunsmith",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.10.1",
+  "engines": {
+    "node": ">=26.13.0"
+  },
+  "scripts": {
+    "start": "pnpm --filter @gunsmith/webapp start",
+    "start:preview": "pnpm --filter @gunsmith/webapp start:preview",
+    "build": "pnpm --recursive build",
+    "checks": "pnpm --recursive checks",
+    "lint": "pnpm --recursive lint",
+    "lint:fix": "pnpm --recursive lint:fix",
+    "format": "pnpm --recursive format",
+    "format:check": "pnpm --recursive format:check",
+    "type-check": "pnpm --recursive type-check",
+    "test": "pnpm --recursive test"
+  }
+}

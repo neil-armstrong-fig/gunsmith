@@ -1,0 +1,64 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+build/
+dist/
+dev-dist/
+*.tsbuildinfo
+
+# Test output
+coverage/
+screenshots/
+playwright-report/
+blob-report/
+playwright/.cache/
+test-results/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Environment and secrets. Anything starting `.env` is local; commit a `.env.example` with no values instead.
+.env*
+!.env.example
+*.local
+*.pem
+*.key
+
+# Worker secrets for local dev (`.dev.vars.<environment>` too); commit a `.dev.vars.example` with no values instead
+.dev.vars*
+!.dev.vars.example
+.wrangler/
+
+# Alchemy local state and generated files
+.alchemy/
+
+# LangGraph dev server state (`langgraph dev`). The eval results in `ai/evals/results/` ARE committed, so not ignored.
+.langgraph_api/
+
+# Caches
+.eslintcache
+.vite/
+.cache/
+
+# Editors and OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Local scratch notes, not for the repo
+todo.txt
+
+# Playwright MCP browser session output (snapshots, screenshots, console logs)
+.playwright-mcp/
+
+# Claude Code: local settings and memory stay out; worktrees live inside the repo folder, so ignore them. A shared
+# `.claude/settings.json`, if one is ever added, is committed.
+.claude/settings.local.json
+.claude/worktrees/
+CLAUDE.local.md

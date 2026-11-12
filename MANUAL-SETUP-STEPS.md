@@ -1,0 +1,23 @@
+# Manual setup steps
+
+Everything that lives outside the repository, in order, and why. Update it in the same pass as any change that creates,
+renames or removes one. **Never put an account id, token, secret or personal address in this file.** Modelled on janggi's
+`MANUAL-SETUP-STEPS.md`. Status: planned; nothing has been done yet.
+
+| # | Step | Why | Who | Done |
+| - | ---- | --- | --- | ---- |
+| 1 | Pick the subdomain `gunsmith.neilarmstrong.dev` (one label below the registrable domain) | A deeper name has no free certificate | User | [ ] |
+| 2 | Create a **Google OAuth client** (web application). Authorised redirect URI: the Worker's `/api/auth/google/callback` on the domain, and `http://localhost:8787/...` for local. Note the client id and secret | Google lets nobody create a client from code | User | [ ] |
+| 3 | Create a **Cloudflare API token** for deploys: Workers admin, D1 edit; no zone permissions. Use `alchemy util create-cloudflare-token` (see janggi `infra/AGENTS.md`). Store as `CLOUDFLARE_API_TOKEN` (and `CLOUDFLARE_ACCOUNT_ID` only if the token reaches several accounts) | CI deploys | User | [ ] |
+| 4 | Choose an `ALCHEMY_PASSWORD` (long random string) | Encrypts secrets in Alchemy's state | User | [ ] |
+| 5 | First `pnpm --filter @gunsmith/infra provision` on a **throwaway Cloudflare account**, then on the real one | Alchemy adopts resources by name; the first real deploy is the test | `build` with the user | [ ] |
+| 6 | Attach the Worker's custom domain in the Cloudflare dashboard | Whose domain it is, and where its DNS lives, is the owner's | User | [ ] |
+| 7 | Create the **AI Gateway** and its **spend-limit rules** (per `user_id`, plus a global one) in the dashboard or API; enable caching and rate limits | Layer 2 of the cost controls (`docs/cost-and-budget.md`) | `ai` with the user | [ ] |
+| 8 | Create the **LLM provider key** with its own **hard spend cap** a little above the monthly ceiling. Store as a Worker secret | Layer 1 of the cost controls | User | [ ] |
+| 9 | Create a **LangSmith** account, a project, and an API key (free tier; traces expire after 14 days). Store as a secret. **If the user approves hosting option 1 (`docs/ai-hosting.md`), this needs the Plus plan ($39 a seat a month)**, which is what includes a hosted deployment | Tracing and evals | User | [ ] |
+| 10 | Set **Cloudflare budget alerts** (email) for $10, $16 and $20 of usage-based spend | The last line; they do not stop anything | User | [ ] |
+| 11 | Add the **GitHub secrets**: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` (if needed), `ALCHEMY_PASSWORD`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, the provider key, the LangSmith key | CI deploy and evals | User | [ ] |
+| 12 | Create the **GitHub repository** (private for now) with remote named as the user prefers; no branch protection requiring the property tests or evals | Janggi's rule: non-deterministic checks must not gate by the back door (evals gate only changes under `ai/`) | User | [ ] |
+| 13 | Create the local `api/.dev.vars` (git-ignored) with the Google client and the redirect URI for `wrangler dev` | Local real sign-in | User (the agents never read it) | [ ] |
+| 14 | Run the **shutdown drill** once against the live Worker with a tiny budget | Proves the kill switch | `ai` with the user | [ ] |
+| 15 | **Pre-publication scrub** before the repo or the case study goes public | The repo is private for now | `build` with the user | [ ] |
