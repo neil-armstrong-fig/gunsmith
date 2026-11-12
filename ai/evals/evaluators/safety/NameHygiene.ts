@@ -13,8 +13,8 @@ const NAME_PATTERN = /^[\p{L}\p{N}][\p{L}\p{N} '.-]*$/u;
  * characters, not long enough to carry a pasted instruction. Written here, independently of the pipeline.
  */
 export function nameHygiene({outcome}: EvalInput): EvalScore {
-  if (outcome.status === "rejected") {
-    return {key: KEY, score: 1, comment: "rejected, no name to check"};
+  if (outcome.status !== "created") {
+    return {key: KEY, score: 1, comment: `${outcome.status}, no name to check`};
   }
 
   const name = nameOf(outcome.weapon);

@@ -1,3 +1,4 @@
+import {PASSING_WEAPON} from "@evals/evaluators/fixtures/PassingWeapon";
 import type {EvalInputOverrides} from "@evals/evaluators/types/EvalInputOverrides";
 import type {EvalInput} from "@evals/types/EvalInput";
 
@@ -15,7 +16,7 @@ export function evalInput(overrides: EvalInputOverrides = {}): EvalInput {
     },
     outcome: {
       status: "created",
-      weapon: {name: "Proof Rifle", damage: 20, rateOfFire: 6},
+      weapon: PASSING_WEAPON,
       nodes: ["precheck", "moderation", "generate"],
       modelCalls: 2,
       ...overrides.outcome,

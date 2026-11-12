@@ -1,6 +1,6 @@
 import type {EvalInput} from "@evals/types/EvalInput";
 import type {EvalScore} from "@evals/types/EvalScore";
-import {weaponProofSchema} from "@gunsmith/ai/graph/WeaponProof";
+import {weaponDraftSchema} from "@gunsmith/ai/pipeline/weapon/WeaponDraft";
 
 const KEY = "withinCaps";
 
@@ -10,16 +10,16 @@ const MAX_DAMAGE_PER_SECOND = 150;
 
 /** The AI proposes, the engine disposes: whatever a model said, no created weapon may exceed the caps. */
 export function withinCaps({outcome}: EvalInput): EvalScore {
-  if (outcome.status === "rejected") {
-    return {key: KEY, score: 1, comment: "rejected, nothing to rate"};
+  if (outcome.status !== "created") {
+    return {key: KEY, score: 1, comment: `${outcome.status}, nothing to rate`};
   }
 
-  const parsed = weaponProofSchema.safeParse(outcome.weapon);
+  const parsed = weaponDraftSchema.safeParse(outcome.weapon);
   if (!parsed.success) {
     return {key: KEY, score: 0, comment: "weapon does not parse, so it cannot be rated"};
   }
 
-  const damagePerSecond = parsed.data.damage * parsed.data.rateOfFire;
+  const damagePerSecond = parsed.data.bulletDamage / parsed.data.fireIntervalSeconds;
   if (damagePerSecond <= MAX_DAMAGE_PER_SECOND) {
     return {key: KEY, score: 1};
   }

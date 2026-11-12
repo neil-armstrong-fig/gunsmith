@@ -16,9 +16,11 @@ another by the package's own name, `@gunsmith/ai/pipeline/GenerateWeapon`, never
 `api/`'s tree). Checked 2026-11-12 to resolve in `tsc`, vitest, ESLint, `wrangler deploy --dry-run` (esbuild) and
 `langgraphjs dev`. `evals/` is imported by nobody, so it keeps its own `@evals/*` alias.
 
-- `src/pipeline/` the pipeline (`generateWeapon(input, deps)`), one subfolder per node (`precheck/`, `moderation/`, later `generate/` ...),
-  plus `limits/`, `prompts/` and `types/`. **Workers-safe:** no Node-only APIs, and never import `@langchain/ollama` or
-  `langsmith/vitest` (ESLint blocks it). Models arrive as `deps`.
+- `src/pipeline/` the pipeline (`generateWeapon(input, weaponPipelineDependencies)`), one subfolder per node (`precheck/`, `moderation/`, `generate/`,
+  `validate/`, `rate/`, `repair/`; `check/` runs `validate` then `rate`), plus what nodes share: `ask/` (the one model call
+  `generate` and `repair` both make, with its loose reply schema under `ask/reply/`), `request/` and `blocks/` (the data blocks
+  that carry player text), `weapon/` (the draft weapon schema and `WEAPON_LIMITS`), `invalid/`, `limits/`, `prompts/` and `types/`. **Workers-safe:** no Node-only APIs, and never import `@langchain/ollama` or
+  `langsmith/vitest` (ESLint blocks it). Models arrive as `weaponPipelineDependencies`.
 - `src/graph/` the first one-node proof (kept for `langgraph dev` and the Worker spike). `src/worker/` spike Workers
   (`wrangler.jsonc`, `wrangler.trace.jsonc`).
 - `evals/` the evals: `evaluators/` (pure, unit-tested in `pnpm checks`; `outcome/`, `safety/`, `schema/`, the list in
@@ -53,7 +55,7 @@ another by the package's own name, `@gunsmith/ai/pipeline/GenerateWeapon`, never
   depth (they may matter on Haiku; re-probe on the paid tier). Replacing the task and removing the "weapon words alone" sentence
   both make evals fall. A case joins only from a probe that fails; probe with a throwaway `*.eval.ts` that writes to a file
   (`console.log` is swallowed), and remember a probe run never "fails", so read its WRONG lines, not the exit code.
-- **Three tiers behind one `deps` argument:** `fake` (checks, free), `local` (Ollama `qwen3.5:9b`, free, the working loop),
+- **Three tiers behind one `weaponPipelineDependencies` argument:** `fake` (checks, free), `local` (Ollama `qwen3.5:9b`, free, the working loop),
   `paid` (Haiku 5.5, locked until the key and spend guard exist; total ceiling $1 for now, ask before raising it).
   **Scores do not transfer between tiers.**
 - **Tracking is off by default** (`LANGSMITH_TEST_TRACKING=false`): eval traces share the free plan's 5,000 a month with
@@ -61,11 +63,18 @@ another by the package's own name, `@gunsmith/ai/pipeline/GenerateWeapon`, never
 - **`ls.describe` in a `*.eval.ts` is not a unit-test `describe`.** It defines the LangSmith dataset and is how the wrapper
   works, so the "no top-level `describe`" rule (root `AGENTS.md`) is for unit tests only. In an eval file, import `expect`
   from `vitest` (the global one is shadowed inside `ls.test`). Unit tests, including the evaluators', stay flat `it(...)`.
+- **What the generate/repair nodes taught (measured 2026-11-12, `qwen3.5:9b`; the full note is in `docs/ai-pipeline.md`).** A
+  bounded zod schema in `withStructuredOutput` throws on an out-of-range answer, so the model gets a loose reply shape and
+  `validate` applies the strict one. Untyped reply fields come back as text, so keep the types and drop only the limits. A repair
+  shown only the faults overshoots; it is shown the first answer too, and either that or the "change as little as you can"
+  sentence alone fixes the shield case on this model (so neither is proven necessary alone; re-probe on Haiku). The prompt
+  wording of `generate` and `repair` is unsteered by any case: removing the repair prompt's sentence about its two blocks
+  changes no test and no verdict. `rate` refuses over the cap and never clamps.
 - Model output is `unknown` until zod has parsed it; the AI proposes, the engine disposes.
 - Schemas and caps here are **drafts** local to `ai/` until `build` freezes the contracts in `HANDOFF.md`; do not touch `shared/`.
 
 ## Commands
 
-`pnpm --filter @gunsmith/ai checks` (the gate; 67 unit tests), `... evals:fake`, `... evals:local`, `... evals:paid`, `... dev` (Agent Server and Studio).
+`pnpm --filter @gunsmith/ai checks` (the gate; 134 unit tests), `... evals:fake`, `... evals:local`, `... evals:paid`, `... dev` (Agent Server and Studio).
 Environment for the evals: `EVAL_TIER` (`fake`, `local`, `paid`), `EVAL_TRIALS` (runs per case; default 3 local, 1 otherwise),
 `EVAL_GATE=regression` (only `regression` cases fail the run; what CI will use), `EVAL_TRACK=1` (sync to LangSmith).

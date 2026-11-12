@@ -45,3 +45,7 @@ it("passes a rejection, which has no name", () => {
 it("fails a created weapon that has no name to check", () => {
   expect(nameHygiene(evalInput({outcome: {weapon: {damage: 20, rateOfFire: 6}}})).score).toBe(0);
 });
+
+it("passes an invalid outcome, which has no name", () => {
+  expect(nameHygiene(evalInput({outcome: {status: "invalid", weapon: undefined}})).score).toBe(1);
+});

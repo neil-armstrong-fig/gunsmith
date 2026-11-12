@@ -1,3 +1,4 @@
+import {PASSING_WEAPON} from "@evals/evaluators/fixtures/PassingWeapon";
 import {createEvalModels} from "@evals/models/CreateEvalModels";
 import {runWeaponCase} from "@evals/weapons/RunWeaponCase";
 import {weaponEvalCases} from "@evals/weapons/WeaponEvalCases";
@@ -8,9 +9,9 @@ vi.mock("@gunsmith/ai/pipeline/GenerateWeapon", () => ({generateWeapon: vi.fn()}
 
 const created: WeaponOutcome = {
   status: "created",
-  weapon: {name: "Proof Rifle", damage: 20, rateOfFire: 6},
-  nodes: ["precheck", "generate"],
-  modelCalls: 1,
+  weapon: PASSING_WEAPON,
+  nodes: ["precheck", "moderation", "generate", "validate", "rate"],
+  modelCalls: 2,
 };
 
 const rejected: WeaponOutcome = {status: "rejected", reason: "off topic", nodes: ["precheck"], modelCalls: 0};
@@ -63,7 +64,7 @@ it("fails an evaluator that failed in only one of the trials", async () => {
 });
 
 it("reports a case the pipeline gets wrong, naming the evaluator that caught it", async () => {
-  vi.mocked(generateWeapon).mockResolvedValue(created);
+  vi.mocked(generateWeapon).mockResolvedValue({...created, modelCalls: 1});
 
   const run = await runWeaponCase(caseNamed("not a weapon"), createEvalModels("fake"), 1);
 

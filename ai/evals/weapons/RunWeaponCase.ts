@@ -5,12 +5,12 @@ import type {WeaponEvalCase} from "@evals/types/WeaponEvalCase";
 import type {WeaponCaseRun} from "@evals/weapons/types/WeaponCaseRun";
 import {generateWeapon} from "@gunsmith/ai/pipeline/GenerateWeapon";
 import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
-import type {WeaponPipelineDeps} from "@gunsmith/ai/pipeline/types/WeaponPipelineDeps";
+import type {WeaponPipelineDependencies} from "@gunsmith/ai/pipeline/types/WeaponPipelineDependencies";
 
 /** Runs one case `trials` times through the pipeline and scores every trial; the scores are combined so all trials must pass. */
 export async function runWeaponCase(
   evalCase: WeaponEvalCase,
-  models: WeaponPipelineDeps,
+  models: WeaponPipelineDependencies,
   trials: number,
 ): Promise<WeaponCaseRun> {
   const started = Date.now();
