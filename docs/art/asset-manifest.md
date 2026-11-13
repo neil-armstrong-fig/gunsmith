@@ -27,7 +27,7 @@ The contract between `build` and `art` so art can be dropped in without code cha
 | `fx-hit`, `fx-death` | Player hit and death | 96 | PNG strip |
 | `tile-floor-l1`, `tile-floor-l2`, `tile-floor-l3` | Three height levels | 64 | SVG or atlas |
 | `tile-wall`, `tile-cover` | Indestructible wall vs penetrable cover | 64 | SVG or atlas |
-| `tile-edge-<n>`, `tile-ramp` | Height edges and ramps | 64 | SVG or atlas |
+| `tile-edge-<n>`; stair keys pending build | Height edges and paired stair landings; provisional `tile-ramp` withdrawn | 64 | SVG or atlas |
 | `tile-spawn`, `tile-pickup-spot` | Markers (shown in the practice arena and the reveal) | 64 | SVG |
 | `fx-ring-edge`, `fx-fog` | The closing ring's edge and the fog texture | tiling | PNG |
 | `ui-hud-frame`, `ui-slot-1`, `ui-slot-2`, `ui-health`, `ui-ammo`, `ui-credit` | HUD | varies | SVG |

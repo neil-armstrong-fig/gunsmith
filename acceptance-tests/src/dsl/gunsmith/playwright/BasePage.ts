@@ -19,9 +19,15 @@ export abstract class BasePage {
   /**
    * Waits until `check` says yes of the game as it stands, looking again as long as it says no (until the expect
    * timeout). The check runs here in the test, not in the page, so it may use anything in scope; a state that comes and
-   * goes between two looks is not for this (`BulletsPlaywright` records those from inside the page instead).
+   * goes between two looks is not for this (`BulletsPlaywright` records those from inside the page instead). It gives up
+   * after the expect timeout, or after `timeoutSeconds` when a wait is known to take longer than that.
    */
-  protected async waitForGameState(check: GameStateCheck): Promise<void> {
-    await expect.poll(async () => check(await this.readGameState()), {intervals: LOOK_AGAIN_AFTER}).toBe(true);
+  protected async waitForGameState(check: GameStateCheck, timeoutSeconds?: number): Promise<void> {
+    await expect
+      .poll(async () => check(await this.readGameState()), {
+        intervals: LOOK_AGAIN_AFTER,
+        timeout: timeoutSeconds && timeoutSeconds * 1000,
+      })
+      .toBe(true);
   }
 }

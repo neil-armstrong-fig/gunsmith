@@ -56,19 +56,38 @@ entry point uses. Tiles are the unit; `x` grows to the east and `y` to the north
 - `round/`: `DecideRound` (`playing | won | lost` from the two healths: the player at zero loses, even when both fall in the
   same step; the opponent at zero wins; with no opponent the round only ends if the player falls). `types/` has
   `RoundState` and `RoundHealth`.
-- `opponent/`: the scripted opponent's brain. `OpponentInput(world)` returns an `Input` like a player's, so the opponent is
-  played by the same rules: it stands where it is, always aims at the player, holds the trigger in bursts
-  (`burst/`: 0.5 s on, 1.5 s off, worked out from the clock alone) while `sight/HasClearLine` finds no wall between them,
-  and reloads when its magazine is empty. It has finite ammunition like the player. `DisarmOpponent` empties its magazines,
-  for sparring. It does not move yet (next: a simple state-machine AI, `TODO-build.md`).
+- `random/`: `NextRandom(seed)` is a mulberry32 generator whose whole state is the seed, handed back with each draw
+  (`types/RandomDraw`), so it sits in the `World` as plain data. The engine has no `Math.random`; the caller picks the seed.
+- `opponent/`: a small bot, a finite state machine, to test weapons and arenas against. It exists to be played against, so it
+  is weapon- and map-agnostic, beatable and legible, not clever. `ThinkOpponent(world, seconds)` returns an `OpponentDecision`:
+  an `Input` like a player's, so it is played by the same rules, and the `OpponentBrain` it carries into the next step. The
+  brain (`types/OpponentBrain`) is plain data in `World.opponentBrain`: state, goal, last-seen point, timers, strafe side,
+  stuck watch and the seed. Each step it looks (`sight/CanSee`: within `sightRange` and a clear line; `NoticePlayer` keeps
+  the last-seen point and how long it has been in sight), checks transitions (`state/ChooseState`), lets its state act
+  (`state/ActOnState`), then notices if it has walked a while without getting anywhere (`steering/WatchForStuck`, answered by
+  `unstick/UnstickBrain`). The states: **wander** (walk to a random open tile it can see, re-pick on arrival, after
+  `wanderRepickSeconds` or when stuck), **engage** (after `reactionSeconds` hold the trigger for `burstShots` shots of the
+  weapon in hand, rest, repeat; the aim misses by a per-burst angle that settles from `widestAimError` to
+  `narrowestAimError` over `aimSettleSeconds` of sight; close in beyond `farRange`, back off inside `nearRange`, circle in
+  between and change sides every second or two), **reload** (an empty magazine, from any state: make for the nearest cover
+  it can walk to in a straight line, circle in the open when there is none, ask to reload, or ask for its other weapon when
+  the one in hand has no rounds and no reserve) and **search** (walk to where it last saw the player, wait
+  `searchLingerSeconds`, wander again). There is no pathfinder: goals are only ever tiles it can see, and a stuck bot drops its
+  goal (or flips its strafe side). Every tunable is one field of `Difficulty.ts`. `StartingBrain` and `GiveOpponentBrain(world,
+seed)` give an opponent a brain; **an opponent with no brain takes no action at all** (the still target of sparring), and
+  `DisarmOpponent` empties its magazines and takes its brain away. `sight/HasClearLine` is the line-of-sight test (a bullet's
+  wall test, so what it cannot see a bullet cannot hit). Browser specs watch it engage, move, run its magazine down, reload
+  and refill; `search` has no assertion of its own in a browser (it happens in every seed, but only the pinned fight's timing
+  would notice it go). The engine tests and `ThinkOpponentOverAMatch.test.ts` (20 seeds: kills a standing player within 15 s,
+  never in a wall, replays exactly, wanders a minute without getting stuck) carry the states.
 - `game-loop/`: the body of the game loop: `startingWorld(arena, dummyPositions, opponentPosition?)` (the opponent faces west
-  with the same weapons and 100 health) and `step`. Each fighter, the player by the `Input` and the opponent by
-  `opponentInput`, takes their own part by the same rules (`fighter/PrepareFighter`: switch weapon, then start or run the
+  with the same weapons and 100 health, and no brain: `giveOpponentBrain` adds one) and `step`. Each fighter, the player by
+  the `Input` and the opponent by what `thinkOpponent` asks for, takes their own part by the same rules (`fighter/PrepareFighter`: switch weapon, then start or run the
   reload, so a switch and a reload asked for together reload the new weapon; walk, turn, judge the trigger). Then the bullets
   fly on and hurt what they reach, then the triggers are let go (`fighter/ShootFighter`), so a shot fired this step first
   moves on the next, and a reload that finishes this step lets the weapon fire in it. Health falls, the round is decided,
   and once it is not `playing` the world is frozen: only `elapsedSeconds` runs on, so a wait on the clock never hangs. The loop that calls `step` at a fixed rate lives in the caller (the webapp's
-  `useGameLoop` today, the server's match later), because the engine has no clock. `types/World.ts` (now with `opponent?` and `round`) and `types/Input.ts` (direction, aim, firing, reload and the slot to switch to).
+  `useGameLoop` today, the server's match later), because the engine has no clock. `types/World.ts` (now with `opponent?`, `opponentBrain?` and `round`) and `types/Input.ts` (direction, aim, firing, reload and the slot to switch to).
 
 Several entry points here have a single caller (`AdvanceBullets`, `AimPlayer`, `TriggerPull`, `PushOutOfWalls` are called
 only by `step` or `MovePlayer`). They stay in domain folders of their own, not beneath that caller, on purpose: these are

@@ -137,13 +137,84 @@ interface. Build implements the schema and renderer; AI reviews generation/eval 
 
 Newest first. One line each: date, who, what, where.
 
-- 2026-11-12, `art`: **audio relocated at the user's request after the AI merge**. The private audio workspace now
-  lives in `webapp/audio/`: all TypeScript generation/test source is in `generator-scripts/`, all 14 WAVs and
-  `measurements.json` in `generated-audio/`; config and listening guide stay at its root. Active art links, ownership,
-  package exports/scripts, workspace registration and lockfile updated. Prior delivery paths under `docs/art/concepts/audio/`
-  are historical and superseded. `pnpm --filter @gunsmith/audio-studies render` writes to the new output folder and
-  reproduces every WAV hash. Final `pnpm checks` green: 324 engine, 82 webapp, 67 AI and 1 audio test; no new dependencies
-  or runtime/manifest changes. Listening/full tracks/production encoding still pending.
+- 2026-11-13, `build`: **The audio code is cleaned up to the project's standards, at the user's request, with the audio
+  unchanged.** `webapp/audio/` (`art`'s tooling workspace) was 704 lines of dense, flag-driven code with one test that rendered
+  the whole pack twice (about eight minutes inside `pnpm checks`). Now: a voice is a tone or a noise (no more `frequency: 0` and
+  boolean flags); the two tracks are data (`music/arrangements/`, eight-bar sections) read by one builder instead of a
+  `calm: boolean` threaded through seven helpers; effect recipes are data; `WriteWav` and `MakeMix` are split into small pieces
+  (header, PCM encoding, loop join, mix timeline, layering); the mastering numbers and tuned tables are named; duplicated
+  helpers are one. **The pack is byte for byte the same:** every voice of both tracks and all effects was compared with the old
+  code (1,656 + 94 voices identical), and the whole pack was re-rendered twice and compared with the committed `generated-audio/`
+  (21 of 21 files identical). Tests: 175 in about a second (was 3, about 535 s), mutation-checked (126 of 133 killed; the rest
+  equivalent or pinned by the render check). The full render is now `pnpm --filter @gunsmith/audio-studies test:render`
+  (about 4 to 5 minutes, not in `checks`), and a recipe fingerprint test fails in milliseconds if any pitch, note or pattern
+  changes. New `webapp/audio/AGENTS.md`; README and `TODO-art.md` updated. No contract, no manifest key, no game code touched.
+  Afterwards, at the user's request, every folder of `generator-scripts/` was regrouped so its root is one entry file and its
+  test (the layout is in `webapp/audio/AGENTS.md`); files were moved with plain `mv`, so the index shows them as deleted and
+  untracked until you stage them. Then the folders were grouped in three layers: `generators/` (`effects`, `music`), `common/`
+  (the vocabulary, the format, the noise seed, the footfall keys, `levels/`) and the consumers (`synthesis`, `output`, `pack`);
+  two imports that ran against the grain (`NOISE_SEED`, `stepKey`) now come from `common/`.
+  Uncommitted, for the user's review; **one slip:** a `git mv` staged the rename of `types/MetalNote.ts` into
+  `effects/metallic/types/` in the index (the working tree is as intended); unstage it in your editor if you like.
+
+- 2026-11-13, `art`: **context-clear checkpoint consolidated** in `TODO-art.md`: latest simple/rich references,
+  explicit AI JSON/defaults evaluation task, build renderer experiment, art review and production-audio follow-up.
+  All visual decisions remain provisional; approved audio retained. Shared art status updated. Documentation only;
+  no new asset key, code, dependency, schema, model call or commit.
+
+- 2026-11-13, `art`: **simpler references plus build/AI brief** in `docs/art/concepts/simple-machinery-04/`:
+  six original 6–8-primitive bodies with matching appearance-only JSON, editable SVGs, colour/grayscale/native-size/held
+  previews and a six-part lantern detail. Richer references preserved; all design/schema/default choices remain open.
+  At the user's explicit request, `TODO-ai.md` now calls for JSON-generation complexity/reliability/defaults evaluation,
+  including missing/invalid output, usable identity, bounded repair/fallback and measured cost. No eval performed here.
+  Geometry/bounds/reference checks and five invalid probes pass; selected workspace checks green (492 engine, 101 webapp,
+  67 AI). Two simpler image-generation attempts were rejected; supplied art is original vector geometry. Manifest keys:
+  none; no runtime/schema/dependency/audio changes. The brief proposes experiments, not a frozen interface.
+
+- 2026-11-12, `art`: **six new machinery concepts**, user-requested, in `docs/art/concepts/improbable-machinery-03.png`
+  with reusable mass/mechanism rules in its sibling Markdown. Extends the new direction across all six original oddities;
+  direction 02 supplied as the image reference. Original OpenAI-generated exploration, not production sprites or parsed
+  weapon data. Earlier editable fixtures retained. Manifest keys: none; no runtime/schema/audio/dependency changes.
+
+- 2026-11-12, `art`: **user-directed weapon style revision:** Ratchet & Clank-inspired inventive machinery adapted
+  to overhead 2D. Original three-weapon direction sheet `docs/art/concepts/overhead-machinery-02.png` and sourced notes
+  explain mass hierarchy, functional assemblies and candidate bounded material/corner/window rules. Earlier twelve
+  editable JSON/vector studies retained as a first pass, not a frozen style. New sheet is OpenAI-generated reference;
+  measured/editable translation remains next. Manifest keys: none; no runtime/schema/audio/dependency changes.
+  Selected workspace checks pass (492 engine, 101 webapp, 67 AI); unchanged audio not repeated. PNG/link/diff checks pass.
+
+- 2026-11-12, `art`: **twelve top-down studies and JSON handoff** in `docs/art/concepts/top-down-oddities/`:
+  two designs per oddity, nine editable SVG sheets/ten PNGs, twelve appearance-only JSON examples, budgets and field/identity
+  rules. Colour/grayscale, 64/32 px, held cardinal rotations, both teams/stances and pickup views reviewed. Model-free
+  AI-worktree probe (`e1dffc0` pipeline plus uncommitted eval work) confirms only name/six stats; extra appearance/behaviour
+  fields fail strict validation. Proposal now requests palette/detail tiers and measured grip/muzzle anchors; special
+  behaviours remain build/AI-owned gaps. JSON/SVG equivalence, stroke bounds, references and six invalid probes pass.
+  User authorised two variants and yellow/pink experiments. Manifest keys: none; no runtime/dependency/model changes.
+  Final `pnpm checks` exits 0 (492 engine, 101 webapp, 67 AI, 3 audio); gameplay acceptance/model evals not run for art/docs.
+
+- 2026-11-12, `art`: **user-directed concept planning:** before top-down studies, review the AI worktree's latest
+  draft schemas/output shapes, including uncommitted changes. Iterate both ways: schemas inform concepts, and concept
+  needs inform schema proposals. Neither the drafts nor art's proposal are final; art records concrete gaps/examples
+  for AI/build rather than editing their code. Plan-phase checkpoint added to `TODO-art.md` and the shared status row.
+
+- 2026-11-12, `ai`: **the evals are restructured in the acceptance-test style**, at the user's request and across two passes, in the
+  `ai/` worktree, **uncommitted for the user's review and not in main**. Five test files in `ai/evals/tests/` (`given` / `when` /
+  `thenExpect`, one criterion each) replace a table of 21 case rows scored by every evaluator in a loop. The root is now `tests | dsl |
+  eval-criteria-mapping`, like `acceptance-tests/`, with lint stopping any import that runs upwards: the mapping holds the setup (the
+  model tier, the trials, the real driver, the regression gate, the results file) and is the only layer that touches a model or a test
+  runner; the DSL (`WeaponSmithDsl`) holds the checks behind it and reaches the pipeline only through a driver interface it owns, so
+  its tests never need a model. What holds for every request is the DSL's **standing criteria**, added under each `when` by the mapping,
+  so a test states only what is special to its request: 70 criteria now, up from 64 for a stated reason, not lost coverage. Failures
+  read as one sentence per criterion. Test first, no money spent: `ai` 152 unit tests (was 134; the DSL and `WeaponSmithPipeline` have none of their own, the evals are their test), `pnpm evals:local` 70 of 70,
+  `evals:fake` 62 of 70 (the 4 `when`s that need a real "no"), root `pnpm checks` exits 0. Proved able to fail: the earlier eval mutants
+  sink the same `when`s, a broken gate leaves the fake tier green, a mapping that drops the standing criteria cuts 70 to 28, 12
+  forbidden imports are each reported by lint, 84 of 85 unit-level mutants killed (one survivor: a repair-prompt sentence). Naming is in
+  full (`weaponSmith`, `WeaponPipelineDependencies`). Nothing in `shared/`, nothing for `build` or `art` to wire, no contract changed.
+  Found on the way: an ES module that exports `then` is a thenable, so the mapping's export is `thenExpect`. The DSL is a thin `try` / `catch`
+  wrapper that rethrows a `DslError` naming the intention, over one lower-level `WeaponSmithPipeline` (the weapon smith's pipeline as the system under test: it asks and checks), as
+  `GunsmithDsl` is over `GunsmithPlaywright` in `acceptance-tests/`, with lint holding the line. The user committed it all as `4cc580a`
+  (not yet merged into main). Last tidy-ups: the evaluators are grouped by what they read (`outcome/`, `weapon/`, `player-visible/`),
+  their test-only helpers live in `evaluators/testing/`, and the evals re-ran 70 of 70 after the moves.
 
 - 2026-11-12, `ai`: **loop 2 done: the weapon pipeline is real past moderation** (`generate`, `validate`, `rate`, one `repair`), in
   the `ai/` worktree (`.claude/worktrees/ai-hosting-proof`), **uncommitted for the user's review and not in main**: main's `ai/` is
@@ -157,6 +228,21 @@ Newest first. One line each: date, who, what, where.
   only the faults overshoots. **For `build`: still owed, a shield behaviour** (directional, reflects bullets): a shield has no
   damage in the weapon shape, so a bare shield only passes because the repair gives it a 1-point bullet. Nothing in `shared/`,
   nothing for `art` to wire, no contract changed.
+
+- 2026-11-12, `build`: **A simple opponent AI, test first (slice 3 of 3).** `engine/src/opponent/` is now a four-state bot
+  (`wander`, `engage`, `reload`, `search`): it waits a reaction time, fires bursts sized by the weapon in hand with an aim error
+  that settles over time, circles at a good range, takes cover to reload and searches the place it last saw the player. Its
+  memory is `World.opponentBrain` (plain data, seeded; new `engine/random/NextRandom`), every tunable is one field of
+  `opponent/Difficulty.ts`, and there is no pathfinder (a stuck bot drops its goal). An opponent with no brain takes no action,
+  which is what sparring is; `DisarmOpponent` takes the brain away. Webapp: `?seed=` replays a duel, `worldOfPage()` replaces
+  the scenario-plus-seed pair. The state hook's `opponent` gained `rounds` and `behaviour` (a plain string; `shared/` cannot
+  read the engine's list). Acceptance: `AnOpponentWhoMoves`, `AnOpponentWhoReloads` (its own seed: the opponent reloads at 5.5 s,
+  is full at 7.0 and wins at 9.4), a sparring "stays put" spec, `FightingBack` waits 15 s (9.4 s measured worst case over 40
+  seeds), `startDuel()` pins a seed. `pnpm checks` green (`engine` 492, `webapp` 101, `ai` 67), 61
+  acceptance specs, the duel, sparring and HUD specs at `--repeat-each=10`. Mutation: 128 engine, 13 of 14 webapp (one
+  equivalent) and 12 of 15 browser mutants killed; `search` has no browser assertion of its own (the reload spec kills a
+  never-search mutant only through the pinned fight's timing). Replaces the clock-driven `OpponentInput` and `burst/`. The tunables are guesses until the user plays it. No contract
+  changed; nothing for `ai` or `art` to wire (the opponent is still a disc). Uncommitted, for the user's review.
 
 - 2026-11-12, `build`: **The `ai/` package is merged into main** (`8c52f5f`), at the user's request: the branch
   `worktree-ai-hosting-proof` (the hosting proof, eval harness, token pre-check and moderation node, through `3abc33a`) merged

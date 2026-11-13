@@ -4,6 +4,8 @@ import {ArenaDsl} from "@src/dsl/gunsmith/components/arena/ArenaDsl";
 import {BulletsDsl} from "@src/dsl/gunsmith/components/bullets/BulletsDsl";
 import {DummiesDsl} from "@src/dsl/gunsmith/components/dummies/DummiesDsl";
 import {HudDsl} from "@src/dsl/gunsmith/components/hud/HudDsl";
+import {DUEL_SEED} from "@src/dsl/gunsmith/duel/DuelSeed";
+import {LONG_DUEL_SEED} from "@src/dsl/gunsmith/duel/LongDuelSeed";
 import {OpponentDsl} from "@src/dsl/gunsmith/components/opponent/OpponentDsl";
 import {PlayerDsl} from "@src/dsl/gunsmith/components/player/PlayerDsl";
 import {RoundDsl} from "@src/dsl/gunsmith/components/round/RoundDsl";
@@ -47,12 +49,27 @@ export class GunsmithDsl {
     }
   }
 
-  /** Opens the duel in place of the practice range: the player and one opponent in an arena. */
+  /**
+   * Opens the duel in place of the practice range: the player and one opponent in an arena. The opponent's choices are
+   * drawn from a fixed seed (`DUEL_SEED`), so every run of a spec plays the same duel and only Playwright's timing varies.
+   */
   async startDuel(): Promise<void> {
     try {
-      await this.gunsmith.openDuel();
+      await this.gunsmith.openDuel(DUEL_SEED);
     } catch (error) {
       throw new DslError("Failed to open the duel", error);
+    }
+  }
+
+  /**
+   * Opens a duel that lasts long enough for the opponent to run dry and reload (`LONG_DUEL_SEED`), when the player stands
+   * still. Every other duel spec uses `startDuel`, whose fights are over before that.
+   */
+  async startLongDuel(): Promise<void> {
+    try {
+      await this.gunsmith.openDuel(LONG_DUEL_SEED);
+    } catch (error) {
+      throw new DslError("Failed to open the long duel", error);
     }
   }
 

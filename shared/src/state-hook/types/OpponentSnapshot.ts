@@ -1,6 +1,16 @@
-/** Where the opponent stands, in tiles, and how much health it has left. It stays listed at zero, once it has fallen. */
+/**
+ * Where the opponent stands, in tiles, how much health it has left, and the rounds in the magazine of the weapon it
+ * holds. It stays listed at zero, once it has fallen.
+ */
 export interface OpponentSnapshot {
   x: number;
   y: number;
   health: number;
+  /** The rounds in the magazine of the weapon in its hands. */
+  rounds: number;
+  /**
+   * What it is doing (`wander`, `engage`, `reload` or `search`), as the engine names it. Plain text here, since `shared/`
+   * cannot read the engine's list; absent when the opponent has no brain and takes no action.
+   */
+  behaviour?: string | undefined;
 }

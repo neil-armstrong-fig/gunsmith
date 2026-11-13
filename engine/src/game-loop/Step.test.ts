@@ -2,6 +2,7 @@ import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import {fireBullet} from "@gunsmith/engine/bullet/FireBullet";
 import {DUMMY_HEALTH} from "@gunsmith/engine/dummy/DummyHealth";
 import {disarmOpponent} from "@gunsmith/engine/opponent/DisarmOpponent";
+import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
 import {PLAYER_HEALTH} from "@gunsmith/engine/health/PlayerHealth";
 import {OPPONENT_HEALTH} from "@gunsmith/engine/health/OpponentHealth";
 import type {Player} from "@gunsmith/engine/player/types/Player";
@@ -438,9 +439,9 @@ function sparring(): World {
   return disarmOpponent(startingWorld(arena, [], {x: 11.5, y: 4.5}));
 }
 
-// The same, with the opponent armed as it starts a match.
-function duel(): World {
-  return startingWorld(arena, [], {x: 11.5, y: 4.5});
+// The same, with the opponent armed as it starts a match, and with a brain to play it by.
+function duel(seed = 1): World {
+  return giveOpponentBrain(startingWorld(arena, [], {x: 11.5, y: 4.5}), seed);
 }
 
 function opponentOf(world: World): Player {
@@ -538,45 +539,79 @@ it("does not hurt anyone once the round is over, though bullets are still in the
   expect(after.bullets).toEqual(another.bullets);
 });
 
-it("turns the opponent to face the player, wherever they stand", () => {
+it("plays the opponent by its brain, and carries the brain it comes to on in the world", () => {
   const world = duel();
-  const north = {...world, player: {...world.player, position: {x: 11.5, y: 7.5}}};
-  const after = step(north, IDLE, TICK);
+  const after = step(world, IDLE, TICK);
 
-  expect(opponentOf(after).aim.x).toBeCloseTo(0, 9);
-  expect(opponentOf(after).aim.y).toBeCloseTo(1, 9);
+  expect(world.opponentBrain?.state).toBe("wander");
+  expect(after.opponentBrain?.state).toBe("engage");
+  expect(after.opponentBrain?.seenSeconds).toBeCloseTo(TICK, 9);
 });
 
-it("keeps the opponent where it stands", () => {
-  const after = playTicks(duel(), IDLE, 60);
+it("leaves an opponent with no brain where it stands, without firing: a still target", () => {
+  const still = startingWorld(arena, [], {x: 11.5, y: 4.5});
+  const after = playTicks(still, IDLE, 300);
 
   expect(opponentOf(after).position).toEqual({x: 11.5, y: 4.5});
+  expect(after.bullets).toEqual([]);
+  expect(after.opponentBrain).toBeUndefined();
+  expect(after.player.health).toBe(PLAYER_HEALTH);
 });
 
-it("has the opponent open fire at the start of a match, with a bullet marked as its own", () => {
-  const after = step(duel(), IDLE, TICK);
-
-  expect(after.bullets).toHaveLength(1);
-  expect(after.bullets[0]?.shooter).toBe("opponent");
-  expect(after.bullets[0]?.direction.x).toBeCloseTo(-1, 9);
+it("steps the same world to the same next world", () => {
+  expect(step(duel(7), IDLE, TICK)).toEqual(step(duel(7), IDLE, TICK));
 });
 
-it("spends a round of the opponent's own for each shot it fires", () => {
-  const after = step(duel(), IDLE, TICK);
+it("lets different seeds play a match out differently", () => {
+  const positions = new Set<string>();
+  for (let seed = 1; seed <= 6; seed++) {
+    const after = playTicks(duel(seed), IDLE, 120);
+    positions.add(`${opponentOf(after).position.x.toFixed(3)},${opponentOf(after).position.y.toFixed(3)}`);
+  }
 
-  expect(opponentOf(after).loadout[0]?.rounds).toBe(RIFLE.magazineSize - 1);
-  expect(after.player.loadout[0]?.rounds).toBe(RIFLE.magazineSize);
+  expect(positions.size).toBeGreaterThan(1);
 });
 
-it("has the opponent hold its fire between bursts", () => {
-  const resting = {...duel(), elapsedSeconds: 1};
+// Plays ticks, standing still, until `found` returns something or `limit` ticks pass.
+function untilFound<Found>(world: World, limit: number, found: (world: World) => Found | undefined): Found | undefined {
+  let current = world;
+  for (let tick = 0; tick < limit; tick++) {
+    current = step(current, IDLE, TICK);
+    const result = found(current);
+    if (result !== undefined) {
+      return result;
+    }
+  }
 
-  expect(step(resting, IDLE, TICK).bullets).toEqual([]);
+  return undefined;
+}
+
+it("has the opponent open fire, with a bullet marked as its own, once its reaction time has passed", () => {
+  const bullet = untilFound(duel(), 120, world => world.bullets.find(candidate => candidate.shooter === "opponent"));
+
+  expect(bullet?.shooter).toBe("opponent");
+});
+
+it("does not have the opponent fire in its first moments, while it still reacts", () => {
+  expect(playTicks(duel(), IDLE, 20).bullets).toEqual([]);
+});
+
+it("spends a round of the opponent's own for each shot it fires, and none of the player's", () => {
+  const spent = untilFound(duel(), 240, world => {
+    const rounds = opponentOf(world).loadout[0]?.rounds;
+    if (rounds !== undefined && rounds < RIFLE.magazineSize) {
+      return world;
+    }
+
+    return undefined;
+  });
+
+  expect(spent?.player.loadout[0]?.rounds).toBe(RIFLE.magazineSize);
 });
 
 const wallInTheMiddle = ["###############", ...Array.from({length: 7}, () => "#.....#.......#"), "###############"];
 
-it("has the opponent hold its fire when a wall stands between it and the player", () => {
+it("has the opponent hold its fire when a wall stands between it and the player, however long it wanders", () => {
   const world = duel();
   const behindWall = {
     ...world,
@@ -584,27 +619,31 @@ it("has the opponent hold its fire when a wall stands between it and the player"
     arena: arenaFrom(wallInTheMiddle),
   };
 
-  expect(step(behindWall, IDLE, TICK).bullets).toEqual([]);
+  expect(untilFound(behindWall, 900, after => after.bullets[0])).toBeUndefined();
 });
 
 it("hurts a player who stands still in front of the opponent", () => {
-  const after = playTicks(duel(), IDLE, 60);
+  const after = playTicks(duel(), IDLE, 600);
 
   expect(after.player.health).toBeLessThan(PLAYER_HEALTH);
 });
 
 it("loses the round for a player who stands still long enough", () => {
-  const after = playTicks(duel(), IDLE, 300);
+  const lost = untilFound(duel(), 3600, world => {
+    if (world.round === "lost") {
+      return world;
+    }
 
-  expect(after.player.health).toBe(0);
-  expect(after.round).toBe("lost");
+    return undefined;
+  });
+
+  expect(lost?.player.health).toBe(0);
 });
 
 it("has the opponent reload when it has run dry", () => {
   const world = duel();
   const dry = {
     ...world,
-    elapsedSeconds: 1,
     opponent: {...opponentOf(world), loadout: opponentOf(world).loadout.map(carried => ({...carried, rounds: 0}))},
   };
 

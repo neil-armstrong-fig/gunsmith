@@ -2,6 +2,7 @@ import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import {step} from "@gunsmith/engine/game-loop/Step";
 import {disarmOpponent} from "@gunsmith/engine/opponent/DisarmOpponent";
+import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
 
 const arena = arenaFrom(["#########", "#.......#", "#.......#", "#.......#", "#########"]);
 const duel = startingWorld(arena, [], {x: 6.5, y: 2.5});
@@ -48,4 +49,21 @@ it("leaves an opponent who never fires, however long the match runs", () => {
 
   expect(world.bullets).toEqual([]);
   expect(world.player.health).toBe(duel.player.health);
+});
+
+it("takes the opponent's brain away, so it takes no action", () => {
+  const thinking = giveOpponentBrain(duel, 1);
+
+  expect(thinking.opponentBrain).toBeDefined();
+  expect(disarmOpponent(thinking).opponentBrain).toBeUndefined();
+});
+
+it("leaves an opponent that stays exactly where it stood, however long the match runs", () => {
+  let world = disarmOpponent(giveOpponentBrain(duel, 1));
+  for (let tick = 0; tick < 600; tick += 1) {
+    world = step(world, {direction: {x: 0, y: 0}, firing: false, reload: false}, 1 / 60);
+  }
+
+  expect(world.opponent?.position).toEqual(duel.opponent?.position);
+  expect(world.opponent?.aim).toEqual(duel.opponent?.aim);
 });

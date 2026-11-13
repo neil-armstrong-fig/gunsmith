@@ -1,8 +1,10 @@
 # Proposal: prompt-built visuals from strict JSON
 
 **Scheduling update, 2026-11-12:** the user subsequently dropped the fuzzy frontend and build withdrew the shared
-contracts. This document remains a future proposal, not a dependency for the playable game. References below to the
-existing weapon schema describe the now-withdrawn draft. Build should revisit the idea only when the game needs it;
+contracts. This document remains a future proposal, not a dependency for the playable game. The latest AI-worktree
+draft has only a name and six weapon stats, without appearance, behaviour, sound or vision.
+[The twelve top-down studies](concepts/top-down-oddities/README.md) now provide concrete JSON examples and owner requests.
+Build should adopt a contract only when the game needs it;
 all prototype work follows the current test-first rule, not the superseded fuzzy exception.
 
 Submitted by `art`, 2026-11-12, at the user's request. **Proposal for M2, not an implemented or frozen schema.**
@@ -19,6 +21,16 @@ An object can look like a duck, teapot or fax machine regardless of its firing b
 mechanics: shape cannot create gravity, extra pellets, penetration, damage, a larger hitbox or additional vision.
 Named gameplay behaviours remain implemented rules. Schema-driven vision and stairs are the separate requirements
 already recorded in `HANDOFF.md`; neither is a cosmetic shape property.
+
+## Simplification and evaluation checkpoint (2026-11-13)
+
+The user likes the richer machinery concepts but questions dynamic-generation complexity.
+[Simple studies and build/AI brief](concepts/simple-machinery-04/README.md) now supply six original 6–8-part appearance
+examples with editable geometry and actual-size previews. They are a smaller experiment, not a new frozen budget.
+The earlier 24-part/12-KiB limits below remain historical starting proposals, not requirements or measured safe targets.
+AI has an explicit user-requested TODO to compare generation approaches and evaluate code-owned defaults, omissions,
+validation, repair/fallback, cost and recognisable identity. Every schema, rendering and defaults suggestion here is
+open to revision with build/AI. Visual omission/fallback never settles gameplay-stat defaults.
 
 ## Proposed appearance block
 
@@ -62,6 +74,23 @@ Illustrative body fragment for a duck-like weapon (appearance data only, **not a
 }
 ```
 
+## Concrete top-down additions (2026-11-12)
+
+The user requested two designs per oddity and authorised adventurous accents if the JSON generation rules are explained.
+[Delivered fixtures and field dictionary](concepts/top-down-oddities/README.md) propose:
+
+- `palette`: bounded token assignments for `accent` and `accent-secondary`, including proposed yellow `#F5D45B` and pink
+  `#F58DBA`. No arbitrary CSS values in generated output; team/fog colours remain renderer-owned.
+- Per-part `detail`: `structural` or `fine`. Omit only fine parts in 32 px compositions; preserve the same anchors.
+- Concrete proposed anchors `(12,32)` grip and `(60,32)` visual muzzle in the 64-space. Body geometry and authoritative
+  firing position remain separate. These anchors are measured in fixtures, not an implemented engine contract.
+
+The primitive vocabulary suffices for all twelve static studies. The real gaps are palette assignment, detail reduction
+and gameplay representation, not new named shape types. Animation/draw-cost/model-generation claims still require testing.
+The reviewed loose model reply retains extra fields, but strict validation rejects them. Its one repair works on the whole
+stat weapon; **visual-only fallback below is a future proposal**, not current pipeline behaviour. AI must decide how valid
+stats can survive visual repair/fallback without silently discarding a player's requested identity.
+
 ## Initial budgets and fallbacks to validate
 
 Proposed starting limits: 24 body parts, 8 projectile parts, 32 points per polygon/polyline, 384 points total per
@@ -86,9 +115,10 @@ so many individually valid weapons cannot overload a match. Render density must 
 - **Build / M2:** design the strict zod union and versioned block, shared limits and fixed anchors with AI/art review.
   Add schema-valid fixtures for all six oddities and negative fixtures for unknown kinds, extra fields, malformed points,
   excessive counts/bytes, invalid numbers and out-of-bounds transforms. Keep current weapons working without appearance.
-- **Build / fuzzy frontend:** prove one generic renderer can draw six distinct top-down identities without per-weapon
-  branches or name checks. Support held, pickup, reveal and library views from the same body definition. Log it in the
-  fuzzy ledger and bring it into focus test-first in Phase B.
+- **Build / game-first implementation:** acceptance-test first, try one generic renderer with contrasting simple
+  references (start with the lantern, fax and kettle) without per-weapon name checks. Use the findings to choose detail
+  level and grammar; the richer twelve fixtures are references, not a mandatory first-release feature set. Reuse the
+  body definition across views when needed. No fuzzy-frontend exception applies.
 - **Build / tests:** verify schema failures, stable fallback, anchor consistency and the absence of gameplay/visibility
   changes when cosmetics change. Test the largest legal appearance under many simultaneous projectiles; measure frame
   cost, draw calls and memory before finalising the budgets. Reject unsupported versions and never execute strings.

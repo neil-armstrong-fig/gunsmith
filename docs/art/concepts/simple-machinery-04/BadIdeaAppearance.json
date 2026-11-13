@@ -1,0 +1,148 @@
+{
+  "version": 1,
+  "palette": {
+    "accent": "weapon-violet",
+    "accent-secondary": "weapon-mint"
+  },
+  "body": [
+    {
+      "kind": "polyline",
+      "x": 0,
+      "y": 0,
+      "points": [
+        [
+          17,
+          18
+        ],
+        [
+          7,
+          18
+        ],
+        [
+          5,
+          32
+        ],
+        [
+          7,
+          46
+        ],
+        [
+          17,
+          46
+        ]
+      ],
+      "fill": "none",
+      "stroke": "edge",
+      "strokeWidth": 4,
+      "opacity": 1,
+      "rotation": 0,
+      "detail": "structural"
+    },
+    {
+      "kind": "circle",
+      "x": 30,
+      "y": 32,
+      "radius": 18,
+      "fill": "accent",
+      "stroke": "outline",
+      "strokeWidth": 2,
+      "opacity": 1,
+      "rotation": 0,
+      "detail": "structural"
+    },
+    {
+      "kind": "polygon",
+      "x": 0,
+      "y": 0,
+      "points": [
+        [
+          43,
+          28
+        ],
+        [
+          50,
+          25
+        ],
+        [
+          59,
+          22
+        ],
+        [
+          59,
+          42
+        ],
+        [
+          50,
+          39
+        ],
+        [
+          43,
+          36
+        ]
+      ],
+      "fill": "accent",
+      "stroke": "outline",
+      "strokeWidth": 2,
+      "opacity": 1,
+      "rotation": 0,
+      "detail": "structural"
+    },
+    {
+      "kind": "polyline",
+      "x": 0,
+      "y": 0,
+      "points": [
+        [
+          35,
+          16
+        ],
+        [
+          40,
+          32
+        ],
+        [
+          35,
+          48
+        ]
+      ],
+      "fill": "none",
+      "stroke": "edge",
+      "strokeWidth": 4,
+      "opacity": 1,
+      "rotation": 0,
+      "detail": "structural"
+    },
+    {
+      "kind": "circle",
+      "x": 29,
+      "y": 32,
+      "radius": 9,
+      "fill": "accent-secondary",
+      "stroke": "outline",
+      "strokeWidth": 2,
+      "opacity": 1,
+      "rotation": 0,
+      "detail": "structural"
+    },
+    {
+      "kind": "circle",
+      "x": 29,
+      "y": 32,
+      "radius": 3,
+      "fill": "body",
+      "stroke": "outline",
+      "strokeWidth": 2,
+      "opacity": 1,
+      "rotation": 0,
+      "detail": "structural"
+    }
+  ],
+  "projectile": [],
+  "impact": {
+    "preset": "spark",
+    "colour": "accent"
+  },
+  "animation": {
+    "preset": "none"
+  }
+}

@@ -1,5 +1,4 @@
-import {scenarioOfPage} from "@src/game/scenario/ScenarioOfPage";
-import {worldOfScenario} from "@src/game/scenario/WorldOfScenario";
+import {worldOfPage} from "@src/game/scenario/WorldOfPage";
 import {roundMessage} from "@src/react/components/dom/round-banner/message/RoundMessage";
 import {selectRound} from "@src/store/game/selectors/select-round/SelectRound";
 import {useGameStore} from "@src/store/game/UseGameStore";
@@ -28,7 +27,7 @@ export function RoundBanner(): JSX.Element | undefined {
         type="button"
         className="rounded-md bg-gs-team-blue px-6 py-3 text-lg font-semibold text-gs-background"
         onClick={() => {
-          useGameStore.getState().setWorld(worldOfScenario(scenarioOfPage()));
+          useGameStore.getState().setWorld(worldOfPage());
         }}
       >
         Play again

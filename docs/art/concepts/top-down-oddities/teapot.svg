@@ -1,0 +1,306 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="850" viewBox="0 0 1200 850" role="img" aria-labelledby="title desc">
+<title id="title">Gunsmith / top-down oddities</title>
+<desc id="desc">Two overhead compositions with real-size samples, player overlays and decorative effect studies.</desc>
+<defs>
+<g id="duck-hull">
+<rect x="6" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="42" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<ellipse cx="29" cy="32" rx="18" ry="13" fill="#F5D45B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="43" cy="28" r="9" fill="#F5D45B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="49,25 59,28 59,36 49,35" fill="#FF9B54" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="13,25 8,20 19,23" fill="#F5D45B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<ellipse cx="27" cy="32" rx="8" ry="5" fill="#18212B" stroke="#91A2B2" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="45" cy="25" r="1.5" fill="#18212B" stroke="#91A2B2" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g id="duck-hull-small">
+<rect x="6" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="42" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<ellipse cx="29" cy="32" rx="18" ry="13" fill="#F5D45B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="43" cy="28" r="9" fill="#F5D45B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="49,25 59,28 59,36 49,35" fill="#FF9B54" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="13,25 8,20 19,23" fill="#F5D45B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g id="duck-reservoir">
+<rect x="6" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="42" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="19" y="17" width="28" height="30" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<ellipse cx="32" cy="31" rx="12" ry="12" fill="#F5D45B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="38" cy="27" r="6" fill="#F5D45B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="41,26 48,29 41,32" fill="#FF9B54" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="20" y="14" width="24" height="4" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="20" y="44" width="24" height="4" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polyline points="25,18 25,43" fill="none" stroke="#91A2B2" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polyline points="39,18 39,43" fill="none" stroke="#91A2B2" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g id="duck-reservoir-small">
+<rect x="6" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="42" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="19" y="17" width="28" height="30" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<ellipse cx="32" cy="31" rx="12" ry="12" fill="#F5D45B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="38" cy="27" r="6" fill="#F5D45B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="41,26 48,29 41,32" fill="#FF9B54" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="20" y="14" width="24" height="4" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="20" y="44" width="24" height="4" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g id="fax-desktop">
+<rect x="6" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="42" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="17" y="14" width="32" height="36" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="22" y="11" width="21" height="15" fill="#E5EAF0" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="22" y="38" width="21" height="16" fill="#E5EAF0" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="20" y="28" width="20" height="7" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="23" y="29" width="9" height="3" fill="#B6A0FF" stroke="#91A2B2" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polyline points="26,17 39,17" fill="none" stroke="#91A2B2" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polyline points="26,45 38,45" fill="none" stroke="#91A2B2" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g id="fax-desktop-small">
+<rect x="6" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="42" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="17" y="14" width="32" height="36" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="22" y="11" width="21" height="15" fill="#E5EAF0" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="22" y="38" width="21" height="16" fill="#E5EAF0" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="20" y="28" width="20" height="7" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g id="fax-receipt">
+<rect x="6" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="42" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="15" y="23" width="35" height="18" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="18" y="19" width="17" height="26" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="22,20 28,20 28,8 38,8 38,16 44,16 44,24" fill="#E5EAF0" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="23,41 34,41 34,52 21,52" fill="#E5EAF0" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polyline points="29,45 25,45" fill="none" stroke="#91A2B2" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="38" y="28" width="8" height="8" fill="#B6A0FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g id="fax-receipt-small">
+<rect x="6" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="42" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="15" y="23" width="35" height="18" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="18" y="19" width="17" height="26" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="22,20 28,20 28,8 38,8 38,16 44,16 44,24" fill="#E5EAF0" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="23,41 34,41 34,52 21,52" fill="#E5EAF0" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="38" y="28" width="8" height="8" fill="#B6A0FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g id="teapot-kettle">
+<rect x="6" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="42" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<ellipse cx="14" cy="32" rx="9" ry="15" fill="none" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="31" cy="32" r="17" fill="#B6A0FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="44,28 50,23 58,27 59,35 50,37 44,36" fill="#B6A0FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="31" cy="32" r="9" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="31" cy="32" r="3" fill="#F5D45B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polyline points="22,23 37,25 41,34 30,41" fill="none" stroke="#91A2B2" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g id="teapot-kettle-small">
+<rect x="6" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="42" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<ellipse cx="14" cy="32" rx="9" ry="15" fill="none" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="31" cy="32" r="17" fill="#B6A0FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="44,28 50,23 58,27 59,35 50,37 44,36" fill="#B6A0FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="31" cy="32" r="9" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="31" cy="32" r="3" fill="#F5D45B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g id="teapot-angular">
+<rect x="6" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="42" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="6,20 18,17 23,24 23,40 18,47 6,44" fill="none" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="23,12 39,12 48,23 48,41 39,52 23,52 18,41 18,23" fill="#B6A0FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="46,29 52,24 59,28 59,36 51,39 46,35" fill="#B6A0FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="25" y="23" width="15" height="18" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="32" cy="32" r="3" fill="#F5D45B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polyline points="26,16 37,16" fill="none" stroke="#91A2B2" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g id="teapot-angular-small">
+<rect x="6" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="42" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="6,20 18,17 23,24 23,40 18,47 6,44" fill="none" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="23,12 39,12 48,23 48,41 39,52 23,52 18,41 18,23" fill="#B6A0FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="46,29 52,24 59,28 59,36 51,39 46,35" fill="#B6A0FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="25" y="23" width="15" height="18" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="32" cy="32" r="3" fill="#F5D45B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g id="cactus-stem">
+<rect x="6" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="42" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="14,26 20,17 42,17 49,26 49,38 42,47 20,47 14,38" fill="#8AD4B0" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polyline points="22,21 22,43" fill="none" stroke="#91A2B2" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polyline points="31,20 31,44" fill="none" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polyline points="40,21 40,43" fill="none" stroke="#91A2B2" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="23,15 27,8 31,15" fill="#B6A0FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="32,49 37,56 40,49" fill="#B6A0FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g id="cactus-stem-small">
+<rect x="6" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="42" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="14,26 20,17 42,17 49,26 49,38 42,47 20,47 14,38" fill="#8AD4B0" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polyline points="31,20 31,44" fill="none" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="23,15 27,8 31,15" fill="#B6A0FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="32,49 37,56 40,49" fill="#B6A0FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g id="cactus-cluster">
+<rect x="6" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="42" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="25" y="16" width="15" height="32" fill="#8AD4B0" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="25,24 18,24 18,14 11,14 11,32 25,35" fill="#8AD4B0" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="39,29 47,29 47,41 53,41 53,49 43,49 39,40" fill="#8AD4B0" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="33" cy="15" r="9" fill="#B6A0FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polyline points="27,13 38,17" fill="none" stroke="#91A2B2" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polyline points="32,8 32,21" fill="none" stroke="#91A2B2" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polyline points="30,25 30,42" fill="none" stroke="#91A2B2" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g id="cactus-cluster-small">
+<rect x="6" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="42" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="25" y="16" width="15" height="32" fill="#8AD4B0" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="25,24 18,24 18,14 11,14 11,32 25,35" fill="#8AD4B0" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="39,29 47,29 47,41 53,41 53,49 43,49 39,40" fill="#8AD4B0" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="33" cy="15" r="9" fill="#B6A0FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g id="jellyfish-bell">
+<rect x="6" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="42" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<ellipse cx="26" cy="32" rx="17" ry="21" fill="#62B5FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<ellipse cx="25" cy="32" rx="10" ry="14" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="35,18 42,24 47,27 55,28 57,31 47,32 39,27" fill="#B6A0FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="35,46 42,40 47,37 55,36 57,33 47,32 39,37" fill="#B6A0FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="23" cy="29" r="4" fill="#E5EAF0" stroke="#91A2B2" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polyline points="14,22 20,17 29,16" fill="none" stroke="#91A2B2" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g id="jellyfish-bell-small">
+<rect x="6" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="42" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<ellipse cx="26" cy="32" rx="17" ry="21" fill="#62B5FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<ellipse cx="25" cy="32" rx="10" ry="14" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="35,18 42,24 47,27 55,28 57,31 47,32 39,27" fill="#B6A0FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="35,46 42,40 47,37 55,36 57,33 47,32 39,37" fill="#B6A0FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g id="jellyfish-cage">
+<rect x="6" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="42" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="17,18 34,18 43,25 43,39 34,46 17,46 10,39 10,25" fill="#62B5FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="20" y="23" width="13" height="18" fill="#E5EAF0" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polyline points="17,18 17,46" fill="none" stroke="#91A2B2" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polyline points="36,21 36,43" fill="none" stroke="#91A2B2" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="41,24 49,28 57,29 57,31 47,31 41,28" fill="#B6A0FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="41,40 49,36 57,35 57,33 47,33 41,36" fill="#B6A0FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g id="jellyfish-cage-small">
+<rect x="6" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="42" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="17,18 34,18 43,25 43,39 34,46 17,46 10,39 10,25" fill="#62B5FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="20" y="23" width="13" height="18" fill="#E5EAF0" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="41,24 49,28 57,29 57,31 47,31 41,28" fill="#B6A0FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="41,40 49,36 57,35 57,33 47,33 41,36" fill="#B6A0FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g id="gum-drum">
+<rect x="6" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="42" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="29" cy="32" r="18" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="29" cy="32" r="14" fill="#F58DBA" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="23" cy="26" r="5" fill="#FF9B54" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="35" cy="26" r="5" fill="#E5EAF0" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="29" cy="37" r="6" fill="#F58DBA" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="46" y="23" width="12" height="18" fill="#FF9B54" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<ellipse cx="25" cy="21" rx="3" ry="1.5" fill="#E5EAF0" stroke="#91A2B2" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g id="gum-drum-small">
+<rect x="6" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="42" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="29" cy="32" r="18" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="29" cy="32" r="14" fill="#F58DBA" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="23" cy="26" r="5" fill="#FF9B54" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="35" cy="26" r="5" fill="#E5EAF0" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="29" cy="37" r="6" fill="#F58DBA" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="46" y="23" width="12" height="18" fill="#FF9B54" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g id="gum-coil">
+<rect x="6" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="42" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="17" y="17" width="32" height="30" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="20,20 43,20 43,26 27,26 27,30 43,30 43,36 27,36 27,40 43,40 43,46 20,46" fill="#F58DBA" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="49" y="25" width="10" height="14" fill="#FF9B54" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="10" y="24" width="6" height="16" fill="#FF9B54" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polyline points="32,22 39,22" fill="none" stroke="#91A2B2" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g id="gum-coil-small">
+<rect x="6" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="42" y="28" width="18" height="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="17" y="17" width="32" height="30" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="20,20 43,20 43,26 27,26 27,30 43,30 43,36 27,36 27,40 43,40 43,46 20,46" fill="#F58DBA" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="49" y="25" width="10" height="14" fill="#FF9B54" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="10" y="24" width="6" height="16" fill="#FF9B54" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+</defs>
+<rect width="1200" height="850" fill="#10151B"/>
+<text x="40" y="47" fill="#E5EAF0" font-size="30" font-family="Arial,sans-serif">GUNSMITH / TEAPOT</text>
+<text x="40" y="76" fill="#A7B3C2" font-size="14" font-family="Arial,sans-serif">A2 / TWO TOP-DOWN DESIGNS / CONCEPT JSON, NOT RUNTIME ASSETS</text>
+<rect x="40" y="105" width="530" height="650" fill="#19222D"/>
+<text x="64" y="140" fill="#E5EAF0" font-size="22" font-family="Arial,sans-serif">ORBIT KETTLE</text>
+<use href="#teapot-kettle" transform="translate(115 165) scale(4)"/>
+<text x="64" y="449" fill="#A7B3C2" font-size="14" font-family="Arial,sans-serif">OVERHEAD / +X AIM / FIXED GRIP AND MUZZLE</text>
+<use href="#teapot-kettle" transform="translate(66 470) scale(1)"/>
+<use href="#teapot-kettle-small" transform="translate(159 486) scale(0.5)"/>
+<text x="66" y="555" fill="#A7B3C2" font-size="14" font-family="Arial,sans-serif">64 px / 32 px</text>
+<g transform="translate(249 470) scale(1)">
+<g transform="rotate(0 20 32)">
+<circle cx="20" cy="32" r="18" fill="#30404F" stroke="#91A2B2" stroke-width="2"/>
+<use href="#teapot-kettle" transform="translate(29 11.2) scale(0.65)"/>
+<rect x="14" y="16" width="12" height="6" fill="#62B5FF"/>
+</g>
+</g>
+<g transform="translate(349 486) scale(0.5)">
+<g transform="rotate(0 20 32)">
+<circle cx="20" cy="32" r="13" fill="#30404F" stroke="#91A2B2" stroke-width="2"/>
+<use href="#teapot-kettle-small" transform="translate(29 11.2) scale(0.65)"/>
+<rect x="13" y="21" width="5" height="6" fill="#FF9B54"/>
+<rect x="22" y="21" width="5" height="6" fill="#FF9B54"/>
+</g>
+</g>
+<text x="249" y="555" fill="#A7B3C2" font-size="14" font-family="Arial,sans-serif">HELD / STAND + CROUCH</text>
+<g transform="translate(66 592) scale(.65)">
+<circle cx="32" cy="32" r="13" fill="#B6A0FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="32" cy="32" r="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polyline points="23,26 29,21 39,25" fill="none" stroke="#91A2B2" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g transform="translate(187 612)" fill="none" stroke="#B6A0FF" stroke-width="2">
+<circle r="12"/>
+</g>
+<text x="64" y="664" fill="#A7B3C2" font-size="14" font-family="Arial,sans-serif">SHOT / IMPACT MOTIF: RING</text>
+<text x="64" y="702" fill="#A7B3C2" font-size="14" font-family="Arial,sans-serif">Behaviour is a request, not implemented by this art.</text>
+<text x="64" y="728" fill="#A7B3C2" font-size="13" font-family="Arial,sans-serif">teapot-kettle.json</text>
+<rect x="600" y="105" width="530" height="650" fill="#19222D"/>
+<text x="624" y="140" fill="#E5EAF0" font-size="22" font-family="Arial,sans-serif">ANGULAR POT</text>
+<use href="#teapot-angular" transform="translate(675 165) scale(4)"/>
+<text x="624" y="449" fill="#A7B3C2" font-size="14" font-family="Arial,sans-serif">OVERHEAD / +X AIM / FIXED GRIP AND MUZZLE</text>
+<use href="#teapot-angular" transform="translate(626 470) scale(1)"/>
+<use href="#teapot-angular-small" transform="translate(719 486) scale(0.5)"/>
+<text x="626" y="555" fill="#A7B3C2" font-size="14" font-family="Arial,sans-serif">64 px / 32 px</text>
+<g transform="translate(809 470) scale(1)">
+<g transform="rotate(0 20 32)">
+<circle cx="20" cy="32" r="18" fill="#30404F" stroke="#91A2B2" stroke-width="2"/>
+<use href="#teapot-angular" transform="translate(29 11.2) scale(0.65)"/>
+<rect x="14" y="16" width="12" height="6" fill="#62B5FF"/>
+</g>
+</g>
+<g transform="translate(909 486) scale(0.5)">
+<g transform="rotate(0 20 32)">
+<circle cx="20" cy="32" r="13" fill="#30404F" stroke="#91A2B2" stroke-width="2"/>
+<use href="#teapot-angular-small" transform="translate(29 11.2) scale(0.65)"/>
+<rect x="13" y="21" width="5" height="6" fill="#FF9B54"/>
+<rect x="22" y="21" width="5" height="6" fill="#FF9B54"/>
+</g>
+</g>
+<text x="809" y="555" fill="#A7B3C2" font-size="14" font-family="Arial,sans-serif">HELD / STAND + CROUCH</text>
+<g transform="translate(626 592) scale(.65)">
+<circle cx="32" cy="32" r="13" fill="#B6A0FF" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="32" cy="32" r="8" fill="#18212B" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polyline points="23,26 29,21 39,25" fill="none" stroke="#91A2B2" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g transform="translate(747 612)" fill="none" stroke="#B6A0FF" stroke-width="2">
+<circle r="12"/>
+</g>
+<text x="624" y="664" fill="#A7B3C2" font-size="14" font-family="Arial,sans-serif">SHOT / IMPACT MOTIF: RING</text>
+<text x="624" y="702" fill="#A7B3C2" font-size="14" font-family="Arial,sans-serif">Behaviour is a request, not implemented by this art.</text>
+<text x="624" y="728" fill="#A7B3C2" font-size="13" font-family="Arial,sans-serif">teapot-angular.json</text>
+<text x="40" y="795" fill="#A7B3C2" font-size="14" font-family="Arial,sans-serif">Body parts: 64 x 64. Held previews occupy a 96 x 64 frame; weapon scale is 0.65.</text>
+<text x="40" y="821" fill="#A7B3C2" font-size="14" font-family="Arial,sans-serif">Team stripes are renderer-owned. Cosmetic size never changes collision, vision or firing origin.</text>
+</svg>

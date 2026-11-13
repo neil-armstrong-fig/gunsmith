@@ -20,10 +20,10 @@ export class RoundDsl {
     }
   }
 
-  /** Waits until the round stands at `state`. */
-  async waitForState(state: RoundSnapshot): Promise<void> {
+  /** Waits until the round stands at `state`, for as long as `timeoutSeconds` when a round is known to take longer than the default. */
+  async waitForState(state: RoundSnapshot, timeoutSeconds?: number): Promise<void> {
     try {
-      await this.round.waitForState(state);
+      await this.round.waitForState(state, timeoutSeconds);
     } catch (error) {
       throw new DslError(`Failed to see the round reach "${state}"`, error);
     }

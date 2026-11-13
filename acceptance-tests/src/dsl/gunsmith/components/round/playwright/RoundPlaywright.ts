@@ -14,9 +14,9 @@ export class RoundPlaywright extends BasePage {
     return round;
   }
 
-  /** Waits until the round stands at `state`. */
-  async waitForState(state: RoundSnapshot): Promise<void> {
-    await this.waitForGameState(({round}) => round === state);
+  /** Waits until the round stands at `state`, for as long as the expect timeout or `timeoutSeconds` allows. */
+  async waitForState(state: RoundSnapshot, timeoutSeconds?: number): Promise<void> {
+    await this.waitForGameState(({round}) => round === state, timeoutSeconds);
   }
 
   /** What the banner over the arena says; waits for it to appear first. */

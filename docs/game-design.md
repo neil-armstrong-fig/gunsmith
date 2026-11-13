@@ -118,8 +118,8 @@ drop keys are decided in the fuzzy frontend and kept in one key-binding config. 
 ## Out of scope for the first pass
 
 Mobile and touch play, accessibility features, other languages (English only, hard-coded), health or ammo pickups, a
-public gallery, paid credits, replays, bots as opponents (a scripted opponent exists only inside the fuzzy frontend and
-practice dummies).
+public gallery, paid credits, replays, bots as opponents (a small scripted bot exists, in `engine/src/opponent/`, as a target to test weapons and arenas
+against while the game is built, not as a feature; and practice dummies).
 
 ## Tunables checklist
 

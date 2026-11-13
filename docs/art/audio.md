@@ -38,19 +38,20 @@ the audition pack is in [webapp/audio/](../../webapp/audio/README.md), with repr
 A hidden opponent's sound reaches a player only as a direction in about 8 sectors, never a position, and only within hearing
 range (`docs/match-netcode.md`). Crouching is quieter. Keep footsteps and weapon sounds distinct enough to read at a glance.
 
-## Chosen direction and first delivery (2026-11-12)
+## Chosen direction and current delivery (2026-11-12)
 
 The user chose **industrial electronic**, a **driving soundtrack during play**, and **original local synthesis**.
 Mechanical percussion, restrained distortion, a D-minor motif and resonant plucks connect the sound to the industrial
 arena. Preserve a strong rhythm while leaving combat cues intelligible. The menu uses a calmer related arrangement.
 
-Delivered: two 15-second, eight-bar music sketches at 128 BPM, all 11 mono effect candidates above, and a stereo mixed
-audition. All files are 48 kHz, 16-bit PCM WAV. The listening guide describes each cue, the mixed timeline, reproduction
+Delivered: 60-second menu / 90-second match arrangements at 128 BPM, all 11 original mono effect candidates,
+six additional footstep variants and a 90-second stereo mixed audition (20 WAVs total). All files are 48 kHz, 16-bit PCM WAV. The listening guide describes each cue, the mixed timeline, reproduction
 and measurements. Music peaks about 6 dB below most effects; crouched steps have lower gain and a softer spectrum.
-Peak matching is only an initial mix, not perceptual loudness matching. Listening review is still pending.
+Peak matching is only an initial mix, not perceptual loudness matching. The user approved the expanded pack
+on 2026-11-12 ("Sounds great"); detailed cross-device/fatigue and in-game masking review remain before production.
 
 Effects have no panning or room reverb baked in. Steps are individual footfalls for scheduling, not continuous walking
-loops; additional variants remain to be made. The 0.82-second reload is a mechanical cue, **not the reload timer**:
+loops; each stance has four variants including the original. Local `-02`/`-03`/`-04` suffixes are candidates, not new manifest keys. The 0.82-second reload is a mechanical cue, **not the reload timer**:
 build decides its playback alignment against each weapon's actual duration and cancels it on an interrupted reload.
 The hit audition proposes outgoing-hit confirmation; no event rules or hidden-hit information are introduced.
 
@@ -58,8 +59,9 @@ Build owns eventual music/effects gain, ducking, scheduling, mute/volume setting
 test-first when needed. Do not derive hidden-opponent audio from precise positions on the client. The mixed audition
 has no gunshots; masking must be rechecked with the real weapon synthesiser before integration.
 
-Next, after listening feedback: 60-second menu and 90-second match arrangements, refined effects/step variants, then
+The expanded tracks have four / six distinct eight-bar sections and preserve wraparound tails. Every crouched
+footfall is at least 6 dB quieter than its paired standing version in measured RMS. Next: detailed listening,
 production encoding and manifest review. Ogg Vorbis plus MP3 remain the required shipping formats; neither is delivered
 yet. The user approved `node-web-audio-api@2.2.0` as a dev-only tool and the pack was regenerated on Node; the Python
 sources were replaced. Run `pnpm --filter @gunsmith/audio-studies render`. No service, paid generation, game-runtime code
-or schema changed. Fresh listening feedback is needed for this new render.
+or schema changed. Preserve the approved direction when expanding the pack; no repeat direction approval is needed.

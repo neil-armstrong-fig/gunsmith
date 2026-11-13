@@ -1,0 +1,86 @@
+[
+  {
+    "design": "duck-hull",
+    "bodyParts": 8,
+    "projectileParts": 3,
+    "points": 10,
+    "bytes": 3365
+  },
+  {
+    "design": "duck-reservoir",
+    "bodyParts": 10,
+    "projectileParts": 3,
+    "points": 10,
+    "bytes": 3852
+  },
+  {
+    "design": "fax-desktop",
+    "bodyParts": 9,
+    "projectileParts": 3,
+    "points": 12,
+    "bytes": 3668
+  },
+  {
+    "design": "fax-receipt",
+    "bodyParts": 8,
+    "projectileParts": 3,
+    "points": 21,
+    "bytes": 3854
+  },
+  {
+    "design": "teapot-kettle",
+    "bodyParts": 8,
+    "projectileParts": 3,
+    "points": 13,
+    "bytes": 3449
+  },
+  {
+    "design": "teapot-angular",
+    "bodyParts": 8,
+    "projectileParts": 3,
+    "points": 25,
+    "bytes": 4029
+  },
+  {
+    "design": "cactus-stem",
+    "bodyParts": 8,
+    "projectileParts": 1,
+    "points": 24,
+    "bytes": 3533
+  },
+  {
+    "design": "cactus-cluster",
+    "bodyParts": 9,
+    "projectileParts": 1,
+    "points": 23,
+    "bytes": 3709
+  },
+  {
+    "design": "jellyfish-bell",
+    "bodyParts": 8,
+    "projectileParts": 0,
+    "points": 17,
+    "bytes": 2990
+  },
+  {
+    "design": "jellyfish-cage",
+    "bodyParts": 8,
+    "projectileParts": 0,
+    "points": 24,
+    "bytes": 3309
+  },
+  {
+    "design": "gum-drum",
+    "bodyParts": 9,
+    "projectileParts": 2,
+    "points": 0,
+    "bytes": 2856
+  },
+  {
+    "design": "gum-coil",
+    "bodyParts": 7,
+    "projectileParts": 2,
+    "points": 14,
+    "bytes": 3096
+  }
+]

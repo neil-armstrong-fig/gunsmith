@@ -1,5 +1,6 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
+import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
 import {MARKSMAN_RIFLE} from "@gunsmith/engine/weapon/weapons/MarksmanRifle";
 import {RIFLE} from "@gunsmith/engine/weapon/weapons/Rifle";
 import {snapshotOf} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/state-hook/SnapshotOf";
@@ -110,7 +111,32 @@ it("reports where the opponent stands and how much health it has left", () => {
   const withOpponent = startingWorld(world.arena, [], {x: 3.5, y: 1.5});
   const hurt = {...withOpponent, opponent: withOpponent.opponent && {...withOpponent.opponent, health: 40}};
 
-  expect(snapshotOf(hurt).opponent).toEqual({x: 3.5, y: 1.5, health: 40});
+  expect(snapshotOf(hurt).opponent).toEqual({x: 3.5, y: 1.5, health: 40, rounds: RIFLE.magazineSize});
+});
+
+it("reports the rounds in the magazine of the weapon the opponent holds", () => {
+  const withOpponent = startingWorld(world.arena, [], {x: 3.5, y: 1.5});
+  const {opponent} = withOpponent;
+  const spent = {
+    ...withOpponent,
+    opponent: opponent && {...opponent, loadout: opponent.loadout.map(carried => ({...carried, rounds: 4}))},
+  };
+
+  expect(snapshotOf(spent).opponent?.rounds).toBe(4);
+});
+
+it("reports what the opponent is doing, when it has a brain", () => {
+  const thinking = giveOpponentBrain(startingWorld(world.arena, [], {x: 3.5, y: 1.5}), 1);
+
+  expect(snapshotOf(thinking).opponent?.behaviour).toBe("wander");
+  expect(
+    snapshotOf({...thinking, opponentBrain: thinking.opponentBrain && {...thinking.opponentBrain, state: "reload"}})
+      .opponent?.behaviour,
+  ).toBe("reload");
+});
+
+it("reports no behaviour for an opponent with no brain", () => {
+  expect(snapshotOf(startingWorld(world.arena, [], {x: 3.5, y: 1.5})).opponent?.behaviour).toBeUndefined();
 });
 
 it("reports where the round stands", () => {

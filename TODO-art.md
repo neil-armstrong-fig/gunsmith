@@ -5,45 +5,71 @@ Your checklist. The shared path is `TODO.md`; read it and `TODO-build.md` and `T
 
 Work **only** under the folders named in `HANDOFF.md`: `webapp/public/assets/`, `docs/art/`, `webapp/audio/`.
 The user authorised audio generators and their local tool config under `webapp/audio/`; game-runtime code, schemas
-and shared config remain build-owned. Style: clean flat vector, neon, geometric; blueprint touches suit the name. Desktop only.
+and shared config remain build-owned. Arena style: slate, neon, geometric; blueprint touches suit the name. Weapon concepts now explore chunky, shaded
+cartoon sci-fi machinery at the user's request (Ratchet & Clank inspiration, adapted to overhead 2D). Desktop only.
 
-## Resume here after clearing context (2026-11-12)
+## Resume here after clearing context (2026-11-13)
 
-**State:** A1, six oddity explorations, the visual-schema proposal, sourced game research and the first audio
-audition pack are delivered. The user prioritised sound/music: original local synthesis, industrial electronic,
-with a driving soundtrack during play. Audio is art's next work ahead of top-down studies.
-Build is on M1: a fun full-screen game, test-first, one mechanic at a time. The fuzzy frontend and pre-emptive shared
-contracts were withdrawn. Do not restore them or assume older schema paths still exist. AI waits for real consumers.
+**Current milestone:** M1, a fun full-screen game, test-first. Build has a playable duel/opponent and is tuning it
+before best-of-three and the remaining mechanics. AI has the weapon pipeline/evals in its worktree; shared production
+contracts remain pending. Read the current shared/persona TODOs for newer status before acting.
+
+**Art delivered:** palette/arena direction, gameplay research, first twelve top-down JSON/vector studies, richer
+Ratchet & Clank-inspired machinery concepts, and a simpler six-weapon build/AI reference. The latest brief is
+`docs/art/concepts/simple-machinery-04/README.md`: six original 6–8-part compositions with matching proposed JSON,
+editable SVGs, 64/32 px samples, held contexts, grayscale and a six-part lantern detail. The user asked for a simpler
+starting point while retaining every richer reference. **All design, grammar, budgets, anchors and defaults remain
+open to change.** Do not mistake the samples for an implemented schema, production sprites or model-quality proof.
+
+**Up next:**
+
+1. **AI:** evaluate JSON-based visual generation before freezing the design. The explicit user-requested task is in
+   `TODO-ai.md` (resume checkpoint and M2). Compare primitive output, code-supplied recipes and a bounded hybrid;
+   evaluate sparse/partial/invalid output, safe visual defaults, identity/readability, reliability, tokens/cost,
+   latency and bounded repair/fallback. This work is not done. Visual defaults do not decide gameplay-stat defaults.
+2. **Build:** when gameplay needs generated visuals, use the brief for a test-first generic renderer experiment,
+   starting with the contrasting lantern, fax and kettle. Check actual held size, aim rotations, team/fog boundaries
+   and appearance/gameplay separation; measure performance before agreeing a contract. No per-weapon name branches.
+3. **Art:** support that review and revise the references from measured generation/rendering failures. Preserve the
+   rich and simple sheets as references; do not lock the game into either detail level or generate another pack by
+   default. Final sprites, tiles and UI still await the manifest and the joint M2 visual-grammar review.
+4. **Audio, before production:** device/fatigue listening and masking with build's shot synth, Ogg/MP3 encoding,
+   browser loop checks, final manifest mapping and build-owned playback integration. Keep the approved sound.
 
 **Decisions to preserve:**
 
-- Industrial arena: slate, blue/orange teams with distinct stripes, flat geometric forms and sparse neon.
-- Stairs are the only height transitions, visibly connecting both landings. No L1/L2/L3 text inside the arena.
-- Terrain remains **dimly visible outside the cone**. The current cone reveals detail, players and items; walls/height
-  occlude it. The **equipped weapon** defines its base angle/range; stance modifies it. Aim rotates it through 360°.
-- Crouch extends range at the same angle and substantially slows movement; it also remains quieter/protected by cover.
-- Arena finalisation follows resolved player/AI definitions. Check legal routes through stairs, spawn/pickup access and
-  ring escape. Built-ins meet the same checks and must be deliberately authored/playtested.
-- Central weighting for the strongest-rated weapon is a **proposal to test**, retaining randomness and fair routes.
-- Art must be malleable to AI prompts, with many silhouettes rather than a fixed weapon catalogue. Development-time
-  schema/renderer changes are allowed; generation changes only strict JSON, never executable code at runtime.
+- Industrial slate arena; blue/orange teams with one/two stripes. Weapon concepts can use chunky cartoon machinery
+  and simple shaded depth; the simpler flat compositions are an implementation experiment, not a final style ruling.
+- Stairs are the only height transitions, with landings on both levels. No L1/L2/L3 text in the arena.
+- Known terrain stays dim outside the aim-rotated cone; detail/entities appear inside, subject to wall/height occlusion.
+  Equipped weapon supplies the base cone, stance modifies it. Crouch extends range at the same angle and slows movement
+  substantially; quieter movement and cover protection remain part of the tradeoff.
+- Arena finalisation checks stair routes, spawn/pickup access and ring escape for generated and built-in arenas alike.
+  Weighting the strongest-rated weapon toward contested central space remains a playtest proposal.
+- Generated visuals stay malleable to prompts; fixed code interprets validated JSON. Cosmetics never add gameplay or
+  expose hidden entities. Runtime-generated executable code is excluded. Omitted gameplay-stat policy is still open.
 
-**Still open:** fixed modest defaults versus AI-selected weaknesses for unspecified weapon stats; exact balance numbers;
-final visual grammar/asset manifest. Cone ownership and dim-map presentation are settled, not blockers.
+**Approved audio:** full pack 02, 60-second menu / 90-second match, four footfalls per stance, industrial electronic
+128 BPM / D minor. User approved it ("Sounds great"); do not restart expansion or request another direction audition.
+Source: `webapp/audio/generator-scripts/`; output: `webapp/audio/generated-audio/`; guide: `webapp/audio/README.md`.
+Commands: `pnpm --filter @gunsmith/audio-studies render` / `... checks` (about a second) / `... test:render` (renders the whole
+pack, about four to five minutes, and requires every file byte for byte the same as `generated-audio/`; not in `checks`).
+The code was restructured by `build` on 2026-11-13 with the audio unchanged; read `webapp/audio/AGENTS.md` before editing it.
+General approval does not claim production integration QA.
 
-**Next useful art work:** get listening feedback on `webapp/audio/README.md` (match, menu and mixed
-auditions), refine the mix and cues, then expand to 60-second menu and 90-second match loops. Add step variants and
-recheck masking with build's weapon synthesiser. Production encoding and wiring await manifest/encoder review.
-After the audio pack, translate the six oddities into top-down 64 px/32 px studies. Final sprites/tiles/UI still wait
-for build's manifest. No runtime integration or generated-weapon synthesis belongs to art.
+**References:** `docs/art/README.md`, `docs/art/visual-schema-proposal.md`, `docs/art/gameplay-research.md`, and
+`docs/art/concepts/`: `industrial-arena.*`, `prompt-built-oddities.*`, `top-down-oddities/`, `overhead-machinery-02.*`,
+`improbable-machinery-03.*`, `simple-machinery-04/`. Rich 02/03 PNGs are generated concepts. The simple 04 drawings are
+original vectors; two image-generation attempts were rejected, and no raster result from them was delivered.
 
-**References:** `docs/art/README.md` (current style/mechanics), `docs/art/concepts/industrial-arena.svg` and `.png`
-(updated arena/vision sheet), `docs/art/concepts/prompt-built-oddities.md` and `.png` (six prompts, variants and limitations),
-`docs/art/visual-schema-proposal.md` (future JSON visual grammar, not implemented), `docs/art/gameplay-research.md`
-(nine sources, five playtests and user feedback). The oddities PNG is a profile-view identity study, not game sprites.
+**Last verified:** simple JSON/SVG equivalence, stroke bounds, references, links and five invalid probes pass.
+Selected workspace lint/format/typecheck/unit gates pass (492 engine, 101 webapp, 67 AI). Full `pnpm checks`, including
+3 audio tests, passed earlier in the session. No gameplay acceptance or appearance model eval was run for art.
 
-**Boundaries:** audio scripts/config under `webapp/audio/` belong to art; game runtime, schemas and shared config belong
-to build/AI. Update this checklist, art's row in `TODO.md` and the delivery log in `HANDOFF.md`. Do not commit or push unless asked.
+**Boundaries:** art owns `docs/art/`, `webapp/public/assets/`, `webapp/audio/` and its checklist. Runtime/schema edits
+belong to build/AI. The user explicitly authorised the visual-generation task addition to `TODO-ai.md`; leave its
+implementation to AI. Re-read shared docs immediately before editing. No commit or push without being asked.
+Update this checklist, art's status row and the handoff log after the next delivery.
 
 ## A1: palette and art direction. Milestone M1
 
@@ -86,15 +112,29 @@ User priority (2026-11-12): audio audition → full audio pack → top-down stud
 - [x] User-directed relocation after the AI merge: generator source in `webapp/audio/generator-scripts/`, WAVs and
       measurements in `webapp/audio/generated-audio/`. CLI regeneration preserves all 14 WAV hashes; links and workspace
       registration updated. `pnpm checks` green (324 engine, 82 webapp, 67 AI, 1 audio test).
-- [ ] Listening review: three repeats of both music sketches, cue identity, fatigue and masking on headphones/speakers.
-      Numerical continuity is checked; perceived quality is not signed off.
-- [ ] Refine the mix/effects, add footstep variants; recheck combat masking with build's generated weapon-shot synth.
-- [ ] After feedback, expand menu to 60 seconds and match to 90 seconds with seamless musical returns.
+- [x] User audition approval (2026-11-12): "audio sounds good". Preserve the sound/direction; proceed to full tracks.
+- [x] Expand menu to 60 seconds and match to 90 seconds, with composed variation and numerically verified loop returns.
+- [x] Four footfalls per stance, including originals; fixed seeds, dry mono, same material, paired crouch at least 6 dB quieter in RMS.
+- [x] User approves the expanded pack (2026-11-12): "Sounds great". Audio expansion complete; proceed to top-down concepts.
+- [ ] Before production, check fatigue and masking on headphones/speakers and with build's generated weapon-shot synth.
+      The user's general approval does not claim this detailed listening protocol or in-game test has been completed.
 - [ ] Production: confirm manifest mappings, encode Ogg Vorbis + MP3, verify browser decoding/loop seams and hand off
       to build for test-first playback/ducking/volume integration. WAV masters do not prove compressed loops seamless.
       Weapon gunshots remain build/AI-owned synthesis; art supplies static cues only.
 
 ## A2: sprites. Milestone M3
+
+- [x] User-requested simpler version and provisional build brief: six matching JSON/vector compositions and actual-size
+      reviews in `docs/art/concepts/simple-machinery-04/`. AI generation/defaults evaluation task added to `TODO-ai.md`.
+
+- [x] **Plan phase first:** inspect the latest AI-worktree schemas and output shapes, including uncommitted work.
+      Go back and forth between those drafts and the six concepts: let existing fields inform the visual studies,
+      and propose the missing fields/vocabulary/examples the concepts need. Record findings and owner requests in
+      `docs/art/visual-schema-proposal.md` / `HANDOFF.md`; drafts are provisional, not a frozen contract. Read the
+      worktree's instructions first and leave AI/build-owned code to its owners.
+
+- [x] **After planning:** twelve top-down oddity concepts (two per prompt) at 64 px / 32 px, using the visual-schema proposal provisionally;
+      keep them in `docs/art/concepts/` and record grammar gaps. Final sprites still require M2 review and the manifest.
 
 - [ ] Review the visual-schema proposal with build/AI at M2; translate all six oddities into top-down compositions
       using only the agreed grammar and verify 64 px/32 px readability (`docs/art/visual-schema-proposal.md`).

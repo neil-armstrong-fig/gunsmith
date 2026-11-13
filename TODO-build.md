@@ -33,13 +33,14 @@ Both are withdrawn until the game is fun (`HANDOFF.md` delivery log, 2026-11-12)
 
 The player walks (WASD, walls stop them), aims with the mouse and clicks to fire bullets that die on walls or on one of
 three practice dummies, which are removed at zero health, all in a full-screen arena. **There is now a duel** (`?scenario=duel`,
-2026-11-12): a scripted opponent who faces the player and shoots bursts when no wall is between them, a health HUD, and a
-round that is won or lost with a "Play again" overlay. `?scenario=sparring` is the same arena with an opponent who cannot
-shoot; the practice range (no query) has no opponent, so the old specs are unchanged. The player carries two weapons (keys
+2026-11-12): an opponent with a small state-machine brain (wander, engage, reload, search: it sees the player, waits a
+reaction time, fires bursts with an aim that settles, circles at a good range, takes cover to reload; `engine/AGENTS.md`),
+a health HUD, and a round that is won or lost with a "Play again" overlay. `?seed=42` replays a duel exactly.
+`?scenario=sparring` is the same arena with an opponent who has no brain and cannot shoot, so it stands still; the practice range (no query) has no opponent, so the old specs are unchanged. The player carries two weapons (keys
 1 and 2): a rifle (25 damage, 12 rounds) and a marksman rifle (50 damage, 5 rounds); R reloads, shots spend rounds, and the
 ammunition shows in a plain-React HUD (`react/components/dom/ammo-hud/`). Five packages: `webapp/`, `engine/`, `acceptance-tests/`, `shared/` (tool
 config plus the state-hook snapshot types) and `ai/` (merged in from `ai`'s worktree on 2026-11-12, `8c52f5f`; `ai` owns it, read
-`ai/AGENTS.md` before touching it). `pnpm checks` is green: engine 324 unit tests, webapp 82, `ai` 67, and 55 acceptance
+`ai/AGENTS.md` before touching it). `pnpm checks` is green: engine 492 unit tests, webapp 101, `ai` 67, and 61 acceptance
 specs (the weapon, HUD, dummy, sparring and duel specs pass at `--repeat-each=10`). Every spec and unit test has been mutation-proved. Read
 `engine/AGENTS.md`, `webapp/AGENTS.md`, `webapp/src/react/AGENTS.md` and `acceptance-tests/AGENTS.md` first.
 
@@ -118,7 +119,7 @@ file and is not in the repo; recreate it, or turn it into a lint rule, before th
   looked at once in a screenshot (2026-11-12) and read fine. Console noise: a favicon 404 and a three.js `Clock`
   deprecation warning from react-three-fiber.
 - `pnpm start` on port 3000 has not been confirmed (janggi held it).
-- There is no player health. There is no auto-reload (an empty magazine just stops firing until R), the two weapons share one
+- The player's reload is manual (there is no auto-reload: an empty magazine just stops firing until R), the two weapons share one
   cool-down, and the reserve cannot be refilled (no pickups yet). Dummies (100 health, radius 0.4, three in
   `PracticeDummies.ts`) do not move, do not block the player, and do not come back once shot, so reloading the page is the
   only way to restore them. `Dummies.tsx` (discs fading as they are hurt) has no spec, because the canvas is not in the DOM:
@@ -179,33 +180,32 @@ RNG, no `Date.now()` or `Math.random()`. The webapp renders it and sends input.
         unit and 11 browser mutants killed by the right tests; survivors were equivalent (`disarmOpponent` twice is
         idempotent), and one real gap (`HasClearLine` with a flipped y direction) was closed with steep-angle tests. Not
         covered by a spec: the opponent disc's drawing and the health bar's width (CSS), like the reload fill.
-  - [ ] **Next: give the opponent a simple AI** (slice 3; replaces "it wanders"). The point is a bot that is somewhat
-        engaging to test weapons and maps against, not a clever one. **Start in plan mode, and do a web search first** for very
-        simple shooter-bot AI (finite state machines in arena shooters, simple bot behaviours for top-down 2D games, cheap
-        tricks such as reaction delay, aim error, strafing and retreating to reload), then propose a design as stated defaults
-        to confirm, with the sources named. Keep it small. A starting sketch to test against what the search finds:
-        - **A handful of states, a finite state machine:** *wander* (walk to a random open floor point, re-pick on arrival or
-          after a few seconds), *engage* (it sees the player: turn, close to a good range for the weapon in its hand, strafe
-          sideways, fire in bursts), *reload* (break line of sight or back off, then reload). Maybe *search* (go to where it
-          last saw the player). Cut anything the search shows is not worth its cost.
-        - **Beatable and legible, not perfect:** a reaction delay before it opens fire, aim error that shrinks the closer it
-          is or the longer it has seen you, a cap on how often it changes its mind. The exact aim of slice 2 goes.
-        - **Weapon- and map-agnostic**, because it exists to test them: it reads range, fire interval and magazine from the
-          `Weapon` it holds, and picks waypoints from the arena's open floor with no hand-authored navigation. Steering is
-          straight lines that slide along walls; a grid pathfinder (BFS or A\*) only if the search or a playtest shows
-          pillars trap it, and then ask before adding any dependency (a hand-written one is a few dozen lines).
-        - **Deterministic:** the brain's memory (state, goal, timers, last-seen point) lives in `World`, plain data, and
-          randomness comes from a seeded generator whose seed lives in `World` too (a ~10-line mulberry32 in
-          `engine/random/`, no dependency; `pure-rand` 8.4.2 was not checked for whether its state is plain data). Same seed and
-          inputs, same world, so a match replays and the server and client agree. `Math.random` only in the webapp, to
-          pick a seed per page load.
-        - **Difficulty is a few named tunables** (reaction seconds, aim error, preferred range, burst length), one constant
-          each, so a weapon or a map can be tried against an easier or harder bot.
-        - **Tests:** engine unit tests carry exact behaviour per state and the transitions between them (each state entered
-          and left for the right reason, mutation-proved). Acceptance specs assert properties only (it moves, it comes at you
-          when it sees you, it takes cover to reload, it hurts a player who stands still), because Playwright's timing
-          decides how many ticks pass between actions. Sparring stays a still, unarmed target (the win specs aim at where it
-          stands); give the duel's "lost" wait a longer timeout.
+  - [x] **A simple opponent AI** (slice 3, 2026-11-12; planned in plan mode after a web search. Sources: UT Austin cs354r and cs378 lecture notes on
+        Quake-style bot FSMs, Glavin and Madden (arXiv 1806.05554) on bot aim handicaps, Valve's TFBot aim-error notes, the
+        11th Dream AI write-up ("don't make it too good"), and devlogs on searching a last known position). A four-state
+        machine in `engine/src/opponent/` (`wander`, `engage`, `reload`, `search`), its memory in `World.opponentBrain`
+        (plain data, seed included), randomness from `engine/random/NextRandom` (mulberry32, no dependency), every tunable one
+        field of `opponent/Difficulty.ts`. Stated defaults, to be set by play: 0.4 s reaction, bursts of 3 shots then 1 s rest,
+        aim miss 0.12 rad settling to 0.03 over 1.5 s in sight, close in beyond 8 tiles, back off inside 4, circle between,
+        walk at 70% of the player's speed, sight range 14 tiles, cover sampled 12 times within 8 tiles, search lingers 3 s.
+        No pathfinder: goals are tiles it can see, and a stuck bot (under 0.5 tile in 1.5 s of walking) drops its goal or flips
+        its strafe side. **An opponent with no brain takes no action** (sparring); `DisarmOpponent` also takes the brain away.
+        Deviations from the plan: `giveOpponentBrain(world, seed)` instead of a fourth `startingWorld` parameter; the reload
+        spec needed a fight long enough for the 12-round magazine to run out, which only 2 of 40 seeds give (a standing player
+        is dead in 2.3 to 9.4 s; seeds 1 and 6 reload at about 5.4 s), so it has its own seed (`LONG_DUEL_SEED` 6: reload 5.5 s,
+        refilled 7.0 s, player dead 9.4 s) and a `startLongDuel()`. Engine unit tests and `ThinkOpponentOverAMatch.test.ts` (20
+        seeds: kills a standing player within 15 s, stays on open floor, replays exactly, wanders a minute without sticking)
+        carry the rest. Webapp: `?seed=`
+        (`game/scenario/seed/`), `worldOfPage()`; the state hook's opponent gained `rounds` and `behaviour` (a plain string,
+        since `shared/` cannot read the engine's list). Specs: `AnOpponentWhoMoves` (engages, leaves its spot, magazine runs
+        down), `AnOpponentWhoReloads` (reloads when dry, refills, goes back to the fight; the duel, HUD and sparring specs 960 of 960 at `--repeat-each=40`, after two racy assertions were removed: the browser re-reads state that keeps moving, so specs assert what survives a stalled page), a sparring spec that it stays put, `FightingBack`'s lost wait now 15 s (measured), `startDuel()` pins
+        `DUEL_SEED`. Mutation: 128 engine mutants killed (the first pass found six weak tests and one blind spot in
+        `strafeDirection`, all fixed), 13 of 14 webapp (one equivalent) and 12 of 15 browser mutants. The survivors: disarm-keeps-brain
+        cannot show in the webapp (it builds sparring without a brain), "after a reload always wander" re-engages one step later
+        so a browser cannot tell, and the never-search mutant of the first run, which the reload spec now kills only by changing
+        the pinned fight's timing, so `search` has no assertion of its own in a browser. Not tested by feel yet: is it engaging, is it beatable, does it
+        stick on pillars (the 20-seed test says not on the practice pillars). **Next for it: the user plays it and sets the
+        tunables.**
   - [ ] Best of three.
   - [ ] Dim arena outside a detailed forward cone, set by equipped weapon and standing/crouched stance. Rotate it
         with aim through 360°; reveal terrain detail and players/items only in the unoccluded cone. Three height levels

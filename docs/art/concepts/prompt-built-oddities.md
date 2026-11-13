@@ -22,10 +22,12 @@ Shape should respond to the player's idea beyond a palette swap: the body can be
 living-looking cactus or translucent jellyfish. Consistent outlines, neutral grip/pivot placement and readable
 projectile/effect motifs tie the results together. The exact generated drawings are explorations, not mandatory designs.
 
-The existing schema can describe behaviour, stats, sound and palette colour, but it cannot yet express all these visual
-parts. Build/AI need a shared visual-description contract before these variations can be implemented. Broad body colours
+The withdrawn draft described behaviour, stats, sound and colour. The latest AI-worktree weapon draft instead has only
+a name and six bullet/ammunition stats; none of those appearance or behaviour fields exists in it. Build/AI need a shared
+visual-description contract before these variations can be implemented. Broad body colours
 in the sheet are mood studies: final team cues, limited accent tokens, fog rules and bounded effects still apply.
-A duck's toy-yellow appearance would currently use the orange accent token rather than introduce an unapproved token.
+The user authorised yellow/pink concept experiments for the [twelve top-down studies](top-down-oddities/README.md);
+those accents remain proposals until the production palette review.
 
 Generated images do not establish hitboxes or new physics. For unsupported requested mechanics, the generation/reveal
 flow must explain the supported interpretation. Do not silently show a gravity vortex while promising gravity gameplay.

@@ -63,9 +63,12 @@ is a few times a second at most. A per-frame value is never bound to a component
 managers are fine for updates that are not rapid). The decision and its sources are in `docs/state-management.md`.
 
 **Which match opens** is chosen once, from the page's query (`game/scenario/`): none is the practice range with its dummies,
-`?scenario=duel` is the duel (an opponent who shoots back), `?scenario=sparring` the same arena with an opponent who cannot
-shoot. It is a selector only, never a way to write state; it goes when a menu picks the match. `worldOfScenario` builds the
-world and is also what "Play again" puts in the store.
+`?scenario=duel` is the duel (an opponent with a brain who moves and shoots back), `?scenario=sparring` the same arena with
+an opponent who has no brain and cannot shoot. It is a selector only, never a way to write state; it goes when a menu picks
+the match. `worldOfPage()` builds the world (`worldOfScenario(scenario, seed)`) and is also what "Play again" puts in the
+store. The opponent's choices are drawn from a seed (`game/scenario/seed/`): `?seed=42` replays a match exactly (the
+acceptance specs pin one), otherwise each page load and each "Play again" draws a fresh random one, which is the only
+`Math.random` in the game.
 
 The HUD is plain React over the canvas (`react/components/dom/ammo-hud/`, `health-hud/`, and the `round-banner/` overlay that
 appears when a round is won or lost), styled with Tailwind and the `--color-gs-*` tokens. Anything

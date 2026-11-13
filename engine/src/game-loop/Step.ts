@@ -5,7 +5,7 @@ import {shootFighter} from "@gunsmith/engine/game-loop/fighter/ShootFighter";
 import type {Input} from "@gunsmith/engine/game-loop/types/Input";
 import type {World} from "@gunsmith/engine/game-loop/types/World";
 import {takeDamage} from "@gunsmith/engine/health/TakeDamage";
-import {opponentInput} from "@gunsmith/engine/opponent/OpponentInput";
+import {thinkOpponent} from "@gunsmith/engine/opponent/ThinkOpponent";
 import type {Player} from "@gunsmith/engine/player/types/Player";
 import {decideRound} from "@gunsmith/engine/round/DecideRound";
 
@@ -15,7 +15,7 @@ import {decideRound} from "@gunsmith/engine/round/DecideRound";
  * explains why), and the engine caps what an input may ask for, so a client cannot walk faster by asking.
  *
  * In order: each fighter, the player by `input` and the opponent (if there is one) by what its brain asks for
- * (`opponentInput`), plays their own part by the same rules (`prepareFighter`: switch weapon, reload, walk, turn, judge
+ * (`thinkOpponent`, which also gives the brain it carries into the next step), plays their own part by the same rules (`prepareFighter`: switch weapon, reload, walk, turn, judge
  * the trigger). Then the bullets already flying move on, hurting any dummy or fighter they reach, and then the triggers
  * are let go, so a shot fired this step starts to move on the next one. A shot spends a round and leaves with the damage
  * and speed of the weapon in hand; a reload that finishes this step lets the weapon fire in the same step. When either
@@ -27,7 +27,8 @@ export function step(world: World, input: Input, seconds: number): World {
   }
 
   const playerTurn = prepareFighter(world.arena, world.player, input, seconds);
-  const opponentTurn = world.opponent && prepareFighter(world.arena, world.opponent, opponentInput(world), seconds);
+  const opponentDecision = thinkOpponent(world, seconds);
+  const opponentTurn = world.opponent && prepareFighter(world.arena, world.opponent, opponentDecision.input, seconds);
 
   const bulletFlight = advanceBullets(world.arena, {
     bullets: world.bullets,
@@ -53,6 +54,7 @@ export function step(world: World, input: Input, seconds: number): World {
     ...world,
     player,
     opponent,
+    opponentBrain: opponentDecision.brain,
     bullets,
     dummies: bulletFlight.dummies,
     elapsedSeconds: world.elapsedSeconds + seconds,

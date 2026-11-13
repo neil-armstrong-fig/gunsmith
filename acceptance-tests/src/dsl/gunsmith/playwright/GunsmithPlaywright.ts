@@ -13,8 +13,9 @@ export class GunsmithPlaywright extends BasePage {
     await expect(this.page.getByTestId("arena")).toHaveAttribute("data-ready", "true");
   }
 
-  async openDuel(): Promise<void> {
-    await this.openScenario("duel");
+  /** Opens the duel with the opponent's every choice drawn from `seed`, so the same seed plays the same match. */
+  async openDuel(seed: number): Promise<void> {
+    await this.openScenario(`duel&seed=${seed}`);
   }
 
   async openSparring(): Promise<void> {

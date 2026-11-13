@@ -11,7 +11,7 @@ waits on you. **O1 needs nothing from `build` and can start immediately.**
 **What the others need from you:** a decision on where the pipeline runs (it decides whether `api/` imports `ai/`), the
 kill-switch flag's shape, and a review of the contracts before they freeze (Milestone M2).
 
-## Resume here (context-clear checkpoint, 2026-11-12, after generate, validate, rate and repair)
+## Resume here (context-clear checkpoint, 2026-11-13, after the eval refactor was committed)
 
 **State.** O1 is closed, the eval harness is built, and the **moderation node is built, probed and committed** by the user on the
 branch `worktree-ai-hosting-proof` (worktree `.claude/worktrees/ai-hosting-proof`): `02f0885` "Add moderation prompt / evals", then
@@ -46,9 +46,79 @@ as you can" sentence alone falls none (either is enough on `qwen3.5:9b`; both re
 were written with the code, so they were proved by mutation, not watched red first. Findings are in `docs/ai-pipeline.md`
 ("What building generate, validate, rate and repair taught") and `ai/AGENTS.md`.
 
+**The evals were restructured in the acceptance-test style (the user's request, two passes; uncommitted in the worktree).** A table
+of 21 case rows scored by 7 generic evaluators in a loop became five test files in `evals/tests/` (`AskingForAWeapon`,
+`TryingToBreakTheSmith`, `ShieldsAndArmour`, `NotAWeaponRequest`, `AnUnusableRequest`), each `given` / `when` / `thenExpect`, one
+criterion per `thenExpect`. **Pass 2 (the user's foldering review): the root is now `tests | dsl | eval-criteria-mapping`, like
+`acceptance-tests/`**, imports run only down, and lint enforces three layers. The user asked whether the order is `dsl → evaluators →
+drivers` and whether drivers belong in the mapping: evaluators and the driver are *siblings* under the DSL (it checks with the
+first, acts through the second), and the driver belongs to the mapping's setup. So: `dsl/` holds `WeaponSmithDsl`, `evaluators/`,
+`trials/` and `types/` (including the driver *interface* the DSL owns, with no `tier`);
+`eval-criteria-mapping/` holds `tier/` (the model tier, the trials and the real driver; the only place a model is built), `gate/`,
+`reporting/` and `types/`. The DSL's tests therefore never need a model, and the mapping never reaches past the DSL to a checker.
+Cleanups in the same pass: the fake tier has its own canned reply instead of importing a DSL test fixture; `EvalInputBuilder.ts`
+(exporting `evalInput`) became `PassingEvalInput.ts` exporting `passingEvalInput`; the loose `evals/types/` folder was rehomed.
+**Tests are now clean (also pass 2):** what holds for every request moved into the DSL as **standing criteria**
+(`weaponSmith.standingCriteria()`: safe to show; the fixed path within three model calls), which the mapping adds under every
+`when`, so a test states only what is special to its request and the tighter budgets stay explicit (`expectModelCallsAtMost(0|1)`).
+Reversible in one line (`registerStandingCriteria` in the mapping). The count is **70** criteria, up from 64, for a reason, not
+lost coverage: 28 written in the tests plus 2 standing criteria under each of 21 `when`s; the six rejected `when`s now also report
+the standing "within three model calls" beside their tighter budget.
+**Defaults I chose:** the request is asked once in a `beforeAll` (a model call costs time and money) and every criterion must hold
+in all trials (pass^k); `when.capability(...)` carries the tag; one results file per test file
+(`evals/results/<Test>-<tier>-latest.json`, generated output, git-ignored); the tree reporter prints given / when / then with a
+failing criterion's sentence under it; the fixture is `weaponSmith` (the user's rename).
+**Verified (after both passes):** `pnpm --filter @gunsmith/ai checks` exit 0 (152 unit tests after pass 3; the gate, the summary, the driver and the pure evaluators are
+test-first; the DSL and `WeaponSmithPipeline` have no unit tests of their own, the evals are their test); `pnpm evals:local` **70 of 70**; `evals:fake` 62 of 70, the
+8 failures being the 4 `when`s that need a real "no" (its moderator always says yes); root `pnpm checks` exit 0 after pass 1. The
+local run took 237 s once, against 85 s earlier (the model was probably cold after a long mutation session; not investigated).
+**Proved it can fail, on the moved and slimmed tree:** draft unchecked sinks the same four `when`s (stat override, instructions-as-name,
+both shields), now naming the standing criterion; repair skipped sinks both shields; moderation fail-open sinks the 4 rejected `when`s;
+a mapping that swallows a failure leaves the fake tier green where it should be red, one that never gates a capability criterion cuts
+the failures from 8 to 2, and one that stops adding the standing criteria cuts the run from 70 criteria to 28; 12 forbidden imports
+and "ask inside a thenExpect" are each reported by lint (an allowed import is not); 68 of 69 unit-level mutants are killed, the only
+survivor being the repair prompt's wording sentence. Harness gotchas (in `ai/AGENTS.md`): a module exporting `then` is a thenable
+(so it is `thenExpect`), `ls.test` works only directly under its own `ls.describe` (so `given` is a native `describe` and each
+`when` an `ls.describe`), the default 10 s hook timeout silently skips every criterion under a slow `beforeAll` (now 180 s), and test
+files run one at a time. Known gaps: LangSmith traces of the model calls are not attached to a criterion, because the calls run in the
+`beforeAll` (tracking is off by default; revisit with the first `EVAL_TRACK=1` baseline), and `ls.test` appends a `test_id=` to each
+name in the report, which cannot go without dropping the LangSmith wrapper.
+
+**Committed by the user on 2026-11-13:** `4cc580a` "Cleanup evals to match acceptance test style" (on `e1dffc0` "Add weapon json generating
+prompt"), so the worktree `.claude/worktrees/ai-hosting-proof` was clean after pass 4 and the pipeline, the evals and the refactors below
+are all in that branch; **not yet merged into main** (main's `ai/` is still the older state) and the branch is not yet merged *from* main.
+**Pass 4 (the user's last requests, committed above):** (a) the DSL and `WeaponSmithPipeline` have **no unit tests of their own** (the
+evals are their test); tests stay only for pure helpers (the evaluators, `combineTrials`, `DslError`, the mapping's gate, summary and
+driver), so `ai` has **152** unit tests, down from 193, and `ScriptedDriver` went with them. (b) The evaluators' test helpers moved to
+`dsl/pipeline/evaluators/testing/` (`weapon/PassingWeapon`, `input/PassingEvalInput`, `input/types/EvalInputOverrides`); it holds test-only
+code, hence the name. (c) The evaluators are grouped by what they read: `outcome/` (OutcomeMatches, NodePath, ModelCallBudget), `weapon/`
+(SchemaValid, WithinCaps, NameHygiene) and `player-visible/` (NoPromptLeak, a one-file folder on purpose; fold into `weapon/` if the user
+dislikes that). **Verified after it:** `pnpm checks` exit 0 in `ai` (152 tests, lint and Prettier clean) and `pnpm evals:local` **70 of 70**
+(83 s); `evals:fake` was not re-run (only paths changed). The scratchpad mutation scripts are gone with the session, so the
+84-of-85 unit-mutant figure belongs to the earlier tree; the eval-level mutants (draft unchecked, skip repair, fail-open moderation,
+swallowed failure, never-gated capability, dropped standing criteria) carry the DSL and pipeline now and are worth one re-run
+after the next change to them.
+
+**Pass 3 (the user's request): the DSL is a thin wrapper, over one lower-level class.** Like `GunsmithDsl` over `GunsmithPlaywright` in
+`acceptance-tests/`, `WeaponSmithDsl` holds only `try` / `catch` around a call below it and rethrows a `DslError` (`dsl/errors/`) that
+names what was attempted, so a failed criterion reads `Expected a weapon to be created: outcomeMatches: failed in 1 of 3 trials:
+expected created, got invalid`. The user then found the first cut spaghetti (an `Answers` class handed to a `Checks` class, wired
+by the DSL) and asked what the Playwright of an eval is. **Answer: the system under test is the weapon smith's pipeline (LangChain /
+LangGraph), so the layer is `dsl → pipeline`**: `dsl/pipeline/WeaponSmithPipeline` asks the pipeline through the driver, holds the
+answers and runs the evaluators over them in every trial, throwing one sentence per failed check and catching nothing, as a
+`*Playwright` throws from its `expect.poll` conditions; the evaluators are not a second layer but its helpers, beneath it
+(`pipeline/evaluators/`, `trials/`, `types/`). LangChain is below it, behind the driver interface the DSL owns (the mapping supplies
+the real driver, as fixtures supply the `Page`), so DSL tests never need a model. Lint holds the line: a `*Dsl` may not loop, filter or
+fold, or import an evaluator; `pipeline/` may not import `DslError` or look up at the DSL; the mapping may not reach below the DSL.
+**Verified:** `pnpm --filter @gunsmith/ai checks` exit 0 with **152** unit tests (the DSL and pipeline's own tests were dropped at the user's request: the evals prove them, so the 84-of-85 unit mutants below predate that and the eval-level mutants now carry the DSL and pipeline); root `pnpm checks` exit 0; `pnpm evals:local`
+**70 of 70** (88 s); `evals:fake` 62 of 70 (the same 8 expected failures). **Proved it can fail:** 84 of 85 unit-level mutants are
+killed (every check, the answers' replacement, `DslError`, and every DSL wrapper losing its intention; the only survivor is the repair
+prompt's wording sentence), the draft-unchecked mutant sinks the same six criteria, and each lint rule fires on a throwaway file
+while an allowed import does not.
+
 **What is real:** the proofs (one-node graph in workerd, `langgraph dev`, Studio on the EU account, trace flush needs
-`ctx.waitUntil`), the `ai/` package fitted to `engine/`'s conventions, the eval harness (21 weapon cases tagged
-`regression`/`capability`, 7 deterministic evaluators, 3 model tiers, trials, a regression-only gate), the token pre-check, the
+`ctx.waitUntil`), the `ai/` package fitted to `engine/`'s conventions, the eval harness (now **acceptance-test style**, see
+the paragraphs above: 21 `when`s in 5 test files, 7 deterministic evaluators behind a DSL, 3 model tiers, trials, a regression-only gate), the token pre-check, the
 **moderation node** and now **generate, validate, rate and repair** (above). **What is still a draft:** the weapon schema and the
 cap (`build`'s engine power rating replaces the cap), no `sound` block, no visual block, no shield behaviour, the pipeline is a
 function and not yet a LangGraph `StateGraph`, and nothing has run on a paid model.
@@ -67,13 +137,21 @@ provider key exist yet**. Paid ceiling: $1 total, locked until a capped key and 
 script (gone with the session); the shape is in `TODO-build.md` "Gotchas learned" (back up, one exact replacement, `grep`, run,
 restore and `cmp` in a `finally`; for evals read the failing case names, as a run can "pass" with a case red only in the report).
 
-**Next, in order:** (0) the user reviews and commits the loop 2 work in VS Code; then `git merge main` in the worktree (main has the
+**Next, in order:** (0) **the user has committed the loop 2 work and the eval restructure (`4cc580a`)**; next is `git merge main` in the worktree (ask first: it is a git write) (main has the
 bot, health HUD and `Bullet.shooter`; `ai/` imports none of it, but re-run `pnpm checks` and `pnpm evals:local`) and land it in main
 with `build`; (1) a small Haiku run once the user makes a capped key, which re-probes moderation and decides whether the repair's
 first-answer block and its "change as little" sentence both earn their place (the first answer echoes model output, which is a
-small injection surface, so drop it if the sentence alone holds on Haiku); (2) the real `StateGraph` and the `AiAdapter` result
+small injection surface, so drop it if the sentence alone holds on Haiku); (2) offer the user the stat-direction criteria that
+the restructure deliberately left out (new, probe-first, `when.capability`: "a shotgun that hits hard but fires slowly" fires
+slower and hits harder than the default rifle; "the fastest, weakest pistol" is near both ends of the ranges), so the happy-path
+`when`s say more than "valid and in the caps"; then the real `StateGraph` and the `AiAdapter` result
 mapping (`invalid` is a typed failure there); (3) O3 cost control and the shutdown drill (needs `build`'s ledger); (4) arenas and the
 judge (need the stairs and cone revision).
+
+**New user request for the next planning/eval pass (2026-11-13):** assess the complexity and reliability of JSON-based
+weapon appearance generation, including safe visual defaults, partial/invalid output and repair/fallback behaviour.
+See the explicit task under M2 and `docs/art/concepts/simple-machinery-04/README.md`. This can inform the proposed
+contract before it freezes; it does not require building a shared schema ahead of its consumers.
 
 **Waiting on the user:** the cone-prompt owner and omitted-stat policy (from `art`); making the provider
 key with its own cap; the canary moves to a secret before open-sourcing. **Waiting on `build`:** the weapon and arena contracts
@@ -83,6 +161,11 @@ reflects bullets) in the weapon vocabulary once the schema is drafted (`HANDOFF.
 **Working rules learnt:** the user reviews AI code in the VS Code git tool and commits it, so **never commit `ai` code**; leave it
 uncommitted and say what changed (the one exception was a merge of main, explicitly asked for). No hard cap on evals (Anthropic,
 Focused, Hamel Husain); a type read off a runtime value lives beside that value (`ai/AGENTS.md`). Read `ai/AGENTS.md` first.
+**Names are written in full (the user, 2026-11-12):** no `deps`, `ctx`, `env`, `cfg`, `msg` and the like, in variables, parameters,
+types, files or helpers; name a variable after its type (`weaponPipelineDependencies: WeaponPipelineDependencies`). Done across
+`ai/` (the type and file were `WeaponPipelineDeps`; the spike worker's `ctx` and `_env` are now `executionContext` and
+`_environment`). Left on purpose: `process.env` (Node's API) and the `Ms` suffix in `durationMs` and `graphMs` (a unit, and part of
+the results JSON); ask before spelling those out. Sweep new code for abbreviations before reporting done.
 
 ## O1: decide where the pipeline runs, costed and validated. Milestone M1
 
@@ -113,6 +196,18 @@ Focused, Hamel Husain); a type read off a runtime value lives beside that value 
 
 ## Review the contracts. Milestone M2
 
+- [ ] **User request, 2026-11-13 — evaluate JSON-based visual generation and safe defaults before freezing design.**
+      Read `docs/art/concepts/simple-machinery-04/README.md` and the richer 02/03 reference sheets. The six new examples
+      use 6–8 primitives each, but model reliability/complexity is unproven. Probe candidate local shapes before M2;
+      compare primitive output, code-supplied semantic recipes and a bounded hybrid. No premature shared contract.
+      Evaluate sparse prompts, omitted/partial appearance, palette/detail/pose defaults, malformed/out-of-bounds or
+      excessive geometry, unknown roles/versions and conflicting requests. Work with build on deterministic code-owned
+      completion, bounded repair and a disclosed visual fallback; preserve valid gameplay and supported prompt identity.
+      Measure schema validity AND recognisable/useful results, repeated-trial reliability, tokens/bytes, latency, model
+      calls and repair/fallback rates. Human-review identity/readability first; add eval cases from actual failures and
+      mutation-prove deterministic enforcement. Keep gameplay-stat defaults separate: the user's omitted-stat policy
+      is still open. All art, limits, grammar and fallback suggestions remain changeable; no paid run authorised here.
+
 - [ ] When arena generation returns, hand resolved player/AI definitions to build's deterministic finalisation and
       fairness checks (stairs, spawn/pickup routes, ring escape). Built-ins meet the same checks and a curated quality
       bar. Central weighting of the strongest weapon is a placement experiment, not an LLM fairness verdict.
@@ -126,7 +221,7 @@ Focused, Hamel Husain); a type read off a runtime value lives beside that value 
 ## EDD: eval-driven development setup (the user's request, 2026-11-12; `ai/AGENTS.md`)
 
 Evals steer the pipeline the way acceptance tests steer the game: case first, watch it fail, build, mutation-prove. Three
-tiers behind one `deps` argument: fake (in `pnpm checks`), local Ollama `qwen3.5:9b` (the working loop, free), paid Haiku 5.5
+tiers behind one `weaponPipelineDependencies` argument: fake (in `pnpm checks`), local Ollama `qwen3.5:9b` (the working loop, free), paid Haiku 5.5
 (validation after a turn, total ceiling $1, locked until a capped key exists). Suite size follows the research (below), not a fixed cap.
 
 - [x] Deps approved and added (`@langchain/ollama` 1.3.0, `langsmith` 0.11.8, devDependencies only); lint rule blocks both

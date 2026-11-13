@@ -113,13 +113,24 @@ Modelled on Focused's published pipeline (Austin Vance, "Evaluation Pipelines fo
 module 02.
 
 - **The loop, set up 2026-11-12 (`ai/AGENTS.md`):** case first, watch it fail for the right reason, build the smallest change,
-  mutation-prove (degrade the prompt or drop a node and the score must fall). **Three tiers behind one `deps` argument:**
+  mutation-prove (degrade the prompt or drop a node and the score must fall). **Three tiers behind one `weaponPipelineDependencies` argument:**
   `fake` (in `pnpm checks`, proves the harness and the deterministic logic), `local` (Ollama `qwen3.5:9b` on the laptop, free,
   the working loop) and `paid` (Haiku 5.5, validation after a turn only, total ceiling $1 until the user raises it, locked until
   a capped provider key and a spend guard exist). **Scores do not transfer between tiers:** a local 9B model's pass rate says
   nothing about Haiku's, so the local tier checks the mechanics and prompt structure and the paid tier checks quality. A
   GitHub runner cannot run Ollama, so `evals.yml` will be fake or paid. **Eval traces share the free plan's 5,000 a month with
   production**, so LangSmith tracking is off by default for evals and on only for a deliberate baseline run (`EVAL_TRACK=1`).
+- **Shape: acceptance-test style (2026-11-12, the user's request).** The evals are tests in `ai/evals/tests/`, grouped by behaviour:
+  `given` a situation, `when` one request is asked (once, for all the trials), `thenExpect` one named criterion each. The root is
+  `tests | dsl | eval-criteria-mapping`, as in `acceptance-tests/`: the mapping is the setup (the model tier, the trials, the
+  real driver, the regression gate, the results file); the DSL (`WeaponSmithDsl.ask`, `expectCreated`, `expectNoWeaponOverTheCap`,
+  `expectSafeToShow`, …) is a thin `try` / `catch` wrapper that rethrows a `DslError` naming what was expected; beneath it, answers are
+  kept and the deterministic evaluators are run in every trial. It reaches the pipeline only through a driver interface it owns,
+  so its own tests use a scripted driver and no model. Lint stops an import running upwards. What holds whatever is asked
+  (safe to show; the fixed path within three model calls) is the DSL's standing criteria, which the mapping adds under every `when`.
+  This replaced a table of 21 case rows scored by every evaluator in a loop, whose intent lived in comments and whose failures were
+  JSON. A criterion now fails as one sentence (`withinCaps: failed in 3 of 3 trials: 2000 damage per second is over 150`). Details in
+  `ai/AGENTS.md`.
 - **Datasets** (research of 2026-11-12, replacing the user's earlier "about 10": no source gives a cap. Anthropic: 20 to 50
   tasks drawn from real failures is a great start; Focused: a 7-example demo, 50 to 100 for production; Hamel Husain: about 100
   traces to discover failure modes. So start near 20 to 30 and grow to 50 to 100 once there is traffic, adding a case only

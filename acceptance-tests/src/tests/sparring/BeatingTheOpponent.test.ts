@@ -11,6 +11,17 @@ given("a sparring match has just begun", () => {
       expect(await gunsmith.round.isBannerShown()).toBe(false);
     });
 
+    then("the opponent stands where it began, taking no action", async ({gunsmith}) => {
+      const start = await gunsmith.opponent.get();
+
+      await gunsmith.waitForGameSeconds(3);
+
+      const now = await gunsmith.opponent.get();
+      expect(now.x).toBeCloseTo(start.x, 9);
+      expect(now.y).toBeCloseTo(start.y, 9);
+      expect(now.behaviour).toBeUndefined();
+    });
+
     then("the opponent stands in the arena with health to lose", async ({gunsmith}) => {
       const opponent = await gunsmith.opponent.get();
       const arena = await gunsmith.arena.getSizeInTiles();

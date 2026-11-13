@@ -1,5 +1,4 @@
-import {scenarioOfPage} from "@src/game/scenario/ScenarioOfPage";
-import {worldOfScenario} from "@src/game/scenario/WorldOfScenario";
+import {worldOfPage} from "@src/game/scenario/WorldOfPage";
 import type {GameStore} from "@src/store/game/types/GameStore";
 import {create} from "zustand";
 
@@ -10,7 +9,7 @@ import {create} from "zustand";
  * (`?scenario=duel`), the practice range otherwise.
  */
 export const useGameStore = create<GameStore>()(set => ({
-  world: worldOfScenario(scenarioOfPage()),
+  world: worldOfPage(),
   setWorld: world => {
     set({world});
   },

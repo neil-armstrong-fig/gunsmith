@@ -1,0 +1,225 @@
+{
+  "version": 1,
+  "palette": {
+    "accent": "weapon-yellow",
+    "accent-secondary": "weapon-orange"
+  },
+  "body": [
+    {
+      "kind": "rect",
+      "x": 6,
+      "y": 28,
+      "width": 18,
+      "height": 8,
+      "fill": "body",
+      "stroke": "edge",
+      "strokeWidth": 2,
+      "opacity": 1,
+      "rotation": 0,
+      "detail": "structural"
+    },
+    {
+      "kind": "rect",
+      "x": 42,
+      "y": 28,
+      "width": 18,
+      "height": 8,
+      "fill": "body",
+      "stroke": "edge",
+      "strokeWidth": 2,
+      "opacity": 1,
+      "rotation": 0,
+      "detail": "structural"
+    },
+    {
+      "kind": "rect",
+      "x": 19,
+      "y": 17,
+      "width": 28,
+      "height": 30,
+      "fill": "body",
+      "stroke": "edge",
+      "strokeWidth": 2,
+      "opacity": 1,
+      "rotation": 0,
+      "detail": "structural"
+    },
+    {
+      "kind": "ellipse",
+      "x": 32,
+      "y": 31,
+      "radiusX": 12,
+      "radiusY": 12,
+      "fill": "accent",
+      "stroke": "edge",
+      "strokeWidth": 2,
+      "opacity": 1,
+      "rotation": 0,
+      "detail": "structural"
+    },
+    {
+      "kind": "circle",
+      "x": 38,
+      "y": 27,
+      "radius": 6,
+      "fill": "accent",
+      "stroke": "edge",
+      "strokeWidth": 2,
+      "opacity": 1,
+      "rotation": 0,
+      "detail": "structural"
+    },
+    {
+      "kind": "polygon",
+      "x": 0,
+      "y": 0,
+      "points": [
+        [
+          41,
+          26
+        ],
+        [
+          48,
+          29
+        ],
+        [
+          41,
+          32
+        ]
+      ],
+      "fill": "accent-secondary",
+      "stroke": "edge",
+      "strokeWidth": 2,
+      "opacity": 1,
+      "rotation": 0,
+      "detail": "structural"
+    },
+    {
+      "kind": "rect",
+      "x": 20,
+      "y": 14,
+      "width": 24,
+      "height": 4,
+      "fill": "body",
+      "stroke": "edge",
+      "strokeWidth": 2,
+      "opacity": 1,
+      "rotation": 0,
+      "detail": "structural"
+    },
+    {
+      "kind": "rect",
+      "x": 20,
+      "y": 44,
+      "width": 24,
+      "height": 4,
+      "fill": "body",
+      "stroke": "edge",
+      "strokeWidth": 2,
+      "opacity": 1,
+      "rotation": 0,
+      "detail": "structural"
+    },
+    {
+      "kind": "polyline",
+      "x": 0,
+      "y": 0,
+      "points": [
+        [
+          25,
+          18
+        ],
+        [
+          25,
+          43
+        ]
+      ],
+      "fill": "none",
+      "stroke": "edge",
+      "strokeWidth": 1,
+      "opacity": 1,
+      "rotation": 0,
+      "detail": "fine"
+    },
+    {
+      "kind": "polyline",
+      "x": 0,
+      "y": 0,
+      "points": [
+        [
+          39,
+          18
+        ],
+        [
+          39,
+          43
+        ]
+      ],
+      "fill": "none",
+      "stroke": "edge",
+      "strokeWidth": 1,
+      "opacity": 1,
+      "rotation": 0,
+      "detail": "fine"
+    }
+  ],
+  "projectile": [
+    {
+      "kind": "ellipse",
+      "x": 31,
+      "y": 33,
+      "radiusX": 12,
+      "radiusY": 9,
+      "fill": "accent",
+      "stroke": "edge",
+      "strokeWidth": 2,
+      "opacity": 1,
+      "rotation": 0,
+      "detail": "structural"
+    },
+    {
+      "kind": "circle",
+      "x": 40,
+      "y": 28,
+      "radius": 6,
+      "fill": "accent",
+      "stroke": "edge",
+      "strokeWidth": 2,
+      "opacity": 1,
+      "rotation": 0,
+      "detail": "structural"
+    },
+    {
+      "kind": "polygon",
+      "x": 0,
+      "y": 0,
+      "points": [
+        [
+          44,
+          27
+        ],
+        [
+          54,
+          30
+        ],
+        [
+          44,
+          33
+        ]
+      ],
+      "fill": "accent-secondary",
+      "stroke": "edge",
+      "strokeWidth": 2,
+      "opacity": 1,
+      "rotation": 0,
+      "detail": "structural"
+    }
+  ],
+  "impact": {
+    "preset": "spark",
+    "colour": "accent"
+  },
+  "animation": {
+    "preset": "none"
+  }
+}

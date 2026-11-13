@@ -38,6 +38,16 @@ reads the canvas before `data-ready` is `true` sees the browser's default 300 by
 What is drawn over the canvas is ordinary DOM (the ammunition display): read it by test id, as `gunsmith.hud` does, and
 check it against the state hook, which is the game's own account of the same thing.
 
+## Duels are seeded, and specs assert properties
+
+The duel's opponent draws every choice from a seed, and `startDuel()` opens the page with a fixed one (`DUEL_SEED`), so a spec
+replays the same duel and only Playwright's timing varies. That timing decides how many game ticks pass between two looks, so
+a duel spec asserts **properties** (it engages, it leaves its spot, its magazine runs down, a standing player loses in the
+end), never exact positions or tick counts. A wait that can take longer than the 5 s expect timeout takes an explicit
+`timeoutSeconds` grounded in a measurement (`FightingBack`: 15 s against 9.4 s measured over 40 seeds), not a guess. The one
+duel long enough for the opponent to run dry has its own seed (`LONG_DUEL_SEED`, `startLongDuel()`); only 2 of 40 seeds get
+that far. Sparring has no brain, so its opponent never moves; the specs aim at where it stands.
+
 ## Running
 
 ```bash

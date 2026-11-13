@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="460" viewBox="0 0 800 460" role="img" aria-labelledby="title desc">
+<title id="title">Simple lantern appearance / six primitives</title>
+<desc id="desc">Proposed JSON composition rendered at enlarged, 64 and 32 pixel sizes, with two held contexts. Reference only.</desc>
+<defs><g id="lantern">
+<polyline points="12,17 6,17 6,47 12,47" fill="none" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="10,18 21,12 32,17 41,28 41,36 32,47 21,52 10,46" fill="#62B5FF" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polyline points="31,19 43,20 51,29" fill="none" stroke="#B6A0FF" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polyline points="31,45 43,44 51,35" fill="none" stroke="#B6A0FF" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="48" y="28" width="12" height="8" fill="#30404F" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="24" cy="32" r="6" fill="#E5EAF0" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g></defs>
+<rect width="800" height="460" fill="#10151B"/>
+<g fill="#E5EAF0" font-family="Arial,sans-serif">
+<text x="30" y="40" font-size="24">LANTERN / SIX PRIMITIVES</text>
+<text x="30" y="69" font-size="14">Proposed appearance data / static reference / open to change</text>
+<use href="#lantern" transform="translate(35 85) scale(3.5)"/>
+<text x="350" y="145" font-size="16">64 px</text><use href="#lantern" transform="translate(350 160)"/>
+<text x="460" y="145" font-size="16">32 px</text><use href="#lantern" transform="translate(460 176) scale(.5)"/>
+<text x="350" y="270" font-size="16">Held contexts / same body</text>
+<g transform="translate(350 290)"><circle cx="20" cy="32" r="18" fill="#30404F" stroke="#91A2B2" stroke-width="2"/><use href="#lantern" transform="translate(29 11.2) scale(.65)"/><rect x="14" y="16" width="12" height="6" fill="#62B5FF"/></g>
+<g transform="translate(460 306) scale(.5)"><circle cx="20" cy="32" r="13" fill="#30404F" stroke="#91A2B2" stroke-width="2"/><use href="#lantern" transform="translate(29 11.2) scale(.65)"/><rect x="13" y="23" width="5" height="6" fill="#FF9B54"/><rect x="22" y="23" width="5" height="6" fill="#FF9B54"/></g>
+<text x="30" y="405" font-size="15">Bell + core / paired conduits / emitter / rear brace</text>
+<text x="30" y="431" font-size="14">Same geometry at every scale. No shader, glass, glow or animation.</text>
+</g></svg>

@@ -1,6 +1,7 @@
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import type {Bullet} from "@gunsmith/engine/bullet/types/Bullet";
 import type {Dummy} from "@gunsmith/engine/dummy/types/Dummy";
+import type {OpponentBrain} from "@gunsmith/engine/opponent/types/OpponentBrain";
 import type {Player} from "@gunsmith/engine/player/types/Player";
 import type {RoundState} from "@gunsmith/engine/round/types/RoundState";
 
@@ -10,6 +11,8 @@ export interface World {
   player: Player;
   /** The scripted opponent; absent in a world that has none, such as the practice range. */
   opponent?: Player | undefined;
+  /** What the opponent remembers between steps. Absent when it has no brain: it then takes no action, a still target. */
+  opponentBrain?: OpponentBrain | undefined;
   /** The shots in the air right now. */
   bullets: readonly Bullet[];
   /** The practice dummies still standing. A dummy with no health left is gone from the list. */

@@ -1,0 +1,38 @@
+[
+  {
+    "name": "Quackback",
+    "parts": 7,
+    "points": 23,
+    "bytes": 3025
+  },
+  {
+    "name": "Final Notice",
+    "parts": 7,
+    "points": 14,
+    "bytes": 2627
+  },
+  {
+    "name": "Bad Idea",
+    "parts": 6,
+    "points": 14,
+    "bytes": 2326
+  },
+  {
+    "name": "Prickle Drive",
+    "parts": 8,
+    "points": 16,
+    "bytes": 2981
+  },
+  {
+    "name": "Abyss Lantern",
+    "parts": 6,
+    "points": 18,
+    "bytes": 2549
+  },
+  {
+    "name": "Pop Catastrophe",
+    "parts": 7,
+    "points": 10,
+    "bytes": 2413
+  }
+]

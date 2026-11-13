@@ -13,6 +13,27 @@ stripes. Avoid decorative distress, perspective, photorealism, pure black, pure 
 It includes 64 px and 32 px samples.
 This is a concept delivery, not production sprites. The real manifest and behaviour enum are still pending from `build`.
 
+[Twelve top-down weapon studies](concepts/top-down-oddities/README.md) now supply two designs per oddity,
+editable SVGs, native-size/grayscale/held/pickup reviews and appearance-only JSON with generic drawing rules.
+Yellow/pink are user-authorised concept experiments, pending final palette/manifest review.
+
+## Weapon direction revision (2026-11-12)
+
+The user asks for Ratchet & Clank's inventive weapon spirit, adapted to Gunsmith's top-down 2D view.
+[Overhead machinery study 02](concepts/overhead-machinery-02.md) explores three original designs: exaggerated
+functional assemblies, chunky shells, visible mechanisms and simple shaded depth. This relaxes the earlier flat-only
+weapon treatment for concept exploration; the slate arena, team cues, fog rules and gameplay boundaries remain.
+The first twelve vectors are an initial grammar proof, not a visual quality target to freeze into the schema.
+Translate the stronger constructions into editable JSON/vector studies before settling material presets or final sprites.
+
+## Simpler build reference (2026-11-13)
+
+The user asks for a less ambitious version suitable for JSON-driven generation, with every choice still open.
+[Simple machine studies / build and AI brief](concepts/simple-machinery-04/README.md) supplies six original 6–8-part
+compositions, editable SVGs, matching proposed JSON and native-size/held reviews. It explains what to keep from the
+rich references and asks AI to evaluate reliability, complexity and code-owned visual defaults before freezing a contract.
+Both simple and rich references remain useful; none fixes the final detail level or renderer architecture.
+
 ## Palette and integration proposal
 
 Prefix every token below with `--color-gs-` when `build` adopts it into Tailwind `@theme`. Components use tokens,
@@ -106,8 +127,9 @@ including absurd ones, while keeping the game's industrial outline language.
   ornaments, projectile shapes and impact motifs. Preserve the forward aim axis, held pivot and pickup framing.
 - Separate body, barrel, attachment, accent mask, projectile and effect layers so new combinations do not require
   repainting a complete held/pickup/UI sprite. Reuse a composition across those views at their own readable detail level.
-- Use validated generated data for visual choices. The existing schema supplies behaviour, colour and stats; it
-  **does not yet carry these visual parts**. Build and AI must agree a bounded visual description at M2 rather than
+- Use validated generated data for visual choices. The latest AI-worktree draft supplies a name and six bullet/ammunition
+  stats; it **does not carry behaviour, colour, visual parts, sound or vision**. Build and AI must agree a bounded visual
+  description at M2 rather than
   silently discarding imaginative prompt details or treating this art note as an implemented interface.
 - Variation may suggest firing behaviour, but art cannot add gravity, sticky terrain, destructible cover or new damage
   rules. Any such request needs an explicit supported behaviour or a clear explanation of the available interpretation.

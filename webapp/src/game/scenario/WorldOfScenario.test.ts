@@ -1,5 +1,6 @@
 import {isSolid} from "@gunsmith/engine/arena/IsSolid";
 import {disarmOpponent} from "@gunsmith/engine/opponent/DisarmOpponent";
+import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import {DUEL_ARENA} from "@src/game/duel/DuelArena";
 import {DUEL_OPPONENT} from "@src/game/duel/DuelOpponent";
@@ -8,7 +9,7 @@ import {PRACTICE_DUMMIES} from "@src/game/practice/PracticeDummies";
 import {worldOfScenario} from "@src/game/scenario/WorldOfScenario";
 
 it("makes the practice range with its dummies and no opponent", () => {
-  const world = worldOfScenario("practice");
+  const world = worldOfScenario("practice", 1);
 
   expect(world).toEqual(startingWorld(PRACTICE_ARENA, PRACTICE_DUMMIES));
   expect(world.opponent).toBeUndefined();
@@ -16,15 +17,15 @@ it("makes the practice range with its dummies and no opponent", () => {
 });
 
 it("makes the duel with the opponent where it stands and no dummies", () => {
-  const world = worldOfScenario("duel");
+  const world = worldOfScenario("duel", 7);
 
-  expect(world).toEqual(startingWorld(DUEL_ARENA, [], DUEL_OPPONENT));
+  expect(world).toEqual(giveOpponentBrain(startingWorld(DUEL_ARENA, [], DUEL_OPPONENT), 7));
   expect(world.opponent?.position).toEqual(DUEL_OPPONENT);
   expect(world.dummies).toEqual([]);
 });
 
 it("has nothing between the player and the opponent in the duel", () => {
-  const {player, opponent, arena} = worldOfScenario("duel");
+  const {player, opponent, arena} = worldOfScenario("duel", 1);
   const row = Math.floor(player.position.y);
 
   expect(Math.floor(opponent?.position.y ?? -1)).toBe(row);
@@ -34,9 +35,22 @@ it("has nothing between the player and the opponent in the duel", () => {
 });
 
 it("makes sparring the duel with an opponent who has nothing to shoot with", () => {
-  const world = worldOfScenario("sparring");
+  const world = worldOfScenario("sparring", 7);
 
   expect(world).toEqual(disarmOpponent(startingWorld(DUEL_ARENA, [], DUEL_OPPONENT)));
   expect(world.opponent?.loadout.every(carried => carried.rounds === 0 && carried.reserve === 0)).toBe(true);
   expect(world.player.loadout.every(carried => carried.rounds > 0)).toBe(true);
+});
+
+it("gives the duel's opponent a brain that draws from the seed it is given", () => {
+  expect(worldOfScenario("duel", 7).opponentBrain?.seed).toBe(7);
+  expect(worldOfScenario("duel", 8).opponentBrain?.seed).toBe(8);
+});
+
+it("gives the sparring opponent no brain, so it stands and takes it", () => {
+  expect(worldOfScenario("sparring", 7).opponentBrain).toBeUndefined();
+});
+
+it("gives the practice range no brain, since it has no opponent", () => {
+  expect(worldOfScenario("practice", 7).opponentBrain).toBeUndefined();
 });

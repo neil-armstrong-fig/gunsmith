@@ -12,7 +12,8 @@
     "lint": "eslint --max-warnings=0 .",
     "format:check": "prettier --check generator-scripts generated-audio/measurements.json *.js *.json README.md",
     "type-check": "tsc --noEmit",
-    "test": "node --test generator-scripts/RenderAudio.test.ts"
+    "test": "node --test \"generator-scripts/**/*.test.ts\"",
+    "test:render": "FULL_RENDER=1 node --test generator-scripts/pack/verification/RenderedPack.test.ts"
   },
   "devDependencies": {
     "@gunsmith/shared": "workspace:*",

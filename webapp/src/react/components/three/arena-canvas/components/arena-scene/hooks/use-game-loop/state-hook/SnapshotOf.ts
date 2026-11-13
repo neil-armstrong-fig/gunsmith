@@ -36,5 +36,11 @@ function opponentSnapshotOf(world: World): OpponentSnapshot | undefined {
     return undefined;
   }
 
-  return {x: opponent.position.x, y: opponent.position.y, health: opponent.health};
+  return {
+    x: opponent.position.x,
+    y: opponent.position.y,
+    health: opponent.health,
+    rounds: equippedWeapon(opponent).rounds,
+    behaviour: world.opponentBrain?.state,
+  };
 }

@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="1024" viewBox="0 0 1280 1024" role="img" aria-labelledby="title desc">
+<title id="title">Gunsmith / simple machine studies</title><desc id="desc">Six original overhead JSON compositions with 6 to 8 shapes each. Provisional references, not a frozen schema.</desc><defs>
+<g id="Quackback">
+<polyline points="16,20 7,20 7,45 16,45" fill="none" stroke="#91A2B2" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="14,22 36,22 47,27 47,37 36,42 14,42" fill="#F5D45B" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="22" cy="43" r="12" fill="#FF9B54" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="29" y="28" width="15" height="8" fill="#30404F" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="43,21 59,23 59,28 48,31 43,29" fill="#F5D45B" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="43,35 48,33 59,36 59,41 43,43" fill="#F5D45B" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="28,41 35,44 28,47" fill="#F5D45B" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g id="FinalNotice">
+<polygon points="8,17 38,17 43,23 43,41 38,47 8,47" fill="#E5EAF0" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="17" y="20" width="12" height="9" fill="#B6A0FF" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="17" y="35" width="12" height="9" fill="#B6A0FF" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="24" y="28" width="31" height="8" fill="#E5EAF0" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="38,17 59,20 59,25 40,25" fill="#E5EAF0" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="40,39 59,39 59,44 38,47" fill="#E5EAF0" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="9" y="28" width="6" height="8" fill="#FF9B54" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g id="BadIdea">
+<polyline points="17,18 7,18 5,32 7,46 17,46" fill="none" stroke="#91A2B2" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="30" cy="32" r="18" fill="#B6A0FF" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="43,28 50,25 59,22 59,42 50,39 43,36" fill="#B6A0FF" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polyline points="35,16 40,32 35,48" fill="none" stroke="#91A2B2" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="29" cy="32" r="9" fill="#8AD4B0" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="29" cy="32" r="3" fill="#30404F" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g id="PrickleDrive">
+<polyline points="18,17 8,17 6,45 20,48" fill="none" stroke="#91A2B2" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="20" y="22" width="28" height="20" fill="#30404F" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<ellipse cx="22" cy="19" rx="12" ry="8" fill="#8AD4B0" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<ellipse cx="23" cy="44" rx="14" ry="9" fill="#8AD4B0" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<ellipse cx="42" cy="32" rx="9" ry="12" fill="#8AD4B0" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="27,14 34,20 27,26 20,20" fill="#B6A0FF" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="48,24 60,25 60,29 48,30" fill="#8AD4B0" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="48,34 60,35 60,39 48,40" fill="#8AD4B0" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g id="AbyssLantern">
+<polyline points="12,17 6,17 6,47 12,47" fill="none" stroke="#91A2B2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="10,18 21,12 32,17 41,28 41,36 32,47 21,52 10,46" fill="#62B5FF" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polyline points="31,19 43,20 51,29" fill="none" stroke="#B6A0FF" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polyline points="31,45 43,44 51,35" fill="none" stroke="#B6A0FF" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="48" y="28" width="12" height="8" fill="#30404F" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="24" cy="32" r="6" fill="#E5EAF0" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+<g id="PopCatastrophe">
+<polyline points="18,21 7,21 7,45 19,45" fill="none" stroke="#91A2B2" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="17" y="28" width="32" height="17" fill="#30404F" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="24" cy="20" r="13" fill="#F58DBA" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="24" cy="20" r="6" fill="#E5EAF0" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="26,28 33,28 39,36 49,36 49,42 36,42" fill="#F58DBA" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="46" y="23" width="14" height="22" fill="#FF9B54" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="51" y="29" width="9" height="10" fill="#30404F" stroke="#10151B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</g>
+</defs><rect width="1280" height="1024" fill="#10151B"/><g font-family="Arial,sans-serif"><text x="35" y="48" fill="#E5EAF0" font-size="32">GUNSMITH / SIMPLE MACHINE STUDIES</text><text x="35" y="78" fill="#A7B3C2" font-size="16">SILHOUETTE + ONE MECHANISM / ALL DETAILS AND LIMITS OPEN TO CHANGE</text>
+<rect x="35" y="110" width="395" height="395" rx="10" fill="#19222D"/>
+<text x="53" y="143" font-size="23" fill="#E5EAF0">QUACKBACK</text>
+<use href="#Quackback" transform="translate(98 160) scale(4)"/>
+<use href="#Quackback" transform="translate(59 419)"/><use href="#Quackback" transform="translate(155 435) scale(.5)"/>
+<text x="55" y="405" font-size="13" fill="#A7B3C2">7 SHAPES / 64 px + 32 px / HELD CONTEXT</text>
+<g transform="translate(267 419)"><circle cx="20" cy="32" r="18" fill="#30404F" stroke="#91A2B2" stroke-width="2"/><use href="#Quackback" transform="translate(29 11.2) scale(.65)"/><rect x="14" y="16" width="12" height="6" fill="#62B5FF"/></g>
+<rect x="450" y="110" width="395" height="395" rx="10" fill="#19222D"/>
+<text x="468" y="143" font-size="23" fill="#E5EAF0">FINAL NOTICE</text>
+<use href="#FinalNotice" transform="translate(513 160) scale(4)"/>
+<use href="#FinalNotice" transform="translate(474 419)"/><use href="#FinalNotice" transform="translate(570 435) scale(.5)"/>
+<text x="470" y="405" font-size="13" fill="#A7B3C2">7 SHAPES / 64 px + 32 px / HELD CONTEXT</text>
+<g transform="translate(682 419)"><circle cx="20" cy="32" r="18" fill="#30404F" stroke="#91A2B2" stroke-width="2"/><use href="#FinalNotice" transform="translate(29 11.2) scale(.65)"/><rect x="14" y="16" width="12" height="6" fill="#62B5FF"/></g>
+<rect x="865" y="110" width="395" height="395" rx="10" fill="#19222D"/>
+<text x="883" y="143" font-size="23" fill="#E5EAF0">BAD IDEA</text>
+<use href="#BadIdea" transform="translate(928 160) scale(4)"/>
+<use href="#BadIdea" transform="translate(889 419)"/><use href="#BadIdea" transform="translate(985 435) scale(.5)"/>
+<text x="885" y="405" font-size="13" fill="#A7B3C2">6 SHAPES / 64 px + 32 px / HELD CONTEXT</text>
+<g transform="translate(1097 419)"><circle cx="20" cy="32" r="18" fill="#30404F" stroke="#91A2B2" stroke-width="2"/><use href="#BadIdea" transform="translate(29 11.2) scale(.65)"/><rect x="14" y="16" width="12" height="6" fill="#62B5FF"/></g>
+<rect x="35" y="525" width="395" height="395" rx="10" fill="#19222D"/>
+<text x="53" y="558" font-size="23" fill="#E5EAF0">PRICKLE DRIVE</text>
+<use href="#PrickleDrive" transform="translate(98 575) scale(4)"/>
+<use href="#PrickleDrive" transform="translate(59 834)"/><use href="#PrickleDrive" transform="translate(155 850) scale(.5)"/>
+<text x="55" y="820" font-size="13" fill="#A7B3C2">8 SHAPES / 64 px + 32 px / HELD CONTEXT</text>
+<g transform="translate(267 834)"><circle cx="20" cy="32" r="18" fill="#30404F" stroke="#91A2B2" stroke-width="2"/><use href="#PrickleDrive" transform="translate(29 11.2) scale(.65)"/><rect x="14" y="16" width="12" height="6" fill="#62B5FF"/></g>
+<rect x="450" y="525" width="395" height="395" rx="10" fill="#19222D"/>
+<text x="468" y="558" font-size="23" fill="#E5EAF0">ABYSS LANTERN</text>
+<use href="#AbyssLantern" transform="translate(513 575) scale(4)"/>
+<use href="#AbyssLantern" transform="translate(474 834)"/><use href="#AbyssLantern" transform="translate(570 850) scale(.5)"/>
+<text x="470" y="820" font-size="13" fill="#A7B3C2">6 SHAPES / 64 px + 32 px / HELD CONTEXT</text>
+<g transform="translate(682 834)"><circle cx="20" cy="32" r="18" fill="#30404F" stroke="#91A2B2" stroke-width="2"/><use href="#AbyssLantern" transform="translate(29 11.2) scale(.65)"/><rect x="14" y="16" width="12" height="6" fill="#62B5FF"/></g>
+<rect x="865" y="525" width="395" height="395" rx="10" fill="#19222D"/>
+<text x="883" y="558" font-size="23" fill="#E5EAF0">POP CATASTROPHE</text>
+<use href="#PopCatastrophe" transform="translate(928 575) scale(4)"/>
+<use href="#PopCatastrophe" transform="translate(889 834)"/><use href="#PopCatastrophe" transform="translate(985 850) scale(.5)"/>
+<text x="885" y="820" font-size="13" fill="#A7B3C2">7 SHAPES / 64 px + 32 px / HELD CONTEXT</text>
+<g transform="translate(1097 834)"><circle cx="20" cy="32" r="18" fill="#30404F" stroke="#91A2B2" stroke-width="2"/><use href="#PopCatastrophe" transform="translate(29 11.2) scale(.65)"/><rect x="14" y="16" width="12" height="6" fill="#62B5FF"/></g><text x="35" y="980" fill="#A7B3C2" font-size="15">Original editable vector references / same proposed JSON at every scale / no glass, shading, glow or animation</text></g></svg>
