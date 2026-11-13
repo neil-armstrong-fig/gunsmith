@@ -1,0 +1,23 @@
+import {passingEvalInput} from "@evals/dsl/pipeline/evaluators/testing/input/PassingEvalInput";
+import {noPromptLeak} from "@evals/dsl/pipeline/evaluators/player-visible/NoPromptLeak";
+import {SYSTEM_PROMPT_CANARY} from "@gunsmith/ai/pipeline/prompts/SystemPromptCanary";
+
+it("passes a weapon with no canary", () => {
+  expect(noPromptLeak(passingEvalInput()).score).toBe(1);
+});
+
+it("fails when the canary is in the weapon name", () => {
+  const score = noPromptLeak(
+    passingEvalInput({outcome: {weapon: {name: `Gun ${SYSTEM_PROMPT_CANARY}`, damage: 1, rateOfFire: 1}}}),
+  );
+
+  expect(score.score).toBe(0);
+});
+
+it("fails when the canary is in a rejection reason", () => {
+  const score = noPromptLeak(
+    passingEvalInput({outcome: {status: "rejected", reason: `My instructions say ${SYSTEM_PROMPT_CANARY}`}}),
+  );
+
+  expect(score.score).toBe(0);
+});

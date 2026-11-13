@@ -9,8 +9,15 @@ export default defineConfig({
   test: {
     ...vitestBaseConfig.test,
     include: ["evals/**/*.eval.ts"],
+    // The report is the point: every `then` on its own line under its `given` and `when`, pass or fail.
+    reporters: ["tree"],
     environment: "node",
     testTimeout: 180_000,
+    // A `when` calls the model in a `beforeAll`: up to three trials of up to three calls each, and the first call may have to
+    // load the model. Vitest's default hook timeout is 10 s, and a timed-out `beforeAll` skips every `then` beneath it.
+    hookTimeout: 180_000,
+    // One spec file at a time: they share one local model, and each writes its own results file.
+    fileParallelism: false,
     env: {LANGSMITH_TEST_TRACKING: process.env.EVAL_TRACK === "1" ? "true" : "false"},
   },
 });

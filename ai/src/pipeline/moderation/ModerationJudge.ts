@@ -3,7 +3,7 @@ import type {BaseChatModel} from "@langchain/core/language_models/chat_models";
 import {moderationVerdictSchema} from "@gunsmith/ai/pipeline/moderation/ModerationVerdict";
 import type {ModerationVerdict} from "@gunsmith/ai/pipeline/moderation/ModerationVerdict";
 import {MODERATION_PROMPT} from "@gunsmith/ai/pipeline/moderation/prompts/ModerationPrompt";
-import {requestBlock} from "@gunsmith/ai/pipeline/moderation/request/RequestBlock";
+import {requestBlock} from "@gunsmith/ai/pipeline/request/RequestBlock";
 import {UNAVAILABLE_VERDICT} from "@gunsmith/ai/pipeline/moderation/unavailable/UnavailableVerdict";
 
 /**
