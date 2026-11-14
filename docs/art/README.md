@@ -50,6 +50,16 @@ The user accepted the review. Frozen inputs distinguish available artwork from
 newer eval summaries and AI-reported results; concrete AI/build follow-up is
 recorded there. No kit-selection comparison or production approval is implied.
 
+## Build asset reference (2026-11-14)
+
+[Start with the build guide](asset-reference/README.md): five visual sheets,
+80 individual SVG examples, native-size/grayscale and held poses, effect strips,
+interface states, brand direction and links to every approved audio cue.
+Covers all planned manifest families; examples do not freeze M2 or approve production.
+The later AI kit probe was shelved at the user's request after the primitive
+shapes arm looked better (`be6b913` in the AI worktree). Kit 05 remains approved
+as authored artwork; its pending-probe notes above are historical.
+
 ## Palette and integration proposal
 
 Prefix every token below with `--color-gs-` when `build` adopts it into Tailwind `@theme`. Components use tokens,

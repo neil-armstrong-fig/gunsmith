@@ -145,6 +145,19 @@ those implementations; art's README records unsupported identities and proposed 
 
 ## Delivery log
 
+- 2026-11-14, `art`: **build asset reference delivered** at
+  `docs/art/asset-reference/README.md`: five editable SVG/PNG sheets, 80 individual
+  SVG examples, 2× effect/brand previews, exact-size favicons and all approved
+  audio links. Covers every planned manifest family, stairs and A4/A7 extras;
+  anchors, tint, states and unresolved decisions documented. Original art;
+  previous concepts/audio preserved. Kit generation is shelved per the user's
+  later AI verdict; authored kit retained. Manifest keys registered: none.
+  Production/M2 remain open. Root checks pass: lint, formatting, strict types;
+  679 engine, 420 AI, 179 webapp, 254 audio tests; one slow render skipped.
+  Asset QA, preservation hashes and folder/reference review pass. Verification
+  record beside the guide; no runtime, schema, dependency, paid call or commit.
+
+
 - 2026-11-14, `build`: **`ai` worktree merged again (`ceb5063`), then heights slice 2: vision over height, test first, uncommitted for the user's review.** The merge brought the `ai` kit-arm notes and a drawings-sheet change; only `HANDOFF.md` and `TODO.md` conflicted, both sides kept. Vision: a tile blocks a viewer's sight if it is a wall or on a level higher than their eye (a stair counts as its upper level), so from the low ground a platform and what stands on it is hidden, and from a platform the low ground shows; the opponent sees by the same rule. The user chose the simple rule and descoped a longer reach for higher ground (an idea, not built). **Contract change for `ai`/`art`: none.** (`Cone` gained `eyeLevel` and `coneOf` takes the arena, which only `engine/` and `webapp/` use; `ai/` imports none of it, its 420 tests pass; state hook shape unchanged, but `visible` now also hides across height.) `?scenario=heights` now has a dummy on each level. Spec `SeeingAcrossLevels`; engine 661, webapp 161, 98 of 98 specs on a production build, 520 of 520 at `--repeat-each=10`; 21 of 22 engine mutants and 3 browser mutants killed (the survivor is equivalent). **Known oddity in `?scenario=heights`: bullets still stop only at walls, so from the low ground the player can shoot the platform dummy they cannot see.** Later in the session: platform edges got a bright lip and a shadow (the user: "looks great"), and `PushOutOfWalls`, `vision/` and `HeightTilesOf` were split into helper folders, no behaviour change (engine 679, webapp 179). Not done: bullets and cover across levels, the opponent walking stairs, a stair-flank validator, the ring and timer. Manifest keys: none.
 
 - 2026-11-14, `art`: removed the one-off alignment runner, comparison helper,

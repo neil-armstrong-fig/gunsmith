@@ -3,6 +3,10 @@
 The contract between `build` and `art` so art can be dropped in without code changes. **`build` creates the real manifest in
 `webapp/src/assets/manifest` and keeps this spec in step;** `art` reviews it before it freezes (Milestone M2).
 
+[Visual examples and build guide](asset-reference/README.md) cover every family
+below, with labelled sizes, placement, variants and approved audio links. These
+are reference examples; they add no production keys or frozen contracts.
+
 ## Rules
 
 - Every sprite, tile, icon and sound has a **stable key**, a size, a format and a **placeholder** (a drawn primitive or a

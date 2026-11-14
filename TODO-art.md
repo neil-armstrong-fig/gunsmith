@@ -8,7 +8,27 @@ The user authorised audio generators and their local tool config under `webapp/a
 and shared config remain build-owned. Arena style: slate, neon, geometric; blueprint touches suit the name. Weapon concepts now explore chunky, shaded
 cartoon sci-fi machinery at the user's request (Ratchet & Clank inspiration, adapted to overhead 2D). Desktop only.
 
-## Resume here after clearing context (2026-11-14)
+## Resume here: build asset reference delivered (2026-11-14)
+
+- [x] User-requested complete build-facing asset guide: five SVG/PNG sheets,
+  80 individual SVG examples, raster effect/brand previews and approved audio
+  links in `docs/art/asset-reference/README.md`. Covers every planned manifest
+  family plus stairs and A4/A7 component examples. Final keys/sizes remain M2.
+- Native-size/grayscale and held poses reviewed; dimensions, links, SVG safety,
+  coverage and preservation verified. No runtime assets or code were installed.
+  Final root checks pass: lint/format/types, 679 engine, 420 AI, 179 webapp,
+  254 audio tests; one slow render skipped. Folder/reference review complete.
+- AI's later kit probe is complete: user preferred the shapes arm and shelved
+  kit generation; worktree `be6b913` retains findings after probe code removal.
+  Preserve kit 05 as approved authored reference; do not restart its model probe.
+- Build has crouch and basic stairs; remaining height rules and ring are its M1
+  work. AI owns lantern bounds and appearance integration. Art next supports
+  concrete renderer/manifest feedback using this reference pack. Audio playback,
+  fatigue/masking and production approval remain open with build.
+- Reference delivery does not complete A2–A4 production files or A7 final branding.
+  See `docs/art/asset-reference/Verification.md` for validation and limitations.
+
+## Earlier context-clear checkpoint (2026-11-14)
 
 **Current milestone:** M1, a fun full-screen game, test-first. Build has delivered
 best-of-three and now the first aim-rotated forward-cone slice (latest `HANDOFF.md`:
