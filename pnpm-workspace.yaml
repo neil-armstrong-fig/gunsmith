@@ -54,6 +54,9 @@ catalog:
   # Local model through Ollama, for the evals only (`ai/evals`, a devDependency; never imported by code the Worker bundles).
   # 1.3.0 was published 2026-06-17.
   "@langchain/ollama": 1.3.0
+  # Haiku 5.5 for the paid eval tier (`ai/evals`, a devDependency for now). 1.6.0 was published 2026-10-22; its peer range
+  # `@langchain/core ^1.3.0` holds for 1.3.4. Added 2026-11-13 at the user's request.
+  "@langchain/anthropic": 1.6.0
   # LangSmith client for the evals' vitest wrapper and result export (`ai/evals`). 0.11.8 is the version already installed
   # through `@langchain/core`; 0.12.0 (2026-11-10) is inside the seven-day window.
   langsmith: 0.11.8

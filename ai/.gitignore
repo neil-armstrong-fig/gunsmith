@@ -2,5 +2,7 @@
 # LangGraph API
 .langgraph_api
 
-# Eval run summaries (copy one to a dated file to keep a baseline)
+# Eval run summaries and kept drawings (copy a summary to a dated file to keep a baseline)
 evals/results/*-latest.json
+evals/results/*-latest.html
+evals/results/appearance-probe/

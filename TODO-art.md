@@ -138,6 +138,14 @@ User priority (2026-11-12): audio audition → full audio pack → top-down stud
 
 - [ ] Review the visual-schema proposal with build/AI at M2; translate all six oddities into top-down compositions
       using only the agreed grammar and verify 64 px/32 px readability (`docs/art/visual-schema-proposal.md`).
+- [ ] **Explore a kit of parts for prompt-built weapons (user request, 2026-11-13, from `ai`'s first probe).** The local model's
+      free-form drawings did not come close to any prompt (`docs/ai-visual-generation.md`), so the model should pick and place
+      your authored parts instead of drawing coordinates, and code supplies the geometry. Explore, do not freeze: a small kit
+      (roughly 10 to 20 parts: barrel, stock, body, lantern body, kettle spout, fax tray, lens, handle) where each part is a
+      few primitives inside the 64 by 64 space, with named anchors (`grip`, `muzzle`, where the next part attaches), the
+      parameters it takes (scale, flip, colour role, detail tier), and how parts attach. Then compose the six oddity prompts
+      from the kit alone and record which prompts the kit cannot say and what should happen then. `ai` will probe whether a
+      model can choose parts and parameters from it (the cheap local probe, then Haiku). Messages go through `HANDOFF.md` first.
 - [ ] Player (standing and crouched, with a held-weapon variant per behavior class), default rifle, practice dummy.
 - [ ] Pickup glows, projectiles and muzzle flashes per behavior, hit and death effects.
 

@@ -28,6 +28,7 @@
   "devDependencies": {
     "@eslint/js": "catalog:",
     "@gunsmith/shared": "workspace:*",
+    "@langchain/anthropic": "catalog:",
     "@langchain/langgraph-cli": "catalog:",
     "@langchain/ollama": "catalog:",
     "@langchain/langgraph-sdk": "catalog:",

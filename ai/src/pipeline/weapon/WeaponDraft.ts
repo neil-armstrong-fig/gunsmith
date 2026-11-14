@@ -1,5 +1,5 @@
 import {z} from "zod";
-import {WEAPON_LIMITS} from "@gunsmith/ai/pipeline/weapon/WeaponLimits";
+import {WEAPON_LIMITS} from "@gunsmith/ai/pipeline/weapon/limits/WeaponLimits";
 
 /** Letters (any language) and digits, with spaces, apostrophes, hyphens and full stops inside. No markup, braces or backticks. */
 const WEAPON_NAME_PATTERN = /^[\p{L}\p{N}][\p{L}\p{N} '.-]*$/u;

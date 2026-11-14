@@ -137,6 +137,26 @@ interface. Build implements the schema and renderer; AI reviews generation/eval 
 
 Newest first. One line each: date, who, what, where.
 
+- 2026-11-14, `ai`: **appearance work finished for now, uncommitted in the `ai/` worktree for the user.** Added `@langchain/anthropic` 1.6.0 (catalog,
+  user-approved) and a Haiku 5.5 paid tier for the appearance spec behind a spend ledger capped at $1 total ($0.116 used); the user's key
+  is in `ai/.env.local` (never read). Haiku: 33 of 36 drawings valid first time, 2 stand-ins (jellyfish lantern), about $0.0007 each; the
+  user's verdict "nearly usable". Appearance code renamed to match the weapon (`drafting/`, `check/{fix,validate}`, nodes `generate, fix,
+  validate, repair`); evals now have `AppearanceDsl` beside `WeaponSmithDsl`, a `when` takes its DSL, `tests/{weapon,appearance}`, the
+  mapping grouped by subject. `ai` 394 unit tests, mutation-proved; weapon evals unchanged. Needs `build` for the integration: the call
+  budget (about 1.08 extra calls) and the schema's home (`shared/` when the renderer imports it). Manifest keys: none.
+- 2026-11-13, `ai`: **very early look at JSON-generated weapon visuals, local tier only, nothing wired in.** `docs/ai-visual-generation.md`
+  has the findings and the questions for `build`, `art` and the user. `ai/src/pipeline/appearance/` (strict validator, `check` with a `fix` step,
+  one repair, disclosed stand-in) is a candidate, not a contract; nothing is in `shared/` and `generateWeapon` is unchanged. On
+  `qwen3.5:9b`, 72 trials: first answers valid 1 of 72, 59 ended as the stand-in (stroke overshoot, foreign fields, token
+  cut-offs); the call budget for wiring it in (five calls with repairs) is for `build` and the user. Also: `ai/src` regrouped
+  by subject (`prompt-screening/`, `weapon-drafting/`, `check/`, `appearance/`, `graph/`, `worker/`), the evals got an
+  appearance component in the DSL (`evals/` standing 36 of 36, own 0 of 17 as capability, weapon suites 70 of 70). 368 `ai` unit
+  tests, mutation-proved. Uncommitted in the `ai/` worktree for the user to review. No paid call made; manifest keys: none.
+  **Update, same day, key and Haiku 5.5 added (`@langchain/anthropic` 1.6.0, a spend ledger with a $1 total ceiling): the drawings are
+  nearly usable** (36 drawings: 33 valid first time, 1 repaired, 2 stand-ins, 1.08 calls, about $0.0007 each); the local model is not
+  (59 of 72 stand-ins). Ready for `build` to integrate: `ai/src/pipeline/appearance/` is the candidate, call budget and schema home are
+  `build`'s and the user's call. Earlier note: the user looked at the local drawings: none came close. **Request to `art` (user's choice): explore a kit of authored parts with anchors and
+  parameters** that a model picks from, in `TODO-art.md` A2; research and the other options are in the doc.
 - 2026-11-13, `build`: **The audio code is cleaned up to the project's standards, at the user's request, with the audio
   unchanged.** `webapp/audio/` (`art`'s tooling workspace) was 704 lines of dense, flag-driven code with one test that rendered
   the whole pack twice (about eight minutes inside `pnpm checks`). Now: a voice is a tone or a noise (no more `frequency: 0` and

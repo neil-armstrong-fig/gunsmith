@@ -1,7 +1,7 @@
 import {FakeListChatModel} from "@langchain/core/utils/testing";
 import {Annotation, END, START, StateGraph} from "@langchain/langgraph";
-import {weaponProofSchema} from "@gunsmith/ai/graph/WeaponProof";
-import type {WeaponProof} from "@gunsmith/ai/graph/WeaponProof";
+import {weaponProofSchema} from "@gunsmith/ai/graph/proof/WeaponProof";
+import type {WeaponProof} from "@gunsmith/ai/graph/proof/WeaponProof";
 
 const FIXED_REPLY = JSON.stringify({name: "Proof Rifle", damage: 20, rateOfFire: 6});
 

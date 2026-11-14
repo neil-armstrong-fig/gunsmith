@@ -95,7 +95,7 @@ branch `worktree-ai-hosting-proof`, in `ai/` (package, `langgraph.json`, a proof
   public-to-localhost calls (Safari blocks http localhost from an https page) may refuse. `langgraph dev` also warns that
   `@langchain/langgraph-checkpoint` reports version `0.0.0` against a required `^1.2.0`; it ran fine, but note it.
 - **LangSmith trace flush on Workers, checked 2026-11-12 against a local fake LangSmith endpoint** (a dummy key, a 300 ms
-  reply, so no account and no spend; spike files `ai/src/worker/TraceProofWorker.ts` and `ai/wrangler.trace.jsonc`, workerd via
+  reply, so no account and no spend; spike files `ai/src/worker/trace/TraceProofWorker.ts` and `ai/wrangler.trace.jsonc`, workerd via
   `wrangler dev`). "One shot" does not save you: the tracer's queue and batch live at module level, so they outlive a request
   and are shared by the next one. Four ways to end a request, each tried:
   - **No flush:** the response returns in 5 ms but **the trace is not sent** (nothing arrived). Worse, the orphaned batch then

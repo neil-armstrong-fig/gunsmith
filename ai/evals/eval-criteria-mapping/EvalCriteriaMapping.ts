@@ -1,11 +1,15 @@
 import * as ls from "langsmith/vitest";
 import {afterAll, beforeAll as runBeforeAll, describe, expect} from "vitest";
-import {createWeaponPipelineDriver} from "@evals/eval-criteria-mapping/tier/CreateWeaponPipelineDriver";
+import {createAppearanceDriver} from "@evals/eval-criteria-mapping/appearance/CreateAppearanceDriver";
+import {createWeaponPipelineDriver} from "@evals/eval-criteria-mapping/weapon/CreateWeaponPipelineDriver";
 import {parseEvalTier} from "@evals/eval-criteria-mapping/tier/ParseEvalTier";
+import {AppearanceDsl} from "@evals/dsl/appearance/AppearanceDsl";
 import {WeaponSmithDsl} from "@evals/dsl/WeaponSmithDsl";
+import {TrackedFixtures} from "@evals/eval-criteria-mapping/fixtures/TrackedFixtures";
 import {isGating} from "@evals/eval-criteria-mapping/gate/IsGating";
 import type {RunCriterion} from "@evals/eval-criteria-mapping/types/RunCriterion";
-import type {DefineBlock, WhenBlock} from "@evals/eval-criteria-mapping/types/WhenBlock";
+import type {FixtureName} from "@evals/eval-criteria-mapping/types/FixtureName";
+import type {DefineGiven, DefineWhen, WhenBlock} from "@evals/eval-criteria-mapping/types/WhenBlock";
 import type {WhenContext} from "@evals/eval-criteria-mapping/types/WhenContext";
 import {specNameOf} from "@evals/eval-criteria-mapping/reporting/spec-name/SpecNameOf";
 import type {CriterionResult} from "@evals/eval-criteria-mapping/reporting/types/CriterionResult";
@@ -14,16 +18,18 @@ import type {EvalSuite} from "@evals/eval-criteria-mapping/types/EvalSuite";
 
 // The tier is chosen once per run (`EVAL_TIER`), and each spec file keeps its own results, written when the file is done.
 const tier = parseEvalTier(process.env.EVAL_TIER);
-const driver = createWeaponPipelineDriver(tier, process.env.EVAL_TRIALS);
+const weaponDriver = createWeaponPipelineDriver(tier, process.env.EVAL_TRIALS);
+const appearanceDriver = createAppearanceDriver(tier, process.env.EVAL_TRIALS);
 const results: CriterionResult[] = [];
 let currentGiven = "";
 let currentWhen: WhenContext | undefined;
+let firstTaken: FixtureName | undefined;
 
 afterAll(() => {
   writeEvalResults({
     spec: specNameOf(expect.getState().testPath),
     tier,
-    trials: driver.trials,
+    trials: firstTaken === "appearance" ? appearanceDriver.trials : weaponDriver.trials,
     ranAt: new Date().toISOString(),
     results,
   });
@@ -34,7 +40,7 @@ afterAll(() => {
  * `given` and `when` are native `describe` blocks underneath, except that each `when` is a LangSmith `ls.describe` (the wrapper
  * cannot nest, and a `when` is the right grain for a LangSmith dataset: one scenario, one example per `then`).
  */
-export function given(description: string, define: DefineBlock): void {
+export function given(description: string, define: DefineGiven): void {
   describe(`given ${description}`, () => {
     currentGiven = description;
     define();
@@ -42,8 +48,8 @@ export function given(description: string, define: DefineBlock): void {
 }
 
 export const when: WhenBlock = Object.assign(
-  (description: string, define: DefineBlock): void => defineWhen("regression", description, define),
-  {capability: (description: string, define: DefineBlock): void => defineWhen("capability", description, define)},
+  (description: string, define: DefineWhen): void => defineWhen("regression", description, define),
+  {capability: (description: string, define: DefineWhen): void => defineWhen("capability", description, define)},
 );
 
 /**
@@ -52,9 +58,9 @@ export const when: WhenBlock = Object.assign(
  * reads those same answers. A `then` must therefore not ask anything itself; lint stops it.
  */
 export function beforeAll(arrange: RunCriterion): void {
-  const whenContext = requireWhen("beforeAll");
+  requireWhen("beforeAll");
 
-  runBeforeAll(() => arrange({weaponSmith: whenContext.weaponSmith}));
+  runBeforeAll(() => arrange());
 }
 
 /**
@@ -67,20 +73,26 @@ export function thenExpect(description: string, check: RunCriterion): void {
   registerCriterion(requireWhen("thenExpect"), description, check);
 }
 
-function defineWhen(suite: EvalSuite, description: string, define: DefineBlock): void {
+function defineWhen(suite: EvalSuite, description: string, define: DefineWhen): void {
   ls.describe(`when ${description}`, () => {
-    const whenContext: WhenContext = {given: currentGiven, description, suite, weaponSmith: new WeaponSmithDsl(driver)};
+    const whenContext: WhenContext = {given: currentGiven, description, suite};
+    // One of each DSL per `when`, so its `then`s share the answers its `beforeAll` asked for, and no other `when` does.
+    const tracked = new TrackedFixtures({
+      weaponSmith: new WeaponSmithDsl(weaponDriver),
+      appearance: new AppearanceDsl(appearanceDriver),
+    });
 
     currentWhen = whenContext;
-    define();
-    registerStandingCriteria(whenContext);
+    define(tracked.fixtures);
+    registerStandingCriteria(whenContext, tracked);
+    firstTaken ??= tracked.taken()[0];
     currentWhen = undefined;
   });
 }
 
-/** What holds whatever was asked is the DSL's to say; the mapping only reports it under every `when`, after the test's own criteria. */
-function registerStandingCriteria(whenContext: WhenContext): void {
-  for (const criterion of whenContext.weaponSmith.standingCriteria()) {
+/** What holds whatever was asked is each DSL's to say; the mapping only reports it under every `when`, after the test's own criteria. */
+function registerStandingCriteria(whenContext: WhenContext, tracked: TrackedFixtures): void {
+  for (const criterion of tracked.standingCriteria()) {
     registerCriterion(whenContext, criterion.description, () => criterion.expect());
   }
 }
@@ -110,7 +122,7 @@ async function runCriterion(whenContext: WhenContext, description: string, check
   };
 
   try {
-    await check({weaponSmith: whenContext.weaponSmith});
+    await check();
   } catch (error) {
     const comment = error instanceof Error ? error.message : String(error);
     results.push({...criterion, passed: false, comment});

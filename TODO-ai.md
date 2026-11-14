@@ -11,7 +11,50 @@ waits on you. **O1 needs nothing from `build` and can start immediately.**
 **What the others need from you:** a decision on where the pipeline runs (it decides whether `api/` imports `ai/`), the
 kill-switch flag's shape, and a review of the contracts before they freeze (Milestone M2).
 
-## Resume here (context-clear checkpoint, 2026-11-13, after the eval refactor was committed)
+## Resume here (context-clear checkpoint, 2026-11-14, before the user commits the appearance work)
+
+**State.** Everything below is in the worktree `.claude/worktrees/ai-hosting-proof`, **uncommitted for the user's review** (the user
+commits `ai/`; never commit it). `pnpm --filter @gunsmith/ai checks` exit 0: **394 unit tests in 59 files**. Run `git merge main` in
+the worktree first when you next work there. Read `ai/AGENTS.md` (the layout and the evals sections are current) and
+`docs/ai-visual-generation.md` (the findings) before anything else.
+
+**What was done.**
+- **Weapon visuals, a very early look (the user's 2026-11-13 request): done and judged.** `ai/src/pipeline/appearance/`:
+  `generateAppearance` runs `generate` (`drafting/`), then `check/` (`fix/` unwraps text-encoded fields and fills what is left out,
+  then `validate/` holds it to schema, budgets and bounds), at most one `repair`, then a disclosed `fallback` stand-in. Nodes read
+  `generate, fix, validate, repair, fix, validate, fallback`. Folders mirror the weapon's (`weapon-drafting/`, `check/`). **Not wired
+  into `generateWeapon`**, nothing in `shared/`.
+- **Results.** Local `qwen3.5:9b`: 59 of 72 fell back, the user judged none close. **Haiku 5.5: "way better, already nearly usable"**:
+  36 drawings, 33 valid first time after one prompt fix (the `detail` tiers), 2 stand-ins (both the jellyfish lantern, long tentacles
+  run 25 to 40 units off the canvas), 1.08 calls and about $0.0007 each.
+- **Paid tier for the appearance spec.** `@langchain/anthropic` 1.6.0 (new, pinned in the catalog; the user approved). Key in
+  `ai/.env.local` (the user's; never read it, the code loads it). A spend ledger `evals/results/paid-spend-latest.json` caps **all paid
+  runs at $1 total** (ask before raising); about **$0.116 spent**. Haiku 5.5 refuses `temperature`. Weapon specs still throw on the paid tier.
+- **Evals refactor.** `AppearanceDsl` is its own DSL beside `WeaponSmithDsl`; **a `when` takes the DSL it uses** (`({weaponSmith}) =>` or
+  `({appearance}) =>`), which decides its standing criteria (a `when` taking neither fails at load). Specs are `evals/tests/weapon/` and
+  `evals/tests/appearance/` (an `arena/` comes later). The mapping is grouped by subject: `weapon/`, `appearance/`, `tier/`, with `fixtures/`,
+  `gate/`, `reporting/`. The appearance spec runs **1 trial** locally by default (`EVAL_TRIALS=3` for more); the whole local run is
+  about 5 minutes. `EVAL_KEEP_DRAWINGS=1` writes `evals/results/drawings-<tier>-latest.html` to look at.
+- `generateWeapon` untouched; the weapon suites passed 70 of 70 locally. The fake tier shows **8 failures by design** (its moderator always
+  says yes, so the rejection cases fail). **Decided by the user 2026-11-14: leave them**; a fake tier that stays red is a free check that
+  the harness can still fail.
+
+**How to run.** `pnpm --filter @gunsmith/ai checks`; `pnpm evals:fake`; `pnpm evals:local`; Haiku appearance:
+`EVAL_TIER=paid npx vitest run --config vitest.evals.config.ts evals/tests/appearance` (add `EVAL_TRIALS=3 EVAL_KEEP_DRAWINGS=1`).
+Mutation scripts are in the old session's scratchpad (gone); rebuild per `AGENTS.md` (one replacement, `grep`, restore, `cmp`).
+
+**Next, in order.**
+1. **Integrate with `build`** (the user's decision: integrate first, tune from there). Needs: the call budget (about one extra call per weapon,
+   1.08 on average; same call as the stats or a second one, the user and `build` decide) and the schema's home (it moves to `shared/` once
+   the webapp renderer imports it). Do not move it before then.
+2. **Jellyfish lantern, red first:** long thin shapes (tentacles) run off the canvas and the repair only half fixes them. A prompt line
+   or a case in `evals/tests/appearance/DrawingAWeapon.eval.ts`; the last Haiku run is the baseline.
+3. **Weapon on the paid tier** (`weapon/models/CreateEvalModels.ts` still throws) and a small Haiku weapon run, within the $1.
+4. **`art`'s kit of parts** (their `TODO-art.md` A2 item): once it exists, probe whether a model can pick parts and parameters from it.
+5. Still open from before: the real `StateGraph` and `AiAdapter` mapping; the shield behaviour `build` owes; the omitted-stat policy (the user's).
+6. Smaller: consider a 3-trial Haiku baseline before any prompt change. (The fake tier's 8 rejection failures stay: the user's call.)
+
+## Earlier checkpoint (2026-11-13, after the eval refactor was committed)
 
 **State.** O1 is closed, the eval harness is built, and the **moderation node is built, probed and committed** by the user on the
 branch `worktree-ai-hosting-proof` (worktree `.claude/worktrees/ai-hosting-proof`): `02f0885` "Add moderation prompt / evals", then
@@ -207,6 +250,26 @@ the results JSON); ask before spelling those out. Sweep new code for abbreviatio
       calls and repair/fallback rates. Human-review identity/readability first; add eval cases from actual failures and
       mutation-prove deterministic enforcement. Keep gameplay-stat defaults separate: the user's omitted-stat policy
       is still open. All art, limits, grammar and fallback suggestions remain changeable; no paid run authorised here.
+      **Very early pass done 2026-11-13 (local `qwen3.5:9b` only; findings in `docs/ai-visual-generation.md`):**
+      - [x] Candidate strict validator, `check` (fix: unwrap, complete; then validate), one repair and a disclosed stand-in, in
+            `ai/src/pipeline/appearance/`, not wired into `generateWeapon`; art's fixtures are the oracle; mutation-proved.
+      - [x] Primitives arm probed, 72 trials (zero-shot and one example): 0 and 1 of 36 first answers valid, 33 and 26 fell back.
+            Stroke overshoot, foreign fields per part and token cut-offs are the main faults.
+      - [x] Evals in the standard form: `appearance` in the DSL, twelve `when`s in `DrawingAWeapon`; standing criteria 36 of 36,
+            own criteria 0 of 17 (all `capability`).
+      - [x] **Haiku 5.5 probe done (2026-11-13):** the user judged the drawings "way better, already nearly usable"; 33 of 36 valid
+            first time after one prompt fix (the `detail` tiers), 2 stand-ins, both the jellyfish lantern (long tentacles run off the canvas).
+            Next: integrate with `build` (call budget, schema home), then climb the jellyfish case red-first.
+      - [x] Human identity review (user, 2026-11-13): **none of the local model's drawings came close to the prompt.**
+      - [ ] **Next pass, a big check (research done in `docs/ai-visual-generation.md`, "what to try next"):** separate "model too
+            weak" from "method too hard". In order: Haiku on the same 72-trial probe (needs a capped key, budget agreed first);
+            drawing tools (`add_rect`, `add_ellipse`, `add_polygon` with named anchors) instead of one JSON answer; the recipe or
+            kit arm (needs art's parts); a render, look and revise loop with a vision model only if a stronger model can draw
+            (extra calls and image tokens, so past the call budget). The user judges recognisability on the contact sheet each time.
+      - [ ] Haiku re-probe (needs a capped key): first step of the next pass above.
+      - [ ] Recipe arm (code-supplied geometry) and hybrid: not built; needs art's vocabulary first.
+      - [ ] Policy answers from build/art: call budget, tolerance (prune foreign fields, accept 2 units of overshoot),
+            where completion lives. Then climb the hills red-first in `DrawingAWeapon`.
 
 - [ ] When arena generation returns, hand resolved player/AI definitions to build's deterministic finalisation and
       fairness checks (stairs, spawn/pickup routes, ring escape). Built-ins meet the same checks and a curated quality

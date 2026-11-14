@@ -6,7 +6,7 @@ import {nameHygiene} from "@evals/dsl/pipeline/evaluators/weapon/NameHygiene";
 import {noPromptLeak} from "@evals/dsl/pipeline/evaluators/player-visible/NoPromptLeak";
 import {withinCaps} from "@evals/dsl/pipeline/evaluators/weapon/WithinCaps";
 import {schemaValid} from "@evals/dsl/pipeline/evaluators/weapon/SchemaValid";
-import {combineTrials} from "@evals/dsl/pipeline/trials/CombineTrials";
+import {failuresAcrossTrials} from "@evals/dsl/trials/FailuresAcrossTrials";
 import type {WeaponEvaluator} from "@evals/dsl/pipeline/types/WeaponEvaluator";
 import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
 
@@ -79,18 +79,10 @@ export class WeaponSmithPipeline {
       throw new Error("Ask for a weapon (in a beforeAll) before expecting anything");
     }
 
-    const failures = checks.flatMap(check => this.failuresOf(check));
+    const inputs = this.answered.map(outcome => ({outcome}));
+    const failures = checks.flatMap(check => failuresAcrossTrials(inputs, check));
     if (failures.length > 0) {
       throw new Error(failures.join("; "));
     }
-  }
-
-  /** One sentence per way the check failed, folded across trials. */
-  private failuresOf(check: WeaponEvaluator): string[] {
-    const trials = this.answered.map(outcome => [check({outcome})]);
-
-    return combineTrials(trials)
-      .filter(score => score.score === 0)
-      .map(score => `${score.key}: ${score.comment}`);
   }
 }
