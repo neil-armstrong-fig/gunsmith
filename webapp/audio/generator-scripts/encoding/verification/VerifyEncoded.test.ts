@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
-import {mkdtemp, readFile, readdir, rm, writeFile} from "node:fs/promises";
+import {mkdir, mkdtemp, readFile, readdir, rm, writeFile} from "node:fs/promises";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
 import {afterEach, beforeEach, it} from "node:test";
 import {encodeAudio} from "@gunsmith/audio-studies/encoding/EncodeAudio";
-import {shimEncoder} from "@gunsmith/audio-studies/encoding/fixture/ShimEncoder";
+import {shimEncoder} from "@gunsmith/audio-studies/encoding/verification/shim/ShimEncoder";
 import {sourceOfOneEffect} from "@gunsmith/audio-studies/encoding/fixture/SourceOfOneEffect";
 import {readEncodingReport} from "@gunsmith/audio-studies/encoding/report/ReadEncodingReport";
 import {writeReport} from "@gunsmith/audio-studies/encoding/report/WriteReport";
@@ -19,21 +19,11 @@ beforeEach(async () => {
   const {source} = await sourceOfOneEffect(folder);
   output = join(folder, "output");
   await encodeAudio({source, output});
-  // The positive case is MP3 only, so it does not depend on the Vorbis decoder's known 128-frame shortfall on short effects.
-  const report = await readEncodingReport(output);
-  await writeReport(join(output, "report.json"), {
-    ...report,
-    files: report.files.filter(file => file.format === "mp3"),
-  });
 });
 
 afterEach(async () => {
   await rm(folder, {recursive: true, force: true});
 });
-
-async function verificationOf(folderOfExports: string): Promise<VerificationReport> {
-  return JSON.parse(await readFile(join(folderOfExports, "verification.json"), "utf8")) as VerificationReport;
-}
 
 it("passes exports that are the ones reported, and says so in verification.json", async () => {
   await verifyEncoded(output);
@@ -41,7 +31,7 @@ it("passes exports that are the ones reported, and says so in verification.json"
 
   assert.equal(verification.passed, true);
   assert.deepEqual(verification.failures, []);
-  assert.deepEqual(Object.keys(verification.files), ["sfx-ui-click.mp3"]);
+  assert.deepEqual(Object.keys(verification.files), ["sfx-ui-click.ogg", "sfx-ui-click.mp3"]);
   assert.match(verification.decoder, /^ffmpeg version/);
 });
 
@@ -77,7 +67,7 @@ it("records a finding, writes the report with passed false, and then fails", asy
   await assert.rejects(verifyEncoded(output), /sfx-ui-click.mp3: duration mismatch/);
   const verification = await verificationOf(output);
   assert.equal(verification.passed, false);
-  assert.equal(verification.failures.length, 1);
+  assert.equal(verification.failures.length, 2);
 });
 
 it("runs the encoder it is given for the version, the probe and the decode, and no other", async () => {
@@ -93,3 +83,22 @@ it("runs the encoder it is given for the version, the probe and the decode, and 
 it("fails when the encoder it is given cannot be run", async () => {
   await assert.rejects(verifyEncoded(output, "/missing/ffmpeg"), /ENOENT/);
 });
+
+it("keeps the hit cue at its measured length in both formats", async () => {
+  const hitFolder = join(folder, "hit");
+  await mkdir(hitFolder);
+  const {source} = await sourceOfOneEffect(hitFolder, "sfx-hit");
+  const hitOutput = join(hitFolder, "output");
+  await encodeAudio({source, output: hitOutput});
+
+  await verifyEncoded(hitOutput);
+  const verification = await verificationOf(hitOutput);
+
+  assert.equal(verification.passed, true);
+  assert.equal(verification.files["sfx-hit.ogg"]?.frames, 9600);
+  assert.equal(verification.files["sfx-hit.mp3"]?.frames, 9600);
+});
+
+async function verificationOf(folderOfExports: string): Promise<VerificationReport> {
+  return JSON.parse(await readFile(join(folderOfExports, "verification.json"), "utf8")) as VerificationReport;
+}

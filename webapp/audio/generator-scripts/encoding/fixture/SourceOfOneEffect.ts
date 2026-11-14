@@ -8,20 +8,20 @@ import type {SourceFixture} from "@gunsmith/audio-studies/encoding/fixture/types
 const MASTERS = resolve(import.meta.dirname, "../../../generated-audio");
 
 /**
- * A small source for the encoder's tests, built from the approved pack: the UI click, which is a fraction of a second, and the
+ * A small source for the encoder's tests, built from the approved pack: one effect (the UI click by default), and the
  * audition mix, which must be left out. The masters themselves are only read.
  */
-export async function sourceOfOneEffect(folder: string): Promise<SourceFixture> {
+export async function sourceOfOneEffect(folder: string, key = "sfx-ui-click"): Promise<SourceFixture> {
   const source = join(folder, "source");
   await mkdir(source);
-  const master = await readFile(join(MASTERS, "sfx-ui-click.wav"));
-  await writeFile(join(source, "sfx-ui-click.wav"), master);
+  const master = await readFile(join(MASTERS, `${key}.wav`));
+  await writeFile(join(source, `${key}.wav`), master);
   await copyFile(join(MASTERS, `${AUDITION_KEY}.wav`), join(source, `${AUDITION_KEY}.wav`));
   const measurements = await readMeasurements(MASTERS);
-  const click = measurements.files["sfx-ui-click"];
+  const measurement = measurements.files[key];
   const audition = measurements.files[AUDITION_KEY];
-  assert.ok(click && audition, "the approved pack measures the click and the audition mix");
-  const files = {"sfx-ui-click": click, [AUDITION_KEY]: audition};
+  assert.ok(measurement && audition, "the approved pack measures the effect and the audition mix");
+  const files = {[key]: measurement, [AUDITION_KEY]: audition};
   await writeFile(join(source, "measurements.json"), JSON.stringify({...measurements, files}));
 
   return {source, master};

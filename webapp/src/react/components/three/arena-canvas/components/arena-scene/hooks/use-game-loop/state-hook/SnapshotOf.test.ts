@@ -3,6 +3,7 @@ import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
 import {MARKSMAN_RIFLE} from "@gunsmith/engine/weapon/weapons/MarksmanRifle";
 import {RIFLE} from "@gunsmith/engine/weapon/weapons/Rifle";
+import {CROUCH_RANGE_FACTOR} from "@gunsmith/engine/vision/cone/CrouchRangeFactor";
 import {snapshotOf} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/state-hook/SnapshotOf";
 
 const world = startingWorld(arenaFrom(["#####", "#...#", "#...#", "#...#", "#####"]));
@@ -128,6 +129,14 @@ it("reports the width and reach of the player's view, which follow the weapon in
 
   expect(holding(0)).toEqual({degrees: RIFLE.visionDegrees, range: RIFLE.visionRange});
   expect(holding(1)).toEqual({degrees: MARKSMAN_RIFLE.visionDegrees, range: MARKSMAN_RIFLE.visionRange});
+});
+
+it("reports a longer reach, and the same width, while the player is crouching", () => {
+  const standing = snapshotOf(world).vision;
+  const crouching = snapshotOf({...world, player: {...world.player, crouching: true}}).vision;
+
+  expect(crouching.range).toBeCloseTo(RIFLE.visionRange * CROUCH_RANGE_FACTOR, 9);
+  expect(crouching.degrees).toBe(standing.degrees);
 });
 
 it("reports the width of the player's view as the weapon in hand sets it, not a fixed one", () => {

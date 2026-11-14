@@ -6,6 +6,8 @@ export const ENCODER_SETTINGS = {
   sampleRate: AUDIO_FORMAT.sampleRate,
   /** Ogg Vorbis quality, as the encoder's `-q:a` takes it. */
   vorbisQuality: "5",
+  /** Short pages restore native/Chromium effect lengths; this is container timing, not PCM processing. */
+  oggPageDurationMicroseconds: "20000",
   /** LAME MP3 variable bit rate quality, as the encoder's `-q:a` takes it. */
   mp3Quality: "2",
   /** The most an encoder may print to a pipe, which is a whole decoded music loop. */

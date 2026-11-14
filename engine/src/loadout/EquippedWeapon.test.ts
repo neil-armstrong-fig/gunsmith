@@ -14,6 +14,7 @@ function playerHolding(equippedIndex: number): Player {
     cooldownSeconds: 0,
     loadout: [FIRST, SECOND],
     equippedIndex,
+    crouching: false,
     health: 100,
   };
 }

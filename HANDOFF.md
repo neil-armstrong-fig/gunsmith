@@ -145,6 +145,26 @@ those implementations; art's README records unsupported identities and proposed 
 
 ## Delivery log
 
+- 2026-11-14, `build`: **Crouch (slice 2), test first, and the `ai` worktree merged.** Merged `worktree-ai-hosting-proof` into main
+  (`c8269cf`; `HANDOFF.md` and `TODO.md` conflicts kept both sides; the worktree is `ai`'s, left in place). Crouch: hold C or either Control;
+  speed 0.4 of standing, cone range 1.5 times, angle unchanged, both tunables; the opponent does not crouch yet. **For `ai`:** `Player`
+  gained `crouching` and `Input` an optional `crouching`; `Weapon` is unchanged by this slice, and `ai/` still imports no engine code.
+  **Contract change:** none to `shared/` (the state hook's `vision.range` now reports the crouched reach). For `art`: nothing to wire.
+  Specs `CrouchingToSeeFurther`, `CrouchingToWalkSlowly`; engine 570, webapp 139, `ai` 394; 89 of 89 specs on a production build; 23
+  mutants killed. At the user's request the key listeners are one shared hook (`use-held-keys`). Not done: cover, quiet, heights, the bot
+  crouching. The user reviewed it and played it with crouch ("works well"), so the factors stay as they are; they are committing it. They also said the bot is "fun to play against, easy to beat but it still
+  needs a bit of moving and shooting", so `opponent/Difficulty.ts` stays unchanged.
+
+- 2026-11-14, `art`: **Ogg page-duration fix delivered test-first**, with frozen
+  baseline QA and preservation evidence in `webapp/audio/qa/ogg-pages/README.md`.
+  Native and Chromium pass all 38 exports; WebKit falls from 34 to 23 failing
+  candidates, with crouch levels fixed. Master/MP3 hashes and native-decoded music
+  preserved. Remaining playback/format issues handed to build; production stays
+  blocked. Flag-removal mutation killed by the regression tests. No runtime,
+  dependency, model call or manifest change. Manifest keys: none.
+  Root checks and post-shim-move audio checks pass; full master comparison passes
+  in 321 seconds (21 files). Folder/caller and standards audit completed.
+
 Newest first. One line each: date, who, what, where.
 
 - 2026-11-14, `art`: **context-clear checkpoint prepared after user acceptance of review 06.**

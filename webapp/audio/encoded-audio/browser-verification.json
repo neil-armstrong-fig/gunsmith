@@ -6,12 +6,12 @@
     "rows": [
       {
         "name": "sfx-pickup.ogg",
-        "frames": 18112,
+        "frames": 18240,
         "channels": 1,
         "peak": 0.5079008340835571,
-        "rmsDbfs": -24.28242338826053,
+        "rmsDbfs": -24.31300763310273,
         "join": 0.0014041602844372392,
-        "failures": ["duration"]
+        "failures": []
       },
       {
         "name": "sfx-pickup.mp3",
@@ -24,12 +24,12 @@
       },
       {
         "name": "sfx-drop.ogg",
-        "frames": 16192,
+        "frames": 16320,
         "channels": 1,
         "peak": 0.5035590529441833,
-        "rmsDbfs": -23.95414929099119,
+        "rmsDbfs": -23.988345883572563,
         "join": 0.007995711639523506,
-        "failures": ["duration"]
+        "failures": []
       },
       {
         "name": "sfx-drop.mp3",
@@ -42,12 +42,12 @@
       },
       {
         "name": "sfx-reload.ogg",
-        "frames": 39232,
+        "frames": 39360,
         "channels": 1,
         "peak": 0.5221350789070129,
-        "rmsDbfs": -28.537885559652786,
+        "rmsDbfs": -28.552031972222803,
         "join": 0.0034974587615579367,
-        "failures": ["duration"]
+        "failures": []
       },
       {
         "name": "sfx-reload.mp3",
@@ -60,12 +60,12 @@
       },
       {
         "name": "sfx-hit.ogg",
-        "frames": 9536,
+        "frames": 9600,
         "channels": 1,
         "peak": 0.5021977424621582,
-        "rmsDbfs": -25.269814367702562,
+        "rmsDbfs": -25.298864274136633,
         "join": 0.0004832646227441728,
-        "failures": ["duration"]
+        "failures": []
       },
       {
         "name": "sfx-hit.mp3",
@@ -114,12 +114,12 @@
       },
       {
         "name": "sfx-ui-click.ogg",
-        "frames": 2992,
+        "frames": 3120,
         "channels": 1,
         "peak": 0.4988071620464325,
-        "rmsDbfs": -25.43101892064832,
+        "rmsDbfs": -25.612948968908512,
         "join": 0.006125250831246376,
-        "failures": ["duration"]
+        "failures": []
       },
       {
         "name": "sfx-ui-click.mp3",
@@ -168,12 +168,12 @@
       },
       {
         "name": "sfx-step-stand.ogg",
-        "frames": 11392,
+        "frames": 11520,
         "channels": 1,
         "peak": 0.44758686423301697,
-        "rmsDbfs": -25.95561103099294,
+        "rmsDbfs": -26.00413605893706,
         "join": 0.004256086889654398,
-        "failures": ["duration"]
+        "failures": []
       },
       {
         "name": "sfx-step-stand.mp3",
@@ -186,12 +186,12 @@
       },
       {
         "name": "sfx-step-crouch.ogg",
-        "frames": 11392,
+        "frames": 11520,
         "channels": 1,
         "peak": 0.15033692121505737,
-        "rmsDbfs": -34.8865224858725,
+        "rmsDbfs": -34.93504751381661,
         "join": 0.0004076473996974528,
-        "failures": ["duration"]
+        "failures": []
       },
       {
         "name": "sfx-step-crouch.mp3",
@@ -204,12 +204,12 @@
       },
       {
         "name": "sfx-step-stand-02.ogg",
-        "frames": 11392,
+        "frames": 11520,
         "channels": 1,
         "peak": 0.46726012229919434,
-        "rmsDbfs": -25.745874180115806,
+        "rmsDbfs": -25.79439920805993,
         "join": 0.0010753944516181946,
-        "failures": ["duration"]
+        "failures": []
       },
       {
         "name": "sfx-step-stand-02.mp3",
@@ -222,12 +222,12 @@
       },
       {
         "name": "sfx-step-crouch-02.ogg",
-        "frames": 11392,
+        "frames": 11520,
         "channels": 1,
         "peak": 0.15085449814796448,
-        "rmsDbfs": -34.44140581051945,
+        "rmsDbfs": -34.48993083846357,
         "join": 0.0005676446598954499,
-        "failures": ["duration"]
+        "failures": []
       },
       {
         "name": "sfx-step-crouch-02.mp3",
@@ -240,12 +240,12 @@
       },
       {
         "name": "sfx-step-stand-03.ogg",
-        "frames": 11392,
+        "frames": 11520,
         "channels": 1,
         "peak": 0.45390865206718445,
-        "rmsDbfs": -26.18659702980303,
+        "rmsDbfs": -26.235122057747148,
         "join": 0.0007871372508816421,
-        "failures": ["duration"]
+        "failures": []
       },
       {
         "name": "sfx-step-stand-03.mp3",
@@ -258,12 +258,12 @@
       },
       {
         "name": "sfx-step-crouch-03.ogg",
-        "frames": 11392,
+        "frames": 11520,
         "channels": 1,
         "peak": 0.1509268879890442,
-        "rmsDbfs": -34.178237474242636,
+        "rmsDbfs": -34.22676250218675,
         "join": 0.00048058765241876245,
-        "failures": ["duration"]
+        "failures": []
       },
       {
         "name": "sfx-step-crouch-03.mp3",
@@ -276,12 +276,12 @@
       },
       {
         "name": "sfx-step-stand-04.ogg",
-        "frames": 11392,
+        "frames": 11520,
         "channels": 1,
         "peak": 0.4623481035232544,
-        "rmsDbfs": -25.394764745278138,
+        "rmsDbfs": -25.44328977322226,
         "join": 0.003358877496793866,
-        "failures": ["duration"]
+        "failures": []
       },
       {
         "name": "sfx-step-stand-04.mp3",
@@ -294,12 +294,12 @@
       },
       {
         "name": "sfx-step-crouch-04.ogg",
-        "frames": 11392,
+        "frames": 11520,
         "channels": 1,
         "peak": 0.15141049027442932,
-        "rmsDbfs": -33.261626470891144,
+        "rmsDbfs": -33.31015149883526,
         "join": 0.00010795234993565828,
-        "failures": ["duration"]
+        "failures": []
       },
       {
         "name": "sfx-step-crouch-04.mp3",
@@ -361,12 +361,12 @@
     "rows": [
       {
         "name": "sfx-pickup.ogg",
-        "frames": 18112,
+        "frames": 18240,
         "channels": 1,
-        "peak": 0.47853749990463257,
-        "rmsDbfs": -25.413468005981457,
-        "join": 0.17036885023117065,
-        "failures": ["duration"]
+        "peak": 0.5079008340835571,
+        "rmsDbfs": -24.411057427910748,
+        "join": 0.20653951168060303,
+        "failures": []
       },
       {
         "name": "sfx-pickup.mp3",
@@ -415,12 +415,12 @@
       },
       {
         "name": "sfx-hit.ogg",
-        "frames": 9472,
+        "frames": 9600,
         "channels": 1,
-        "peak": 0.1583007574081421,
-        "rmsDbfs": -36.54479550108505,
-        "join": 0.06338531523942947,
-        "failures": ["duration"]
+        "peak": 0.5021977424621582,
+        "rmsDbfs": -25.621390955372704,
+        "join": 0.24796687066555023,
+        "failures": []
       },
       {
         "name": "sfx-hit.mp3",
@@ -469,12 +469,12 @@
       },
       {
         "name": "sfx-ui-click.ogg",
-        "frames": 2992,
+        "frames": 3120,
         "channels": 1,
-        "peak": 0.017034126445651054,
-        "rmsDbfs": -52.71212738051944,
-        "join": 0.0005093778017908335,
-        "failures": ["duration"]
+        "peak": 0.49880722165107727,
+        "rmsDbfs": -26.974648354724778,
+        "join": 0.23185928165912628,
+        "failures": []
       },
       {
         "name": "sfx-ui-click.mp3",
@@ -523,12 +523,12 @@
       },
       {
         "name": "sfx-step-stand.ogg",
-        "frames": 11392,
+        "frames": 11520,
         "channels": 1,
-        "peak": 0.18110990524291992,
-        "rmsDbfs": -33.65450365095689,
-        "join": 0.14607717096805573,
-        "failures": ["duration"]
+        "peak": 0.44758686423301697,
+        "rmsDbfs": -26.44446598780748,
+        "join": 0.33871665596961975,
+        "failures": []
       },
       {
         "name": "sfx-step-stand.mp3",
@@ -541,12 +541,12 @@
       },
       {
         "name": "sfx-step-crouch.ogg",
-        "frames": 11392,
+        "frames": 11520,
         "channels": 1,
-        "peak": 0.07284747809171677,
-        "rmsDbfs": -40.600160707316434,
-        "join": 0.028055379167199135,
-        "failures": ["duration"]
+        "peak": 0.15033690631389618,
+        "rmsDbfs": -35.36686160078891,
+        "join": 0.10836731642484665,
+        "failures": []
       },
       {
         "name": "sfx-step-crouch.mp3",
@@ -559,12 +559,12 @@
       },
       {
         "name": "sfx-step-stand-02.ogg",
-        "frames": 11392,
+        "frames": 11520,
         "channels": 1,
-        "peak": 0.24865427613258362,
-        "rmsDbfs": -31.7826375657417,
-        "join": 0.1665627360343933,
-        "failures": ["duration"]
+        "peak": 0.4672602117061615,
+        "rmsDbfs": -25.863543804230606,
+        "join": 0.09354561567306519,
+        "failures": []
       },
       {
         "name": "sfx-step-stand-02.mp3",
@@ -577,12 +577,12 @@
       },
       {
         "name": "sfx-step-crouch-02.ogg",
-        "frames": 11392,
+        "frames": 11520,
         "channels": 1,
-        "peak": 0.06615734845399857,
-        "rmsDbfs": -39.67418271059226,
-        "join": 0.021458594128489494,
-        "failures": ["duration"]
+        "peak": 0.1508544683456421,
+        "rmsDbfs": -34.53081163737646,
+        "join": 0.0034825538750737906,
+        "failures": []
       },
       {
         "name": "sfx-step-crouch-02.mp3",
@@ -595,12 +595,12 @@
       },
       {
         "name": "sfx-step-stand-03.ogg",
-        "frames": 11392,
+        "frames": 11520,
         "channels": 1,
-        "peak": 0.24374206364154816,
-        "rmsDbfs": -31.089691980756587,
-        "join": 0.015805236995220184,
-        "failures": ["duration"]
+        "peak": 0.45390865206718445,
+        "rmsDbfs": -26.28366740483027,
+        "join": 0.035855237394571304,
+        "failures": []
       },
       {
         "name": "sfx-step-stand-03.mp3",
@@ -613,12 +613,12 @@
       },
       {
         "name": "sfx-step-crouch-03.ogg",
-        "frames": 11392,
+        "frames": 11520,
         "channels": 1,
-        "peak": 0.11759401857852936,
-        "rmsDbfs": -37.605275852329825,
-        "join": 0.11679503321647644,
-        "failures": ["duration"]
+        "peak": 0.1509268879890442,
+        "rmsDbfs": -34.246954132647815,
+        "join": 0.016049034893512726,
+        "failures": []
       },
       {
         "name": "sfx-step-crouch-03.mp3",
@@ -631,12 +631,12 @@
       },
       {
         "name": "sfx-step-stand-04.ogg",
-        "frames": 11392,
+        "frames": 11520,
         "channels": 1,
-        "peak": 0.2538081705570221,
-        "rmsDbfs": -30.0887990647959,
-        "join": 0.16014835238456726,
-        "failures": ["duration"]
+        "peak": 0.462348073720932,
+        "rmsDbfs": -25.467460159078374,
+        "join": 0.013787616975605488,
+        "failures": []
       },
       {
         "name": "sfx-step-stand-04.mp3",
@@ -649,12 +649,12 @@
       },
       {
         "name": "sfx-step-crouch-04.ogg",
-        "frames": 11392,
+        "frames": 11520,
         "channels": 1,
-        "peak": 0.12421135604381561,
-        "rmsDbfs": -35.351939756087646,
-        "join": 0.058169856667518616,
-        "failures": ["duration", "crouch level"]
+        "peak": 0.15141050517559052,
+        "rmsDbfs": -33.31393208448735,
+        "join": 0.003488170448690653,
+        "failures": []
       },
       {
         "name": "sfx-step-crouch-04.mp3",

@@ -29,9 +29,15 @@ starting point; do not restart its direction or request the same approval again.
 AI selection/placement evaluation and runtime proof remain pending.
 This is experimental art data, not an implemented renderer or frozen M2 contract.
 
-**Latest audio preparation (2026-11-13):** compressed candidates and reproducible browser/native reports now exist.
-Production is blocked by the measured duration/level/seam differences documented in `webapp/audio/README.md`.
-The approved masters remain byte-identical. Do not repeat the direction audition or mark A6 production complete.
+**Latest audio follow-up (2026-11-14):** the Ogg page-duration fix is delivered;
+native/Chromium pass all 38 candidates. WebKit retains 23 failing candidates
+(17 MP3 durations, four Vorbis durations, two music seams). Crouch levels now pass.
+Masters and MP3 hashes are unchanged. See `webapp/audio/qa/ogg-pages/README.md`
+for evidence and build's playback/format handoff. Keep production blocked.
+AI appearance work is now merged into main (`c8269cf`); later worktree changes
+are paid-model plumbing, with no new drawings at this checkpoint. Review 06 inputs
+still match their frozen hashes. Preserve kit/player concepts; no player-style
+TODO addition was requested after the user inspected the SVG.
 
 **Haiku review delivered and accepted (2026-11-14):**
 `docs/art/concepts/haiku-review-06/README.md` reviews the twelve saved outputs,
@@ -61,8 +67,8 @@ model call, revised fixture or production approval. Kit 05 approval is preserved
    Those are AI-reported results, not rerun by art. Compare approaches; do not assume the kit wins.
 3. **Build:** when generated visuals are needed, prove one generic renderer test-first (lantern, fax, kettle), checking
    held size, rotations, team/fog boundaries and gameplay separation. Final sprites/tiles/UI await M2 and the manifest.
-4. **Audio follow-up:** investigate recorded Ogg/MP3 duration, WebKit crouch-level and Vorbis seam failures, preserving
-   masters. Encoding and browser/native QA tools are delivered; production approval, device/fatigue listening,
+4. **Audio follow-up:** build owns the remaining WebKit playback/format decision; reproduce its
+   four Vorbis effect-duration, 17 MP3 effect-duration and two Vorbis seam failures, preserving masters. Encoding and browser/native QA tools are delivered; production approval, device/fatigue listening,
    masking with build's shot synth, final manifest mapping and playback integration remain pending.
 
 **AI worktree / evidence checkpoint (2026-11-14):**
@@ -128,6 +134,15 @@ belong to build/AI. The user explicitly authorised the visual-generation task ad
 implementation to AI. Re-read shared docs immediately before editing. No commit or push without being asked.
 Update this checklist, art's status row and the handoff log after the next delivery.
 
+
+**Audio delivery validation (2026-11-14):** root checks passed (570 engine, 394 AI,
+139 webapp, 254 audio; one slow audio check skipped); audio checks passed after
+moving the one-caller shim beneath verification. Full master render passed in
+321 seconds, all 21 files byte-identical. Native/Chromium 38/38; WebKit 23 failing
+candidates retained in the report. Two browser negative controls per engine pass;
+flag-removal mutation reproduces the two duration regressions. Folder/caller and
+standards audit completed. No runtime acceptance suite or model call by art.
+
 ## A1: palette and art direction. Milestone M1
 
 - [x] `docs/art/README.md`: palette as named colour tokens (the webapp will use them as Tailwind `@theme` tokens), shape
@@ -176,8 +191,11 @@ User priority (2026-11-12): audio audition → full audio pack → top-down stud
 - [x] Production-preparation experiment (2026-11-13): 38 compressed candidates, exporter, native verification and
       Chromium/WebKit harness delivered under `webapp/audio/`. Master byte comparison passes. QA exposes release blockers;
       reports and reproduction commands are in its README. Encoding does not imply production approval.
-- [ ] Resolve measured codec/browser issues before shipping: 13 native/Chromium Vorbis effect-duration failures;
-      WebKit effect-duration differences, one crouch-level failure and two Vorbis music seam failures. Preserve masters.
+- [x] Fix native/Chromium Vorbis durations test-first with 20 ms pages; verify all 38
+      candidates, preserve masters/MP3 hashes, and mutation-prove the regression (2026-11-14).
+- [ ] Resolve remaining WebKit playback/format blockers with build: 17 MP3 effect
+      durations, four Vorbis effect durations and two Vorbis music seams. Crouch levels pass.
+      Evidence and reproduction: `webapp/audio/qa/ogg-pages/README.md`. Preserve masters.
 - [ ] Before production, check fatigue and masking on headphones/speakers and with build's generated weapon-shot synth.
       The user's general approval does not claim this detailed listening protocol or in-game test has been completed.
 - [ ] Production approval: resolve the delivered compressed candidates' failed native/browser checks, confirm manifest

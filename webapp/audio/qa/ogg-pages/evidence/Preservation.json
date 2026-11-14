@@ -1,0 +1,22 @@
+{
+  "mastersUnchanged": true,
+  "mp3Unchanged": true,
+  "nativeMusicPcm": [
+    {
+      "key": "music-loop-menu",
+      "beforeSha256": "2b21da2753dbaeb33a14e94063a6fc78c17212f62dd08c0dfca2d8c077aee0ce",
+      "afterSha256": "2b21da2753dbaeb33a14e94063a6fc78c17212f62dd08c0dfca2d8c077aee0ce",
+      "beforeBytes": 838350,
+      "afterBytes": 911385
+    },
+    {
+      "key": "music-loop-match",
+      "beforeSha256": "2c9bceadb2b6f08cc13392a44b68849b37e6983ecb63f5481aa48e3aaf757a5f",
+      "afterSha256": "2c9bceadb2b6f08cc13392a44b68849b37e6983ecb63f5481aa48e3aaf757a5f",
+      "beforeBytes": 1354717,
+      "afterBytes": 1463878
+    }
+  ],
+  "vorbisBytesBefore": 2319644,
+  "vorbisBytesAfter": 2514989
+}

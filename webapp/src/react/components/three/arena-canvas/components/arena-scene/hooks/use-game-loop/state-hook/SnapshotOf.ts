@@ -1,5 +1,6 @@
 import type {World} from "@gunsmith/engine/game-loop/types/World";
 import {equippedWeapon} from "@gunsmith/engine/loadout/EquippedWeapon";
+import {coneOf} from "@gunsmith/engine/vision/ConeOf";
 import {visibleToPlayer} from "@gunsmith/engine/vision/VisibleToPlayer";
 import type {GameStateSnapshot} from "@gunsmith/shared/state-hook/types/GameStateSnapshot";
 import type {MatchSnapshot} from "@gunsmith/shared/state-hook/types/MatchSnapshot";
@@ -25,7 +26,7 @@ export function snapshotOf(world: World): GameStateSnapshot {
       reserve: carried.reserve,
       reloading: reloadRemainingSeconds !== undefined,
     },
-    vision: {degrees: carried.weapon.visionDegrees, range: carried.weapon.visionRange},
+    vision: {degrees: carried.weapon.visionDegrees, range: coneOf(world.player).range},
     opponent: opponentSnapshotOf(world, visible.opponent),
     round: world.round,
     match: matchSnapshotOf(world),

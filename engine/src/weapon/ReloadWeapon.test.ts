@@ -21,6 +21,7 @@ function playerWith(rounds: number, reserve: number, reloadRemainingSeconds?: nu
     cooldownSeconds: 0,
     loadout: [{weapon: WEAPON, rounds, reserve}],
     equippedIndex: 0,
+    crouching: false,
     health: 100,
     reloadRemainingSeconds,
   };

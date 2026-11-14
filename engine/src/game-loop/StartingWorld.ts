@@ -21,6 +21,7 @@ export function startingWorld(arena: Arena, dummyPositions: readonly Point[] = [
       cooldownSeconds: 0,
       loadout: STARTING_LOADOUT,
       equippedIndex: 0,
+      crouching: false,
       health: PLAYER_HEALTH,
     },
     opponent: opponentAt(opponentPosition),
@@ -42,6 +43,7 @@ function opponentAt(position: Point | undefined): Player | undefined {
     cooldownSeconds: 0,
     loadout: STARTING_LOADOUT,
     equippedIndex: 0,
+    crouching: false,
     health: OPPONENT_HEALTH,
   };
 }

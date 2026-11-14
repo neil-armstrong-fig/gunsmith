@@ -27,9 +27,9 @@ everything else is a domain folder. Tiles are the unit; `x` grows to the east an
 - `movement/`: `PushOutOfWalls`, circle against the tile grid. It resolves overlap along the line from the wall's nearest
   point to the circle's centre, so a player slides along a wall. It does not sweep: the caller steps small, which is why
   `step` is called with a fixed `TICK_SECONDS` from the webapp.
-- `player/`: `MovePlayer`, `AimPlayer`, and `PlayerRadius` (the body, shared with `bullet/`). `walking/PlayerSpeed.ts` is
-  `MovePlayer`'s; `types/Player.ts` (position, aim, one cool-down for both weapons, the `loadout`, which weapon is in hand,
-  the reload still to run, absent when there is none, and `health`). The opponent is a `Player` too.
+- `player/`: `MovePlayer(arena, walk)` (a `types/Walk`: position, direction, seconds and whether crouching), `AimPlayer`, and `PlayerRadius` (the body, shared with `bullet/`). `walking/PlayerSpeed.ts` and
+  `walking/CrouchSpeedFactor.ts` (0.4: a crouching player keeps 40% of the speed, a tunable) are `MovePlayer`'s; `types/Player.ts` (position, aim, one cool-down for both weapons, the `loadout`, which weapon is in hand,
+  `crouching`, the reload still to run, absent when there is none, and `health`). Crouching follows `Input.crouching` (optional, absent means standing; held, not toggled) each step in `PrepareFighter`. The opponent is a `Player` too.
 - `bullet/`: `AdvanceBullets` is a short pipeline: `flight/MeetBullet` decides what each bullet runs into (a `Meeting`),
   then `flight/BulletsStillFlying`, `hit/StrikesOf` and `hit/DamageDealtBy` each read the meetings for one answer.
   (`flight/meeting/` holds what `MeetBullet` asks, and its own `types/Reach`.)
@@ -106,7 +106,7 @@ seed)` give an opponent a brain; **an opponent with no brain takes no action at 
   what to send; the player's own bullets always show, the opponent's only in the cone) and `VisibleArea(arena, cone)` (the outline of the cone
   with the walls cut out, always 50 points, for drawing the dim veil). Beneath: `cone/IsInCone` (one caller, `CanSeePoint`; compares the
   cosine, so no angle wraps) and `outline/ReachAlong` (one caller, `VisibleArea`; finds a wall's face by halving the last sample's gap, so the
-  outline sits on the wall and not a sample inside it). Not built yet: crouch (longer range, slower), heights, sound.
+  outline sits on the wall and not a sample inside it). `cone/CrouchRangeFactor` (1.5, a tunable; one caller, `ConeOf`) multiplies the range of a crouching fighter and leaves the angle and the aim alone; the opponent never crouches yet. Not built yet: heights, sound, the cover and quiet that crouching is also meant to buy.
 - `game-loop/`: the body of the game loop: `startingWorld(arena, dummyPositions, opponentPosition?)` (the opponent faces west
   with the same weapons and 100 health, and no brain: `giveOpponentBrain` adds one) and `step`. Each fighter, the player by
   the `Input` and the opponent by what `thinkOpponent` asks for, takes their own part by the same rules (`fighter/PrepareFighter`: switch weapon, then start or run the

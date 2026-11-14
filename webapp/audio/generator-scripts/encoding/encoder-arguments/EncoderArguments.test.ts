@@ -20,6 +20,8 @@ it("reads the first audio stream, drops the metadata, keeps 48 kHz and adds the 
     "libvorbis",
     "-q:a",
     "5",
+    "-page_duration",
+    "20000",
     "out.ogg",
   ]);
 });

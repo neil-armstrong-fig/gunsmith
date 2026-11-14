@@ -142,7 +142,15 @@ fatigue, device playback and masking with real gunshots.
 Compressed candidates and browser reports are delivered below, with failing production checks. Manifest approval and runtime integration remain outstanding. MP3 fallback loop behaviour needs separate
 verification; WAV continuity alone does not prove compressed playback seamless.
 
-## Compressed candidate delivery (2026-11-13)
+## Current codec QA (2026-11-14)
+
+The [Ogg page-duration fix and build handoff](qa/ogg-pages/README.md) supersedes the
+failed counts below: native and Chromium now pass all 38 candidates; WebKit has
+23 failing candidates (17 MP3 effect durations, four Vorbis effect durations and
+two Vorbis music seams). The crouch-level failure is resolved. Masters and MP3s
+are unchanged; production approval remains open.
+
+## Compressed candidate delivery (2026-11-13, historical baseline)
 
 Production is **blocked by measured codec/browser differences**. The approved WAV masters remain unchanged.
 `encoded-audio/` contains 38 candidate files (17 effects and two music loops, each Ogg Vorbis and MP3); the audition mix is excluded.

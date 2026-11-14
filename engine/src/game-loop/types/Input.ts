@@ -8,6 +8,8 @@ export interface Input {
   aimAt?: Point;
   /** Whether the trigger is held down. */
   firing: boolean;
+  /** Whether the crouch key is held. Absent means standing, which is what the opponent always asks for. */
+  crouching?: boolean;
   /** Whether the player is asking for a reload this step. It has no effect on a full magazine or an empty reserve. */
   reload: boolean;
   /** The slot of the weapon the player is asking for this step (1 is the first). Absent when nothing is asked for. */

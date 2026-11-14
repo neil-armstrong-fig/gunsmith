@@ -73,3 +73,12 @@ see the [commands and findings](../../webapp/audio/README.md#compressed-candidat
 Masters are unchanged. Production approval remains open: measured effect durations differ across codecs/browsers,
 WebKit Vorbis music joins fail, and one WebKit crouch pair misses the 6 dB margin. Both MP3 music loops pass in both browsers.
 No manifest keys registered and no runtime integration. Keep these as candidates pending resolution and listening QA.
+
+
+## Codec follow-up (2026-11-14)
+
+[Ogg packaging fix and remaining build handoff](../../webapp/audio/qa/ogg-pages/README.md):
+native and Chromium pass all 38 exports; WebKit failures fall from 34 candidates
+to 23. The crouch-level failure is resolved. Remaining: 17 MP3 effect durations,
+four Vorbis effect durations and both Vorbis music seams. Approved masters and
+MP3 exports are unchanged. Production remains blocked; limits are unchanged.

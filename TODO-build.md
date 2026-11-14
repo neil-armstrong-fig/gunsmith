@@ -31,16 +31,16 @@ Both are withdrawn until the game is fun (`HANDOFF.md` delivery log, 2026-11-12)
 
 ### Resume here (written 2026-11-14, end of a session; read this first)
 
-**Nothing is committed.** Everything below is in the working tree for the user to review and commit (plain `mv` was used, so
-the index still lists some old paths: tell the user to re-add). Root `pnpm checks` exits 0 (engine 516, webapp 127, `ai` 152,
-`audio-studies` 254 with one slow render skipped); acceptance 73 of 73 on a production build. Done this session, all logged in
-`HANDOFF.md`: **best of three** (the duel only), **`engine/src/` sub-foldered** with a front door `Engine.ts`, and the newest
-**audio code cleaned** (`webapp/audio/`, `art`'s folder, at the user's request).
+**2026-11-14, second session:** the `ai` worktree was merged (`c8269cf`), then crouch landed (see the crouch item below). The user
+reviewed it, played it ("works well") and is committing it; earlier work was committed by the user too. Root `pnpm checks` exits 0
+(engine 570, webapp 139, `ai` 394, `audio-studies` 254 with one slow render skipped); acceptance 89 of 89 on a production build.
+Logged in `HANDOFF.md`: **best of three** (the duel only), **`engine/src/` sub-foldered** with a front door `Engine.ts`, the newest
+**audio code cleaned** (`webapp/audio/`, `art`'s folder), the **forward cone** and **crouch**.
 
 **Next, in order (none was requested yet; ask or pick the first):**
-1. **The user plays the duel**, then the bot's tunables (`engine/src/opponent/Difficulty.ts`) are set by feel. Do not change them
-   before that.
-2. The **dim arena and forward cone** (open item below), then the **closing ring** and a round timer.
+1. ~~The bot's tunables~~ **settled 2026-11-14:** the user played the duel with the cone and crouch and called the bot "fun to play
+   against, easy to beat but it still needs a bit of moving and shooting". Leave `engine/src/opponent/Difficulty.ts` as it is.
+2. **Heights** (the last of the dim arena and cone), then the **closing ring** and a round timer. Crouch is done (slice 2).
 3. Owed to `ai`: a root `pnpm evals` script (see "Owed to `ai`" below).
 4. The `ai` row in `TODO.md` is stale (its worktree merged as `e40e9a1`): it is `ai`'s to update, so only mention it.
 
@@ -235,8 +235,8 @@ RNG, no `Date.now()` or `Math.random()`. The webapp renders it and sends input.
         cannot show in the webapp (it builds sparring without a brain), "after a reload always wander" re-engages one step later
         so a browser cannot tell, and the never-search mutant of the first run, which the reload spec now kills only by changing
         the pinned fight's timing, so `search` has no assertion of its own in a browser. Not tested by feel yet: is it engaging, is it beatable, does it
-        stick on pillars (the 20-seed test says not on the practice pillars). **Next for it: the user plays it and sets the
-        tunables.**
+        stick on pillars (the 20-seed test says not on the practice pillars). **The user played it (2026-11-14) and
+        left the tunables as they are.**
   - [x] **Best of three** (2026-11-13; the duel only, first to two rounds). Engine: `match/` (`Match`, `StartMatch`, `ScoreRound`,
         `DecideMatch`, `NextRound`, `winning/RoundsToWin`) and an optional `World.match`, which `step` scores once in the step that
         decides a round (a simultaneous kill is the opponent's, as before). Webapp: the duel is a match; `RoundBanner` keeps
@@ -285,7 +285,23 @@ RNG, no `Date.now()` or `Math.random()`. The webapp renders it and sends input.
         `dummy.visible`. Spec `SeeingOnlyWhatYouFace` (7 criteria). Engine 559, webapp 133 unit tests; 31 of 31 mutants killed (two survivors first,
         a test gap: both weapons were 90 degrees wide); browser mutants killed. **Open:** dummies vanish outside the cone in the practice range
         too (a stated default); the opponent's and veil drawing have no spec (canvas). Next: crouch (slice 2), then heights.
-  - [ ] Dim arena, remaining: crouch and heights. Original item: dim arena outside a detailed forward cone, set by equipped weapon and standing/crouched stance. Rotate it
+  - [x] **Crouch, slice 2 (2026-11-14), test first.** Hold C or either Control: the player walks at 0.4 of their speed
+        (`player/walking/CrouchSpeedFactor`) and their cone reaches 1.5 times as far (`vision/cone/CrouchRangeFactor`), the angle and
+        the aim unchanged; let go and both come back. Both factors are tunables, stated defaults to be set by play; the bot never
+        crouches yet, and cover and quiet (the rest of the tradeoff) do not exist, so they are not in this slice. Engine:
+        `Input.crouching` (optional, absent means standing), `Player.crouching`, `MovePlayer(arena, walk)` takes a `Walk` (it had
+        four parameters), `ConeOf` reads the stance. Webapp: `use-held-keys/` is one hook that keeps the keys held and derives a value
+        (the user asked for it: `use-wasd-movement` and the new `use-crouch-key` were repeating the same listeners), the snapshot's
+        `vision.range` now comes from `coneOf` so it grows when crouched (it read the weapon's range directly; the veil already used the
+        cone). The state hook gained nothing: the plan's `player.crouching` was dropped, since the range already shows it. Specs:
+        `CrouchingToSeeFurther` (range grows, angle does not, stands up again, window losing focus stands the player up, an opponent
+        beyond a standing view is seen crouched) and `CrouchingToWalkSlowly` (a measured speed: under 0.6 of standing, back to full
+        after standing up), with DSL `player.crouch()`, `standUp()`, `loseFocus()` and `measureWalkingSpeed()`. Red first for the right reason
+        (five of seven failed on the behaviour). Engine 570, webapp 139 unit tests; 89 of 89 specs on a production build, 220 of 220
+        at `--repeat-each=10` for the crouch, vision and walking specs. Mutation: 18 engine and webapp mutants and 5 shared-hook
+        mutants, all killed by the right tests; the first run found one survivor (the `blur` handler, which nothing exercised), closed with
+        the focus spec. Not covered by a spec: the veil's drawing while crouched (canvas). **The user reviewed it and played it: "works well"**, so 0.4 and 1.5 stay until they say otherwise.
+  - [ ] Dim arena, remaining: heights. Original item: dim arena outside a detailed forward cone, set by equipped weapon and standing/crouched stance. Rotate it
         with aim through 360°; reveal terrain detail and players/items only in the unoccluded cone. Three height levels
         and longer-range, substantially slower crouch follow `HANDOFF.md`. Cone ownership is settled.
   - [ ] The closing ring after the round timer.

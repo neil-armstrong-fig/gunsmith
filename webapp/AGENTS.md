@@ -74,7 +74,7 @@ acceptance specs pin one), otherwise each page load and each "Play again" draws 
 **What the player sees** is the engine's `vision/` (`docs/game-design.md`, "Vision"): `three/arena-canvas/.../vision-overlay/` draws a dark
 veil over the arena with the cone cut out (`visibleArea`, rebuilt every frame in `useFrame`), and `Opponent`, `Dummies` and `Bullets` draw
 only what `visibleToPlayer(world)` says is seen. The snapshot reports the same answer (`vision`, `opponent.visible`, `dummy.visible`), since the
-canvas is not in the DOM; the veil's own drawing has no spec, only its geometry (`DimmedGeometry.test.ts`).
+canvas is not in the DOM (`vision.range` is the cone's own, so it grows while the player crouches: C or either Control key, held, read by `use-game-loop/hooks/use-crouch-key/`); the veil's own drawing has no spec, only its geometry (`DimmedGeometry.test.ts`).
 
 The HUD is plain React over the canvas (`react/components/dom/ammo-hud/`, `health-hud/`, `score-hud/` (the round and the score, top
 middle, only in a match) and the `round-banner/` overlay that appears when a round is won or lost), styled with Tailwind and the

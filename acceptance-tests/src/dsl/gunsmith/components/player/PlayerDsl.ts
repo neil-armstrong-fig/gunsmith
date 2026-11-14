@@ -29,6 +29,45 @@ export class PlayerDsl {
     }
   }
 
+  /** Holds the crouch key, and keeps holding it until `standUp`. */
+  async crouch(): Promise<void> {
+    try {
+      await this.player.crouch();
+    } catch (error) {
+      throw new DslError("Failed to crouch", error);
+    }
+  }
+
+  /** Lets go of the crouch key. */
+  async standUp(): Promise<void> {
+    try {
+      await this.player.standUp();
+    } catch (error) {
+      throw new DslError("Failed to stand up", error);
+    }
+  }
+
+  /** Takes the focus away from the window, as switching to another window does: a key held at that moment never sends its release. */
+  async loseFocus(): Promise<void> {
+    try {
+      await this.player.loseFocus();
+    } catch (error) {
+      throw new DslError("Failed to take the focus away from the window", error);
+    }
+  }
+
+  /**
+   * Walks this way for `seconds` of game time, in whatever stance the player is in, and says how fast that was, in tiles
+   * a second. The player stops again afterwards. Keep clear of walls: a wall in the way makes the answer too low.
+   */
+  async measureWalkingSpeed(heading: Heading, seconds: number): Promise<number> {
+    try {
+      return await this.player.measureWalkingSpeed(heading, seconds);
+    } catch (error) {
+      throw new DslError(`Failed to measure walking speed ${heading}`, error);
+    }
+  }
+
   /** How much health the player has left. */
   async getHealth(): Promise<number> {
     try {

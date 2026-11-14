@@ -6,8 +6,8 @@
       "key": "sfx-pickup",
       "format": "ogg",
       "sourceSha256": "ec52c4cd420fe504ef749d4beb95df0b839c53d256be8c5013eb73e080ef7cb4",
-      "sha256": "6c5a016cb4740ac4b8dd786516efa0effab721bde1a20749d31dc6e04d02e4ed",
-      "bytes": 6953,
+      "sha256": "c23fd3289848d3fd5aa884e48bb7c628e86d752b5e16726e754ea23a2b5900cb",
+      "bytes": 7412,
       "channels": 1,
       "seconds": 0.38,
       "arguments": [
@@ -27,6 +27,8 @@
         "libvorbis",
         "-q:a",
         "5",
+        "-page_duration",
+        "20000",
         "sfx-pickup.ogg"
       ]
     },
@@ -64,8 +66,8 @@
       "key": "sfx-drop",
       "format": "ogg",
       "sourceSha256": "f68534049d49bfa1b68b682699bc82899baec3b98aa502542bc7beba548bac19",
-      "sha256": "9587a722df52fe803e7dfee568eadf0d7cd28f811df591cae61cb5218cd51984",
-      "bytes": 5949,
+      "sha256": "06ef5bdde43883ce14e8208ba44aca57418818acb25ab0466ee193a71edb307b",
+      "bytes": 6354,
       "channels": 1,
       "seconds": 0.34,
       "arguments": [
@@ -85,6 +87,8 @@
         "libvorbis",
         "-q:a",
         "5",
+        "-page_duration",
+        "20000",
         "sfx-drop.ogg"
       ]
     },
@@ -122,8 +126,8 @@
       "key": "sfx-reload",
       "format": "ogg",
       "sourceSha256": "fae3248b467102eee7ec5fe8e04b750e0e06890bcba8f8768a77fe07a6576705",
-      "sha256": "be5c8479d46fde57aecb9d1abdbc6af452d14aefcf41a36bf1a6c6150758135b",
-      "bytes": 6992,
+      "sha256": "41487d24851f4e6a728efc1efee461cc22f370e3afcb79f391ce27f9d827b543",
+      "bytes": 7964,
       "channels": 1,
       "seconds": 0.82,
       "arguments": [
@@ -143,6 +147,8 @@
         "libvorbis",
         "-q:a",
         "5",
+        "-page_duration",
+        "20000",
         "sfx-reload.ogg"
       ]
     },
@@ -180,8 +186,8 @@
       "key": "sfx-hit",
       "format": "ogg",
       "sourceSha256": "dab6e83a0cbb64fc1ad5e2224ab49b705acea3cf7535cf6949d7f44fc12eb820",
-      "sha256": "df9bd51b4ec71f043508fc86beacf1796a8f31268f27e753e55e02da3174b2ad",
-      "bytes": 5025,
+      "sha256": "81472b438d78de2d4531296fc677c1b5a9b8ecb40a1ec55b4bdef469196be7be",
+      "bytes": 5268,
       "channels": 1,
       "seconds": 0.2,
       "arguments": [
@@ -201,6 +207,8 @@
         "libvorbis",
         "-q:a",
         "5",
+        "-page_duration",
+        "20000",
         "sfx-hit.ogg"
       ]
     },
@@ -238,8 +246,8 @@
       "key": "sfx-death",
       "format": "ogg",
       "sourceSha256": "efaf205ee20b77853c355e1b693dd1e1fc3bd34c60e637af58039ef8d5ca2dbe",
-      "sha256": "c76d15cf80f6ff0bf7bf1a7df968375d17eb928fb39a584cd2fd13444bb9c0b2",
-      "bytes": 12079,
+      "sha256": "81ac2eea62fccca2defb1dc6a59b3ee17ce6ba19e26f7cf03729ea99158e1438",
+      "bytes": 13726,
       "channels": 1,
       "seconds": 1.35,
       "arguments": [
@@ -259,6 +267,8 @@
         "libvorbis",
         "-q:a",
         "5",
+        "-page_duration",
+        "20000",
         "sfx-death.ogg"
       ]
     },
@@ -296,8 +306,8 @@
       "key": "sfx-ring-warning",
       "format": "ogg",
       "sourceSha256": "c63de6aa28889fe8001c2728187fdc8f20306c641a92b170fa2bb8fcff1a877f",
-      "sha256": "2951d778199c051a669d200efdfdd210e1c1335ddc0d1dcd0c76ac68b7cab7e1",
-      "bytes": 15261,
+      "sha256": "826da040473f018f2feb2c25a4b2ea69ba29a04dcb4a94f640fd007e3c73df54",
+      "bytes": 18717,
       "channels": 1,
       "seconds": 2.8,
       "arguments": [
@@ -317,6 +327,8 @@
         "libvorbis",
         "-q:a",
         "5",
+        "-page_duration",
+        "20000",
         "sfx-ring-warning.ogg"
       ]
     },
@@ -354,8 +366,8 @@
       "key": "sfx-ui-click",
       "format": "ogg",
       "sourceSha256": "b158f454736ac2785171737beffd93b05c294fda6b4a776aa91969eb4144ea2e",
-      "sha256": "3eef1f66214fe60268415cf3d630591846c48bf4e55d89de07ef31e93604dd23",
-      "bytes": 4471,
+      "sha256": "2942ad04899b319ec38e973cf4994b109da08bc9d4fd42b8f81002434963efe1",
+      "bytes": 4525,
       "channels": 1,
       "seconds": 0.065,
       "arguments": [
@@ -375,6 +387,8 @@
         "libvorbis",
         "-q:a",
         "5",
+        "-page_duration",
+        "20000",
         "sfx-ui-click.ogg"
       ]
     },
@@ -412,8 +426,8 @@
       "key": "sfx-round-start",
       "format": "ogg",
       "sourceSha256": "91a47f7535899c7c3d278dc42ddf112e3b4ff900100df47771e5f088bb4b9896",
-      "sha256": "e19b09397cfdeee8a8a6f030d0017ca8958d0cdcb48d4d7dba4ca04b17b2b396",
-      "bytes": 12744,
+      "sha256": "bf7bf14f6866d754a9b20a81e1ad3bf8e40967c260536a2f246786218677b9d3",
+      "bytes": 14364,
       "channels": 1,
       "seconds": 1.35,
       "arguments": [
@@ -433,6 +447,8 @@
         "libvorbis",
         "-q:a",
         "5",
+        "-page_duration",
+        "20000",
         "sfx-round-start.ogg"
       ]
     },
@@ -470,8 +486,8 @@
       "key": "sfx-round-end",
       "format": "ogg",
       "sourceSha256": "2b970fa89c17f1f3c041bd628ecc4ad39f1ea41a6a6acb5d2072c0ab99adbdc9",
-      "sha256": "887ac135785295032a0dbc79f12586dfb6e646ed7fdc0b5d81f1a4a6116a00bc",
-      "bytes": 14477,
+      "sha256": "a3464d4f82b5b9d1aee1678ebfff2660c6b4cd1c9f98046a3432e1e1b3bd7e9a",
+      "bytes": 16502,
       "channels": 1,
       "seconds": 1.65,
       "arguments": [
@@ -491,6 +507,8 @@
         "libvorbis",
         "-q:a",
         "5",
+        "-page_duration",
+        "20000",
         "sfx-round-end.ogg"
       ]
     },
@@ -528,8 +546,8 @@
       "key": "sfx-step-stand",
       "format": "ogg",
       "sourceSha256": "1045fcf211591856b590ddb21a7c83e6a8b8c47662cbc6888cfb4d434a64e147",
-      "sha256": "ec8890b1a0499f83750339453aeb60fee6cfdc5db3692a1f3c89c62cdf759381",
-      "bytes": 5474,
+      "sha256": "8082459b0eb3a7966fa0186517a01231fa4da8c1a04c8d5b0b7ff2f7e9b5c31c",
+      "bytes": 5771,
       "channels": 1,
       "seconds": 0.24,
       "arguments": [
@@ -549,6 +567,8 @@
         "libvorbis",
         "-q:a",
         "5",
+        "-page_duration",
+        "20000",
         "sfx-step-stand.ogg"
       ]
     },
@@ -586,8 +606,8 @@
       "key": "sfx-step-crouch",
       "format": "ogg",
       "sourceSha256": "2627139f4efff8477abf1d5150e133e89e0e5d6cd010d594a9268217999983c6",
-      "sha256": "365ee80671ce410f2c1f3e8aa4d02bdff07e3d17dbdb24fa15280e79287e0db4",
-      "bytes": 5193,
+      "sha256": "9950ee8f1b50fff28f53797dd11d67244ed7d687149dfd1e090d7f8926930634",
+      "bytes": 5463,
       "channels": 1,
       "seconds": 0.24,
       "arguments": [
@@ -607,6 +627,8 @@
         "libvorbis",
         "-q:a",
         "5",
+        "-page_duration",
+        "20000",
         "sfx-step-crouch.ogg"
       ]
     },
@@ -644,8 +666,8 @@
       "key": "sfx-step-stand-02",
       "format": "ogg",
       "sourceSha256": "db2b21c1351bbdeaf03c3c4a6a3aa8d873b8643a5911e77a23d2e659e4ea756b",
-      "sha256": "f56a0ab629af22c1ad0dae093bc9339cbc9eeb124f988aefd51ccac117541440",
-      "bytes": 5518,
+      "sha256": "2b80a9fa6e845f93be92925698db5445f25cacb9adb8dcd6f92053f92df6c4da",
+      "bytes": 5815,
       "channels": 1,
       "seconds": 0.24,
       "arguments": [
@@ -665,6 +687,8 @@
         "libvorbis",
         "-q:a",
         "5",
+        "-page_duration",
+        "20000",
         "sfx-step-stand-02.ogg"
       ]
     },
@@ -702,8 +726,8 @@
       "key": "sfx-step-crouch-02",
       "format": "ogg",
       "sourceSha256": "b964a306ea0568eefae992e16beba4a017c86ec3c1c1bffd4f33f1dbce437c0c",
-      "sha256": "f2a8ee774dbc628c3da031d7e86b545fac51fae8af25abf232271723570ca276",
-      "bytes": 5207,
+      "sha256": "026885688a9eadd4defab913de94ef7df5f250dcc26a621a02193b3614feb887",
+      "bytes": 5477,
       "channels": 1,
       "seconds": 0.24,
       "arguments": [
@@ -723,6 +747,8 @@
         "libvorbis",
         "-q:a",
         "5",
+        "-page_duration",
+        "20000",
         "sfx-step-crouch-02.ogg"
       ]
     },
@@ -760,8 +786,8 @@
       "key": "sfx-step-stand-03",
       "format": "ogg",
       "sourceSha256": "4f52420cfa84acd3481120de2fcbad31d8d73d472c0251ba2bf36fe877c4b308",
-      "sha256": "16318bd090be955fcac6b5a4719adb485f90ade3410c5c63be1f37dc6dc6f985",
-      "bytes": 5428,
+      "sha256": "34501b7ad4f9d13cc2ad68b597df9ecddd2a37f8fbcfc0337bf38607e3508100",
+      "bytes": 5725,
       "channels": 1,
       "seconds": 0.24,
       "arguments": [
@@ -781,6 +807,8 @@
         "libvorbis",
         "-q:a",
         "5",
+        "-page_duration",
+        "20000",
         "sfx-step-stand-03.ogg"
       ]
     },
@@ -818,8 +846,8 @@
       "key": "sfx-step-crouch-03",
       "format": "ogg",
       "sourceSha256": "2519b9b6c2853726074d789fd9b88c50e4f43951dbe803a21576f017563c60a4",
-      "sha256": "5d3d62fe6a2bb4a1aaaabb403e849efad6c50b9fcb58b15f7ba1f6b21e8e92c3",
-      "bytes": 5182,
+      "sha256": "263a8115022355a1e8b0b9d7d1dd515c3eac1b83fc438e3e16e3b986b0654d95",
+      "bytes": 5452,
       "channels": 1,
       "seconds": 0.24,
       "arguments": [
@@ -839,6 +867,8 @@
         "libvorbis",
         "-q:a",
         "5",
+        "-page_duration",
+        "20000",
         "sfx-step-crouch-03.ogg"
       ]
     },
@@ -876,8 +906,8 @@
       "key": "sfx-step-stand-04",
       "format": "ogg",
       "sourceSha256": "5684f20981927208231a8a33961a5b4ac740ce62b9127572815bc1bc0e42ce4e",
-      "sha256": "c33d24e68d7f71549967318617c828f8fb0c50da5df33954c300810e752b6124",
-      "bytes": 5452,
+      "sha256": "00788b2b0395fbf0ae2ca2bbbffe492f207296193d677a5b6649588984476a55",
+      "bytes": 5749,
       "channels": 1,
       "seconds": 0.24,
       "arguments": [
@@ -897,6 +927,8 @@
         "libvorbis",
         "-q:a",
         "5",
+        "-page_duration",
+        "20000",
         "sfx-step-stand-04.ogg"
       ]
     },
@@ -934,8 +966,8 @@
       "key": "sfx-step-crouch-04",
       "format": "ogg",
       "sourceSha256": "587099fdcacd583b740eb0f23cda43615e39a9d935c1d758f51e06d5bcc518dd",
-      "sha256": "f694277e4048e36d1618dcaa1629f1c58fb093ac7059de363fde9a466b21ee49",
-      "bytes": 5172,
+      "sha256": "53d6314a08126808f864822bcdef99bd92680527f8d36ad6993471dd54b82f89",
+      "bytes": 5442,
       "channels": 1,
       "seconds": 0.24,
       "arguments": [
@@ -955,6 +987,8 @@
         "libvorbis",
         "-q:a",
         "5",
+        "-page_duration",
+        "20000",
         "sfx-step-crouch-04.ogg"
       ]
     },
@@ -992,8 +1026,8 @@
       "key": "music-loop-match",
       "format": "ogg",
       "sourceSha256": "0bdbbeb0ff57fefd9a6bf71856bc7a3e2be9de793f084d93fed77350d69bee51",
-      "sha256": "d2be06199ed79a86c0d3d42a3ab718ba6bf1c69e7b0604aafff4500d94c5b2cb",
-      "bytes": 1354717,
+      "sha256": "45467e25097caab0e1ae877b772b177e8cb9dc0a49135425c7baa621d2c4c28e",
+      "bytes": 1463878,
       "channels": 2,
       "seconds": 90,
       "arguments": [
@@ -1013,6 +1047,8 @@
         "libvorbis",
         "-q:a",
         "5",
+        "-page_duration",
+        "20000",
         "music-loop-match.ogg"
       ]
     },
@@ -1050,8 +1086,8 @@
       "key": "music-loop-menu",
       "format": "ogg",
       "sourceSha256": "7d2e12021620717c452739bfd7fd3834e02837ecf1571e624ea9b86b789560cd",
-      "sha256": "ed706fc81055731cc6da76c420ff2e9087b708431adcbfe02a78e594febf4aeb",
-      "bytes": 838350,
+      "sha256": "453aad2ac9dd7618e6b413ecf214034929813cdb0839342314c072a6571ec225",
+      "bytes": 911385,
       "channels": 2,
       "seconds": 60,
       "arguments": [
@@ -1071,6 +1107,8 @@
         "libvorbis",
         "-q:a",
         "5",
+        "-page_duration",
+        "20000",
         "music-loop-menu.ogg"
       ]
     },

@@ -12,12 +12,13 @@ import {pullTrigger} from "@gunsmith/engine/weapon/TriggerPull";
 /**
  * The part of a step that belongs to one fighter, the player or the opponent alike: the weapon is switched (which cancels
  * a reload), the reload starts or counts down (so a switch and a reload asked for together reload the new weapon), the
- * fighter walks, turns to the aim, and the trigger is judged. It does not fly any bullet or let one go: see `shootFighter`.
+ * fighter crouches or stands as asked, walks (slower crouched), turns to the aim, and the trigger is judged. It does not fly any bullet or let one go: see `shootFighter`.
  */
 export function prepareFighter(arena: Arena, fighter: Player, input: Input, seconds: number): FighterTurn {
   const ready = reloadWeapon(switchWeapon(fighter, input.switchTo), input.reload, seconds);
   const carriedWeapon = equippedWeapon(ready);
-  const position = movePlayer(arena, ready.position, input.direction, seconds);
+  const crouching = input.crouching === true;
+  const position = movePlayer(arena, {position: ready.position, direction: input.direction, seconds, crouching});
   const aim = aimPlayer(ready.aim, position, input.aimAt);
   const trigger = pullTrigger({
     cooldownSeconds: ready.cooldownSeconds,
@@ -28,5 +29,8 @@ export function prepareFighter(arena: Arena, fighter: Player, input: Input, seco
     reloading: ready.reloadRemainingSeconds !== undefined,
   });
 
-  return {fighter: {...ready, position, aim, cooldownSeconds: trigger.cooldownSeconds}, fires: trigger.fires};
+  return {
+    fighter: {...ready, position, aim, crouching, cooldownSeconds: trigger.cooldownSeconds},
+    fires: trigger.fires,
+  };
 }

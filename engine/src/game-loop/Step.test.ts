@@ -7,6 +7,7 @@ import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
 import {PLAYER_HEALTH} from "@gunsmith/engine/health/PlayerHealth";
 import {OPPONENT_HEALTH} from "@gunsmith/engine/health/OpponentHealth";
 import type {Player} from "@gunsmith/engine/player/types/Player";
+import {CROUCH_SPEED_FACTOR} from "@gunsmith/engine/player/walking/CrouchSpeedFactor";
 import {PLAYER_SPEED} from "@gunsmith/engine/player/walking/PlayerSpeed";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import {step} from "@gunsmith/engine/game-loop/Step";
@@ -48,6 +49,22 @@ it("moves the player east at the player speed", () => {
 
   expect(after.player.position.x - world.player.position.x).toBeCloseTo(PLAYER_SPEED * TICK, 9);
   expect(after.player.position.y).toBe(world.player.position.y);
+});
+
+it("crouches the player while the input says so, and stands them up when it stops", () => {
+  const world = centred();
+  const crouching = step(world, {...walking(0, 0), crouching: true}, TICK);
+
+  expect(world.player.crouching).toBe(false);
+  expect(crouching.player.crouching).toBe(true);
+  expect(step(crouching, walking(0, 0), TICK).player.crouching).toBe(false);
+});
+
+it("walks a crouching player the crouch factor as far", () => {
+  const world = centred();
+  const after = step(world, {...walking(1, 0), crouching: true}, TICK);
+
+  expect(after.player.position.x - world.player.position.x).toBeCloseTo(PLAYER_SPEED * CROUCH_SPEED_FACTOR * TICK, 9);
 });
 
 it("moves the player north when y is positive", () => {

@@ -24,6 +24,7 @@ function playerHolding(equippedSlot: number, reloadRemainingSeconds?: number): P
       {weapon: WEAPON, rounds: 7, reserve: 12},
     ],
     equippedIndex: equippedSlot - 1,
+    crouching: false,
     health: 100,
     reloadRemainingSeconds,
   };

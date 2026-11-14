@@ -2,9 +2,9 @@
   "decoder": "ffmpeg version 9.0.2 Copyright (c) 2000-2026 the FFmpeg developers",
   "files": {
     "sfx-pickup.ogg": {
-      "frames": 18112,
+      "frames": 18240,
       "peak": 0.5079008340835571,
-      "rmsDbfs": -24.282423430345986,
+      "rmsDbfs": -24.313007675188185,
       "loopJump": 0.001404160400852561
     },
     "sfx-pickup.mp3": {
@@ -14,9 +14,9 @@
       "loopJump": 0.002403124701231718
     },
     "sfx-drop.ogg": {
-      "frames": 16192,
+      "frames": 16320,
       "peak": 0.5035590529441833,
-      "rmsDbfs": -23.954149182736675,
+      "rmsDbfs": -23.98834577531805,
       "loopJump": 0.007995711639523506
     },
     "sfx-drop.mp3": {
@@ -26,9 +26,9 @@
       "loopJump": 0.000541005574632436
     },
     "sfx-reload.ogg": {
-      "frames": 39232,
+      "frames": 39360,
       "peak": 0.5221350789070129,
-      "rmsDbfs": -28.537885502735847,
+      "rmsDbfs": -28.55203191530586,
       "loopJump": 0.0034974582958966494
     },
     "sfx-reload.mp3": {
@@ -38,9 +38,9 @@
       "loopJump": 0.0030695577152073383
     },
     "sfx-hit.ogg": {
-      "frames": 10560,
+      "frames": 9600,
       "peak": 0.5021976828575134,
-      "rmsDbfs": -25.712791093014996,
+      "rmsDbfs": -25.298864241432746,
       "loopJump": 0.0004832646227441728
     },
     "sfx-hit.mp3": {
@@ -74,9 +74,9 @@
       "loopJump": 0.0027925511822104454
     },
     "sfx-ui-click.ogg": {
-      "frames": 2992,
+      "frames": 3120,
       "peak": 0.4988071620464325,
-      "rmsDbfs": -25.431018859629134,
+      "rmsDbfs": -25.612948907889326,
       "loopJump": 0.006125251296907663
     },
     "sfx-ui-click.mp3": {
@@ -110,9 +110,9 @@
       "loopJump": 0.0012858210830017924
     },
     "sfx-step-stand.ogg": {
-      "frames": 11392,
+      "frames": 11520,
       "peak": 0.4475868344306946,
-      "rmsDbfs": -25.955610942731244,
+      "rmsDbfs": -26.004135970675364,
       "loopJump": 0.004256086423993111
     },
     "sfx-step-stand.mp3": {
@@ -122,9 +122,9 @@
       "loopJump": 0.0006025769398547709
     },
     "sfx-step-crouch.ogg": {
-      "frames": 11392,
+      "frames": 11520,
       "peak": 0.15033692121505737,
-      "rmsDbfs": -34.886522425697436,
+      "rmsDbfs": -34.93504745364156,
       "loopJump": 0.0004076473996974528
     },
     "sfx-step-crouch.mp3": {
@@ -134,9 +134,9 @@
       "loopJump": 0.00011461801477707922
     },
     "sfx-step-stand-02.ogg": {
-      "frames": 11392,
+      "frames": 11520,
       "peak": 0.46726012229919434,
-      "rmsDbfs": -25.745874090153436,
+      "rmsDbfs": -25.79439911809756,
       "loopJump": 0.0010753944516181946
     },
     "sfx-step-stand-02.mp3": {
@@ -146,9 +146,9 @@
       "loopJump": 0.0012960417661815882
     },
     "sfx-step-crouch-02.ogg": {
-      "frames": 11392,
+      "frames": 11520,
       "peak": 0.1508544683456421,
-      "rmsDbfs": -34.44140575507354,
+      "rmsDbfs": -34.489930783017655,
       "loopJump": 0.0005676446598954499
     },
     "sfx-step-crouch-02.mp3": {
@@ -158,9 +158,9 @@
       "loopJump": 0.0002752170548774302
     },
     "sfx-step-stand-03.ogg": {
-      "frames": 11392,
+      "frames": 11520,
       "peak": 0.45390865206718445,
-      "rmsDbfs": -26.186596940753905,
+      "rmsDbfs": -26.23512196869803,
       "loopJump": 0.000787134631536901
     },
     "sfx-step-stand-03.mp3": {
@@ -170,9 +170,9 @@
       "loopJump": 0.000026689807782531716
     },
     "sfx-step-crouch-03.ogg": {
-      "frames": 11392,
+      "frames": 11520,
       "peak": 0.1509268879890442,
-      "rmsDbfs": -34.1782374372022,
+      "rmsDbfs": -34.22676246514632,
       "loopJump": 0.00048058765241876245
     },
     "sfx-step-crouch-03.mp3": {
@@ -182,9 +182,9 @@
       "loopJump": 0.0001504899119026959
     },
     "sfx-step-stand-04.ogg": {
-      "frames": 11392,
+      "frames": 11520,
       "peak": 0.4623481333255768,
-      "rmsDbfs": -25.394764812173246,
+      "rmsDbfs": -25.443289840117373,
       "loopJump": 0.00335887772962451
     },
     "sfx-step-stand-04.mp3": {
@@ -194,9 +194,9 @@
       "loopJump": 0.00035092735197395086
     },
     "sfx-step-crouch-04.ogg": {
-      "frames": 11392,
+      "frames": 11520,
       "peak": 0.1514105200767517,
-      "rmsDbfs": -33.261626097686154,
+      "rmsDbfs": -33.31015112563027,
       "loopJump": 0.00010795234993565828
     },
     "sfx-step-crouch-04.mp3": {
@@ -230,20 +230,6 @@
       "loopJump": 0.00012477051859605126
     }
   },
-  "passed": false,
-  "failures": [
-    "sfx-pickup.ogg: duration mismatch (18112 frames; expected 18240)",
-    "sfx-drop.ogg: duration mismatch (16192 frames; expected 16320)",
-    "sfx-reload.ogg: duration mismatch (39232 frames; expected 39360)",
-    "sfx-hit.ogg: duration mismatch (10560 frames; expected 9600)",
-    "sfx-ui-click.ogg: duration mismatch (2992 frames; expected 3120)",
-    "sfx-step-stand.ogg: duration mismatch (11392 frames; expected 11520)",
-    "sfx-step-crouch.ogg: duration mismatch (11392 frames; expected 11520)",
-    "sfx-step-stand-02.ogg: duration mismatch (11392 frames; expected 11520)",
-    "sfx-step-crouch-02.ogg: duration mismatch (11392 frames; expected 11520)",
-    "sfx-step-stand-03.ogg: duration mismatch (11392 frames; expected 11520)",
-    "sfx-step-crouch-03.ogg: duration mismatch (11392 frames; expected 11520)",
-    "sfx-step-stand-04.ogg: duration mismatch (11392 frames; expected 11520)",
-    "sfx-step-crouch-04.ogg: duration mismatch (11392 frames; expected 11520)"
-  ]
+  "passed": true,
+  "failures": []
 }
