@@ -35,6 +35,7 @@ store/game/
       types/AmmoReadout.ts
     select-player-health/      the player's health, a plain number
     select-round/              where the round stands, a plain string
+    select-match/              the best-of-three the world belongs to (the same object until a round is scored), or nothing
     game-state/                `gameState()`, the one-off read for `useFrame`
       GameState.ts
 ```
@@ -63,15 +64,21 @@ is a few times a second at most. A per-frame value is never bound to a component
 managers are fine for updates that are not rapid). The decision and its sources are in `docs/state-management.md`.
 
 **Which match opens** is chosen once, from the page's query (`game/scenario/`): none is the practice range with its dummies,
-`?scenario=duel` is the duel (an opponent with a brain who moves and shoots back), `?scenario=sparring` the same arena with
+`?scenario=duel` is the duel, a best-of-three (an opponent with a brain who moves and shoots back; first to two rounds, `World.match`), `?scenario=sparring` the same arena with
 an opponent who has no brain and cannot shoot. It is a selector only, never a way to write state; it goes when a menu picks
 the match. `worldOfPage()` builds the world (`worldOfScenario(scenario, seed)`) and is also what "Play again" puts in the
 store. The opponent's choices are drawn from a seed (`game/scenario/seed/`): `?seed=42` replays a match exactly (the
 acceptance specs pin one), otherwise each page load and each "Play again" draws a fresh random one, which is the only
 `Math.random` in the game.
 
-The HUD is plain React over the canvas (`react/components/dom/ammo-hud/`, `health-hud/`, and the `round-banner/` overlay that
-appears when a round is won or lost), styled with Tailwind and the `--color-gs-*` tokens. Anything
+The HUD is plain React over the canvas (`react/components/dom/ammo-hud/`, `health-hud/`, `score-hud/` (the round and the score, top
+middle, only in a match) and the `round-banner/` overlay that appears when a round is won or lost), styled with Tailwind and the
+`--color-gs-*` tokens. In a match the banner keeps "You won" / "You lost" for a round, adds the score, and offers **"Next round"**
+(`game/scenario/NextRoundOfPage.ts`: a fresh duel, the score kept, the opponent's seed the page's plus the rounds already played,
+so `?seed=` still replays a whole match); when the match is decided it says "You won the match" / "You lost the match" and offers
+"Play again" (a new match), as does a game with no match. `score-text/` holds the one sentence of the score both the banner and the
+HUD say. **A click on a `button` is not a shot** (`use-firing/trigger/PullsTheTrigger.ts`): the trigger listens on `window`, so
+without it pressing "Next round" fired a shot into the round it started. Anything
 animated on a timer (the reload fill) is a CSS animation, so React never sees a per-frame value.
 
 ## Folders inside `react/`

@@ -1,10 +1,10 @@
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import {distanceToWall} from "@gunsmith/engine/bullet/flight/DistanceToWall";
-import {distanceToFighter} from "@gunsmith/engine/bullet/hit/DistanceToFighter";
-import {firstContact} from "@gunsmith/engine/bullet/hit/FirstContact";
-import {nearestDummyHit} from "@gunsmith/engine/bullet/hit/NearestDummyHit";
+import {distanceToFighter} from "@gunsmith/engine/bullet/flight/meeting/DistanceToFighter";
+import {firstContact} from "@gunsmith/engine/bullet/flight/meeting/FirstContact";
+import {nearestDummyHit} from "@gunsmith/engine/bullet/flight/meeting/NearestDummyHit";
 import type {Bullet} from "@gunsmith/engine/bullet/types/Bullet";
-import type {DummyHit} from "@gunsmith/engine/bullet/types/DummyHit";
+import type {DummyHit} from "@gunsmith/engine/bullet/flight/types/DummyHit";
 import type {FlightRequest} from "@gunsmith/engine/bullet/types/FlightRequest";
 import type {Meeting} from "@gunsmith/engine/bullet/types/Meeting";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";

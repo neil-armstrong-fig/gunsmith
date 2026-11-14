@@ -61,7 +61,15 @@ has no gunshots; masking must be rechecked with the real weapon synthesiser befo
 
 The expanded tracks have four / six distinct eight-bar sections and preserve wraparound tails. Every crouched
 footfall is at least 6 dB quieter than its paired standing version in measured RMS. Next: detailed listening,
-production encoding and manifest review. Ogg Vorbis plus MP3 remain the required shipping formats; neither is delivered
-yet. The user approved `node-web-audio-api@2.2.0` as a dev-only tool and the pack was regenerated on Node; the Python
+production encoding and manifest review. Ogg Vorbis plus MP3 remain the required shipping formats; candidates are delivered, but strict production QA fails as documented below. The user approved `node-web-audio-api@2.2.0` as a dev-only tool and the pack was regenerated on Node; the Python
 sources were replaced. Run `pnpm --filter @gunsmith/audio-studies render`. No service, paid generation, game-runtime code
 or schema changed. Preserve the approved direction when expanding the pack; no repeat direction approval is needed.
+
+
+## Compressed production-preparation result (2026-11-13)
+
+38 Ogg/MP3 candidates and reproducible native/Chromium/WebKit QA are in `webapp/audio/encoded-audio/`;
+see the [commands and findings](../../webapp/audio/README.md#compressed-candidate-delivery-2026-11-13).
+Masters are unchanged. Production approval remains open: measured effect durations differ across codecs/browsers,
+WebKit Vorbis music joins fail, and one WebKit crouch pair misses the 6 dB margin. Both MP3 music loops pass in both browsers.
+No manifest keys registered and no runtime integration. Keep these as candidates pending resolution and listening QA.

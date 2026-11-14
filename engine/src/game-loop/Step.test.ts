@@ -1,5 +1,6 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import {fireBullet} from "@gunsmith/engine/bullet/FireBullet";
+import {startMatch} from "@gunsmith/engine/match/StartMatch";
 import {DUMMY_HEALTH} from "@gunsmith/engine/dummy/DummyHealth";
 import {disarmOpponent} from "@gunsmith/engine/opponent/DisarmOpponent";
 import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
@@ -528,6 +529,60 @@ it("freezes the world once the round is over, but lets the clock run", () => {
   expect(after.opponent).toEqual(won.opponent);
   expect(after.round).toBe("won");
   expect(after.elapsedSeconds).toBeCloseTo(won.elapsedSeconds + TICK, 9);
+});
+
+// A match in its first round, the opponent still and unarmed, or armed and in a fight.
+function sparringMatch(): World {
+  return {...sparring(), match: startMatch()};
+}
+
+it("gives the player a round win in the match when the opponent runs out of health", () => {
+  expect(shoot(sparringMatch(), 180, 0).match).toEqual({playerWins: 1, opponentWins: 0, roundNumber: 1});
+});
+
+it("gives the opponent a round win in the match when the player runs out of health", () => {
+  const after = playTicks({...shotAtPlayer(RIFLE.bulletDamage), match: startMatch()}, IDLE, 30);
+
+  expect(after.match).toEqual({playerWins: 0, opponentWins: 1, roundNumber: 1});
+});
+
+it("leaves the score alone while the round is still being fought", () => {
+  expect(shoot(sparringMatch(), 1, 30).match).toEqual(startMatch());
+});
+
+it("scores a round once, however long the finished world goes on being stepped", () => {
+  const won = shoot(sparringMatch(), 180, 0);
+
+  expect(playTicks(won, IDLE, 100).match).toEqual({playerWins: 1, opponentWins: 0, roundNumber: 1});
+});
+
+it("gives the opponent the round when both fall in the same step", () => {
+  const world = shotAtPlayer(RIFLE.bulletDamage);
+  const bothFalling: World = {
+    ...world,
+    opponent: {...opponentOf(world), health: RIFLE.bulletDamage},
+    bullets: [
+      ...world.bullets,
+      {
+        position: {x: 9.5, y: 4.5},
+        direction: {x: 1, y: 0},
+        damage: RIFLE.bulletDamage,
+        speed: RIFLE.bulletSpeed,
+        shooter: "player",
+      },
+    ],
+    match: startMatch(),
+  };
+
+  const after = playTicks(bothFalling, IDLE, 30);
+
+  expect(after.player.health).toBe(0);
+  expect(opponentOf(after).health).toBe(0);
+  expect(after.match).toEqual({playerWins: 0, opponentWins: 1, roundNumber: 1});
+});
+
+it("has no match when it was not given one, whatever happens to the round", () => {
+  expect(shoot(sparring(), 180, 0).match).toBeUndefined();
 });
 
 it("does not hurt anyone once the round is over, though bullets are still in the air", () => {

@@ -144,3 +144,13 @@ it("reports where the round stands", () => {
   expect(snapshotOf({...world, round: "won"}).round).toBe("won");
   expect(snapshotOf({...world, round: "lost"}).round).toBe("lost");
 });
+
+it("reports no match when the world is not one", () => {
+  expect(snapshotOf(world).match).toBeUndefined();
+});
+
+it("reports the score of the match and which round is being fought", () => {
+  const match = {playerWins: 1, opponentWins: 0, roundNumber: 2};
+
+  expect(snapshotOf({...world, match}).match).toEqual({playerWins: 1, opponentWins: 0, round: 2});
+});

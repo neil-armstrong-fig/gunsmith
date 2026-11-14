@@ -1,7 +1,7 @@
-import {actEngage} from "@gunsmith/engine/opponent/state/Engage";
-import {actReload} from "@gunsmith/engine/opponent/state/Reload";
-import {actSearch} from "@gunsmith/engine/opponent/state/Search";
-import {actWander} from "@gunsmith/engine/opponent/state/Wander";
+import {actEngage} from "@gunsmith/engine/opponent/state/acting/Engage";
+import {actReload} from "@gunsmith/engine/opponent/state/acting/Reload";
+import {actSearch} from "@gunsmith/engine/opponent/state/acting/Search";
+import {actWander} from "@gunsmith/engine/opponent/state/acting/Wander";
 import type {OpponentBrain} from "@gunsmith/engine/opponent/types/OpponentBrain";
 import type {OpponentContext} from "@gunsmith/engine/opponent/types/OpponentContext";
 import type {StateAct} from "@gunsmith/engine/opponent/types/StateAct";

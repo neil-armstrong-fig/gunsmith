@@ -1,6 +1,7 @@
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import type {Bullet} from "@gunsmith/engine/bullet/types/Bullet";
 import type {Dummy} from "@gunsmith/engine/dummy/types/Dummy";
+import type {Match} from "@gunsmith/engine/match/types/Match";
 import type {OpponentBrain} from "@gunsmith/engine/opponent/types/OpponentBrain";
 import type {Player} from "@gunsmith/engine/player/types/Player";
 import type {RoundState} from "@gunsmith/engine/round/types/RoundState";
@@ -17,8 +18,10 @@ export interface World {
   bullets: readonly Bullet[];
   /** The practice dummies still standing. A dummy with no health left is gone from the list. */
   dummies: readonly Dummy[];
-  /** Game time since the match began, in seconds. */
+  /** Game time since the round began, in seconds: a new round starts a new world, so it starts again from zero. */
   elapsedSeconds: number;
   /** Whether the round is still being fought. Once it is not, the world is frozen and only the clock runs. */
   round: RoundState;
+  /** The best-of-three this round belongs to, scored as each round ends; absent in a world that is not one, such as the practice range. */
+  match?: Match | undefined;
 }

@@ -1,5 +1,6 @@
 import {limitPeak} from "@gunsmith/audio-studies/common/levels/limit/LimitPeak";
 import {MASTERING} from "@gunsmith/audio-studies/output/mastering/Mastering";
+import {AUDITION_KEY} from "@gunsmith/audio-studies/output/mix/AuditionKey";
 import {layerCue} from "@gunsmith/audio-studies/output/mix/layer/LayerCue";
 import {mixTimeline} from "@gunsmith/audio-studies/output/mix/timeline/MixTimeline";
 import type {RenderedCue} from "@gunsmith/audio-studies/common/types/RenderedCue";
@@ -16,7 +17,7 @@ export function makeMix(match: RenderedCue, effects: ReadonlyMap<string, Rendere
   }
   limitPeak(channels, MASTERING.mixPeak);
 
-  return {key: "audition-mix", channels};
+  return {key: AUDITION_KEY, channels};
 }
 
 function monoOf(effects: ReadonlyMap<string, RenderedCue>, key: string): Float32Array {

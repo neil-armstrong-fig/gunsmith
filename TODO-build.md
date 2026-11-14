@@ -40,7 +40,7 @@ a health HUD, and a round that is won or lost with a "Play again" overlay. `?see
 1 and 2): a rifle (25 damage, 12 rounds) and a marksman rifle (50 damage, 5 rounds); R reloads, shots spend rounds, and the
 ammunition shows in a plain-React HUD (`react/components/dom/ammo-hud/`). Five packages: `webapp/`, `engine/`, `acceptance-tests/`, `shared/` (tool
 config plus the state-hook snapshot types) and `ai/` (merged in from `ai`'s worktree on 2026-11-12, `8c52f5f`; `ai` owns it, read
-`ai/AGENTS.md` before touching it). `pnpm checks` is green: engine 492 unit tests, webapp 101, `ai` 67, and 61 acceptance
+`ai/AGENTS.md` before touching it). `pnpm checks` is green for `build`'s packages: engine 512 unit tests, webapp 127, and 73 acceptance
 specs (the weapon, HUD, dummy, sparring and duel specs pass at `--repeat-each=10`). Every spec and unit test has been mutation-proved. Read
 `engine/AGENTS.md`, `webapp/AGENTS.md`, `webapp/src/react/AGENTS.md` and `acceptance-tests/AGENTS.md` first.
 
@@ -206,7 +206,45 @@ RNG, no `Date.now()` or `Math.random()`. The webapp renders it and sends input.
         the pinned fight's timing, so `search` has no assertion of its own in a browser. Not tested by feel yet: is it engaging, is it beatable, does it
         stick on pillars (the 20-seed test says not on the practice pillars). **Next for it: the user plays it and sets the
         tunables.**
-  - [ ] Best of three.
+  - [x] **Best of three** (2026-11-13; the duel only, first to two rounds). Engine: `match/` (`Match`, `StartMatch`, `ScoreRound`,
+        `DecideMatch`, `NextRound`, `winning/RoundsToWin`) and an optional `World.match`, which `step` scores once in the step that
+        decides a round (a simultaneous kill is the opponent's, as before). Webapp: the duel is a match; `RoundBanner` keeps
+        "You won" / "You lost" for a round, adds the score and a **"Next round"** button, then "You won the match" / "You lost
+        the match" and "Play again"; a `score-hud/` readout ("Round 2 · You 0 · Opponent 1"); `nextRoundOfPage` (a fresh
+        duel, the score kept, seed = page seed + rounds played, so `?seed=` replays a whole match); the state hook gained an
+        optional `match` (`shared/`'s `MatchSnapshot`). Decisions the user made: a button, not a timer; **full reset** each
+        round (health, positions, magazines and reserve; only the score carries over); sparring and the practice range stay
+        one endless round. **Found on the way: a click on the banner's button also pulled the trigger** (the latch listens
+        on `window`), so "Next round", and "Play again" before it, fired a shot into the round they started; `PullsTheTrigger`
+        now ignores a press on a `button`. Spec `PlayingABestOfThree` (12 criteria: nothing to nothing at the start; a lost round
+        scores for the opponent and offers "Next round"; round 2 keeps the score, with both fighters restored (measured against the frozen end of round 1, since round 2 is live); two
+        lost rounds lose the match and offer only "Play again"; "Play again" starts a fresh match), 200 of 200 at
+        `--repeat-each=10` with the other duel specs. Mutation: 12 engine, 13 webapp and 7 browser mutants, all killed by the
+        right tests. **Gap, measured:** no browser spec *wins* a round or a match. Over 60 seeds
+        (idle for a start delay, aim at where the bot stands, hold fire) a round is won only when the aim is taken at exactly
+        0.50 s of game time, the same for every seed (0 of 60 at 0.45 s or 0.55 s, also with up to 0.1 s of aim-to-fire lag): a
+        timing window no spec can hit, not a seed property, and a spec-only way to win would be a seam. The win paths are
+        covered by engine and webapp unit tests only.
+        Not done: a round timer, the closing ring, a pause or countdown between rounds, random spawns.
+  - [x] **`engine/src/` sub-foldered, and `Engine.ts` added** (2026-11-13, at the user's request: several entry points share a
+        root only when they share the subject; a helper with one caller goes beneath it; `src/` has one entry file too). New
+        `src/Engine.ts` (`engine = {startingWorld, step}`, type in `src/types/Engine.ts`, 4 tests, 2 mutants killed); the webapp's
+        loop (`UseGameLoop`) and `worldOfScenario` call through it. Moved, with their tests and every import rewritten:
+        `opponent/state/{Engage,Reload,Search,Wander}` to `opponent/state/acting/` (their helper folders with them), `opponent/aim/`
+        to `state/acting/engage/aim/`, `opponent/cover/` to `state/acting/reload/cover/`, `StartingBrain` and `BrainStart` to
+        `opponent/brain/`; `bullet/hit/{DistanceToCircle,DistanceToFighter,FirstContact,NearestDummyHit}` and `Reach` to
+        `bullet/flight/meeting/`, `DummyHit` and (from `geometry/`) `Ray` to `bullet/flight/types/`. Left alone on purpose:
+        `movement/` (a recorded decision), `opponent/{sight,steering,unstick}` (several callers), and the 8-file
+        `opponent/types/` and 7-file `bullet/types/` (types are one folder by rule). No behaviour change: engine 516, webapp 127
+        and `ai` 152 tests pass, 73 of 73 specs on the production build. There is no property-test suite yet (no
+        `test:properties` script), so that step had nothing to run.
+  - [x] **Newest audio code cleaned up** (2026-11-14, at the user's request; `webapp/audio/` is `art`'s folder, so this is logged in
+        `HANDOFF.md`). `encoding/` split into named, tested units (no code in two places: it reuses `peakOf`, `AUDIO_FORMAT`,
+        `MASTERING.maxLoopJump`, `wavHeader`); `qa/` replaced by `generator-scripts/browser/` (own local server, two controls, the
+        page's limits injected from `VERIFICATION_LIMITS`); `AGENTS.md` and `README.md` updated. Output unchanged (MP3 hashes, Ogg
+        decoded audio, both verification reports byte for byte). Asked: is there a library for the encoding? No: the encode is one
+        `ffmpeg` call per file (about 65 lines); the rest is verification and safe publishing, `fluent-ffmpeg` is deprecated, and
+        the JS encoders would change the bytes and the MP3 delay header the loop findings depend on.
   - [ ] Dim arena outside a detailed forward cone, set by equipped weapon and standing/crouched stance. Rotate it
         with aim through 360°; reveal terrain detail and players/items only in the unoccluded cone. Three height levels
         and longer-range, substantially slower crouch follow `HANDOFF.md`. Cone ownership is settled.

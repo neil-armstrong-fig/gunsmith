@@ -36,6 +36,26 @@ export class RoundPlaywright extends BasePage {
     await expect(this.page.getByTestId("round-banner")).toBeHidden();
   }
 
+  /** The score line on the banner; waits for the banner to appear first. */
+  async getBannerScore(): Promise<string> {
+    const score = this.page.getByTestId("round-banner-score");
+    await expect(score).toBeVisible();
+
+    return await score.innerText();
+  }
+
+  async isNextRoundOffered(): Promise<boolean> {
+    return await this.page.getByRole("button", {name: "Next round"}).isVisible();
+  }
+
+  async isPlayAgainOffered(): Promise<boolean> {
+    return await this.page.getByRole("button", {name: "Play again"}).isVisible();
+  }
+
+  async nextRound(): Promise<void> {
+    await this.page.getByRole("button", {name: "Next round"}).click();
+  }
+
   async playAgain(): Promise<void> {
     await this.page.getByRole("button", {name: "Play again"}).click();
   }

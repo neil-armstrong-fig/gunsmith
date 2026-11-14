@@ -1,7 +1,8 @@
 # AGENTS.md: audio
 
 `@gunsmith/audio-studies` renders the original audition pack (effects, two music loops and a mixed audition) offline with
-`node-web-audio-api`, and writes WAVs and `measurements.json` into `generated-audio/`. It is a private tooling workspace
+`node-web-audio-api`, and writes WAVs and `measurements.json` into `generated-audio/`. It then encodes the WAV masters
+to Ogg Vorbis and MP3 candidates in `encoded-audio/` with `ffmpeg`, and checks those natively and in Chromium and WebKit. It is a private tooling workspace
 owned by `art`, not a game package, and it is never imported by the game. `README.md` is the listening guide and the
 decisions; this file is how the code is laid out. The root `AGENTS.md` standards apply.
 
@@ -14,11 +15,18 @@ When a sound is meant to change, re-render with `pnpm render`, say so, and let t
 ## Commands
 
 ```bash
-pnpm --filter @gunsmith/audio-studies checks   # lint, format, types and the fast tests (about a second)
+pnpm --filter @gunsmith/audio-studies checks   # lint, format, types and the fast tests (a few seconds)
 pnpm --filter @gunsmith/audio-studies render        # re-render the pack into generated-audio/ (replaces the files)
 pnpm --filter @gunsmith/audio-studies test:render   # render the whole pack into a temp folder and compare every file
                                                     # to generated-audio/ byte for byte (minutes; not in checks)
+pnpm --filter @gunsmith/audio-studies encode          # masters -> encoded-audio/ (needs ffmpeg with libvorbis; see the README)
+pnpm --filter @gunsmith/audio-studies verify:encoded   # decode every export natively; writes verification.json
+pnpm --filter @gunsmith/audio-studies verify:browser   # decode them in Chromium and WebKit; writes browser-verification.json
 ```
+
+`verify:encoded` and `verify:browser` exit non-zero while art's findings stand (the README lists them): a red run is the
+result, not a fault in the tool. `encode` replaces `encoded-audio/`, and Ogg bytes change on every encode (the container
+carries a random stream serial number), so compare a re-encode by decoded audio, MP3 by hash.
 
 Run `test:render` after any change to a recipe, the synthesis, the levels or the encoding. The fast tests cover every stage
 on its own, and the whole pipeline on a tiny pack; `pack/verification/CommittedPack.test.ts` checks the committed WAVs against the hashes
@@ -61,6 +69,21 @@ it to `common/` rather than reaching across.
 - `pack/`: `MakeAudioPack` is the real pack (`types/AudioPack`). `verification/` holds the tests that look at the whole pack:
   `PackFingerprint` (the recipes), `CommittedPack` (the committed WAVs against their hashes) and `RenderedPack` (the slow
   byte-for-byte render).
+- `encoding/`: `EncodeAudio` encodes every measured master but the audition mix into a staging folder and publishes only if all
+  succeeded, the report last (`publish/`). `masters/` loops the masters and `masters/master/` encodes one (hash checked
+  before and after, so the approved masters are never changed); `encoder-arguments/` is the one list of `ffmpeg` arguments
+  (`codec/` holds each codec's flags), `settings/` the rate and qualities, `files/` what an export may be called, and `format/`
+  the two formats. `process/` runs a program without a shell and finds the build (`binary/`: the `FFMPEG` override, Homebrew's full
+  build, or the system one). `verification/VerifyEncoded` decodes every export **with the same build that encoded it** (its
+  `ffprobe` is the one beside it): a wrong name, hash or codec stops it with no report; a finding (`failures/`: length, loop join,
+  crouch level, against `limits/`) is written to `verification.json` and then fails. `pcm/` measures decoded floats and
+  `report/` reads and writes the three reports (Prettier-formatted, so a report passes `format:check`). `fixture/` builds the
+  small source the tests encode.
+- `browser/`: `VerifyBrowserAudio` serves the check page from this machine (`serve/`, a port the system picks, only the page and
+  `encoded-audio/`), opens it in each browser (`run/`), and proves the check can fail with two controls (`controls/`: a corrupt
+  file, a loop that jumps at its join). `page/` is the page and its script, plain JavaScript because it runs in the browser;
+  it takes its limits from `VERIFICATION_LIMITS`, which the runner injects, so a limit is written once. Playwright is
+  borrowed from `acceptance-tests/` (`playwright/LoadPlaywright`), not a dependency of this package.
 
 ## Conventions specific to this package
 
@@ -71,5 +94,9 @@ it to `common/` rather than reaching across.
 - **A voice is a tone or a noise, never a bag of flags.** Noise carries a seed; a tone carries a pitch.
 - **Numbers that were tuned by ear live in one named table** (`VOICE_SHAPE`, `STRIKE_SHAPE`, `STANCE_SHAPE`, `MASTERING`,
   `BASS_PATTERNS`, `KICK_PATTERNS`), not inline.
+- **Encode and verify with one `ffmpeg` build.** Both read `FFMPEG` or Homebrew's full build, and `ffprobe` is found beside it, so a
+  result names the build that made it. The limits a decoded export is held to (`encoding/verification/limits/`) are shared with the
+  browser page, and the loop-join limit is the mastering one: compression may not make a loop click more than its master.
+- **A red verification is a finding, never a number to loosen.** Do not change a limit, a tolerance or a master to make a run green.
 - **The measurements record the engine version** (`output/measurements/WriteMeasurements.ts`); a test fails if it differs from the installed
   `node-web-audio-api`, which `pnpm-workspace.yaml` pins. Upgrading it means a re-render and the user's ear.

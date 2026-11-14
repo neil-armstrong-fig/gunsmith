@@ -1,5 +1,5 @@
 import type {World} from "@gunsmith/engine/game-loop/types/World";
-import {startingBrain} from "@gunsmith/engine/opponent/StartingBrain";
+import {startingBrain} from "@gunsmith/engine/opponent/brain/StartingBrain";
 
 /**
  * The same world with its opponent given a brain, which plays it: a world's opponent without one takes no action at all

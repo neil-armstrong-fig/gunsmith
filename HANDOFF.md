@@ -112,6 +112,15 @@ known effect/animation presets, palette roles, fixed anchors and one reusable re
 legacy fallback, initial budgets to measure and build/AI/art acceptance criteria. This is an M2 proposal, not a frozen
 interface. Build implements the schema and renderer; AI reviews generation/eval cost; art supplies top-down QA.
 
+## Authored weapon-parts experiment (2026-11-14)
+
+Art supplies `docs/art/concepts/weapon-parts-kit-05/Parts.json`, twelve recipes and matching drawings.
+Its `Assembly.md` defines the provisional attachment/size/mirroring interface and expansion conventions.
+This is a proposed art-data interface for AI's kit probe, not a new production schema or renderer.
+All twelve expanded drawings pass AI's current draft validator after temporary format conversion.
+User identity approval, model selection/placement and runtime performance are unmeasured. Build/AI own
+those implementations; art's README records unsupported identities and proposed handling.
+
 ## Folder ownership
 
 | Path | Owner |
@@ -136,6 +145,75 @@ interface. Build implements the schema and renderer; AI reviews generation/eval 
 ## Delivery log
 
 Newest first. One line each: date, who, what, where.
+
+- 2026-11-14, `art`: **authored weapon-parts kit 05 delivered** under `docs/art/concepts/weapon-parts-kit-05/`:
+  18 original pieces, six primary/six alternate recipes, expanded JSON/SVGs, catalogue, native-size/grayscale
+  and standing/crouched held reviews at four angles for both teams. Explicit recipe interpretation and identity
+  limitations supplied to AI/build. Twelve geometry/SVG comparisons and AI-draft compatibility checks pass;
+  nine faulty recipe controls rejected. User identity review and model-selection evaluation remain pending.
+  Newer AI-worktree Haiku results acknowledged; no model call, runtime/schema edit, dependency or commit.
+  Final root `pnpm checks` exits 0 (516 engine, 152 AI, 127 webapp, 253 audio passed / one skipped).
+  Art's TODO and shared art status updated. Manifest keys: none.
+
+
+- 2026-11-13, `art`: **context-clear review reconciled main with the AI worktree's newer visual findings.**
+  `TODO-art.md` now prioritises the user's authored-parts kit (roughly 10–20 parts, anchors/parameters, six oddity
+  compositions) for AI to probe. Source: worktree `docs/ai-visual-generation.md` and its TODO/handoff updates:
+  primitive first answers 1/72 valid, 59/72 stand-ins, user judged none close. Main's best-of-three and compressed-audio
+  deliveries retained; audio production remains blocked by measured codec/browser failures. No asset/schema/code change,
+  worktree mutation, merge, paid call or commit. Shared art/AI status reconciled with main merge `e40e9a1`; outstanding
+  owner requests updated. Root `pnpm checks` passes; documentation diff review passes.
+
+
+- 2026-11-13, `art`: production-audio preparation in `webapp/audio/`: 38 Ogg/MP3 candidates, staged/hash-checked exporter,
+  native verifier and isolated Chromium/WebKit harness with corrupt/discontinuous negative controls. Masters byte-identical
+  in full-render comparison. Strict QA is red: 13 native/Chromium Vorbis effect-duration failures; WebKit 34 candidates fail
+  duration/level/seam checks. Both MP3 music loops pass in both browsers. Production remains blocked; full details/reports
+  linked in audio README. Root `pnpm checks` passes (audio 177 pass / one slow check skipped); separate full render passes,
+  six mutants killed and both browser negative controls reject faulty fixtures. Homebrew FFmpeg/full and WebKit installed; pnpm dependencies unchanged. Manifest keys: none.
+
+
+- 2026-11-13, `build`: **Best of three, test first.** The duel (`?scenario=duel`) is now a match, first to two rounds; sparring and
+  the practice range are unchanged. `engine/` gains `match/` and an optional `World.match` that `step` scores once per round;
+  the webapp gains a "Next round" button (the user chose a button over a timer, and a full reset of health, positions and
+  magazines each round), "You won the match" / "You lost the match", a score readout and `nextRoundOfPage` (seed = page seed
+  plus rounds played, so `?seed=` replays a whole match). **The state hook's snapshot gained an optional `match`**
+  (`shared/src/state-hook/types/MatchSnapshot.ts`: `playerWins`, `opponentWins`, `round`), the one change in `shared/`.
+  Found and fixed on the way: a click on an overlay button also pulled the trigger, firing a shot into the round it started.
+  New spec `PlayingABestOfThree` (12 criteria); 73 acceptance specs pass, the duel specs 200 of 200 at `--repeat-each=10`;
+  engine 512 and webapp 127 unit tests; 12 engine, 13 webapp and 7 browser mutants, all killed. No browser spec wins a round (measured over 60
+  seeds: a win needs the aim taken at exactly 0.50 s of game time, so it is a timing window, not a seed; unit tests cover it). No contract changed; nothing for `ai` or `art` to wire. Uncommitted, for the user's review. **For `ai`:**
+  root `pnpm checks` currently stops in `ai` (not my change): `ai/src/pipeline/appearance/` is untracked, with three red-first test
+  files whose code does not exist yet, and Prettier flags two of them; `ai`'s other 27 files (163 tests) pass against this engine.
+
+- 2026-11-13, `build`: **`engine/src/` sub-foldered, at the user's request, with a new `src/Engine.ts`.** No behaviour change.
+  `Engine.ts` exports `engine = {startingWorld, step}` (the two calls that run a game; not a barrel); the webapp's game loop and
+  `worldOfScenario` go through it. Paths moved inside `engine/`: the opponent's four states are now in
+  `opponent/state/acting/` (with `aim/` under `engage/` and `cover/` under `reload/`), `StartingBrain` is in `opponent/brain/`,
+  and the bullet's meeting helpers are in `bullet/flight/meeting/` (`Ray` moved from `geometry/types/` to
+  `bullet/flight/types/`). **For `ai` and `art`:** nothing in `ai/`, `shared/` or `art`'s folders imports any of these paths
+  (checked), and no contract changed; if `ai` later imports the engine, `@gunsmith/engine/Engine` is the front door and
+  `@gunsmith/engine/arena/ArenaFrom` and `.../match/...` are unchanged. Engine 516, webapp 127 and `ai` 152 tests pass, and 73 of 73
+  specs pass on the production build. Uncommitted: plain `mv`, so the index still lists some old paths as staged additions
+  until the user re-adds.
+
+- 2026-11-14, `build`: **The newest audio code (`webapp/audio/`: the compressed-candidate encoder, its checks and the browser QA) is
+  cleaned up to the project's standards, at the user's request. No sound or output change.** `art`'s folder, so `art` should know
+  where things went. `generator-scripts/encoding/` is now small named units under `EncodeAudio` and `verification/VerifyEncoded`
+  (a test beside each; the one long integration test is one `it` per claim), and the `qa/` folder is gone: its browser check is
+  `generator-scripts/browser/` (type-checked and linted, `pnpm verify:browser` unchanged), which **starts its own local server on a
+  port the system picks, so the manual `python3 -m http.server 3187` step is no longer needed**. Fixed on the way: verification now
+  decodes with the same `ffmpeg` build that encoded (it used the one on the path); the reports are written Prettier-formatted, so
+  they pass `format:check`; the audition key is one constant (`output/mix/AuditionKey`); the page's limits are written once
+  (`VERIFICATION_LIMITS`, with the loop-join limit the mastering one) instead of three times. **Unchanged, proved:** a fresh encode
+  matches `encoded-audio/` (MP3 by hash, Ogg by decoded audio: Ogg bytes differ on every encode, its container carries a random
+  serial number), and `verify:encoded` and `verify:browser` reproduce the committed `verification.json` and
+  `browser-verification.json` byte for byte, **including your 13 native and the WebKit findings, which are still red**: they are
+  `art`'s to resolve, and no limit was loosened. `pnpm checks` in `audio-studies` passes (254 tests, one slow render skipped);
+  25 of 27 mutants were killed first time and the 2 survivors led to a new test and a removed redundant line; 5 of 5 browser
+  mutants were killed by the runner's own controls. **Open for the user:** the browser check borrows Playwright from
+  `acceptance-tests/` (`browser/playwright/LoadPlaywright`) rather than adding a dependency to `audio-studies`; adding
+  `"@playwright/test": "catalog:"` there would remove that borrow and the hand-written Playwright types, and needs the user's say.
 
 - 2026-11-13, `build`: **The audio code is cleaned up to the project's standards, at the user's request, with the audio
   unchanged.** `webapp/audio/` (`art`'s tooling workspace) was 704 lines of dense, flag-driven code with one test that rendered

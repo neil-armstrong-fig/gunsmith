@@ -1,6 +1,7 @@
 import type {ArenaSnapshot} from "@gunsmith/shared/state-hook/types/ArenaSnapshot";
 import type {BulletSnapshot} from "@gunsmith/shared/state-hook/types/BulletSnapshot";
 import type {DummySnapshot} from "@gunsmith/shared/state-hook/types/DummySnapshot";
+import type {MatchSnapshot} from "@gunsmith/shared/state-hook/types/MatchSnapshot";
 import type {OpponentSnapshot} from "@gunsmith/shared/state-hook/types/OpponentSnapshot";
 import type {PlayerSnapshot} from "@gunsmith/shared/state-hook/types/PlayerSnapshot";
 import type {RoundSnapshot} from "@gunsmith/shared/state-hook/types/RoundSnapshot";
@@ -16,10 +17,12 @@ export interface GameStateSnapshot {
   opponent?: OpponentSnapshot | undefined;
   /** Whether the round is still being fought, or has been won or lost. */
   round: RoundSnapshot;
+  /** The best-of-three this round belongs to; absent in a game that is not a match, such as the practice range or sparring. */
+  match?: MatchSnapshot | undefined;
   /** The shots in the air right now. */
   bullets: BulletSnapshot[];
   /** The practice dummies still standing. */
   dummies: DummySnapshot[];
-  /** Game time since the match began, in seconds. Specs wait on this, never on the wall clock. */
+  /** Game time since the round began, in seconds; it starts again from zero with each round. Specs wait on this, never on the wall clock. */
   elapsedSeconds: number;
 }

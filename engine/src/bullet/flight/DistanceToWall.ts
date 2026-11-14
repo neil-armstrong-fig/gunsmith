@@ -1,6 +1,6 @@
 import {isSolid} from "@gunsmith/engine/arena/IsSolid";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
-import type {Ray} from "@gunsmith/engine/geometry/types/Ray";
+import type {Ray} from "@gunsmith/engine/bullet/flight/types/Ray";
 
 /** A bullet is checked at least this often along its path, so a one-tile wall can never be jumped. */
 const SAMPLE_SPACING = 0.1;
