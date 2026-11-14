@@ -10,4 +10,6 @@ export interface Cone {
   halfAngleRadians: number;
   /** How far the cone reaches, in tiles. */
   range: number;
+  /** The level the fighter looks from: ground on a higher level hides what is on it and behind it, ground on their own level or lower does not. */
+  eyeLevel: number;
 }

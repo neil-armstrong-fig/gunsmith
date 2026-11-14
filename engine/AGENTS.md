@@ -26,14 +26,15 @@ everything else is a domain folder. Tiles are the unit; `x` grows to the east an
   up, and an arrow `^ v < >` a stair that climbs the way it points; it throws unless a stair has plain floor behind it and ahead of
   it, the far one exactly one level higher, so every stair has a landing at each end), `IsSolid` (outside the arena counts as solid),
   `LevelOfTile` (a stair has the level of its low end; beyond the edge, 0) and `StairOfTile` (the way a stair climbs, or `undefined`).
-  `types/Arena.ts` is a width, a height and flat lists, one entry per tile: `solid`, `levels` and `stairs` (`TileStair`); `Uphill` is
+  `SolidTilesOf(arena)` is the `BlockedTiles` test (`types/BlockedTiles.ts`: a tile's x and y in, blocked or not out) for walls and nothing else, which is what a bullet and the opponent's walking goals ask. `types/Arena.ts` is a width, a height and flat lists, one entry per tile: `solid`, `levels` and `stairs` (`TileStair`); `Uphill` is
   the list `UPHILLS` and its type; `DrawnArena` is the same lists while `ArenaFrom` still fills them. what only `ArenaFrom` uses is in
   `drawing/` (`DrawingCharacters`, `LevelOfCharacter`, `PlaceStairs`), and what only `PlaceStairs` uses is in `drawing/stairs/` (`LandingIndex`: is a
   neighbour plain floor; `UphillStep`: a direction as a step). Up to three levels (0 to 2); a stair is one tile and joins two neighbouring levels.
 - `movement/`: `PushOutOfWalls(blocked, centre, radius)`, circle against the tile grid; what counts as blocked is the caller's `BlockedTiles` test
-  (`types/`), so a wall and a drop between levels are the same thing to it. It resolves overlap along the line from the wall's nearest
+  (`arena/types/`), so a wall and a drop between levels are the same thing to it. It resolves overlap along the line from the wall's nearest
   point to the circle's centre, so a player slides along a wall. It does not sweep: the caller steps small, which is why
-  `step` is called with a fixed `TICK_SECONDS` from the webapp.
+  `step` is called with a fixed `TICK_SECONDS` from the webapp. The root file is the loop of passes; `pushing/PushOnce` is one pass over the tiles the circle could touch,
+  `pushing/tile/PushFromTile` the push from one tile, and `pushing/tile/inside/PushOutFromInside` the way out when the centre is inside it.
 - `player/`: `MovePlayer(arena, walk)` (a `types/Walk`: position, direction, seconds and whether crouching; walls and `height/BlockedFrom` stop it), `AimPlayer`, and `PlayerRadius` (the body, shared with `bullet/`). `walking/PlayerSpeed.ts` and
   `walking/CrouchSpeedFactor.ts` (0.4: a crouching player keeps 40% of the speed, a tunable) are `MovePlayer`'s; `types/Player.ts` (position, aim, one cool-down for both weapons, the `loadout`, which weapon is in hand,
   `crouching`, the reload still to run, absent when there is none, and `health`). Crouching follows `Input.crouching` (optional, absent means standing; held, not toggled) each step in `PrepareFighter`. The opponent is a `Player` too.
@@ -47,7 +48,7 @@ everything else is a domain folder. Tiles are the unit; `x` grows to the east an
   or the opponent, an opponent's can hurt the player, none hurts its own side, and the opponent's pass through dummies; a wall is found by sampling the path every 0.1 tile (so a one-tile wall cannot be
   jumped), a dummy or a fighter by an exact ray-against-circle test (`flight/meeting/DistanceToCircle`, so a graze is not missed between samples).
   Every bullet is judged against the dummies as they stood at the start of the step, so two landing together both count.
-  `flight/` (`DistanceToWall`, which takes any `Ray`, so a line of sight uses it too; its `types/` hold `Ray` and `DummyHit`),
+  `flight/` (`DistanceToWall(blocked, ray, distance)`, which takes any `Ray` and any `BlockedTiles` test, so a line of sight uses it too, with its own test; a bullet's is `SolidTilesOf`, walls only, so a bullet still flies over a drop; its `types/` hold `Ray` and `DummyHit`),
   `flight/meeting/` (`DistanceToCircle`, `NearestDummyHit`, `DistanceToFighter`, and `FirstContact`, which decides what a
   step meets first: a target counts only if strictly nearer than the wall, and a dummy beats a fighter at the same distance),
   `hit/` (`StrikesOf`, `DamageDealtBy`), `types/` (`Bullet`, `Shooter`, `ShotRequest`, `BulletFlight`, `FlightRequest`,
@@ -100,28 +101,30 @@ everything else is a domain folder. Tiles are the unit; `x` grows to the east an
   goal (or flips its strafe side). The four states sit in `state/acting/` beneath `ActOnState`, each with its helpers beside it:
   `engage/` (with `aim/`) and `reload/` (with `cover/`). Every tunable is one field of `Difficulty.ts`. `brain/StartingBrain` and `GiveOpponentBrain(world,
 seed)` give an opponent a brain; **an opponent with no brain takes no action at all** (the still target of sparring), and
-  `DisarmOpponent` empties its magazines and takes its brain away. The line-of-sight test it shares with the player is `vision/HasClearLine` (a bullet's
-  wall test, so what it cannot see a bullet cannot hit). Browser specs watch it engage, move, run its magazine down, reload
+  `DisarmOpponent` empties its magazines and takes its brain away. Its walking goals and its cover use `vision/sight/HasClearLine` with `SolidTilesOf` (a bullet's
+  wall test, so a place it picks is one a bullet can reach), not the sight test below, so it does not yet know a stair from a drop. Browser specs watch it engage, move, run its magazine down, reload
   and refill; `search` has no assertion of its own in a browser (it happens in every seed, but only the pinned fight's timing
   would notice it go). The engine tests and `ThinkOpponentOverAMatch.test.ts` (20 seeds: kills a standing player within 15 s,
   never in a wall, replays exactly, wanders a minute without getting stuck) carry the states.
-- `vision/`: what a fighter sees in detail. A `Cone` (`types/Cone.ts`: apex, aim, half angle in radians, range) is what `ConeOf(fighter)`
-  builds from the fighter's position and aim and the **weapon in hand** (`Weapon.visionDegrees`, `visionRange`; 90 degrees, 12 tiles
-  for the rifle and 16 for the marksman rifle, tunables). Root: `ConeOf`, `CanSeePoint(arena, cone, point)` (inside the cone and a clear
-  line), `HasClearLine` (a bullet's wall test; also the opponent's, so it stays here as the shared helper),
+- `vision/`: what a fighter sees in detail. A `Cone` (`types/Cone.ts`: apex, aim, half angle in radians, range, `eyeLevel`) is what `ConeOf(arena, fighter)`
+  builds from the fighter's position and aim, the level they stand on and the **weapon in hand** (`Weapon.visionDegrees`, `visionRange`; 90 degrees, 12 tiles
+  for the rifle and 16 for the marksman rifle, tunables). Root, the three entry points: `ConeOf`,
   `VisibleToPlayer(world)` (`{opponent, dummies, bullets}` booleans: what the player sees, and the same answer the server will use to decide
   what to send; the player's own bullets always show, the opponent's only in the cone) and `VisibleArea(arena, cone)` (the outline of the cone
-  with the walls cut out, always 50 points, for drawing the dim veil). Beneath: `cone/IsInCone` (one caller, `CanSeePoint`; compares the
+  with the walls and the higher ground cut out, always 50 points, for drawing the dim veil). Beneath: `sight/CanSeePoint(arena, cone, point)` (inside the cone and a clear
+  line **for that eye level**: `height/BlocksSightFrom`; also the opponent's `CanSee`) and `sight/HasClearLine(blocked, from, to)` (a line is clear when it meets no tile the `BlockedTiles` test blocks;
+  sight passes `BlocksSightFrom`, the opponent's goals pass `SolidTilesOf`); `cone/IsInCone` (one caller, `CanSeePoint`; compares the
   cosine, so no angle wraps) and `outline/ReachAlong` (one caller, `VisibleArea`; finds a wall's face by halving the last sample's gap, so the
-  outline sits on the wall and not a sample inside it). `cone/CrouchRangeFactor` (1.5, a tunable; one caller, `ConeOf`) multiplies the range of a crouching fighter and leaves the angle and the aim alone; the opponent never crouches yet. Not built yet: heights, sound, the cover and quiet that crouching is also meant to buy.
-- `height/`: levels and stairs, slice 1 (walking only). `BlockedFrom(arena, standingAt)` is the `BlockedTiles` test for a walker at that point: every wall,
+  outline sits on the wall and not a sample inside it). `cone/EyeLevelAt(arena, point)` (one caller, `ConeOf`) is the level a viewer looks from: the level of their ground, or the **upper** level while they are on a stair. `cone/CrouchRangeFactor` (1.5, a tunable; one caller, `ConeOf`) multiplies the range of a crouching fighter and leaves the angle and the aim alone; the opponent never crouches yet. Not built yet: sound, the cover and quiet that crouching is also meant to buy, and a longer reach from higher ground (an idea to try after the blocking has been played).
+- `height/`: levels and stairs, slice 1 (walking) and slice 2 (seeing). `BlockedFrom(arena, standingAt)` is the `BlockedTiles` test for a walker at that point: every wall,
   and every tile on a level they cannot step to from where they stand. From a level they walk onto floor of that level and onto a stair
   that joins it; from a stair, onto floor of either level it joins; so a stair is the only way across a drop, and the drop is a wall to
   the level below and the level above. It judges from where the walker **stood**, not where the step ends, so one long step cannot jump
-  a drop. `LevelAt(arena, point)` is the level of the tile, or half way (`level + 0.5`) anywhere on a stair; the snapshot reports it. A
+  a drop. `LevelAt(arena, point)` is the level of the tile, or half way (`level + 0.5`) anywhere on a stair; the snapshot reports it. `BlocksSightFrom(arena, eyeLevel)` is the `BlockedTiles` test for sight: every wall, and every tile on a level higher than the viewer's eye
+  (a stair has the level of its low end), so from the low ground a platform and what stands on it are hidden, and its edge hides what lies behind, while from a platform the ground below and the platform itself
+  show; walls still block everything. No sloped line of sight, and no cover with a height yet, so "higher ground sees over lower cover" waits for cover. A
   stair's flanks are not checked: a raised tile beside a stair's middle can be entered from the stair, so arenas keep stairs between walls
-  or low ground (an arena validator is to come). **Not built yet:** vision over height (higher ground sees over cover, lower ground cannot see up),
-  bullets and cover across levels, the opponent walking stairs (it picks goals it can see and drops one it cannot reach, so it is not
+  or low ground (an arena validator is to come). **Not built yet:** bullets and cover across levels, the opponent walking stairs (it picks goals it can see and drops one it cannot reach, so it is not
   at home in an arena with levels), three-level arenas in play, and the ring's escape time by the stairs.
 - `game-loop/`: the body of the game loop: `startingWorld(arena, dummyPositions, opponentPosition?)` (the opponent faces west
   with the same weapons and 100 health, and no brain: `giveOpponentBrain` adds one) and `step`. Each fighter, the player by

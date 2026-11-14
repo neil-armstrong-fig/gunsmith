@@ -1,12 +1,12 @@
 import type {World} from "@gunsmith/engine/game-loop/types/World";
-import {canSeePoint} from "@gunsmith/engine/vision/CanSeePoint";
+import {canSeePoint} from "@gunsmith/engine/vision/sight/CanSeePoint";
 import {coneOf} from "@gunsmith/engine/vision/ConeOf";
 import type {VisibleToPlayer} from "@gunsmith/engine/vision/types/VisibleToPlayer";
 
 /** What the player sees in `world`: the opponent and each dummy, inside the player's cone and with no wall in the way. */
 export function visibleToPlayer(world: World): VisibleToPlayer {
-  const cone = coneOf(world.player);
   const {opponent, arena} = world;
+  const cone = coneOf(arena, world.player);
 
   return {
     opponent: opponent !== undefined && canSeePoint(arena, cone, opponent.position),

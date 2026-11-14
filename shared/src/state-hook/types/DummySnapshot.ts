@@ -6,6 +6,6 @@ export interface DummySnapshot {
   x: number;
   y: number;
   health: number;
-  /** Whether it is inside the player's cone with no wall in the way. The game does not draw it when it is not. */
+  /** Whether it is inside the player's cone with no wall or higher ground in the way. The game does not draw it when it is not. */
   visible: boolean;
 }

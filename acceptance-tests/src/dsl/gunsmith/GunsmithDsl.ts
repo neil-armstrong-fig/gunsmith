@@ -88,7 +88,7 @@ export class GunsmithDsl {
     }
   }
 
-  /** Opens the heights arena: low ground beside a raised platform, with one stair up and no opponent. */
+  /** Opens the heights arena: low ground beside a raised platform, with one stair up, a dummy on each level and no opponent. */
   async startHeights(): Promise<void> {
     try {
       await this.gunsmith.openHeights();

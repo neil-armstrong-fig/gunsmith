@@ -1,8 +1,9 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
+import {solidTilesOf} from "@gunsmith/engine/arena/SolidTilesOf";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import {DIFFICULTY} from "@gunsmith/engine/opponent/Difficulty";
-import {hasClearLine} from "@gunsmith/engine/vision/HasClearLine";
+import {hasClearLine} from "@gunsmith/engine/vision/sight/HasClearLine";
 import {actReload} from "@gunsmith/engine/opponent/state/acting/Reload";
 import {startingBrain} from "@gunsmith/engine/opponent/brain/StartingBrain";
 import type {OpponentBrain} from "@gunsmith/engine/opponent/types/OpponentBrain";
@@ -87,7 +88,7 @@ it("looks for cover when it sees the player and has none yet, and heads for it",
     const {goal} = act.brain;
     if (goal) {
       found++;
-      expect(hasClearLine(blocked, PLAYER, goal)).toBe(false);
+      expect(hasClearLine(solidTilesOf(blocked), PLAYER, goal)).toBe(false);
       if (Math.hypot(goal.x - HERE.x, goal.y - HERE.y) >= DIFFICULTY.arrivalRadius) {
         expect(act.input.direction.x === 0 && act.input.direction.y === 0).toBe(false);
       }

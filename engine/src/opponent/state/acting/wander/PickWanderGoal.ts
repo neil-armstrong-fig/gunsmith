@@ -1,4 +1,5 @@
-import {hasClearLine} from "@gunsmith/engine/vision/HasClearLine";
+import {solidTilesOf} from "@gunsmith/engine/arena/SolidTilesOf";
+import {hasClearLine} from "@gunsmith/engine/vision/sight/HasClearLine";
 import {DIFFICULTY} from "@gunsmith/engine/opponent/Difficulty";
 import {randomOpenPoint} from "@gunsmith/engine/opponent/steering/RandomOpenPoint";
 import type {OpponentBrain} from "@gunsmith/engine/opponent/types/OpponentBrain";
@@ -22,7 +23,7 @@ export function pickWanderGoal(brain: OpponentBrain, context: OpponentContext): 
     if (
       point &&
       Math.hypot(point.x - opponent.position.x, point.y - opponent.position.y) >= DIFFICULTY.wanderMinDistance &&
-      hasClearLine(arena, opponent.position, point)
+      hasClearLine(solidTilesOf(arena), opponent.position, point)
     ) {
       return {...brain, seed, goal: point, secondsInState: 0};
     }

@@ -20,7 +20,7 @@ export class VisionDsl {
     }
   }
 
-  /** Whether the opponent is inside the player's cone with no wall in the way, as the game itself reckons it. */
+  /** Whether the opponent is inside the player's cone with no wall or higher ground in the way, as the game itself reckons it. */
   async isOpponentSeen(): Promise<boolean> {
     try {
       return await this.vision.isOpponentSeen();

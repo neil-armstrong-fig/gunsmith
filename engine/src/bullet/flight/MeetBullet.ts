@@ -1,3 +1,4 @@
+import {solidTilesOf} from "@gunsmith/engine/arena/SolidTilesOf";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import {distanceToWall} from "@gunsmith/engine/bullet/flight/DistanceToWall";
 import {distanceToFighter} from "@gunsmith/engine/bullet/flight/meeting/DistanceToFighter";
@@ -18,7 +19,7 @@ export function meetBullet(arena: Arena, flightRequest: FlightRequest, bullet: B
   const distance = bullet.speed * flightRequest.seconds;
   const dummyHit = hittableDummyHit(flightRequest, bullet, distance);
   const contact = firstContact({
-    wallDistance: distanceToWall(arena, bullet, distance) ?? Infinity,
+    wallDistance: distanceToWall(solidTilesOf(arena), bullet, distance) ?? Infinity,
     dummyHit,
     fighterDistance: distanceToFighter(fighterHurtBy(flightRequest, bullet), bullet, distance),
   });

@@ -2,7 +2,7 @@ import {isInCone} from "@gunsmith/engine/vision/cone/IsInCone";
 import type {Cone} from "@gunsmith/engine/vision/types/Cone";
 
 // A cone from (5, 5) facing east, 90 degrees wide (45 either side of the aim) and 10 tiles long.
-const EAST: Cone = {apex: {x: 5, y: 5}, aim: {x: 1, y: 0}, halfAngleRadians: Math.PI / 4, range: 10};
+const EAST: Cone = {apex: {x: 5, y: 5}, aim: {x: 1, y: 0}, halfAngleRadians: Math.PI / 4, range: 10, eyeLevel: 0};
 
 it("holds a point straight ahead", () => {
   expect(isInCone(EAST, {x: 8, y: 5})).toBe(true);

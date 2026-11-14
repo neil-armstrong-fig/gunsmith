@@ -1,7 +1,8 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
+import {solidTilesOf} from "@gunsmith/engine/arena/SolidTilesOf";
 import {findCover} from "@gunsmith/engine/opponent/state/acting/reload/cover/FindCover";
 import {DIFFICULTY} from "@gunsmith/engine/opponent/Difficulty";
-import {hasClearLine} from "@gunsmith/engine/vision/HasClearLine";
+import {hasClearLine} from "@gunsmith/engine/vision/sight/HasClearLine";
 
 const room = arenaFrom([
   "##############",
@@ -26,8 +27,8 @@ it("finds a place out of the threat's sight that can be walked to, within reach"
     seed = draw.seed;
     if (draw.cover) {
       found++;
-      expect(hasClearLine(room, THREAT, draw.cover)).toBe(false);
-      expect(hasClearLine(room, FROM, draw.cover)).toBe(true);
+      expect(hasClearLine(solidTilesOf(room), THREAT, draw.cover)).toBe(false);
+      expect(hasClearLine(solidTilesOf(room), FROM, draw.cover)).toBe(true);
       expect(Math.hypot(draw.cover.x - FROM.x, draw.cover.y - FROM.y)).toBeLessThanOrEqual(DIFFICULTY.coverReach);
     }
   }

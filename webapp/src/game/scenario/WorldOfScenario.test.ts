@@ -9,6 +9,7 @@ import {startMatch} from "@gunsmith/engine/match/StartMatch";
 import {DUEL_ARENA} from "@src/game/duel/DuelArena";
 import {DUEL_OPPONENT} from "@src/game/duel/DuelOpponent";
 import {HEIGHTS_ARENA} from "@src/game/heights/HeightsArena";
+import {HEIGHTS_DUMMIES} from "@src/game/heights/HeightsDummies";
 import {PRACTICE_ARENA} from "@src/game/practice/PracticeArena";
 import {PRACTICE_DUMMIES} from "@src/game/practice/PracticeDummies";
 import {worldOfScenario} from "@src/game/scenario/WorldOfScenario";
@@ -69,12 +70,20 @@ it("makes sparring and the practice range single rounds, with no match", () => {
   expect(worldOfScenario("practice", 7).match).toBeUndefined();
 });
 
-it("makes the heights arena with no dummies and no opponent", () => {
+it("makes the heights arena with a dummy on each level and no opponent", () => {
   const world = worldOfScenario("heights", 1);
 
-  expect(world).toEqual(startingWorld(HEIGHTS_ARENA));
+  expect(world).toEqual(startingWorld(HEIGHTS_ARENA, HEIGHTS_DUMMIES));
   expect(world.opponent).toBeUndefined();
-  expect(world.dummies).toEqual([]);
+});
+
+it("stands one dummy on the low ground and one on the platform, each four tiles from the player along their row", () => {
+  const {dummies, player, arena} = worldOfScenario("heights", 1);
+  const levels = dummies.map(dummy => levelAt(arena, dummy.position)).sort();
+
+  expect(levels).toEqual([0, 1]);
+  expect(dummies.map(dummy => Math.abs(dummy.position.x - player.position.x))).toEqual([4, 4]);
+  expect(dummies.every(dummy => dummy.position.y === player.position.y)).toBe(true);
 });
 
 it("starts the player on the low ground, with a stair climbing east from their row onto a platform", () => {

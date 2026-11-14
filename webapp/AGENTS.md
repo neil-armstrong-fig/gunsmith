@@ -66,7 +66,7 @@ managers are fine for updates that are not rapid). The decision and its sources 
 **Which match opens** is chosen once, from the page's query (`game/scenario/`): none is the practice range with its dummies,
 `?scenario=duel` is the duel, a best-of-three (an opponent with a brain who moves and shoots back; first to two rounds, `World.match`), `?scenario=sparring` the same arena with
 an opponent who has no brain and cannot shoot, `?scenario=heights` a low-ground and platform arena (`game/heights/HeightsArena.ts`) with one
-stair, no dummies and no opponent. It is a selector only, never a way to write state; it goes when a menu picks
+stair, a dummy on each level (`game/heights/HeightsDummies.ts`) and no opponent. It is a selector only, never a way to write state; it goes when a menu picks
 the match. `worldOfPage()` builds the world (`worldOfScenario(scenario, seed)`) and is also what "Play again" puts in the
 store. The opponent's choices are drawn from a seed (`game/scenario/seed/`): `?seed=42` replays a match exactly (the
 acceptance specs pin one), otherwise each page load and each "Play again" draws a fresh random one, which is the only
@@ -79,7 +79,7 @@ canvas is not in the DOM (`vision.range` is the cone's own, so it grows while th
 
 **Heights are drawn** by `three/arena-canvas/.../arena-heights/` (no labels): raised floor a step lighter per level (`colours/LevelColour`, the
 palette's `--color-gs-floor-l1` to `l3` repeated, since WebGL cannot read CSS variables), and each stair as four bands shaded from its low floor to
-its high one (`stairs/StairStripsOf`). The snapshot's `player.level` is the engine's `levelAt`; the drawing itself has no spec (canvas), its
+its high one (`stairs/StairStripsOf`). Every edge where a raised floor drops to lower open ground (not against a wall, and not on the side a stair arrives) gets a bright lip on the raised side and a shadow on the lower ground (`drops/DropStripsOf`, `drops/DropLipColour`; `heightTilesOf` finds them), so the edge reads as a cliff. The snapshot's `player.level` is the engine's `levelAt`; the drawing itself has no spec (canvas), its
 helpers have unit tests.
 
 The HUD is plain React over the canvas (`react/components/dom/ammo-hud/`, `health-hud/`, `score-hud/` (the round and the score, top

@@ -21,7 +21,7 @@ export function VisionOverlay(): JSX.Element {
     }
 
     const {arena, player} = gameState();
-    const next = dimmedGeometry(arena, visibleArea(arena, coneOf(player)));
+    const next = dimmedGeometry(arena, visibleArea(arena, coneOf(arena, player)));
 
     veilRef.current.geometry.dispose();
     veilRef.current.geometry = next;

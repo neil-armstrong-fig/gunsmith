@@ -24,6 +24,17 @@ export class DummiesPlaywright extends BasePage {
     return this.standingAt(dummies, place)?.health;
   }
 
+  /** Whether the player sees the dummy standing at `place`, as the game itself reckons it. Throws when no dummy stands there. */
+  async isSeenAt(place: Point): Promise<boolean> {
+    const {dummies} = await this.readGameState();
+    const standing = this.standingAt(dummies, place);
+    if (!standing) {
+      throw new Error(`No dummy stands at ${place.x}, ${place.y}.`);
+    }
+
+    return standing.visible;
+  }
+
   /** Waits until the dummy standing at `dummy` has less health than `health`. A dummy that is gone has none. */
   async waitForHealthBelow(dummy: Point, health: number): Promise<void> {
     await this.waitForGameState(({dummies}) => {

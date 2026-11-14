@@ -30,6 +30,15 @@ export class DummiesDsl {
     }
   }
 
+  /** Whether the player sees the dummy standing at `place`: inside their cone, with no wall or higher ground in the way. */
+  async isSeenAt(place: Point): Promise<boolean> {
+    try {
+      return await this.dummies.isSeenAt(place);
+    } catch (error) {
+      throw new DslError(`Failed to read whether the dummy at ${place.x}, ${place.y} is seen`, error);
+    }
+  }
+
   /** Waits until the dummy standing at `dummy` has less health than `health` (or has fallen, which is less still). */
   async waitForHealthBelow(dummy: Point, health: number): Promise<void> {
     try {

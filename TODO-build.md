@@ -29,7 +29,26 @@ Both are withdrawn until the game is fun (`HANDOFF.md` delivery log, 2026-11-12)
 
 ## Phase 1: the game, test first. Milestone M1 (redefined: the game is fun)
 
-### Resume here (written 2026-11-14, end of a session; read this first)
+### Resume here (written 2026-11-14, end of the fourth session; read this first)
+
+**State at the end of the fourth session.** Everything below is **uncommitted for the user's review** except the merge `ceb5063` (the `ai` worktree, merged a second time); the `ai`
+worktree is now behind main, so `ai` should `git merge main` there first. Root `pnpm checks` exits 0 (engine 679, webapp 179, `ai` 420, audio 254 with one slow render skipped).
+Done after the vision slice, at the user's word: **a bright lip and a shadow on every drop edge** of a platform (`arena-heights/drops/`), which the user looked at and said
+"the updated wall looks great"; `movement/PushOutOfWalls` split into `pushing/` helpers; `vision/` sub-foldered (`CanSeePoint` and `HasClearLine` now in `vision/sight/`;
+`ConeOf`, `VisibleToPlayer` and `VisibleArea` stay at the root); `HeightTilesOf` split into `tiles/positions/` and `tiles/drops/` helpers. All mutation-proved.
+
+**The first thing to do next session: bullets and cover across levels.** It is a known oddity the user will meet in `?scenario=heights`: bullets still stop only at walls
+(`SolidTilesOf`), so from the low ground the player can shoot the platform dummy they cannot see. **This needs a design plan first** (the user wants a detailed plan for a multi-slice
+feature before any test, memory `plan-big-slices-first`): the questions are whether a bullet crosses a drop or is stopped by a platform's face, whether a bullet fired from a platform flies over
+the low ground, and whether it follows the same `BlocksSightFrom` rule as sight. Then, in order: the opponent on stairs, a stair-flank validator, the closing ring and a round timer
+(fine to take the ring first if the user prefers), a longer reach for higher ground (an idea only, descoped by the user).
+
+**Loose ends.** The new browser-level mutation scripts are scratchpad-only (gone with the session). The drop-edge drawing has no spec (canvas): it was checked by screenshot, so a
+future change to it should be looked at again. `docs/art/asset-reference/` is untracked and is `art`'s. The `ai` row in `TODO.md` is `ai`'s to update.
+
+**2026-11-14, fourth session:** merged the `ai` worktree again (`ceb5063`: kit-arm notes and a drawings-sheet change; `HANDOFF.md` and `TODO.md` conflicts kept both
+sides), then built **heights, slice 2: vision over height**, test first, left uncommitted for the user's review (the item below). Root `pnpm checks` exits 0 (engine 661,
+webapp 161, `ai` 420); acceptance 98 of 98 on a production build, 520 of 520 at `--repeat-each=10` for the vision, arena, player and dummy specs.
 
 **2026-11-14, third session:** merged the `ai` worktree (`f456130`: Haiku evals, docs conflicts resolved keeping both sides), then built
 **heights, slice 1 (walking only)**, test first, left uncommitted for the user's review (see the item below). Root `pnpm checks` exits 0 (engine
@@ -45,8 +64,7 @@ Logged in `HANDOFF.md`: **best of three** (the duel only), **`engine/src/` sub-f
 **Next, in order (none was requested yet; ask or pick the first):**
 1. ~~The bot's tunables~~ **settled 2026-11-14:** the user played the duel with the cone and crouch and called the bot "fun to play
    against, easy to beat but it still needs a bit of moving and shooting". Leave `engine/src/opponent/Difficulty.ts` as it is.
-2. **Heights, the rest** (slice 1, walking, is done): higher ground extends vision and sees over cover, lower ground cannot see up; bullets and
-   cover across levels; the opponent on stairs (it has no pathfinder and picks goals it can see); a stair-flank check (an arena validator);
+2. **Heights, the rest** (slice 1, walking, and slice 2, seeing, are done; the drop edges are drawn): **bullets and cover across levels first (plan it with the user before coding)**; a longer reach for higher ground (an idea);  the opponent on stairs (it has no pathfinder and picks goals it can see); a stair-flank check (an arena validator);
    then the **closing ring** and a round timer (the smaller, stalemate-curing slice: fine to take it first if the user prefers). Crouch is done (slice 2).
 3. Owed to `ai`: a root `pnpm evals` script (see "Owed to `ai`" below).
 4. The `ai` row in `TODO.md` is stale (its worktree merged as `e40e9a1`): it is `ai`'s to update, so only mention it.
@@ -328,9 +346,24 @@ RNG, no `Date.now()` or `Math.random()`. The webapp renders it and sends input.
         gap:** a stair's flanks are not checked (a raised tile beside a stair's middle can be entered from it), so arenas keep stairs between
         walls or low ground until a validator exists. Not covered by a spec: the drawing (canvas). Next: vision over height, bullets and cover across levels,
         the opponent on stairs, then the ring.
-  - [ ] Dim arena, remaining: vision over height (higher ground sees over cover, lower ground cannot see up). Original item: dim arena outside a detailed forward cone, set by equipped weapon and standing/crouched stance. Rotate it
-        with aim through 360°; reveal terrain detail and players/items only in the unoccluded cone. Three height levels
-        and longer-range, substantially slower crouch follow `HANDOFF.md`. Cone ownership is settled.
+  - [x] **Heights, slice 2: vision over height (2026-11-14), test first.** The user chose the simple level rule and **descoped the range bonus**
+        ("add that as an idea to explore later"). A viewer's **eye level** is the level of their ground, or the upper level on a stair
+        (`vision/cone/EyeLevelAt`); **a tile blocks sight if it is a wall or on a level higher than the eye** (`height/BlocksSightFrom`). So from the low
+        ground a platform and everything on it is hidden, and its edge hides what is behind it; from a platform the low ground below and the platform show;
+        walls still block. `Cone` gained `eyeLevel`; `coneOf(arena, fighter)` takes the arena; `CanSeePoint` and `VisibleArea` pass `BlocksSightFrom(arena,
+        cone.eyeLevel)`, so `VisibleToPlayer`, the snapshot's `visible` flags, the opponent's `CanSee` and the dim veil's cut-out all follow. The line samplers
+        take a `BlockedTiles` test instead of an arena (`distanceToWall`, `reachAlong`, `hasClearLine`; `BlockedTiles` moved to `arena/types/`, and
+        `arena/SolidTilesOf` is the walls-only test bullets and the opponent's walking goals use, so they are unchanged). `?scenario=heights` gained a dummy on
+        each level (`game/heights/HeightsDummies`). Spec `SeeingAcrossLevels` (5 criteria; DSL `gunsmith.dummies.isSeenAt`). No `shared/` change. Engine 661,
+        webapp 161, `ai` 420; 98 of 98 specs on a production build, 520 of 520 at `--repeat-each=10` for the vision, arena, player and dummy specs. **Mutation:**
+        21 of 22 engine mutants killed (the survivor, `Math.ceil` to `Math.round` in `EyeLevelAt`, is equivalent: levels are whole numbers or n + 0.5); 3 browser
+        mutants (eye level fixed at 0, sight by walls only, the platform dummy moved down) each killed by the right criteria. The spec was written after the engine
+        code (its unit tests were red first), so its red run is the mutant "levels ignored", which fails exactly the "does not see it" criterion. **Stated defaults, to be set by
+        play:** a stair's eye level is its upper level; no sloped line of sight; the opponent inherits the rule through `CanSee` but its walking goals still use walls
+        only, so it does not know a stair from a drop. Not covered by a spec: the veil's drawing over height (canvas). **After the first look, at the user's word the platform's edge was hard to see:** every drop edge now has a bright lip and a shadow (`arena-heights/drops/`); looked at in a screenshot, not specced (canvas). The same session split `movement/PushOutOfWalls` into `pushing/` helpers (19 mutants killed, two gaps closed) and moved `CanSeePoint` and `HasClearLine` to `vision/sight/`. **Idea, not built:** a longer reach for higher
+        ground ("extends vision"); and "sees over lower cover" once cover has a height.
+  - [x] Dim arena (original item, now complete): dim arena outside a detailed forward cone, set by equipped weapon and standing/crouched stance, rotating
+        with aim through 360 degrees, revealing terrain detail and players/items only in the unoccluded cone, with height blocking sight (slice 2). Cone ownership is settled.
   - [ ] The closing ring after the round timer.
   - [ ] Pick up and drop a custom weapon; rough Web Audio gunshots.
 - [ ] **Demo checkpoint:** when the core is playable, tell the user it is ready for a first look. Agree what to cut or add

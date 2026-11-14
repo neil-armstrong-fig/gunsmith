@@ -50,3 +50,14 @@ it("does not see a player behind a wall, however near", () => {
 it("sees a player on the same spot", () => {
   expect(canSee(hall, opponentAt(2.5, 2.5), {x: 2.5, y: 2.5})).toBe(true);
 });
+
+// The opponent stands on the low ground at x = 2.5 with a platform one level up from x = 6 to x = 10.
+const platformAhead = arenaFrom(["###############", "#....11111....#", "#....11111....#", "###############"]);
+
+it("does not see a player on a platform when it stands on the low ground below, though the player is in front of it and in range", () => {
+  expect(canSee(platformAhead, opponentAt(2.5, 2.5), {x: 7.5, y: 2.5})).toBe(false);
+});
+
+it("sees a player on the low ground when it stands on the platform", () => {
+  expect(canSee(platformAhead, opponentAt(7.5, 2.5), {x: 12.5, y: 2.5})).toBe(true);
+});

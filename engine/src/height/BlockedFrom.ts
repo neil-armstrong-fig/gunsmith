@@ -3,7 +3,7 @@ import {levelOfTile} from "@gunsmith/engine/arena/LevelOfTile";
 import {stairOfTile} from "@gunsmith/engine/arena/StairOfTile";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
-import type {BlockedTiles} from "@gunsmith/engine/movement/types/BlockedTiles";
+import type {BlockedTiles} from "@gunsmith/engine/arena/types/BlockedTiles";
 
 /**
  * The tiles that stop a walker standing at `standingAt`: every wall, and every tile on a level the walker cannot step to

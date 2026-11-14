@@ -1,11 +1,12 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
+import {solidTilesOf} from "@gunsmith/engine/arena/SolidTilesOf";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
 import {DIFFICULTY} from "@gunsmith/engine/opponent/Difficulty";
 import {actWander} from "@gunsmith/engine/opponent/state/acting/Wander";
 import {startingBrain} from "@gunsmith/engine/opponent/brain/StartingBrain";
-import {hasClearLine} from "@gunsmith/engine/vision/HasClearLine";
+import {hasClearLine} from "@gunsmith/engine/vision/sight/HasClearLine";
 import type {OpponentBrain} from "@gunsmith/engine/opponent/types/OpponentBrain";
 import type {OpponentContext} from "@gunsmith/engine/opponent/types/OpponentContext";
 
@@ -40,7 +41,7 @@ it("chooses somewhere to go when it has no goal, a place it can see from where i
     const act = actWander(wandering(seed, HERE), contextIn(room, HERE));
 
     if (act.brain.goal) {
-      expect(hasClearLine(room, HERE, act.brain.goal)).toBe(true);
+      expect(hasClearLine(solidTilesOf(room), HERE, act.brain.goal)).toBe(true);
       expect(Math.hypot(act.brain.goal.x - HERE.x, act.brain.goal.y - HERE.y)).toBeGreaterThanOrEqual(
         DIFFICULTY.wanderMinDistance,
       );

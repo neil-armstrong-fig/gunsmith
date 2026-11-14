@@ -28,7 +28,7 @@ export function snapshotOf(world: World): GameStateSnapshot {
       reserve: carried.reserve,
       reloading: reloadRemainingSeconds !== undefined,
     },
-    vision: {degrees: carried.weapon.visionDegrees, range: coneOf(world.player).range},
+    vision: {degrees: carried.weapon.visionDegrees, range: coneOf(world.arena, world.player).range},
     opponent: opponentSnapshotOf(world, visible.opponent),
     round: world.round,
     match: matchSnapshotOf(world),

@@ -1,5 +1,6 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
-import {hasClearLine} from "@gunsmith/engine/vision/HasClearLine";
+import {solidTilesOf} from "@gunsmith/engine/arena/SolidTilesOf";
+import {hasClearLine} from "@gunsmith/engine/vision/sight/HasClearLine";
 import {nearestCover} from "@gunsmith/engine/opponent/state/acting/reload/cover/nearest/NearestCover";
 
 // A wall block stands in the middle of the room, tiles x 6 to 7 and y 2 to 6, with a clear row of floor above and below it.
@@ -28,7 +29,7 @@ it("passes over places the threat can see", () => {
     {x: 9.5, y: 4.5},
     {x: 9.5, y: 1.5},
   ];
-  expect(candidates.every(point => hasClearLine(room, THREAT, point))).toBe(true);
+  expect(candidates.every(point => hasClearLine(solidTilesOf(room), THREAT, point))).toBe(true);
 
   expect(nearestCover(room, {from: FROM, threat: THREAT, candidates})).toBeUndefined();
 });
@@ -36,7 +37,7 @@ it("passes over places the threat can see", () => {
 it("passes over a place the threat cannot see but that cannot be walked to in a straight line", () => {
   const threat = {x: 3.5, y: 1.5};
   const behindTheBlock = {x: 10.5, y: 4.5};
-  expect(hasClearLine(room, threat, behindTheBlock)).toBe(false);
+  expect(hasClearLine(solidTilesOf(room), threat, behindTheBlock)).toBe(false);
 
   expect(nearestCover(room, {from: FROM, threat, candidates: [behindTheBlock]})).toBeUndefined();
 });
