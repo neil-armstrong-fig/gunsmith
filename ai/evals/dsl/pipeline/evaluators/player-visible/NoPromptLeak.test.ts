@@ -1,6 +1,6 @@
 import {passingEvalInput} from "@evals/dsl/pipeline/evaluators/testing/input/PassingEvalInput";
 import {noPromptLeak} from "@evals/dsl/pipeline/evaluators/player-visible/NoPromptLeak";
-import {SYSTEM_PROMPT_CANARY} from "@gunsmith/ai/pipeline/prompts/SystemPromptCanary";
+import {SYSTEM_PROMPT_CANARY} from "@gunsmith/ai/pipeline/canary/SystemPromptCanary";
 
 it("passes a weapon with no canary", () => {
   expect(noPromptLeak(passingEvalInput()).score).toBe(1);

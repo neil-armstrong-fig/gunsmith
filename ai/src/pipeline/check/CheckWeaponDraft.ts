@@ -1,6 +1,6 @@
 import type {WeaponCheck} from "@gunsmith/ai/pipeline/check/types/WeaponCheck";
-import {rateWeaponDraft} from "@gunsmith/ai/pipeline/rate/RateWeaponDraft";
-import {validateWeaponDraft} from "@gunsmith/ai/pipeline/validate/ValidateWeaponDraft";
+import {rateWeaponDraft} from "@gunsmith/ai/pipeline/check/rate/RateWeaponDraft";
+import {validateWeaponDraft} from "@gunsmith/ai/pipeline/check/validate/ValidateWeaponDraft";
 
 /**
  * Everything code decides about what the model wrote, in order: does it parse (`validate`), then is it within the cap (`rate`).

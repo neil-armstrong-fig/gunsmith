@@ -1,5 +1,5 @@
 import type {EvalInput} from "@evals/dsl/pipeline/types/EvalInput";
-import type {EvalScore} from "@evals/dsl/pipeline/types/EvalScore";
+import type {EvalScore} from "@evals/dsl/types/EvalScore";
 
 const KEY = "modelCallBudget";
 

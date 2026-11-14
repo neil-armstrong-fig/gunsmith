@@ -27,7 +27,7 @@ Each has its own `AGENTS.md` (written when the package is scaffolded), and webap
 
 `docs/` holds research a decision in the code rests on, linked from the code it justifies. Add a document only when
 losing the reasoning would mean someone re-deriving it. Today: `docs/fuzzy-frontend.md`, `docs/game-design.md`, `docs/architecture.md`,
-`docs/match-netcode.md`, `docs/schemas.md`, `docs/ai-pipeline.md`, `docs/ai-hosting.md`, `docs/cost-and-budget.md`,
+`docs/match-netcode.md`, `docs/schemas.md`, `docs/ai-pipeline.md`, `docs/ai-hosting.md`, `docs/ai-visual-generation.md`, `docs/cost-and-budget.md`,
 `docs/privacy-and-data.md`, `docs/focused-case-study.md`, `docs/state-management.md`, `docs/art/`.
 
 ## The three builders

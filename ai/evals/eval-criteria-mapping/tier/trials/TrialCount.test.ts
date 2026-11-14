@@ -18,3 +18,13 @@ it("ignores a value that is not a positive whole number", () => {
   expect(trialCount("local", "2.5")).toBe(3);
   expect(trialCount("local", "many")).toBe(3);
 });
+
+it("runs a local tier as many times as the caller says is its default, for a slow case", () => {
+  expect(trialCount("local", undefined, 1)).toBe(1);
+  expect(trialCount("local", "many", 1)).toBe(1);
+});
+
+it("lets the environment override that default, and leaves the other tiers at one", () => {
+  expect(trialCount("local", "4", 1)).toBe(4);
+  expect(trialCount("fake", undefined, 2)).toBe(1);
+});

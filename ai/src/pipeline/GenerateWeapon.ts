@@ -1,14 +1,16 @@
 import {checkWeaponDraft} from "@gunsmith/ai/pipeline/check/CheckWeaponDraft";
 import type {WeaponCheck} from "@gunsmith/ai/pipeline/check/types/WeaponCheck";
-import {generateWeaponDraft} from "@gunsmith/ai/pipeline/generate/GenerateWeaponDraft";
-import {INVALID_WEAPON_REASON} from "@gunsmith/ai/pipeline/invalid/InvalidWeaponReason";
-import {WEAPON_PROMPT_TOKEN_LIMIT} from "@gunsmith/ai/pipeline/limits/WeaponPromptTokenLimit";
-import {moderationJudge} from "@gunsmith/ai/pipeline/moderation/ModerationJudge";
-import {tokenPrecheck} from "@gunsmith/ai/pipeline/precheck/TokenPrecheck";
-import {repairWeaponDraft} from "@gunsmith/ai/pipeline/repair/RepairWeaponDraft";
+import {generateWeaponDraft} from "@gunsmith/ai/pipeline/weapon-drafting/generate/GenerateWeaponDraft";
+import {WEAPON_PROMPT_TOKEN_LIMIT} from "@gunsmith/ai/pipeline/prompt-screening/precheck/limit/WeaponPromptTokenLimit";
+import {moderationJudge} from "@gunsmith/ai/pipeline/prompt-screening/moderation/ModerationJudge";
+import {tokenPrecheck} from "@gunsmith/ai/pipeline/prompt-screening/precheck/TokenPrecheck";
+import {repairWeaponDraft} from "@gunsmith/ai/pipeline/weapon-drafting/repair/RepairWeaponDraft";
 import type {GenerateWeaponInput} from "@gunsmith/ai/pipeline/types/GenerateWeaponInput";
 import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
 import type {WeaponPipelineDependencies} from "@gunsmith/ai/pipeline/types/WeaponPipelineDependencies";
+
+/** What a player is told when a request was a weapon request but no valid weapon came out of it, even after the one repair. */
+const INVALID_WEAPON_REASON = "We could not build a valid weapon from that request. Try describing it differently.";
 
 /**
  * Turns a player's words into a weapon, or a rejection, or (when no valid weapon can be made) an invalid. Built node by node,

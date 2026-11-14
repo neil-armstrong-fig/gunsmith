@@ -82,7 +82,7 @@ export default [
         patterns: [
           {group: ["@evals/tests/**"], message: notUpwards},
           {
-            group: ["@evals/dsl/pipeline/**", "@evals/dsl/errors/**"],
+            group: ["@evals/dsl/**/pipeline/**", "@evals/dsl/errors/**"],
             message:
               "The mapping does not run checks. They are the DSL's `expect` methods; import the DSL (or its types), not what is behind it.",
           },
@@ -106,7 +106,7 @@ export default [
     // A `*Dsl` only wraps, as in `acceptance-tests/`: each method is a `try` / `catch` that rethrows a `DslError` naming what was
     // attempted. Asking the weapon smith, holding its answers and checking them are done beneath it, by the pipeline, in `pipeline/`. (Repeats the block above,
     // because flat config replaces a rule for a file rather than merging it.)
-    files: ["evals/dsl/*Dsl.ts"],
+    files: ["evals/dsl/**/*Dsl.ts"],
     rules: {
       "no-restricted-syntax": [
         "error",
@@ -126,9 +126,9 @@ export default [
         patterns: [
           {group: ["@evals/tests/**", "@evals/eval-criteria-mapping/**"], message: notUpwards},
           {
-            group: ["@evals/dsl/pipeline/evaluators/**", "@evals/dsl/pipeline/trials/**"],
+            group: ["@evals/dsl/**/evaluators/**", "@evals/dsl/trials/**"],
             message:
-              "A *Dsl does not check anything itself. Call the WeaponSmithPipeline beneath it, which uses the evaluators.",
+              "A *Dsl does not check anything itself. Call the pipeline class beneath it (WeaponSmithPipeline, AppearancePipeline), which uses the evaluators.",
           },
         ],
       }),
@@ -136,7 +136,7 @@ export default [
   },
   {
     // The lower level catches nothing and wraps nothing: it throws a plain sentence, and the DSL above it says what was attempted.
-    files: ["evals/dsl/pipeline/**"],
+    files: ["evals/dsl/**/pipeline/**"],
     rules: {
       "no-restricted-imports": restrictedImports({
         allowedPackages: ["@gunsmith/ai"],
@@ -144,7 +144,7 @@ export default [
         patterns: [
           {group: ["@evals/tests/**", "@evals/eval-criteria-mapping/**"], message: notUpwards},
           {
-            group: ["@evals/dsl/errors/**", "@evals/dsl/*Dsl"],
+            group: ["@evals/dsl/errors/**", "@evals/dsl/**/*Dsl"],
             message:
               "The lower level wraps nothing and never looks up at the DSL. It throws a plain Error; the *Dsl puts it in words.",
           },

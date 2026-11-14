@@ -169,6 +169,13 @@ module 02.
 - **Pitfalls to design against (from Focused):** a flaky judge, eval gaming (rotate examples), judge disagreement with
   humans, dataset drift.
 
+## Weapon visuals (very early, 2026-11-13)
+
+A second domain, `ai/src/pipeline/appearance/`, has the model draw a weapon's appearance as strict JSON (generate, fix, validate, one repair,
+a disclosed stand-in). It is **not wired into `generateWeapon`**: its call budget is for `build` and the user to decide. On the
+local model first answers were never valid, so most requests ended as the stand-in. Measurements, failure classes, candidate
+defaults and open questions are in `docs/ai-visual-generation.md`.
+
 ## Features that need LangSmith Plus
 
 Hosted deployment, online evals, annotation queues, dashboards and alerts. Build them behind a clear "needs Plus" note and a

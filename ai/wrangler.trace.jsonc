@@ -1,7 +1,7 @@
 {
   // Spike only: tracing flush test against a local fake LangSmith endpoint. The key is a dummy.
   "name": "gunsmith-ai-trace-proof",
-  "main": "src/worker/TraceProofWorker.ts",
+  "main": "src/worker/trace/TraceProofWorker.ts",
   "compatibility_date": "2026-11-01",
   "compatibility_flags": ["nodejs_compat", "nodejs_compat_populate_process_env"],
   "vars": {
