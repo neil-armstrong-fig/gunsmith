@@ -88,6 +88,15 @@ export class GunsmithDsl {
     }
   }
 
+  /** Opens the heights arena: low ground beside a raised platform, with one stair up and no opponent. */
+  async startHeights(): Promise<void> {
+    try {
+      await this.gunsmith.openHeights();
+    } catch (error) {
+      throw new DslError("Failed to open the heights arena", error);
+    }
+  }
+
   async resizeWindowTo(size: Size): Promise<void> {
     try {
       await this.gunsmith.resizeWindowTo(size);

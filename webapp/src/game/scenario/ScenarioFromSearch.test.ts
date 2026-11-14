@@ -23,3 +23,7 @@ it("asks for the practice range when it is named", () => {
 it("asks for the sparring match when the query says so", () => {
   expect(scenarioFromSearch("?scenario=sparring")).toBe("sparring");
 });
+
+it("asks for the heights arena when the query says so", () => {
+  expect(scenarioFromSearch("?scenario=heights")).toBe("heights");
+});

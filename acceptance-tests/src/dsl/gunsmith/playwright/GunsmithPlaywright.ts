@@ -22,6 +22,10 @@ export class GunsmithPlaywright extends BasePage {
     await this.openScenario("sparring");
   }
 
+  async openHeights(): Promise<void> {
+    await this.openScenario("heights");
+  }
+
   async resizeWindowTo(size: Size): Promise<void> {
     await this.page.setViewportSize(size);
   }

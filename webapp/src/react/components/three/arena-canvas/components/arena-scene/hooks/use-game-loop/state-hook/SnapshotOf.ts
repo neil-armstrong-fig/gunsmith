@@ -1,4 +1,5 @@
 import type {World} from "@gunsmith/engine/game-loop/types/World";
+import {levelAt} from "@gunsmith/engine/height/LevelAt";
 import {equippedWeapon} from "@gunsmith/engine/loadout/EquippedWeapon";
 import {coneOf} from "@gunsmith/engine/vision/ConeOf";
 import {visibleToPlayer} from "@gunsmith/engine/vision/VisibleToPlayer";
@@ -18,6 +19,7 @@ export function snapshotOf(world: World): GameStateSnapshot {
       x: position.x,
       y: position.y,
       aimDegrees: (Math.atan2(aim.y, aim.x) * 180) / Math.PI,
+      level: levelAt(world.arena, position),
       health: world.player.health,
     },
     weapon: {

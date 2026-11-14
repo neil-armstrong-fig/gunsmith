@@ -31,6 +31,11 @@ Both are withdrawn until the game is fun (`HANDOFF.md` delivery log, 2026-11-12)
 
 ### Resume here (written 2026-11-14, end of a session; read this first)
 
+**2026-11-14, third session:** merged the `ai` worktree (`f456130`: Haiku evals, docs conflicts resolved keeping both sides), then built
+**heights, slice 1 (walking only)**, test first, left uncommitted for the user's review (see the item below). Root `pnpm checks` exits 0 (engine
+618, webapp 160, `ai` 419); acceptance 93 of 93 on a production build, 120 of 120 at `--repeat-each=10` for the stair, walking and crouch-speed
+specs. `?scenario=heights` opens it. **Not committed; the merge is.**
+
 **2026-11-14, second session:** the `ai` worktree was merged (`c8269cf`), then crouch landed (see the crouch item below). The user
 reviewed it, played it ("works well") and is committing it; earlier work was committed by the user too. Root `pnpm checks` exits 0
 (engine 570, webapp 139, `ai` 394, `audio-studies` 254 with one slow render skipped); acceptance 89 of 89 on a production build.
@@ -40,7 +45,9 @@ Logged in `HANDOFF.md`: **best of three** (the duel only), **`engine/src/` sub-f
 **Next, in order (none was requested yet; ask or pick the first):**
 1. ~~The bot's tunables~~ **settled 2026-11-14:** the user played the duel with the cone and crouch and called the bot "fun to play
    against, easy to beat but it still needs a bit of moving and shooting". Leave `engine/src/opponent/Difficulty.ts` as it is.
-2. **Heights** (the last of the dim arena and cone), then the **closing ring** and a round timer. Crouch is done (slice 2).
+2. **Heights, the rest** (slice 1, walking, is done): higher ground extends vision and sees over cover, lower ground cannot see up; bullets and
+   cover across levels; the opponent on stairs (it has no pathfinder and picks goals it can see); a stair-flank check (an arena validator);
+   then the **closing ring** and a round timer (the smaller, stalemate-curing slice: fine to take it first if the user prefers). Crouch is done (slice 2).
 3. Owed to `ai`: a root `pnpm evals` script (see "Owed to `ai`" below).
 4. The `ai` row in `TODO.md` is stale (its worktree merged as `e40e9a1`): it is `ai`'s to update, so only mention it.
 
@@ -301,7 +308,27 @@ RNG, no `Date.now()` or `Math.random()`. The webapp renders it and sends input.
         at `--repeat-each=10` for the crouch, vision and walking specs. Mutation: 18 engine and webapp mutants and 5 shared-hook
         mutants, all killed by the right tests; the first run found one survivor (the `blur` handler, which nothing exercised), closed with
         the focus spec. Not covered by a spec: the veil's drawing while crouched (canvas). **The user reviewed it and played it: "works well"**, so 0.4 and 1.5 stay until they say otherwise.
-  - [ ] Dim arena, remaining: heights. Original item: dim arena outside a detailed forward cone, set by equipped weapon and standing/crouched stance. Rotate it
+  - [x] **Heights, slice 1: levels and stairs, walking only (2026-11-14), test first.** The arena reads `1`/`2` as raised floor and an arrow
+        `^ v < >` as a stair that climbs the way it points; `ArenaFrom` throws unless the stair has plain floor behind and ahead, the far
+        one exactly one level higher (a landing at each end, enforced in code). `Arena` gained `levels` and `stairs`; new `engine/src/height/`
+        (`BlockedFrom`: from a level a walker steps onto that level and onto a stair that joins it, from a stair onto either end, so a stair
+        is the only way over a drop, and it judges from where they stood so one long step cannot jump a drop; `LevelAt`: the level, or
+        half way on a stair); `PushOutOfWalls` now takes a `BlockedTiles` test (`movement/types/`) instead of an arena, and `MovePlayer` passes
+        `blockedFrom`. Snapshot `player.level` (a `shared/` contract change; `levelAt`). Webapp: `?scenario=heights` (`game/heights/HeightsArena`,
+        16 by 7: low ground, a platform from column 10, one stair on the player's row, no dummies or opponent) and `arena-heights/` drawing
+        (a lighter floor per level from the palette's `floor-l1..l3`, each stair as four shaded bands, no labels). Spec `ClimbingAStair` (4
+        criteria: begins on the low ground; walking east up the stair puts the player on the platform; the platform's edge stops them as a wall
+        does; walking back west comes down). Red first for the right reason (`level` undefined; the edge did not stop the walk). Engine 618,
+        webapp 160. **Mutation:** 22 engine mutants, 3 survivors first (a test of the walker judged from the wrong tile, error messages that
+        both said "stair", and edge tests whose neighbouring tile was a wall) closed with tests, one equivalent left (`[level - 1, level,
+        level + 1]`: no tile is below level 0); 14 webapp mutants, 2 survivors first (a stair at level 1 counted as floor, closed; a lower clamp
+        a `??` fallback already covers, removed); 6 browser mutants (no stair, hook stuck at 0, floor never blocks, heights ignored, stair
+        reaches one level, stair unusable from the platform), each caught by the right criterion. **Stated defaults, to be set by play:** a stair is one
+        tile wide and long, one tile of landing each end, two levels in the first arena, a stair is `level + 0.5` for the snapshot. **Known
+        gap:** a stair's flanks are not checked (a raised tile beside a stair's middle can be entered from it), so arenas keep stairs between
+        walls or low ground until a validator exists. Not covered by a spec: the drawing (canvas). Next: vision over height, bullets and cover across levels,
+        the opponent on stairs, then the ring.
+  - [ ] Dim arena, remaining: vision over height (higher ground sees over cover, lower ground cannot see up). Original item: dim arena outside a detailed forward cone, set by equipped weapon and standing/crouched stance. Rotate it
         with aim through 360°; reveal terrain detail and players/items only in the unoccluded cone. Three height levels
         and longer-range, substantially slower crouch follow `HANDOFF.md`. Cone ownership is settled.
   - [ ] The closing ring after the round timer.

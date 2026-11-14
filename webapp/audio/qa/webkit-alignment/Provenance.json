@@ -1,0 +1,23 @@
+{
+  "capturedUtc": "2026-11-14T22:49:19.677315+00:00",
+  "note": "Frozen evidence hashes remain verifiable. Removed investigation source hashes are historical identifiers; the source and nine tests were deleted at the user's request after delivery.",
+  "sha256": {
+    "qa/webkit-alignment/evidence/Alignment.json": "2550093e6ab106ddfa3725e287a9aca332611450f6c3ae3630f69cf21a875f71",
+    "qa/webkit-alignment/evidence/Preservation.json": "68b8bbcf3ed1436b270ae831cc11895f9dbe7b5a16b5f2f3416db0bfaf2d94de",
+    "qa/webkit-alignment/evidence/Native.json": "061c6ff9d805d518994d988472a5efbe79b60352749a30888ad16ef1be3596af",
+    "qa/webkit-alignment/evidence/Browser.json": "7c314768453828a7dd0fbb9a259e25268e936ce4feadfc32e4816b30cc779eb2"
+  },
+  "removedSourceSha256": {
+    "generator-scripts/browser/alignment/InspectAudioAlignment.ts": "1d32ed3e31d45a07a6f15c8303d4eb8dd57ea7431d2bd4d8ca42f85968901d70",
+    "generator-scripts/browser/alignment/types/AlignmentOptions.ts": "a5dd365aee2a41eaa88435bcd4523b93be7e9e8b9f15639f8e9e537e6d3bbc23",
+    "generator-scripts/browser/alignment/types/DecodeRequest.ts": "573d3f37115e680214a9d468dd5683ef12c82322af116e355c4c108d7277de89",
+    "generator-scripts/browser/alignment/types/AlignmentPage.ts": "8159ddc6ba8a66abddbcf0a0512c8f9695cf985a41914c3cbfdc281b1181b5e7",
+    "generator-scripts/browser/alignment/types/DecodedWindows.ts": "400897dc709a7777edf713e1c4129de1eee8a4d2baf7c80776762c80bb85546f",
+    "generator-scripts/browser/alignment/limits/AlignmentLimits.ts": "ae8e13130849cc26adf2e1e3af4248d4802b42e64dc4d97136dd4d8e30d2c7d3",
+    "generator-scripts/browser/alignment/comparison/CompareWindow.ts": "33ad7b97379838d14ff0529f9d43bc84ca8100133cff4c1987028abb6db418ae",
+    "generator-scripts/browser/alignment/comparison/CompareWindow.test.ts": "de5f7968a109603b1d8f8a14e7e791da272b522815d785e1e3f366550ed25c38",
+    "generator-scripts/browser/alignment/comparison/types/WindowRequest.ts": "0750fedd49e94ff11072dbd8c73835a7148ae5d5a1dc6fe70a8278fdc39f0165",
+    "generator-scripts/browser/alignment/comparison/types/InconclusiveReason.ts": "d4173a075adc99a2f550175ca847936bb02ccda52964533d1eb89bdefcf531a7",
+    "generator-scripts/browser/alignment/comparison/types/WindowComparison.ts": "9ae4d56042a2a7cf05f8b6ecc2cbd23039dcf1a77e0182f9a51d3119e553a8b2"
+  }
+}

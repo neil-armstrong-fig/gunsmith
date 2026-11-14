@@ -61,6 +61,12 @@ player sees. `SeeingOnlyWhatYouFace` uses sparring, whose opponent never moves, 
 to the side, beyond the rifle's range, behind a pillar, then the marksman rifle's longer reach). A spec that fires or reads dummies must compare
 what it means (`x`, `y`, `health`), not whole snapshots, since turning changes `visible`.
 
+## Heights
+
+`ClimbingAStair` opens `?scenario=heights` (`gunsmith.startHeights()`), whose player starts at (8.5, 3.5) on the low ground with a platform one level up from
+x = 10 and a single stair at (9, 3). It reads `gunsmith.player.getLevel()` (the state hook's `player.level`: 0 low ground, 1 platform, half way on a
+stair) and asserts the edge stops the player as a wall does (x between 9.4 and 9.7, level 0), the stair climbs (x past 11, level 1) and comes down again.
+
 ## Running
 
 ```bash

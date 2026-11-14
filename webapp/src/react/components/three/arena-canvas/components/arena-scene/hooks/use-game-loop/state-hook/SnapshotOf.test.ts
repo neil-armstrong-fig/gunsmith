@@ -186,3 +186,21 @@ it("reports the score of the match and which round is being fought", () => {
 
   expect(snapshotOf({...world, match}).match).toEqual({playerWins: 1, opponentWins: 0, round: 2});
 });
+
+const hills = startingWorld(arenaFrom(["#######", "#.>111#", "#######"]));
+
+it("reports the player on the low ground as level 0", () => {
+  expect(snapshotOf(world).player.level).toBe(0);
+});
+
+it("reports the player on a platform as that platform's level", () => {
+  const onThePlatform = {...hills, player: {...hills.player, position: {x: 4.5, y: 1.5}}};
+
+  expect(snapshotOf(onThePlatform).player.level).toBe(1);
+});
+
+it("reports the player on a stair as half way between the two levels it joins", () => {
+  const onTheStair = {...hills, player: {...hills.player, position: {x: 2.5, y: 1.5}}};
+
+  expect(snapshotOf(onTheStair).player.level).toBe(0.5);
+});

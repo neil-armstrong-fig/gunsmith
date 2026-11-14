@@ -86,6 +86,15 @@ export class PlayerDsl {
     }
   }
 
+  /** Which level the player stands on: 0 is the low ground, and each stair climbed is one more. On a stair it is half way between two. */
+  async getLevel(): Promise<number> {
+    try {
+      return await this.player.getLevel();
+    } catch (error) {
+      throw new DslError("Failed to read which level the player is on", error);
+    }
+  }
+
   /** Where the player's centre is, in tiles. */
   async getPosition(): Promise<Point> {
     try {

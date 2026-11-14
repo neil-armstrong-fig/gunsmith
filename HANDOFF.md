@@ -145,6 +145,24 @@ those implementations; art's README records unsupported identities and proposed 
 
 ## Delivery log
 
+- 2026-11-14, `art`: removed the one-off alignment runner, comparison helper,
+  types and nine tests at the user's request. Frozen evidence/build handoff and
+  existing codec QA retained; reproduction notes and historical source hashes
+  updated. No audio, runtime, dependency or manifest change. Root pnpm checks
+  passes (lint, formatting, strict types and tests); audio 254 pass, one slow
+  render skipped. Evidence/audio hashes and folder/caller review pass.
+
+- 2026-11-14, `art`: **WebKit alignment diagnosis delivered**, under
+  `webapp/audio/qa/webkit-alignment/`: 76 browser/file rows, native/browser QA,
+  preservation hashes and an owned-playback handoff for build. Nine signal tests;
+  offset/overlap/combined-ambiguity mutation probes killed. Informative windows
+  show −128 in 15 Vorbis files and +576 in 11 MP3 files; ambiguous windows remain
+  inconclusive. Native/Chromium 38/38, WebKit 23 failures retained. No master,
+  export, runtime, format, dependency or model-call change. Manifest keys: none.
+  Final root checks pass (630 engine, 419 AI, 160 webapp, 263 audio; one slow
+  render skipped). Folder/caller and standards audit completed. No gameplay
+  acceptance or model eval run for the offline diagnostic.
+
 - 2026-11-14, `build`: **Crouch (slice 2), test first, and the `ai` worktree merged.** Merged `worktree-ai-hosting-proof` into main
   (`c8269cf`; `HANDOFF.md` and `TODO.md` conflicts kept both sides; the worktree is `ai`'s, left in place). Crouch: hold C or either Control;
   speed 0.4 of standing, cone range 1.5 times, angle unchanged, both tunables; the opponent does not crouch yet. **For `ai`:** `Player`
@@ -166,6 +184,8 @@ those implementations; art's README records unsupported identities and proposed 
   in 321 seconds (21 files). Folder/caller and standards audit completed.
 
 Newest first. One line each: date, who, what, where.
+
+- 2026-11-14, `build`: **`ai` worktree merged (`f456130`; only `TODO.md` and `HANDOFF.md` conflicted, both sides kept), then heights, slice 1 (walking only), test first, uncommitted for the user's review.** The arena drawing reads `1` and `2` as floor one and two levels up and `^ v < >` as a stair that climbs the way it points; a stair must have plain floor behind and ahead of it, the far one a level higher. A stair is the only way across a drop (`engine/src/height/BlockedFrom`, judged from where the walker stood). **Contract change for `ai`/`art`: none to the weapon or manifest; the state hook's `player` snapshot gained `level` (`shared/`).** For `art`: the drawing uses the palette's `--color-gs-floor-l1` to `l3` for the levels, repeated in `arena-heights/colours/LevelColour.ts` since WebGL cannot read CSS variables; each stair is four shaded bands, no labels. `?scenario=heights` opens it. Engine 618, webapp 160, `ai` 419, 93 of 93 specs on a production build; 22 engine, 14 webapp and 6 browser mutants (the survivors closed with tests; one equivalent). Not done: vision over height, bullets and cover across levels, the opponent on stairs, a stair-flank check, the ring and timer. Manifest keys: none.
 
 - 2026-11-14, `ai`: **main merged into the `ai/` worktree (`b276c64`), and the weapon evals now run on Haiku 5.5**, uncommitted for the user apart from the merge. Docs conflicts resolved keeping both sides (`TODO-art.md` is main's). Test first (`ai` 419 unit tests, 18 mutants killed): a shared key loader, `PaidWeaponModels` (both models behind the one spend guard, `maxTokens` 2000), and `RunPaidWeapon`, which fails a run in words when a paid call errored or an answer was cut off (the pipeline would swallow both and read them as a bad weapon) and logs tokens, stop reason and latency per request. **Haiku: 70 of 70 criteria at 3 trials, 101 calls, none cut off; a created weapon costs about $0.00036** (half the estimate; the draft weapon is only a name and six numbers), `docs/cost-and-budget.md`. **Prompt ablations on Haiku**: at first all six survived, because nothing there depended on the repair (the attack specs accept `invalid`); the user agreed to a criterion that "100 damage, 20 a second" still ends `created` inside the cap, and now skipping the repair falls exactly it, while dropping the `<previous>` block or the "change as little" sentence still passes (`docs/ai-pipeline.md`). **The user's stat-balancing design** (the AI returns inferred stats plus a preference, code balances) is in `TODO-ai.md` O2, with a question for `build` in `TODO.md` on where the balancer lives. Spend $0.32 of the $1 ceiling. Nothing for `build` or `art` to wire; no contract changed; manifest keys: none.
 

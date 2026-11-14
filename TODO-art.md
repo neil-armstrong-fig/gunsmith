@@ -29,6 +29,26 @@ starting point; do not restart its direction or request the same approval again.
 AI selection/placement evaluation and runtime proof remain pending.
 This is experimental art data, not an implemented renderer or frozen M2 contract.
 
+**Investigation tooling removed (2026-11-14, user request):** the alignment
+runner, helper, types and tests are deleted. Frozen measurements/build handoff
+and existing codec QA remain. Source hashes are marked historical. Future
+playback fixes should carry focused regressions in build's implementation.
+Removal verified: root pnpm checks passes; audio 254 pass, one slow render
+skipped. Evidence/audio hashes and folder/caller standards review pass.
+
+**Alignment diagnosis delivered (2026-11-14):**
+`webapp/audio/qa/webkit-alignment/README.md` freezes 76 browser/file measurements,
+fresh native/browser QA and preservation hashes. Nine synthetic tests cover
+sample alignment; three mutation probes killed (the two ambiguity guards were
+removed together). Informative WebKit windows show −128 frames in 15 Vorbis
+files and +576 in 11 MP3 files; ambiguous/quiet windows remain inconclusive.
+Native/Chromium still pass 38/38, WebKit still has 23 failing candidates.
+Build owns reproduction in the eventual playback path and any timing correction.
+Art's diagnostic slice is complete; production, listening and manifest work stay open.
+Final root checks pass: lint, formatting, strict types; 630 engine, 419 AI,
+160 webapp and 263 audio tests (one slow render skipped). Folder/caller and
+standards review completed; no gameplay acceptance suite or model eval run.
+
 **Latest audio follow-up (2026-11-14):** the Ogg page-duration fix is delivered;
 native/Chromium pass all 38 candidates. WebKit retains 23 failing candidates
 (17 MP3 durations, four Vorbis durations, two music seams). Crouch levels now pass.
@@ -193,6 +213,8 @@ User priority (2026-11-12): audio audition → full audio pack → top-down stud
       reports and reproduction commands are in its README. Encoding does not imply production approval.
 - [x] Fix native/Chromium Vorbis durations test-first with 20 ms pages; verify all 38
       candidates, preserve masters/MP3 hashes, and mutation-prove the regression (2026-11-14).
+- [x] Deliver reproducible per-channel sample-alignment diagnosis and frozen build handoff,
+      retaining Ogg/MP3 and preserving all masters/exports (2026-11-14).
 - [ ] Resolve remaining WebKit playback/format blockers with build: 17 MP3 effect
       durations, four Vorbis effect durations and two Vorbis music seams. Crouch levels pass.
       Evidence and reproduction: `webapp/audio/qa/ogg-pages/README.md`. Preserve masters.

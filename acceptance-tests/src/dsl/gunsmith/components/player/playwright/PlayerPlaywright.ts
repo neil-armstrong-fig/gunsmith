@@ -65,6 +65,12 @@ export class PlayerPlaywright extends BasePage {
     await this.waitForGameState(({player}) => player.health < health);
   }
 
+  async getLevel(): Promise<number> {
+    const {player} = await this.readGameState();
+
+    return player.level;
+  }
+
   async getPosition(): Promise<Point> {
     const {player} = await this.readGameState();
 

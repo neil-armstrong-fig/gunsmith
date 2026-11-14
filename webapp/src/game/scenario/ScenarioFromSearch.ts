@@ -1,7 +1,7 @@
 import type {Scenario} from "@src/game/scenario/types/Scenario";
 
 /**
- * The scenario a page's query string asks for (`?scenario=duel` or `?scenario=sparring`). Anything else, or nothing, is the practice range:
+ * The scenario a page's query string asks for (`?scenario=duel`, `sparring` or `heights`). Anything else, or nothing, is the practice range:
  * the query only picks between matches, it never carries state into one.
  */
 export function scenarioFromSearch(search: string): Scenario {
@@ -12,6 +12,10 @@ export function scenarioFromSearch(search: string): Scenario {
 
   if (asked === "sparring") {
     return "sparring";
+  }
+
+  if (asked === "heights") {
+    return "heights";
   }
 
   return "practice";

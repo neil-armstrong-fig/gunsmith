@@ -142,6 +142,16 @@ fatigue, device playback and masking with real gunshots.
 Compressed candidates and browser reports are delivered below, with failing production checks. Manifest approval and runtime integration remain outstanding. MP3 fallback loop behaviour needs separate
 verification; WAV continuity alone does not prove compressed playback seamless.
 
+## Alignment diagnosis (2026-11-14)
+
+[Sample-alignment evidence and build handoff](qa/webkit-alignment/README.md)
+cover all 38 candidates in both browsers. Informative WebKit windows expose
+shifted Vorbis content and delayed MP3 effects, including shifts hidden by a
+correct total duration. Inconclusive windows remain explicitly inconclusive.
+Masters, exports, existing QA limits and production status are unchanged. The
+one-off comparison code and tests were removed after delivery; the frozen
+evidence and existing codec QA remain.
+
 ## Current codec QA (2026-11-14)
 
 The [Ogg page-duration fix and build handoff](qa/ogg-pages/README.md) supersedes the

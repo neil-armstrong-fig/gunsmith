@@ -1,10 +1,14 @@
 import {isSolid} from "@gunsmith/engine/arena/IsSolid";
+import {levelOfTile} from "@gunsmith/engine/arena/LevelOfTile";
+import {stairOfTile} from "@gunsmith/engine/arena/StairOfTile";
+import {levelAt} from "@gunsmith/engine/height/LevelAt";
 import {disarmOpponent} from "@gunsmith/engine/opponent/DisarmOpponent";
 import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import {startMatch} from "@gunsmith/engine/match/StartMatch";
 import {DUEL_ARENA} from "@src/game/duel/DuelArena";
 import {DUEL_OPPONENT} from "@src/game/duel/DuelOpponent";
+import {HEIGHTS_ARENA} from "@src/game/heights/HeightsArena";
 import {PRACTICE_ARENA} from "@src/game/practice/PracticeArena";
 import {PRACTICE_DUMMIES} from "@src/game/practice/PracticeDummies";
 import {worldOfScenario} from "@src/game/scenario/WorldOfScenario";
@@ -63,4 +67,36 @@ it("makes the duel a best-of-three, at nothing to nothing in its first round", (
 it("makes sparring and the practice range single rounds, with no match", () => {
   expect(worldOfScenario("sparring", 7).match).toBeUndefined();
   expect(worldOfScenario("practice", 7).match).toBeUndefined();
+});
+
+it("makes the heights arena with no dummies and no opponent", () => {
+  const world = worldOfScenario("heights", 1);
+
+  expect(world).toEqual(startingWorld(HEIGHTS_ARENA));
+  expect(world.opponent).toBeUndefined();
+  expect(world.dummies).toEqual([]);
+});
+
+it("starts the player on the low ground, with a stair climbing east from their row onto a platform", () => {
+  const {player, arena} = worldOfScenario("heights", 1);
+  const row = Math.floor(player.position.y);
+  const column = Math.floor(player.position.x);
+
+  expect(levelAt(arena, player.position)).toBe(0);
+  expect(stairOfTile(arena, column + 1, row)).toBe("east");
+  expect(levelOfTile(arena, column + 2, row)).toBe(1);
+});
+
+it("keeps the platform's edge a drop everywhere but the stair's row", () => {
+  const {player, arena} = worldOfScenario("heights", 1);
+  const stairRow = Math.floor(player.position.y);
+
+  for (let row = 1; row < arena.height - 1; row += 1) {
+    const edgeColumn = Math.floor(player.position.x) + 2;
+    if (row !== stairRow) {
+      expect(levelOfTile(arena, edgeColumn, row)).toBe(1);
+      expect(levelOfTile(arena, edgeColumn - 1, row)).toBe(0);
+      expect(stairOfTile(arena, edgeColumn - 1, row)).toBeUndefined();
+    }
+  }
 });

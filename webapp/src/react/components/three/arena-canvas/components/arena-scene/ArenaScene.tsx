@@ -2,6 +2,7 @@ import {useFrame, useThree} from "@react-three/fiber";
 import {zoomToFit} from "@src/react/components/three/arena-canvas/components/arena-scene/camera/ZoomToFit";
 import {Dummies} from "@src/react/components/three/arena-canvas/components/arena-scene/components/dummies/Dummies";
 import {Bullets} from "@src/react/components/three/arena-canvas/components/arena-scene/components/bullets/Bullets";
+import {ArenaHeights} from "@src/react/components/three/arena-canvas/components/arena-scene/components/arena-heights/ArenaHeights";
 import {ArenaWalls} from "@src/react/components/three/arena-canvas/components/arena-scene/components/arena-walls/ArenaWalls";
 import {VisionOverlay} from "@src/react/components/three/arena-canvas/components/arena-scene/components/vision-overlay/VisionOverlay";
 import {Opponent} from "@src/react/components/three/arena-canvas/components/arena-scene/components/opponent/Opponent";
@@ -36,6 +37,8 @@ export function ArenaScene(): JSX.Element {
       <color attach="background" args={["#10151b"]} />
 
       <ArenaWalls arena={arena} />
+
+      <ArenaHeights arena={arena} />
 
       <VisionOverlay />
 

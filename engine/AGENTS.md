@@ -22,12 +22,19 @@ everything else is a domain folder. Tiles are the unit; `x` grows to the east an
   their own paths.
 - `geometry/types/`: `Point` (a place) and `Circle` (a centre and a radius). `Ray` (a start and a unit direction) is used
   only by `bullet/flight/`, so it lives in `bullet/flight/types/`.
-- `arena/`: `ArenaFrom` (reads a drawing: `#` wall, `.` floor, first row on top) and `IsSolid` (outside the arena counts
-  as solid). `types/Arena.ts` is a width, a height and a flat list of solid tiles.
-- `movement/`: `PushOutOfWalls`, circle against the tile grid. It resolves overlap along the line from the wall's nearest
+- `arena/`: `ArenaFrom` (reads a drawing, first row on top: `#` wall, `.` floor on the low ground, `1` and `2` floor one and two levels
+  up, and an arrow `^ v < >` a stair that climbs the way it points; it throws unless a stair has plain floor behind it and ahead of
+  it, the far one exactly one level higher, so every stair has a landing at each end), `IsSolid` (outside the arena counts as solid),
+  `LevelOfTile` (a stair has the level of its low end; beyond the edge, 0) and `StairOfTile` (the way a stair climbs, or `undefined`).
+  `types/Arena.ts` is a width, a height and flat lists, one entry per tile: `solid`, `levels` and `stairs` (`TileStair`); `Uphill` is
+  the list `UPHILLS` and its type; `DrawnArena` is the same lists while `ArenaFrom` still fills them. what only `ArenaFrom` uses is in
+  `drawing/` (`DrawingCharacters`, `LevelOfCharacter`, `PlaceStairs`), and what only `PlaceStairs` uses is in `drawing/stairs/` (`LandingIndex`: is a
+  neighbour plain floor; `UphillStep`: a direction as a step). Up to three levels (0 to 2); a stair is one tile and joins two neighbouring levels.
+- `movement/`: `PushOutOfWalls(blocked, centre, radius)`, circle against the tile grid; what counts as blocked is the caller's `BlockedTiles` test
+  (`types/`), so a wall and a drop between levels are the same thing to it. It resolves overlap along the line from the wall's nearest
   point to the circle's centre, so a player slides along a wall. It does not sweep: the caller steps small, which is why
   `step` is called with a fixed `TICK_SECONDS` from the webapp.
-- `player/`: `MovePlayer(arena, walk)` (a `types/Walk`: position, direction, seconds and whether crouching), `AimPlayer`, and `PlayerRadius` (the body, shared with `bullet/`). `walking/PlayerSpeed.ts` and
+- `player/`: `MovePlayer(arena, walk)` (a `types/Walk`: position, direction, seconds and whether crouching; walls and `height/BlockedFrom` stop it), `AimPlayer`, and `PlayerRadius` (the body, shared with `bullet/`). `walking/PlayerSpeed.ts` and
   `walking/CrouchSpeedFactor.ts` (0.4: a crouching player keeps 40% of the speed, a tunable) are `MovePlayer`'s; `types/Player.ts` (position, aim, one cool-down for both weapons, the `loadout`, which weapon is in hand,
   `crouching`, the reload still to run, absent when there is none, and `health`). Crouching follows `Input.crouching` (optional, absent means standing; held, not toggled) each step in `PrepareFighter`. The opponent is a `Player` too.
 - `bullet/`: `AdvanceBullets` is a short pipeline: `flight/MeetBullet` decides what each bullet runs into (a `Meeting`),
@@ -107,6 +114,15 @@ seed)` give an opponent a brain; **an opponent with no brain takes no action at 
   with the walls cut out, always 50 points, for drawing the dim veil). Beneath: `cone/IsInCone` (one caller, `CanSeePoint`; compares the
   cosine, so no angle wraps) and `outline/ReachAlong` (one caller, `VisibleArea`; finds a wall's face by halving the last sample's gap, so the
   outline sits on the wall and not a sample inside it). `cone/CrouchRangeFactor` (1.5, a tunable; one caller, `ConeOf`) multiplies the range of a crouching fighter and leaves the angle and the aim alone; the opponent never crouches yet. Not built yet: heights, sound, the cover and quiet that crouching is also meant to buy.
+- `height/`: levels and stairs, slice 1 (walking only). `BlockedFrom(arena, standingAt)` is the `BlockedTiles` test for a walker at that point: every wall,
+  and every tile on a level they cannot step to from where they stand. From a level they walk onto floor of that level and onto a stair
+  that joins it; from a stair, onto floor of either level it joins; so a stair is the only way across a drop, and the drop is a wall to
+  the level below and the level above. It judges from where the walker **stood**, not where the step ends, so one long step cannot jump
+  a drop. `LevelAt(arena, point)` is the level of the tile, or half way (`level + 0.5`) anywhere on a stair; the snapshot reports it. A
+  stair's flanks are not checked: a raised tile beside a stair's middle can be entered from the stair, so arenas keep stairs between walls
+  or low ground (an arena validator is to come). **Not built yet:** vision over height (higher ground sees over cover, lower ground cannot see up),
+  bullets and cover across levels, the opponent walking stairs (it picks goals it can see and drops one it cannot reach, so it is not
+  at home in an arena with levels), three-level arenas in play, and the ring's escape time by the stairs.
 - `game-loop/`: the body of the game loop: `startingWorld(arena, dummyPositions, opponentPosition?)` (the opponent faces west
   with the same weapons and 100 health, and no brain: `giveOpponentBrain` adds one) and `step`. Each fighter, the player by
   the `Input` and the opponent by what `thinkOpponent` asks for, takes their own part by the same rules (`fighter/PrepareFighter`: switch weapon, then start or run the
