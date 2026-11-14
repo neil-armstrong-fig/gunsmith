@@ -1,5 +1,6 @@
 import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
+import {startMatch} from "@gunsmith/engine/match/StartMatch";
 import {DUEL_ARENA} from "@src/game/duel/DuelArena";
 import {DUEL_OPPONENT} from "@src/game/duel/DuelOpponent";
 import {worldOfPage} from "@src/game/scenario/WorldOfPage";
@@ -11,7 +12,10 @@ afterEach(() => {
 it("makes the duel the page asks for, with the seed the page asks for", () => {
   vi.stubGlobal("location", {search: "?scenario=duel&seed=5"});
 
-  expect(worldOfPage()).toEqual(giveOpponentBrain(startingWorld(DUEL_ARENA, [], DUEL_OPPONENT), 5));
+  expect(worldOfPage()).toEqual({
+    ...giveOpponentBrain(startingWorld(DUEL_ARENA, [], DUEL_OPPONENT), 5),
+    match: startMatch(),
+  });
 });
 
 it("makes a different match, with a fresh seed, each time the page asks for no seed", () => {

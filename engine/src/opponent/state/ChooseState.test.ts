@@ -2,7 +2,7 @@ import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import {DIFFICULTY} from "@gunsmith/engine/opponent/Difficulty";
 import {chooseState} from "@gunsmith/engine/opponent/state/ChooseState";
-import {startingBrain} from "@gunsmith/engine/opponent/StartingBrain";
+import {startingBrain} from "@gunsmith/engine/opponent/brain/StartingBrain";
 import type {OpponentBrain} from "@gunsmith/engine/opponent/types/OpponentBrain";
 import type {OpponentContext} from "@gunsmith/engine/opponent/types/OpponentContext";
 import type {OpponentState} from "@gunsmith/engine/opponent/types/OpponentState";

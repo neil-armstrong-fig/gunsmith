@@ -1,0 +1,140 @@
+{
+  "recipe": "bad-idea-alternate",
+  "palette": {
+    "accent": "violet",
+    "secondary": "mint"
+  },
+  "body": [
+    {
+      "kind": "ellipse",
+      "x": 30.0,
+      "y": 32.0,
+      "radiusX": 11.2,
+      "radiusY": 11.2,
+      "fill": "accent",
+      "stroke": "outline",
+      "strokeWidth": 1.2,
+      "detail": "structural"
+    },
+    {
+      "kind": "ellipse",
+      "x": 30.0,
+      "y": 32.0,
+      "radiusX": 8.0,
+      "radiusY": 8.0,
+      "fill": "secondary",
+      "stroke": "outline",
+      "strokeWidth": 1.2,
+      "detail": "structural"
+    },
+    {
+      "kind": "polyline",
+      "points": [
+        [
+          18.8,
+          23.0
+        ],
+        [
+          11.8,
+          23.0
+        ],
+        [
+          8.8,
+          27.0
+        ],
+        [
+          8.8,
+          37.0
+        ],
+        [
+          11.8,
+          41.0
+        ],
+        [
+          18.8,
+          41.0
+        ]
+      ],
+      "fill": "none",
+      "stroke": "edge",
+      "strokeWidth": 3,
+      "detail": "structural"
+    },
+    {
+      "kind": "polygon",
+      "points": [
+        [
+          41.2,
+          28.8
+        ],
+        [
+          46.8,
+          28.8
+        ],
+        [
+          51.6,
+          24.8
+        ],
+        [
+          54.8,
+          24.8
+        ],
+        [
+          54.8,
+          29.6
+        ],
+        [
+          49.2,
+          35.2
+        ],
+        [
+          41.2,
+          35.2
+        ]
+      ],
+      "fill": "accent",
+      "stroke": "outline",
+      "strokeWidth": 1.2,
+      "detail": "structural"
+    },
+    {
+      "kind": "polyline",
+      "points": [
+        [
+          50.8,
+          26.4
+        ],
+        [
+          54.0,
+          26.4
+        ]
+      ],
+      "fill": "none",
+      "stroke": "edge",
+      "strokeWidth": 0.8,
+      "detail": "fine"
+    },
+    {
+      "kind": "ellipse",
+      "x": 30.0,
+      "y": 32.0,
+      "radiusX": 7.2,
+      "radiusY": 7.2,
+      "fill": "secondary",
+      "stroke": "outline",
+      "strokeWidth": 1.8,
+      "detail": "structural"
+    },
+    {
+      "kind": "ellipse",
+      "x": 30.0,
+      "y": 32.0,
+      "radiusX": 2.4,
+      "radiusY": 2.4,
+      "fill": "body",
+      "stroke": "outline",
+      "strokeWidth": 1.8,
+      "detail": "structural"
+    }
+  ]
+}

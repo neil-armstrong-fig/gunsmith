@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "id": "pop-catastrophe-alternate",
+  "name": "Pop Catastrophe / alternate",
+  "palette": {
+    "accent": "pink",
+    "secondary": "pink"
+  },
+  "instances": [
+    {
+      "id": "brace",
+      "part": "rear-brace",
+      "parent": "frame",
+      "anchor": "rear",
+      "ownAnchor": "attach",
+      "size": "standard",
+      "orientation": 0,
+      "mirror": false,
+      "colourRole": "accent"
+    },
+    {
+      "id": "body",
+      "part": "block-body",
+      "parent": "frame",
+      "anchor": "center",
+      "ownAnchor": "attach",
+      "size": "small",
+      "orientation": 0,
+      "mirror": false,
+      "colourRole": "accent"
+    },
+    {
+      "id": "hopper",
+      "part": "round-chamber",
+      "parent": "frame",
+      "anchor": "upper",
+      "ownAnchor": "attach",
+      "size": "small",
+      "orientation": 0,
+      "mirror": false,
+      "colourRole": "accent"
+    },
+    {
+      "id": "bubbles",
+      "part": "bubble-cluster",
+      "parent": "hopper",
+      "anchor": "core",
+      "ownAnchor": "attach",
+      "size": "standard",
+      "orientation": 0,
+      "mirror": true,
+      "colourRole": "text"
+    },
+    {
+      "id": "ribbon",
+      "part": "folded-ribbon",
+      "parent": "body",
+      "anchor": "core",
+      "ownAnchor": "attach",
+      "size": "standard",
+      "orientation": 0,
+      "mirror": false,
+      "colourRole": "accent"
+    },
+    {
+      "id": "collar",
+      "part": "muzzle-collar",
+      "parent": "frame",
+      "anchor": "muzzle",
+      "ownAnchor": "front",
+      "size": "standard",
+      "orientation": 0,
+      "mirror": false,
+      "colourRole": "orange"
+    }
+  ]
+}

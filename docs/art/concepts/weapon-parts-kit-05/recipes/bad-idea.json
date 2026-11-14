@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "id": "bad-idea",
+  "name": "Bad Idea",
+  "palette": {
+    "accent": "violet",
+    "secondary": "mint"
+  },
+  "instances": [
+    {
+      "id": "body",
+      "part": "round-chamber",
+      "parent": "frame",
+      "anchor": "center",
+      "ownAnchor": "attach",
+      "size": "standard",
+      "orientation": 0,
+      "mirror": false,
+      "colourRole": "accent"
+    },
+    {
+      "id": "handle",
+      "part": "open-handle",
+      "parent": "body",
+      "anchor": "rear",
+      "ownAnchor": "attach",
+      "size": "standard",
+      "orientation": 0,
+      "mirror": false,
+      "colourRole": "accent"
+    },
+    {
+      "id": "spout",
+      "part": "kettle-spout",
+      "parent": "body",
+      "anchor": "front",
+      "ownAnchor": "attach",
+      "size": "small",
+      "orientation": 0,
+      "mirror": false,
+      "colourRole": "accent"
+    },
+    {
+      "id": "lens",
+      "part": "inset-lens",
+      "parent": "body",
+      "anchor": "core",
+      "ownAnchor": "attach",
+      "size": "standard",
+      "orientation": 0,
+      "mirror": false,
+      "colourRole": "accent"
+    }
+  ]
+}

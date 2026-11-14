@@ -1,5 +1,5 @@
 import {noticePlayer} from "@gunsmith/engine/opponent/sight/NoticePlayer";
-import {startingBrain} from "@gunsmith/engine/opponent/StartingBrain";
+import {startingBrain} from "@gunsmith/engine/opponent/brain/StartingBrain";
 
 const TICK = 1 / 60;
 const PLAYER = {x: 8.5, y: 3.5};

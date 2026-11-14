@@ -12,9 +12,16 @@ from the engine would agree with it whatever the engine did.
 ## What is here
 
 One folder per subject. Each has its entry points at the top, its types in `types/`, and a subfolder for a helper only an
-entry point uses. Tiles are the unit; `x` grows to the east and `y` to the north.
+entry point uses. Several entry points may share a root only when they share the subject (`match/` has four, all the match);
+a file that does not share it is a different domain with a folder of its own, and a helper with one caller goes beneath that
+caller (`opponent/state/acting/engage/aim/` serves `Engage`). `src/` follows the same rule: its one file is `Engine.ts`, and
+everything else is a domain folder. Tiles are the unit; `x` grows to the east and `y` to the north.
 
-- `geometry/types/`: `Point`, `Ray` (a start and a unit direction) and `Circle` (a centre and a radius).
+- `Engine.ts` (`types/Engine.ts`): the front door, `engine = {startingWorld, step}`, the two calls that run a game. The webapp's
+  loop and its scenarios go through it. It is not a barrel: the arena, the match, the weapons and the rest are reached by
+  their own paths.
+- `geometry/types/`: `Point` (a place) and `Circle` (a centre and a radius). `Ray` (a start and a unit direction) is used
+  only by `bullet/flight/`, so it lives in `bullet/flight/types/`.
 - `arena/`: `ArenaFrom` (reads a drawing: `#` wall, `.` floor, first row on top) and `IsSolid` (outside the arena counts
   as solid). `types/Arena.ts` is a width, a height and a flat list of solid tiles.
 - `movement/`: `PushOutOfWalls`, circle against the tile grid. It resolves overlap along the line from the wall's nearest
@@ -25,17 +32,19 @@ entry point uses. Tiles are the unit; `x` grows to the east and `y` to the north
   the reload still to run, absent when there is none, and `health`). The opponent is a `Player` too.
 - `bullet/`: `AdvanceBullets` is a short pipeline: `flight/MeetBullet` decides what each bullet runs into (a `Meeting`),
   then `flight/BulletsStillFlying`, `hit/StrikesOf` and `hit/DamageDealtBy` each read the meetings for one answer.
+  (`flight/meeting/` holds what `MeetBullet` asks, and its own `types/Reach`.)
   `FireBullet(shooter, {from, aim, weapon})` (a bullet leaves the muzzle, just outside the fighter, carrying the
   damage and speed of the weapon that fired it and the `shooter`, `"player"` or `"opponent"`) and `AdvanceBullets` (flies each on at its own speed and returns a `BulletFlight`: the bullets
   still in the air, the dummies still standing and the `playerDamage` and `opponentDamage` that landed). A bullet is gone
   when it meets a wall, a dummy or the fighter on the other side, whichever is nearest: a player's bullet can hurt a dummy
   or the opponent, an opponent's can hurt the player, none hurts its own side, and the opponent's pass through dummies; a wall is found by sampling the path every 0.1 tile (so a one-tile wall cannot be
-  jumped), a dummy or a fighter by an exact ray-against-circle test (`hit/DistanceToCircle`, so a graze is not missed between samples).
+  jumped), a dummy or a fighter by an exact ray-against-circle test (`flight/meeting/DistanceToCircle`, so a graze is not missed between samples).
   Every bullet is judged against the dummies as they stood at the start of the step, so two landing together both count.
-  `flight/` (`DistanceToWall`, which takes any `Ray`, so a line of sight uses it too), `hit/` (`DistanceToCircle`,
-  `NearestDummyHit`, `DistanceToFighter`, and `FirstContact`, which decides what a step meets first: a target counts only
-  if strictly nearer than the wall, and a dummy beats a fighter at the same distance), `types/` (`Bullet`, `Shooter`,
-  `ShotRequest`, `BulletFlight`, `FlightRequest`, `DummyHit`, `Contact`, `Reach`).
+  `flight/` (`DistanceToWall`, which takes any `Ray`, so a line of sight uses it too; its `types/` hold `Ray` and `DummyHit`),
+  `flight/meeting/` (`DistanceToCircle`, `NearestDummyHit`, `DistanceToFighter`, and `FirstContact`, which decides what a
+  step meets first: a target counts only if strictly nearer than the wall, and a dummy beats a fighter at the same distance),
+  `hit/` (`StrikesOf`, `DamageDealtBy`), `types/` (`Bullet`, `Shooter`, `ShotRequest`, `BulletFlight`, `FlightRequest`,
+  `Contact`, `Meeting`).
 - `dummy/`: the practice target. `HurtDummies` takes each bullet's own damage off the dummy it hit (a `Strike`: which
   dummy, how much) and drops the ones left with no health; `DummyHealth` and `DummyRadius` are tunables;
   `types/Dummy.ts` and `types/Strike.ts`. A dummy does not move, and
@@ -56,6 +65,14 @@ entry point uses. Tiles are the unit; `x` grows to the east and `y` to the north
 - `round/`: `DecideRound` (`playing | won | lost` from the two healths: the player at zero loses, even when both fall in the
   same step; the opponent at zero wins; with no opponent the round only ends if the player falls). `types/` has
   `RoundState` and `RoundHealth`.
+- `match/`: the best-of-three a duel is. A `Match` (`types/Match.ts`: the rounds each side has won and the round being fought,
+  from 1) is plain data, optional on the `World` (`World.match`; absent in the practice range and sparring, which stay one
+  endless round). `StartMatch`, `ScoreRound(match, round)` (a won round is the player's, a lost one the opponent's, one still
+  being fought nobody's), `DecideMatch` (`playing | won | lost`: the first side to `winning/RoundsToWin`, 2, a tunable) and `NextRound`
+  (the score kept, the round number up one). `step` scores a round once, in the step that decides it; the frozen world after
+  it never scores it again. A simultaneous kill is the opponent's round, as `DecideRound` already says. Starting the next
+  round's world (full health, full magazines, back at the start) is the caller's, since the engine has no arena of its own:
+  the webapp's `nextRoundOfPage`.
 - `random/`: `NextRandom(seed)` is a mulberry32 generator whose whole state is the seed, handed back with each draw
   (`types/RandomDraw`), so it sits in the `World` as plain data. The engine has no `Math.random`; the caller picks the seed.
 - `opponent/`: a small bot, a finite state machine, to test weapons and arenas against. It exists to be played against, so it
@@ -73,7 +90,8 @@ entry point uses. Tiles are the unit; `x` grows to the east and `y` to the north
   it can walk to in a straight line, circle in the open when there is none, ask to reload, or ask for its other weapon when
   the one in hand has no rounds and no reserve) and **search** (walk to where it last saw the player, wait
   `searchLingerSeconds`, wander again). There is no pathfinder: goals are only ever tiles it can see, and a stuck bot drops its
-  goal (or flips its strafe side). Every tunable is one field of `Difficulty.ts`. `StartingBrain` and `GiveOpponentBrain(world,
+  goal (or flips its strafe side). The four states sit in `state/acting/` beneath `ActOnState`, each with its helpers beside it:
+  `engage/` (with `aim/`) and `reload/` (with `cover/`). Every tunable is one field of `Difficulty.ts`. `brain/StartingBrain` and `GiveOpponentBrain(world,
 seed)` give an opponent a brain; **an opponent with no brain takes no action at all** (the still target of sparring), and
   `DisarmOpponent` empties its magazines and takes its brain away. `sight/HasClearLine` is the line-of-sight test (a bullet's
   wall test, so what it cannot see a bullet cannot hit). Browser specs watch it engage, move, run its magazine down, reload
@@ -85,9 +103,9 @@ seed)` give an opponent a brain; **an opponent with no brain takes no action at 
   the `Input` and the opponent by what `thinkOpponent` asks for, takes their own part by the same rules (`fighter/PrepareFighter`: switch weapon, then start or run the
   reload, so a switch and a reload asked for together reload the new weapon; walk, turn, judge the trigger). Then the bullets
   fly on and hurt what they reach, then the triggers are let go (`fighter/ShootFighter`), so a shot fired this step first
-  moves on the next, and a reload that finishes this step lets the weapon fire in it. Health falls, the round is decided,
-  and once it is not `playing` the world is frozen: only `elapsedSeconds` runs on, so a wait on the clock never hangs. The loop that calls `step` at a fixed rate lives in the caller (the webapp's
-  `useGameLoop` today, the server's match later), because the engine has no clock. `types/World.ts` (now with `opponent?`, `opponentBrain?` and `round`) and `types/Input.ts` (direction, aim, firing, reload and the slot to switch to).
+  moves on the next, and a reload that finishes this step lets the weapon fire in it. Health falls, the round is decided
+  and, in a match, scored once, and once it is not `playing` the world is frozen: only `elapsedSeconds` runs on, so a wait on the clock never hangs. The loop that calls `step` at a fixed rate lives in the caller (the webapp's
+  `useGameLoop` today, the server's match later), because the engine has no clock. `types/World.ts` (now with `opponent?`, `opponentBrain?`, `round` and `match?`) and `types/Input.ts` (direction, aim, firing, reload and the slot to switch to).
 
 Several entry points here have a single caller (`AdvanceBullets`, `AimPlayer`, `TriggerPull`, `PushOutOfWalls` are called
 only by `step` or `MovePlayer`). They stay in domain folders of their own, not beneath that caller, on purpose: these are

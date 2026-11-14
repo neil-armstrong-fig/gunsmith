@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "id": "prickle-drive-alternate",
+  "name": "Prickle Drive / alternate",
+  "palette": {
+    "accent": "mint",
+    "secondary": "violet"
+  },
+  "instances": [
+    {
+      "id": "brace",
+      "part": "rear-brace",
+      "parent": "frame",
+      "anchor": "rear",
+      "ownAnchor": "attach",
+      "size": "standard",
+      "orientation": 0,
+      "mirror": false,
+      "colourRole": "accent"
+    },
+    {
+      "id": "body",
+      "part": "block-body",
+      "parent": "frame",
+      "anchor": "center",
+      "ownAnchor": "attach",
+      "size": "small",
+      "orientation": 0,
+      "mirror": false,
+      "colourRole": "accent"
+    },
+    {
+      "id": "top",
+      "part": "oval-pod",
+      "parent": "frame",
+      "anchor": "upper",
+      "ownAnchor": "attach",
+      "size": "large",
+      "orientation": 0,
+      "mirror": false,
+      "colourRole": "accent"
+    },
+    {
+      "id": "bottom",
+      "part": "oval-pod",
+      "parent": "frame",
+      "anchor": "lower",
+      "ownAnchor": "attach",
+      "size": "large",
+      "orientation": 0,
+      "mirror": false,
+      "colourRole": "accent"
+    },
+    {
+      "id": "comb",
+      "part": "spine-comb",
+      "parent": "body",
+      "anchor": "front",
+      "ownAnchor": "attach",
+      "size": "standard",
+      "orientation": 0,
+      "mirror": false,
+      "colourRole": "accent"
+    },
+    {
+      "id": "crown",
+      "part": "faceted-crown",
+      "parent": "body",
+      "anchor": "core",
+      "ownAnchor": "attach",
+      "size": "large",
+      "orientation": 0,
+      "mirror": false,
+      "colourRole": "accent"
+    }
+  ]
+}

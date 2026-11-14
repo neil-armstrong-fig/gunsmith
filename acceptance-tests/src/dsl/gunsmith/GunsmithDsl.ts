@@ -4,6 +4,7 @@ import {ArenaDsl} from "@src/dsl/gunsmith/components/arena/ArenaDsl";
 import {BulletsDsl} from "@src/dsl/gunsmith/components/bullets/BulletsDsl";
 import {DummiesDsl} from "@src/dsl/gunsmith/components/dummies/DummiesDsl";
 import {HudDsl} from "@src/dsl/gunsmith/components/hud/HudDsl";
+import {MatchDsl} from "@src/dsl/gunsmith/components/match/MatchDsl";
 import {DUEL_SEED} from "@src/dsl/gunsmith/duel/DuelSeed";
 import {LONG_DUEL_SEED} from "@src/dsl/gunsmith/duel/LongDuelSeed";
 import {OpponentDsl} from "@src/dsl/gunsmith/components/opponent/OpponentDsl";
@@ -24,6 +25,7 @@ export class GunsmithDsl {
   readonly weapon: WeaponDsl;
   readonly hud: HudDsl;
   readonly opponent: OpponentDsl;
+  readonly match: MatchDsl;
   readonly round: RoundDsl;
 
   constructor(page: Page) {
@@ -36,6 +38,7 @@ export class GunsmithDsl {
     this.weapon = new WeaponDsl(page);
     this.hud = new HudDsl(page);
     this.opponent = new OpponentDsl(page);
+    this.match = new MatchDsl(page);
     this.round = new RoundDsl(page);
   }
 

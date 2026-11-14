@@ -139,6 +139,48 @@ does not install files into `webapp/public/assets/` or register manifest keys.
 
 The full tracks and footstep variants are delivered. Next: listening review for
 fatigue, device playback and masking with real gunshots.
-Ogg Vorbis/MP3 encoding, browser loop/decode checks, manifest approval and runtime
-integration remain outstanding. MP3 fallback loop behaviour needs separate
+Compressed candidates and browser reports are delivered below, with failing production checks. Manifest approval and runtime integration remain outstanding. MP3 fallback loop behaviour needs separate
 verification; WAV continuity alone does not prove compressed playback seamless.
+
+## Compressed candidate delivery (2026-11-13)
+
+Production is **blocked by measured codec/browser differences**. The approved WAV masters remain unchanged.
+`encoded-audio/` contains 38 candidate files (17 effects and two music loops, each Ogg Vorbis and MP3); the audition mix is excluded.
+These are not registered manifest assets. Footstep suffixes remain provisional.
+
+Install Homebrew `ffmpeg-full` (the standard formula lacks `libvorbis`). The exporter finds its Apple Silicon Homebrew path;
+otherwise put a full build on PATH or set `FFMPEG` to its executable. Encoding uses Vorbis quality 5 and LAME MP3 VBR quality 2,
+48 kHz, original channel counts, and MP3 Xing/LAME delay metadata. No new pnpm dependency is used. No gain, fade, trim or tempo change is applied.
+Sources: [FFmpeg codecs](https://ffmpeg.org/ffmpeg-codecs.html), [MP3 metadata](https://ffmpeg.org/ffmpeg-formats.html#mp3),
+[Web Audio looping](https://www.w3.org/TR/webaudio/#AudioBufferSourceNode).
+
+```sh
+pnpm --filter @gunsmith/audio-studies encode
+pnpm --filter @gunsmith/audio-studies verify:encoded
+# Requires the existing acceptance workspace's Playwright installation:
+pnpm --filter @gunsmith/acceptance-tests exec playwright install chromium webkit
+pnpm --filter @gunsmith/audio-studies verify:browser
+```
+
+`verify:browser` starts and stops its own local server on a port the system picks; nothing is started by hand.
+
+The encoder verifies master hashes and stages output before publishing its inventory. A new encode removes previous QA reports.
+`report.json` records source/output hashes, exact settings, sizes and encoder version; `verification.json` records native decode results
+and failure status; `browser-verification.json` records each browser's version, decoded samples, levels, loop joins and repetition errors.
+Verification commands intentionally exit nonzero when a candidate fails. Re-run verification after every encode.
+The browser runner (`generator-scripts/browser/`) borrows existing Playwright tooling via the acceptance workspace; it does not import game code or change its tests. Ogg files are not byte-reproducible (the container carries a random stream serial number), so a re-encode matches by decoded audio, and MP3 by hash.
+Corrupt audio and a synthetic discontinuous loop are negative controls. The harness renders three complete music periods offline,
+then compares every sample against repeated decoded input; this verifies scheduling, not perceived seam quality.
+
+Findings: native decoding and Chromium expose duration differences in 13 Vorbis effects (usually 128 samples short; the hit cue is longer).
+WebKit has 34 failing candidates: effect-duration differences, one crouch-level failure, and Vorbis music joins above 0.003 amplitude.
+Both MP3 music loops pass in both browsers; Chromium also passes both Vorbis loops. All 38 candidates decode in each browser.
+These results are release blockers, not permission to loosen thresholds or change the approved masters. Do not wire this pack into production yet.
+Detailed cross-device/fatigue listening, masking with real weapon shots, manifest agreement and build-owned runtime integration remain pending.
+
+Implementation validation: root `pnpm checks` passes (lint, formatting, types and unit tests; audio 177 pass / one slow test skipped).
+The separate full-render comparison passes in 645 seconds, byte for byte against all approved masters.
+Six targeted mutations (peak, frame count, join measurement, audition exclusion, source hash and stale-report removal)
+were killed by their corresponding tests and restored. Both browser negative controls reject corrupt audio and a discontinuous loop.
+The exporter integration test was observed red before implementation; measurement cover was proved by mutation.
+Game acceptance specs were not run: no runtime/gameplay code changed. Compressed-candidate QA remains red for the findings above.

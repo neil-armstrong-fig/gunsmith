@@ -10,10 +10,13 @@
     "render": "node generator-scripts/RenderAudio.ts",
     "checks": "pnpm lint && pnpm format:check && pnpm type-check && pnpm test",
     "lint": "eslint --max-warnings=0 .",
-    "format:check": "prettier --check generator-scripts generated-audio/measurements.json *.js *.json README.md",
+    "format:check": "prettier --check generator-scripts generated-audio/measurements.json encoded-audio/*.json *.js *.json README.md",
     "type-check": "tsc --noEmit",
     "test": "node --test \"generator-scripts/**/*.test.ts\"",
-    "test:render": "FULL_RENDER=1 node --test generator-scripts/pack/verification/RenderedPack.test.ts"
+    "test:render": "FULL_RENDER=1 node --test generator-scripts/pack/verification/RenderedPack.test.ts",
+    "encode": "node generator-scripts/encoding/EncodeAudio.ts",
+    "verify:encoded": "node generator-scripts/encoding/verification/VerifyEncoded.ts",
+    "verify:browser": "node generator-scripts/browser/VerifyBrowserAudio.ts"
   },
   "devDependencies": {
     "@gunsmith/shared": "workspace:*",

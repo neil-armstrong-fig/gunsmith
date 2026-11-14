@@ -1,7 +1,7 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
-import {startingBrain} from "@gunsmith/engine/opponent/StartingBrain";
+import {startingBrain} from "@gunsmith/engine/opponent/brain/StartingBrain";
 
 const arena = arenaFrom(["#######", "#.....#", "#.....#", "#######"]);
 

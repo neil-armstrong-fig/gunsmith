@@ -46,7 +46,13 @@ a duel spec asserts **properties** (it engages, it leaves its spot, its magazine
 end), never exact positions or tick counts. A wait that can take longer than the 5 s expect timeout takes an explicit
 `timeoutSeconds` grounded in a measurement (`FightingBack`: 15 s against 9.4 s measured over 40 seeds), not a guess. The one
 duel long enough for the opponent to run dry has its own seed (`LONG_DUEL_SEED`, `startLongDuel()`); only 2 of 40 seeds get
-that far. Sparring has no brain, so its opponent never moves; the specs aim at where it stands.
+that far. A round that has just begun is live, so a spec never asserts that the opponent is "full" in it (a quick bot has fired by the time it reads): it measures what was restored against the frozen end of the round before. Sparring has no brain, so its opponent never moves; the specs aim at where it stands. The duel is a best-of-three
+(`PlayingABestOfThree`): it loses rounds by standing still, and round _n_ of a match plays seed `DUEL_SEED + n - 1`. No spec
+_wins_ a round, and that was measured: over 60 seeds, with the player idle for a start delay, then aiming at where the opponent
+stands and holding fire, a round is won only when the aim is taken at exactly 0.50 s of game time (60 of 60 seeds; 0 of 60 at 0.45 s
+or 0.55 s, with up to 0.1 s of lag from aiming to firing), so it is a timing window narrower than a spec can hit, not a property of a
+seed. A spec-only way to win would be a seam, so winning is covered by engine and webapp unit tests (`Step`, `ScoreRound`,
+`DecideMatch`, `RoundMessage`).
 
 ## Running
 

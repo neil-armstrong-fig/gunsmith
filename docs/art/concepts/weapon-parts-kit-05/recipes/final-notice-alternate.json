@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "id": "final-notice-alternate",
+  "name": "Final Notice / alternate",
+  "palette": {
+    "accent": "violet",
+    "secondary": "violet"
+  },
+  "instances": [
+    {
+      "id": "brace",
+      "part": "rear-brace",
+      "parent": "frame",
+      "anchor": "rear",
+      "ownAnchor": "attach",
+      "size": "standard",
+      "orientation": 0,
+      "mirror": false,
+      "colourRole": "accent"
+    },
+    {
+      "id": "body",
+      "part": "block-body",
+      "parent": "frame",
+      "anchor": "center",
+      "ownAnchor": "attach",
+      "size": "small",
+      "orientation": 0,
+      "mirror": false,
+      "colourRole": "text"
+    },
+    {
+      "id": "tray",
+      "part": "paper-tray",
+      "parent": "body",
+      "anchor": "front",
+      "ownAnchor": "attach",
+      "size": "standard",
+      "orientation": 0,
+      "mirror": false,
+      "colourRole": "accent"
+    },
+    {
+      "id": "feed",
+      "part": "paper-tray",
+      "parent": "body",
+      "anchor": "rear",
+      "ownAnchor": "attach",
+      "size": "small",
+      "orientation": 180,
+      "mirror": false,
+      "colourRole": "accent"
+    },
+    {
+      "id": "rollers",
+      "part": "paired-rollers",
+      "parent": "body",
+      "anchor": "core",
+      "ownAnchor": "attach",
+      "size": "standard",
+      "orientation": 0,
+      "mirror": false,
+      "colourRole": "accent"
+    },
+    {
+      "id": "paper",
+      "part": "folded-ribbon",
+      "parent": "body",
+      "anchor": "core",
+      "ownAnchor": "attach",
+      "size": "standard",
+      "orientation": 0,
+      "mirror": false,
+      "colourRole": "text"
+    }
+  ]
+}

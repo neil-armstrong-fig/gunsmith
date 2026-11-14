@@ -1,5 +1,5 @@
 import {DIFFICULTY} from "@gunsmith/engine/opponent/Difficulty";
-import {startingBrain} from "@gunsmith/engine/opponent/StartingBrain";
+import {startingBrain} from "@gunsmith/engine/opponent/brain/StartingBrain";
 import {unstickBrain} from "@gunsmith/engine/opponent/unstick/UnstickBrain";
 import type {OpponentBrain} from "@gunsmith/engine/opponent/types/OpponentBrain";
 import type {OpponentState} from "@gunsmith/engine/opponent/types/OpponentState";

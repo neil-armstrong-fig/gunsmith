@@ -5,6 +5,7 @@ import {shootFighter} from "@gunsmith/engine/game-loop/fighter/ShootFighter";
 import type {Input} from "@gunsmith/engine/game-loop/types/Input";
 import type {World} from "@gunsmith/engine/game-loop/types/World";
 import {takeDamage} from "@gunsmith/engine/health/TakeDamage";
+import {scoreRound} from "@gunsmith/engine/match/ScoreRound";
 import {thinkOpponent} from "@gunsmith/engine/opponent/ThinkOpponent";
 import type {Player} from "@gunsmith/engine/player/types/Player";
 import {decideRound} from "@gunsmith/engine/round/DecideRound";
@@ -19,7 +20,8 @@ import {decideRound} from "@gunsmith/engine/round/DecideRound";
  * the trigger). Then the bullets already flying move on, hurting any dummy or fighter they reach, and then the triggers
  * are let go, so a shot fired this step starts to move on the next one. A shot spends a round and leaves with the damage
  * and speed of the weapon in hand; a reload that finishes this step lets the weapon fire in the same step. When either
- * side is out of health the round is decided; after that the world is frozen and only the clock runs.
+ * side is out of health the round is decided and, in a match, scored once (the frozen world below never scores it again);
+ * after that the world is frozen and only the clock runs.
  */
 export function step(world: World, input: Input, seconds: number): World {
   if (world.round !== "playing") {
@@ -50,6 +52,8 @@ export function step(world: World, input: Input, seconds: number): World {
   const player = hurt(playerShot.fighter, bulletFlight.playerDamage);
   const opponent = opponentShot && hurt(opponentShot.fighter, bulletFlight.opponentDamage);
 
+  const round = decideRound({playerHealth: player.health, opponentHealth: opponent?.health});
+
   return {
     ...world,
     player,
@@ -58,7 +62,8 @@ export function step(world: World, input: Input, seconds: number): World {
     bullets,
     dummies: bulletFlight.dummies,
     elapsedSeconds: world.elapsedSeconds + seconds,
-    round: decideRound({playerHealth: player.health, opponentHealth: opponent?.health}),
+    round,
+    match: world.match && scoreRound(world.match, round),
   };
 }
 

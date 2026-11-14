@@ -1,6 +1,6 @@
 import {DIFFICULTY} from "@gunsmith/engine/opponent/Difficulty";
 import {enterState} from "@gunsmith/engine/opponent/state/EnterState";
-import {startingBrain} from "@gunsmith/engine/opponent/StartingBrain";
+import {startingBrain} from "@gunsmith/engine/opponent/brain/StartingBrain";
 import type {OpponentBrain} from "@gunsmith/engine/opponent/types/OpponentBrain";
 
 const mid: OpponentBrain = {

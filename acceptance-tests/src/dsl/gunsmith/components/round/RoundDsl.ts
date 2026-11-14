@@ -56,6 +56,42 @@ export class RoundDsl {
     }
   }
 
+  /** The score line on the banner, such as "You 0 · Opponent 1". */
+  async getBannerScore(): Promise<string> {
+    try {
+      return await this.round.getBannerScore();
+    } catch (error) {
+      throw new DslError("Failed to read the score on the round banner", error);
+    }
+  }
+
+  /** Whether the banner offers a "Next round" button right now. */
+  async isNextRoundOffered(): Promise<boolean> {
+    try {
+      return await this.round.isNextRoundOffered();
+    } catch (error) {
+      throw new DslError("Failed to see whether the next round is offered", error);
+    }
+  }
+
+  /** Whether the banner offers a "Play again" button right now. */
+  async isPlayAgainOffered(): Promise<boolean> {
+    try {
+      return await this.round.isPlayAgainOffered();
+    } catch (error) {
+      throw new DslError("Failed to see whether playing again is offered", error);
+    }
+  }
+
+  /** Presses the banner's "Next round" button. */
+  async nextRound(): Promise<void> {
+    try {
+      await this.round.nextRound();
+    } catch (error) {
+      throw new DslError("Failed to press Next round", error);
+    }
+  }
+
   /** Presses the banner's "Play again" button. */
   async playAgain(): Promise<void> {
     try {

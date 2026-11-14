@@ -1,5 +1,5 @@
 import {useFrame} from "@react-three/fiber";
-import {step} from "@gunsmith/engine/game-loop/Step";
+import {engine} from "@gunsmith/engine/Engine";
 import {STATE_HOOK_NAME} from "@gunsmith/shared/state-hook/StateHookName";
 import {gameState} from "@src/store/game/selectors/game-state/GameState";
 import {useGameStore} from "@src/store/game/UseGameStore";
@@ -53,7 +53,7 @@ export function useGameLoop(): void {
         switchTo: weaponKeys.takeSlot(),
       };
 
-      world = step(world, input, TICK_SECONDS);
+      world = engine.step(world, input, TICK_SECONDS);
     }
 
     if (owed.ticks > 0) {
