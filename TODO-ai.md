@@ -11,7 +11,32 @@ waits on you. **O1 needs nothing from `build` and can start immediately.**
 **What the others need from you:** a decision on where the pipeline runs (it decides whether `api/` imports `ai/`), the
 kill-switch flag's shape, and a review of the contracts before they freeze (Milestone M2).
 
-## Resume here (context-clear checkpoint, 2026-11-14, after merging main and the weapon evals going paid)
+## Resume here (context-clear checkpoint, 2026-11-14, after the kit probe, which is removed)
+
+**State.** Main is merged into the worktree (a fast-forward to `f456130`). **The kit-of-parts probe on `art`'s kit 05 was built, measured and then removed
+at the user's request** ("no point keeping around bloat"); nothing of it is left in the tree except its note, `docs/ai-visual-generation.md` ("The kit arm
+on Haiku 5.5" and "How the kit arm worked"), written so it can be rebuilt. **Result (Haiku 5.5, 3 trials, $0.031; spend $0.380 of the $1):** kit 12 valid / 5 repaired / 16
+stand-ins of 33, shapes arm 32 / 2 / 2 of 36; 21 of 21 first refusals were overflow past the right edge; local model 0 of 11. **The user's verdict: the shapes arm is
+"way better"; the kit is not going to work for now.** The only code change kept: the contact sheet shows input tokens as well as output tokens
+(`DrawingsSheetHtml`). Everything else is as at the previous checkpoint (the weapon specs on Haiku). `pnpm checks` exit 0 (engine 570, `ai` 420, webapp 139);
+`evals:fake` shows exactly the 8 by-design failures. All of it is **uncommitted for the user's review** (never commit `ai` code; the user has staged some of the doc
+edits in VS Code, so touch only the working files and never the index).
+
+**Next turn, in this order:**
+1. **Jellyfish lantern, red first** (the user's last open appearance item). Baseline = today's Haiku run, shapes arm, 3 trials: jellyfish **valid, stand-in, stand-in**
+   (the disco cactus is repaired, valid, repaired; the other ten requests 3 of 3 valid): `ai/evals/results/drawings-paid-latest.html` (git-ignored; regenerate with
+   `EVAL_TIER=paid EVAL_TRIALS=3 EVAL_KEEP_DRAWINGS=1 npx vitest run --config vitest.evals.config.ts evals/tests/appearance/DrawingAWeapon.eval.ts` from `ai/`).
+   The fault: long thin tentacles run 25 to 40 units off the canvas and the one repair only half fixes them. First write the failing criterion (a `when` in
+   `evals/tests/appearance/DrawingAWeapon.eval.ts`, or tighten the existing jellyfish one) and watch it fail for that reason; then try, one at a time: a prompt line
+   about keeping long shapes inside the canvas (say how far a polyline may reach), naming the overflowing shape and the edge in the repair sentence (today
+   `body.N`), and nothing that clips or prunes silently (art's rule: no silent clipping). Re-run on Haiku at 3 trials; the user judges the sheet. Budget: a run is about $0.03,
+   **$0.380 of the $1 spent**, ask before raising the ceiling.
+2. **Integrate appearance with `build`** once the user wants it: needs the call budget (about 1.1 calls per weapon, the same call as the stats or a second one) and where the
+   schema lives (`shared/` once the renderer imports it). Do not move it before then.
+3. Still waiting on the user and `build`: the stat balancer (needs where it lives, the budget, the preference encoding, the no-preference default; `TODO.md` blockers),
+   the shield behaviour, the omitted-stat policy, the real `StateGraph` and `AiAdapter` mapping.
+
+## Earlier checkpoint (2026-11-14, after merging main and the weapon evals going paid)
 
 **State.** Main is merged into the worktree (`b276c64`, the one commit I made; conflicts only in `HANDOFF.md`, `TODO.md`, `TODO-art.md`,
 resolved keeping both sides, `TODO-art.md` taken from main). Root `pnpm checks` exits 0 after the merge (engine 516, `ai` 394, webapp 127);
@@ -82,10 +107,10 @@ Mutation scripts are in the old session's scratchpad (gone); rebuild per `AGENTS
 1. **Integrate with `build`** (the user's decision: integrate first, tune from there). Needs: the call budget (about one extra call per weapon,
    1.08 on average; same call as the stats or a second one, the user and `build` decide) and the schema's home (it moves to `shared/` once
    the webapp renderer imports it). Do not move it before then.
-2. **Jellyfish lantern, red first:** long thin shapes (tentacles) run off the canvas and the repair only half fixes them. A prompt line
+2. **Jellyfish lantern, red first (now item 1 of the top checkpoint):** long thin shapes (tentacles) run off the canvas and the repair only half fixes them. A prompt line
    or a case in `evals/tests/appearance/DrawingAWeapon.eval.ts`; the last Haiku run is the baseline.
 3. ~~**Weapon on the paid tier** and a small Haiku weapon run, within the $1.~~ **Done 2026-11-14** (see the checkpoint above).
-4. **`art`'s kit of parts** (their `TODO-art.md` A2 item): once it exists, probe whether a model can pick parts and parameters from it.
+4. ~~**`art`'s kit of parts**: probe whether a model can pick parts and parameters from it.~~ **Done and removed 2026-11-14** (see the checkpoint at the top; the user shelved it).
 5. Still open from before: the real `StateGraph` and `AiAdapter` mapping; the shield behaviour `build` owes; the omitted-stat policy (the user's).
 6. Smaller: consider a 3-trial Haiku baseline before any prompt change. (The fake tier's 8 rejection failures stay: the user's call.)
 

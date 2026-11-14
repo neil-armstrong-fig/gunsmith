@@ -163,6 +163,14 @@ those implementations; art's README records unsupported identities and proposed 
   render skipped). Folder/caller and standards audit completed. No gameplay
   acceptance or model eval run for the offline diagnostic.
 
+- 2026-11-14, `ai`: **Kit-of-parts selection probe done and the code removed again** (art's kit 05; the user judged the shapes arm far
+  better and asked for the kit code to go, with a note to rebuild from: `docs/ai-visual-generation.md`, "How the kit arm worked").
+  Main merged into the `ai` worktree first (a fast-forward to `f456130`). **Findings for `art` and `build` (Haiku 5.5, 11 requests x 3
+  trials, $0.031):** valid drawings were clean (teapot, jellyfish, bubblegum mortar, plain gun) but only 12 of 33 were valid first time,
+  5 repaired, 16 stand-ins; the shapes arm on the same prompts is 32 / 2 / 2 of 36. Every first refusal (21 of 21) was parts running
+  **past the right edge** (the model cannot add up chained parts); the duck and fax never reached the canvas. Nothing was changed in
+  `art`'s files; art's expansion rules, 12 recipes and 9 faulty recipes held up as an oracle. The call budget question for `build` is
+  unchanged.
 - 2026-11-14, `build`: **Crouch (slice 2), test first, and the `ai` worktree merged.** Merged `worktree-ai-hosting-proof` into main
   (`c8269cf`; `HANDOFF.md` and `TODO.md` conflicts kept both sides; the worktree is `ai`'s, left in place). Crouch: hold C or either Control;
   speed 0.4 of standing, cone range 1.5 times, angle unchanged, both tunables; the opponent does not crouch yet. **For `ai`:** `Player`
