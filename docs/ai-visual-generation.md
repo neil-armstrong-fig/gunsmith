@@ -224,6 +224,28 @@ expansion rules), `recipes/` and `assemblies/` (12 recipes and their expected dr
 - **Why it failed, so a rebuild starts there:** the model cannot add up how far chained parts stick out, so it overflows the canvas
   (21 of 21 first refusals); give it part widths it can add, or let code place parts on a grid, before trying again.
 
+## The jellyfish lantern (2026-11-14, Haiku 5.5, shapes arm)
+
+**Red first.** The existing jellyfish `when` (`the model's own drawing is shown`, `the first drawing needs no repair`) already fell, for the
+right reason: every recorded error was `reaches outside the 64 by 64 space`, tentacle polylines 30 to 40 units past the bottom or right edge,
+and the one repair moved them 1 to 10 units at most (`95 to 96`, `101 to 100`, `105 to 100`; in the scoped baseline run `97 to 91`, `105 to 95`).
+Baseline across the two days: 3 stand-ins in 9 trials.
+
+**One change.** The overflow sentence now says what the shape is and how to fix it:
+`body.2 (polyline): reaches outside the 64 by 64 space (bottom edge 97); pull it in by 33 so its bottom edge, stroke included, is at most 64`
+(`OutsideErrors`, with `EdgeOutside` returning the crossing as data; 15 of 15 mutants killed, the existing tests that quoted the old sentence moved to the new one
+first and fell for the wording only). Nothing clips, prunes or scales: the model still has to redraw it.
+
+**Result.** 31 jellyfish trials after the change (3, 8 and 20): 29 valid first time, 2 repaired (both a 0.5 unit overshoot of one ellipse), **0 stand-ins**. The
+full set at 3 trials: 35 of 36 valid first time, the disco cactus repaired once, no stand-ins (was 32 / 2 / 2); `$0.025`.
+
+**What this does not prove (read before crediting the sentence).** The first draft's prompt did not change, and the first-draft overflow rate moved anyway
+(5 of 9 the day before, 1 of 3 earlier the same day, 2 of 31 afterwards, both tiny), so most of the improvement is the model, not the sentence. A controlled
+repair-only test (a fixed jellyfish draft with the tentacles 30 to 40 units over, 8 repairs per sentence, same hour) gave **7 of 8 repaired with the old sentence and
+8 of 8 with the new one**, the old arm's miss being one unit over: not a difference to claim. The sentence is kept because it is cheap, tested and says what the
+model needs; it is **unproven**. To prove it, replay real failing first drafts (the outcome does not keep the draft, only its errors) through both sentences. The
+prompt line about long shapes was **not** added: no eval shows the model failing without it.
+
 ## Questions
 
 **For `build` and the user:**

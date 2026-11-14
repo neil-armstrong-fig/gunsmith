@@ -145,6 +145,10 @@ those implementations; art's README records unsupported identities and proposed 
 
 ## Delivery log
 
+- 2026-11-14, `ai`: main merged into the `ai` worktree (fast-forward to `ceb5063`). The jellyfish lantern drawing, red first on Haiku 5.5: the overflow
+  sentence now names the shape's kind and how far to pull it in (`ai/` only; no contract, `shared/` or `engine/` change). 0 stand-ins in 31 jellyfish trials
+  (was 3 in 9) and 35 of 36 valid first time over the full set, but the first draft moved too, so the sentence's own effect is unproven
+  (`docs/ai-visual-generation.md`, "The jellyfish lantern"). Spend $0.458 of the $1. Uncommitted in the worktree for the user. Nothing new needed from `build` or `art`.
 - 2026-11-14, `art`: removed the one-off alignment runner, comparison helper,
   types and nine tests at the user's request. Frozen evidence/build handoff and
   existing codec QA retained; reproduction notes and historical source hashes
