@@ -42,6 +42,14 @@ clear silhouettes. Catalogue, JSON/SVGs and native-size/grayscale/held reviews a
 visually approved the kit on 2026-11-14 (“looks really good”). AI selection/placement probes and runtime
 proof remain pending. Earlier references remain intact.
 
+## Saved Haiku review (2026-11-14)
+
+[Review 06](concepts/haiku-review-06/README.md) compares twelve saved drawings,
+the six approved kit primaries, native sizes, grayscale and provisional held poses.
+The user accepted the review. Frozen inputs distinguish available artwork from
+newer eval summaries and AI-reported results; concrete AI/build follow-up is
+recorded there. No kit-selection comparison or production approval is implied.
+
 ## Palette and integration proposal
 
 Prefix every token below with `--color-gs-` when `build` adopts it into Tailwind `@theme`. Components use tokens,

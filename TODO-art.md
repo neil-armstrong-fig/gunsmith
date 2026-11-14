@@ -10,11 +10,14 @@ cartoon sci-fi machinery at the user's request (Ratchet & Clank inspiration, ada
 
 ## Resume here after clearing context (2026-11-14)
 
-**Current milestone:** M1, a fun full-screen game, test-first. Build has delivered best-of-three on the duel;
-next are play tuning and the remaining vision/ring mechanics. AI's later, uncommitted worktree checkpoint reports the
-first local appearance-generation probe; art's authored-parts kit is now delivered. The committed weapon pipeline/eval DSL
-has merged into main (`e40e9a1`); later appearance work remains in the worktree. Production contracts remain pending.
-Read the current shared/persona TODOs and the AI worktree updates before acting.
+**Current milestone:** M1, a fun full-screen game, test-first. Build has delivered
+best-of-three and now the first aim-rotated forward-cone slice (latest `HANDOFF.md`:
+cone/wall filtering and dim veil; crouch and heights are not done). Re-read build's
+current checklist rather than treating old status counts as current. AI's committed
+weapon pipeline/eval DSL is in main (`e40e9a1`); later appearance work and findings
+remain in `.claude/worktrees/ai-hosting-proof/`. M2/manifest contracts remain open.
+Art's kit 05 and Haiku review 06 are delivered; the user accepted this review
+(“great”, 2026-11-14) and asked for a context-clear checkpoint.
 
 **Art delivered:** authored kit 05 in `docs/art/concepts/weapon-parts-kit-05/`: 18 pieces,
 12 kit-only recipes (six primaries plus six alternates), matching expanded JSON/SVGs, catalogue and
@@ -30,7 +33,7 @@ This is experimental art data, not an implemented renderer or frozen M2 contract
 Production is blocked by the measured duration/level/seam differences documented in `webapp/audio/README.md`.
 The approved masters remain byte-identical. Do not repeat the direction audition or mark A6 production complete.
 
-**Haiku review delivered (2026-11-14, user-selected next pass):**
+**Haiku review delivered and accepted (2026-11-14):**
 `docs/art/concepts/haiku-review-06/README.md` reviews the twelve saved outputs,
 with editable comparison sheets, native-size/grayscale/detail comparisons and
 96 provisional held stamps. Frozen evidence separates the 00:17 drawing snapshot
@@ -42,7 +45,8 @@ model call, revised fixture or production approval. Kit 05 approval is preserved
 **Up next, in priority order:**
 
 1. **Next art pass: read the latest AI worktree findings and shared handoff first.** The kit is visually
-   approved. If a kit-selection probe has landed, review the actual generated assemblies and improve only
+   approved; review 06 is complete. Do not repeat it against the same twelve saved drawings.
+   If new primitive/kit outputs or renderer feedback have landed, review those and improve only
    demonstrated identity/attachment failures; retain the approved examples as comparison fixtures.
    If no probe or owner request is available, continue the recorded audio codec/browser blockers instead:
    read `webapp/audio/AGENTS.md` and the current QA reports, reproduce a failure test-first, preserve
@@ -61,17 +65,23 @@ model call, revised fixture or production approval. Kit 05 approval is preserved
    masters. Encoding and browser/native QA tools are delivered; production approval, device/fatigue listening,
    masking with build's shot synth, final manifest mapping and playback integration remain pending.
 
-**AI worktree review (2026-11-13; read-only, not copied or merged wholesale):**
+**AI worktree / evidence checkpoint (2026-11-14):**
 
-- Source: `.claude/worktrees/ai-hosting-proof/docs/ai-visual-generation.md` plus its `TODO-ai.md`, `TODO-art.md`,
-  `TODO.md` and `HANDOFF.md`. These contain newer AI findings but older build/audio status than main.
-- AI reports 368 unit tests, 36/36 standing appearance criteria and 0/17 capability criteria; weapon evals 70/70.
-  These are AI's reported results, not rerun by art. Appearance code is experimental and not wired into `generateWeapon`.
-- Art should answer the questions about part budgets, anchors, palette roles and recipe vocabulary through the kit
-  experiment. The proposed 24-part cap is unmeasured; stroke tolerance/pruning and call-budget policies remain open.
-- Newer source note reports a user-reviewed Haiku run and later prompt fix (33/36 first answers valid).
-  The old footer and some main status text are stale. No additional model call was made by art.
-  Visual defaults do not settle gameplay-stat defaults.
+- Read the worktree's current `docs/ai-visual-generation.md`, TODO and handoff
+  changes read-only. Its build/audio history is older than main. Do not merge,
+  copy its docs wholesale, or trust stale “not done / no Haiku” footers.
+- Review 06 freezes the twelve 00:17 UTC drawings (11 valid, one lantern fallback),
+  separately from the 00:32 summary (50/53 criteria) and AI's reported 36-trial
+  run (33 first-valid, one repaired, two fallbacks). No correspondence is proved.
+  Reuse `Provenance.json`, `Verification.json` and `evidence/`; never replace these
+  snapshots with a newer `latest` file. Kit selection/placement is still unmeasured.
+- AI follow-up: duck/cactus identity, structural detail labels, and retained
+  lantern first/repair/final drafts with run/trial IDs. Build follow-up: generic
+  renderer pose/muzzle alignment, contrast, team cues and real fog boundaries.
+  Both owner requests are in `TODO.md` and review 06. Art does not edit their code.
+- Historical local-tier scores and Haiku results do not transfer between tiers.
+  Visual defaults do not decide omitted gameplay stats. No new model call was
+  made by art; this checkpoint authorises no paid run or tolerance/budget change.
 
 **Decisions to preserve:**
 
@@ -96,17 +106,22 @@ General approval does not claim production integration QA.
 
 **References:** `docs/art/README.md`, `docs/art/visual-schema-proposal.md`, `docs/art/gameplay-research.md`, and
 `docs/art/concepts/`: `industrial-arena.*`, `prompt-built-oddities.*`, `top-down-oddities/`, `overhead-machinery-02.*`,
-`improbable-machinery-03.*`, `simple-machinery-04/`. Rich 02/03 PNGs are generated concepts. The simple 04 drawings are
+`improbable-machinery-03.*`, `simple-machinery-04/`, `weapon-parts-kit-05/`, `haiku-review-06/`. Rich 02/03 PNGs are generated concepts. The simple 04 drawings are
 original vectors; two image-generation attempts were rejected, and no raster result from them was delivered.
 
-**Latest validation (2026-11-14, kit delivery):** root `pnpm checks` exits 0: lint, format,
-strict typecheck and unit tests (516 engine, 152 AI, 127 webapp, 253 audio passed / one slow render skipped).
-Twelve assembly/SVG comparisons, stroke-inclusive bounds and temporary AI-draft format conversions pass;
-nine faulty recipes rejected; artifact hashes, local links and numeric anchor/grip checks pass.
-Colour/grayscale/catalogue/held sheets inspected. User visually approved the kit (2026-11-14);
-model-selection evaluation and runtime proof remain pending.
-No gameplay suite or full audio re-render run for the kit. Earlier full master comparison and compressed
-browser/native QA results remain as documented in the audio README; no audio files changed in this delivery.
+**Latest completed validation (context-clear pass, 2026-11-14):** root `pnpm checks`
+exited 0 outside the sandbox: lint, format, strict typecheck; 559 engine, 152 AI,
+133 webapp and 253 audio tests passed, one slow audio render skipped. The earlier
+review's `Verification.json` retains its own 558-engine/132-webapp checkpoint.
+That earlier sandboxed run stalled in local-server audio tests; its replacement
+passed and the stalled process was stopped. No server started by art remains.
+Documentation/folder review and diff whitespace checks pass. Artifact checks passed: frozen
+hashes, SVG safety, 72 source-faithful Haiku samples, six full-size kit comparisons,
+96 held transforms, PNG dimensions and README links. All three sheets inspected.
+No gameplay acceptance, paid/local model eval or full audio re-render was run.
+Review verification used `/tmp` authoring/QA scripts; do not assume they survive
+context clear. The shipped SVGs and frozen evidence are the review source.
+Earlier kit and audio verifications remain with their own deliveries.
 
 **Boundaries:** art owns `docs/art/`, `webapp/public/assets/`, `webapp/audio/` and its checklist. Runtime/schema edits
 belong to build/AI. The user explicitly authorised the visual-generation task addition to `TODO-ai.md`; leave its
@@ -237,7 +252,13 @@ nine faulty recipes rejected. User visually approved the kit on 2026-11-14 (“l
 - [x] After each delivery, add a line to the delivery log in `HANDOFF.md` listing the manifest keys delivered, so `build`
       can wire them in; then tick the row here.
 
-**Context-clear checkpoint (2026-11-14):** kit 05 visually approved; next action is the AI
-selection/placement comparison, with art responding to observed failures. Audio codec QA is art's
-independent next task while waiting. M2, production sprites and manifest integration stay open.
-No commit, paid run, production-schema choice or new dependency is authorised by this checkpoint.
+**Context-clear checkpoint (2026-11-14):** review 06 is delivered and accepted;
+kit 05 remains visually approved. Next art action is new-output/renderer review
+if owner evidence is available, otherwise audio codec QA with masters preserved.
+Production art, M2/manifest agreement and kit-selection evaluation remain open.
+Shared TODO/handoff updated; leave existing staging to the user. No commit,
+paid call, dependency or production contract change is authorised here.
+
+**Next-session prompt:** “You are art, continue TODO-art.md. Read the context-clear
+checkpoint and current AI worktree changes first. Preserve approved kit 05 and
+completed Haiku review 06; use new owner evidence, otherwise continue audio codec QA.”

@@ -147,6 +147,13 @@ those implementations; art's README records unsupported identities and proposed 
 
 Newest first. One line each: date, who, what, where.
 
+- 2026-11-14, `art`: **context-clear checkpoint prepared after user acceptance of review 06.**
+  `TODO-art.md` now records frozen evidence distinctions, latest completed checks,
+  build's new cone-slice handoff, owner requests and a next-session prompt. Resume
+  with new AI/renderer evidence, otherwise audio codec QA; preserve approved kit 05
+  and do not repeat the completed review. Art status updated; production/M2 and
+  kit-selection evaluation stay open. Documentation only; manifest keys: none.
+
 - 2026-11-14, `build`: **Forward vision cone, slice 1 (cone only), test first.** `engine/src/vision/` is new: a fighter sees a cone
   (`Weapon.visionDegrees`, `visionRange`: 90 degrees, rifle 12 tiles, marksman rifle 16; tunables) along their aim, blocked by walls; the player's
   view decides what is drawn (opponent, dummies, the opponent's bullets) and `VisibleToPlayer` is the function the server will reuse to filter
