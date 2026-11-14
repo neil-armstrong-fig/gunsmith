@@ -34,6 +34,14 @@ compositions, editable SVGs, matching proposed JSON and native-size/held reviews
 rich references and asks AI to evaluate reliability, complexity and code-owned visual defaults before freezing a contract.
 Both simple and rich references remain useful; none fixes the final detail level or renderer architecture.
 
+## Authored parts experiment (2026-11-14)
+
+[Kit 05 and AI handoff](concepts/weapon-parts-kit-05/README.md) supplies 18 reusable authored pieces,
+named anchors, bounded size/orientation choices and six oddities with alternates. The user chose flat,
+clear silhouettes. Catalogue, JSON/SVGs and native-size/grayscale/held reviews are delivered; the user
+visually approved the kit on 2026-11-14 (“looks really good”). AI selection/placement probes and runtime
+proof remain pending. Earlier references remain intact.
+
 ## Palette and integration proposal
 
 Prefix every token below with `--color-gs-` when `build` adopts it into Tailwind `@theme`. Components use tokens,

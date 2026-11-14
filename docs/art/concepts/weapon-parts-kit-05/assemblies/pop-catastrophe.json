@@ -1,0 +1,263 @@
+{
+  "recipe": "pop-catastrophe",
+  "palette": {
+    "accent": "pink",
+    "secondary": "pink"
+  },
+  "body": [
+    {
+      "kind": "polyline",
+      "points": [
+        [
+          14.0,
+          24.0
+        ],
+        [
+          7.0,
+          24.0
+        ],
+        [
+          7.0,
+          40.0
+        ],
+        [
+          14.0,
+          40.0
+        ]
+      ],
+      "fill": "none",
+      "stroke": "edge",
+      "strokeWidth": 3,
+      "detail": "structural"
+    },
+    {
+      "kind": "polyline",
+      "points": [
+        [
+          7.0,
+          29.0
+        ],
+        [
+          7.0,
+          35.0
+        ]
+      ],
+      "fill": "none",
+      "stroke": "secondary",
+      "strokeWidth": 3,
+      "detail": "structural"
+    },
+    {
+      "kind": "polygon",
+      "points": [
+        [
+          14.0,
+          21.0
+        ],
+        [
+          40.0,
+          21.0
+        ],
+        [
+          44.0,
+          25.0
+        ],
+        [
+          44.0,
+          39.0
+        ],
+        [
+          40.0,
+          43.0
+        ],
+        [
+          14.0,
+          43.0
+        ]
+      ],
+      "fill": "body",
+      "stroke": "outline",
+      "strokeWidth": 1.5,
+      "detail": "structural"
+    },
+    {
+      "kind": "polygon",
+      "points": [
+        [
+          18.0,
+          25.0
+        ],
+        [
+          37.0,
+          25.0
+        ],
+        [
+          37.0,
+          39.0
+        ],
+        [
+          18.0,
+          39.0
+        ]
+      ],
+      "fill": "accent",
+      "stroke": "outline",
+      "strokeWidth": 1.5,
+      "detail": "structural"
+    },
+    {
+      "kind": "ellipse",
+      "x": 25.0,
+      "y": 18.0,
+      "radiusX": 11.2,
+      "radiusY": 11.2,
+      "fill": "accent",
+      "stroke": "outline",
+      "strokeWidth": 1.2,
+      "detail": "structural"
+    },
+    {
+      "kind": "ellipse",
+      "x": 25.0,
+      "y": 18.0,
+      "radiusX": 8.0,
+      "radiusY": 8.0,
+      "fill": "secondary",
+      "stroke": "outline",
+      "strokeWidth": 1.2,
+      "detail": "structural"
+    },
+    {
+      "kind": "ellipse",
+      "x": 22.0,
+      "y": 15.0,
+      "radiusX": 4,
+      "radiusY": 4,
+      "fill": "secondary",
+      "stroke": "outline",
+      "strokeWidth": 1.5,
+      "detail": "structural"
+    },
+    {
+      "kind": "ellipse",
+      "x": 29.0,
+      "y": 17.0,
+      "radiusX": 4,
+      "radiusY": 4,
+      "fill": "secondary",
+      "stroke": "outline",
+      "strokeWidth": 1.5,
+      "detail": "structural"
+    },
+    {
+      "kind": "ellipse",
+      "x": 25.0,
+      "y": 23.0,
+      "radiusX": 4,
+      "radiusY": 4,
+      "fill": "secondary",
+      "stroke": "outline",
+      "strokeWidth": 1.5,
+      "detail": "structural"
+    },
+    {
+      "kind": "polygon",
+      "points": [
+        [
+          30.0,
+          29.0
+        ],
+        [
+          35.0,
+          29.0
+        ],
+        [
+          39.0,
+          33.0
+        ],
+        [
+          50.0,
+          33.0
+        ],
+        [
+          50.0,
+          38.0
+        ],
+        [
+          37.0,
+          38.0
+        ],
+        [
+          33.0,
+          34.0
+        ],
+        [
+          30.0,
+          34.0
+        ]
+      ],
+      "fill": "accent",
+      "stroke": "outline",
+      "strokeWidth": 1.5,
+      "detail": "structural"
+    },
+    {
+      "kind": "polygon",
+      "points": [
+        [
+          50.0,
+          25.0
+        ],
+        [
+          58.0,
+          25.0
+        ],
+        [
+          60.0,
+          27.0
+        ],
+        [
+          60.0,
+          37.0
+        ],
+        [
+          58.0,
+          39.0
+        ],
+        [
+          50.0,
+          39.0
+        ]
+      ],
+      "fill": "edge",
+      "stroke": "outline",
+      "strokeWidth": 1.5,
+      "detail": "structural"
+    },
+    {
+      "kind": "polygon",
+      "points": [
+        [
+          56.0,
+          28.0
+        ],
+        [
+          60.0,
+          28.0
+        ],
+        [
+          60.0,
+          36.0
+        ],
+        [
+          56.0,
+          36.0
+        ]
+      ],
+      "fill": "body",
+      "stroke": "outline",
+      "strokeWidth": 1.5,
+      "detail": "structural"
+    }
+  ]
+}

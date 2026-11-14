@@ -29,7 +29,38 @@ Both are withdrawn until the game is fun (`HANDOFF.md` delivery log, 2026-11-12)
 
 ## Phase 1: the game, test first. Milestone M1 (redefined: the game is fun)
 
-### Where things stand (end of the 2026-11-12 sessions)
+### Resume here (written 2026-11-14, end of a session; read this first)
+
+**Nothing is committed.** Everything below is in the working tree for the user to review and commit (plain `mv` was used, so
+the index still lists some old paths: tell the user to re-add). Root `pnpm checks` exits 0 (engine 516, webapp 127, `ai` 152,
+`audio-studies` 254 with one slow render skipped); acceptance 73 of 73 on a production build. Done this session, all logged in
+`HANDOFF.md`: **best of three** (the duel only), **`engine/src/` sub-foldered** with a front door `Engine.ts`, and the newest
+**audio code cleaned** (`webapp/audio/`, `art`'s folder, at the user's request).
+
+**Next, in order (none was requested yet; ask or pick the first):**
+1. **The user plays the duel**, then the bot's tunables (`engine/src/opponent/Difficulty.ts`) are set by feel. Do not change them
+   before that.
+2. The **dim arena and forward cone** (open item below), then the **closing ring** and a round timer.
+3. Owed to `ai`: a root `pnpm evals` script (see "Owed to `ai`" below).
+4. The `ai` row in `TODO.md` is stale (its worktree merged as `e40e9a1`): it is `ai`'s to update, so only mention it.
+
+**Open questions for the user:** (a) add `"@playwright/test": "catalog:"` to `audio-studies` so its browser check stops borrowing
+Playwright from `acceptance-tests/` (a dependency change, so it needs their say); (b) no browser spec *wins* a round (measured: a
+win needs the aim at exactly 0.50 s, a timing window, not a seed), so winning is covered by unit tests only.
+
+**Things that will bite you:**
+- Another session may be editing the tree (`art` runs in Codex, `ai` elsewhere; the `ps` check does not see them): run
+  `git status --short` first, attribute files outside your folders to their owner, and never run repo-wide `format`/`lint:fix`.
+- `audio-studies`: **never run `pnpm encode` against the real `encoded-audio/`** to test something (Ogg bytes change on every
+  encode, because the container has a random serial number, and it removes the three reports). Encode into a temp folder and
+  compare MP3 by hash and Ogg by decoded audio. `verify:encoded` and `verify:browser` are *meant* to exit non-zero: `art`'s findings
+  (13 native, the WebKit ones) are open, and a green run would mean a limit was loosened. See `webapp/audio/AGENTS.md`.
+- Port 3000 may be held by janggi: use `vite --port 3100 --strictPort` (or `vite preview --port 3100`) and
+  `WEBAPP_URL=http://localhost:3100`; stop it with `pkill -f "vite.*--port 3100"`. The production build goes to `webapp/build/`.
+- Mutation proof uses scratchpad scripts that are **not in the repo**: write them again (backup, one exact replacement, `grep`,
+  run, restore, byte compare).
+
+### Where things stand (as of the 2026-11-12 sessions, counts brought up to date 2026-11-14)
 
 The player walks (WASD, walls stop them), aims with the mouse and clicks to fire bullets that die on walls or on one of
 three practice dummies, which are removed at zero health, all in a full-screen arena. **There is now a duel** (`?scenario=duel`,
@@ -40,7 +71,7 @@ a health HUD, and a round that is won or lost with a "Play again" overlay. `?see
 1 and 2): a rifle (25 damage, 12 rounds) and a marksman rifle (50 damage, 5 rounds); R reloads, shots spend rounds, and the
 ammunition shows in a plain-React HUD (`react/components/dom/ammo-hud/`). Five packages: `webapp/`, `engine/`, `acceptance-tests/`, `shared/` (tool
 config plus the state-hook snapshot types) and `ai/` (merged in from `ai`'s worktree on 2026-11-12, `8c52f5f`; `ai` owns it, read
-`ai/AGENTS.md` before touching it). `pnpm checks` is green for `build`'s packages: engine 512 unit tests, webapp 127, and 73 acceptance
+`ai/AGENTS.md` before touching it). `pnpm checks` is green for `build`'s packages: engine 516 unit tests, webapp 127, and 73 acceptance
 specs (the weapon, HUD, dummy, sparring and duel specs pass at `--repeat-each=10`). Every spec and unit test has been mutation-proved. Read
 `engine/AGENTS.md`, `webapp/AGENTS.md`, `webapp/src/react/AGENTS.md` and `acceptance-tests/AGENTS.md` first.
 

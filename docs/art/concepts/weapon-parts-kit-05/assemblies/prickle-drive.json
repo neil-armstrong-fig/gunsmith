@@ -1,0 +1,248 @@
+{
+  "recipe": "prickle-drive",
+  "palette": {
+    "accent": "mint",
+    "secondary": "violet"
+  },
+  "body": [
+    {
+      "kind": "polyline",
+      "points": [
+        [
+          14.0,
+          24.0
+        ],
+        [
+          7.0,
+          24.0
+        ],
+        [
+          7.0,
+          40.0
+        ],
+        [
+          14.0,
+          40.0
+        ]
+      ],
+      "fill": "none",
+      "stroke": "edge",
+      "strokeWidth": 3,
+      "detail": "structural"
+    },
+    {
+      "kind": "polyline",
+      "points": [
+        [
+          7.0,
+          29.0
+        ],
+        [
+          7.0,
+          35.0
+        ]
+      ],
+      "fill": "none",
+      "stroke": "secondary",
+      "strokeWidth": 3,
+      "detail": "structural"
+    },
+    {
+      "kind": "polygon",
+      "points": [
+        [
+          14.0,
+          21.0
+        ],
+        [
+          40.0,
+          21.0
+        ],
+        [
+          44.0,
+          25.0
+        ],
+        [
+          44.0,
+          39.0
+        ],
+        [
+          40.0,
+          43.0
+        ],
+        [
+          14.0,
+          43.0
+        ]
+      ],
+      "fill": "body",
+      "stroke": "outline",
+      "strokeWidth": 1.5,
+      "detail": "structural"
+    },
+    {
+      "kind": "polygon",
+      "points": [
+        [
+          18.0,
+          25.0
+        ],
+        [
+          37.0,
+          25.0
+        ],
+        [
+          37.0,
+          39.0
+        ],
+        [
+          18.0,
+          39.0
+        ]
+      ],
+      "fill": "accent",
+      "stroke": "outline",
+      "strokeWidth": 1.5,
+      "detail": "structural"
+    },
+    {
+      "kind": "ellipse",
+      "x": 25.0,
+      "y": 18.0,
+      "radiusX": 12.0,
+      "radiusY": 7.2,
+      "fill": "accent",
+      "stroke": "outline",
+      "strokeWidth": 1.8,
+      "detail": "structural"
+    },
+    {
+      "kind": "polyline",
+      "points": [
+        [
+          19.0,
+          15.6
+        ],
+        [
+          31.0,
+          15.6
+        ]
+      ],
+      "fill": "none",
+      "stroke": "edge",
+      "strokeWidth": 1.2,
+      "detail": "fine"
+    },
+    {
+      "kind": "ellipse",
+      "x": 25.0,
+      "y": 46.0,
+      "radiusX": 12.0,
+      "radiusY": 7.2,
+      "fill": "accent",
+      "stroke": "outline",
+      "strokeWidth": 1.8,
+      "detail": "structural"
+    },
+    {
+      "kind": "polyline",
+      "points": [
+        [
+          19.0,
+          43.6
+        ],
+        [
+          31.0,
+          43.6
+        ]
+      ],
+      "fill": "none",
+      "stroke": "edge",
+      "strokeWidth": 1.2,
+      "detail": "fine"
+    },
+    {
+      "kind": "polygon",
+      "points": [
+        [
+          44.0,
+          25.0
+        ],
+        [
+          48.0,
+          25.0
+        ],
+        [
+          55.0,
+          27.0
+        ],
+        [
+          48.0,
+          29.0
+        ],
+        [
+          48.0,
+          35.0
+        ],
+        [
+          55.0,
+          37.0
+        ],
+        [
+          48.0,
+          39.0
+        ],
+        [
+          44.0,
+          39.0
+        ]
+      ],
+      "fill": "edge",
+      "stroke": "outline",
+      "strokeWidth": 1.5,
+      "detail": "structural"
+    },
+    {
+      "kind": "polygon",
+      "points": [
+        [
+          24.0,
+          32.0
+        ],
+        [
+          30.0,
+          26.0
+        ],
+        [
+          36.0,
+          32.0
+        ],
+        [
+          30.0,
+          38.0
+        ]
+      ],
+      "fill": "secondary",
+      "stroke": "outline",
+      "strokeWidth": 1.5,
+      "detail": "structural"
+    },
+    {
+      "kind": "polyline",
+      "points": [
+        [
+          30.0,
+          27.0
+        ],
+        [
+          30.0,
+          36.0
+        ]
+      ],
+      "fill": "none",
+      "stroke": "text",
+      "strokeWidth": 1,
+      "detail": "fine"
+    }
+  ]
+}

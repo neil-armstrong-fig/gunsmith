@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "id": "quackback",
+  "name": "Quackback",
+  "palette": {
+    "accent": "yellow",
+    "secondary": "orange"
+  },
+  "instances": [
+    {
+      "id": "brace",
+      "part": "rear-brace",
+      "parent": "frame",
+      "anchor": "rear",
+      "ownAnchor": "attach",
+      "size": "standard",
+      "orientation": 0,
+      "mirror": false,
+      "colourRole": "accent"
+    },
+    {
+      "id": "body",
+      "part": "round-chamber",
+      "parent": "frame",
+      "anchor": "center",
+      "ownAnchor": "attach",
+      "size": "standard",
+      "orientation": 0,
+      "mirror": false,
+      "colourRole": "accent"
+    },
+    {
+      "id": "socket",
+      "part": "muzzle-collar",
+      "parent": "frame",
+      "anchor": "muzzle",
+      "ownAnchor": "front",
+      "size": "small",
+      "orientation": 0,
+      "mirror": false,
+      "colourRole": "accent"
+    },
+    {
+      "id": "duck",
+      "part": "duck-head-beak",
+      "parent": "body",
+      "anchor": "front",
+      "ownAnchor": "attach",
+      "size": "standard",
+      "orientation": 0,
+      "mirror": false,
+      "colourRole": "accent"
+    }
+  ]
+}

@@ -21,7 +21,9 @@ Read the current shared/persona TODOs and the AI worktree updates before acting.
 64/32 px/grayscale/held rotation reviews. User chose simple clear silhouettes and bounded choices.
 `Assembly.md` specifies anchors, transforms and the proposed recipe interface; `README.md` records
 identity limitations and unsupported requests. All earlier rich/simple references remain intact.
-Geometry passes; user identity approval and AI selection/placement evaluation remain pending.
+**User visual approval (2026-11-14): “looks really good”.** Preserve this kit as the approved
+starting point; do not restart its direction or request the same approval again. Geometry passes;
+AI selection/placement evaluation and runtime proof remain pending.
 This is experimental art data, not an implemented renderer or frozen M2 contract.
 
 **Latest audio preparation (2026-11-13):** compressed candidates and reproducible browser/native reports now exist.
@@ -30,9 +32,17 @@ The approved masters remain byte-identical. Do not repeat the direction audition
 
 **Up next, in priority order:**
 
-1. **Art: review the delivered kit's identities with the user**, especially fax, cactus and lantern.
-   Revise the authored parts from actual feedback; keep changes inside art-owned paths.
-2. **AI: selection/placement probe can start from kit 05.** Local primitive results were weak, but the
+1. **Next art pass: read the latest AI worktree findings and shared handoff first.** The kit is visually
+   approved. If a kit-selection probe has landed, review the actual generated assemblies and improve only
+   demonstrated identity/attachment failures; retain the approved examples as comparison fixtures.
+   If no probe or owner request is available, continue the recorded audio codec/browser blockers instead:
+   read `webapp/audio/AGENTS.md` and the current QA reports, reproduce a failure test-first, preserve
+   every approved WAV master, and keep production blocked until the measured failures are resolved.
+2. **AI next: selection/placement probe against the approved kit 05.** Read its `README.md`,
+   `Parts.json`, `Assembly.md`, `recipes/` and `RejectedRecipes.json`. Probe the original six prompts
+   plus sparse/unsupported/conflicting requests; report validity AND recognisable identity, variation,
+   tokens, latency, repairs and disclosed stand-ins. Art does not implement AI code or run paid calls.
+   Compare against the existing primitive arm before choosing an approach. Local primitive results were weak, but the
    newer worktree Haiku report records 33/36 strict first answers after its prompt fix (one repaired,
    two lantern stand-ins); the user's first Haiku review was “way better, already nearly usable”.
    Those are AI-reported results, not rerun by art. Compare approaches; do not assume the kit wins.
@@ -84,7 +94,8 @@ original vectors; two image-generation attempts were rejected, and no raster res
 strict typecheck and unit tests (516 engine, 152 AI, 127 webapp, 253 audio passed / one slow render skipped).
 Twelve assembly/SVG comparisons, stroke-inclusive bounds and temporary AI-draft format conversions pass;
 nine faulty recipes rejected; artifact hashes, local links and numeric anchor/grip checks pass.
-Colour/grayscale/catalogue/held sheets inspected. Human identity approval and model evals remain pending.
+Colour/grayscale/catalogue/held sheets inspected. User visually approved the kit (2026-11-14);
+model-selection evaluation and runtime proof remain pending.
 No gameplay suite or full audio re-render run for the kit. Earlier full master comparison and compressed
 browser/native QA results remain as documented in the audio README; no audio files changed in this delivery.
 
@@ -175,7 +186,7 @@ User priority (2026-11-12): audio audition → full audio pack → top-down stud
       model can choose parts and parameters from it (the cheap local probe, then Haiku). Messages go through `HANDOFF.md` first.
 *Delivered 2026-11-14: kit 05, 18 authored pieces, twelve assembly recipes, colour/grayscale/held reviews,
 explicit unsupported identities and proposed handling. Twelve adapted drawings pass the current AI draft validator;
-nine faulty recipes rejected. User identity review and model-selection probe remain open.*
+nine faulty recipes rejected. User visually approved the kit on 2026-11-14 (“looks really good”); model-selection probe remains open.*
 
 - [ ] Player (standing and crouched, with a held-weapon variant per behavior class), default rifle, practice dummy.
 - [ ] Pickup glows, projectiles and muzzle flashes per behavior, hit and death effects.
@@ -209,3 +220,8 @@ nine faulty recipes rejected. User identity review and model-selection probe rem
 
 - [x] After each delivery, add a line to the delivery log in `HANDOFF.md` listing the manifest keys delivered, so `build`
       can wire them in; then tick the row here.
+
+**Context-clear checkpoint (2026-11-14):** kit 05 visually approved; next action is the AI
+selection/placement comparison, with art responding to observed failures. Audio codec QA is art's
+independent next task while waiting. M2, production sprites and manifest integration stay open.
+No commit, paid run, production-schema choice or new dependency is authorised by this checkpoint.

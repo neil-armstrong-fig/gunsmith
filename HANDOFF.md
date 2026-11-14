@@ -118,7 +118,8 @@ Art supplies `docs/art/concepts/weapon-parts-kit-05/Parts.json`, twelve recipes 
 Its `Assembly.md` defines the provisional attachment/size/mirroring interface and expansion conventions.
 This is a proposed art-data interface for AI's kit probe, not a new production schema or renderer.
 All twelve expanded drawings pass AI's current draft validator after temporary format conversion.
-User identity approval, model selection/placement and runtime performance are unmeasured. Build/AI own
+User visually approved the kit on 2026-11-14 (“looks really good”). Model selection/placement and
+runtime performance remain unmeasured. Build/AI own
 those implementations; art's README records unsupported identities and proposed handling.
 
 ## Folder ownership
@@ -145,6 +146,13 @@ those implementations; art's README records unsupported identities and proposed 
 ## Delivery log
 
 Newest first. One line each: date, who, what, where.
+
+- 2026-11-14, `art`: **user visually approved kit 05 (“looks really good”); context-clear checkpoint updated.**
+  Next is AI's selection/placement comparison using the delivered catalogue/recipes, followed by art revisions
+  from observed failures. While waiting, art can continue the recorded audio codec/browser blockers with
+  approved masters preserved. `TODO-art.md`, shared art status and kit guide updated; production/M2 and
+  runtime integration remain open. No new asset, schema, code, paid call or commit. Manifest keys: none.
+
 
 - 2026-11-14, `art`: **authored weapon-parts kit 05 delivered** under `docs/art/concepts/weapon-parts-kit-05/`:
   18 original pieces, six primary/six alternate recipes, expanded JSON/SVGs, catalogue, native-size/grayscale
