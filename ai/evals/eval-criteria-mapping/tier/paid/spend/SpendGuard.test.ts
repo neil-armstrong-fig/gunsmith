@@ -1,23 +1,12 @@
 import {mkdtempSync} from "node:fs";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
-import {AIMessage} from "@langchain/core/messages";
-import type {ChatGeneration, LLMResult} from "@langchain/core/outputs";
 import {SpendGuard} from "@evals/eval-criteria-mapping/tier/paid/spend/SpendGuard";
 import {SpendLedger} from "@evals/eval-criteria-mapping/tier/paid/spend/SpendLedger";
+import {finishedCall} from "@evals/eval-criteria-mapping/tier/paid/spend/testing/FinishedCall";
 
 function ledger(ceilingDollars: number): SpendLedger {
   return new SpendLedger({file: join(mkdtempSync(join(tmpdir(), "guard-")), "ledger.json"), ceilingDollars});
-}
-
-function finishedCall(inputTokens: number, outputTokens: number): LLMResult {
-  const message = new AIMessage({
-    content: "",
-    usage_metadata: {input_tokens: inputTokens, output_tokens: outputTokens, total_tokens: inputTokens + outputTokens},
-  });
-  const generation: ChatGeneration = {text: "", message};
-
-  return {generations: [[generation]]};
 }
 
 it("adds what a finished call cost, from the tokens the model reported", () => {
@@ -66,4 +55,48 @@ it("hands a failure over once, then has none", () => {
 
 it("has no failure when every call finished", () => {
   expect(new SpendGuard(ledger(1)).takeFailure()).toBeUndefined();
+});
+
+it("keeps what each finished call used and why it stopped, so a run can tell a cut-off answer from a bad one", () => {
+  const guard = new SpendGuard(ledger(1));
+  guard.handleLLMEnd(finishedCall(300, 40, "tool_use"));
+  guard.handleLLMEnd(finishedCall(500, 1000, "max_tokens"));
+
+  expect(guard.takeCalls()).toEqual([
+    {inputTokens: 300, outputTokens: 40, stopReason: "tool_use"},
+    {inputTokens: 500, outputTokens: 1000, stopReason: "max_tokens"},
+  ]);
+});
+
+it("records a call that gave no stop reason as having none", () => {
+  const guard = new SpendGuard(ledger(1));
+  guard.handleLLMEnd(finishedCall(10, 5));
+
+  expect(guard.takeCalls()).toEqual([{inputTokens: 10, outputTokens: 5, stopReason: undefined}]);
+});
+
+it("hands the calls over once, then has none", () => {
+  const guard = new SpendGuard(ledger(1));
+  guard.handleLLMEnd(finishedCall(10, 5, "tool_use"));
+  guard.takeCalls();
+
+  expect(guard.takeCalls()).toEqual([]);
+});
+
+it("bills every call from every model that carries it into one ledger, the sum, not the last", () => {
+  const spent = ledger(1);
+  const guard = new SpendGuard(spent);
+  guard.handleLLMEnd(finishedCall(1_000_000, 0));
+  guard.handleLLMEnd(finishedCall(0, 1_000_000));
+
+  expect(spent.total()).toBeCloseTo(0.6, 10);
+});
+
+it("keeps the stop as a failure too, so a request cut short by the ceiling is not read as a bad answer", () => {
+  const spent = ledger(0.5);
+  spent.add(0.5);
+  const guard = new SpendGuard(spent);
+
+  expect(() => guard.handleChatModelStart()).toThrow("ceiling");
+  expect(guard.takeFailure()).toContain("ceiling");
 });

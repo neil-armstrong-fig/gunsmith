@@ -6,3 +6,6 @@
 evals/results/*-latest.json
 evals/results/*-latest.html
 evals/results/appearance-probe/
+
+# Paid weapon requests: tokens, stop reasons and latency, one JSON line each
+evals/results/*-latest.jsonl

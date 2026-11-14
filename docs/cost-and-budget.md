@@ -61,7 +61,7 @@ library and the built-in weapon and arena pool; guests are unaffected.
 | ----------- | ----- | ---- |
 | DO duration per 1v1 match-minute | | |
 | Requests per match | | |
-| Cost per weapon generation | Sonnet 5.5 $0.0116 (cached prefix $0.0082); Haiku 5.5 $0.0007 (cached $0.0005). Estimate | 2026-11-12 |
+| Cost per weapon generation | **Measured, Haiku 5.5: $0.00036** for a created weapon (moderation plus generation, 2 calls, median 2.7 s), $0.00015 for a rejection (1 call), $0.00032 mean over every request that reached a model; see "Measured on Haiku" below. Estimates: Sonnet 5.5 $0.0116 (cached prefix $0.0082); Haiku 5.5 $0.0007 (cached $0.0005) | 2026-11-14 (measured), 2026-11-12 (estimates) |
 | Cost per arena generation | Sonnet 5.5 $0.0242 (cached $0.0208); Haiku 5.5 $0.0013 (cached $0.0011). Estimate | 2026-11-12 |
 | Cost per edit | Sonnet 5.5 $0.0128 (cached $0.0094); Haiku 5.5 $0.0007 (cached $0.0006). Estimate | 2026-11-12 |
 | Cost per arena judgement | Haiku 5.5 $0.00014. Estimate | 2026-11-12 |
@@ -100,6 +100,28 @@ Findings:
   Keep the cheap judge. Neither change touches the credit prices.
 - **A request for `build`, not an edit:** the credit prices and limits live in `shared/`. If Sonnet stays in the mix, lower
   daily credits or raise prices there. Not needed if Haiku holds up.
+
+## Measured on Haiku (2026-11-14, the weapon evals on the paid tier)
+
+The weapon specs now run on Haiku 5.5 (`ai/evals/eval-criteria-mapping/weapon/paid/`), and each request's calls are logged with
+tokens, stop reason and latency. One baseline: the 21 `when`s at 3 trials, 63 requests, 101 calls; every call ended in
+`tool_use`, none was cut off. Cost is computed from the tokens the model reported at the prices above, so the Console's usage
+page is the bill and this is the guard's estimate.
+
+| | Measured |
+| - | -------- |
+| Input and output tokens per call (mean) | 1,104 in, 138 out (the function-calling schema and prompt are most of the input) |
+| Calls per request that reached a model | 1.77 (a rejection 1, a created weapon 2, a repaired one 3: 5 of 57 needed the repair) |
+| A created weapon, moderation plus generation | $0.00036, median 2.7 s |
+| A rejection, moderation only | $0.00015 |
+| The whole 70-criterion suite | about $0.006 at 1 trial, about $0.018 at 3 trials |
+
+Against the estimates above: a created weapon is **about half** the $0.0007 estimated (output is far smaller than the guessed
+600 tokens, input larger than guessed). **Caveat: the draft weapon is a name and six numbers.** The real weapon adds the `sound`
+block and, if wired in, the appearance (about one extra call and $0.0007 each, `docs/ai-visual-generation.md`), so expect the
+final figure to be higher than this and re-measure then. At $0.00036 the $1 daily soft cap buys about 2,800 created weapons, so
+for weapons the monthly cap, not the daily one, is the limit; arenas are not measured yet. The eval spend so far is $0.32 of
+the $1 total ceiling.
 
 ## What eval-driven development costs on Haiku alone (estimate, 2026-11-12)
 

@@ -1,6 +1,7 @@
 import {FakeListChatModel} from "@langchain/core/utils/testing";
 import {ChatOllama} from "@langchain/ollama";
 import {FAKE_WEAPON_REPLY} from "@evals/eval-criteria-mapping/weapon/models/FakeWeaponReply";
+import {createPaidWeaponModels} from "@evals/eval-criteria-mapping/weapon/models/PaidWeaponModels";
 import type {EvalTier} from "@evals/eval-criteria-mapping/tier/types/EvalTier";
 import type {WeaponPipelineDependencies} from "@gunsmith/ai/pipeline/types/WeaponPipelineDependencies";
 
@@ -17,10 +18,7 @@ export function createEvalModels(tier: EvalTier): WeaponPipelineDependencies {
     return createLocalModels();
   }
 
-  throw new Error(
-    "The paid tier is not set up yet: it needs a provider key with its own hard cap (MANUAL-SETUP-STEPS.md step 8) and the " +
-      "spend guard. Use the local tier.",
-  );
+  return createPaidWeaponModels();
 }
 
 function createFakeModels(): WeaponPipelineDependencies {
