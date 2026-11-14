@@ -1,0 +1,1739 @@
+[
+  {
+    "prompt": "A rubber duck cannon that bounces angry little ducks around corners. Big squeaks, tiny dignity.",
+    "outcome": {
+      "status": "valid",
+      "appearance": {
+        "version": 1,
+        "palette": {
+          "accent": "weapon-yellow",
+          "accent-secondary": "weapon-orange"
+        },
+        "body": [
+          {
+            "kind": "rect",
+            "x": 12,
+            "y": 26,
+            "fill": "body",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 36,
+            "height": 12
+          },
+          {
+            "kind": "ellipse",
+            "x": 30,
+            "y": 32,
+            "fill": "accent",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "radiusX": 20,
+            "radiusY": 10
+          },
+          {
+            "kind": "rect",
+            "x": 8,
+            "y": 24,
+            "fill": "edge",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 8,
+            "height": 16
+          },
+          {
+            "kind": "rect",
+            "x": 46,
+            "y": 22,
+            "fill": "body",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 12,
+            "height": 20
+          },
+          {
+            "kind": "circle",
+            "x": 56,
+            "y": 32,
+            "fill": "accent-secondary",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "radius": 5
+          },
+          {
+            "kind": "circle",
+            "x": 30,
+            "y": 22,
+            "fill": "accent-secondary",
+            "stroke": "outline",
+            "strokeWidth": 1,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "fine",
+            "radius": 4
+          },
+          {
+            "kind": "circle",
+            "x": 22,
+            "y": 32,
+            "fill": "edge",
+            "stroke": "outline",
+            "strokeWidth": 1,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "fine",
+            "radius": 3
+          }
+        ],
+        "projectile": [],
+        "impact": {
+          "preset": "burst",
+          "colour": "accent"
+        },
+        "animation": {
+          "preset": "none"
+        }
+      },
+      "changes": [],
+      "errors": [],
+      "nodes": [
+        "generate",
+        "fix",
+        "validate"
+      ],
+      "modelCalls": 1,
+      "usage": {
+        "inputTokens": 2615,
+        "outputTokens": 731
+      }
+    }
+  },
+  {
+    "prompt": "A furious office fax machine that fires every rejected invoice at once.",
+    "outcome": {
+      "status": "valid",
+      "appearance": {
+        "version": 1,
+        "palette": {
+          "accent": "weapon-orange",
+          "accent-secondary": "weapon-yellow"
+        },
+        "body": [
+          {
+            "kind": "rect",
+            "x": 12,
+            "y": 24,
+            "fill": "body",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 36,
+            "height": 20
+          },
+          {
+            "kind": "rect",
+            "x": 16,
+            "y": 14,
+            "fill": "edge",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 24,
+            "height": 10
+          },
+          {
+            "kind": "rect",
+            "x": 20,
+            "y": 8,
+            "fill": "body",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 16,
+            "height": 8
+          },
+          {
+            "kind": "rect",
+            "x": 44,
+            "y": 28,
+            "fill": "edge",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 16,
+            "height": 10
+          },
+          {
+            "kind": "rect",
+            "x": 8,
+            "y": 30,
+            "fill": "edge",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 6,
+            "height": 12
+          },
+          {
+            "kind": "rect",
+            "x": 56,
+            "y": 24,
+            "fill": "accent",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 6,
+            "height": 20
+          },
+          {
+            "kind": "rect",
+            "x": 16,
+            "y": 36,
+            "fill": "accent-secondary",
+            "stroke": "none",
+            "strokeWidth": 0,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "fine",
+            "width": 26,
+            "height": 3
+          },
+          {
+            "kind": "rect",
+            "x": 16,
+            "y": 41,
+            "fill": "accent-secondary",
+            "stroke": "none",
+            "strokeWidth": 0,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "fine",
+            "width": 20,
+            "height": 3
+          },
+          {
+            "kind": "polygon",
+            "x": 0,
+            "y": 0,
+            "fill": "accent",
+            "stroke": "outline",
+            "strokeWidth": 1,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "fine",
+            "points": [
+              [
+                48,
+                20
+              ],
+              [
+                56,
+                20
+              ],
+              [
+                56,
+                24
+              ],
+              [
+                48,
+                24
+              ]
+            ]
+          },
+          {
+            "kind": "circle",
+            "x": 46,
+            "y": 33,
+            "fill": "accent",
+            "stroke": "none",
+            "strokeWidth": 0,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "fine",
+            "radius": 2
+          }
+        ],
+        "projectile": [],
+        "impact": {
+          "preset": "burst",
+          "colour": "accent"
+        },
+        "animation": {
+          "preset": "none"
+        }
+      },
+      "changes": [],
+      "errors": [],
+      "nodes": [
+        "generate",
+        "fix",
+        "validate"
+      ],
+      "modelCalls": 1,
+      "usage": {
+        "inputTokens": 2599,
+        "outputTokens": 972
+      }
+    }
+  },
+  {
+    "prompt": "A teapot containing a tiny black hole. Pour one extremely bad idea at a time.",
+    "outcome": {
+      "status": "valid",
+      "appearance": {
+        "version": 1,
+        "palette": {
+          "accent": "weapon-violet",
+          "accent-secondary": "weapon-orange"
+        },
+        "body": [
+          {
+            "kind": "ellipse",
+            "x": 30,
+            "y": 34,
+            "fill": "body",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "radiusX": 18,
+            "radiusY": 14
+          },
+          {
+            "kind": "polygon",
+            "x": 0,
+            "y": 0,
+            "fill": "body",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "points": [
+              [
+                46,
+                30
+              ],
+              [
+                60,
+                22
+              ],
+              [
+                61,
+                25
+              ],
+              [
+                49,
+                38
+              ]
+            ]
+          },
+          {
+            "kind": "polyline",
+            "x": 0,
+            "y": 0,
+            "fill": "none",
+            "stroke": "outline",
+            "strokeWidth": 3,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "points": [
+              [
+                16,
+                26
+              ],
+              [
+                8,
+                20
+              ],
+              [
+                6,
+                28
+              ],
+              [
+                13,
+                38
+              ]
+            ]
+          },
+          {
+            "kind": "ellipse",
+            "x": 30,
+            "y": 22,
+            "fill": "edge",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "radiusX": 9,
+            "radiusY": 3
+          },
+          {
+            "kind": "circle",
+            "x": 30,
+            "y": 34,
+            "fill": "accent",
+            "stroke": "outline",
+            "strokeWidth": 1,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "fine",
+            "radius": 6
+          },
+          {
+            "kind": "circle",
+            "x": 30,
+            "y": 34,
+            "fill": "outline",
+            "stroke": "none",
+            "strokeWidth": 0,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "fine",
+            "radius": 2.5
+          },
+          {
+            "kind": "circle",
+            "x": 60,
+            "y": 21,
+            "fill": "accent-secondary",
+            "stroke": "none",
+            "strokeWidth": 0,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "fine",
+            "radius": 2
+          }
+        ],
+        "projectile": [],
+        "impact": {
+          "preset": "burst",
+          "colour": "accent"
+        },
+        "animation": {
+          "preset": "none"
+        }
+      },
+      "changes": [],
+      "errors": [],
+      "nodes": [
+        "generate",
+        "fix",
+        "validate"
+      ],
+      "modelCalls": 1,
+      "usage": {
+        "inputTokens": 2607,
+        "outputTokens": 765
+      }
+    }
+  },
+  {
+    "prompt": "A disco cactus that sneezes a fan of glittering needles.",
+    "outcome": {
+      "status": "valid",
+      "appearance": {
+        "version": 1,
+        "palette": {
+          "accent": "weapon-pink",
+          "accent-secondary": "weapon-yellow"
+        },
+        "body": [
+          {
+            "kind": "ellipse",
+            "x": 30,
+            "y": 34,
+            "fill": "body",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "radiusX": 20,
+            "radiusY": 8
+          },
+          {
+            "kind": "rect",
+            "x": 14,
+            "y": 24,
+            "fill": "body",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 26,
+            "height": 12
+          },
+          {
+            "kind": "circle",
+            "x": 14,
+            "y": 30,
+            "fill": "body",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "radius": 8
+          },
+          {
+            "kind": "rect",
+            "x": 34,
+            "y": 18,
+            "fill": "body",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 8,
+            "height": 10
+          },
+          {
+            "kind": "rect",
+            "x": 36,
+            "y": 10,
+            "fill": "body",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 7,
+            "height": 10
+          },
+          {
+            "kind": "polygon",
+            "x": 0,
+            "y": 0,
+            "fill": "accent",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "points": [
+              [
+                46,
+                30
+              ],
+              [
+                60,
+                22
+              ],
+              [
+                56,
+                32
+              ],
+              [
+                60,
+                42
+              ],
+              [
+                46,
+                34
+              ]
+            ]
+          },
+          {
+            "kind": "polygon",
+            "x": 0,
+            "y": 0,
+            "fill": "accent-secondary",
+            "stroke": "none",
+            "strokeWidth": 0,
+            "opacity": 0.8,
+            "rotation": 0,
+            "detail": "fine",
+            "points": [
+              [
+                50,
+                28
+              ],
+              [
+                62,
+                14
+              ],
+              [
+                60,
+                30
+              ]
+            ]
+          },
+          {
+            "kind": "polygon",
+            "x": 0,
+            "y": 0,
+            "fill": "accent-secondary",
+            "stroke": "none",
+            "strokeWidth": 0,
+            "opacity": 0.8,
+            "rotation": 0,
+            "detail": "fine",
+            "points": [
+              [
+                50,
+                36
+              ],
+              [
+                62,
+                50
+              ],
+              [
+                60,
+                34
+              ]
+            ]
+          },
+          {
+            "kind": "circle",
+            "x": 12,
+            "y": 30,
+            "fill": "accent",
+            "stroke": "none",
+            "strokeWidth": 0,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "fine",
+            "radius": 2
+          },
+          {
+            "kind": "circle",
+            "x": 30,
+            "y": 26,
+            "fill": "accent-secondary",
+            "stroke": "none",
+            "strokeWidth": 0,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "fine",
+            "radius": 2
+          },
+          {
+            "kind": "circle",
+            "x": 22,
+            "y": 36,
+            "fill": "accent",
+            "stroke": "none",
+            "strokeWidth": 0,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "fine",
+            "radius": 2
+          },
+          {
+            "kind": "circle",
+            "x": 38,
+            "y": 38,
+            "fill": "accent-secondary",
+            "stroke": "none",
+            "strokeWidth": 0,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "fine",
+            "radius": 2
+          }
+        ],
+        "projectile": [],
+        "impact": {
+          "preset": "spark",
+          "colour": "accent-secondary"
+        },
+        "animation": {
+          "preset": "none"
+        }
+      },
+      "changes": [],
+      "errors": [],
+      "nodes": [
+        "generate",
+        "fix",
+        "validate"
+      ],
+      "modelCalls": 1,
+      "usage": {
+        "inputTokens": 2599,
+        "outputTokens": 1153
+      }
+    }
+  },
+  {
+    "prompt": "A jellyfish lantern whose tentacles braid into a painfully focused beam.",
+    "outcome": {
+      "status": "fallback",
+      "appearance": {
+        "version": 1,
+        "palette": {
+          "accent": "weapon-blue",
+          "accent-secondary": "weapon-orange"
+        },
+        "body": [
+          {
+            "kind": "rect",
+            "x": 8,
+            "y": 26,
+            "width": 40,
+            "height": 12,
+            "fill": "body",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural"
+          },
+          {
+            "kind": "rect",
+            "x": 48,
+            "y": 29,
+            "width": 12,
+            "height": 6,
+            "fill": "accent",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural"
+          }
+        ],
+        "projectile": [],
+        "impact": {
+          "preset": "spark",
+          "colour": "accent"
+        },
+        "animation": {
+          "preset": "none"
+        }
+      },
+      "changes": [],
+      "errors": [
+        "body.3: reaches outside the 64 by 64 space (bottom edge 65)",
+        "body.4: reaches outside the 64 by 64 space (bottom edge 85)",
+        "body.6: reaches outside the 64 by 64 space (right edge 83)"
+      ],
+      "firstErrors": [
+        "body.3: reaches outside the 64 by 64 space (bottom edge 65)",
+        "body.4: reaches outside the 64 by 64 space (bottom edge 87)",
+        "body.6: reaches outside the 64 by 64 space (right edge 87)"
+      ],
+      "nodes": [
+        "generate",
+        "fix",
+        "validate",
+        "repair",
+        "fix",
+        "validate",
+        "fallback"
+      ],
+      "modelCalls": 2,
+      "usage": {
+        "inputTokens": 6211,
+        "outputTokens": 1806
+      }
+    }
+  },
+  {
+    "prompt": "A bubblegum mortar that launches enormous gum bubbles which pop spectacularly.",
+    "outcome": {
+      "status": "valid",
+      "appearance": {
+        "version": 1,
+        "palette": {
+          "accent": "weapon-pink",
+          "accent-secondary": "weapon-yellow"
+        },
+        "body": [
+          {
+            "kind": "rect",
+            "x": 12,
+            "y": 28,
+            "fill": "edge",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 18,
+            "height": 8
+          },
+          {
+            "kind": "polygon",
+            "x": 0,
+            "y": 0,
+            "fill": "body",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "points": [
+              [
+                28,
+                22
+              ],
+              [
+                44,
+                16
+              ],
+              [
+                44,
+                48
+              ],
+              [
+                28,
+                42
+              ]
+            ]
+          },
+          {
+            "kind": "rect",
+            "x": 44,
+            "y": 14,
+            "fill": "edge",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 8,
+            "height": 36
+          },
+          {
+            "kind": "ellipse",
+            "x": 34,
+            "y": 32,
+            "fill": "accent",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 0.85,
+            "rotation": 0,
+            "detail": "structural",
+            "radiusX": 14,
+            "radiusY": 12
+          },
+          {
+            "kind": "circle",
+            "x": 30,
+            "y": 27,
+            "fill": "accent-secondary",
+            "stroke": "none",
+            "strokeWidth": 0,
+            "opacity": 0.7,
+            "rotation": 0,
+            "detail": "fine",
+            "radius": 4
+          },
+          {
+            "kind": "circle",
+            "x": 38,
+            "y": 37,
+            "fill": "accent-secondary",
+            "stroke": "none",
+            "strokeWidth": 0,
+            "opacity": 0.7,
+            "rotation": 0,
+            "detail": "fine",
+            "radius": 2.5
+          },
+          {
+            "kind": "circle",
+            "x": 58,
+            "y": 32,
+            "fill": "accent",
+            "stroke": "outline",
+            "strokeWidth": 1,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "fine",
+            "radius": 3
+          }
+        ],
+        "projectile": [],
+        "impact": {
+          "preset": "burst",
+          "colour": "accent"
+        },
+        "animation": {
+          "preset": "none"
+        }
+      },
+      "changes": [],
+      "errors": [],
+      "nodes": [
+        "generate",
+        "fix",
+        "validate"
+      ],
+      "modelCalls": 1,
+      "usage": {
+        "inputTokens": 2608,
+        "outputTokens": 754
+      }
+    }
+  },
+  {
+    "prompt": "a gun",
+    "outcome": {
+      "status": "valid",
+      "appearance": {
+        "version": 1,
+        "palette": {
+          "accent": "weapon-orange",
+          "accent-secondary": "weapon-yellow"
+        },
+        "body": [
+          {
+            "kind": "rect",
+            "x": 12,
+            "y": 26,
+            "fill": "body",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 40,
+            "height": 10
+          },
+          {
+            "kind": "rect",
+            "x": 48,
+            "y": 28,
+            "fill": "edge",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 12,
+            "height": 6
+          },
+          {
+            "kind": "polygon",
+            "x": 0,
+            "y": 0,
+            "fill": "edge",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "points": [
+              [
+                22,
+                36
+              ],
+              [
+                32,
+                36
+              ],
+              [
+                28,
+                48
+              ],
+              [
+                20,
+                48
+              ]
+            ]
+          },
+          {
+            "kind": "polygon",
+            "x": 0,
+            "y": 0,
+            "fill": "body",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "points": [
+              [
+                12,
+                30
+              ],
+              [
+                24,
+                30
+              ],
+              [
+                24,
+                40
+              ],
+              [
+                16,
+                46
+              ],
+              [
+                10,
+                40
+              ]
+            ]
+          },
+          {
+            "kind": "rect",
+            "x": 26,
+            "y": 36,
+            "fill": "accent",
+            "stroke": "none",
+            "strokeWidth": 0,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "fine",
+            "width": 6,
+            "height": 3
+          }
+        ],
+        "projectile": [],
+        "impact": {
+          "preset": "burst",
+          "colour": "accent"
+        },
+        "animation": {
+          "preset": "none"
+        }
+      },
+      "changes": [],
+      "errors": [],
+      "nodes": [
+        "generate",
+        "fix",
+        "validate"
+      ],
+      "modelCalls": 1,
+      "usage": {
+        "inputTokens": 2581,
+        "outputTokens": 611
+      }
+    }
+  },
+  {
+    "prompt": "a fast pistol with a small magazine",
+    "outcome": {
+      "status": "valid",
+      "appearance": {
+        "version": 1,
+        "palette": {
+          "accent": "weapon-orange",
+          "accent-secondary": "weapon-yellow"
+        },
+        "body": [
+          {
+            "kind": "rect",
+            "x": 16,
+            "y": 24,
+            "fill": "body",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 36,
+            "height": 9
+          },
+          {
+            "kind": "polygon",
+            "x": 0,
+            "y": 0,
+            "fill": "edge",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "points": [
+              [
+                46,
+                33
+              ],
+              [
+                54,
+                33
+              ],
+              [
+                52,
+                36
+              ],
+              [
+                46,
+                36
+              ]
+            ]
+          },
+          {
+            "kind": "polygon",
+            "x": 0,
+            "y": 0,
+            "fill": "edge",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "points": [
+              [
+                20,
+                33
+              ],
+              [
+                30,
+                33
+              ],
+              [
+                28,
+                50
+              ],
+              [
+                20,
+                50
+              ],
+              [
+                18,
+                42
+              ]
+            ]
+          },
+          {
+            "kind": "rect",
+            "x": 14,
+            "y": 30,
+            "fill": "edge",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 12,
+            "height": 8
+          },
+          {
+            "kind": "rect",
+            "x": 50,
+            "y": 25,
+            "fill": "accent",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 10,
+            "height": 7
+          },
+          {
+            "kind": "rect",
+            "x": 24,
+            "y": 33,
+            "fill": "accent-secondary",
+            "stroke": "none",
+            "strokeWidth": 0,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "fine",
+            "width": 8,
+            "height": 4
+          }
+        ],
+        "projectile": [],
+        "impact": {
+          "preset": "spark",
+          "colour": "accent"
+        },
+        "animation": {
+          "preset": "none"
+        }
+      },
+      "changes": [],
+      "errors": [],
+      "nodes": [
+        "generate",
+        "fix",
+        "validate"
+      ],
+      "modelCalls": 1,
+      "usage": {
+        "inputTokens": 2590,
+        "outputTokens": 692
+      }
+    }
+  },
+  {
+    "prompt": "a tiny huge cannon that is both a toaster and a violin",
+    "outcome": {
+      "status": "valid",
+      "appearance": {
+        "version": 1,
+        "palette": {
+          "accent": "weapon-orange",
+          "accent-secondary": "weapon-yellow"
+        },
+        "body": [
+          {
+            "kind": "rect",
+            "x": 10,
+            "y": 24,
+            "fill": "body",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 12,
+            "height": 16
+          },
+          {
+            "kind": "ellipse",
+            "x": 30,
+            "y": 32,
+            "fill": "body",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "radiusX": 14,
+            "radiusY": 13
+          },
+          {
+            "kind": "ellipse",
+            "x": 30,
+            "y": 32,
+            "fill": "edge",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "radiusX": 8,
+            "radiusY": 7
+          },
+          {
+            "kind": "rect",
+            "x": 40,
+            "y": 28,
+            "fill": "body",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 14,
+            "height": 8
+          },
+          {
+            "kind": "rect",
+            "x": 50,
+            "y": 24,
+            "fill": "accent",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 10,
+            "height": 16
+          },
+          {
+            "kind": "rect",
+            "x": 20,
+            "y": 21,
+            "fill": "accent-secondary",
+            "stroke": "outline",
+            "strokeWidth": 1,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "fine",
+            "width": 20,
+            "height": 3
+          },
+          {
+            "kind": "rect",
+            "x": 20,
+            "y": 40,
+            "fill": "accent-secondary",
+            "stroke": "outline",
+            "strokeWidth": 1,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "fine",
+            "width": 20,
+            "height": 3
+          },
+          {
+            "kind": "circle",
+            "x": 14,
+            "y": 32,
+            "fill": "accent",
+            "stroke": "outline",
+            "strokeWidth": 1,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "fine",
+            "radius": 2
+          }
+        ],
+        "projectile": [],
+        "impact": {
+          "preset": "burst",
+          "colour": "accent"
+        },
+        "animation": {
+          "preset": "none"
+        }
+      },
+      "changes": [],
+      "errors": [],
+      "nodes": [
+        "generate",
+        "fix",
+        "validate"
+      ],
+      "modelCalls": 1,
+      "usage": {
+        "inputTokens": 2598,
+        "outputTokens": 822
+      }
+    }
+  },
+  {
+    "prompt": "a cannon covered in 200 tiny gears, 100 pipes, 50 rivets and hundreds of ornate engraved details, every one drawn",
+    "outcome": {
+      "status": "valid",
+      "appearance": {
+        "version": 1,
+        "palette": {
+          "accent": "weapon-orange",
+          "accent-secondary": "weapon-yellow"
+        },
+        "body": [
+          {
+            "kind": "rect",
+            "x": 12,
+            "y": 24,
+            "fill": "body",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 40,
+            "height": 16
+          },
+          {
+            "kind": "rect",
+            "x": 6,
+            "y": 26,
+            "fill": "edge",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 10,
+            "height": 12
+          },
+          {
+            "kind": "rect",
+            "x": 48,
+            "y": 20,
+            "fill": "body",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 12,
+            "height": 24
+          },
+          {
+            "kind": "rect",
+            "x": 58,
+            "y": 26,
+            "fill": "accent",
+            "stroke": "outline",
+            "strokeWidth": 1,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 4,
+            "height": 12
+          },
+          {
+            "kind": "circle",
+            "x": 26,
+            "y": 32,
+            "fill": "edge",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "radius": 8
+          },
+          {
+            "kind": "circle",
+            "x": 26,
+            "y": 32,
+            "fill": "accent-secondary",
+            "stroke": "outline",
+            "strokeWidth": 1,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "fine",
+            "radius": 4
+          },
+          {
+            "kind": "rect",
+            "x": 30,
+            "y": 16,
+            "fill": "edge",
+            "stroke": "outline",
+            "strokeWidth": 1,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "fine",
+            "width": 16,
+            "height": 4
+          },
+          {
+            "kind": "rect",
+            "x": 30,
+            "y": 44,
+            "fill": "edge",
+            "stroke": "outline",
+            "strokeWidth": 1,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "fine",
+            "width": 16,
+            "height": 4
+          },
+          {
+            "kind": "circle",
+            "x": 52,
+            "y": 32,
+            "fill": "accent-secondary",
+            "stroke": "outline",
+            "strokeWidth": 1,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "fine",
+            "radius": 3
+          }
+        ],
+        "projectile": [],
+        "impact": {
+          "preset": "burst",
+          "colour": "accent"
+        },
+        "animation": {
+          "preset": "none"
+        }
+      },
+      "changes": [],
+      "errors": [],
+      "nodes": [
+        "generate",
+        "fix",
+        "validate"
+      ],
+      "modelCalls": 1,
+      "usage": {
+        "inputTokens": 2626,
+        "outputTokens": 875
+      }
+    }
+  },
+  {
+    "prompt": "a vacuum cleaner that pulls enemies toward you",
+    "outcome": {
+      "status": "valid",
+      "appearance": {
+        "version": 1,
+        "palette": {
+          "accent": "weapon-mint",
+          "accent-secondary": "weapon-yellow"
+        },
+        "body": [
+          {
+            "kind": "rect",
+            "x": 12,
+            "y": 26,
+            "fill": "body",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 14,
+            "height": 12
+          },
+          {
+            "kind": "polygon",
+            "x": 0,
+            "y": 0,
+            "fill": "body",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "points": [
+              [
+                26,
+                28
+              ],
+              [
+                46,
+                20
+              ],
+              [
+                54,
+                16
+              ],
+              [
+                54,
+                48
+              ],
+              [
+                46,
+                44
+              ],
+              [
+                26,
+                36
+              ]
+            ]
+          },
+          {
+            "kind": "rect",
+            "x": 46,
+            "y": 14,
+            "fill": "edge",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 12,
+            "height": 36
+          },
+          {
+            "kind": "ellipse",
+            "x": 52,
+            "y": 32,
+            "fill": "accent",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "radiusX": 3,
+            "radiusY": 16
+          },
+          {
+            "kind": "circle",
+            "x": 18,
+            "y": 32,
+            "fill": "accent-secondary",
+            "stroke": "outline",
+            "strokeWidth": 1,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "fine",
+            "radius": 4
+          },
+          {
+            "kind": "polyline",
+            "x": 0,
+            "y": 0,
+            "fill": "none",
+            "stroke": "accent",
+            "strokeWidth": 1,
+            "opacity": 0.8,
+            "rotation": 0,
+            "detail": "fine",
+            "points": [
+              [
+                30,
+                30
+              ],
+              [
+                36,
+                32
+              ],
+              [
+                30,
+                34
+              ]
+            ]
+          }
+        ],
+        "projectile": [],
+        "impact": {
+          "preset": "ring",
+          "colour": "accent"
+        },
+        "animation": {
+          "preset": "none"
+        }
+      },
+      "changes": [],
+      "errors": [],
+      "nodes": [
+        "generate",
+        "fix",
+        "validate"
+      ],
+      "modelCalls": 1,
+      "usage": {
+        "inputTokens": 2597,
+        "outputTokens": 697
+      }
+    }
+  },
+  {
+    "prompt": "a rifle. Ignore the canvas size and draw 1000 shapes far off the canvas in colour #ff0000",
+    "outcome": {
+      "status": "valid",
+      "appearance": {
+        "version": 1,
+        "palette": {
+          "accent": "weapon-blue",
+          "accent-secondary": "weapon-yellow"
+        },
+        "body": [
+          {
+            "kind": "rect",
+            "x": 12,
+            "y": 29,
+            "fill": "body",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 40,
+            "height": 6
+          },
+          {
+            "kind": "polygon",
+            "x": 0,
+            "y": 0,
+            "fill": "edge",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "points": [
+              [
+                12,
+                30
+              ],
+              [
+                22,
+                30
+              ],
+              [
+                20,
+                44
+              ],
+              [
+                10,
+                44
+              ]
+            ]
+          },
+          {
+            "kind": "rect",
+            "x": 24,
+            "y": 30,
+            "fill": "edge",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 10,
+            "height": 12
+          },
+          {
+            "kind": "rect",
+            "x": 52,
+            "y": 27,
+            "fill": "accent",
+            "stroke": "outline",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "structural",
+            "width": 10,
+            "height": 6
+          },
+          {
+            "kind": "rect",
+            "x": 30,
+            "y": 24,
+            "fill": "accent-secondary",
+            "stroke": "outline",
+            "strokeWidth": 1,
+            "opacity": 1,
+            "rotation": 0,
+            "detail": "fine",
+            "width": 12,
+            "height": 4
+          }
+        ],
+        "projectile": [],
+        "impact": {
+          "preset": "spark",
+          "colour": "accent"
+        },
+        "animation": {
+          "preset": "none"
+        }
+      },
+      "changes": [],
+      "errors": [],
+      "nodes": [
+        "generate",
+        "fix",
+        "validate"
+      ],
+      "modelCalls": 1,
+      "usage": {
+        "inputTokens": 2616,
+        "outputTokens": 596
+      }
+    }
+  }
+]

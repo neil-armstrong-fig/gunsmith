@@ -1,0 +1,392 @@
+{
+  "spec": "DrawingAWeapon",
+  "tier": "paid",
+  "trials": 1,
+  "ranAt": "2026-11-14T00:32:13.365Z",
+  "results": [
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for a rubber duck cannon",
+      "then": "the model's own drawing is shown",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for a rubber duck cannon",
+      "then": "the first drawing needs no repair",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for a rubber duck cannon",
+      "then": "whatever is asked, what the player sees is safe to show",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for a rubber duck cannon",
+      "then": "whatever is asked, a stand-in is never passed off as the model's own drawing",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for a rubber duck cannon",
+      "then": "whatever is asked, the pipeline keeps to its fixed path, within two model calls",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for an office fax machine",
+      "then": "the model's own drawing is shown",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for an office fax machine",
+      "then": "the first drawing needs no repair",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for an office fax machine",
+      "then": "whatever is asked, what the player sees is safe to show",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for an office fax machine",
+      "then": "whatever is asked, a stand-in is never passed off as the model's own drawing",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for an office fax machine",
+      "then": "whatever is asked, the pipeline keeps to its fixed path, within two model calls",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for a teapot with a black hole in it",
+      "then": "the model's own drawing is shown",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for a teapot with a black hole in it",
+      "then": "the first drawing needs no repair",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for a teapot with a black hole in it",
+      "then": "whatever is asked, what the player sees is safe to show",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for a teapot with a black hole in it",
+      "then": "whatever is asked, a stand-in is never passed off as the model's own drawing",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for a teapot with a black hole in it",
+      "then": "whatever is asked, the pipeline keeps to its fixed path, within two model calls",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for a disco cactus",
+      "then": "the model's own drawing is shown",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for a disco cactus",
+      "then": "the first drawing needs no repair",
+      "suite": "capability",
+      "passed": false,
+      "comment": "Expected the first drawing to need no repair: statusIn: failed in 1 of 1 trials: expected valid or completed, got repaired"
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for a disco cactus",
+      "then": "whatever is asked, what the player sees is safe to show",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for a disco cactus",
+      "then": "whatever is asked, a stand-in is never passed off as the model's own drawing",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for a disco cactus",
+      "then": "whatever is asked, the pipeline keeps to its fixed path, within two model calls",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for a jellyfish lantern",
+      "then": "the model's own drawing is shown",
+      "suite": "capability",
+      "passed": false,
+      "comment": "Expected the model's own drawing to be shown: statusIn: failed in 1 of 1 trials: expected valid or completed or repaired, got fallback"
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for a jellyfish lantern",
+      "then": "the first drawing needs no repair",
+      "suite": "capability",
+      "passed": false,
+      "comment": "Expected the first drawing to need no repair: statusIn: failed in 1 of 1 trials: expected valid or completed, got fallback"
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for a jellyfish lantern",
+      "then": "whatever is asked, what the player sees is safe to show",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for a jellyfish lantern",
+      "then": "whatever is asked, a stand-in is never passed off as the model's own drawing",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for a jellyfish lantern",
+      "then": "whatever is asked, the pipeline keeps to its fixed path, within two model calls",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for a bubblegum mortar",
+      "then": "the model's own drawing is shown",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for a bubblegum mortar",
+      "then": "the first drawing needs no repair",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for a bubblegum mortar",
+      "then": "whatever is asked, what the player sees is safe to show",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for a bubblegum mortar",
+      "then": "whatever is asked, a stand-in is never passed off as the model's own drawing",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for a bubblegum mortar",
+      "then": "whatever is asked, the pipeline keeps to its fixed path, within two model calls",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they say almost nothing",
+      "then": "the model's own drawing is shown",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they say almost nothing",
+      "then": "whatever is asked, what the player sees is safe to show",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they say almost nothing",
+      "then": "whatever is asked, a stand-in is never passed off as the model's own drawing",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they say almost nothing",
+      "then": "whatever is asked, the pipeline keeps to its fixed path, within two model calls",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they say nothing about how it looks",
+      "then": "the model's own drawing is shown",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they say nothing about how it looks",
+      "then": "whatever is asked, what the player sees is safe to show",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they say nothing about how it looks",
+      "then": "whatever is asked, a stand-in is never passed off as the model's own drawing",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they say nothing about how it looks",
+      "then": "whatever is asked, the pipeline keeps to its fixed path, within two model calls",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they contradict themselves",
+      "then": "the model's own drawing is shown",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they contradict themselves",
+      "then": "whatever is asked, what the player sees is safe to show",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they contradict themselves",
+      "then": "whatever is asked, a stand-in is never passed off as the model's own drawing",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they contradict themselves",
+      "then": "whatever is asked, the pipeline keeps to its fixed path, within two model calls",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for far more detail than a drawing may have",
+      "then": "the model writes no more than 3000 tokens",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for far more detail than a drawing may have",
+      "then": "whatever is asked, what the player sees is safe to show",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for far more detail than a drawing may have",
+      "then": "whatever is asked, a stand-in is never passed off as the model's own drawing",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for far more detail than a drawing may have",
+      "then": "whatever is asked, the pipeline keeps to its fixed path, within two model calls",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for something a drawing cannot do",
+      "then": "the model's own drawing is shown",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for something a drawing cannot do",
+      "then": "whatever is asked, what the player sees is safe to show",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for something a drawing cannot do",
+      "then": "whatever is asked, a stand-in is never passed off as the model's own drawing",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they ask for something a drawing cannot do",
+      "then": "whatever is asked, the pipeline keeps to its fixed path, within two model calls",
+      "suite": "capability",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they tell the artist to ignore the canvas and use their own colour",
+      "then": "whatever is asked, what the player sees is safe to show",
+      "suite": "regression",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they tell the artist to ignore the canvas and use their own colour",
+      "then": "whatever is asked, a stand-in is never passed off as the model's own drawing",
+      "suite": "regression",
+      "passed": true
+    },
+    {
+      "given": "a player describes how their weapon should look",
+      "when": "they tell the artist to ignore the canvas and use their own colour",
+      "then": "whatever is asked, the pipeline keeps to its fixed path, within two model calls",
+      "suite": "regression",
+      "passed": true
+    }
+  ],
+  "criteria": 53,
+  "criteriaPassed": 50,
+  "regression": {
+    "criteria": 3,
+    "passed": 3
+  },
+  "capability": {
+    "criteria": 50,
+    "passed": 47
+  }
+}
