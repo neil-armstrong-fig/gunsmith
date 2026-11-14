@@ -54,3 +54,12 @@ function passingAppearanceOutcome(): AppearanceOutcome {
     usage: {inputTokens: 3000, outputTokens: 1000},
   };
 }
+
+it("shows the tokens a request cost going in as well as coming out, because the kit's catalogue is in the prompt", () => {
+  const html = drawingsSheetHtml([
+    {prompt: "a gun", outcome: {...passingAppearanceOutcome(), usage: {inputTokens: 1320, outputTokens: 245}}},
+  ]);
+
+  expect(html).toContain("1320 tokens in");
+  expect(html).toContain("245 tokens out");
+});

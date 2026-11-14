@@ -160,6 +160,70 @@ about 3.5 s each.
 **So.** Haiku draws. The tolerance and foreign-field changes are no longer needed to get drawings on this model (they were the
 local model's faults). What remains is a prompt problem for long shapes, to climb red-first when `build` has what it needs from it.
 
+## The kit arm on Haiku 5.5 (2026-11-14, art's kit 05)
+
+The model does not draw shapes: it picks parts from `art`'s 18-part kit and says where they join (code removed afterwards, see the note below; the
+expander reproduces art's 12 hand-expanded drawings exactly, and refuses art's 9 faulty recipes). Same six oddity prompts plus five
+more, 3 trials each, same day, same `validateAppearance` for both arms, $0.031 for the kit run and $0.027 for the shapes run.
+
+| | shapes arm | kit arm |
+| --- | --- | --- |
+| valid first time / repaired / stand-in (of 36 and 33) | 32 / 2 / 2 | 12 / 5 / 16 |
+| model calls per request | 1.11 | 1.64 |
+| input tokens per request (prompt included) | 3020 | 5382 (about 3.3 thousand a call, a catalogue of 18 parts) |
+| output tokens per request | 915 | 792 |
+
+- **When it works it reads well**: teapot (round chamber, open handle, spout, lens), jellyfish (bell, lens, conduits), bubblegum
+  mortar and a plain gun are clean, with the part names to check identity against. Identity is checkable as part ids (`partsUsed`).
+- **The dominant fault is overflow, not choice.** All 21 first refusals are a part reaching past the right edge: the model chains `front`
+  anchors and cannot see how far they add up (the catalogue's "reaches" numbers were not enough). Duck and fax never reach the canvas.
+  After the repair, 7 of the 16 stand-ins are still overflow and **9 are the model echoing `instances` back as a text string**
+  (the repair prompt shows the first recipe as JSON text), which the primitive arm's `fix/unwrap` would have read.
+- **Local `qwen3.5:9b`: 0 of 11 drawn**, all stand-ins (overflow, an invented anchor on a part, an invalid palette word).
+- **The user's verdict (2026-11-14): the shapes arm is "way better"; the kit arm is shelved for now.** The code was then removed at the user's request (note below). The ideas below were not tried.
+- **Cheap next steps, red first (not pursued)**: name the instance that overflows in the repair sentence (today it says `body.4`, an expanded shape
+  the model never wrote); let `fix` read `instances` out of text; tell the model the horizontal budget (the weapon spans x 4 to 60) and
+  how far each part sticks out. Not done; the comparison above is the baseline.
+- **Not claimed**: whether the kit's pictures read better than the shapes arm's is for a person to judge from
+  the two contact sheets, which the user compared (the kit's page went with its code). Identity-by-part-id is a
+  proxy and does not check pose or muzzle alignment. 3 trials per request is thin.
+
+### How the kit arm worked (code removed 2026-11-14, at the user's request; rebuild from this)
+
+`art`'s `docs/art/concepts/weapon-parts-kit-05/` stays the spec: `Parts.json` (18 parts: anchors, sizes, shapes), `Assembly.md` (the exact
+expansion rules), `recipes/` and `assemblies/` (12 recipes and their expected drawings), `RejectedRecipes.json` (9 faulty recipes).
+
+- **Reply the model writes:** `{version: 1, id, name, palette: {accent, secondary}, instances: [{id, part, parent, anchor, ownAnchor,
+  size, orientation, mirror, colourRole}]}`, strict (zod); palette words blue, orange, violet, mint, yellow, pink; size small, standard,
+  large (0.8, 1, 1.2); orientation 0, 90, 180, -90 (absolute, clockwise); ids `^[a-z0-9-]{1,32}$`; 1 to 12 instances (my cap, art warns
+  against a universal one). A loose, all-optional twin of it is the function-calling schema, as for the shapes arm.
+- **Reference rules** (need the catalogue; one sentence each naming the instance, listing what is valid): unknown part, duplicate id,
+  parent not `frame` or an *earlier* instance (forward and self references), anchor missing on the parent's part (or the frame's), own
+  anchor missing, size, turn or mirror not offered by the part. The kit's parts all offer the same choices, so a test needs a hand-made
+  catalogue to prove those checks.
+- **Expansion** (`Assembly.md` step 3 and 4): per instance in order, `a = s cos t`, `b = s sin t`, `c = -s sin t * m`, `d = s cos t * m`
+  (m = -1 when mirrored: the mirror flips local y *before* the turn), translation chosen so the part's own anchor lands on the parent's
+  anchor resolved through the parent's full transform (frame: identity and `frameAnchors`). A child's size and turn are absolute, not
+  multiplied by the parent's. Use exact cos and sin for the four turns. Ellipse radii and strokes scale by `s`; radii swap on a quarter
+  turn. `colourRole` replaces only an `accent` fill (`orange` resolved to `edge`). Round every coordinate to 6 decimals (and `+ 0` to
+  drop -0).
+- **Adapter** into the shapes arm's `Appearance`: palette words to `weapon-*`, art's `secondary` to `accent-secondary`, polygons and
+  polylines get `x: 0, y: 0`, every part `opacity: 1, rotation: 0`, empty projectile, `spark` impact, `none` animation. Then the *same*
+  `validateAppearance` judges both arms (bounds are checked there, with no tolerance).
+- **Prompt:** instructions (canvas, the reply's fields and choices, "start with one big body part", "never invent a part, build the
+  closest mechanical weapon"), a catalogue generated from `Parts.json` (id, label, anchors with offsets, how far the part reaches from
+  its origin, no drawing), one worked example (a plain pistol, held to the same check in a test). About 3.3 thousand input tokens a call
+  on Haiku. The repair is the same prompt plus `<previous>` and `<problems>` data blocks.
+- **Eval:** the same six prompts as the shapes spec; criteria drawn by the model, no repair, plus a deterministic identity proxy (the
+  part ids that carry the cue: `duck-head-beak`, `paper-tray`, `kettle-spout` and `open-handle`, `spine-comb`, `bell-shell`,
+  `bubble-cluster`). The fake tier used a model that answered with art's recipe picked by keyword in the request. The route check needed
+  the kit's nodes (`generate, expand, adapt, validate`, and a recipe can stop after `expand`).
+- **Proof that paid off:** expanding art's 12 recipes and comparing with their `assemblies/` to six decimals, and the 9 faulty recipes,
+  caught most mistakes; but art's recipes never turn a part 90 degrees, so turn and radius-swap needed their own unit tests (mutation
+  found it).
+- **Why it failed, so a rebuild starts there:** the model cannot add up how far chained parts stick out, so it overflows the canvas
+  (21 of 21 first refusals); give it part widths it can add, or let code place parts on a grid, before trying again.
+
 ## Questions
 
 **For `build` and the user:**

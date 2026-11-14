@@ -41,7 +41,7 @@ function figure(drawing: KeptDrawing): string {
     '<figure class="cell">',
     picture,
     `<figcaption><span class="prompt">${escapeHtml(drawing.prompt)}</span><br>`,
-    `<strong class="badge ${outcome.status}">${outcome.status}</strong> · ${calls} · ${outcome.usage.outputTokens} tokens out`,
+    `<strong class="badge ${outcome.status}">${outcome.status}</strong> · ${calls} · ${outcome.usage.inputTokens} tokens in · ${outcome.usage.outputTokens} tokens out`,
     `${faults}</figcaption></figure>`,
   ].join("");
 }
