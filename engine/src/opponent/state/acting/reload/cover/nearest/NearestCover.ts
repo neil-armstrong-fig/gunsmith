@@ -1,7 +1,7 @@
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
 import type {CoverCandidates} from "@gunsmith/engine/opponent/state/acting/reload/cover/nearest/types/CoverCandidates";
-import {hasClearLine} from "@gunsmith/engine/opponent/sight/HasClearLine";
+import {hasClearLine} from "@gunsmith/engine/vision/HasClearLine";
 
 /**
  * The nearest of the candidate places that is cover: out of the threat's sight, and reachable from `from` in a straight

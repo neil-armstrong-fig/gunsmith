@@ -66,10 +66,15 @@ given("a match has just begun", () => {
       await gunsmith.bullets.waitForNoBullets();
 
       expect(before.length).toBeGreaterThan(0);
-      expect(await gunsmith.dummies.getAll()).toEqual(before);
+      expect(standingAndHealth(await gunsmith.dummies.getAll())).toEqual(standingAndHealth(before));
     });
   });
 });
+
+/** Where each dummy stands and how much health it has: turning to fire changes whether the player sees one, which is not what these specs are about. */
+function standingAndHealth(dummies: readonly DummySnapshot[]): Pick<DummySnapshot, "x" | "y" | "health">[] {
+  return dummies.map(({x, y, health}) => ({x, y, health}));
+}
 
 /** The dummy these specs shoot at: the first one the game lists. They never move, so it is the same one every time. */
 function firstOf(dummies: readonly DummySnapshot[]): DummySnapshot {

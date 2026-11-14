@@ -9,6 +9,8 @@ const WEAPON: Weapon = {
   magazineSize: 10,
   reloadSeconds: 1,
   startingReserve: 30,
+  visionDegrees: 90,
+  visionRange: 12,
 };
 
 function playerHolding(equippedIndex: number): Player {

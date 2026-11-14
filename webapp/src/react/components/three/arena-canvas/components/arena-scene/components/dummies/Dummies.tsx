@@ -1,6 +1,7 @@
 import {useFrame} from "@react-three/fiber";
 import {DUMMY_HEALTH} from "@gunsmith/engine/dummy/DummyHealth";
 import {DUMMY_RADIUS} from "@gunsmith/engine/dummy/DummyRadius";
+import {visibleToPlayer} from "@gunsmith/engine/vision/VisibleToPlayer";
 import {gameState} from "@src/store/game/selectors/game-state/GameState";
 import type {JSX} from "react";
 import {useRef, useState} from "react";
@@ -14,7 +15,7 @@ const MOST_DUMMIES_DRAWN = 16;
 const WHOLE = new Color("#f08a5d");
 const NEARLY_GONE = new Color("#4a3a38");
 
-/** Every dummy still standing, drawn as a disc where the simulation says it is, dimmer the more it has been hurt. */
+/** Every dummy still standing that the player sees, drawn as a disc where the simulation says it is, dimmer the more it has been hurt. */
 export function Dummies(): JSX.Element {
   const meshRef = useRef<InstancedMesh>(null);
   const [placement] = useState(() => new Object3D());
@@ -25,7 +26,9 @@ export function Dummies(): JSX.Element {
       return;
     }
 
-    const dummies = gameState().dummies.slice(0, MOST_DUMMIES_DRAWN);
+    const world = gameState();
+    const seen = visibleToPlayer(world).dummies;
+    const dummies = world.dummies.filter((_, index) => seen[index]).slice(0, MOST_DUMMIES_DRAWN);
     meshRef.current.count = dummies.length;
 
     dummies.forEach((dummy, index) => {

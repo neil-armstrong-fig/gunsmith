@@ -1,6 +1,8 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
-import {DIFFICULTY} from "@gunsmith/engine/opponent/Difficulty";
+import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
+import type {Player} from "@gunsmith/engine/player/types/Player";
 import {canSee} from "@gunsmith/engine/opponent/sight/CanSee";
+import {RIFLE} from "@gunsmith/engine/weapon/weapons/Rifle";
 
 const hall = arenaFrom([
   "########################################",
@@ -11,22 +13,40 @@ const hall = arenaFrom([
 ]);
 const walled = arenaFrom(["###########", "#....#....#", "#....#....#", "###########"]);
 
-it("sees a player in the open within its sight range", () => {
-  expect(canSee(hall, {x: 2.5, y: 2.5}, {x: 2.5 + DIFFICULTY.sightRange - 1, y: 2.5})).toBe(true);
+// An opponent at `position`, facing east with the rifle in hand.
+function opponentAt(x: number, y: number, aim = {x: 1, y: 0}): Player {
+  const opponent = startingWorld(hall, [], {x, y}).opponent;
+  if (!opponent) {
+    throw new Error("The world has no opponent.");
+  }
+
+  return {...opponent, aim};
+}
+
+it("sees a player in front of it within its weapon's range", () => {
+  expect(canSee(hall, opponentAt(2.5, 2.5), {x: 2.5 + RIFLE.visionRange - 1, y: 2.5})).toBe(true);
 });
 
-it("sees a player exactly at its sight range", () => {
-  expect(canSee(hall, {x: 2.5, y: 2.5}, {x: 2.5 + DIFFICULTY.sightRange, y: 2.5})).toBe(true);
+it("sees a player exactly at its weapon's range", () => {
+  expect(canSee(hall, opponentAt(2.5, 2.5), {x: 2.5 + RIFLE.visionRange, y: 2.5})).toBe(true);
 });
 
-it("does not see a player beyond its sight range, though no wall is in the way", () => {
-  expect(canSee(hall, {x: 2.5, y: 2.5}, {x: 2.5 + DIFFICULTY.sightRange + 0.5, y: 2.5})).toBe(false);
+it("does not see a player beyond its weapon's range, though no wall is in the way", () => {
+  expect(canSee(hall, opponentAt(2.5, 2.5), {x: 2.5 + RIFLE.visionRange + 0.5, y: 2.5})).toBe(false);
+});
+
+it("does not see a player behind it, however near", () => {
+  expect(canSee(hall, opponentAt(10.5, 2.5), {x: 7.5, y: 2.5})).toBe(false);
+});
+
+it("sees that player once it turns round", () => {
+  expect(canSee(hall, opponentAt(10.5, 2.5, {x: -1, y: 0}), {x: 7.5, y: 2.5})).toBe(true);
 });
 
 it("does not see a player behind a wall, however near", () => {
-  expect(canSee(walled, {x: 3.5, y: 1.5}, {x: 7.5, y: 1.5})).toBe(false);
+  expect(canSee(walled, opponentAt(3.5, 1.5), {x: 7.5, y: 1.5})).toBe(false);
 });
 
 it("sees a player on the same spot", () => {
-  expect(canSee(hall, {x: 2.5, y: 2.5}, {x: 2.5, y: 2.5})).toBe(true);
+  expect(canSee(hall, opponentAt(2.5, 2.5), {x: 2.5, y: 2.5})).toBe(true);
 });

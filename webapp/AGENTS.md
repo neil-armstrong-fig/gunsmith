@@ -71,6 +71,11 @@ store. The opponent's choices are drawn from a seed (`game/scenario/seed/`): `?s
 acceptance specs pin one), otherwise each page load and each "Play again" draws a fresh random one, which is the only
 `Math.random` in the game.
 
+**What the player sees** is the engine's `vision/` (`docs/game-design.md`, "Vision"): `three/arena-canvas/.../vision-overlay/` draws a dark
+veil over the arena with the cone cut out (`visibleArea`, rebuilt every frame in `useFrame`), and `Opponent`, `Dummies` and `Bullets` draw
+only what `visibleToPlayer(world)` says is seen. The snapshot reports the same answer (`vision`, `opponent.visible`, `dummy.visible`), since the
+canvas is not in the DOM; the veil's own drawing has no spec, only its geometry (`DimmedGeometry.test.ts`).
+
 The HUD is plain React over the canvas (`react/components/dom/ammo-hud/`, `health-hud/`, `score-hud/` (the round and the score, top
 middle, only in a match) and the `round-banner/` overlay that appears when a round is won or lost), styled with Tailwind and the
 `--color-gs-*` tokens. In a match the banner keeps "You won" / "You lost" for a round, adds the score, and offers **"Next round"**

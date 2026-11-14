@@ -11,7 +11,6 @@ export const DIFFICULTY: Difficulty = {
   farRange: 8,
   nearRange: 4,
   speedShare: 0.7,
-  sightRange: 14,
   strafeMinSeconds: 1,
   strafeMaxSeconds: 2,
   wanderRepickSeconds: 4,

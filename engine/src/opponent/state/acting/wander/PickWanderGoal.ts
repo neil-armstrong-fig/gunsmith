@@ -1,4 +1,4 @@
-import {hasClearLine} from "@gunsmith/engine/opponent/sight/HasClearLine";
+import {hasClearLine} from "@gunsmith/engine/vision/HasClearLine";
 import {DIFFICULTY} from "@gunsmith/engine/opponent/Difficulty";
 import {randomOpenPoint} from "@gunsmith/engine/opponent/steering/RandomOpenPoint";
 import type {OpponentBrain} from "@gunsmith/engine/opponent/types/OpponentBrain";

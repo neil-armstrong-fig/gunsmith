@@ -53,18 +53,18 @@ it("reports no dummies when the world has none", () => {
   expect(snapshotOf(world).dummies).toEqual([]);
 });
 
-it("reports where each dummy stands and how much health it has left", () => {
+it("reports where each dummy stands, how much health it has left and whether the player sees it", () => {
   const withDummies = {
     ...world,
     dummies: [
       {position: {x: 1.5, y: 2.5}, health: 100},
-      {position: {x: 3.5, y: 1.5}, health: 25},
+      {position: {x: 3.5, y: 2.5}, health: 25},
     ],
   };
 
   expect(snapshotOf(withDummies).dummies).toEqual([
-    {x: 1.5, y: 2.5, health: 100},
-    {x: 3.5, y: 1.5, health: 25},
+    {x: 1.5, y: 2.5, health: 100, visible: false},
+    {x: 3.5, y: 2.5, health: 25, visible: true},
   ]);
 });
 
@@ -108,10 +108,33 @@ it("reports no opponent when the world has none", () => {
 });
 
 it("reports where the opponent stands and how much health it has left", () => {
-  const withOpponent = startingWorld(world.arena, [], {x: 3.5, y: 1.5});
+  const withOpponent = startingWorld(world.arena, [], {x: 3.5, y: 2.5});
   const hurt = {...withOpponent, opponent: withOpponent.opponent && {...withOpponent.opponent, health: 40}};
 
-  expect(snapshotOf(hurt).opponent).toEqual({x: 3.5, y: 1.5, health: 40, rounds: RIFLE.magazineSize});
+  expect(snapshotOf(hurt).opponent).toMatchObject({x: 3.5, y: 2.5, health: 40, rounds: RIFLE.magazineSize});
+});
+
+it("reports that the opponent is in sight when it stands in front of the player, and not when it is behind", () => {
+  const ahead = startingWorld(world.arena, [], {x: 3.5, y: 2.5});
+  const behind = startingWorld(world.arena, [], {x: 1.5, y: 2.5});
+
+  expect(snapshotOf(ahead).opponent?.visible).toBe(true);
+  expect(snapshotOf(behind).opponent?.visible).toBe(false);
+});
+
+it("reports the width and reach of the player's view, which follow the weapon in hand", () => {
+  const holding = (equippedIndex: number): unknown =>
+    snapshotOf({...world, player: {...world.player, equippedIndex}}).vision;
+
+  expect(holding(0)).toEqual({degrees: RIFLE.visionDegrees, range: RIFLE.visionRange});
+  expect(holding(1)).toEqual({degrees: MARKSMAN_RIFLE.visionDegrees, range: MARKSMAN_RIFLE.visionRange});
+});
+
+it("reports the width of the player's view as the weapon in hand sets it, not a fixed one", () => {
+  const narrow = {...RIFLE, visionDegrees: 60};
+  const holdingNarrow = {...world.player, loadout: [{weapon: narrow, rounds: 1, reserve: 0}], equippedIndex: 0};
+
+  expect(snapshotOf({...world, player: holdingNarrow}).vision.degrees).toBe(60);
 });
 
 it("reports the rounds in the magazine of the weapon the opponent holds", () => {

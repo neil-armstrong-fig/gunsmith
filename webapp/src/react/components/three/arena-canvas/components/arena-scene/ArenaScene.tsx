@@ -3,6 +3,7 @@ import {zoomToFit} from "@src/react/components/three/arena-canvas/components/are
 import {Dummies} from "@src/react/components/three/arena-canvas/components/arena-scene/components/dummies/Dummies";
 import {Bullets} from "@src/react/components/three/arena-canvas/components/arena-scene/components/bullets/Bullets";
 import {ArenaWalls} from "@src/react/components/three/arena-canvas/components/arena-scene/components/arena-walls/ArenaWalls";
+import {VisionOverlay} from "@src/react/components/three/arena-canvas/components/arena-scene/components/vision-overlay/VisionOverlay";
 import {Opponent} from "@src/react/components/three/arena-canvas/components/arena-scene/components/opponent/Opponent";
 import {PlayerDisc} from "@src/react/components/three/arena-canvas/components/arena-scene/components/player-disc/PlayerDisc";
 import {useGameLoop} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/UseGameLoop";
@@ -10,7 +11,7 @@ import {gameState} from "@src/store/game/selectors/game-state/GameState";
 import {useGameStore} from "@src/store/game/UseGameStore";
 import type {JSX} from "react";
 
-/** Everything drawn in the arena: the camera fitted to the window, the walls, the dummies, the bullets, the opponent and the player. */
+/** Everything drawn in the arena: the camera fitted to the window, the walls with the dim veil over what the player does not see, the dummies, the bullets, the opponent and the player. */
 export function ArenaScene(): JSX.Element {
   useGameLoop();
 
@@ -35,6 +36,8 @@ export function ArenaScene(): JSX.Element {
       <color attach="background" args={["#10151b"]} />
 
       <ArenaWalls arena={arena} />
+
+      <VisionOverlay />
 
       <Dummies />
 

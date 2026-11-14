@@ -1,5 +1,5 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
-import {hasClearLine} from "@gunsmith/engine/opponent/sight/HasClearLine";
+import {hasClearLine} from "@gunsmith/engine/vision/HasClearLine";
 import {nearestCover} from "@gunsmith/engine/opponent/state/acting/reload/cover/nearest/NearestCover";
 
 // A wall block stands in the middle of the room, tiles x 6 to 7 and y 2 to 6, with a clear row of floor above and below it.

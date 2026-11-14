@@ -8,4 +8,6 @@ export const RIFLE: Weapon = {
   magazineSize: 12,
   reloadSeconds: 1.5,
   startingReserve: 36,
+  visionDegrees: 90,
+  visionRange: 12,
 };

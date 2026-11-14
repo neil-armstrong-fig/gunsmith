@@ -2,7 +2,7 @@ import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import {DIFFICULTY} from "@gunsmith/engine/opponent/Difficulty";
-import {hasClearLine} from "@gunsmith/engine/opponent/sight/HasClearLine";
+import {hasClearLine} from "@gunsmith/engine/vision/HasClearLine";
 import {actReload} from "@gunsmith/engine/opponent/state/acting/Reload";
 import {startingBrain} from "@gunsmith/engine/opponent/brain/StartingBrain";
 import type {OpponentBrain} from "@gunsmith/engine/opponent/types/OpponentBrain";

@@ -9,6 +9,8 @@ const WEAPON: Weapon = {
   magazineSize: 10,
   reloadSeconds: 1,
   startingReserve: 30,
+  visionDegrees: 90,
+  visionRange: 12,
 };
 
 /** A player holding one weapon with `rounds` in the magazine and `reserve` in the bag. */

@@ -1,5 +1,6 @@
 import type {World} from "@gunsmith/engine/game-loop/types/World";
 import {equippedWeapon} from "@gunsmith/engine/loadout/EquippedWeapon";
+import {visibleToPlayer} from "@gunsmith/engine/vision/VisibleToPlayer";
 import type {GameStateSnapshot} from "@gunsmith/shared/state-hook/types/GameStateSnapshot";
 import type {MatchSnapshot} from "@gunsmith/shared/state-hook/types/MatchSnapshot";
 import type {OpponentSnapshot} from "@gunsmith/shared/state-hook/types/OpponentSnapshot";
@@ -8,6 +9,7 @@ import type {OpponentSnapshot} from "@gunsmith/shared/state-hook/types/OpponentS
 export function snapshotOf(world: World): GameStateSnapshot {
   const {position, aim, equippedIndex, reloadRemainingSeconds} = world.player;
   const carried = equippedWeapon(world.player);
+  const visible = visibleToPlayer(world);
 
   return {
     arena: {width: world.arena.width, height: world.arena.height},
@@ -23,16 +25,22 @@ export function snapshotOf(world: World): GameStateSnapshot {
       reserve: carried.reserve,
       reloading: reloadRemainingSeconds !== undefined,
     },
-    opponent: opponentSnapshotOf(world),
+    vision: {degrees: carried.weapon.visionDegrees, range: carried.weapon.visionRange},
+    opponent: opponentSnapshotOf(world, visible.opponent),
     round: world.round,
     match: matchSnapshotOf(world),
     bullets: world.bullets.map(bullet => ({x: bullet.position.x, y: bullet.position.y})),
-    dummies: world.dummies.map(dummy => ({x: dummy.position.x, y: dummy.position.y, health: dummy.health})),
+    dummies: world.dummies.map((dummy, index) => ({
+      x: dummy.position.x,
+      y: dummy.position.y,
+      health: dummy.health,
+      visible: visible.dummies[index] === true,
+    })),
     elapsedSeconds: world.elapsedSeconds,
   };
 }
 
-function opponentSnapshotOf(world: World): OpponentSnapshot | undefined {
+function opponentSnapshotOf(world: World, visible: boolean): OpponentSnapshot | undefined {
   const {opponent} = world;
   if (!opponent) {
     return undefined;
@@ -43,6 +51,7 @@ function opponentSnapshotOf(world: World): OpponentSnapshot | undefined {
     y: opponent.position.y,
     health: opponent.health,
     rounds: equippedWeapon(opponent).rounds,
+    visible,
     behaviour: world.opponentBrain?.state,
   };
 }

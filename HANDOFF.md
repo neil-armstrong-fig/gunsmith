@@ -147,6 +147,26 @@ those implementations; art's README records unsupported identities and proposed 
 
 Newest first. One line each: date, who, what, where.
 
+- 2026-11-14, `build`: **Forward vision cone, slice 1 (cone only), test first.** `engine/src/vision/` is new: a fighter sees a cone
+  (`Weapon.visionDegrees`, `visionRange`: 90 degrees, rifle 12 tiles, marksman rifle 16; tunables) along their aim, blocked by walls; the player's
+  view decides what is drawn (opponent, dummies, the opponent's bullets) and `VisibleToPlayer` is the function the server will reuse to filter
+  snapshots. The bot now has the same cone. **For `ai`: `Weapon` gained two fields (`visionDegrees`, `visionRange`), which the weapon schema
+  will need; `ai/` imports none of it and its 152 tests pass.** For `art`: nothing to wire (the dim veil is code). **Contract change:**
+  the state hook's snapshot gained `vision {degrees, range}`, `opponent.visible` and `dummy.visible` (`shared/`). Spec `SeeingOnlyWhatYouFace`;
+  engine 559, webapp 133; the duel, sparring, HUD and vision specs pass at `--repeat-each=10`; 31 mutants killed. At the user's request
+  `vision/` was sub-foldered and the **folder-rule audit is now an explicit step in `AGENTS.md`** (before finishing) and `engine/AGENTS.md`.
+  Not done: crouch, heights. Uncommitted, for the user's review.
+
+- 2026-11-14, `art`: **Haiku review 06 delivered**, user-selected, under
+  `docs/art/concepts/haiku-review-06/`: twelve saved outputs, six approved-kit
+  comparisons, editable SVG/PNG native-size/grayscale/detail sheets and 96 held
+  stamps. Frozen evidence and hashes distinguish the retained drawings from newer
+  summaries and AI-reported 36-trial results. Prioritised silhouette/detail,
+  lantern evidence and pose/contrast feedback for AI/build; kit approval retained.
+  Validation recorded in the review's `Verification.json`. No new generation,
+  corrected fixture, schema, runtime/audio change, dependency or commit.
+  Manifest keys: none; production and kit-selection evaluation remain open.
+
 - 2026-11-14, `art`: **user visually approved kit 05 (“looks really good”); context-clear checkpoint updated.**
   Next is AI's selection/placement comparison using the delivered catalogue/recipes, followed by art revisions
   from observed failures. While waiting, art can continue the recorded audio codec/browser blockers with

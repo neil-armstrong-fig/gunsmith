@@ -5,6 +5,7 @@ import type {MatchSnapshot} from "@gunsmith/shared/state-hook/types/MatchSnapsho
 import type {OpponentSnapshot} from "@gunsmith/shared/state-hook/types/OpponentSnapshot";
 import type {PlayerSnapshot} from "@gunsmith/shared/state-hook/types/PlayerSnapshot";
 import type {RoundSnapshot} from "@gunsmith/shared/state-hook/types/RoundSnapshot";
+import type {VisionSnapshot} from "@gunsmith/shared/state-hook/types/VisionSnapshot";
 import type {WeaponSnapshot} from "@gunsmith/shared/state-hook/types/WeaponSnapshot";
 
 /** What the state hook returns: a copy of the game as it is now, for an acceptance spec to read. */
@@ -13,6 +14,8 @@ export interface GameStateSnapshot {
   player: PlayerSnapshot;
   /** The weapon in the player's hands. */
   weapon: WeaponSnapshot;
+  /** The width and reach of what the player sees in detail; the weapon in hand sets them. */
+  vision: VisionSnapshot;
   /** The scripted opponent; absent in a game that has none, such as the practice range. */
   opponent?: OpponentSnapshot | undefined;
   /** Whether the round is still being fought, or has been won or lost. */

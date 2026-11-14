@@ -1,16 +1,14 @@
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
-import {DIFFICULTY} from "@gunsmith/engine/opponent/Difficulty";
-import {hasClearLine} from "@gunsmith/engine/opponent/sight/HasClearLine";
+import type {Player} from "@gunsmith/engine/player/types/Player";
+import {canSeePoint} from "@gunsmith/engine/vision/CanSeePoint";
+import {coneOf} from "@gunsmith/engine/vision/ConeOf";
 
 /**
- * Whether the opponent at `from` sees `target`: within `sightRange` and with no wall between them. The range is a
- * stand-in until the arena's vision cone arrives; it has no angle yet, so the opponent sees all the way round.
+ * Whether the opponent sees `target`: it is inside the opponent's own cone (as wide and as far as the weapon in its hand
+ * allows, along the way it faces) and no wall stands between, the same test the player's view goes through. It has to turn
+ * to look, so it sees nothing behind it.
  */
-export function canSee(arena: Arena, from: Point, target: Point): boolean {
-  if (Math.hypot(target.x - from.x, target.y - from.y) > DIFFICULTY.sightRange) {
-    return false;
-  }
-
-  return hasClearLine(arena, from, target);
+export function canSee(arena: Arena, opponent: Player, target: Point): boolean {
+  return canSeePoint(arena, coneOf(opponent), target);
 }

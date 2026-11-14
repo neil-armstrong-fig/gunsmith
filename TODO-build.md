@@ -276,7 +276,16 @@ RNG, no `Date.now()` or `Math.random()`. The webapp renders it and sends input.
         decoded audio, both verification reports byte for byte). Asked: is there a library for the encoding? No: the encode is one
         `ffmpeg` call per file (about 65 lines); the rest is verification and safe publishing, `fluent-ffmpeg` is deprecated, and
         the JS encoders would change the bytes and the MP3 delay header the loop findings depend on.
-  - [ ] Dim arena outside a detailed forward cone, set by equipped weapon and standing/crouched stance. Rotate it
+  - [x] **Forward vision cone, slice 1 (2026-11-14; cone only).** `engine/src/vision/` (`ConeOf`, `CanSeePoint`, `VisibleToPlayer`,
+        `VisibleArea`, with `cone/IsInCone` and `outline/ReachAlong` beneath), `Weapon.visionDegrees` and `visionRange` (90 degrees; rifle 12 tiles,
+        marksman rifle 16, tunables), `HasClearLine` moved up from `opponent/sight/`. **The bot uses the same cone** (`CanSee` takes the opponent
+        itself; `DIFFICULTY.sightRange` is gone), so it must turn to look (its wander and search already aim where they walk): the 20-seed
+        match test and the duel specs pass unchanged; it has not been played by feel. Webapp: a dark veil with the cone cut out
+        (`vision-overlay/`), opponent, dummies and the opponent's bullets drawn only where seen. Snapshot gained `vision`, `opponent.visible`,
+        `dummy.visible`. Spec `SeeingOnlyWhatYouFace` (7 criteria). Engine 559, webapp 133 unit tests; 31 of 31 mutants killed (two survivors first,
+        a test gap: both weapons were 90 degrees wide); browser mutants killed. **Open:** dummies vanish outside the cone in the practice range
+        too (a stated default); the opponent's and veil drawing have no spec (canvas). Next: crouch (slice 2), then heights.
+  - [ ] Dim arena, remaining: crouch and heights. Original item: dim arena outside a detailed forward cone, set by equipped weapon and standing/crouched stance. Rotate it
         with aim through 360°; reveal terrain detail and players/items only in the unoccluded cone. Three height levels
         and longer-range, substantially slower crouch follow `HANDOFF.md`. Cone ownership is settled.
   - [ ] The closing ring after the round timer.

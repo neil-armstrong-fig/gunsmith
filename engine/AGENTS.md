@@ -79,7 +79,7 @@ everything else is a domain folder. Tiles are the unit; `x` grows to the east an
   is weapon- and map-agnostic, beatable and legible, not clever. `ThinkOpponent(world, seconds)` returns an `OpponentDecision`:
   an `Input` like a player's, so it is played by the same rules, and the `OpponentBrain` it carries into the next step. The
   brain (`types/OpponentBrain`) is plain data in `World.opponentBrain`: state, goal, last-seen point, timers, strafe side,
-  stuck watch and the seed. Each step it looks (`sight/CanSee`: within `sightRange` and a clear line; `NoticePlayer` keeps
+  stuck watch and the seed. Each step it looks (`sight/CanSee`: inside its own `vision/` cone, so it must turn to look, with a clear line; `NoticePlayer` keeps
   the last-seen point and how long it has been in sight), checks transitions (`state/ChooseState`), lets its state act
   (`state/ActOnState`), then notices if it has walked a while without getting anywhere (`steering/WatchForStuck`, answered by
   `unstick/UnstickBrain`). The states: **wander** (walk to a random open tile it can see, re-pick on arrival, after
@@ -93,11 +93,20 @@ everything else is a domain folder. Tiles are the unit; `x` grows to the east an
   goal (or flips its strafe side). The four states sit in `state/acting/` beneath `ActOnState`, each with its helpers beside it:
   `engage/` (with `aim/`) and `reload/` (with `cover/`). Every tunable is one field of `Difficulty.ts`. `brain/StartingBrain` and `GiveOpponentBrain(world,
 seed)` give an opponent a brain; **an opponent with no brain takes no action at all** (the still target of sparring), and
-  `DisarmOpponent` empties its magazines and takes its brain away. `sight/HasClearLine` is the line-of-sight test (a bullet's
+  `DisarmOpponent` empties its magazines and takes its brain away. The line-of-sight test it shares with the player is `vision/HasClearLine` (a bullet's
   wall test, so what it cannot see a bullet cannot hit). Browser specs watch it engage, move, run its magazine down, reload
   and refill; `search` has no assertion of its own in a browser (it happens in every seed, but only the pinned fight's timing
   would notice it go). The engine tests and `ThinkOpponentOverAMatch.test.ts` (20 seeds: kills a standing player within 15 s,
   never in a wall, replays exactly, wanders a minute without getting stuck) carry the states.
+- `vision/`: what a fighter sees in detail. A `Cone` (`types/Cone.ts`: apex, aim, half angle in radians, range) is what `ConeOf(fighter)`
+  builds from the fighter's position and aim and the **weapon in hand** (`Weapon.visionDegrees`, `visionRange`; 90 degrees, 12 tiles
+  for the rifle and 16 for the marksman rifle, tunables). Root: `ConeOf`, `CanSeePoint(arena, cone, point)` (inside the cone and a clear
+  line), `HasClearLine` (a bullet's wall test; also the opponent's, so it stays here as the shared helper),
+  `VisibleToPlayer(world)` (`{opponent, dummies, bullets}` booleans: what the player sees, and the same answer the server will use to decide
+  what to send; the player's own bullets always show, the opponent's only in the cone) and `VisibleArea(arena, cone)` (the outline of the cone
+  with the walls cut out, always 50 points, for drawing the dim veil). Beneath: `cone/IsInCone` (one caller, `CanSeePoint`; compares the
+  cosine, so no angle wraps) and `outline/ReachAlong` (one caller, `VisibleArea`; finds a wall's face by halving the last sample's gap, so the
+  outline sits on the wall and not a sample inside it). Not built yet: crouch (longer range, slower), heights, sound.
 - `game-loop/`: the body of the game loop: `startingWorld(arena, dummyPositions, opponentPosition?)` (the opponent faces west
   with the same weapons and 100 health, and no brain: `giveOpponentBrain` adds one) and `step`. Each fighter, the player by
   the `Input` and the opponent by what `thinkOpponent` asks for, takes their own part by the same rules (`fighter/PrepareFighter`: switch weapon, then start or run the
@@ -112,7 +121,7 @@ only by `step` or `MovePlayer`). They stay in domain folders of their own, not b
 the engine's vocabulary, each will grow (hits, health, dummies) and be used from more than one place, and `engine/` is
 imported by other packages. A single-caller helper that is _not_ a domain still goes beneath its caller.
 
-A new subject (`visibility/`, `ring/`) gets a folder of its own rather than joining a bucket. Past about six
+A new subject (`ring/`, `sound/`) gets a folder of its own rather than joining a bucket. Past about six
 files a folder is a smell: split it by subject.
 
 ## Conventions
@@ -120,6 +129,10 @@ files a folder is a smell: split it by subject.
 - **A new rule gets a unit test first** (`it(...)` at the top level, no `describe`), watched to fail, then mutation-proved.
   Wall, edge and corner cases are where this package has been wrong before; test each side, not one.
 - **The engine does not trust its input.** `step` caps the direction's length, so a client cannot walk faster by asking.
+- **Audit the folder before saying done.** For each new or changed domain folder, list its files and, for every root file, count its
+  callers (`grep -rln "<domain>/<Name>\"" engine/src webapp/src`): one caller means it goes in a subject-named subfolder beneath that
+  caller; two or more domains means it stays at the owning root. Every interface is in `<domain>/types/`. A root of more than about five
+  entry points needs a reason (`vision/` has five, all about seeing). Move a file with its test, with plain `mv`.
 - **A step never changes the world it is given**; it returns a new one.
 - **Tunables are constants in their own file** (`PlayerSpeed.ts`) until there are enough to want a table.
 - Property tests (`fast-check`) are deliberately not here yet.

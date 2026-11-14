@@ -12,4 +12,8 @@ export interface Weapon {
   reloadSeconds: number;
   /** The rounds in the reserve at the start of a match: what reloads draw on. */
   startingReserve: number;
+  /** How wide the detailed forward cone is, in degrees: what the holder sees round the aim. */
+  visionDegrees: number;
+  /** How far the cone reaches, in tiles. */
+  visionRange: number;
 }

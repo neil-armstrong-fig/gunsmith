@@ -18,8 +18,6 @@ export interface Difficulty {
   nearRange: number;
   /** What share of a player's walking speed it walks at. */
   speedShare: number;
-  /** It cannot see a player farther than this, in tiles, wall or no wall. */
-  sightRange: number;
   /** The shortest time it holds one side while circling the player. */
   strafeMinSeconds: number;
   /** The longest time it holds one side while circling the player. */

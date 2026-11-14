@@ -1,7 +1,7 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import {findCover} from "@gunsmith/engine/opponent/state/acting/reload/cover/FindCover";
 import {DIFFICULTY} from "@gunsmith/engine/opponent/Difficulty";
-import {hasClearLine} from "@gunsmith/engine/opponent/sight/HasClearLine";
+import {hasClearLine} from "@gunsmith/engine/vision/HasClearLine";
 
 const room = arenaFrom([
   "##############",

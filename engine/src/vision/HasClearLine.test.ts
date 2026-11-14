@@ -1,5 +1,5 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
-import {hasClearLine} from "@gunsmith/engine/opponent/sight/HasClearLine";
+import {hasClearLine} from "@gunsmith/engine/vision/HasClearLine";
 
 // Floor is x 1 to 5 and y 1 to 3, with a one-tile pillar at x 3, y 2.
 const hall = arenaFrom(["#######", "#.....#", "#..#..#", "#.....#", "#######"]);

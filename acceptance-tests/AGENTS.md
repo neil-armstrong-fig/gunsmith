@@ -54,6 +54,13 @@ or 0.55 s, with up to 0.1 s of lag from aiming to firing), so it is a timing win
 seed. A spec-only way to win would be a seam, so winning is covered by engine and webapp unit tests (`Step`, `ScoreRound`,
 `DecideMatch`, `RoundMessage`).
 
+## Vision
+
+`gunsmith.vision` (`getView()`, `isOpponentSeen()`) reads the state hook's `vision` and `opponent.visible`: the game's own account of what the
+player sees. `SeeingOnlyWhatYouFace` uses sparring, whose opponent never moves, and walks or aims the player instead (in front, behind, 70 degrees
+to the side, beyond the rifle's range, behind a pillar, then the marksman rifle's longer reach). A spec that fires or reads dummies must compare
+what it means (`x`, `y`, `health`), not whole snapshots, since turning changes `visible`.
+
 ## Running
 
 ```bash

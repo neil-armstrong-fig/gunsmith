@@ -53,6 +53,10 @@ session, tick your own checklist, update your row on the status board in `TODO.m
 3. Before editing, say which instruction files and reference implementations you used.
 4. Before finishing, re-read the applicable instructions and perform a standards-only review of
    the diff. Fix deviations that lint and tests cannot detect before reporting completion.
+   **The folder rule is the one most often missed** (a new domain folder with everything loose at its root, types
+   beside code, a helper with one caller beside it): for every folder you created or added to, `ls` it, count the
+   callers of each root file with `grep`, and move the one-caller helpers beneath their caller and the types to
+   `types/` *before* you run the final checks. Say in your summary that you did it.
 
 ## Commands (planned)
 

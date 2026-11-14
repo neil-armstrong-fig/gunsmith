@@ -8,4 +8,6 @@ export const MARKSMAN_RIFLE: Weapon = {
   magazineSize: 5,
   reloadSeconds: 2.2,
   startingReserve: 15,
+  visionDegrees: 90,
+  visionRange: 16,
 };

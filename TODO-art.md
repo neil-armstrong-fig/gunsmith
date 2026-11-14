@@ -30,6 +30,15 @@ This is experimental art data, not an implemented renderer or frozen M2 contract
 Production is blocked by the measured duration/level/seam differences documented in `webapp/audio/README.md`.
 The approved masters remain byte-identical. Do not repeat the direction audition or mark A6 production complete.
 
+**Haiku review delivered (2026-11-14, user-selected next pass):**
+`docs/art/concepts/haiku-review-06/README.md` reviews the twelve saved outputs,
+with editable comparison sheets, native-size/grayscale/detail comparisons and
+96 provisional held stamps. Frozen evidence separates the 00:17 drawing snapshot
+(11 valid, one fallback) from the newer eval summary and AI-reported 36-trial run.
+Duck/cactus identity, disappearing fine cues, lantern evidence and pose/contrast
+are prioritised for AI/build. This completes the annotated review only; no new
+model call, revised fixture or production approval. Kit 05 approval is preserved.
+
 **Up next, in priority order:**
 
 1. **Next art pass: read the latest AI worktree findings and shared handoff first.** The kit is visually
@@ -161,6 +170,13 @@ User priority (2026-11-12): audio audition → full audio pack → top-down stud
       Weapon gunshots remain build/AI-owned synthesis; art supplies static cues only.
 
 ## A2: sprites. Milestone M3
+
+- [x] User-selected Haiku review (2026-11-14): annotate all twelve saved drawings,
+      compare the six oddities to approved kit 05 at 64/32 px and in grayscale,
+      show both detail variants and 96 provisional held stamps, freeze evidence
+      and hand AI/build observed identity, pose and contrast failures. See
+      `docs/art/concepts/haiku-review-06/README.md`. No corrected fixtures or model run.
+
 
 - [x] User-requested simpler version and provisional build brief: six matching JSON/vector compositions and actual-size
       reviews in `docs/art/concepts/simple-machinery-04/`. AI generation/defaults evaluation task added to `TODO-ai.md`.

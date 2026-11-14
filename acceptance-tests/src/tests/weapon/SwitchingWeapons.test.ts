@@ -44,8 +44,8 @@ given("a match has just begun", () => {
   });
 
   when("the player shoots one dummy with each weapon in turn", () => {
-    let firstDummy: DummySnapshot = {x: 0, y: 0, health: 0};
-    let secondDummy: DummySnapshot = {x: 0, y: 0, health: 0};
+    let firstDummy: DummySnapshot = {x: 0, y: 0, health: 0, visible: false};
+    let secondDummy: DummySnapshot = {x: 0, y: 0, health: 0, visible: false};
 
     beforeEach(async ({gunsmith}) => {
       const dummies = await gunsmith.dummies.getAll();

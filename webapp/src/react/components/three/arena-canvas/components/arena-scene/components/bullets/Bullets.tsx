@@ -1,4 +1,5 @@
 import {useFrame} from "@react-three/fiber";
+import {visibleToPlayer} from "@gunsmith/engine/vision/VisibleToPlayer";
 import {gameState} from "@src/store/game/selectors/game-state/GameState";
 import type {JSX} from "react";
 import {useRef, useState} from "react";
@@ -8,7 +9,7 @@ import type {InstancedMesh} from "three";
 /** More bullets than this cannot be in the air at once at the current fire rate, with room to spare. */
 const MOST_BULLETS_DRAWN = 64;
 
-/** Every bullet in the air, drawn as a small disc where the simulation says it is. */
+/** Every bullet in the air that the player sees (the opponent's only inside the cone), drawn as a small disc where the simulation says it is. */
 export function Bullets(): JSX.Element {
   const meshRef = useRef<InstancedMesh>(null);
   const [placement] = useState(() => new Object3D());
@@ -18,7 +19,9 @@ export function Bullets(): JSX.Element {
       return;
     }
 
-    const bullets = gameState().bullets.slice(0, MOST_BULLETS_DRAWN);
+    const world = gameState();
+    const shown = visibleToPlayer(world).bullets;
+    const bullets = world.bullets.filter((_, index) => shown[index]).slice(0, MOST_BULLETS_DRAWN);
     meshRef.current.count = bullets.length;
 
     bullets.forEach((bullet, index) => {

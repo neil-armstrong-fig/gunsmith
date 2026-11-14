@@ -5,7 +5,7 @@ import type {Point} from "@gunsmith/engine/geometry/types/Point";
 import {DIFFICULTY} from "@gunsmith/engine/opponent/Difficulty";
 import {actWander} from "@gunsmith/engine/opponent/state/acting/Wander";
 import {startingBrain} from "@gunsmith/engine/opponent/brain/StartingBrain";
-import {hasClearLine} from "@gunsmith/engine/opponent/sight/HasClearLine";
+import {hasClearLine} from "@gunsmith/engine/vision/HasClearLine";
 import type {OpponentBrain} from "@gunsmith/engine/opponent/types/OpponentBrain";
 import type {OpponentContext} from "@gunsmith/engine/opponent/types/OpponentContext";
 

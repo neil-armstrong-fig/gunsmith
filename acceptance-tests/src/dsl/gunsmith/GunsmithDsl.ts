@@ -10,6 +10,7 @@ import {LONG_DUEL_SEED} from "@src/dsl/gunsmith/duel/LongDuelSeed";
 import {OpponentDsl} from "@src/dsl/gunsmith/components/opponent/OpponentDsl";
 import {PlayerDsl} from "@src/dsl/gunsmith/components/player/PlayerDsl";
 import {RoundDsl} from "@src/dsl/gunsmith/components/round/RoundDsl";
+import {VisionDsl} from "@src/dsl/gunsmith/components/vision/VisionDsl";
 import {WeaponDsl} from "@src/dsl/gunsmith/components/weapon/WeaponDsl";
 import {GunsmithPlaywright} from "@src/dsl/gunsmith/playwright/GunsmithPlaywright";
 import type {Size} from "@src/dsl/gunsmith/types/Size";
@@ -27,6 +28,7 @@ export class GunsmithDsl {
   readonly opponent: OpponentDsl;
   readonly match: MatchDsl;
   readonly round: RoundDsl;
+  readonly vision: VisionDsl;
 
   constructor(page: Page) {
     this.gunsmith = new GunsmithPlaywright(page);
@@ -40,6 +42,7 @@ export class GunsmithDsl {
     this.opponent = new OpponentDsl(page);
     this.match = new MatchDsl(page);
     this.round = new RoundDsl(page);
+    this.vision = new VisionDsl(page);
   }
 
   /** Opens the game and waits until the arena is on screen. */

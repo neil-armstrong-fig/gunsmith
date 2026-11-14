@@ -1,11 +1,12 @@
 import {useFrame} from "@react-three/fiber";
 import {PLAYER_RADIUS} from "@gunsmith/engine/player/PlayerRadius";
+import {visibleToPlayer} from "@gunsmith/engine/vision/VisibleToPlayer";
 import {gameState} from "@src/store/game/selectors/game-state/GameState";
 import type {JSX} from "react";
 import {useRef} from "react";
 import type {Group} from "three";
 
-/** The opponent: a disc the size of the player's, in the other team's colour, with a barrel pointing the way it faces. Hidden when the match has none. */
+/** The opponent: a disc the size of the player's, in the other team's colour, with a barrel pointing the way it faces. Hidden when the match has none, and while the player does not see it. */
 export function Opponent(): JSX.Element {
   const opponentRef = useRef<Group>(null);
 
@@ -14,8 +15,9 @@ export function Opponent(): JSX.Element {
       return;
     }
 
-    const {opponent} = gameState();
-    opponentRef.current.visible = opponent !== undefined;
+    const world = gameState();
+    const {opponent} = world;
+    opponentRef.current.visible = opponent !== undefined && visibleToPlayer(world).opponent;
 
     if (!opponent) {
       return;
