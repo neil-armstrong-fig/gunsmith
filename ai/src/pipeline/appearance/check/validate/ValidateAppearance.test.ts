@@ -253,14 +253,18 @@ it("refuses more bytes than allowed, and says how many", () => {
   expect(errorsOf(appearance)).toEqual([expect.stringMatching(/^appearance: \d+ bytes, over the limit of 12288$/)]);
 });
 
-it("refuses a part that sticks out of the space, and names the part", () => {
+it("refuses a part that sticks out of the space, names the part and its kind, and says how far to pull it in", () => {
   const errors = errorsOf(withBodyPart(0, {x: 60, width: 10}));
 
-  expect(errors).toEqual(["body.0: reaches outside the 64 by 64 space (right edge 71)"]);
+  expect(errors).toEqual([
+    "body.0 (rect): reaches outside the 64 by 64 space (right edge 71); pull it in by 7 so its right edge, stroke included, is at most 64",
+  ]);
 });
 
 it("refuses a part whose stroke is what pushes it out", () => {
-  expect(errorsOf(withBodyPart(1, {x: 62, radius: 2}))).toEqual([expect.stringContaining("body.1: reaches outside")]);
+  expect(errorsOf(withBodyPart(1, {x: 62, radius: 2}))).toEqual([
+    expect.stringContaining("body.1 (circle): reaches outside"),
+  ]);
 });
 
 it("accepts a part whose stroke reaches the very edge of the space", () => {
@@ -272,10 +276,22 @@ it("accepts a part at the edge when the stroke that would push it out is not dra
 });
 
 it.each([
-  ["left", withBodyPart(1, {x: 2, radius: 6}), "body.1: reaches outside the 64 by 64 space (left edge -5)"],
-  ["top", withBodyPart(1, {y: 2, radius: 6}), "body.1: reaches outside the 64 by 64 space (top edge -5)"],
-  ["bottom", withBodyPart(1, {y: 60, radius: 6}), "body.1: reaches outside the 64 by 64 space (bottom edge 67)"],
-  ["left, when it crosses the top too", withBodyPart(1, {x: 2, y: 2, radius: 6}), "(left edge -5)"],
+  [
+    "left",
+    withBodyPart(1, {x: 2, radius: 6}),
+    "body.1 (circle): reaches outside the 64 by 64 space (left edge -5); pull it in by 5 so its left edge, stroke included, is at least 0",
+  ],
+  [
+    "top",
+    withBodyPart(1, {y: 2, radius: 6}),
+    "body.1 (circle): reaches outside the 64 by 64 space (top edge -5); pull it in by 5 so its top edge, stroke included, is at least 0",
+  ],
+  [
+    "bottom",
+    withBodyPart(1, {y: 60, radius: 6}),
+    "body.1 (circle): reaches outside the 64 by 64 space (bottom edge 67); pull it in by 3 so its bottom edge, stroke included, is at most 64",
+  ],
+  ["left, when it crosses the top too", withBodyPart(1, {x: 2, y: 2, radius: 6}), "(left edge -5); pull it in by 5"],
 ])("names the %s edge a part crosses", (_edge, candidate, expectedError) => {
   expect(errorsOf(candidate)).toEqual([expect.stringContaining(expectedError)]);
 });
@@ -298,14 +314,35 @@ it("refuses a projectile part that sticks out of the space, and names it", () =>
     ]),
   ];
 
-  expect(errorsOf(appearance)).toEqual(["projectile.0: reaches outside the 64 by 64 space (right edge 81)"]);
+  expect(errorsOf(appearance)).toEqual([
+    "projectile.0 (polygon): reaches outside the 64 by 64 space (right edge 81); pull it in by 17 so its right edge, stroke included, is at most 64",
+  ]);
+});
+
+it("names a long thin line by its kind, so the model knows it is the line to shorten", () => {
+  const tentacle = {
+    ...polygonOf([]),
+    kind: "polyline",
+    points: [
+      [10, 10],
+      [10, 90],
+    ],
+  };
+  const appearance = passingAppearance();
+  appearance.body = [tentacle];
+
+  expect(errorsOf(appearance)).toEqual([
+    expect.stringMatching(
+      /^body\.0 \(polyline\): reaches outside the 64 by 64 space \(bottom edge \d+(\.\d+)?\); pull it in by \d+(\.\d+)? so its bottom edge, stroke included, is at most 64$/,
+    ),
+  ]);
 });
 
 it("refuses a part that is turned out of the space, though unturned it fits", () => {
   const turned = withBodyPart(0, {x: 30, y: 40, width: 30, height: 4, rotation: 90});
   const unturned = withBodyPart(0, {x: 30, y: 40, width: 30, height: 4, rotation: 0});
 
-  expect(errorsOf(turned)).toEqual([expect.stringContaining("body.0: reaches outside")]);
+  expect(errorsOf(turned)).toEqual([expect.stringContaining("body.0 (rect): reaches outside")]);
   expect(errorsOf(unturned)).toEqual([]);
 });
 

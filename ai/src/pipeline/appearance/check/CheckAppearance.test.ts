@@ -60,5 +60,7 @@ it("refuses no answer at all", () => {
 it("holds a completed answer to the same limits: a part out of the space is refused", () => {
   const result = checkAppearance({body: [{kind: "rect", x: 60, y: 10, width: 20, height: 5}]});
 
-  expect(result.ok ? [] : result.errors).toEqual(["body.0: reaches outside the 64 by 64 space (right edge 81)"]);
+  expect(result.ok ? [] : result.errors).toEqual([
+    "body.0 (rect): reaches outside the 64 by 64 space (right edge 81); pull it in by 17 so its right edge, stroke included, is at most 64",
+  ]);
 });

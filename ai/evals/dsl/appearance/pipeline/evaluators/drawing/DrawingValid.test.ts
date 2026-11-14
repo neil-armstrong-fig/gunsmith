@@ -27,7 +27,8 @@ it("fails a drawing outside the canvas, saying where", () => {
   expect(drawingValid({outcome})).toEqual({
     key: "drawingValid",
     score: 0,
-    comment: "body.0: reaches outside the 64 by 64 space (right edge 81)",
+    comment:
+      "body.0 (rect): reaches outside the 64 by 64 space (right edge 81); pull it in by 17 so its right edge, stroke included, is at most 64",
   });
 });
 

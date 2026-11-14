@@ -11,7 +11,30 @@ waits on you. **O1 needs nothing from `build` and can start immediately.**
 **What the others need from you:** a decision on where the pipeline runs (it decides whether `api/` imports `ai/`), the
 kill-switch flag's shape, and a review of the contracts before they freeze (Milestone M2).
 
-## Resume here (context-clear checkpoint, 2026-11-14, after the kit probe, which is removed)
+## Resume here (context-clear checkpoint, 2026-11-14 night, after the jellyfish lantern)
+
+**State.** Main is merged into the worktree (fast-forward to `ceb5063`; `build`'s uncommitted `SolidTilesOf` refactor in main's tree is not in it). **Jellyfish lantern, done red
+first.** Baseline: 3 stand-ins in 9 trials, all `reaches outside the 64 by 64 space`, the repair moving tentacles 1 to 10 units. One change: `OutsideErrors` now writes
+`body.2 (polyline): reaches outside the 64 by 64 space (bottom edge 97); pull it in by 33 so its bottom edge, stroke included, is at most 64` (`EdgeOutside` returns an
+`EdgeCrossing` in `edge/types/`; tests moved to the new sentence first and fell for the wording; 15 of 15 mutants killed). **After: 0 stand-ins in 31 jellyfish trials, and 35 of 36
+valid first time over the whole set (the disco cactus repaired once, so "the first drawing needs no repair" still falls for it, pass^k). Not proven to be the sentence:** the first-draft prompt is unchanged and its
+overflow rate moved anyway; a repair-only A/B on a fixed bad draft gave 7 of 8 (old) against 8 of 8 (new). The generation-prompt line about long shapes was not added (no eval fails without it).
+Details and the way to prove it (replay real failing drafts; outcomes keep only the errors, not the draft) are in `docs/ai-visual-generation.md`, "The jellyfish lantern".
+`pnpm checks` exit 0 at the root (engine 630, `ai` 421, webapp 160); `evals:fake` shows exactly the 8 by-design failures; `evals:local` not re-run (nothing it covers changed).
+Spend **$0.458 of the $1** (the sheet `ai/evals/results/drawings-paid-latest.html` is regenerated, git-ignored). All **uncommitted for the user's review**; the user judges the sheet.
+
+**The user looked at the sheet (2026-11-14, night): "it all looks really good". The appearance drawing work is accepted; nothing more to climb on it.**
+
+**Next turn, in this order:**
+1. **Integrate appearance with `build`** (the user's earlier call: integrate first, tune from there). Needs two answers, so start by asking `build` (a line in `TODO.md` "Blockers and requests") and the user:
+   the **call budget** (about 1.1 calls per weapon: the same call as the stats or a second one; the weapon criterion allows three calls and appearance alone can use two) and **where the schema lives**
+   (`shared/` once the webapp renderer imports it; not before). Then: wire `generateAppearance` beside `generateWeapon` (test first, evals first), keep the disclosed stand-in visible to the player.
+2. **The stat balancer** (the user's design, `O2` below): needs where it lives (probably `engine/`, with `ai/` using a local draft), the budget, the preference encoding, the no-preference default. Probe the model's preferences first.
+3. Still waiting on the user and `build`: the shield behaviour, the omitted-stat policy, the real `StateGraph` and `AiAdapter` mapping.
+4. Optional, only if the user wants the overflow sentence proven rather than kept on trust: keep the failing first draft in the outcome, replay real failing drafts through the old and new sentence (about $0.05).
+Budget: **$0.458 of the $1 spent**; ask before raising the ceiling. Everything is uncommitted for the user's review (never commit `ai` code).
+
+## Earlier checkpoint (2026-11-14, after the kit probe, which is removed)
 
 **State.** Main is merged into the worktree (a fast-forward to `f456130`). **The kit-of-parts probe on `art`'s kit 05 was built, measured and then removed
 at the user's request** ("no point keeping around bloat"); nothing of it is left in the tree except its note, `docs/ai-visual-generation.md` ("The kit arm
@@ -22,7 +45,7 @@ stand-ins of 33, shapes arm 32 / 2 / 2 of 36; 21 of 21 first refusals were overf
 `evals:fake` shows exactly the 8 by-design failures. All of it is **uncommitted for the user's review** (never commit `ai` code; the user has staged some of the doc
 edits in VS Code, so touch only the working files and never the index).
 
-**Next turn, in this order:**
+**Was next (item 1 is done, see the checkpoint above):**
 1. **Jellyfish lantern, red first** (the user's last open appearance item). Baseline = today's Haiku run, shapes arm, 3 trials: jellyfish **valid, stand-in, stand-in**
    (the disco cactus is repaired, valid, repaired; the other ten requests 3 of 3 valid): `ai/evals/results/drawings-paid-latest.html` (git-ignored; regenerate with
    `EVAL_TIER=paid EVAL_TRIALS=3 EVAL_KEEP_DRAWINGS=1 npx vitest run --config vitest.evals.config.ts evals/tests/appearance/DrawingAWeapon.eval.ts` from `ai/`).
