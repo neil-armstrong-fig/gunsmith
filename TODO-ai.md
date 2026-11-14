@@ -11,7 +11,42 @@ waits on you. **O1 needs nothing from `build` and can start immediately.**
 **What the others need from you:** a decision on where the pipeline runs (it decides whether `api/` imports `ai/`), the
 kill-switch flag's shape, and a review of the contracts before they freeze (Milestone M2).
 
-## Resume here (context-clear checkpoint, 2026-11-14, before the user commits the appearance work)
+## Resume here (context-clear checkpoint, 2026-11-14, after merging main and the weapon evals going paid)
+
+**State.** Main is merged into the worktree (`b276c64`, the one commit I made; conflicts only in `HANDOFF.md`, `TODO.md`, `TODO-art.md`,
+resolved keeping both sides, `TODO-art.md` taken from main). Root `pnpm checks` exits 0 after the merge (engine 516, `ai` 394, webapp 127);
+`evals:fake` shows exactly the 8 by-design failures; `evals:local` passes the weapon suites 70 of 70 and fails 13 appearance criteria on
+the local model (the known state). **Everything after the merge is UNCOMMITTED for the user's review** (never commit `ai` code).
+
+**Done this session: the weapon specs run on the paid tier** (`TODO-ai.md` "Next" #3 below, ticked). Test first, 25 new unit tests (`ai` 419),
+18 mutants of the new code all killed. `tier/paid/key/LoadAnthropicKey` (the key loader, shared with appearance), `tier/paid/PaidModel`,
+`weapon/models/PaidWeaponModels` (Haiku 5.5 for the generator and the moderator, both carrying the **one** `paidSpendGuard()`, `maxTokens` 2000),
+`weapon/paid/RunPaidWeapon` (checks room first, then **fails the run in words** when a paid call errored or an answer stopped at `max_tokens`,
+because the pipeline swallows both and they read as a bad weapon or a rejection; logs each request's calls to
+`evals/results/paid-weapon-calls-latest.jsonl`, git-ignored, appends). `SpendGuard` now also records each call (`takeCalls`: tokens, stop
+reason) and keeps a mid-request ceiling stop as a failure.
+**Results (Haiku 5.5, weapon suites): 70 of 70 in a 1-trial smoke run and again in the 3-trial baseline**; 101 calls, all `tool_use`, none
+cut off; $0.018 for the baseline; a created weapon costs about **$0.00036** measured (half the estimate; the draft weapon is only a name
+and six numbers), median 2.7 s (`docs/cost-and-budget.md`). **Spend: $0.322 of the $1 total ceiling.**
+**Prompt ablations on Haiku at 3 trials (`docs/ai-pipeline.md`).** First pass, all six survived 70 of 70, because nothing on Haiku
+depended on the repair (the attack specs accept `invalid` as readily as `created`). **The user agreed to a criterion (2026-11-14), added
+to the "maximum of everything" `when` in `evals/tests/weapon/TryingToBreakTheSmith.eval.ts`: a request for 100 damage and 20 a second
+still ends `created`, inside the cap** (`when.capability`: reported always, only warned about under `EVAL_GATE=regression`). Green on all
+three tiers. Re-run on Haiku: **repair skipped falls exactly that criterion** (the eval can fail); **dropping the `<previous>` block, the
+"change as little" sentence, or both still passes 71 of 71** (the local model needed them). One case, three trials: thin, and the
+balancer below will take over fixing stats, so nothing was dropped. Moderation's "say no" list and data-block paragraph, removed one at a
+time, change no verdict on the current cases (kept as defence in depth). Spend now **$0.322 of the $1**.
+
+**The user's balancing design is in O2 below** (the AI returns inferred stats plus a stat preference, code balances; four evals listed,
+none satisfiable by maxing every stat; a line for `build` is in the `TODO.md` blockers). Its open questions (where it lives, the budget,
+how a preference is encoded, the no-preference default) are the user's and `build`'s.
+
+**Waiting on the user:** what to do next: **the kit-of-parts selection probe** (art is waiting, kit 05 is approved), the jellyfish lantern,
+the balancer (needs the open questions settled; probe the model's preferences first), or integrating appearance with `build`.
+**Next, in order:** the kit probe; the jellyfish lantern; integrate appearance with `build`; the real `StateGraph` and `AiAdapter` mapping; the
+shield behaviour `build` owes; the omitted-stat policy (the user's). The older list below still applies after its item 3.
+
+## Earlier checkpoint (2026-11-14, before the merge and the paid weapon tier)
 
 **State.** Everything below is in the worktree `.claude/worktrees/ai-hosting-proof`, **uncommitted for the user's review** (the user
 commits `ai/`; never commit it). `pnpm --filter @gunsmith/ai checks` exit 0: **394 unit tests in 59 files**. Run `git merge main` in
@@ -49,7 +84,7 @@ Mutation scripts are in the old session's scratchpad (gone); rebuild per `AGENTS
    the webapp renderer imports it). Do not move it before then.
 2. **Jellyfish lantern, red first:** long thin shapes (tentacles) run off the canvas and the repair only half fixes them. A prompt line
    or a case in `evals/tests/appearance/DrawingAWeapon.eval.ts`; the last Haiku run is the baseline.
-3. **Weapon on the paid tier** (`weapon/models/CreateEvalModels.ts` still throws) and a small Haiku weapon run, within the $1.
+3. ~~**Weapon on the paid tier** and a small Haiku weapon run, within the $1.~~ **Done 2026-11-14** (see the checkpoint above).
 4. **`art`'s kit of parts** (their `TODO-art.md` A2 item): once it exists, probe whether a model can pick parts and parameters from it.
 5. Still open from before: the real `StateGraph` and `AiAdapter` mapping; the shield behaviour `build` owes; the omitted-stat policy (the user's).
 6. Smaller: consider a 3-trial Haiku baseline before any prompt change. (The fake tier's 8 rejection failures stay: the user's call.)
@@ -355,6 +390,30 @@ tiers behind one `weaponPipelineDependencies` argument: fake (in `pnpm checks`),
 
 ## O2: the pipeline (a deterministic LangGraph `StateGraph`, not a free agent). Milestones M3 to M5
 
+- [ ] **Stat balancing: the AI infers, the code balances (the user's design, 2026-11-14).** "Max everything" is not a solution, and
+      asking the model to behave (or refusing and repairing) is the wrong tool. Instead the model returns **two things**: the **stat
+      values it infers** from the prompt, and the player's **stat preference** (which stats they want high, which they would give up).
+      Then **code balances the JSON after it is produced**: if one stat is high, it must cost the others, so a weapon cannot be strong
+      everywhere and a preference decides *where* the budget goes. Deterministic code, never the model ("the AI proposes, the engine
+      disposes"). This **replaces "refuse, never clamp"** for stats: today `rate` refuses a weapon over one damage-per-second cap (150) and
+      the repair tries again; with a balancer the over-the-limit request becomes a balanced weapon instead of an `invalid` one. Hard
+      caps stay as the last check, and the repair stays for schema faults (it just stops being the stat fixer).
+      **Open, to settle with the user and `build` before building:** (1) where the balancer lives. `build` owns the power rating and caps
+      in `engine/` (`HANDOFF.md` contracts), and a balancer is that rating run backwards, so it probably belongs there, with `ai/` using a
+      local draft until it lands; (2) the budget: what the "total" is (the engine's power rating, not a sum of raw stats) and how a
+      trade-off is priced between stats; (3) how a preference is written (an ordered list, weights, or high / low per stat) so the model
+      can produce it reliably and zod can parse it; (4) a prompt with no preference: this is the user's still-open **omitted-stat policy**,
+      and the balancer needs a default to fall back on. Probe the model's preferences first (can it say what the player wants, from "a
+      shotgun that hits hard but fires slowly"?) before choosing the encoding.
+      **Evals to add, probe first, each a `when.capability` and red first** (none can be satisfied by maxing every stat): (a) *maximum
+      of everything*: "100 damage and 20 a second" ends `created`, inside the budget, with **at least one stat clearly below its limit**;
+      the criterion added 2026-11-14 ("created, inside the cap") is its first half. (b) *a trade-off follows the preference*: "a
+      shotgun that hits hard but fires slowly" has damage above the default rifle's **and** rate below it; "the fastest, weakest pistol"
+      is near both ends. (c) *the preference decides where the budget goes*: the same request with a stat promoted ends with that stat
+      higher and another lower, the total unchanged. (d) *the model's two outputs are each valid on their own*: values in range,
+      preference parseable. **Code-level tests, not evals** (property tests, in the same package as the balancer): for any inferred
+      stats and any preference the balanced weapon is inside every cap and the budget, the same input gives the same output, and
+      promoting a stat never lowers it.
 - [ ] Nodes: `tokenPrecheck` → `moderationJudge` (cheap model) → `generate` (structured output) → `validate` (zod) →
       `repair` (one attempt) → `rate` (the engine's power rating and caps) → `commit`. See `docs/ai-pipeline.md`.
 - [ ] Weapon and arena generators against the shared schemas (`withStructuredOutput` or `responseFormat`); model output is

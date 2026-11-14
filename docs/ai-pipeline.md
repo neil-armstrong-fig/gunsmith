@@ -50,6 +50,32 @@ generation.
   before the repair. A shield has no damage in this weapon shape, so a bare shield needs the repair to invent some; a real shield
   behaviour is still owed by `build` (`HANDOFF.md`).
 
+### What the weapon evals showed on Haiku 5.5 (measured 2026-11-14)
+
+The weapon specs run on the paid tier now. **All 70 criteria pass, in all 3 trials** (101 calls, every one `tool_use`, none cut
+off; about $0.018; costs in `docs/cost-and-budget.md`). The shield cases, which on the local model passed only through the repair,
+pass first time. What the run taught:
+
+- **A paid result can lie unless the harness refuses to let it.** The pipeline swallows a failed model call and moderation fails
+  closed, so an API error, or a tool call cut off at `maxTokens`, reads as "the model wrote a bad weapon" or "rejected the
+  request". The paid runner fails the run in words for either, and the spend guard records the ceiling stopping a call mid-request
+  as a failure too. A paid model's token cap must be far above need (2,000 here, a reply is about 140 tokens), unlike the local
+  one's 400 and 100, which only kept Ollama fast.
+- **At first nothing on Haiku steered the repair, and one criterion fixed that.** Four eval mutants at 3 trials (repair skipped,
+  "change as little as you can" removed, the `<previous>` block removed, both removed) all survived 70 of 70, because the attack specs
+  accept `invalid` as well as `created` ("refusing is as good as creating"). The repair does run (5 of 57 model requests, the "100
+  damage, 20 a second" request 3 of 3). With the user's agreement a criterion was added to that `when`: **the request still ends
+  `created`, inside the cap.** Re-run: **skipping the repair now falls exactly that criterion** (so the Haiku eval can fail), and
+  **removing the `<previous>` block, the "change as little" sentence, or both still passes 71 of 71.** So on Haiku, for the one case
+  that needs a repair, the model fixes its own overshoot from the problem list alone; the local model needed them (each alone
+  enough, both removed fell). One case and three trials is thin, and the user's stat balancer (`TODO-ai.md` O2) will take over
+  fixing stats, leaving the repair for schema faults, so **nothing was dropped**: revisit the `<previous>` block (it echoes model
+  output, a small injection surface) when the repair's job is settled.
+- **Moderation does not need its two defence paragraphs on Haiku, for the current cases.** Removing the "say no" list, and
+  removing the data-block paragraph (the weapon-words sentence kept), each leave 70 of 70. These mutants *can* fall (a fail-open
+  moderator sinks four `when`s), so the cases genuinely do not exercise them. They stay as defence in depth until a case does:
+  the injection probes so far are the 46 local ones, and none was aimed at Haiku.
+
 ### The arena judge
 
 A separate small graph: given two arena prompts, choose the more interesting one. Both are validated first. They are placed in a

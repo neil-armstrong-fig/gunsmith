@@ -132,9 +132,15 @@ model calls". The mapping adds both under every `when`, after the test's own cri
   both make evals fall. A case joins only from a probe that fails; probe with a throwaway `*.eval.ts` in `evals/` itself (a layer folder bans vitest) that writes to a file
   (`console.log` is swallowed), and remember a probe run never "fails", so read its WRONG lines, not the exit code.
 - **Three tiers behind one `weaponPipelineDependencies` argument:** `fake` (checks, free), `local` (Ollama `qwen3.5:9b`, free, the working loop),
-  `paid` (Haiku 5.5, **appearance spec only so far**: the key comes from `ANTHROPIC_API_KEY` or the git-ignored `ai/.env.local`, never printed; a ledger in
-  `evals/results/paid-spend-latest.json` adds up the cost of every paid run from the tokens reported and stops at the **$1 total ceiling**; ask before raising it;
-  Haiku 5.5 refuses `temperature`; the weapon specs still throw on the paid tier).
+  `paid` (Haiku 5.5, weapon and appearance specs: the key comes from `ANTHROPIC_API_KEY` or the git-ignored `ai/.env.local`, never printed, loaded by
+  `tier/paid/key/LoadAnthropicKey`; a ledger in `evals/results/paid-spend-latest.json` adds up the cost of every paid run from the tokens reported and stops at
+  the **$1 total ceiling**; ask before raising it; Haiku 5.5 refuses `temperature`). **Every paid model carries the one `paidSpendGuard()`** (never a second:
+  it is what adds into the one ledger and remembers the failures of either model). The weapon's two paid models are `weapon/models/PaidWeaponModels`, with a
+  token cap far above need (2000), because a tool call cut off by `maxTokens` fails to parse and moderation then fails closed, which a report would read as a
+  model that over-rejects. **A paid weapon request goes through `weapon/paid/RunPaidWeapon`**, which checks there is room first, then **fails the run in words**
+  when a paid call errored or an answer stopped at `max_tokens`, because the pipeline swallows both and they read as "a bad weapon" or "rejected", and which
+  logs each request's calls (tokens, stop reason, latency) to `evals/results/paid-weapon-calls-latest.jsonl` (git-ignored; it appends, so move it aside to
+  start a baseline). Paid weapon runs are 1 trial unless `EVAL_TRIALS=3`; a 1-trial run is a smoke test, because Haiku has no `temperature` to pin.
   **Scores do not transfer between tiers.**
 - **Tracking is off by default** (`LANGSMITH_TEST_TRACKING=false`): eval traces share the free plan's 5,000 a month with
   production. Set `EVAL_TRACK=1` for a deliberate baseline run only.
@@ -153,7 +159,7 @@ model calls". The mapping adds both under every `when`, after the test's own cri
 
 ## Commands
 
-`pnpm --filter @gunsmith/ai checks` (the gate; 394 unit tests), `... evals:fake`, `... evals:local`, `... evals:paid`, `... dev` (Agent Server and Studio).
+`pnpm --filter @gunsmith/ai checks` (the gate; 419 unit tests), `... evals:fake`, `... evals:local`, `... evals:paid`, `... dev` (Agent Server and Studio).
 Environment for the evals: `EVAL_TIER` (`fake`, `local`, `paid`), `EVAL_TRIALS` (runs per case; default 3 local for weapons, 1 for drawings, 1 otherwise),
 `EVAL_KEEP_DRAWINGS=1` (keeps every drawing of the run in `evals/results/drawings-<tier>-latest.json` and a page to look at, `.html`),
 `EVAL_GATE=regression` (only `regression` cases fail the run; what CI will use), `EVAL_TRACK=1` (sync to LangSmith).
