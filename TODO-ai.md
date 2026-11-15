@@ -11,7 +11,39 @@ waits on you. **O1 needs nothing from `build` and can start immediately.**
 **What the others need from you:** a decision on where the pipeline runs (it decides whether `api/` imports `ai/`), the
 kill-switch flag's shape, and a review of the contracts before they freeze (Milestone M2).
 
-## Resume here (context-clear checkpoint, 2026-11-15, after the stat balancer)
+## Resume here (2026-11-15, after the appearance integration)
+
+**State.** Main is merged into the worktree (`2429895`, the one commit I made; conflicts only in `HANDOFF.md`, `TODO.md`, `TODO-ai.md`, both sides kept). **Appearance is wired
+into `generateWeapon` as a second stage**, uncommitted for the user's review (never commit `ai` code). Root `pnpm checks` exit 0 (engine 772, `ai` 485, webapp 191).
+`evals:fake` shows exactly the 8 by-design failures; `evals:local` **81 of 81** (the weapon specs draw with a canned valid drawing on fake and local, an interim policy); **Haiku, 3 trials,
+80 of 81**, the one red being the open "big magazine" finding below. 25 mutants, 24 killed (the survivor, a drawing that changes a stat, is invisible to an eval and killed by its unit test);
+the five-call ceiling and the stage-tagged call log were proved separately. Spend **$0.623 of the $1** (this run about $0.053); ask before raising it.
+
+**Measured (Haiku 5.5, 48 created and drawn weapons): $0.00105 each, $1.05 per 1,000, against the $1.06 estimate; median 5.9 s end to end; 3 calls for 45, 4 for 3, never 5.** The drawing is
+$0.00061 of it and roughly triples the cost of a weapon. Detail in `docs/cost-and-budget.md`; design in `docs/ai-pipeline.md` ("Weapon visuals") and `docs/ai-visual-generation.md` ("Integration").
+
+- [x] Criteria first (unit tests in `GenerateWeapon.test.ts`, evaluators, the "created and drawn" `when`), watched failing for the right reason.
+- [x] `generateAppearance` wired in after stats pass: `weapon-drawing/DrawCreatedWeapon`, a separate `appearanceGenerator`, one repair per stage, five calls at most, disclosed stand-in, no drawing on rejected or invalid.
+- [x] Mutation-proved; `pnpm checks`, `evals:fake`, `evals:local` run; standards and folder review done (new helpers sit beneath their one caller, types in `types/`).
+- [x] One paid run at 3 trials, approved by the user; combined cost and latency reported above.
+- [x] Docs, checklist, AI row, delivery log.
+
+**Open, for the user.**
+1. **The cheaper-model benchmark: the user approved the shortlist and plan (2026-11-15), see below; waiting only on the user's Cloudflare token.** Shortlist, prices, the finding that Haiku is already cheap, and why Cloudflare: `docs/cost-and-budget.md` ("Cheaper models for the drawing, stats and moderation"). Until it lands fake and local stub the drawing.
+2. The per-stat overshoot finding below (a magazine of 100 against a range of 60), still in a `given.inProgress`.
+3. `build`: renderer and schema home when the webapp imports the appearance (nothing moves to `shared/` before); `HANDOFF.md` has no contract change from this (the outcome shape is local to `ai/`).
+
+**The benchmark plan (approved by the user 2026-11-15; not started).** One Cloudflare API token limited to Workers AI covers every model (the OpenAI-compatible endpoint); no other new key (the Anthropic key stays; Groq is dropped from round one). **Approved: the dependency** (an OpenAI-compatible client, probably `@langchain/openai` pointed at the Cloudflare endpoint, exact-pinned in the catalog; mind the 7-day release-age policy; if tool calls do not work through it, try `@langchain/cloudflare`); **the Workers Free allowance (10,000 neurons a day, calls fail beyond it) replaces a $2 ledger as the cap** (if the user ever moves to Workers Paid, put a ledger back); nothing paid, nothing raised. Steps, test first, all mutation-proved as usual:
+1. A per-role model setting in the eval mapping (stats, moderation, drawing each chosen separately on any tier), then a `cloudflare` tier that builds the models from the token (the key loader never prints it; the user supplies the token, I never read it).
+2. A one-call smoke test per shortlisted model: tool calling (`withStructuredOutput(..., {method: "functionCalling"})`) and a valid drawing-shaped answer; drop any model that cannot, and say so.
+3. **Drawing first** (it is the cost): `DrawingAWeapon` per surviving model at 3 trials with `EVAL_KEEP_DRAWINGS=1`; report valid first time, repaired, stand-ins, tokens, neurons used and cost per drawing against Haiku's $0.00061 (reasoning models can spend hidden output tokens: measure). The user judges each contact sheet.
+4. Then stats and moderation: the weapon specs per model, with the drawing stubbed.
+5. Write the findings in `docs/cost-and-budget.md` and `docs/ai-visual-generation.md`; if a small model is good enough, propose it as the default per role (the user decides) and what it does to the $1.05 per 1,000 weapons.
+Shortlist (details and prices in the doc): **drawing** Gemma 4 26B-A4B, GLM-4.7 Flash, Qwen3 30B-A3B, with `gpt-oss-120b` as the quality reference and Haiku as the baseline; **stats and moderation** Qwen3 30B-A3B, Gemma 4 26B-A4B, `gpt-oss-20b`, plus Granite 4.0 H Micro for moderation only.
+
+**Next, in order:** (a) the benchmark plan above, once the user has made the Cloudflare token; (b) the per-stat overshoot decision; (c) still waiting on the user and `build`: the shield behaviour, the omitted-stat policy, the real `StateGraph` and `AiAdapter` mapping (the outcome now carries `appearance`, which the adapter must pass through).
+
+## Earlier checkpoint (2026-11-15, after the stat balancer)
 
 **State.** Main is merged into the worktree (fast-forward to `11f7f45`, before anything else). **The stat balancer is built and wired in**, all
 **uncommitted for the user's review** (never commit `ai` code; the new `engine/` files are in the same state). Root `pnpm checks` exit 0 (engine 756,
@@ -41,8 +73,7 @@ tune `power-rating/` and `weapon-balance/` (budget, shares, weights); a sacrific
 fast a weapon can be whoever is favoured.
 
 **Next, in order:**
-1. **Integrate appearance** (the user's call: a **second model call**, the schema stays in `ai/` until the webapp renderer imports it): wire `generateAppearance` beside `generateWeapon`, test first, eval first,
-   keep the disclosed stand-in visible, the weapon criterion's 3-call budget becomes 5.
+1. ~~**Integrate appearance**~~ **Done 2026-11-15** (see the checkpoint above).
 2. The per-stat overshoot question above, if the user wants it.
 3. Still waiting on the user and `build`: the shield behaviour, the omitted-stat policy, the real `StateGraph` and `AiAdapter` mapping.
 

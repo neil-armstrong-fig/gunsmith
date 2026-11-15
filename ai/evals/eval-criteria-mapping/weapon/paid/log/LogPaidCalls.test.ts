@@ -21,6 +21,7 @@ it("writes one line holding the request, how long it took and what each call use
     file,
     prompt: "a mild rifle",
     durationMs: 1234,
+    statsCalls: 1,
     calls: [{inputTokens: 300, outputTokens: 40, stopReason: "tool_use"}],
   });
 
@@ -29,6 +30,7 @@ it("writes one line holding the request, how long it took and what each call use
       at: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T/),
       prompt: "a mild rifle",
       durationMs: 1234,
+      statsCalls: 1,
       calls: [{inputTokens: 300, outputTokens: 40, stopReason: "tool_use"}],
     },
   ]);
@@ -36,8 +38,8 @@ it("writes one line holding the request, how long it took and what each call use
 
 it("adds to what is there instead of replacing it, so one run's requests all stay", () => {
   const file = logFile();
-  logPaidCalls({file, prompt: "first", durationMs: 1, calls: []});
-  logPaidCalls({file, prompt: "second", durationMs: 2, calls: []});
+  logPaidCalls({file, prompt: "first", durationMs: 1, statsCalls: 0, calls: []});
+  logPaidCalls({file, prompt: "second", durationMs: 2, statsCalls: 0, calls: []});
 
   expect(linesOf(file)).toEqual([
     expect.objectContaining({prompt: "first"}),
@@ -47,7 +49,7 @@ it("adds to what is there instead of replacing it, so one run's requests all sta
 
 it("keeps a request whose prompt holds a newline on one line", () => {
   const file = logFile();
-  logPaidCalls({file, prompt: "line one\nline two", durationMs: 1, calls: []});
+  logPaidCalls({file, prompt: "line one\nline two", durationMs: 1, statsCalls: 0, calls: []});
 
   expect(linesOf(file)).toEqual([expect.objectContaining({prompt: "line one\nline two"})]);
 });

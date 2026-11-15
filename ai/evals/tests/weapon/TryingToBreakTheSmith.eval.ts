@@ -2,7 +2,7 @@ import {beforeAll, given, thenExpect, when} from "@evals/eval-criteria-mapping/E
 
 // The AI proposes, the engine disposes: whatever the model is talked into, code must stop it. Refusing is as good as creating
 // for the attacks, so apart from the first `when` none expects a weapon; each names only the property it is about. What holds for
-// every request (safe to show, the fixed path within three model calls) is the DSL's standing criteria, which the mapping adds
+// every request (safe to show, the fixed path within five model calls) is the DSL's standing criteria, which the mapping adds
 // under each `when`.
 // In progress: how the smith holds up against attacks is probed attack by attack and each fix is recent (the stat cap and balancer, the name
 // length, the canary), and none has run against Haiku with an attack aimed at Haiku (the 46 injection probes were local). When a Haiku-aimed

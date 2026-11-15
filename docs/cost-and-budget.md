@@ -123,6 +123,66 @@ final figure to be higher than this and re-measure then. At $0.00036 the $1 dail
 for weapons the monthly cap, not the daily one, is the limit; arenas are not measured yet. The eval spend so far is $0.32 of
 the $1 total ceiling.
 
+## Measured with the drawing wired in (2026-11-15, Haiku 5.5, the weapon specs at 3 trials)
+
+`generateWeapon` now draws every created weapon with a second model call (the user's call budget: five calls at most, three when
+nothing needs repairing). One paid run of the five weapon spec files: 72 requests, 165 calls, every one ended `tool_use`, none cut
+off; 48 requests reached a drawing and 24 were turned away (a rejection draws nothing). Cost is computed from the reported tokens
+at the prices above; the ledger moved $0.570 to $0.623 (about $0.053 for the run).
+
+| Per created and drawn weapon (48) | Measured |
+| - | - |
+| Stats stage (moderation, generation, any repair) | $0.00044 (a little above the stats-only $0.00036: 3 of the 48 repaired) |
+| Drawing stage (the calls after the stats stage's) | $0.00061, 2,596 tokens in, 693 out |
+| **Both together** | **$0.00105, or $1.05 per 1,000 weapons** (estimate from separate runs: $1.06) |
+| Calls | 3 for 45 of 48, 4 for 3; never 5 |
+| End to end, wall clock | median 5.9 s, mean 6.0 s, max 8.3 s (stats alone: median 2.7 s) |
+
+So the drawing roughly **triples the cost of a created weapon** ($0.00036 to about $0.00105) and more than doubles the wait, as
+estimated; $1 buys about 950 drawn weapons rather than 2,800 stats-only ones. Not measured here: arenas, the `sound` block, and a
+deliberately hard drawing set (this run's requests are the weapon specs', not the twelve drawing requests). The 3-of-48 four-call
+weapons are one repair, of the stats or of the drawing (the log does not say which); the per-call log (`paid-weapon-calls-latest.jsonl`) tags the stage with `statsCalls`.
+Nothing was raised: the ceiling is still the $1 total, $0.623 spent.
+
+## Cheaper models for the drawing, stats and moderation: the shortlist (researched 2026-11-15, approved by the user)
+
+**Why.** The user asked whether cheap hosted open models (Qwen, GLM, DeepSeek, Kimi, gpt-oss) could replace Haiku, and noted that stats, moderation and the
+drawing can each use a different model (they already can: `generator`, `moderator` and `appearanceGenerator` in `weaponPipelineDependencies`).
+
+**The finding that shapes the benchmark.** Haiku 5.5 is $0.10 in and $0.50 out per million tokens, so a drawing (about 2,600 in, 700 out) is $0.00061 measured.
+The big open models cost **more**: by estimate Kimi K2.5 about $0.0037, DeepSeek V4.1 Flash about $0.0016, GLM-5.3 Flash about $0.00074. Only the small ones
+undercut Haiku, so the best case is a weapon falling from about $0.00105 to roughly $0.0006 to $0.0007 ($1 buys about 1,600 weapons, up from 950). This is a test of whether a small model is
+**good enough**, not of whether Chinese models are cheap. Stats and moderation are $0.00044 of the weapon, so their saving is at most about $0.0002 to $0.0004: drawing first.
+
+**Where.** Cloudflare Workers AI (the platform the game deploys to; prompts stay with a US company; no new provider). One API token limited to Workers AI covers every model below,
+through the [OpenAI-compatible endpoint](https://developers.cloudflare.com/workers-ai/configuration/open-ai-compatibility/)
+(`https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/v1`, the token as the API key). Its docs do **not** say which models support tool calls or `json_schema`
+(only one old model is named), so each model gets a one-call smoke test first. **The Workers Free plan includes 10,000 neurons a day (about $0.11) and fails calls beyond it**, so
+it cannot overspend; the models below are not among those that need a paid billing method (DeepSeek V4, GLM-5.x, Kimi K2.6 and K2.7 do). A full drawing spec at 3 trials is 36 drawings, so
+the benchmark should fit in the free allowance over a few days. Prices from Cloudflare's [pricing table](https://developers.cloudflare.com/workers-ai/platform/pricing/).
+
+| Role | Model (`@cf/...`) | In / out per M | Est. per drawing | Why |
+| ---- | ----------------- | -------------- | ---------------- | --- |
+| Drawing | Haiku 5.5 (baseline) | $0.10 / $0.50 | $0.00061 measured | what we have |
+| Drawing | `google/gemma-4-26b-a4b-it` | $0.10 / $0.30 | about $0.00047 | newest small model, reported to support `json_schema` |
+| Drawing | `zai-org/glm-4.7-flash` | $0.06 / $0.40 | about $0.00044 | the small GLM, MIT licence reported |
+| Drawing | `qwen/qwen3-30b-a3b-fp8` | $0.051 / $0.335 | about $0.00037 | cheapest credible; older, so the biggest quality risk |
+| Drawing | `openai/gpt-oss-120b` | $0.35 / $0.75 | about $0.0014 | the quality reference: if a bigger open model cannot draw, the small ones will not |
+| Stats and moderation | `qwen/qwen3-30b-a3b-fp8` | $0.051 / $0.335 | | close to our local Qwen, which passes the weapon specs 81 of 81 |
+| Stats and moderation | `google/gemma-4-26b-a4b-it` | $0.10 / $0.30 | | second opinion |
+| Stats and moderation | `openai/gpt-oss-20b` | $0.20 / $0.30 | | reported to support `json_schema` |
+| Moderation only | `ibm-granite/granite-4.0-h-micro` | $0.017 / $0.112 | | tiny; may not do tool calls |
+
+Reasoning models (`gpt-oss`) can spend many hidden output tokens, which would raise these estimates: measure, do not trust the table.
+**Not shortlisted:** Kimi, DeepSeek V4 and GLM-5.x (1.2 to 6 times Haiku's drawing cost by estimate, and they need paid billing), and Groq for round one
+(its free tier is 30 requests a minute, 8,000 tokens a minute and 200,000 tokens a day per model, 1,000 requests a day, serving `gpt-oss-20b`, `gpt-oss-120b` and a preview `qwen3.8-27b` at
+$0.075/$0.30, $0.15/$0.60 and $0.80/$4.00 after it; the `gpt-oss` models are already on Cloudflare, and the free numbers conflict between sources, so check the console). Groq is a
+reasonable later addition as a free, fast iteration tier, with its own free key and a throttle for its 429s. AI Gateway Unified Billing could route Anthropic and Groq through the
+Cloudflare token (prepaid credits, a card, a 5% fee on purchases) but is not worth setting up for this.
+
+**Public benchmarks are no guide here** (researched the same day): no independent leaderboard reports schema compliance, tool calling and cost together for open-weight models; the SVG
+benchmarks (SVGenius, VectorGym, VGBench) use old models and none enforce our strict geometry (the common failure here is a shape past the 64 by 64 canvas). Our own specs decide.
+
 ## What eval-driven development costs on Haiku alone (estimate, 2026-11-12)
 
 Haiku 5.5 at $0.10 in and $0.50 out per million tokens (the pricing page, fetched 2026-11-12), the token assumptions above

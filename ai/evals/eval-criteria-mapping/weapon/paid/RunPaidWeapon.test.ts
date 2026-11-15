@@ -61,6 +61,7 @@ it("returns what the pipeline returned, and logs the request with every call it 
       at: expect.any(String),
       prompt: "a mild rifle",
       durationMs: expect.any(Number),
+      statsCalls: 2,
       calls: [
         {inputTokens: 300, outputTokens: 5, stopReason: "tool_use"},
         {inputTokens: 500, outputTokens: 60, stopReason: "tool_use"},

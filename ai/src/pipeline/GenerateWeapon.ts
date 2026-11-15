@@ -8,15 +8,18 @@ import {repairWeaponDraft} from "@gunsmith/ai/pipeline/weapon-drafting/repair/Re
 import type {GenerateWeaponInput} from "@gunsmith/ai/pipeline/types/GenerateWeaponInput";
 import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
 import type {WeaponPipelineDependencies} from "@gunsmith/ai/pipeline/types/WeaponPipelineDependencies";
+import {drawCreatedWeapon} from "@gunsmith/ai/pipeline/weapon-drawing/DrawCreatedWeapon";
 
 /** What a player is told when a request was a weapon request but no valid weapon came out of it, even after the one repair. */
 const INVALID_WEAPON_REASON = "We could not build a valid weapon from that request. Try describing it differently.";
 
 /**
  * Turns a player's words into a weapon, or a rejection, or (when no valid weapon can be made) an invalid. Built node by node,
- * driven by the evals (`evals/weapons`): the token pre-check, the moderation judge, generation, then code's two checks
- * (`validate`, `rate`), and at most one repair that puts the faults back to the model before the same two checks run again.
- * Model calls: moderation, generation and at most one repair, so three at most.
+ * driven by the evals (`evals/weapons`): the token pre-check, the moderation judge, generation, then code's checks (`validate`,
+ * `balance`, `rate`), and at most one repair that puts the faults back to the model before the same checks run again. A weapon
+ * that passes is then drawn, by a second model with its own repair and its own disclosed stand-in; a rejected or invalid request
+ * draws nothing. Model calls: moderation, generation and at most one repair, then the drawing and at most one repair: five at
+ * most, three when nothing needs repairing.
  */
 export async function generateWeapon(
   input: GenerateWeaponInput,
@@ -35,12 +38,15 @@ export async function generateWeapon(
   const draft = await generateWeaponDraft(input.prompt, weaponPipelineDependencies.generator);
   const firstCheck = checkWeaponDraft(draft);
   if (firstCheck.ok) {
-    return {
-      status: "created",
-      weapon: firstCheck.weapon,
-      nodes: ["precheck", "moderation", "generate", ...firstCheck.nodes],
-      modelCalls: 2,
-    };
+    return drawCreatedWeapon(
+      {
+        prompt: input.prompt,
+        weapon: firstCheck.weapon,
+        nodes: ["precheck", "moderation", "generate", ...firstCheck.nodes],
+        modelCalls: 2,
+      },
+      weaponPipelineDependencies.appearanceGenerator,
+    );
   }
 
   const repaired = await repairWeaponDraft(
@@ -49,12 +55,15 @@ export async function generateWeapon(
   );
   const secondCheck = checkWeaponDraft(repaired);
   if (secondCheck.ok) {
-    return {
-      status: "created",
-      weapon: secondCheck.weapon,
-      nodes: nodesAfterRepair(firstCheck, secondCheck),
-      modelCalls: 3,
-    };
+    return drawCreatedWeapon(
+      {
+        prompt: input.prompt,
+        weapon: secondCheck.weapon,
+        nodes: nodesAfterRepair(firstCheck, secondCheck),
+        modelCalls: 3,
+      },
+      weaponPipelineDependencies.appearanceGenerator,
+    );
   }
 
   return {

@@ -3,7 +3,7 @@
 Owner: `ai`. Dated 2026-11-13. Requested by the user via `art`: evaluate JSON-based weapon appearance generation before the
 design freezes (complexity, reliability, safe code-owned defaults, repair and fallback, cost). **This is findings and
 questions, not a contract.** The original local probe and later Haiku results are preserved below; scores do not transfer
-between tiers. Appearance remains local to `ai/` and is not wired into `generateWeapon`.
+between tiers. Appearance remains local to `ai/`; **since 2026-11-15 `generateWeapon` runs it as a second stage** (see "Integration, 2026-11-15" below).
 
 ## AI session handoff (2026-11-15)
 
@@ -68,6 +68,17 @@ standards review. No model call is needed to deliver this documentation.
 paid run from main, reconcile and preserve the latest cumulative total; do not let a missing ledger restart accounting at
 zero or create independent allowances in two checkouts. The older $0.458 checkpoint below is historical. Do not read or
 print provider secrets, raise the ceiling, or run a paid probe merely to verify this handoff.
+
+## Integration, 2026-11-15 (done by the AI session)
+
+Done as the handoff recommends: `generateWeapon` runs `generateAppearance` after `validate`, `balance` and `rate`
+(`ai/src/pipeline/weapon-drawing/DrawCreatedWeapon.ts`), with its own `appearanceGenerator` model; `WeaponOutcome.appearance` is present
+on every `created` and no other outcome; the drawing's nodes follow the stats' own with an `appearance.` prefix; `modelCalls` adds both
+stages (five at most); the stand-in stays disclosed and the weapon untouched when a drawing cannot be made; the weapon criterion's three-call
+budget became five. The drawing prompts and strict geometry are unchanged. Proved test first (the `generateWeapon` tests, the path and drawing evaluator tests, a "created and drawn" criterion) and by 25 mutants of which 24 were killed (the survivor, a drawing that
+changes a stat, cannot be seen by an eval that has no second run to compare with; the unit test kills it). **Measured on Haiku 5.5: $0.00105
+and a median 5.9 s per created weapon, $1.05 per 1,000, against the $1.06 estimate** (`docs/cost-and-budget.md`). On the fake and local tiers
+the weapon specs draw with a canned valid drawing (interim, to keep the local run near 85 s); `DrawingAWeapon` still tests real local drawings.
 
 ## What was built (all in `ai/`, uncommitted until the user reviews it)
 

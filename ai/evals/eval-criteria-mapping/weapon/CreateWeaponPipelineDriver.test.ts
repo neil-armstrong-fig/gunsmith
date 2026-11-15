@@ -6,7 +6,24 @@ it("runs the real pipeline on the tier's models", async () => {
   const outcome = await driver.run("a mild rifle");
 
   expect(outcome.status).toBe("created");
-  expect(outcome.nodes).toEqual(["precheck", "moderation", "generate", "validate", "balance", "rate"]);
+  expect(outcome.nodes).toEqual([
+    "precheck",
+    "moderation",
+    "generate",
+    "validate",
+    "balance",
+    "rate",
+    "appearance.generate",
+    "appearance.fix",
+    "appearance.validate",
+  ]);
+});
+
+it("draws a created weapon with a canned drawing on the fake and local tiers, so no model is asked to draw", async () => {
+  const outcome = await createWeaponPipelineDriver("fake", undefined).run("a mild rifle");
+
+  expect(outcome.appearance?.status).toBe("valid");
+  expect(outcome.modelCalls).toBe(3);
 });
 
 it("rejects a prompt that is only whitespace without calling a model", async () => {

@@ -15,7 +15,8 @@ export async function runPaidWeapon(prompt: string, options: PaidWeaponRunOption
   const started = Date.now();
   const outcome = await options.pipeline(prompt);
   const calls = options.guard.takeCalls();
-  logPaidCalls({file: options.logFile, prompt, durationMs: Date.now() - started, calls});
+  const statsCalls = outcome.modelCalls - (outcome.appearance?.modelCalls ?? 0);
+  logPaidCalls({file: options.logFile, prompt, durationMs: Date.now() - started, statsCalls, calls});
 
   const failure = options.guard.takeFailure();
   if (failure !== undefined) {

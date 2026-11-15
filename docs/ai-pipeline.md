@@ -21,7 +21,9 @@ Built for weapons 2026-11-12 (`ai/src/pipeline/`): the path is `precheck`, `mode
 and when `validate` refuses (or `rate`, which after `balance` should never), `repair` then `validate`, `balance` and `rate` once
 more. **`balance` joined 2026-11-15** (the user's design, below): the model proposes the stats and the player's preference, code
 brings the weapon inside the limits. A weapon request ends `created`, `rejected` (not a weapon, too long) or `invalid` (a weapon
-request, but no valid weapon even after the repair). Three model calls at most.
+request, but no valid weapon even after the repair). **A created weapon is then drawn (2026-11-15)**, as a second stage with its own model,
+repair and disclosed stand-in (below), so a request costs **five model calls at most** (moderation, stats, stats repair, drawing,
+drawing repair; three when nothing needs repairing).
 
 | Node | Does | Model? | Cost control |
 | ---- | ---- | ------ | ------------ |
@@ -217,7 +219,7 @@ module 02.
   `expectSafeToShow`, …) is a thin `try` / `catch` wrapper that rethrows a `DslError` naming what was expected; beneath it, answers are
   kept and the deterministic evaluators are run in every trial. It reaches the pipeline only through a driver interface it owns,
   so its own tests use a scripted driver and no model. Lint stops an import running upwards. What holds whatever is asked
-  (safe to show; the fixed path within three model calls) is the DSL's standing criteria, which the mapping adds under every `when`.
+  (safe to show; the fixed path within five model calls, three before the drawing joined) is the DSL's standing criteria, which the mapping adds under every `when`.
   This replaced a table of 21 case rows scored by every evaluator in a loop, whose intent lived in comments and whose failures were
   JSON. A criterion now fails as one sentence (`withinCaps: failed in 3 of 3 trials: 2000 damage per second is over 150`). Details in
   `ai/AGENTS.md`.
@@ -259,12 +261,28 @@ module 02.
 - **Pitfalls to design against (from Focused):** a flaky judge, eval gaming (rotate examples), judge disagreement with
   humans, dataset drift.
 
-## Weapon visuals (very early, 2026-11-13)
+## Weapon visuals (very early, 2026-11-13; wired in 2026-11-15)
 
 A second domain, `ai/src/pipeline/appearance/`, has the model draw a weapon's appearance as strict JSON (generate, fix, validate, one repair,
-a disclosed stand-in). It is **not wired into `generateWeapon`**: its call budget is for `build` and the user to decide. On the
-local model first answers were never valid, so most requests ended as the stand-in. Measurements, failure classes, candidate
-defaults and open questions are in `docs/ai-visual-generation.md`.
+a disclosed stand-in). **Since 2026-11-15 `generateWeapon` runs it as a second stage** (the user's call budget: separate stats and drawing
+calls, five at most), after the stats have passed `validate`, `balance` and `rate`:
+
+```
+… ─► rate ─► appearance.generate ─► appearance.fix ─► appearance.validate ─► done
+                       └ refused ─► appearance.repair (once) ─► fix ─► validate ─► still refused: appearance.fallback (the stand-in)
+```
+
+- **Order and skipping.** A rejected or `invalid` request makes no drawing call. Drawing never runs before the weapon has passed
+  everything, so a weapon that could not be built costs no drawing.
+- **The outcome.** `WeaponOutcome.appearance` is the drawing's own `AppearanceOutcome` (`valid | completed | repaired | fallback`, what
+  code changed, what was refused), on every `created` outcome and on none other. The drawing's nodes follow the stats' own with an
+  `appearance.` prefix, and `modelCalls` adds both stages. A drawing that cannot be made leaves a `created` weapon with the
+  disclosed stand-in: the stats are never held hostage to the picture, and the picture never changes a stat.
+- **Its own model.** `appearanceGenerator` sits beside `generator` and `moderator` in `weaponPipelineDependencies`, because a drawing
+  needs far more output than the stats (about 3,000 tokens of cap against a hundred) and a temperature above zero locally.
+- **Where it lives.** `ai/src/pipeline/weapon-drawing/DrawCreatedWeapon.ts`; the schema stays in `ai/` until the webapp renderer imports it.
+
+Measurements, failure classes, candidate defaults and open questions are in `docs/ai-visual-generation.md`.
 
 ## Features that need LangSmith Plus
 

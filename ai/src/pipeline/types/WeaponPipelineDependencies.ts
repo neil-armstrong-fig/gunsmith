@@ -9,4 +9,6 @@ export interface WeaponPipelineDependencies {
   generator: BaseChatModel;
   /** The cheap model that judges whether a request is a weapon request at all. */
   moderator: BaseChatModel;
+  /** The model that draws a created weapon: its own settings, since a drawing needs far more output than the stats and a temperature above zero. */
+  appearanceGenerator: BaseChatModel;
 }

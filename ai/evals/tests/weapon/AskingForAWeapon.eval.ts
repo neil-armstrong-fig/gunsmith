@@ -45,6 +45,17 @@ given("a player asks for a weapon", () => {
   });
 });
 
+// A created weapon is drawn too, by a second model after the stats have passed (the user's call budget, 2026-11-15: five calls at most, three
+// when nothing needs repairing). What the drawing must satisfy for every request, valid and never a stand-in passed off as the model's own,
+// and that a request turned away draws nothing, is the standing "safe to show" criterion; this `when` names the intention once.
+given("a player asks for a weapon and sees it drawn", () => {
+  when("they ask for a cannon shaped like a rubber duck", ({weaponSmith}) => {
+    beforeAll(() => weaponSmith.ask("a cannon shaped like a rubber duck"));
+
+    thenExpect("a weapon is created and drawn", () => weaponSmith.expectCreatedAndDrawn());
+  });
+});
+
 // In progress: the stat balancer (built 2026-11-15, `engine/src/weapon-balance/`) is new and its first measured weakness is still open. On Haiku, "a big
 // magazine and plenty of spare ammo" gets a magazine of 80 to 100 and a reserve of 300 to 400, past the ranges, whatever the prompt's wording, so a repair
 // runs. Whether code should take a number past a range as data and bring it in is the user's call. The single-word request is moderation's, probed once.
