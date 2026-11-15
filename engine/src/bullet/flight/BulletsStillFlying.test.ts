@@ -10,6 +10,7 @@ function meeting(contact: Contact, changes: Partial<Bullet> = {}): Meeting {
     damage: 25,
     speed: 20,
     shooter: "player",
+    level: 0,
     ...changes,
   };
 

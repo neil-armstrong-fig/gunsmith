@@ -25,6 +25,7 @@ function bulletAt(x: number, y: number, directionX: number, directionY: number, 
     damage: DAMAGE,
     speed: SPEED,
     shooter: "player",
+    level: 0,
     ...changes,
   };
 }

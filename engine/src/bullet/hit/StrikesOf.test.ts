@@ -4,7 +4,14 @@ import type {Contact} from "@gunsmith/engine/bullet/types/Contact";
 import type {Meeting} from "@gunsmith/engine/bullet/types/Meeting";
 
 function meeting(contact: Contact, dummyIndex: number | undefined, damage = 25): Meeting {
-  const bullet: Bullet = {position: {x: 0, y: 0}, direction: {x: 1, y: 0}, damage, speed: 20, shooter: "player"};
+  const bullet: Bullet = {
+    position: {x: 0, y: 0},
+    direction: {x: 1, y: 0},
+    damage,
+    speed: 20,
+    shooter: "player",
+    level: 0,
+  };
 
   return {bullet, contact, dummyIndex};
 }

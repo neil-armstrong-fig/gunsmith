@@ -44,7 +44,9 @@ it("reports no bullets when none are in the air", () => {
 it("reports where each bullet in the air is", () => {
   const flying = {
     ...world,
-    bullets: [{position: {x: 1, y: 2}, direction: {x: 1, y: 0}, damage: 25, speed: 20, shooter: "player" as const}],
+    bullets: [
+      {position: {x: 1, y: 2}, direction: {x: 1, y: 0}, damage: 25, speed: 20, shooter: "player" as const, level: 0},
+    ],
   };
 
   expect(snapshotOf(flying).bullets).toEqual([{x: 1, y: 2}]);

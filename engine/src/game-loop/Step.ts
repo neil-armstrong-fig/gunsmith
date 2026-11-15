@@ -40,8 +40,8 @@ export function step(world: World, input: Input, seconds: number): World {
     seconds,
   });
 
-  const playerShot = shootFighter("player", playerTurn);
-  const opponentShot = opponentTurn && shootFighter("opponent", opponentTurn);
+  const playerShot = shootFighter(world.arena, "player", playerTurn);
+  const opponentShot = opponentTurn && shootFighter(world.arena, "opponent", opponentTurn);
   const bullets: Bullet[] = [...bulletFlight.bullets];
   for (const shot of [playerShot, opponentShot]) {
     if (shot?.bullet) {

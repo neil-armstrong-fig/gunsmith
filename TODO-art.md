@@ -8,6 +8,33 @@ The user authorised audio generators and their local tool config under `webapp/a
 and shared config remain build-owned. Arena style: slate, neon, geometric; blueprint touches suit the name. Weapon concepts now explore chunky, shaded
 cartoon sci-fi machinery at the user's request (Ratchet & Clank inspiration, adapted to overhead 2D). Desktop only.
 
+## Next: user-requested studies and assets (2026-11-15)
+
+- [ ] **Aim reticle:** design a readable reticle that replaces the mouse pointer
+      over the arena. Show it against all floor levels, fog and combat effects;
+      hand cursor artwork/hotspot and behaviour notes to build for integration.
+- [ ] **Taking damage and game juice:** distinguish taking damage from outgoing
+      hit confirmation, and study how to make combat feel responsive and satisfying.
+      Refer to janggi's docs, including [sound](../janggi/docs/sound.md) (judge in
+      context, not only in isolation) and [rules](../janggi/docs/rules.md) (motion
+      and reduced-motion presentation). Compare restrained visual/audio feedback
+      and motion treatments at game scale; document recommended effects and tradeoffs
+      for build. Feedback must preserve aim readability and hidden-opponent privacy.
+- [ ] **Empty-weapon click:** create and audition a short dry click when trying to
+      fire with an empty magazine. Preserve approved audio; agree its new manifest
+      key and trigger/repetition rules with build before production integration.
+- [ ] **Fair, symmetrical arenas:** study how generation can prevent a starting
+      high-ground advantage. Require symmetrical arena geometry, heights, cover
+      and stair access, with equivalent spawn opportunities; weapon placement
+      remains random. Compare legal routes to high ground, sightlines, choke
+      points and ring escape, and test with player/spawn assignments swapped.
+      Recommend a symmetry approach and deterministic finalisation/validation checks
+      for build/AI, applying the same fairness standard to built-in arenas.
+
+Art supplies examples/studies; build owns runtime, generation constraints and
+engine validation, with AI consuming the agreed constraints. These are queued
+items, not implemented mechanics or new production manifest keys.
+
 ## Resume here: build asset reference delivered (2026-11-14)
 
 - [x] User-requested complete build-facing asset guide: five SVG/PNG sheets,

@@ -3,7 +3,14 @@ import type {Bullet} from "@gunsmith/engine/bullet/types/Bullet";
 import type {Dummy} from "@gunsmith/engine/dummy/types/Dummy";
 
 // Dummies have a radius of 0.4 (`DUMMY_RADIUS`). The bullet leaves the origin heading east.
-const bullet: Bullet = {position: {x: 0, y: 0}, direction: {x: 1, y: 0}, damage: 25, speed: 20, shooter: "player"};
+const bullet: Bullet = {
+  position: {x: 0, y: 0},
+  direction: {x: 1, y: 0},
+  damage: 25,
+  speed: 20,
+  shooter: "player",
+  level: 0,
+};
 
 function dummyAt(x: number, y: number): Dummy {
   return {position: {x, y}, health: 100};

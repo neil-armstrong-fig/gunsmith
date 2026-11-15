@@ -7,7 +7,15 @@ import type {FlightRequest} from "@gunsmith/engine/bullet/types/FlightRequest";
 const hall = arenaFrom(["#######", "#.....#", "#..#..#", "#.....#", "#######"]);
 
 function bulletAt(y: number, changes: Partial<Bullet> = {}): Bullet {
-  return {position: {x: 1.5, y}, direction: {x: 1, y: 0}, damage: 25, speed: 20, shooter: "player", ...changes};
+  return {
+    position: {x: 1.5, y},
+    direction: {x: 1, y: 0},
+    damage: 25,
+    speed: 20,
+    shooter: "player",
+    level: 0,
+    ...changes,
+  };
 }
 
 function request(changes: Partial<FlightRequest>): FlightRequest {
@@ -68,4 +76,47 @@ it("hands back the bullet it was given", () => {
   const bullet = bulletAt(1.5);
 
   expect(meetBullet(hall, request({}), bullet).bullet).toBe(bullet);
+});
+
+// Low ground at x 1, a stair at x 2 up to a platform at x 3 and 4 (level 1), then low ground again at x 5, 6 and 7 past a drop.
+const platform = arenaFrom(["#########", "#.>11...#", "#########"]);
+const BEHIND_THE_PLATFORM_FACE = {position: {x: 3.5, y: 1.5}, health: 100};
+const LOW_GROUND_DUMMY = {position: {x: 6.5, y: 1.5}, health: 100};
+
+it("stops a low-ground bullet at the face of a platform, before a dummy standing on it", () => {
+  const meeting = meetBullet(
+    platform,
+    request({dummies: [BEHIND_THE_PLATFORM_FACE], seconds: 0.2}),
+    bulletAt(1.5, {position: {x: 1.2, y: 1.5}, level: 0}),
+  );
+
+  expect(meeting.contact).toBe("wall");
+  expect(meeting.dummyIndex).toBeUndefined();
+});
+
+it("lets a bullet fired from the platform fly out over the drop and hit a dummy on the low ground", () => {
+  const meeting = meetBullet(
+    platform,
+    request({dummies: [LOW_GROUND_DUMMY], seconds: 0.2}),
+    bulletAt(1.5, {position: {x: 4.2, y: 1.5}, level: 1}),
+  );
+
+  expect(meeting.contact).toBe("dummy");
+  expect(meeting.dummyIndex).toBe(0);
+});
+
+it("lets a bullet on the platform's level hit a dummy on the platform", () => {
+  const meeting = meetBullet(
+    platform,
+    request({dummies: [BEHIND_THE_PLATFORM_FACE], seconds: 0.2}),
+    bulletAt(1.5, {position: {x: 4.2, y: 1.5}, level: 1, direction: {x: -1, y: 0}}),
+  );
+
+  expect(meeting.contact).toBe("dummy");
+});
+
+it("still stops a bullet fired from the platform at the wall beyond the drop", () => {
+  const meeting = meetBullet(platform, request({seconds: 0.5}), bulletAt(1.5, {position: {x: 4.2, y: 1.5}, level: 1}));
+
+  expect(meeting.contact).toBe("wall");
 });

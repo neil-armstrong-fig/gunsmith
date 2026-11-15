@@ -232,7 +232,7 @@ it("starts a new bullet at the muzzle of the player where they now stand, and do
   const after = step(centred(), {...IDLE, direction: {x: 1, y: 0}, aimAt: east, firing: true}, TICK);
 
   expect(after.bullets[0]?.position).toEqual(
-    fireBullet("player", {from: after.player.position, aim: after.player.aim, weapon: RIFLE}).position,
+    fireBullet("player", {from: after.player.position, aim: after.player.aim, weapon: RIFLE, level: 0}).position,
   );
 });
 
@@ -510,6 +510,7 @@ function shotAtPlayer(playerHealth: number): World {
     damage: RIFLE.bulletDamage,
     speed: RIFLE.bulletSpeed,
     shooter: "opponent",
+    level: 0,
   } as const;
 
   return {...world, player: {...world.player, health: playerHealth}, bullets: [bullet]};
@@ -586,6 +587,7 @@ it("gives the opponent the round when both fall in the same step", () => {
         damage: RIFLE.bulletDamage,
         speed: RIFLE.bulletSpeed,
         shooter: "player",
+        level: 0,
       },
     ],
     match: startMatch(),
@@ -662,6 +664,23 @@ it("has the opponent open fire, with a bullet marked as its own, once its reacti
   const bullet = untilFound(duel(), 120, world => world.bullets.find(candidate => candidate.shooter === "opponent"));
 
   expect(bullet?.shooter).toBe("opponent");
+});
+
+// The whole floor one level up, so whoever fires from it fires from level 1.
+const upstairs = arenaFrom(["###############", ...Array.from({length: 7}, () => "#1111111111111#"), "###############"]);
+
+it("fires the player's bullet at the level of the ground they stand on", () => {
+  const after = step({...centred(), arena: upstairs}, {...IDLE, aimAt: {x: 20, y: 4.5}, firing: true}, TICK);
+
+  expect(after.bullets[0]?.level).toBe(1);
+});
+
+it("fires the opponent's bullet at the level of the ground it stands on", () => {
+  const bullet = untilFound({...duel(), arena: upstairs}, 120, world => {
+    return world.bullets.find(candidate => candidate.shooter === "opponent");
+  });
+
+  expect(bullet?.level).toBe(1);
 });
 
 it("does not have the opponent fire in its first moments, while it still reacts", () => {

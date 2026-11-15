@@ -88,7 +88,7 @@ drop keys are decided in the fuzzy frontend and kept in one key-binding config. 
   with you. Dim terrain does not reveal hidden players/items. The omitted-stat policy remains pending in `HANDOFF.md`.
   **Higher ground** sees over lower ground; **lower ground cannot see up**. Built (2026-11-14): a tile blocks a viewer's sight if it is a wall or on a level higher than the
   viewer's eye level (on a stair, its upper level), so from the low ground a platform and everything on it is hidden and its edge hides what is behind it, while from a platform the low
-  ground below shows. Ideas to try after playing it: a longer reach for higher ground ("extends vision"), and "sees over lower cover" once cover has a height.
+  ground below shows. A bullet follows the same rule (built 2026-11-14): it keeps the level of its shooter's eye and stops at a wall or at any tile higher than that, so from the low ground a platform's face stops your shots, and from a platform they fly out over the low ground; what you cannot see you cannot shoot. Ideas to try after playing it: a longer reach for higher ground ("extends vision"), and "sees over lower cover" once cover has a height.
 - **Crouch** hides you behind cover and increases forward vision range. Keep the same cone angle and aim direction;
   walls and height still block vision. Crouching **substantially slows movement**, leaving you easier to hit; this
   is its intended tradeoff. The range bonus and slowdown are tunable. Protection depends on whether the incoming weapon

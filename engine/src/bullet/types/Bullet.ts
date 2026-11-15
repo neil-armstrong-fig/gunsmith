@@ -15,4 +15,6 @@ export interface Bullet {
   speed: number;
   /** Whose it is: it hurts the other side, never its own. */
   shooter: Shooter;
+  /** The level of the shooter's eye when it was fired, which it keeps: it flies over lower ground and stops at a tile higher than this. */
+  level: number;
 }

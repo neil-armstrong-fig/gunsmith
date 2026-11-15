@@ -145,6 +145,17 @@ those implementations; art's README records unsupported identities and proposed 
 
 ## Delivery log
 
+- 2026-11-15, `build`: **`ai` worktree merged again (`11f7f45`: the jellyfish overflow fix, `ai/` and docs only; `HANDOFF.md` and `TODO.md` conflicted, both sides kept), then heights slice 3: bullets across levels, test first, uncommitted for the user's review.** A bullet takes the eye level of its shooter when fired (`height/EyeLevelAt`, moved here from `vision/cone/` since `ShootFighter` now uses it too) and is stopped by `height/BlocksSightFrom` at that level, so line of fire is line of sight: from the low ground a platform's face stops your shots, from a platform they fly out over the low ground, and the bot's follow the same rule through the same code. `Bullet` and `ShotRequest` gained `level`, `shootFighter` takes the arena. **Contract change for `ai`/`art`: none** (`ai/` imports none of it, its 421 tests pass; the state hook and `BulletSnapshot` are unchanged). Spec `ShootingAcrossLevels` (red first: the platform dummy took 25 damage from the low ground); engine 690, webapp 179, 102 of 102 specs on a production build, 120 of 120 at 30 repeats under extra load (a first version that walked at full speed flaked 2 in 10, since the player overshot the platform dummy; it now climbs crouched); 7 mutants killed, one of which (the opponent judged on a flat floor) first survived and got a `Step` test. `pnpm test:properties` does not exist yet, so it was not run. Not done: the opponent walking stairs, a stair-flank validator, cover with a height, the ring and timer. Manifest keys: none.
+
+- 2026-11-15, `art`: queued four user requests in `TODO-art.md`: reticle replacing
+  the mouse pointer, taking-damage/game-juice study referencing janggi docs,
+  empty-weapon click, and fair symmetrical arena generation with equivalent
+  high-ground opportunities (weapon placement stays random). Shared status and
+  build/AI follow-up updated. Documentation diff review and root pnpm checks pass
+  (lint, formatting, types and unit tests; one slow audio render skipped).
+  Documentation only; no assets, code or keys changed.
+
+
 - 2026-11-14, `art`: **build asset reference delivered** at
   `docs/art/asset-reference/README.md`: five editable SVG/PNG sheets, 80 individual
   SVG examples, 2× effect/brand previews, exact-size favicons and all approved
