@@ -81,6 +81,11 @@ everything else is a domain folder. Tiles are the unit; `x` grows to the east an
   it never scores it again. A simultaneous kill is the opponent's round, as `DecideRound` already says. Starting the next
   round's world (full health, full magazines, back at the start) is the caller's, since the engine has no arena of its own:
   the webapp's `nextRoundOfPage`.
+- `ring/`: the round's closing ring, slice 1 of 3 (the clock only). A `Ring` (`types/Ring.ts`: `roundSeconds`, how much of the round has been played) is plain data,
+  optional on the `World` (`World.ring`; the duel has one, sparring, the practice range and the heights arena stay endless). `StartRing` (none played), `AdvanceRing(ring, seconds)` and
+  `SecondsUntilRing(ring)` (the start delay less the round played, never below 0; `countdown/RingStartDelaySeconds`, 45, a tunable, is its own). `step` runs the ring's clock on while the round is
+  `playing`, so it stops when the round is decided, unlike `elapsedSeconds`, which keeps running so a wait on it never hangs. **Not built yet:** the ring itself (its seeded centre, its
+  shrinking radius, damage outside it) and the bot walking inward; the plan is in `TODO-build.md`.
 - `random/`: `NextRandom(seed)` is a mulberry32 generator whose whole state is the seed, handed back with each draw
   (`types/RandomDraw`), so it sits in the `World` as plain data. The engine has no `Math.random`; the caller picks the seed.
 - `opponent/`: a small bot, a finite state machine, to test weapons and arenas against. It exists to be played against, so it
@@ -132,7 +137,7 @@ seed)` give an opponent a brain; **an opponent with no brain takes no action at 
   fly on and hurt what they reach, then the triggers are let go (`fighter/ShootFighter`), so a shot fired this step first
   moves on the next, and a reload that finishes this step lets the weapon fire in it. Health falls, the round is decided
   and, in a match, scored once, and once it is not `playing` the world is frozen: only `elapsedSeconds` runs on, so a wait on the clock never hangs. The loop that calls `step` at a fixed rate lives in the caller (the webapp's
-  `useGameLoop` today, the server's match later), because the engine has no clock. `types/World.ts` (now with `opponent?`, `opponentBrain?`, `round` and `match?`) and `types/Input.ts` (direction, aim, firing, reload and the slot to switch to).
+  `useGameLoop` today, the server's match later), because the engine has no clock. `types/World.ts` (now with `opponent?`, `opponentBrain?`, `round`, `match?` and `ring?`) and `types/Input.ts` (direction, aim, firing, reload and the slot to switch to).
 
 Several entry points here have a single caller (`AdvanceBullets`, `AimPlayer`, `TriggerPull`, `PushOutOfWalls` are called
 only by `step` or `MovePlayer`). They stay in domain folders of their own, not beneath that caller, on purpose: these are

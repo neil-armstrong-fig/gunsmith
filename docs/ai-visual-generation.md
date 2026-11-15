@@ -2,9 +2,72 @@
 
 Owner: `ai`. Dated 2026-11-13. Requested by the user via `art`: evaluate JSON-based weapon appearance generation before the
 design freezes (complexity, reliability, safe code-owned defaults, repair and fallback, cost). **This is findings and
-questions, not a contract.** Nothing is in `shared/`, nothing is wired into `generateWeapon`, no paid call was made, and every
-number below is **local tier, `qwen3.5:9b` on Ollama. Re-probe on Haiku before relying on any of it**: scores do not transfer
-between tiers.
+questions, not a contract.** The original local probe and later Haiku results are preserved below; scores do not transfer
+between tiers. Appearance remains local to `ai/` and is not wired into `generateWeapon`.
+
+## AI session handoff (2026-11-15)
+
+**Owner and boundary.** The AI coding session implements the integration described here, coordinating with `build` on
+consumers and contracts. Codex supplies this documentation and review only. The user limits Codex's code-writing scope to
+explicitly requested audio generation or art assets; do not interpret this handoff as permission for Codex to change AI,
+engine, webapp or API code. No implementation, schema or configuration changed with this handoff.
+
+**Agreed call budget.** The user chose separate stats and appearance generation, allowing **five calls maximum**:
+moderation, stats generation, one stats repair, appearance generation and one appearance repair. A clean request uses
+three calls. This settles the earlier combined-versus-separate question; it does not change the current code's three-call
+weapon criterion, which the AI session must update as part of integration.
+
+**Cost concern to resolve with measurements.** The user explicitly asked whether this balloons cost. Recorded Haiku runs
+measured approximately $0.00036 for a created weapon's stats and $0.0007 for a drawing, giving a combined estimate of
+**$0.00106 per weapon, or $1.06 per 1,000 weapons**: roughly three times stats alone. These are separate historical runs,
+not an integrated measurement or a current provider-price check. They exclude unmeasured arena generation and future
+sound fields. At that estimate, $1 buys roughly 940 weapons rather than 2,800 stats-only weapons. Five calls is the worst
+case; the drawing's larger output drives most of the increase. Measure combined tokens, calls, cost and end-to-end latency
+before relying on the estimate. No increase to budgets or credit prices is approved. Sources:
+[measured weapon costs](cost-and-budget.md#measured-on-haiku-2026-11-14-the-weapon-evals-on-the-paid-tier) and
+[appearance results](#haiku-55-on-the-same-request-set-2026-11-13).
+
+### Recommended implementation for the AI session
+
+These are implementation recommendations, not newly frozen shared contracts. Follow the root and `ai/` instructions and
+record any cross-persona contract change in `HANDOFF.md` before implementing it.
+
+- Keep `generateWeapon` as the entry point, running screening and the existing stats checks first. Generate appearance
+  only after stats pass validation and rating; rejected or invalid weapons make no appearance calls.
+- Inject a separate `appearanceGenerator` through `WeaponPipelineDependencies`, preserving each generator's model
+  settings. Add the existing `AppearanceOutcome` to `WeaponOutcome`, present on every `created` result. Keep generated
+  payloads `unknown` until parsed; do not merge visual fields into the gameplay-stat schema.
+- Return stats and appearance together after sequential generation. Preserve the validated stats when drawing fails,
+  returning the existing validated stand-in with its fallback disclosure. Appearance must never change gameplay stats.
+- Keep one repair per stage. Count both stages in the outer `modelCalls`; distinguish appearance nodes with an
+  `appearance.` prefix while preserving the nested appearance outcome's own path, usage and disclosure.
+- Keep schemas, completion and fallback in `ai/` until a renderer is a second consumer. Coordinate migration with `build`
+  then; do not create a shared schema or renderer ahead of that consumer.
+- Keep paid models behind the same spend guard and log every call in the combined request. Fail evals clearly on provider
+  errors, spend stops or truncated answers, rather than presenting these as ordinary rejected requests or stand-ins.
+- Preserve the accepted drawing prompts and strict geometry policy unless a demonstrated failure requires a change.
+  Stat balancing, sound, shields, the real `AiAdapter` and renderer implementation remain separate work.
+
+### Acceptance and verification
+
+Add the integration criteria first, watch them fail for the right reason, then implement and mutation-prove them. Require
+every created weapon to include a validated appearance and truthful fallback disclosure. Cover clean creation, code
+completion, stats repair, appearance repair, both repairs, fallback and rejected/invalid stats skipping appearance.
+Check stage order, one repair per stage, unchanged gameplay stats and the five-call ceiling. Extend player-visible safety
+checks to the drawing. Mutants that skip appearance, hide fallback, miscount calls, repeat repairs or draw after rejection
+must fail the relevant checks.
+
+Run root `pnpm checks` and the appropriate package eval commands (`pnpm --filter @gunsmith/ai evals:fake` and
+`pnpm --filter @gunsmith/ai evals:local`). Report the fake tier's eight documented failures and local appearance capability
+failures separately; do not weaken criteria to make them green. Follow the existing approval rules before paid validation,
+and keep it within the cumulative allowance. Report combined cost and latency, and complete the folder/caller and
+standards review. No model call is needed to deliver this documentation.
+
+**Spend continuity.** Inspection on 2026-11-15 found approximately **$0.4674 spent of the $1 cumulative eval allowance** in
+`.claude/worktrees/ai-hosting-proof/ai/evals/results/paid-spend-latest.json`. Main has no corresponding ledger. Before a
+paid run from main, reconcile and preserve the latest cumulative total; do not let a missing ledger restart accounting at
+zero or create independent allowances in two checkouts. The older $0.458 checkpoint below is historical. Do not read or
+print provider secrets, raise the ceiling, or run a paid probe merely to verify this handoff.
 
 ## What was built (all in `ai/`, uncommitted until the user reviews it)
 
@@ -250,8 +313,8 @@ prompt line about long shapes was **not** added: no eval shows the model failing
 
 **For `build` and the user:**
 
-1. **Call budget.** Appearance in the same call as the stats, or a second call? The standing criterion "three model calls at
-   most" would break if appearance plus its repair were added: it is five. This decides cost, latency and the credit price.
+1. **Call budget, answered 2026-11-15.** Separate stats and appearance calls, five maximum. See the dated handoff above
+   for the user's cost concern and the implementation recommendations; no credit-price change is approved.
 2. **Where completion and fallback live.** `ai/` now (one package uses them), `engine/` or `shared/` only once a second package
    imports them. The renderer will need the stand-in drawn the same way.
 3. **The tolerance policy.** May code prune foreign fields and accept up to 2 units of overshoot (then clamp), or must the
@@ -273,7 +336,9 @@ prompt line about long shapes was **not** added: no eval shows the model failing
 10. A Haiku re-probe needs a capped key. The $1 a day ceiling stays locked until you provide one.
 11. The omitted-stat policy is separate and **still open**. Visual defaults do not decide it.
 
-## Not done
+## Not done (original local-probe checkpoint)
+
+Historical status at the first probe; the later Haiku results and dated handoff above supersede this list.
 
 No Haiku run, no human identity verdict, no recipe arm, no per-kind schema, no wiring into `generateWeapon`, nothing in
 `shared/`. The four ideas in "Candidate defaults" are each a case to climb red-first in `DrawingAWeapon`.

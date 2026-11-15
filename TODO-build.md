@@ -29,7 +29,20 @@ Both are withdrawn until the game is fun (`HANDOFF.md` delivery log, 2026-11-12)
 
 ## Phase 1: the game, test first. Milestone M1 (redefined: the game is fun)
 
-### Resume here (written 2026-11-15, end of the fifth session; read this first)
+### Resume here (written 2026-11-15, end of the sixth session; read this first)
+
+**2026-11-15, sixth session: the closing ring, slice 1 of 3, the round timer (uncommitted for the user's review).** Heights slice 3 was already committed by the user (`4250a66`), so the session began
+by **planning the ring with them** (plan mode, three questions): **a shrinking circle that closes on a seeded point; the timer starts the ring and damage ramps until someone dies (no draws, no
+new scoring rule); slices in the order timer, ring and damage, bot walks inward.** Slice 1 is the clock only: `engine/src/ring/` is new (`Ring {roundSeconds}`, `StartRing`, `AdvanceRing`,
+`SecondsUntilRing`, `countdown/RingStartDelaySeconds` = 45 s, a tunable), `World.ring?` (the duel has one; sparring, the practice range and the heights arena do not), and `step` runs the ring's clock on
+only while the round is `playing`, so it **stops when the round is decided** (`elapsedSeconds` still runs on, so a wait on it never hangs). Webapp: `selectSecondsUntilRing` (whole seconds, rounded up,
+so it changes once a second), `ring-hud/RingHud` ("Ring in 0:43", under the score; "Ring closing" at 0, which only slice 2 makes true), the state hook's new optional
+`ring {secondsUntilStart}` (`shared/`'s `RingSnapshot`, a contract change used by `webapp/` and `acceptance-tests/`; none for `ai`/`art`). Spec `CountingDownToTheRing` (10 criteria: the duel counts down
+from about 45, falls as the round is played, stops when the round is lost, starts afresh in the next round, on the screen and in the hook; sparring and the practice range have no ring). **Order
+honestly: the engine and webapp unit tests were red first; the spec was written after the code, so its red run is mutants.** Engine 700, webapp 191, `ai` 421, root `pnpm checks` exit 0; 112 of 112
+specs on a production build, **460 of 460** at `--repeat-each=10` for the ring, duel, HUD and sparring specs. **Mutation: 22 unit mutants and 10 browser mutants, all killed by the right tests**
+(a first control mutant proved the runner can fail). `pnpm test:properties` does not exist yet, so it was not run. **Stated defaults, to be set by play:** 45 s before the ring starts; the
+countdown is a plain box under the score. No spec waits for the ring to start (45 real seconds is too long): slice 2 must decide how a spec reaches it (a seam would be needed, so ask).
 
 **2026-11-15, fifth session: heights slice 3, bullets across levels (uncommitted for the user's review).** The `ai` worktree was merged again first (`11f7f45`; the `ai`
 commit was `ai/` and docs only; `HANDOFF.md` and `TODO.md` conflicted, both sides kept; `art` had to commit its own edits before the merge could run). The user chose **line of fire = line of
@@ -38,20 +51,24 @@ shots fly out over it; the bot follows the same code. `Bullet` and `ShotRequest`
 (red first: the platform dummy took 25 damage), engine 690, webapp 179, `ai` 421, 102 of 102 specs on a production build, 120 of 120 at 30 repeats. 7 mutants killed; the opponent-on-a-flat-floor
 one survived until a `Step` test was added. `pnpm test:properties` does not exist yet. Contract change for `ai`/`art`: none.
 
-**Next, the user's choice: the closing ring and a round timer.** It is a multi-slice feature, so **plan it with the user first** (memory `plan-big-slices-first`): what the ring is
-(a shrinking safe area, damage outside it, how it is drawn and told to the player and the bot), how a timer and the ring end a round, the tunables (`docs/game-design.md` names ring timing and damage),
-and how the bot behaves (it has no pathfinder; it must walk inward). Then, still open from heights: the opponent on stairs, a stair-flank validator, a longer reach for higher ground (an idea only),
-cover with a height. `art` has queued four things for `build` in `TODO-art.md` (aim reticle in place of the pointer, a taking-damage "game juice" study, an empty-weapon click, and a fair symmetrical
-arena-generation study with equivalent high ground); none is started, and the arena one touches the validator and the ring.
+**Next: the closing ring, slice 2 (the ring and its damage), then slice 3 (the bot walks inward).** The approved design (stated defaults, all tunables): a circle whose **centre is drawn from the world's
+seed (`random/NextRandom`) among floor tiles reachable from both fighters' starts** (flood fill that honours `height/BlockedFrom`, so it never closes on an unreachable platform); the **radius is a pure function
+of the ring's clock** (the arena-covering radius until the start delay, a linear shrink to a final radius of about 2 tiles over about 30 s, then fixed), so a replay from seed and inputs agrees; **damage** to a
+fighter outside it, ramping from about 2 to 20 a second over the closing time, through `health/TakeDamage` in `step` before `decideRound` (both falling in one step keeps its rule: the opponent's win);
+bullets and dummies ignore it; drawn as a bright edge over the veil (canvas, checked by screenshot like the drop edges) and in the hook (`ring` gains the centre, radius and damage; `RingStartDelaySeconds`
+moves to the `ring/` root once the radius also uses it). Then slice 3: the bot, outside the radius, makes the centre its goal (no pathfinder: it steers toward it and relies on `WatchForStuck`), keeps
+fighting if it sees the player, over 20 seeds never dies to the ring while the player is alive and far away. **Out of scope:** the bot on stairs, the stair-flank validator, the arena-fairness / ring-escape
+validator, cover with a height, a draw rule, a pause between rounds. Still open from heights: the opponent on stairs, a stair-flank validator, a longer reach for higher ground (an idea only), cover with a
+height. `art` has queued four things for `build` in `TODO-art.md` (aim reticle in place of the pointer, a taking-damage "game juice" study, an empty-weapon click, and a fair symmetrical arena-generation
+study with equivalent high ground); none is started, and the arena one touches the validator and the ring. **From `TODO.md` (Codex, 2026-11-15): the user settled the appearance call budget as separate
+stats and appearance calls, five at most; `ai` implements, and the renderer/schema consumer is to be coordinated with `build`, with no premature shared schema.** Nothing for `build` to do on that yet.
 
 **First thing next session, in order:**
-1. `git status --short` and `git log --oneline -3`: slice 3 and the TODO edits are uncommitted until the user commits them (they had staged the doc files); `art` and `ai` may have edited the tree since.
-2. Ask whether the user has **played slice 3** and what they thought. To try it: `pnpm --filter @gunsmith/webapp exec vite --port 3100 --strictPort`, open `http://localhost:3100/?scenario=heights`, shoot the platform dummy from the
-   low ground (the platform's face stops the bullets), shoot the low-ground dummy (hurt), climb the stair and shoot both (both hurt); `pkill -f "vite.*--port 3100"` after. Take their word on the feel before building on it.
-3. Then **plan the closing ring and round timer with them, before any test.** Questions to bring (from `docs/game-design.md`, "Stalemate", the glossary and the tunables list): when the timer starts the ring and how long a round
-   lasts; the ring's shape (a circle or a shrinking rectangle) and where it closes to (the doc says a random point, so it must be seeded for the engine's determinism); the damage outside it and how fast it grows; how it is shown
-   (a visible edge over the dim veil, and in the state hook for specs) and whether the bot is told; how the bot walks inward with no pathfinder; what happens at height (the ring's escape time by the stairs is already named as
-   not built); the tunables as one config each; and the slice order (timer alone, then the ring, then the bot). Show the design and get approval first (memory `plan-big-slices-first`).
+1. `git status --short` and `git log --oneline -3`: slice 1 of the ring (and these doc edits) are uncommitted until the user commits them; `art`, `ai` and Codex may have edited the tree since.
+2. Ask whether the user has **played slice 1** (`pnpm --filter @gunsmith/webapp exec vite --port 3100 --strictPort`, open `http://localhost:3100/?scenario=duel&seed=42`, look at "Ring in 0:43" under the score;
+   `pkill -f "vite.*--port 3100"` after) and what they thought of the placement and the 45 seconds. Take their word before building slice 2.
+3. Slice 2, test first: engine unit tests for the radius, the seeded reachable centre (include an arena with a platform), the damage and the round ending (red first); then a spec `TheClosingRing` and the
+   drawing. **Decide with the user how a spec reaches the ring** without sitting through 45 real seconds (the cheapest honest option is a scenario whose start delay is short, but that is a seam, so ask).
 
 **State at the end of the fourth session** (the sections above supersede its "next"). Everything was committed by the user as `275255b`. A bright lip and a shadow on every drop edge of a platform
 (`arena-heights/drops/`; the user: "the updated wall looks great"); `movement/PushOutOfWalls` split into `pushing/` helpers; `vision/` sub-foldered (`CanSeePoint` and `HasClearLine` in
@@ -389,7 +406,11 @@ RNG, no `Date.now()` or `Math.random()`. The webapp renders it and sends input.
         height; the bot's walking goals and cover search still use walls only. `pnpm test:properties` does not exist yet, so it was not run.
   - [x] Dim arena (original item, now complete): dim arena outside a detailed forward cone, set by equipped weapon and standing/crouched stance, rotating
         with aim through 360 degrees, revealing terrain detail and players/items only in the unoccluded cone, with height blocking sight (slice 2). Cone ownership is settled.
-  - [ ] The closing ring after the round timer.
+  - [ ] **The closing ring (planned with the user 2026-11-15; a shrinking circle on a seeded reachable point, the timer starts it, damage ramps until someone dies).** Slices:
+        - [x] 1. **The round timer** (2026-11-15, unit tests first, spec after and proved by mutation, uncommitted): `engine/src/ring/` clock, `World.ring?` (the duel only), the ring's clock stops with the round, `RingHud` ("Ring in 0:43"),
+          the hook's `ring.secondsUntilStart`, spec `CountingDownToTheRing` (10 criteria). Engine 700, webapp 191, 112 specs, 460 of 460 at 10 repeats, 22 unit and 10 browser mutants killed.
+        - [ ] 2. The ring and its damage (seeded reachable centre, radius from the clock, damage ramp, the edge drawn over the veil, the hook; decide how a spec reaches it).
+        - [ ] 3. The bot walks inward (its goal becomes the centre when outside; no pathfinder; 20-seed engine test).
   - [ ] Pick up and drop a custom weapon; rough Web Audio gunshots.
 - [ ] **Demo checkpoint:** when the core is playable, tell the user it is ready for a first look. Agree what to cut or add
       before menus. Record the reaction in `docs/fuzzy-frontend.md`'s demo notes (kept for the history).

@@ -145,6 +145,25 @@ those implementations; art's README records unsupported identities and proposed 
 
 ## Delivery log
 
+- 2026-11-15, `build`: **The closing ring, slice 1 of 3: the round timer, unit tests first and the spec after (proved by mutation), uncommitted for the user's review.** Planned with the user first (a shrinking circle on a seeded reachable point; the timer starts the ring; damage ramps until someone dies, no draws; slices timer, ring and damage, bot walks inward). `engine/src/ring/` is new: a `Ring` is `{roundSeconds}`, run on by `step` only while the round is `playing` (so it stops when the round is decided; `elapsedSeconds` still runs on), optional on `World` (`World.ring`: the duel has one, sparring, the practice range and the heights arena do not); `SecondsUntilRing` is the 45 s start delay (a tunable) less the round played. Webapp: `ring-hud/` ("Ring in 0:43" under the score) over `select-seconds-until-ring` (changes once a second). **Contract change (`shared/`): the state hook's snapshot gained an optional `ring {secondsUntilStart}` (`RingSnapshot`), used by `webapp/` and `acceptance-tests/`. For `ai`/`art`: none** (`ai/` imports none of it, its 421 tests pass; no manifest key, the HUD is code). Spec `CountingDownToTheRing` (10 criteria); the engine and webapp unit tests were red first, the spec was written after the code so its red run is mutants; engine 700, webapp 191, 112 of 112 specs on a production build, 460 of 460 at `--repeat-each=10` (ring, duel, HUD, sparring); 22 unit and 10 browser mutants killed. `pnpm test:properties` does not exist yet, so it was not run. Not done: the ring itself (centre, radius, damage), the bot walking inward, and a way for a spec to reach the ring without waiting 45 real seconds. Manifest keys: none.
+
+- 2026-11-15, Codex documentation for `ai`: added the dated integration handoff in
+  `docs/ai-visual-generation.md` and linked it from `TODO-ai.md`. User chose separate
+  stats/appearance calls, five maximum; recorded costs suggest about $1.06 per
+  1,000 complete weapons, roughly three times stats alone, pending integrated
+  measurement. Preserved the cumulative-spend warning (about $0.4674 of $1 in the
+  old worktree; main lacks its ledger). AI session owns implementation; Codex's
+  code scope is explicitly requested audio generation/art assets. Integration
+  remains unimplemented; no code, tests, config, schema, budget or manifest keys
+  changed, and no model calls were made.
+  Validation: root `pnpm checks` passes outside the sandbox (lint, formatting,
+  types and unit tests; one slow audio render skipped). The sandboxed audio-server
+  test stalled and that run was interrupted. Documentation links, diff whitespace
+  and folder/reference review pass; no new folders or code helpers were added.
+  Next-turn checkpoint added at the top of `TODO-ai.md`: explicit unchecked AI
+  implementation steps, resume prompt, spend continuity and Codex's documentation-only
+  boundary; older worktree instructions are labelled historical.
+
 - 2026-11-15, `build`: **`ai` worktree merged again (`11f7f45`: the jellyfish overflow fix, `ai/` and docs only; `HANDOFF.md` and `TODO.md` conflicted, both sides kept), then heights slice 3: bullets across levels, test first, uncommitted for the user's review.** A bullet takes the eye level of its shooter when fired (`height/EyeLevelAt`, moved here from `vision/cone/` since `ShootFighter` now uses it too) and is stopped by `height/BlocksSightFrom` at that level, so line of fire is line of sight: from the low ground a platform's face stops your shots, from a platform they fly out over the low ground, and the bot's follow the same rule through the same code. `Bullet` and `ShotRequest` gained `level`, `shootFighter` takes the arena. **Contract change for `ai`/`art`: none** (`ai/` imports none of it, its 421 tests pass; the state hook and `BulletSnapshot` are unchanged). Spec `ShootingAcrossLevels` (red first: the platform dummy took 25 damage from the low ground); engine 690, webapp 179, 102 of 102 specs on a production build, 120 of 120 at 30 repeats under extra load (a first version that walked at full speed flaked 2 in 10, since the player overshot the platform dummy; it now climbs crouched); 7 mutants killed, one of which (the opponent judged on a flat floor) first survived and got a `Step` test. `pnpm test:properties` does not exist yet, so it was not run. Not done: the opponent walking stairs, a stair-flank validator, cover with a height, the ring and timer. Manifest keys: none.
 
 - 2026-11-15, `art`: queued four user requests in `TODO-art.md`: reticle replacing

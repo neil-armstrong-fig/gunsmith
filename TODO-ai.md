@@ -11,7 +11,40 @@ waits on you. **O1 needs nothing from `build` and can start immediately.**
 **What the others need from you:** a decision on where the pipeline runs (it decides whether `api/` imports `ai/`), the
 kill-switch flag's shape, and a review of the contracts before they freeze (Milestone M2).
 
-## Resume here (context-clear checkpoint, 2026-11-14 night, after the jellyfish lantern)
+## Resume here (2026-11-15, documentation handoff complete)
+
+**2026-11-15 documentation handoff:** read
+[AI session handoff](docs/ai-visual-generation.md#ai-session-handoff-2026-11-15) first. The user chose separate stats and
+appearance calls, **five maximum** (three for a clean request), and raised the cost concern: approximately $1.06 per
+1,000 complete weapons from separate recorded runs, roughly three times stats alone. Integration is still unimplemented.
+Codex documents/reviews; the AI coding session implements. Preserve the latest cumulative eval spend (about $0.4674 of
+$1, in the old worktree's ledger) before any paid run from main. No budget or credit-price increase is approved.
+
+- [x] Document the agreed call budget, cost concern, implementation recommendations and verification handoff for the AI session.
+
+**Next turn, for the AI coding session:**
+
+- [ ] Read the dated handoff above and the current shared checklists; work from the main checkout. The accepted weapon
+      and appearance code is already merged. Do not follow the historical instructions below to merge an old worktree.
+- [ ] Write the integration eval criteria first and watch them fail, then integrate stats and appearance with separate
+      generators, five calls maximum, one repair per stage, and a disclosed stand-in. Skip appearance on rejected/invalid stats.
+- [ ] Coordinate the renderer consumer and schema migration with `build`; keep the schema local until a second package
+      needs it. Preserve accepted drawings and strict bounds; the kit experiment remains shelved.
+- [ ] Before any authorised paid validation, reconcile the latest cumulative spend ledger (last observed about $0.4674
+      of $1 in the old worktree). Measure combined cost and latency; do not reset accounting or increase budgets/credit prices.
+- [ ] Mutation-prove the integration, run the required checks/evals, report real results, and update this checklist,
+      AI's status row and the delivery log. Leave the work uncommitted. Stat balancing follows this integration.
+
+**Codex next turn:** documentation/review only for AI work. Do not implement any of the unchecked code tasks above.
+Code-writing remains limited to explicitly requested audio generation or art assets. This documentation session made no
+AI code changes and no model calls. Root `pnpm checks` passed outside the sandbox after the handoff edits; one slow audio
+render was skipped. Documentation links and folder/reference review passed.
+
+**Resume prompt for the AI coding session:** "You are ai. Continue the 2026-11-15 checkpoint at the top of TODO-ai.md.
+Read the dated appearance-integration handoff first. Implement test/eval first, preserve the cumulative spend ledger,
+coordinate contracts with build, and measure the combined cost. Leave changes uncommitted."
+
+## Earlier checkpoint (2026-11-14 night, after the jellyfish lantern)
 
 **State.** Main is merged into the worktree (fast-forward to `ceb5063`; `build`'s uncommitted `SolidTilesOf` refactor in main's tree is not in it). **Jellyfish lantern, done red
 first.** Baseline: 3 stand-ins in 9 trials, all `reaches outside the 64 by 64 space`, the repair moving tentacles 1 to 10 units. One change: `OutsideErrors` now writes
@@ -26,13 +59,16 @@ Spend **$0.458 of the $1** (the sheet `ai/evals/results/drawings-paid-latest.htm
 **The user looked at the sheet (2026-11-14, night): "it all looks really good". The appearance drawing work is accepted; nothing more to climb on it.**
 
 **Next turn, in this order:**
-1. **Integrate appearance with `build`** (the user's earlier call: integrate first, tune from there). Needs two answers, so start by asking `build` (a line in `TODO.md` "Blockers and requests") and the user:
-   the **call budget** (about 1.1 calls per weapon: the same call as the stats or a second one; the weapon criterion allows three calls and appearance alone can use two) and **where the schema lives**
-   (`shared/` once the webapp renderer imports it; not before). Then: wire `generateAppearance` beside `generateWeapon` (test first, evals first), keep the disclosed stand-in visible to the player.
+1. **Integrate appearance with `build`** (the user's earlier call: integrate first, tune from there). Follow the dated handoff above:
+   separate calls, five maximum; measure combined cost and latency. Coordinate the schema's home with `build`
+   (`shared/` once the webapp renderer imports it; not before). Wire `generateAppearance` beside `generateWeapon`
+   (test first, evals first), keeping the disclosed stand-in visible to the player. The AI coding session owns implementation.
 2. **The stat balancer** (the user's design, `O2` below): needs where it lives (probably `engine/`, with `ai/` using a local draft), the budget, the preference encoding, the no-preference default. Probe the model's preferences first.
 3. Still waiting on the user and `build`: the shield behaviour, the omitted-stat policy, the real `StateGraph` and `AiAdapter` mapping.
 4. Optional, only if the user wants the overflow sentence proven rather than kept on trust: keep the failing first draft in the outcome, replay real failing drafts through the old and new sentence (about $0.05).
-Budget: **$0.458 of the $1 spent**; ask before raising the ceiling. Everything is uncommitted for the user's review (never commit `ai` code).
+Budget: the dated handoff above supersedes this checkpoint's **$0.458** figure; re-read the cumulative ledger before a paid run.
+Ask before raising the ceiling. The existing weapon and appearance pipelines are merged into main through `11f7f45`;
+integration remains unimplemented. Leave new work uncommitted for the user's review.
 
 ## Earlier checkpoint (2026-11-14, after the kit probe, which is removed)
 

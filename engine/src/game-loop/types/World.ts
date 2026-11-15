@@ -4,6 +4,7 @@ import type {Dummy} from "@gunsmith/engine/dummy/types/Dummy";
 import type {Match} from "@gunsmith/engine/match/types/Match";
 import type {OpponentBrain} from "@gunsmith/engine/opponent/types/OpponentBrain";
 import type {Player} from "@gunsmith/engine/player/types/Player";
+import type {Ring} from "@gunsmith/engine/ring/types/Ring";
 import type {RoundState} from "@gunsmith/engine/round/types/RoundState";
 
 /** Everything the simulation knows. A new one is returned from each step; none is ever changed in place. */
@@ -24,4 +25,6 @@ export interface World {
   round: RoundState;
   /** The best-of-three this round belongs to, scored as each round ends; absent in a world that is not one, such as the practice range. */
   match?: Match | undefined;
+  /** The round's closing ring, whose clock runs while the round is fought; absent in a world that has none, such as the practice range and sparring. */
+  ring?: Ring | undefined;
 }

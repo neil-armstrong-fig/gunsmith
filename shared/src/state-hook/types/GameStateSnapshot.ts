@@ -4,6 +4,7 @@ import type {DummySnapshot} from "@gunsmith/shared/state-hook/types/DummySnapsho
 import type {MatchSnapshot} from "@gunsmith/shared/state-hook/types/MatchSnapshot";
 import type {OpponentSnapshot} from "@gunsmith/shared/state-hook/types/OpponentSnapshot";
 import type {PlayerSnapshot} from "@gunsmith/shared/state-hook/types/PlayerSnapshot";
+import type {RingSnapshot} from "@gunsmith/shared/state-hook/types/RingSnapshot";
 import type {RoundSnapshot} from "@gunsmith/shared/state-hook/types/RoundSnapshot";
 import type {VisionSnapshot} from "@gunsmith/shared/state-hook/types/VisionSnapshot";
 import type {WeaponSnapshot} from "@gunsmith/shared/state-hook/types/WeaponSnapshot";
@@ -22,6 +23,8 @@ export interface GameStateSnapshot {
   round: RoundSnapshot;
   /** The best-of-three this round belongs to; absent in a game that is not a match, such as the practice range or sparring. */
   match?: MatchSnapshot | undefined;
+  /** The round's closing ring; absent in a game that has none, such as the practice range or sparring. */
+  ring?: RingSnapshot | undefined;
   /** The shots in the air right now. */
   bullets: BulletSnapshot[];
   /** The practice dummies still standing. */

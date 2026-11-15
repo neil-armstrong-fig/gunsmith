@@ -1,11 +1,13 @@
 import type {World} from "@gunsmith/engine/game-loop/types/World";
 import {levelAt} from "@gunsmith/engine/height/LevelAt";
 import {equippedWeapon} from "@gunsmith/engine/loadout/EquippedWeapon";
+import {secondsUntilRing} from "@gunsmith/engine/ring/SecondsUntilRing";
 import {coneOf} from "@gunsmith/engine/vision/ConeOf";
 import {visibleToPlayer} from "@gunsmith/engine/vision/VisibleToPlayer";
 import type {GameStateSnapshot} from "@gunsmith/shared/state-hook/types/GameStateSnapshot";
 import type {MatchSnapshot} from "@gunsmith/shared/state-hook/types/MatchSnapshot";
 import type {OpponentSnapshot} from "@gunsmith/shared/state-hook/types/OpponentSnapshot";
+import type {RingSnapshot} from "@gunsmith/shared/state-hook/types/RingSnapshot";
 
 /** A copy of the game as it stands, for the state hook. A copy, so nothing that reads it can change the game. */
 export function snapshotOf(world: World): GameStateSnapshot {
@@ -32,6 +34,7 @@ export function snapshotOf(world: World): GameStateSnapshot {
     opponent: opponentSnapshotOf(world, visible.opponent),
     round: world.round,
     match: matchSnapshotOf(world),
+    ring: ringSnapshotOf(world),
     bullets: world.bullets.map(bullet => ({x: bullet.position.x, y: bullet.position.y})),
     dummies: world.dummies.map((dummy, index) => ({
       x: dummy.position.x,
@@ -66,4 +69,13 @@ function matchSnapshotOf(world: World): MatchSnapshot | undefined {
   }
 
   return {playerWins: match.playerWins, opponentWins: match.opponentWins, round: match.roundNumber};
+}
+
+function ringSnapshotOf(world: World): RingSnapshot | undefined {
+  const {ring} = world;
+  if (!ring) {
+    return undefined;
+  }
+
+  return {secondsUntilStart: secondsUntilRing(ring)};
 }

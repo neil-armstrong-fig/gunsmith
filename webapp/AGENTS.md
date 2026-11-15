@@ -36,6 +36,7 @@ store/game/
     select-player-health/      the player's health, a plain number
     select-round/              where the round stands, a plain string
     select-match/              the best-of-three the world belongs to (the same object until a round is scored), or nothing
+    select-seconds-until-ring/ whole seconds (rounded up) before the ring starts, or nothing when the world has no ring; changes once a second
     game-state/                `gameState()`, the one-off read for `useFrame`
       GameState.ts
 ```
@@ -83,7 +84,7 @@ its high one (`stairs/StairStripsOf`). Every edge where a raised floor drops to 
 helpers have unit tests.
 
 The HUD is plain React over the canvas (`react/components/dom/ammo-hud/`, `health-hud/`, `score-hud/` (the round and the score, top
-middle, only in a match) and the `round-banner/` overlay that appears when a round is won or lost), styled with Tailwind and the
+middle, only in a match), `ring-hud/` ("Ring in 0:43", just under it, only when the world has a ring; `text/CountdownText`) and the `round-banner/` overlay that appears when a round is won or lost), styled with Tailwind and the
 `--color-gs-*` tokens. In a match the banner keeps "You won" / "You lost" for a round, adds the score, and offers **"Next round"**
 (`game/scenario/NextRoundOfPage.ts`: a fresh duel, the score kept, the opponent's seed the page's plus the rounds already played,
 so `?seed=` still replays a whole match); when the match is decided it says "You won the match" / "You lost the match" and offers

@@ -1,6 +1,7 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import {fireBullet} from "@gunsmith/engine/bullet/FireBullet";
 import {startMatch} from "@gunsmith/engine/match/StartMatch";
+import {startRing} from "@gunsmith/engine/ring/StartRing";
 import {DUMMY_HEALTH} from "@gunsmith/engine/dummy/DummyHealth";
 import {disarmOpponent} from "@gunsmith/engine/opponent/DisarmOpponent";
 import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
@@ -749,4 +750,24 @@ it("does not let the opponent fire while it reloads", () => {
   };
 
   expect(step(dry, IDLE, TICK).bullets).toEqual([]);
+});
+
+// The ring's clock: the seconds of the round played so far, which stops when the round is decided.
+it("runs the ring's clock on by the seconds stepped while the round is being fought", () => {
+  const after = step({...centred(), ring: {roundSeconds: 2}}, IDLE, 0.5);
+
+  expect(after.ring).toEqual({roundSeconds: 2.5});
+});
+
+it("stops the ring's clock once the round is decided, though the world's own clock runs on", () => {
+  const lost = playTicks({...shotAtPlayer(RIFLE.bulletDamage), ring: startRing()}, IDLE, 30);
+  const later = playTicks(lost, IDLE, 60);
+
+  expect(lost.round).toBe("lost");
+  expect(later.elapsedSeconds).toBeGreaterThan(lost.elapsedSeconds);
+  expect(later.ring).toEqual(lost.ring);
+});
+
+it("has no ring when it was not given one", () => {
+  expect(playTicks(centred(), IDLE, 10).ring).toBeUndefined();
 });
