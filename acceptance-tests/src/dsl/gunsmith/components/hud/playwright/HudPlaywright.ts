@@ -40,12 +40,13 @@ export class HudPlaywright extends BasePage {
   }
 
   /**
-   * Waits until the screen shows the health the game itself says the player has. For a player who is still being hit, where
-   * a fixed number would be stale by the time it was waited for.
+   * Waits until the screen shows the health the game itself says the player has, in whole points with a part of a point rounded
+   * up (the ring takes health a fraction at a time, and the game's own account keeps the fraction). For a player who is still
+   * being hit, where a fixed number would be stale by the time it was waited for.
    */
   async waitForHealthToMatchTheGame(): Promise<void> {
     await expect
-      .poll(async () => (await this.getHealth()) === (await this.readGameState()).player.health, {
+      .poll(async () => (await this.getHealth()) === Math.ceil((await this.readGameState()).player.health), {
         intervals: [25, 50, 100],
       })
       .toBe(true);

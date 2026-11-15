@@ -1,9 +1,18 @@
 import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import {startRing} from "@gunsmith/engine/ring/StartRing";
+import {DEFAULT_RING_TIMING} from "@gunsmith/engine/ring/DefaultRingTiming";
+import type {Ring} from "@gunsmith/engine/ring/types/Ring";
+import type {RingTiming} from "@gunsmith/engine/ring/types/RingTiming";
 import {DUEL_ARENA} from "@src/game/duel/DuelArena";
 import {DUEL_OPPONENT} from "@src/game/duel/DuelOpponent";
 import {nextRoundOfPage} from "@src/game/scenario/NextRoundOfPage";
+
+function duelRing(seed: number, timing: RingTiming = DEFAULT_RING_TIMING): Ring {
+  const {player} = startingWorld(DUEL_ARENA, [], DUEL_OPPONENT);
+
+  return startRing({arena: DUEL_ARENA, starts: [player.position, DUEL_OPPONENT], seed, timing});
+}
 
 beforeEach(() => {
   vi.stubGlobal("location", {search: "?scenario=duel&seed=5"});
@@ -19,8 +28,26 @@ it("makes a fresh duel round with the opponent's seed moved on by one", () => {
   expect(world).toEqual({
     ...giveOpponentBrain(startingWorld(DUEL_ARENA, [], DUEL_OPPONENT), 6),
     match: {playerWins: 0, opponentWins: 1, roundNumber: 2},
-    ring: startRing(),
+    ring: duelRing(6),
   });
+});
+
+it("draws the ring's centre from that moved-on seed, so each round closes on a new place", () => {
+  const first = nextRoundOfPage({playerWins: 0, opponentWins: 1, roundNumber: 1});
+  const centres = new Set<string>();
+  for (let roundNumber = 1; roundNumber <= 12; roundNumber++) {
+    centres.add(JSON.stringify(nextRoundOfPage({playerWins: 0, opponentWins: 0, roundNumber}).ring?.centre));
+  }
+
+  expect(first.ring?.centre).toEqual(duelRing(6).centre);
+  expect(centres.size).toBeGreaterThan(3);
+});
+
+it("keeps the ring timing the page asked for, in every round", () => {
+  vi.stubGlobal("location", {search: "?scenario=duel&seed=5&ringDelay=2&ringClosing=9"});
+  const world = nextRoundOfPage({playerWins: 0, opponentWins: 1, roundNumber: 1});
+
+  expect(world.ring).toEqual(duelRing(6, {startDelaySeconds: 2, closingSeconds: 9}));
 });
 
 it("keeps the score and goes up one round", () => {

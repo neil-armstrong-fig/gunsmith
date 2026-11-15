@@ -5,6 +5,7 @@ import {Bullets} from "@src/react/components/three/arena-canvas/components/arena
 import {ArenaHeights} from "@src/react/components/three/arena-canvas/components/arena-scene/components/arena-heights/ArenaHeights";
 import {ArenaWalls} from "@src/react/components/three/arena-canvas/components/arena-scene/components/arena-walls/ArenaWalls";
 import {VisionOverlay} from "@src/react/components/three/arena-canvas/components/arena-scene/components/vision-overlay/VisionOverlay";
+import {RingEdge} from "@src/react/components/three/arena-canvas/components/arena-scene/components/ring-edge/RingEdge";
 import {Opponent} from "@src/react/components/three/arena-canvas/components/arena-scene/components/opponent/Opponent";
 import {PlayerDisc} from "@src/react/components/three/arena-canvas/components/arena-scene/components/player-disc/PlayerDisc";
 import {useGameLoop} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/UseGameLoop";
@@ -12,7 +13,7 @@ import {gameState} from "@src/store/game/selectors/game-state/GameState";
 import {useGameStore} from "@src/store/game/UseGameStore";
 import type {JSX} from "react";
 
-/** Everything drawn in the arena: the camera fitted to the window, the walls with the dim veil over what the player does not see, the dummies, the bullets, the opponent and the player. */
+/** Everything drawn in the arena: the camera fitted to the window, the walls with the dim veil over what the player does not see, the closing ring over it, the dummies, the bullets, the opponent and the player. */
 export function ArenaScene(): JSX.Element {
   useGameLoop();
 
@@ -41,6 +42,8 @@ export function ArenaScene(): JSX.Element {
       <ArenaHeights arena={arena} />
 
       <VisionOverlay />
+
+      <RingEdge arena={arena} />
 
       <Dummies />
 

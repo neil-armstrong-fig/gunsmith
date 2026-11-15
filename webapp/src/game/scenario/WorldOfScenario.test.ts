@@ -7,6 +7,9 @@ import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import {startMatch} from "@gunsmith/engine/match/StartMatch";
 import {startRing} from "@gunsmith/engine/ring/StartRing";
+import {DEFAULT_RING_TIMING} from "@gunsmith/engine/ring/DefaultRingTiming";
+import type {Ring} from "@gunsmith/engine/ring/types/Ring";
+import type {RingTiming} from "@gunsmith/engine/ring/types/RingTiming";
 import {DUEL_ARENA} from "@src/game/duel/DuelArena";
 import {DUEL_OPPONENT} from "@src/game/duel/DuelOpponent";
 import {HEIGHTS_ARENA} from "@src/game/heights/HeightsArena";
@@ -14,6 +17,12 @@ import {HEIGHTS_DUMMIES} from "@src/game/heights/HeightsDummies";
 import {PRACTICE_ARENA} from "@src/game/practice/PracticeArena";
 import {PRACTICE_DUMMIES} from "@src/game/practice/PracticeDummies";
 import {worldOfScenario} from "@src/game/scenario/WorldOfScenario";
+
+function duelRing(seed: number, timing: RingTiming = DEFAULT_RING_TIMING): Ring {
+  const {player} = startingWorld(DUEL_ARENA, [], DUEL_OPPONENT);
+
+  return startRing({arena: DUEL_ARENA, starts: [player.position, DUEL_OPPONENT], seed, timing});
+}
 
 it("makes the practice range with its dummies and no opponent", () => {
   const world = worldOfScenario("practice", 1);
@@ -29,7 +38,7 @@ it("makes the duel with the opponent where it stands and no dummies", () => {
   expect(world).toEqual({
     ...giveOpponentBrain(startingWorld(DUEL_ARENA, [], DUEL_OPPONENT), 7),
     match: startMatch(),
-    ring: startRing(),
+    ring: duelRing(7),
   });
   expect(world.opponent?.position).toEqual(DUEL_OPPONENT);
   expect(world.dummies).toEqual([]);
@@ -75,14 +84,48 @@ it("makes sparring and the practice range single rounds, with no match", () => {
   expect(worldOfScenario("practice", 7).match).toBeUndefined();
 });
 
-it("gives the duel a ring that has none of its round played", () => {
-  expect(worldOfScenario("duel", 7).ring).toEqual({roundSeconds: 0});
+it("gives the duel the game's own ring, with none of its round played", () => {
+  const {ring} = worldOfScenario("duel", 7);
+
+  expect(ring).toEqual(duelRing(7));
+  expect(ring?.roundSeconds).toBe(0);
+  expect(ring?.timing).toEqual(DEFAULT_RING_TIMING);
+});
+
+it("gives the duel the ring timing it is asked for", () => {
+  const timing = {startDelaySeconds: 2, closingSeconds: 9};
+
+  expect(worldOfScenario("duel", 7, timing).ring).toEqual(duelRing(7, timing));
+});
+
+it("draws the ring's centre from the seed: another seed, another place", () => {
+  const centres = new Set<string>();
+  for (let seed = 0; seed < 30; seed++) {
+    centres.add(JSON.stringify(worldOfScenario("duel", seed).ring?.centre));
+  }
+
+  expect(centres.size).toBeGreaterThan(8);
 });
 
 it("gives sparring, the practice range and the heights arena no ring, so they stay endless", () => {
   expect(worldOfScenario("sparring", 7).ring).toBeUndefined();
   expect(worldOfScenario("practice", 7).ring).toBeUndefined();
   expect(worldOfScenario("heights", 7).ring).toBeUndefined();
+});
+
+it("gives sparring a ring when it is asked for ring timing, and no other scenario", () => {
+  const timing = {startDelaySeconds: 1, closingSeconds: 6};
+
+  expect(worldOfScenario("sparring", 7, timing).ring).toEqual(duelRing(7, timing));
+  expect(worldOfScenario("practice", 7, timing).ring).toBeUndefined();
+  expect(worldOfScenario("heights", 7, timing).ring).toBeUndefined();
+});
+
+it("leaves sparring's opponent without a brain and its match unscored when it has a ring", () => {
+  const world = worldOfScenario("sparring", 7, {startDelaySeconds: 1, closingSeconds: 6});
+
+  expect(world.opponentBrain).toBeUndefined();
+  expect(world.match).toBeUndefined();
 });
 
 it("makes the heights arena with a dummy on each level and no opponent", () => {

@@ -1,6 +1,8 @@
 import type {World} from "@gunsmith/engine/game-loop/types/World";
 import {levelAt} from "@gunsmith/engine/height/LevelAt";
 import {equippedWeapon} from "@gunsmith/engine/loadout/EquippedWeapon";
+import {radiusOfRing} from "@gunsmith/engine/ring/RadiusOfRing";
+import {ringDamageRate} from "@gunsmith/engine/ring/damage/RingDamageRate";
 import {secondsUntilRing} from "@gunsmith/engine/ring/SecondsUntilRing";
 import {coneOf} from "@gunsmith/engine/vision/ConeOf";
 import {visibleToPlayer} from "@gunsmith/engine/vision/VisibleToPlayer";
@@ -77,5 +79,10 @@ function ringSnapshotOf(world: World): RingSnapshot | undefined {
     return undefined;
   }
 
-  return {secondsUntilStart: secondsUntilRing(ring)};
+  return {
+    secondsUntilStart: secondsUntilRing(ring),
+    centre: {x: ring.centre.x, y: ring.centre.y},
+    radius: radiusOfRing(ring),
+    damagePerSecond: ringDamageRate(ring),
+  };
 }

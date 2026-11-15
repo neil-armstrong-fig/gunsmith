@@ -28,7 +28,7 @@ Each has its own `AGENTS.md` (written when the package is scaffolded), and webap
 `docs/` holds research a decision in the code rests on, linked from the code it justifies. Add a document only when
 losing the reasoning would mean someone re-deriving it. Today: `docs/fuzzy-frontend.md`, `docs/game-design.md`, `docs/architecture.md`,
 `docs/match-netcode.md`, `docs/schemas.md`, `docs/ai-pipeline.md`, `docs/ai-hosting.md`, `docs/ai-visual-generation.md`, `docs/cost-and-budget.md`,
-`docs/privacy-and-data.md`, `docs/focused-case-study.md`, `docs/state-management.md`, `docs/art/`.
+`docs/privacy-and-data.md`, `docs/focused-case-study.md`, `docs/state-management.md`, `docs/shaders.md`, `docs/art/`.
 
 ## The three builders
 
@@ -342,6 +342,8 @@ These are janggi's, carried over until each is re-checked against the versions a
 - **The canvas is not in the DOM.** react-three-fiber draws to a `<canvas>`, so Playwright cannot find a player or a
   wall by role. The DSL reads game state through one deliberate state hook (`HANDOFF.md`); it is shipped code, so keep it
   read-only and tiny.
+- **`pnpm checks` needs `glslangValidator` on the PATH** (`brew install glslang`; `apt install glslang-tools`): the webapp's shader test runs it
+  (`docs/shaders.md`), and without it that test fails saying so. A CI runner must install it too.
 - On Linux/WSL, Chromium needs system libraries once:
   `pnpm --filter @gunsmith/acceptance-tests exec playwright install-deps chromium` (needs sudo), or
   every acceptance test fails on browser launch with `libnspr4.so`.

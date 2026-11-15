@@ -14,6 +14,7 @@ import {RoundDsl} from "@src/dsl/gunsmith/components/round/RoundDsl";
 import {VisionDsl} from "@src/dsl/gunsmith/components/vision/VisionDsl";
 import {WeaponDsl} from "@src/dsl/gunsmith/components/weapon/WeaponDsl";
 import {GunsmithPlaywright} from "@src/dsl/gunsmith/playwright/GunsmithPlaywright";
+import type {ClosingRingRequest} from "@src/dsl/gunsmith/types/ClosingRingRequest";
 import type {Size} from "@src/dsl/gunsmith/types/Size";
 
 /** The whole game as a spec sees it. Every area is a member of this rather than a fixture of its own. */
@@ -88,6 +89,18 @@ export class GunsmithDsl {
       await this.gunsmith.openSparring();
     } catch (error) {
       throw new DslError("Failed to open the sparring match", error);
+    }
+  }
+
+  /**
+   * Opens a sparring match that has a ring: the opponent stands still and never shoots, so only the ring can hurt a fighter.
+   * The ring starts after `delaySeconds`, closes over `closingSeconds` and closes on a point drawn from `seed`.
+   */
+  async startClosingRing(request: ClosingRingRequest): Promise<void> {
+    try {
+      await this.gunsmith.openClosingRing(request);
+    } catch (error) {
+      throw new DslError("Failed to open the sparring match with a ring", error);
     }
   }
 
