@@ -9,7 +9,7 @@ earns its place. Tone: terse, dry, a little workshop-and-blueprint; never preach
 | ----- | ---- | ----- |
 | Landing page | One-line pitch, three-line "how it works", buttons: Practice, Private room, Public queue, Sign in | Mention the twist (the weapons are shared) |
 | Practice arena | Control hints (WASD, mouse, Ctrl or C, 1 and 2, reload, pick up and drop), what the dummies are for, the "make a weapon here" prompt | Short |
-| Sign-in | Why sign in (credits and a library); guests can still play | Honest about what Google shares (`openid` only) |
+| Sign-in | Public matchmaking, credits and a library; guests retain practice/private rooms | Honest about what Google shares (`openid` only) |
 | Pre-round | Help text for a weapon prompt and an arena prompt; the token counter; the timer; what the opponent can see | |
 | **Example prompts** | 12 weapon prompts and 6 arena prompts: sensible, silly, deliberately overpowered, and a few that should be rejected | These also seed `ai`'s datasets. Mark each with an expected outcome (accept, accept but wild, reject) |
 | Generation progress | Labels for the steps: checking, judging, generating, validating, rating | One short line each |
@@ -19,7 +19,7 @@ earns its place. Tone: terse, dry, a little workshop-and-blueprint; never preach
 | Credits | How many, when they reset (00:00 UTC), what things cost, that reuse is free | |
 | Library | Empty states; the slot limit message (a future upgrade is a stretch goal; do not promise it) | |
 | Match | Round start, ring warning, forfeit, round won, match won | |
-| Legal | Privacy and terms pages that match `docs/privacy-and-data.md` | Plain language |
+| Legal | Privacy and terms pages that match `docs/privacy-and-data.md`, including recordings, sharing and the minimal retained restriction record | Plain language; no extra replay consent dialog |
 
 ## Style rules
 

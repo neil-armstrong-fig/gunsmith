@@ -10,6 +10,15 @@ cartoon sci-fi machinery at the user's request (Ratchet & Clank inspiration, ada
 
 ## Next: user-requested studies and assets (2026-11-15)
 
+- [x] **Art/research pivot:** sourced anti-cheat, account farming, match recording,
+      reporting, silent restricted queues and open-source recommendations in
+      [fair-play research](docs/art/fair-play-research.md). User chose sign-in for
+      public play, participant/moderator replays with either-player sharing,
+      automatic corroboration plus human override, clean-match-only recovery and
+      a minimal 90-day post-deletion restriction record. Design/privacy/setup and
+      shared handoff reconciled. Runtime remains build/AI work with online play;
+      no detector, schema, code, infrastructure or paid call was added.
+
 - [ ] **Aim reticle:** design a readable reticle that replaces the mouse pointer
       over the arena. Show it against all floor levels, fog and combat effects;
       hand cursor artwork/hotspot and behaviour notes to build for integration.

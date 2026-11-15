@@ -5,6 +5,12 @@ Owner: `art` (Codex). Read `HANDOFF.md`, `TODO.md` and all three persona checkli
 
 ## Direction (A1, 2026-11-12)
 
+[Fair-play research and build handoff](fair-play-research.md) records the user's
+2026-11-15 research pivot: anti-cheat, account farming, recordings, reports,
+silent restricted queues with clean-match recovery, and open-source boundaries.
+Documentation only; runtime work belongs with online play. The reticle, damage
+feedback, empty-weapon click and arena-symmetry studies remain queued.
+
 **Industrial arena:** clean flat vector, slate surfaces, blue and orange teams, heavier geometry and sparse neon.
 Top-down orthographic camera; desktop only. Technical markings are functional: level ticks, stair treads and team
 stripes. Avoid decorative distress, perspective, photorealism, pure black, pure white and text over busy backgrounds.

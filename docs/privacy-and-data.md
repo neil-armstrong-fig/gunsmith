@@ -3,9 +3,15 @@
 What is stored, what leaves for third parties, and what deletion covers. The repo is private for now; this is written as if it
 will be public. Janggi is the model: store only what is needed.
 
+Status: design, including the user-approved 2026-11-15
+[fair-play and recording direction](art/fair-play-research.md). The online
+storage and controls described here are not implemented by the research delivery.
+
 ## Principles
 
-- **Opt-in identity.** Sign-in with Google (`openid` scope only) is optional. Guests can play with the built-in pool.
+- **Identity.** Google sign-in (`openid` scope only) is required for public
+  matchmaking, credits and the library. Guests can play practice/private rooms
+  with the built-in pool.
 - **No email, no real name.** Store Google's subject id (`sub`) and a generated display name the player may change. A hash of
   each session token, never the token.
 - **The internal account id is random and opaque.** It, never the Google `sub` and never a display name, is the only user
@@ -24,8 +30,31 @@ will be public. Janggi is the model: store only what is needed.
 | Credit ledger | Daily AI allowance and refunds | Until the account is deleted |
 | Library: saved weapons and arenas, **with the prompts that made them** | "Use as a base and change the prompt"; reuse for free | Until the owner deletes them or the account |
 | Ratings and match history | Matchmaking and the history list | Until the account is deleted |
+| Recording metadata and share permissions | Authorized completed-match access | 14 days after completion, or deletion handling below |
+| Reports, case evidence references and versioned trust decisions | Fair-play investigation and correction | 90 days after flagging; duplicates do not extend the deadline |
+| Keyed issuer/subject digest, applicable restriction and expiry only | Prevent the same restricted identity immediately resetting through deletion | At most 90 days after deletion; retries do not extend it |
 
 Saved items are private; library limits are per account and never expire.
+
+## Recordings and evidence (planned)
+
+Bounded Durable Object journals export to private R2 storage; D1 holds metadata.
+Ordinary recordings expire 14 days after completion. Flagged evidence copies
+expire 90 days after flagging. Application checks stop access at expiry; lifecycle
+deletion is a backstop, not an exact access cutoff.
+
+Players and moderators can access completed-match replays. Either participant
+can share a sanitized replay without a second-player approval dialog. Links
+expire with the recording and may be revoked; downloaded copies cannot be
+retracted. Shared exports use match-local labels and exclude raw prompts,
+account/provider identifiers, network data, trust decisions and report evidence.
+
+Private moderation evidence may include accepted inputs, server-sent visibility
+and sound information, participant reports and decision records. Access is
+restricted to authorized moderation operations; no evidence goes into ordinary
+request logs, model calls or LangSmith. Silent matchmaking status does not waive
+applicable access, objection or erasure rights. Before launch, justify purposes,
+retention and the lawful basis and make the privacy/terms copy match the design.
 
 ## What leaves for third parties
 
@@ -42,12 +71,24 @@ traced for quality, the retention, and how to delete.
 ## Deletion
 
 `DELETE /api/account` removes the account, sessions, credits, library, ratings and history (janggi's cascade). Traces already
-in LangSmith expire on its retention schedule; the privacy page says so. Private rooms and matches hold no personal data
-beyond the account id.
+in LangSmith expire on its retention schedule; the privacy page says so.
+
+Remove account links and ordinary recording/share access with deletion, deleting
+ordinary recordings and hosted shared copies involving that account. Remove
+flagged personal evidence unless continued retention has a documented applicable
+basis; retention is not an automatic exception to erasure. When needed for an
+existing restriction, keep only the keyed identity digest, restriction and expiry
+for at most 90 days after deletion. These digests remain personal data, not
+anonymous data. The privacy page must explain this narrow exception; it must not
+promise that every record vanishes immediately. A different Google account is
+not recognized by this mechanism.
 
 ## Open items
 
 - Confirm whether LangSmith runs can be deleted on request by metadata.
-- Decide the retention of match history and the ledger after account deletion (default: deleted with the account).
+- Before online launch, verify the retention basis, erasure workflow and complete
+  deletion of recording chunks, evidence copies and references. History and the
+  ordinary ledger are deleted with the account; the minimal restriction record
+  is the bounded exception above.
 - A pseudonymous identifier (the Google `sub`) is still personal data under GDPR-style rules, so keep the stated limits and
   the deletion route honest. Not legal advice; check before the repo or the site goes public.
