@@ -3,6 +3,7 @@ import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
 import {MARKSMAN_RIFLE} from "@gunsmith/engine/weapon/weapons/MarksmanRifle";
 import {RIFLE} from "@gunsmith/engine/weapon/weapons/Rifle";
+import {RING_START_DELAY_SECONDS} from "@gunsmith/engine/ring/countdown/RingStartDelaySeconds";
 import {CROUCH_RANGE_FACTOR} from "@gunsmith/engine/vision/cone/CrouchRangeFactor";
 import {snapshotOf} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/state-hook/SnapshotOf";
 
@@ -44,7 +45,9 @@ it("reports no bullets when none are in the air", () => {
 it("reports where each bullet in the air is", () => {
   const flying = {
     ...world,
-    bullets: [{position: {x: 1, y: 2}, direction: {x: 1, y: 0}, damage: 25, speed: 20, shooter: "player" as const}],
+    bullets: [
+      {position: {x: 1, y: 2}, direction: {x: 1, y: 0}, damage: 25, speed: 20, shooter: "player" as const, level: 0},
+    ],
   };
 
   expect(snapshotOf(flying).bullets).toEqual([{x: 1, y: 2}]);
@@ -185,6 +188,17 @@ it("reports the score of the match and which round is being fought", () => {
   const match = {playerWins: 1, opponentWins: 0, roundNumber: 2};
 
   expect(snapshotOf({...world, match}).match).toEqual({playerWins: 1, opponentWins: 0, round: 2});
+});
+
+it("reports no ring when the world has none", () => {
+  expect(snapshotOf(world).ring).toBeUndefined();
+});
+
+it("reports the seconds still to play before the ring starts", () => {
+  expect(snapshotOf({...world, ring: {roundSeconds: 0}}).ring).toEqual({secondsUntilStart: RING_START_DELAY_SECONDS});
+  expect(snapshotOf({...world, ring: {roundSeconds: 12.5}}).ring).toEqual({
+    secondsUntilStart: RING_START_DELAY_SECONDS - 12.5,
+  });
 });
 
 const hills = startingWorld(arenaFrom(["#######", "#.>111#", "#######"]));

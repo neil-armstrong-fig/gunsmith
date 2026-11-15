@@ -1,5 +1,5 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
-import {eyeLevelAt} from "@gunsmith/engine/vision/cone/EyeLevelAt";
+import {eyeLevelAt} from "@gunsmith/engine/height/EyeLevelAt";
 
 // Low ground at x 1, a stair at x 2 up to level 1 at x 3, a stair at x 4 up to level 2 at x 5.
 const terraces = arenaFrom(["#######", "#.>1>2#", "#######"]);

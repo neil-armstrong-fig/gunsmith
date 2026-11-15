@@ -1,5 +1,5 @@
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
-import {eyeLevelAt} from "@gunsmith/engine/vision/cone/EyeLevelAt";
+import {eyeLevelAt} from "@gunsmith/engine/height/EyeLevelAt";
 import {equippedWeapon} from "@gunsmith/engine/loadout/EquippedWeapon";
 import type {Player} from "@gunsmith/engine/player/types/Player";
 import {CROUCH_RANGE_FACTOR} from "@gunsmith/engine/vision/cone/CrouchRangeFactor";

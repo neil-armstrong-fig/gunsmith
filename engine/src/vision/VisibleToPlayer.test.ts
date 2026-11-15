@@ -58,7 +58,9 @@ it("says which dummies the player sees, in the order they stand", () => {
 it("shows the player's own bullets wherever they are", () => {
   const world: World = {
     ...startingWorld(room),
-    bullets: [{position: {x: 12.5 - 5, y: 3.5}, direction: {x: -1, y: 0}, damage: 25, speed: 20, shooter: "player"}],
+    bullets: [
+      {position: {x: 12.5 - 5, y: 3.5}, direction: {x: -1, y: 0}, damage: 25, speed: 20, shooter: "player", level: 0},
+    ],
   };
 
   expect(visibleToPlayer(world).bullets).toEqual([true]);
@@ -71,6 +73,7 @@ it("shows the opponent's bullets only where the player sees", () => {
     damage: 25,
     speed: 20,
     shooter: "opponent",
+    level: 0,
   });
   const world: World = {...startingWorld(room), bullets: [bullet(12.5 + 4), bullet(12.5 - 4), bullet(12.5 + 20)]};
 
@@ -106,6 +109,7 @@ it("hides the opponent's bullet on a platform from a player on the low ground", 
     damage: 25,
     speed: 20,
     shooter: "opponent",
+    level: 0,
   };
   const world = {...startingWorld(platformAhead), bullets: [bullet]};
 

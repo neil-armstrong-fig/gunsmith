@@ -71,6 +71,10 @@ both on the player's row and inside the rifle's reach. It reads `gunsmith.dummie
 ground, though in front and in reach (the spec checks the reach first, so only the height can hide it), and is seen after the climb; the low-ground dummy is seen from the low ground and
 from the platform. Written after the engine code, so proved by mutation: sight ignoring levels fails exactly the first criterion.
 
+## The ring
+
+`CountingDownToTheRing` (in `ring/`) reads `gunsmith.ring` (the state hook's `ring.secondsUntilStart` and the HUD's `ring-countdown`): the duel counts down from 45 game seconds, falls as the round is played, stops when the round is lost (the game's clock runs on, the ring's does not) and starts again in the next round; sparring and the practice range have no ring and no countdown. The ring itself (its damage) is not built yet, and 45 seconds of real play is too long for a spec to sit through, so no spec waits for the ring to start: the later slices will need a way to reach it, decided then.
+
 ## Running
 
 ```bash

@@ -29,22 +29,53 @@ Both are withdrawn until the game is fun (`HANDOFF.md` delivery log, 2026-11-12)
 
 ## Phase 1: the game, test first. Milestone M1 (redefined: the game is fun)
 
-### Resume here (written 2026-11-14, end of the fourth session; read this first)
+### Resume here (written 2026-11-15, end of the sixth session; read this first)
 
-**State at the end of the fourth session.** Everything below is **uncommitted for the user's review** except the merge `ceb5063` (the `ai` worktree, merged a second time); the `ai`
-worktree is now behind main, so `ai` should `git merge main` there first. Root `pnpm checks` exits 0 (engine 679, webapp 179, `ai` 420, audio 254 with one slow render skipped).
-Done after the vision slice, at the user's word: **a bright lip and a shadow on every drop edge** of a platform (`arena-heights/drops/`), which the user looked at and said
-"the updated wall looks great"; `movement/PushOutOfWalls` split into `pushing/` helpers; `vision/` sub-foldered (`CanSeePoint` and `HasClearLine` now in `vision/sight/`;
-`ConeOf`, `VisibleToPlayer` and `VisibleArea` stay at the root); `HeightTilesOf` split into `tiles/positions/` and `tiles/drops/` helpers. All mutation-proved.
+**2026-11-15, sixth session: the closing ring, slice 1 of 3, the round timer (uncommitted for the user's review).** Heights slice 3 was already committed by the user (`4250a66`), so the session began
+by **planning the ring with them** (plan mode, three questions): **a shrinking circle that closes on a seeded point; the timer starts the ring and damage ramps until someone dies (no draws, no
+new scoring rule); slices in the order timer, ring and damage, bot walks inward.** Slice 1 is the clock only: `engine/src/ring/` is new (`Ring {roundSeconds}`, `StartRing`, `AdvanceRing`,
+`SecondsUntilRing`, `countdown/RingStartDelaySeconds` = 45 s, a tunable), `World.ring?` (the duel has one; sparring, the practice range and the heights arena do not), and `step` runs the ring's clock on
+only while the round is `playing`, so it **stops when the round is decided** (`elapsedSeconds` still runs on, so a wait on it never hangs). Webapp: `selectSecondsUntilRing` (whole seconds, rounded up,
+so it changes once a second), `ring-hud/RingHud` ("Ring in 0:43", under the score; "Ring closing" at 0, which only slice 2 makes true), the state hook's new optional
+`ring {secondsUntilStart}` (`shared/`'s `RingSnapshot`, a contract change used by `webapp/` and `acceptance-tests/`; none for `ai`/`art`). Spec `CountingDownToTheRing` (10 criteria: the duel counts down
+from about 45, falls as the round is played, stops when the round is lost, starts afresh in the next round, on the screen and in the hook; sparring and the practice range have no ring). **Order
+honestly: the engine and webapp unit tests were red first; the spec was written after the code, so its red run is mutants.** Engine 700, webapp 191, `ai` 421, root `pnpm checks` exit 0; 112 of 112
+specs on a production build, **460 of 460** at `--repeat-each=10` for the ring, duel, HUD and sparring specs. **Mutation: 22 unit mutants and 10 browser mutants, all killed by the right tests**
+(a first control mutant proved the runner can fail). `pnpm test:properties` does not exist yet, so it was not run. **Stated defaults, to be set by play:** 45 s before the ring starts; the
+countdown is a plain box under the score. No spec waits for the ring to start (45 real seconds is too long): slice 2 must decide how a spec reaches it (a seam would be needed, so ask).
 
-**The first thing to do next session: bullets and cover across levels.** It is a known oddity the user will meet in `?scenario=heights`: bullets still stop only at walls
-(`SolidTilesOf`), so from the low ground the player can shoot the platform dummy they cannot see. **This needs a design plan first** (the user wants a detailed plan for a multi-slice
-feature before any test, memory `plan-big-slices-first`): the questions are whether a bullet crosses a drop or is stopped by a platform's face, whether a bullet fired from a platform flies over
-the low ground, and whether it follows the same `BlocksSightFrom` rule as sight. Then, in order: the opponent on stairs, a stair-flank validator, the closing ring and a round timer
-(fine to take the ring first if the user prefers), a longer reach for higher ground (an idea only, descoped by the user).
+**2026-11-15, fifth session: heights slice 3, bullets across levels (uncommitted for the user's review).** The `ai` worktree was merged again first (`11f7f45`; the `ai`
+commit was `ai/` and docs only; `HANDOFF.md` and `TODO.md` conflicted, both sides kept; `art` had to commit its own edits before the merge could run). The user chose **line of fire = line of
+sight**: a bullet takes the eye level of its shooter when fired and is stopped by `height/BlocksSightFrom` at that level, so a platform's face stops shots from the low ground and a platform's
+shots fly out over it; the bot follows the same code. `Bullet` and `ShotRequest` gained `level`, `shootFighter(arena, shooter, turn)`, `EyeLevelAt` moved to `height/`. Spec `ShootingAcrossLevels`
+(red first: the platform dummy took 25 damage), engine 690, webapp 179, `ai` 421, 102 of 102 specs on a production build, 120 of 120 at 30 repeats. 7 mutants killed; the opponent-on-a-flat-floor
+one survived until a `Step` test was added. `pnpm test:properties` does not exist yet. Contract change for `ai`/`art`: none.
+
+**Next: the closing ring, slice 2 (the ring and its damage), then slice 3 (the bot walks inward).** The approved design (stated defaults, all tunables): a circle whose **centre is drawn from the world's
+seed (`random/NextRandom`) among floor tiles reachable from both fighters' starts** (flood fill that honours `height/BlockedFrom`, so it never closes on an unreachable platform); the **radius is a pure function
+of the ring's clock** (the arena-covering radius until the start delay, a linear shrink to a final radius of about 2 tiles over about 30 s, then fixed), so a replay from seed and inputs agrees; **damage** to a
+fighter outside it, ramping from about 2 to 20 a second over the closing time, through `health/TakeDamage` in `step` before `decideRound` (both falling in one step keeps its rule: the opponent's win);
+bullets and dummies ignore it; drawn as a bright edge over the veil (canvas, checked by screenshot like the drop edges) and in the hook (`ring` gains the centre, radius and damage; `RingStartDelaySeconds`
+moves to the `ring/` root once the radius also uses it). Then slice 3: the bot, outside the radius, makes the centre its goal (no pathfinder: it steers toward it and relies on `WatchForStuck`), keeps
+fighting if it sees the player, over 20 seeds never dies to the ring while the player is alive and far away. **Out of scope:** the bot on stairs, the stair-flank validator, the arena-fairness / ring-escape
+validator, cover with a height, a draw rule, a pause between rounds. Still open from heights: the opponent on stairs, a stair-flank validator, a longer reach for higher ground (an idea only), cover with a
+height. `art` has queued four things for `build` in `TODO-art.md` (aim reticle in place of the pointer, a taking-damage "game juice" study, an empty-weapon click, and a fair symmetrical arena-generation
+study with equivalent high ground); none is started, and the arena one touches the validator and the ring. **From `TODO.md` (Codex, 2026-11-15): the user settled the appearance call budget as separate
+stats and appearance calls, five at most; `ai` implements, and the renderer/schema consumer is to be coordinated with `build`, with no premature shared schema.** Nothing for `build` to do on that yet.
+
+**First thing next session, in order:**
+1. `git status --short` and `git log --oneline -3`: slice 1 of the ring (and these doc edits) are uncommitted until the user commits them; `art`, `ai` and Codex may have edited the tree since.
+2. Ask whether the user has **played slice 1** (`pnpm --filter @gunsmith/webapp exec vite --port 3100 --strictPort`, open `http://localhost:3100/?scenario=duel&seed=42`, look at "Ring in 0:43" under the score;
+   `pkill -f "vite.*--port 3100"` after) and what they thought of the placement and the 45 seconds. Take their word before building slice 2.
+3. Slice 2, test first: engine unit tests for the radius, the seeded reachable centre (include an arena with a platform), the damage and the round ending (red first); then a spec `TheClosingRing` and the
+   drawing. **Decide with the user how a spec reaches the ring** without sitting through 45 real seconds (the cheapest honest option is a scenario whose start delay is short, but that is a seam, so ask).
+
+**State at the end of the fourth session** (the sections above supersede its "next"). Everything was committed by the user as `275255b`. A bright lip and a shadow on every drop edge of a platform
+(`arena-heights/drops/`; the user: "the updated wall looks great"); `movement/PushOutOfWalls` split into `pushing/` helpers; `vision/` sub-foldered (`CanSeePoint` and `HasClearLine` in
+`vision/sight/`); `HeightTilesOf` split into `tiles/positions/` and `tiles/drops/`.
 
 **Loose ends.** The new browser-level mutation scripts are scratchpad-only (gone with the session). The drop-edge drawing has no spec (canvas): it was checked by screenshot, so a
-future change to it should be looked at again. `docs/art/asset-reference/` is untracked and is `art`'s. The `ai` row in `TODO.md` is `ai`'s to update.
+future change to it should be looked at again. `docs/art/asset-reference/` is `art`'s. The `ai` row in `TODO.md` is `ai`'s to update. `pnpm test:properties` and a root `pnpm evals` script do not exist (the latter is owed to `ai`).
 
 **2026-11-14, fourth session:** merged the `ai` worktree again (`ceb5063`: kit-arm notes and a drawings-sheet change; `HANDOFF.md` and `TODO.md` conflicts kept both
 sides), then built **heights, slice 2: vision over height**, test first, left uncommitted for the user's review (the item below). Root `pnpm checks` exits 0 (engine 661,
@@ -64,8 +95,7 @@ Logged in `HANDOFF.md`: **best of three** (the duel only), **`engine/src/` sub-f
 **Next, in order (none was requested yet; ask or pick the first):**
 1. ~~The bot's tunables~~ **settled 2026-11-14:** the user played the duel with the cone and crouch and called the bot "fun to play
    against, easy to beat but it still needs a bit of moving and shooting". Leave `engine/src/opponent/Difficulty.ts` as it is.
-2. **Heights, the rest** (slice 1, walking, and slice 2, seeing, are done; the drop edges are drawn): **bullets and cover across levels first (plan it with the user before coding)**; a longer reach for higher ground (an idea);  the opponent on stairs (it has no pathfinder and picks goals it can see); a stair-flank check (an arena validator);
-   then the **closing ring** and a round timer (the smaller, stalemate-curing slice: fine to take it first if the user prefers). Crouch is done (slice 2).
+2. **The closing ring and a round timer** (the user's choice, 2026-11-15; plan it with them first), then **heights, the rest** (slices 1 to 3 are done: walking, seeing, bullets): the opponent on stairs (it has no pathfinder and picks goals it can see); a stair-flank check (an arena validator); a longer reach for higher ground (an idea); cover with a height. Crouch is done.
 3. Owed to `ai`: a root `pnpm evals` script (see "Owed to `ai`" below).
 4. The `ai` row in `TODO.md` is stale (its worktree merged as `e40e9a1`): it is `ai`'s to update, so only mention it.
 
@@ -348,12 +378,12 @@ RNG, no `Date.now()` or `Math.random()`. The webapp renders it and sends input.
         the opponent on stairs, then the ring.
   - [x] **Heights, slice 2: vision over height (2026-11-14), test first.** The user chose the simple level rule and **descoped the range bonus**
         ("add that as an idea to explore later"). A viewer's **eye level** is the level of their ground, or the upper level on a stair
-        (`vision/cone/EyeLevelAt`); **a tile blocks sight if it is a wall or on a level higher than the eye** (`height/BlocksSightFrom`). So from the low
+        (`EyeLevelAt`, now in `height/`); **a tile blocks sight if it is a wall or on a level higher than the eye** (`height/BlocksSightFrom`). So from the low
         ground a platform and everything on it is hidden, and its edge hides what is behind it; from a platform the low ground below and the platform show;
         walls still block. `Cone` gained `eyeLevel`; `coneOf(arena, fighter)` takes the arena; `CanSeePoint` and `VisibleArea` pass `BlocksSightFrom(arena,
         cone.eyeLevel)`, so `VisibleToPlayer`, the snapshot's `visible` flags, the opponent's `CanSee` and the dim veil's cut-out all follow. The line samplers
         take a `BlockedTiles` test instead of an arena (`distanceToWall`, `reachAlong`, `hasClearLine`; `BlockedTiles` moved to `arena/types/`, and
-        `arena/SolidTilesOf` is the walls-only test bullets and the opponent's walking goals use, so they are unchanged). `?scenario=heights` gained a dummy on
+        `arena/SolidTilesOf` is the walls-only test the opponent's walking goals use, and bullets did until slice 3). `?scenario=heights` gained a dummy on
         each level (`game/heights/HeightsDummies`). Spec `SeeingAcrossLevels` (5 criteria; DSL `gunsmith.dummies.isSeenAt`). No `shared/` change. Engine 661,
         webapp 161, `ai` 420; 98 of 98 specs on a production build, 520 of 520 at `--repeat-each=10` for the vision, arena, player and dummy specs. **Mutation:**
         21 of 22 engine mutants killed (the survivor, `Math.ceil` to `Math.round` in `EyeLevelAt`, is equivalent: levels are whole numbers or n + 0.5); 3 browser
@@ -362,9 +392,25 @@ RNG, no `Date.now()` or `Math.random()`. The webapp renders it and sends input.
         play:** a stair's eye level is its upper level; no sloped line of sight; the opponent inherits the rule through `CanSee` but its walking goals still use walls
         only, so it does not know a stair from a drop. Not covered by a spec: the veil's drawing over height (canvas). **After the first look, at the user's word the platform's edge was hard to see:** every drop edge now has a bright lip and a shadow (`arena-heights/drops/`); looked at in a screenshot, not specced (canvas). The same session split `movement/PushOutOfWalls` into `pushing/` helpers (19 mutants killed, two gaps closed) and moved `CanSeePoint` and `HasClearLine` to `vision/sight/`. **Idea, not built:** a longer reach for higher
         ground ("extends vision"); and "sees over lower cover" once cover has a height.
+  - [x] **Heights, slice 3: bullets across levels (2026-11-15), test first.** The user chose **line of fire = line of sight** (over "a drop blocks both ways" and "leave bullets alone").
+        A `Bullet` has a `level`, the eye level of its shooter when fired (`ShootFighter` reads `height/EyeLevelAt(arena, position)`, so a stair gives the upper level), and `MeetBullet`
+        asks `distanceToWall(blocksSightFrom(arena, bullet.level), ...)` instead of walls only: a bullet stops at a wall or at ground higher than where it was fired from and flies over lower
+        ground. From the low ground a platform's face is cover and stops your shots; from a platform your shots fly out over the low ground; the bot's follow the same code. `ShotRequest` gained
+        `level`, `shootFighter` takes the arena, `EyeLevelAt` moved from `vision/cone/` to `height/` (two domains use it). No `shared/` change (`BulletSnapshot` is still `{x, y}`).
+        Spec `ShootingAcrossLevels` (4 criteria, existing DSL only): red first (the platform dummy 100 to 75 from the low ground), then green. **A first version flaked 2 in 10 at
+        `--repeat-each=10`:** the player walked at full speed past the platform dummy before the browser stopped the walk, so that dummy stood in the line of fire; it now climbs crouched
+        (2.4 tiles a second) and stops at 10.6. 120 of 120 at 30 repeats with 6 workers. Engine 690, webapp 179, `ai` 421, 102 of 102 specs on a production build. **Mutation, 7 killed:**
+        `FireBullet` level fixed at 0, shooter level fixed at 0, `Math.ceil` to `Math.floor` in `EyeLevelAt`, `MeetBullet` blind to height (level 99) and fixed at 0, `>` to `>=` in
+        `BlocksSightFrom`, and the opponent's shot judged on a flat floor (**survived first**: nothing covered the opponent's path, so two `Step` tests were added, one each side); browser
+        mutants 3 of 3 killed by the right criteria. **Stated defaults, to be set by play:** a bullet's level is fixed at the moment it is fired (it does not follow a stair); no cover with a
+        height; the bot's walking goals and cover search still use walls only. `pnpm test:properties` does not exist yet, so it was not run.
   - [x] Dim arena (original item, now complete): dim arena outside a detailed forward cone, set by equipped weapon and standing/crouched stance, rotating
         with aim through 360 degrees, revealing terrain detail and players/items only in the unoccluded cone, with height blocking sight (slice 2). Cone ownership is settled.
-  - [ ] The closing ring after the round timer.
+  - [ ] **The closing ring (planned with the user 2026-11-15; a shrinking circle on a seeded reachable point, the timer starts it, damage ramps until someone dies).** Slices:
+        - [x] 1. **The round timer** (2026-11-15, unit tests first, spec after and proved by mutation, uncommitted): `engine/src/ring/` clock, `World.ring?` (the duel only), the ring's clock stops with the round, `RingHud` ("Ring in 0:43"),
+          the hook's `ring.secondsUntilStart`, spec `CountingDownToTheRing` (10 criteria). Engine 700, webapp 191, 112 specs, 460 of 460 at 10 repeats, 22 unit and 10 browser mutants killed.
+        - [ ] 2. The ring and its damage (seeded reachable centre, radius from the clock, damage ramp, the edge drawn over the veil, the hook; decide how a spec reaches it).
+        - [ ] 3. The bot walks inward (its goal becomes the centre when outside; no pathfinder; 20-seed engine test).
   - [ ] Pick up and drop a custom weapon; rough Web Audio gunshots.
 - [ ] **Demo checkpoint:** when the core is playable, tell the user it is ready for a first look. Agree what to cut or add
       before menus. Record the reaction in `docs/fuzzy-frontend.md`'s demo notes (kept for the history).

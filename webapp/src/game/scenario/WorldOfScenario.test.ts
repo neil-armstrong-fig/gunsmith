@@ -6,6 +6,7 @@ import {disarmOpponent} from "@gunsmith/engine/opponent/DisarmOpponent";
 import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import {startMatch} from "@gunsmith/engine/match/StartMatch";
+import {startRing} from "@gunsmith/engine/ring/StartRing";
 import {DUEL_ARENA} from "@src/game/duel/DuelArena";
 import {DUEL_OPPONENT} from "@src/game/duel/DuelOpponent";
 import {HEIGHTS_ARENA} from "@src/game/heights/HeightsArena";
@@ -25,7 +26,11 @@ it("makes the practice range with its dummies and no opponent", () => {
 it("makes the duel with the opponent where it stands and no dummies", () => {
   const world = worldOfScenario("duel", 7);
 
-  expect(world).toEqual({...giveOpponentBrain(startingWorld(DUEL_ARENA, [], DUEL_OPPONENT), 7), match: startMatch()});
+  expect(world).toEqual({
+    ...giveOpponentBrain(startingWorld(DUEL_ARENA, [], DUEL_OPPONENT), 7),
+    match: startMatch(),
+    ring: startRing(),
+  });
   expect(world.opponent?.position).toEqual(DUEL_OPPONENT);
   expect(world.dummies).toEqual([]);
 });
@@ -68,6 +73,16 @@ it("makes the duel a best-of-three, at nothing to nothing in its first round", (
 it("makes sparring and the practice range single rounds, with no match", () => {
   expect(worldOfScenario("sparring", 7).match).toBeUndefined();
   expect(worldOfScenario("practice", 7).match).toBeUndefined();
+});
+
+it("gives the duel a ring that has none of its round played", () => {
+  expect(worldOfScenario("duel", 7).ring).toEqual({roundSeconds: 0});
+});
+
+it("gives sparring, the practice range and the heights arena no ring, so they stay endless", () => {
+  expect(worldOfScenario("sparring", 7).ring).toBeUndefined();
+  expect(worldOfScenario("practice", 7).ring).toBeUndefined();
+  expect(worldOfScenario("heights", 7).ring).toBeUndefined();
 });
 
 it("makes the heights arena with a dummy on each level and no opponent", () => {

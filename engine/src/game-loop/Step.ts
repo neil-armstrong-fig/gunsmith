@@ -8,6 +8,7 @@ import {takeDamage} from "@gunsmith/engine/health/TakeDamage";
 import {scoreRound} from "@gunsmith/engine/match/ScoreRound";
 import {thinkOpponent} from "@gunsmith/engine/opponent/ThinkOpponent";
 import type {Player} from "@gunsmith/engine/player/types/Player";
+import {advanceRing} from "@gunsmith/engine/ring/AdvanceRing";
 import {decideRound} from "@gunsmith/engine/round/DecideRound";
 
 /**
@@ -21,7 +22,8 @@ import {decideRound} from "@gunsmith/engine/round/DecideRound";
  * are let go, so a shot fired this step starts to move on the next one. A shot spends a round and leaves with the damage
  * and speed of the weapon in hand; a reload that finishes this step lets the weapon fire in the same step. When either
  * side is out of health the round is decided and, in a match, scored once (the frozen world below never scores it again);
- * after that the world is frozen and only the clock runs.
+ * after that the world is frozen and only the clock runs. A world with a ring runs the ring's own clock on by `seconds`
+ * in each step that is fought, so it stops with the round, unlike `elapsedSeconds`.
  */
 export function step(world: World, input: Input, seconds: number): World {
   if (world.round !== "playing") {
@@ -40,8 +42,8 @@ export function step(world: World, input: Input, seconds: number): World {
     seconds,
   });
 
-  const playerShot = shootFighter("player", playerTurn);
-  const opponentShot = opponentTurn && shootFighter("opponent", opponentTurn);
+  const playerShot = shootFighter(world.arena, "player", playerTurn);
+  const opponentShot = opponentTurn && shootFighter(world.arena, "opponent", opponentTurn);
   const bullets: Bullet[] = [...bulletFlight.bullets];
   for (const shot of [playerShot, opponentShot]) {
     if (shot?.bullet) {
@@ -64,6 +66,7 @@ export function step(world: World, input: Input, seconds: number): World {
     elapsedSeconds: world.elapsedSeconds + seconds,
     round,
     match: world.match && scoreRound(world.match, round),
+    ring: world.ring && advanceRing(world.ring, seconds),
   };
 }
 

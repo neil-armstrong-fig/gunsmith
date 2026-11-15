@@ -46,6 +46,25 @@ fast a weapon can be whoever is favoured.
 2. The per-stat overshoot question above, if the user wants it.
 3. Still waiting on the user and `build`: the shield behaviour, the omitted-stat policy, the real `StateGraph` and `AiAdapter` mapping.
 
+**Codex's documentation handoff (2026-11-15, merged from main; its call budget and verification list stand, its "work from main" lines are superseded).**
+Read [AI session handoff](docs/ai-visual-generation.md#ai-session-handoff-2026-11-15). The user chose separate stats and appearance calls, **five
+maximum** (three for a clean request), and asked whether this balloons cost: about $1.06 per 1,000 complete weapons from separate recorded runs,
+roughly three times stats alone; measure it end to end. **Work in this worktree, not main:** it holds the spend ledger (`ai/evals/results/paid-spend-latest.json`,
+**$0.570 of the $1**, not the $0.4674 the handoff quotes) and the balancer; main has no ledger. Do not reset accounting or raise budgets or credit prices. Codex
+documents and reviews AI work only; the AI coding session implements.
+
+**Integration checklist (2026-11-15, in progress):**
+
+- [ ] Criteria first (unit tests in `GenerateWeapon.test.ts`, then eval criteria in the DSL), watched failing for the right reason.
+- [ ] Wire `generateAppearance` after stats pass validate, balance and rate: separate `appearanceGenerator`, one repair per stage, five calls at most, disclosed stand-in, none on rejected or invalid stats.
+- [ ] Mutation-prove it; run `pnpm checks`, `evals:fake`, `evals:local`; the standards and folder review.
+- [ ] After approval, one paid run at 3 trials; report combined cost and latency per created weapon (stats and appearance split) against the $1.06 per 1,000 estimate.
+- [ ] Docs, this checklist, the AI row and the delivery log. Leave it uncommitted.
+
+**Cheap-model benchmark (the user's idea, 2026-11-15, not started):** benchmark cheap hosted models as a test tier, perhaps good enough to replace Haiku for the drawing. Needs the user first:
+a new dependency (an OpenAI-compatible client), a provider key with its own cap, spend, and a privacy note for production text.
+
+
 ## Earlier checkpoint (2026-11-14 night, after the jellyfish lantern)
 
 **State.** Main is merged into the worktree (fast-forward to `ceb5063`; `build`'s uncommitted `SolidTilesOf` refactor in main's tree is not in it). **Jellyfish lantern, done red
@@ -61,13 +80,16 @@ Spend **$0.458 of the $1** (the sheet `ai/evals/results/drawings-paid-latest.htm
 **The user looked at the sheet (2026-11-14, night): "it all looks really good". The appearance drawing work is accepted; nothing more to climb on it.**
 
 **Next turn, in this order:**
-1. **Integrate appearance with `build`** (the user's earlier call: integrate first, tune from there). Needs two answers, so start by asking `build` (a line in `TODO.md` "Blockers and requests") and the user:
-   the **call budget** (about 1.1 calls per weapon: the same call as the stats or a second one; the weapon criterion allows three calls and appearance alone can use two) and **where the schema lives**
-   (`shared/` once the webapp renderer imports it; not before). Then: wire `generateAppearance` beside `generateWeapon` (test first, evals first), keep the disclosed stand-in visible to the player.
+1. **Integrate appearance with `build`** (the user's earlier call: integrate first, tune from there). Follow the dated handoff above:
+   separate calls, five maximum; measure combined cost and latency. Coordinate the schema's home with `build`
+   (`shared/` once the webapp renderer imports it; not before). Wire `generateAppearance` beside `generateWeapon`
+   (test first, evals first), keeping the disclosed stand-in visible to the player. The AI coding session owns implementation.
 2. **The stat balancer** (the user's design, `O2` below): needs where it lives (probably `engine/`, with `ai/` using a local draft), the budget, the preference encoding, the no-preference default. Probe the model's preferences first.
 3. Still waiting on the user and `build`: the shield behaviour, the omitted-stat policy, the real `StateGraph` and `AiAdapter` mapping.
 4. Optional, only if the user wants the overflow sentence proven rather than kept on trust: keep the failing first draft in the outcome, replay real failing drafts through the old and new sentence (about $0.05).
-Budget: **$0.458 of the $1 spent**; ask before raising the ceiling. Everything is uncommitted for the user's review (never commit `ai` code).
+Budget: the dated handoff above supersedes this checkpoint's **$0.458** figure; re-read the cumulative ledger before a paid run.
+Ask before raising the ceiling. The existing weapon and appearance pipelines are merged into main through `11f7f45`;
+integration remains unimplemented. Leave new work uncommitted for the user's review.
 
 ## Earlier checkpoint (2026-11-14, after the kit probe, which is removed)
 

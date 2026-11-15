@@ -1,5 +1,6 @@
 import {AmmoHud} from "@src/react/components/dom/ammo-hud/AmmoHud";
 import {HealthHud} from "@src/react/components/dom/health-hud/HealthHud";
+import {RingHud} from "@src/react/components/dom/ring-hud/RingHud";
 import {RoundBanner} from "@src/react/components/dom/round-banner/RoundBanner";
 import {ScoreHud} from "@src/react/components/dom/score-hud/ScoreHud";
 import {ArenaCanvas} from "@src/react/components/three/arena-canvas/ArenaCanvas";
@@ -16,6 +17,8 @@ export function App(): JSX.Element {
       <HealthHud />
 
       <ScoreHud />
+
+      <RingHud />
 
       <RoundBanner />
     </>

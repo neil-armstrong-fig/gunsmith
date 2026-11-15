@@ -1,5 +1,6 @@
 import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
+import {startRing} from "@gunsmith/engine/ring/StartRing";
 import {DUEL_ARENA} from "@src/game/duel/DuelArena";
 import {DUEL_OPPONENT} from "@src/game/duel/DuelOpponent";
 import {nextRoundOfPage} from "@src/game/scenario/NextRoundOfPage";
@@ -18,6 +19,7 @@ it("makes a fresh duel round with the opponent's seed moved on by one", () => {
   expect(world).toEqual({
     ...giveOpponentBrain(startingWorld(DUEL_ARENA, [], DUEL_OPPONENT), 6),
     match: {playerWins: 0, opponentWins: 1, roundNumber: 2},
+    ring: startRing(),
   });
 });
 

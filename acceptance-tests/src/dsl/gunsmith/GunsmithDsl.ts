@@ -9,6 +9,7 @@ import {DUEL_SEED} from "@src/dsl/gunsmith/duel/DuelSeed";
 import {LONG_DUEL_SEED} from "@src/dsl/gunsmith/duel/LongDuelSeed";
 import {OpponentDsl} from "@src/dsl/gunsmith/components/opponent/OpponentDsl";
 import {PlayerDsl} from "@src/dsl/gunsmith/components/player/PlayerDsl";
+import {RingDsl} from "@src/dsl/gunsmith/components/ring/RingDsl";
 import {RoundDsl} from "@src/dsl/gunsmith/components/round/RoundDsl";
 import {VisionDsl} from "@src/dsl/gunsmith/components/vision/VisionDsl";
 import {WeaponDsl} from "@src/dsl/gunsmith/components/weapon/WeaponDsl";
@@ -27,6 +28,7 @@ export class GunsmithDsl {
   readonly hud: HudDsl;
   readonly opponent: OpponentDsl;
   readonly match: MatchDsl;
+  readonly ring: RingDsl;
   readonly round: RoundDsl;
   readonly vision: VisionDsl;
 
@@ -41,6 +43,7 @@ export class GunsmithDsl {
     this.hud = new HudDsl(page);
     this.opponent = new OpponentDsl(page);
     this.match = new MatchDsl(page);
+    this.ring = new RingDsl(page);
     this.round = new RoundDsl(page);
     this.vision = new VisionDsl(page);
   }
