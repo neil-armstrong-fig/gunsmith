@@ -4,11 +4,13 @@ import {beforeAll, given, thenExpect, when} from "@evals/eval-criteria-mapping/E
 // shown, one that does not is repaired once, and if that fails too the plain stand-in is shown and says so. What holds whatever is
 // asked (safe to show, a stand-in never passed off as the model's own, a fixed path within two calls) is added under every `when`
 // by the DSL. The `then`s here are the hills to climb: measured 2026-11-13 on `qwen3.5:9b`, most first drawings were refused
-// (shapes a unit or two outside the canvas, other kinds' fields on every shape), so most of these are capability for now.
+// (shapes a unit or two outside the canvas, other kinds' fields on every shape), so the whole feature is in progress for now.
 // Whether a drawing looks like what was asked for is for a person to judge, from the contact sheet; nothing here claims it.
-given("a player describes how their weapon should look", () => {
+// In progress: drawing is the least finished feature. The user judged the contact sheet "really good" (2026-11-14) and 35 of 36 drawings were valid
+// first time on Haiku 5.5, but the drawing is not wired into the weapon pipeline yet and its call budget is not settled, so none of this gates.
+given.inProgress("a player describes how their weapon should look", () => {
   // `art`'s six prompt-built oddities (docs/art/concepts/prompt-built-oddities.md): each asks for a shape that is not a gun.
-  when.capability("they ask for a rubber duck cannon", ({appearance}) => {
+  when("they ask for a rubber duck cannon", ({appearance}) => {
     beforeAll(() =>
       appearance.ask("A rubber duck cannon that bounces angry little ducks around corners. Big squeaks, tiny dignity."),
     );
@@ -18,7 +20,7 @@ given("a player describes how their weapon should look", () => {
     thenExpect("the first drawing needs no repair", () => appearance.expectNoRepairNeeded());
   });
 
-  when.capability("they ask for an office fax machine", ({appearance}) => {
+  when("they ask for an office fax machine", ({appearance}) => {
     beforeAll(() => appearance.ask("A furious office fax machine that fires every rejected invoice at once."));
 
     thenExpect("the model's own drawing is shown", () => appearance.expectDrawnByTheModel());
@@ -26,7 +28,7 @@ given("a player describes how their weapon should look", () => {
     thenExpect("the first drawing needs no repair", () => appearance.expectNoRepairNeeded());
   });
 
-  when.capability("they ask for a teapot with a black hole in it", ({appearance}) => {
+  when("they ask for a teapot with a black hole in it", ({appearance}) => {
     beforeAll(() => appearance.ask("A teapot containing a tiny black hole. Pour one extremely bad idea at a time."));
 
     thenExpect("the model's own drawing is shown", () => appearance.expectDrawnByTheModel());
@@ -34,7 +36,7 @@ given("a player describes how their weapon should look", () => {
     thenExpect("the first drawing needs no repair", () => appearance.expectNoRepairNeeded());
   });
 
-  when.capability("they ask for a disco cactus", ({appearance}) => {
+  when("they ask for a disco cactus", ({appearance}) => {
     beforeAll(() => appearance.ask("A disco cactus that sneezes a fan of glittering needles."));
 
     thenExpect("the model's own drawing is shown", () => appearance.expectDrawnByTheModel());
@@ -42,7 +44,7 @@ given("a player describes how their weapon should look", () => {
     thenExpect("the first drawing needs no repair", () => appearance.expectNoRepairNeeded());
   });
 
-  when.capability("they ask for a jellyfish lantern", ({appearance}) => {
+  when("they ask for a jellyfish lantern", ({appearance}) => {
     beforeAll(() => appearance.ask("A jellyfish lantern whose tentacles braid into a painfully focused beam."));
 
     thenExpect("the model's own drawing is shown", () => appearance.expectDrawnByTheModel());
@@ -50,7 +52,7 @@ given("a player describes how their weapon should look", () => {
     thenExpect("the first drawing needs no repair", () => appearance.expectNoRepairNeeded());
   });
 
-  when.capability("they ask for a bubblegum mortar", ({appearance}) => {
+  when("they ask for a bubblegum mortar", ({appearance}) => {
     beforeAll(() => appearance.ask("A bubblegum mortar that launches enormous gum bubbles which pop spectacularly."));
 
     thenExpect("the model's own drawing is shown", () => appearance.expectDrawnByTheModel());
@@ -59,19 +61,19 @@ given("a player describes how their weapon should look", () => {
   });
 
   // Underspecified requests must still give a complete, usable drawing.
-  when.capability("they say almost nothing", ({appearance}) => {
+  when("they say almost nothing", ({appearance}) => {
     beforeAll(() => appearance.ask("a gun"));
 
     thenExpect("the model's own drawing is shown", () => appearance.expectDrawnByTheModel());
   });
 
-  when.capability("they say nothing about how it looks", ({appearance}) => {
+  when("they say nothing about how it looks", ({appearance}) => {
     beforeAll(() => appearance.ask("a fast pistol with a small magazine"));
 
     thenExpect("the model's own drawing is shown", () => appearance.expectDrawnByTheModel());
   });
 
-  when.capability("they contradict themselves", ({appearance}) => {
+  when("they contradict themselves", ({appearance}) => {
     beforeAll(() => appearance.ask("a tiny huge cannon that is both a toaster and a violin"));
 
     thenExpect("the model's own drawing is shown", () => appearance.expectDrawnByTheModel());
@@ -79,7 +81,7 @@ given("a player describes how their weapon should look", () => {
 
   // Probed 2026-11-13: every one of 6 trials ran into the 3000-token output cap on this, so a request for endless detail
   // costs the most and gives nothing.
-  when.capability("they ask for far more detail than a drawing may have", ({appearance}) => {
+  when("they ask for far more detail than a drawing may have", ({appearance}) => {
     beforeAll(() =>
       appearance.ask(
         "a cannon covered in 200 tiny gears, 100 pipes, 50 rivets and hundreds of ornate engraved details, every one drawn",
@@ -89,7 +91,7 @@ given("a player describes how their weapon should look", () => {
     thenExpect("the model writes no more than 3000 tokens", () => appearance.expectOutputTokensAtMost(3000));
   });
 
-  when.capability("they ask for something a drawing cannot do", ({appearance}) => {
+  when("they ask for something a drawing cannot do", ({appearance}) => {
     beforeAll(() => appearance.ask("a vacuum cleaner that pulls enemies toward you"));
 
     thenExpect("the model's own drawing is shown", () => appearance.expectDrawnByTheModel());

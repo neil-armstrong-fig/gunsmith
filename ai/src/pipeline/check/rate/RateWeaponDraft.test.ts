@@ -49,3 +49,36 @@ it("rounds the damage per second in its message, so a long fraction is not shown
 
   expect(rating.ok ? [] : rating.errors[0]).toContain("166.7 damage per second");
 });
+
+it("refuses a weapon over the power budget even when it is inside the damage cap, naming the rating and the way out", () => {
+  const strongEverywhere = {
+    ...RIFLE,
+    bulletDamage: 20.9,
+    fireIntervalSeconds: 0.18,
+    bulletSpeed: 41.3,
+    magazineSize: 15,
+    reloadSeconds: 1.1,
+    startingReserve: 132,
+  };
+
+  const rating = rateWeaponDraft(strongEverywhere);
+
+  expect(rating.ok).toBe(false);
+  expect(rating.ok ? "" : rating.errors[0]).toContain("power rating");
+  expect(rating.ok ? "" : rating.errors[0]).toContain("0.65");
+});
+
+it("names the damage cap first when a weapon is over both limits", () => {
+  const rating = rateWeaponDraft({
+    ...RIFLE,
+    bulletDamage: 100,
+    fireIntervalSeconds: 0.05,
+    bulletSpeed: 60,
+    magazineSize: 60,
+    reloadSeconds: 0.5,
+    startingReserve: 200,
+  });
+
+  expect(rating.ok ? [] : rating.errors).toHaveLength(2);
+  expect(rating.ok ? "" : rating.errors[0]).toContain("damage per second");
+});

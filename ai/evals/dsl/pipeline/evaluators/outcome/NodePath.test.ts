@@ -6,36 +6,50 @@ function ran(nodes: string[], status: WeaponOutcomeStatus = "invalid"): ReturnTy
   return passingEvalInput({outcome: {nodes, status}});
 }
 
-it("passes a created weapon that was generated, validated and rated", () => {
-  const nodes = ["precheck", "moderation", "generate", "validate", "rate"];
+it("passes a created weapon that was generated, validated, balanced and rated", () => {
+  const nodes = ["precheck", "moderation", "generate", "validate", "balance", "rate"];
 
   expect(nodePath(ran(nodes, "created")).score).toBe(1);
 });
 
 it("passes a created weapon that was repaired once and checked again", () => {
-  const nodes = ["precheck", "moderation", "generate", "validate", "repair", "validate", "rate"];
+  const nodes = ["precheck", "moderation", "generate", "validate", "repair", "validate", "balance", "rate"];
 
   expect(nodePath(ran(nodes, "created")).score).toBe(1);
 });
 
 it("fails a created weapon that was never validated", () => {
-  const score = nodePath(ran(["precheck", "moderation", "generate", "rate"], "created"));
+  const score = nodePath(ran(["precheck", "moderation", "generate", "balance", "rate"], "created"));
 
   expect(score.comment).toBe(
-    "a created weapon must have been validated, but the nodes were [precheck, moderation, generate, rate]",
+    "a created weapon must have been validated, but the nodes were [precheck, moderation, generate, balance, rate]",
+  );
+});
+
+it("fails a created weapon that was never balanced", () => {
+  const score = nodePath(ran(["precheck", "moderation", "generate", "validate", "rate"], "created"));
+
+  expect(score.comment).toBe(
+    "a created weapon must have been balanced, but the nodes were [precheck, moderation, generate, validate, rate]",
   );
 });
 
 it("fails a created weapon that was never rated", () => {
-  const score = nodePath(ran(["precheck", "moderation", "generate", "validate"], "created"));
+  const score = nodePath(ran(["precheck", "moderation", "generate", "validate", "balance"], "created"));
 
   expect(score.comment).toBe(
-    "a created weapon must have been rated, but the nodes were [precheck, moderation, generate, validate]",
+    "a created weapon must have been rated, but the nodes were [precheck, moderation, generate, validate, balance]",
   );
 });
 
+it("fails a created weapon that was rated before it was balanced", () => {
+  const nodes = ["precheck", "moderation", "generate", "validate", "rate", "balance"];
+
+  expect(nodePath(ran(nodes, "created")).score).toBe(0);
+});
+
 it("fails a created weapon whose last check was before its repair", () => {
-  const nodes = ["precheck", "moderation", "generate", "validate", "rate", "repair"];
+  const nodes = ["precheck", "moderation", "generate", "validate", "balance", "rate", "repair"];
 
   expect(nodePath(ran(nodes, "created")).score).toBe(0);
 });

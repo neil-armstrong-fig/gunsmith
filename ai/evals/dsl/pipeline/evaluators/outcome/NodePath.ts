@@ -5,12 +5,12 @@ const KEY = "nodePath";
 
 const MAX_REPAIRS = 1;
 
-const REQUIRED_FOR_CREATED = ["validate", "rate"];
+const REQUIRED_FOR_CREATED = ["validate", "balance", "rate"];
 
 /**
  * The graph is fixed, so its path is asserted node by node rather than with a trajectory judge (Focused reserves those for
  * agents with more than two tools): the pre-check runs first, so a rejection there costs nothing, repair runs at most once, and a
- * weapon counts as created only if it was validated and rated.
+ * weapon counts as created only if it was validated, balanced and rated.
  */
 export function nodePath({outcome}: EvalInput): EvalScore {
   if (outcome.nodes[0] !== "precheck") {
@@ -33,7 +33,7 @@ export function nodePath({outcome}: EvalInput): EvalScore {
   return createdPath(outcome.nodes);
 }
 
-/** A weapon is only created once code has parsed it and rated it, and the last word is the rating (so any repair was checked). */
+/** A weapon is only created once code has parsed it, balanced it and rated it, and the last word is the rating (so any repair was checked). */
 function createdPath(nodes: string[]): EvalScore {
   for (const required of REQUIRED_FOR_CREATED) {
     if (!nodes.includes(required)) {

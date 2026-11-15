@@ -11,7 +11,42 @@ waits on you. **O1 needs nothing from `build` and can start immediately.**
 **What the others need from you:** a decision on where the pipeline runs (it decides whether `api/` imports `ai/`), the
 kill-switch flag's shape, and a review of the contracts before they freeze (Milestone M2).
 
-## Resume here (context-clear checkpoint, 2026-11-14 night, after the jellyfish lantern)
+## Resume here (context-clear checkpoint, 2026-11-15, after the stat balancer)
+
+**State.** Main is merged into the worktree (fast-forward to `11f7f45`, before anything else). **The stat balancer is built and wired in**, all
+**uncommitted for the user's review** (never commit `ai` code; the new `engine/` files are in the same state). Root `pnpm checks` exit 0 (engine 756,
+`ai` 460, webapp 179, audio 254). Spend **$0.570 of the $1** (probe $0.009, weapon runs, the prompt bisect); ask before raising it.
+
+**What was built, test first (read `docs/ai-pipeline.md` "The stat balancer" first).**
+- **`engine/src/weapon-balance/`, built on `engine/src/power-rating/`** (the user chose `engine/`, over `shared/` and over an `ai/` draft; new files only, plus one paragraph in `engine/AGENTS.md`):
+  `power-rating/` (`PowerRatingOf`, `goodness/`, `rating/`, `ranges/StatRanges`) and `weapon-balance/` (`BalanceWeapon`, `limits/` with budget 0.65 and damage cap 150, `shrinking/`, `weights/`, `rounding/`; it imports `power-rating/`, never the reverse). Never adds, trims
+  evenly by weight (favoured 0.25, neutral 1, sacrificed 3): budget first from all six stats, then the damage cap from damage and fire rate. unit tests plus `fast-check`
+  properties (`pnpm test:properties`, not in `pnpm checks`: inside every limit, never stronger, deterministic, promoting a stat never lowers it); over fifty mutants, all killed in the end.
+- **`ai/`**: the model returns `preference: {favoured, sacrificed}` (lists of the engine's six stat names; missing means none; an unknown name is refused and repaired; a stat in
+  both counts as neither), `check/` now runs `validate` → `balance` → `rate`, `rate` is the backstop (engine damage cap and power budget), `WEAPON_LIMITS` takes its six ranges from the
+  engine, `ai/package.json` gained `"@gunsmith/engine": "workspace:*"` (the user approved; one importer line in `pnpm-lock.yaml`). ai's own `MaxDamagePerSecond` is deleted.
+- **Evals** (`evals/tests/weapon/`): `expectBalancedByCode` (a `balance` node and no `repair`) on "maximum of everything" and on "hits hard and fires fast but I do not care about anything
+  else"; `NodePath` now needs `validate, balance, rate`. Red by mutation (balancing bypassed: exactly the three criteria that name it fall, 3 of 3 trials each). Local 78 of 78, fake the same
+  8 by-design failures, **Haiku 77 of 78**.
+
+**Tagging moved up (the user's design, 2026-11-15): `given.inProgress(...)` replaced `when.capability(...)`** (the suite is `inProgress` in the results). Every old tag was carried over one to one: `DrawingAWeapon`, `NotAWeaponRequest`, the shield `given` and the balancer `given` in `AskingForAWeapon` and the whole of `TryingToBreakTheSmith` except its data-block `when` are in progress, each with a comment saying why; mixed specs were split into two `given`s. Not yet promoted to a plain `given`: several now pass on every tier (see the comments), the user's call when.
+
+**The one open finding, for the user.** On "a machine gun with a big magazine and plenty of spare ammo" Haiku writes a magazine of 80 to 100 and a reserve of 300 to 400, past the ranges
+(60 and 200), 3 of 3 times under every wording tried (five variants, bisected: not the prompt), so `validate` refuses and a repair runs (a third call; still `created`). It is in a `given.inProgress`
+("a big magazine and plenty of spare ammo"). **The user's call:** let code take a number past a range as data and bring it in (the engine's goodness already treats it as the end of the range;
+it needs `validate` to accept finite numbers past a range and `balanceWeapon` to clamp into ranges), or leave it to the repair. Not done: it changes what `validate` accepts.
+
+**Also for the user and `build`:** `docs/game-design.md` ("power is capped, not balanced; nothing is silently nerfed") and `docs/schemas.md` now contradict the design; `build` should review and
+tune `power-rating/` and `weapon-balance/` (budget, shares, weights); a sacrificed stat is only trimmed as far as the limits need, not pushed to its floor (the "never buff" choice), and the damage cap decides how hard and
+fast a weapon can be whoever is favoured.
+
+**Next, in order:**
+1. **Integrate appearance** (the user's call: a **second model call**, the schema stays in `ai/` until the webapp renderer imports it): wire `generateAppearance` beside `generateWeapon`, test first, eval first,
+   keep the disclosed stand-in visible, the weapon criterion's 3-call budget becomes 5.
+2. The per-stat overshoot question above, if the user wants it.
+3. Still waiting on the user and `build`: the shield behaviour, the omitted-stat policy, the real `StateGraph` and `AiAdapter` mapping.
+
+## Earlier checkpoint (2026-11-14 night, after the jellyfish lantern)
 
 **State.** Main is merged into the worktree (fast-forward to `ceb5063`; `build`'s uncommitted `SolidTilesOf` refactor in main's tree is not in it). **Jellyfish lantern, done red
 first.** Baseline: 3 stand-ins in 9 trials, all `reaches outside the 64 by 64 space`, the repair moving tentacles 1 to 10 units. One change: `OutsideErrors` now writes
@@ -438,7 +473,7 @@ tiers behind one `weaponPipelineDependencies` argument: fake (in `pnpm checks`),
 
 ## O2: the pipeline (a deterministic LangGraph `StateGraph`, not a free agent). Milestones M3 to M5
 
-- [ ] **Stat balancing: the AI infers, the code balances (the user's design, 2026-11-14).** "Max everything" is not a solution, and
+- [x] **Stat balancing: the AI infers, the code balances (the user's design, 2026-11-14). Built 2026-11-15 in `engine/src/weapon-balance/` (on `power-rating/`) (the user's choice) and wired in as a `balance` node; see "Resume here" and `docs/ai-pipeline.md`. What follows is the original brief; its four open questions were answered: lives in `engine/`; the budget is the engine's power rating (0.65) plus the 150 damage cap; the preference is two enum lists; no preference means trim evenly, never buff. Evals (a) and the "hard and fast" case are in; (b) to (d) are proved in `engine/` unit and seeded-invariant tests instead, because both models already point the right way, so an eval could not be red first.** "Max everything" is not a solution, and
       asking the model to behave (or refusing and repairing) is the wrong tool. Instead the model returns **two things**: the **stat
       values it infers** from the prompt, and the player's **stat preference** (which stats they want high, which they would give up).
       Then **code balances the JSON after it is produced**: if one stat is high, it must cost the others, so a weapon cannot be strong

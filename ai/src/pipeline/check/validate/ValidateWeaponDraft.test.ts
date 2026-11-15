@@ -10,8 +10,27 @@ const RIFLE = {
   startingReserve: 36,
 };
 
-it("returns the weapon when the answer fits the schema", () => {
-  expect(validateWeaponDraft(RIFLE)).toEqual({ok: true, weapon: RIFLE});
+it("returns the weapon when the answer fits the schema, with no preference when the model gave none", () => {
+  expect(validateWeaponDraft(RIFLE)).toEqual({ok: true, weapon: RIFLE, preference: {favoured: [], sacrificed: []}});
+});
+
+it("returns the preference the model gave, apart from the weapon", () => {
+  const preference = {favoured: ["damage"], sacrificed: ["reserve"]};
+
+  expect(validateWeaponDraft({...RIFLE, preference})).toEqual({ok: true, weapon: RIFLE, preference});
+});
+
+it("refuses a preference that names a stat there is not, and says where", () => {
+  const result = validateWeaponDraft({...RIFLE, preference: {favoured: ["accuracy"], sacrificed: []}});
+
+  expect(result.ok).toBe(false);
+  expect(result.ok ? [] : result.errors.map(error => error.split(":")[0])).toEqual(["preference.favoured.0"]);
+});
+
+it("accepts a stat in both lists, which the balancer counts as neither", () => {
+  const preference = {favoured: ["damage"], sacrificed: ["damage"]};
+
+  expect(validateWeaponDraft({...RIFLE, preference})).toEqual({ok: true, weapon: RIFLE, preference});
 });
 
 it("names the field and the problem when a stat is over its cap", () => {

@@ -54,7 +54,7 @@ thing).** Changing one means editing this section in the same change and telling
 | `CreditLedger` interface | `shared/` | `build` | api, `ai` | Balance, atomic spend, refund, daily reset at 00:00 UTC. An in-memory fake and a D1 implementation pass the same contract suite. |
 | Credit prices and limits | one config in `shared/` | `build` | `ai`, webapp | 10 a day; weapon 1, arena 1, edit 1, rejection 0.5. Prompt token limits: weapon 150, arena 250. |
 | Kill-switch flag | `api/` (KV or D1) read through one function | `ai` (writes), `build` (reads in UI) | webapp, api | When on: no new generation, the AI-off banner, built-in pool only, game still plays. |
-| Power rating and caps | `engine/` | `build` | `ai`, webapp | The `rate` node in the AI graph calls it. The AI never decides balance. |
+| Power rating and caps | `engine/` | `build` | `ai`, webapp | **A first version exists (2026-11-15, `engine/src/power-rating/` and `weapon-balance/`, written by `ai` at the user's say; `build` owns it from here).** `PowerRatingOf`, `BalanceWeapon` (brings a weapon inside the power budget and the damage cap by the player's preference, never adding), `ranges/StatRanges`. The `balance` and `rate` nodes in the AI graph call it. The AI never decides balance. |
 | Arena validator | `engine/` | `build` | `ai`, webapp | The `validate` node calls it. |
 | Output moderation (names, descriptions) | `engine/` or `shared/` | `build` | `ai` | Deterministic blocklist and length/charset limits. |
 | Canvas state hook | `webapp/` | `build` | acceptance DSL | A read-only, tiny object on `window` exposing what specs need (player positions, health, round, visible entities). Not for writing state. |
@@ -144,6 +144,17 @@ those implementations; art's README records unsupported identities and proposed 
 - [ ] Art delivered and wired in (`art`, then `build`)
 
 ## Delivery log
+
+- 2026-11-15, `ai`: **the stat balancer is built, in `engine/src/weapon-balance/`, on `engine/src/power-rating/` (the user chose `engine/` over `shared/`, and over an `ai/`
+  draft), uncommitted in the `ai` worktree for review.** It is the one cross-folder write: new files only, plus a paragraph in
+  `engine/AGENTS.md`, and `build`'s files are untouched. `balanceWeapon({stats, preference})` brings a weapon inside the power budget
+  (0.65) and the damage cap (150 a second) by taking from its stats, where the player's `favoured` / `sacrificed` lists say, and never adds;
+  `powerRatingOf` rates a weapon 0 to 1; `ranges/StatRanges` is now the one home of the six numbers' floors and caps (`ai`'s
+  `WEAPON_LIMITS` reads them). `ai` wired it in as a `balance` node between `validate` and `rate`, so the model infers and code balances;
+  the repair is now for schema faults only. `ai` gained a `workspace:*` dependency on `@gunsmith/engine` (one importer line in the
+  lockfile). Engine 751 tests plus 7 properties (was 679), `ai` 460 (was 421); mutation-proved, with `fast-check` properties for the invariants (**a new dependency, `fast-check` 4.9.0 in the engine's devDependencies, pinned as janggi pins it; the user asked for it; run them with `pnpm test:properties`**). **`build`:
+  please review `engine/AGENTS.md` "power-rating" and the numbers (budget, shares, weights) are yours to tune in play; and
+  `docs/game-design.md` still says "power is capped, not balanced; nothing is silently nerfed", which the balancer contradicts.**
 
 - 2026-11-14, `art`: **build asset reference delivered** at
   `docs/art/asset-reference/README.md`: five editable SVG/PNG sheets, 80 individual

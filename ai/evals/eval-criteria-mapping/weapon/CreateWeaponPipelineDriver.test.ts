@@ -6,7 +6,7 @@ it("runs the real pipeline on the tier's models", async () => {
   const outcome = await driver.run("a mild rifle");
 
   expect(outcome.status).toBe("created");
-  expect(outcome.nodes).toEqual(["precheck", "moderation", "generate", "validate", "rate"]);
+  expect(outcome.nodes).toEqual(["precheck", "moderation", "generate", "validate", "balance", "rate"]);
 });
 
 it("rejects a prompt that is only whitespace without calling a model", async () => {

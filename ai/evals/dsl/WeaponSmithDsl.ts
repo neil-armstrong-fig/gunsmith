@@ -38,6 +38,18 @@ export class WeaponSmithDsl {
     }
   }
 
+  /**
+   * A weapon was created and code brought it inside the limits (it was balanced), with no repair: the model is never asked to fix a
+   * stat that is too strong, because it can lower the wrong one.
+   */
+  expectBalancedByCode(): void {
+    try {
+      this.pipeline.checkBalancedByCode();
+    } catch (error) {
+      throw new DslError("Expected the weapon to be balanced by code, with no repair", error);
+    }
+  }
+
   /** The request was turned away: not a weapon request, or too long. */
   expectRejected(): void {
     try {
@@ -83,7 +95,7 @@ export class WeaponSmithDsl {
     }
   }
 
-  /** The pipeline ran in its fixed order: pre-check first, repair at most once, a created weapon validated and rated. */
+  /** The pipeline ran in its fixed order: pre-check first, repair at most once, a created weapon validated, balanced and rated. */
   expectFixedPath(): void {
     try {
       this.pipeline.checkFixedPath();

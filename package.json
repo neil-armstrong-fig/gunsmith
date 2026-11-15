@@ -19,6 +19,7 @@
     "format": "pnpm --recursive format",
     "format:check": "pnpm --recursive format:check",
     "type-check": "pnpm --recursive type-check",
-    "test": "pnpm --recursive test"
+    "test": "pnpm --recursive test",
+    "test:properties": "pnpm --filter @gunsmith/engine test:properties"
   }
 }

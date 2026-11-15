@@ -8,7 +8,7 @@ export function passingEvalInput(overrides: EvalInputOverrides = {}): EvalInput 
     outcome: {
       status: "created",
       weapon: PASSING_WEAPON,
-      nodes: ["precheck", "moderation", "generate", "validate", "rate"],
+      nodes: ["precheck", "moderation", "generate", "validate", "balance", "rate"],
       modelCalls: 2,
       ...overrides.outcome,
     },

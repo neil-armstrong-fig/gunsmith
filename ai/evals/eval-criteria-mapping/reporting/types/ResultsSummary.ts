@@ -6,5 +6,5 @@ export interface ResultsSummary extends ResultsRun {
   criteria: number;
   criteriaPassed: number;
   regression: SuiteTally;
-  capability: SuiteTally;
+  inProgress: SuiteTally;
 }

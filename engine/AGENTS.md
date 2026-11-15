@@ -70,6 +70,19 @@ everything else is a domain folder. Tiles are the unit; `x` grows to the east an
   (the weapon in hand; it throws when the index is wrong, which `SwitchWeapon` keeps from happening) and
   `WithEquippedWeapon` (put a changed one back).
 - `health/`: `PlayerHealth` and `OpponentHealth` (100 each, tunables) and `TakeDamage` (stops at zero).
+- `power-rating/`: how strong a weapon is (**written by `ai` at the user's say, 2026-11-15**; `build` owns it from here). `PowerRatingOf(stats)` rates a `WeaponStats`
+  (a `Weapon` without its vision) from 0 to 1: each stat becomes a goodness from 0 (its weakest allowed value) to 1 (its strongest) in `goodness/` (`GoodnessOf`,
+  and `StatsAt` runs it backwards; log scale for damage, fire rate, magazine and reload speed, linear for bullet speed and reserve; the interval and the reload
+  turn round so higher is always better) and the goodnesses are added up by `rating/StatPowerShares` (damage and fire rate 0.25, magazine and reload 0.15, speed and
+  reserve 0.1). `ranges/StatRanges` is the one home of the floor and cap of each of the six numbers. `testing/` holds the fixtures only tests use. It imports nothing else
+  in the engine; `weapon-balance/` is built on it, never the other way round.
+- `weapon-balance/`: bringing a weapon inside the limits, for the AI pipeline's `balance` node. `BalanceWeapon({stats, preference})` takes from a weapon's stats, never adds: a
+  weapon already inside the two limits comes back as it was. The limits are in `limits/`: the **power budget** (`power-budget/PowerBudget`, 0.65) and the **damage
+  cap** (`damage-cap/MaxDamagePerSecond`, 150), asked by `WithinPowerBudget`, `WithinDamageCap` and `WithinLimits`. Over a limit, `shrinking/ShrinkToLimits` has every
+  stat give up the same share of its goodness times a weight (`weights/TrimWeightsOf` and `TrimWeights`: favoured 0.25, neutral 1, sacrificed 3, from a
+  `StatPreference`, two lists of `StatName`s; a stat in both counts as neither), the smallest shrink that fits, found by halving: first the budget, from all six stats,
+  then the damage cap, from damage and fire rate only. `rounding/RoundTowardWeaker` then rounds to two decimals (whole rounds for the magazine and reserve) toward the
+  weaker value and keeps every number in its range. Deterministic and pure, so the same request gives the same weapon. Every number is a tunable.
 - `round/`: `DecideRound` (`playing | won | lost` from the two healths: the player at zero loses, even when both fall in the
   same step; the opponent at zero wins; with no opponent the round only ends if the player falls). `types/` has
   `RoundState` and `RoundHealth`.
@@ -154,4 +167,8 @@ files a folder is a smell: split it by subject.
   entry points needs a reason (`vision/` has five, all about seeing). Move a file with its test, with plain `mv`.
 - **A step never changes the world it is given**; it returns a new one.
 - **Tunables are constants in their own file** (`PlayerSpeed.ts`) until there are enough to want a table.
-- Property tests (`fast-check`) are deliberately not here yet.
+- **Property tests use `fast-check`, as janggi's do (added 2026-11-15, the user's say), and are not part of `pnpm checks`**: a fresh seed each run means a failure is not
+  reproducible from the same commit. They are listed by path in `PROPERTY_TESTS` in `vitest.config.ts` (which `pnpm test` excludes) and run through
+  `vitest.properties.config.ts`: `pnpm test:properties` from the root. `PROPERTY_TEST_RUNS` sets the cases per property (default 100). There is one,
+  `weapon-balance/property-tests/BalanceWeaponInvariants.test.ts`; run it before finishing work in `engine/src/weapon-balance/` or `power-rating/`. A failure prints a seed and a
+  shrunk counterexample to replay. There is no `property-tests.yml` yet: gunsmith has no CI until `build` writes it (root `AGENTS.md`), and janggi's is the model.

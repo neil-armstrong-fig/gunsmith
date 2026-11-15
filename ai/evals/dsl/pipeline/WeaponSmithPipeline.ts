@@ -1,4 +1,5 @@
 import type {WeaponPipelineDriver} from "@evals/dsl/types/WeaponPipelineDriver";
+import {balancedByCode} from "@evals/dsl/pipeline/evaluators/outcome/BalancedByCode";
 import {modelCallBudget} from "@evals/dsl/pipeline/evaluators/outcome/ModelCallBudget";
 import {nodePath} from "@evals/dsl/pipeline/evaluators/outcome/NodePath";
 import {outcomeMatches} from "@evals/dsl/pipeline/evaluators/outcome/OutcomeMatches";
@@ -44,6 +45,10 @@ export class WeaponSmithPipeline {
 
   checkRejected(): void {
     this.checkEveryTrial([input => outcomeMatches(input, "rejected")]);
+  }
+
+  checkBalancedByCode(): void {
+    this.checkEveryTrial([balancedByCode]);
   }
 
   checkNoWeaponOverTheCap(): void {

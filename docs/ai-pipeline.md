@@ -10,25 +10,28 @@ Focused's stance is that most agent work can be deterministic and autonomy appli
 A Deep Agent is not needed and would add cost and variance.
 
 ```
-tokenPrecheck ─► moderationJudge ─► generate ─► validate ─► rate ─► commit
-     │ over limit        │ rejected        │ model fails   │ invalid or over the cap
+tokenPrecheck ─► moderationJudge ─► generate ─► validate ─► balance ─► rate ─► commit
+     │ over limit        │ rejected        │ model fails   │ not a valid weapon
      ▼                   ▼                 ▼               ▼
-  reject (0.5 credit, no LLM)      repair (once) ─► validate ─► rate ─► still bad: `invalid`
+  reject (0.5 credit, no LLM)      repair (once) ─► validate ─► balance ─► rate ─► still bad: `invalid`
                                    typed failure; built-in pool fallback; refund where it is our fault
 ```
 
-Built for weapons 2026-11-12 (`ai/src/pipeline/`): the path is `precheck`, `moderation`, `generate`, `validate`, `rate`, and when
-`validate` or `rate` refuses, `repair` then `validate` and `rate` once more. A weapon request ends `created`, `rejected` (not a
-weapon, too long) or `invalid` (a weapon request, but no valid weapon even after the repair). Three model calls at most.
+Built for weapons 2026-11-12 (`ai/src/pipeline/`): the path is `precheck`, `moderation`, `generate`, `validate`, `balance`, `rate`,
+and when `validate` refuses (or `rate`, which after `balance` should never), `repair` then `validate`, `balance` and `rate` once
+more. **`balance` joined 2026-11-15** (the user's design, below): the model proposes the stats and the player's preference, code
+brings the weapon inside the limits. A weapon request ends `created`, `rejected` (not a weapon, too long) or `invalid` (a weapon
+request, but no valid weapon even after the repair). Three model calls at most.
 
 | Node | Does | Model? | Cost control |
 | ---- | ---- | ------ | ------------ |
 | `tokenPrecheck` | Counts tokens in code; rejects over-limit prompts (weapon 150, arena 250, tunable) | No | Free; half-credit rejection |
 | `moderationJudge` | One cheap model: is this a weapon/arena request, is it safe, is it an injection attempt? Structured verdict | Cheap | Small output cap |
 | `generate` | Structured output through a **loose reply shape** (the weapon's fields and types, no limits), with the `sound` block later | Stronger | `maxTokens`, one call |
-| `validate` | The strict zod parse of the weapon (and, for arenas, the engine's arena validator). Zod only | No | Free |
-| `rate` | The only home of the weapon cap (damage per second; the engine's power rating replaces it). **It refuses, it never clamps**: an over-cap weapon goes to `repair` once, then fails as `invalid`, so code disposes in the open and no nerfing happens inside the caps | No | Free |
-| `repair` | At most one retry with the first answer and the faults (our own sentences, shortened) each in a data block | Same | Counted against the model-call limit |
+| `validate` | The strict zod parse of the weapon and the player's stat `preference` beside it (and, for arenas, the engine's arena validator). Zod only. A missing preference is no preference; a stat there is not is refused | No | Free |
+| `balance` | **The engine's `balanceWeapon`** (`engine/src/weapon-balance/`): brings the weapon inside the power budget and the damage-per-second cap by taking from its stats where the preference says. Never makes a stat stronger | No | Free |
+| `rate` | The backstop behind `balance`: refuses a weapon over the engine's damage cap or power budget. After `balance` it has nothing to refuse, so a refusal means the balancing was bypassed | No | Free |
+| `repair` | At most one retry with the first answer and the faults (our own sentences, shortened) each in a data block. Now for schema faults only: the model is no longer asked to lower a stat | Same | Counted against the model-call limit |
 | `commit` | Writes to the library through the ledger | No | Atomic credit spend |
 
 Edit-from-base starts at `generate` with the saved item and the changed prompt in the data block, and is charged as a new
@@ -75,6 +78,67 @@ pass first time. What the run taught:
   removing the data-block paragraph (the weapon-words sentence kept), each leave 70 of 70. These mutants *can* fall (a fail-open
   moderator sinks four `when`s), so the cases genuinely do not exercise them. They stay as defence in depth until a case does:
   the injection probes so far are the 46 local ones, and none was aimed at Haiku.
+
+### The stat balancer: the model infers, code balances (built 2026-11-15)
+
+The user's design (2026-11-14): "max everything" is not a solution, and asking the model to behave, or refusing and repairing, is the
+wrong tool. The model returns the **stat values it infers** and the player's **stat preference** (`favoured` and `sacrificed`, two
+lists from `damage, fireRate, bulletSpeed, magazineSize, reloadSpeed, reserve`), and **code balances the weapon afterwards**. This
+**replaces "refuse, never clamp" for stats**: an over-the-limit request now becomes a balanced weapon, not an `invalid` one.
+
+**Where it lives (the user's call, 2026-11-15): `engine/src/weapon-balance/`, on top of `engine/src/power-rating/`**, a game rule that `api/` will need to re-check any stored
+weapon, imported by `ai/` through a workspace link. The one cross-persona write of this slice; `build` owns the numbers from here.
+
+- **A weapon is rated 0 to 1**: each stat is turned into a goodness from 0 (its weakest allowed value) to 1 (its strongest), on a
+  log scale for damage, fire rate, magazine and reload speed (a magazine of 12 against 6 is as big a step as 6 against 3) and a
+  linear one for bullet speed and reserve, and the goodnesses are added up by what each is worth (damage and fire rate 0.25 each,
+  magazine and reload 0.15, speed and reserve 0.1). The rifle rates 0.55 and the marksman rifle 0.46.
+- **Two limits**: a power budget of 0.65, and the old damage cap (150 a second), which the budget alone would not hold, because a
+  very quick, very hard hitter that gives up everything else still rates low. All numbers are tunables, set by play.
+- **Never buff, trim evenly.** A weapon inside both limits comes back as it was (a weak request stays weak). Over them, every stat
+  gives up the same share of its goodness times a weight, **favoured 0.25, neutral 1, sacrificed 3**, the smallest shrink that fits,
+  found by halving. Two steps: the **budget first, from all six stats**, then the **damage cap, from damage and fire rate only**
+  and only if the first step left it over (an even trim to the budget usually does not). Numbers are then rounded to two decimals
+  (whole rounds for the magazine and reserve) toward the weaker value, so rounding cannot put a weapon back over a limit.
+  A stat the player both favours and would sacrifice counts as neither, so it is accepted and not repaired.
+- **Properties, with `fast-check` as janggi does** (`BalanceWeaponInvariants.test.ts`, `pnpm test:properties`, outside `pnpm checks` because a fresh seed each run
+  is not reproducible; 100 random weapons and preferences per property by default, 3000 tried): every output is inside every limit and range, whole rounds in the
+  magazine and reserve, never more than 150 damage a second (counted without the limits it checks), no stat ends stronger than it was asked, a weapon already inside
+  the limits comes back exactly as it was, the same input gives the same output, and **promoting a stat in the preference never lowers it**. Of 15 mutants the
+  properties alone kill 8; the other 7 (the budget, a magazine rounded up, a missing clamp, the preference ignored, goodness going negative, too few halvings) are
+  killed by the unit tests, so neither alone is enough. Over fifty engine and about thirty `ai` mutants were all killed in the end; the ones that survived at first
+  were a missing test (every stat favoured), a step order nothing pinned, a limit no test isolated, and one equivalent guard.
+
+**What the probe found (Haiku 5.5, 12 requests, 3 trials each, $0.009).** The model states the preference well: 36 of 36 answers used
+only the six names and none put a stat in both lists; it is steady on clear requests ("hits hard but fires slowly" favours damage and
+gives up fire rate, the sniper gives up reload speed) and unsteady on one word: **"tiny magazine" is sometimes favoured and sometimes
+sacrificed**, a real ambiguity ("tiny" is wanted low, and the prompt now says a magazine it wants tiny is a sacrificed
+`magazineSize`). The local `qwen3.5:9b` did as well on 12 of 12. Both models already **balance their own stats** unless told to max
+out: asked for "100 damage and 20 shots a second" Haiku writes exactly that (2000 damage a second), which is what the balancer is for.
+
+**What it makes of the requests that trigger it (Haiku, the whole pipeline, 2 calls each):** "100 damage and 20 shots a second"
+becomes 23.7 damage every 0.16 s (148 a second), speed 20.9, magazine 8, reload 2.3 s, reserve 76; "hits hard and fires fast but I do
+not care about anything else" becomes 21 to 22 damage every 0.15 s (140 to 147 a second) with the rest trimmed by what was
+sacrificed (magazine 20, reserve 79). **The damage cap, not the preference, decides how hard and fast a weapon can be**: it holds
+damage times fire rate to 150 whoever is favoured, and the preference decides only which of the two gives more. And because the
+balancer never buffs, a sacrificed stat is trimmed only as far as the limits need, not pushed to its floor.
+
+**Evals.** `evals/tests/weapon/`: the "maximum of everything" request and the "hard and fast" request each end `created` by code (a
+`balance` node, no `repair`: `expectBalancedByCode`), a created weapon's path must read `validate`, `balance`, `rate`
+(`NodePath`). Red-first by mutation, since the balancer was built unit-first: with the balancing bypassed, exactly the three
+criteria that name it fall, in 3 of 3 trials each. Final run, 3 trials: local 78 of 78, fake the same 8 by-design failures (78 criteria), Haiku 77 of 78 (the one failure is the capability criterion for the open finding below; $0.57 of the $1 spent in all). The
+preference's direction is proved in `engine/` (a favoured stat ends higher, a sacrificed one lower, and the random-weapon properties), not in an eval,
+because both models already point the right way, so an eval could not be red first.
+
+**An open finding.** On "a machine gun with a big magazine and plenty of spare ammo" Haiku writes a magazine of 80 to 100 and a
+reserve of 300 to 400, past the ranges (60 and 200), 3 of 3 times, under every prompt wording tried (five variants, including the
+probe's own), so `validate` refuses and a repair runs (a third call; it still ends `created`). It sits in a `given.inProgress`. The fix the
+user's design points at is for code to take a number past a range as data and bring it in (the balancer already treats a number past
+a range as the end of the range), rather than refuse: **the user's call**, since it changes what `validate` accepts.
+
+**Reconcile with `docs/game-design.md`**, which still says "power is capped, not balanced; nothing is silently nerfed" and
+`docs/schemas.md`, which says the power rating "is displayed, not used to scale anything". The balancer trims by design; those two
+lines are `build`'s and the user's to update.
 
 ### The arena judge
 

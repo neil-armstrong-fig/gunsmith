@@ -13,7 +13,7 @@ const failing: CriterionResult = {
   given: "a player asks for a weapon",
   when: "they ask for a riot shield",
   then: "a weapon is created",
-  suite: "capability",
+  suite: "inProgress",
   passed: false,
   comment: "outcomeMatches: failed in 3 of 3 trials: expected created, got invalid",
 };
@@ -30,7 +30,7 @@ it("tallies each suite on its own", () => {
   const summary = summariseResults({...run, results: [passing, failing, passing]});
 
   expect(summary.regression).toEqual({criteria: 2, passed: 2});
-  expect(summary.capability).toEqual({criteria: 1, passed: 0});
+  expect(summary.inProgress).toEqual({criteria: 1, passed: 0});
 });
 
 it("keeps every criterion, with the sentence that says why a failed one failed", () => {
