@@ -4,6 +4,7 @@ import {ChatOllama} from "@langchain/ollama";
 import {createAppearanceModels} from "@evals/eval-criteria-mapping/appearance/models/CreateAppearanceModels";
 import {FAKE_WEAPON_REPLY} from "@evals/eval-criteria-mapping/weapon/models/FakeWeaponReply";
 import {createPaidWeaponModels} from "@evals/eval-criteria-mapping/weapon/models/PaidWeaponModels";
+import {unreachableTier} from "@evals/eval-criteria-mapping/tier/UnreachableTier";
 import type {EvalTier} from "@evals/eval-criteria-mapping/tier/types/EvalTier";
 import type {WeaponPipelineDependencies} from "@gunsmith/ai/pipeline/types/WeaponPipelineDependencies";
 
@@ -20,7 +21,11 @@ export function createEvalModels(tier: EvalTier): WeaponPipelineDependencies {
     return createLocalModels();
   }
 
-  return createPaidWeaponModels();
+  if (tier === "paid") {
+    return createPaidWeaponModels();
+  }
+
+  return unreachableTier(tier);
 }
 
 function createFakeModels(): WeaponPipelineDependencies {

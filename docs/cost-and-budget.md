@@ -146,6 +146,21 @@ Nothing was raised: the ceiling is still the $1 total, $0.623 spent.
 
 ## Cheaper models for the drawing, stats and moderation: the shortlist (researched 2026-11-15, approved by the user)
 
+> **Decision (the user, 2026-11-16): the other models were not good enough, so Haiku 5.5 on the user's own Anthropic key stays the model for the drawing, the stats and moderation, for now.**
+> Every Workers AI model on the shortlist was run through the real evals (a `cloudflare` eval tier, `ai/AGENTS.md`) and none replaces Haiku:
+> Gemma 4 26B-A4B, GLM-4.7 Flash, Qwen3 30B-A3B and `gpt-oss-120b` draw worse (the user judged each sheet; `gpt-oss-120b` is also twice Haiku's cost);
+> for stats and moderation Gemma saves about a tenth of a cent per weapon but wrongly rejects ordinary requests, Qwen rejects most of them, and `gpt-oss-20b` fails on Cloudflare's side.
+> Measured results and numbers are in the blocks below. **Not tried, and not needed now:** Granite for moderation only, other model families, Anthropic through Cloudflare AI Gateway (BYOK is free and adds no markup; Unified Billing adds a 5% fee on credit purchases; tool use through the gateway is undocumented), and any change to the prompts to suit a weaker model. Revisit when a cheaper model is released or the spend becomes a problem. **The Cloudflare eval tier and its dependency were removed from the code the same day** (the results, sheets and call logs stay in the git-ignored `ai/evals/results/`); how it worked is below, so it can be rebuilt.
+
+> **How the removed Workers AI eval tier worked, to rebuild from (removed 2026-11-16; about 25 files and 1,100 lines, 37 mutants killed when it existed).**
+> - **Endpoint and client:** `@langchain/openai` 1.8.0 (the newest whose peer range `@langchain/core ^1.3.1` held for core 1.3.4; a devDependency, lint-fenced out of `src/`) as `ChatOpenAI` with `model: "@cf/<author>/<model>"`, `apiKey` the token, `useResponsesApi: false`, `maxRetries: 0`, `configuration.baseURL: https://api.cloudflare.com/client/v4/accounts/<account id>/ai/v1`.
+>   The token and account id were `CLOUDFLARE_WORKER_AI_KEY` and `CLOUDFLARE_ACCOUNT_ID` in the git-ignored `ai/.env.local`, loaded by code and never read by the AI session.
+> - **One model named per role, no default:** `EVAL_CLOUDFLARE_STATS_MODEL`, `_MODERATION_MODEL`, `_DRAWING_MODEL` (a weapon spec without a drawing model used the canned drawing). Model names were validated as `author/model` so they could not alter the request path.
+> - **A `fetch` wrapper in `configuration.fetch`** recorded, per response, the tokens, Cloudflare's own `usage.neurons` (LangChain's token counts drop it), the finish reason and the first 200 characters of a refusal, never the request (so the token could not reach a message). A run wrapper then **failed the run in words on any non-2xx or `finish_reason: length`**, because the pipeline reads a refused or cut-off call as a stand-in or a rejection, which looks like a weak model. It also logged each request's calls and neurons to a JSON Lines file.
+> - **Thinking switch (`EVAL_CLOUDFLARE_THINKING=off|low`):** `off` sent `chat_template_kwargs: {enable_thinking: false}` through `modelKwargs` (undocumented for Gemma on Cloudflare's page, but it worked: 4,000 tokens and 229 neurons became 569 and 65), `low` sent `reasoning_effort: "low"`. The default left the open models thinking.
+> - **Results files were labelled by model** (`drawings-cloudflare-<model>-<think>-latest.html`) so one model's sheet did not overwrite the next. The cap was the Workers Free plan's 10,000 neurons a day (a call past it fails, shown as HTTP 429), with no ledger; on Workers Paid a ledger would be needed first.
+> - **Facts worth keeping:** a raw tool-calling smoke test passed on all six shortlisted models, yet `gpt-oss-20b` returned HTTP 400 `AiError: Internal Server Error` on every real weapon request, and Qwen3 30B-A3B never returned the `appearance` object, so a smoke test proves the endpoint and not the pipeline.
+
 **Why.** The user asked whether cheap hosted open models (Qwen, GLM, DeepSeek, Kimi, gpt-oss) could replace Haiku, and noted that stats, moderation and the
 drawing can each use a different model (they already can: `generator`, `moderator` and `appearanceGenerator` in `weaponPipelineDependencies`).
 
@@ -164,16 +179,50 @@ the benchmark should fit in the free allowance over a few days. Prices from Clou
 | Role | Model (`@cf/...`) | In / out per M | Est. per drawing | Why |
 | ---- | ----------------- | -------------- | ---------------- | --- |
 | Drawing | Haiku 5.5 (baseline) | $0.10 / $0.50 | $0.00061 measured | what we have |
-| Drawing | `google/gemma-4-26b-a4b-it` | $0.10 / $0.30 | about $0.00047 | newest small model, reported to support `json_schema` |
-| Drawing | `zai-org/glm-4.7-flash` | $0.06 / $0.40 | about $0.00044 | the small GLM, MIT licence reported |
-| Drawing | `qwen/qwen3-30b-a3b-fp8` | $0.051 / $0.335 | about $0.00037 | cheapest credible; older, so the biggest quality risk |
-| Drawing | `openai/gpt-oss-120b` | $0.35 / $0.75 | about $0.0014 | the quality reference: if a bigger open model cannot draw, the small ones will not |
+| Drawing | `google/gemma-4-26b-a4b-it` | $0.10 / $0.30 | about $0.00047 | **REJECTED for drawing (the user, 2026-11-16, after judging the sheet): no cheaper than Haiku and far worse, see "Measured 2026-11-16" below.** Newest small model, reported to support `json_schema` |
+| Drawing | `zai-org/glm-4.7-flash` | $0.06 / $0.40 | about $0.00044 | **REJECTED for drawing (the user judged the sheet, 2026-11-16: "much worse than Haiku"); measured $0.00061 a drawing, the same as Haiku.** The small GLM, MIT licence reported |
+| Drawing | `qwen/qwen3-30b-a3b-fp8` | $0.051 / $0.335 | about $0.00037 | **REJECTED for drawing (the user judged the sheet, 2026-11-16: "much worse than Haiku"; 33 of 33 stand-ins, no `appearance` object in any answer, cause never diagnosed).** Cheapest credible; older, so the biggest quality risk |
+| Drawing | `openai/gpt-oss-120b` | $0.35 / $0.75 | about $0.0014 | **REJECTED for drawing (the user judged the sheet, 2026-11-16: "rubbish too"; 11 of 12 its own drawings but twice Haiku's cost, $0.00124).** The quality reference: if a bigger open model cannot draw, the small ones will not |
 | Stats and moderation | `qwen/qwen3-30b-a3b-fp8` | $0.051 / $0.335 | | close to our local Qwen, which passes the weapon specs 81 of 81 |
 | Stats and moderation | `google/gemma-4-26b-a4b-it` | $0.10 / $0.30 | | second opinion |
 | Stats and moderation | `openai/gpt-oss-20b` | $0.20 / $0.30 | | reported to support `json_schema` |
 | Moderation only | `ibm-granite/granite-4.0-h-micro` | $0.017 / $0.112 | | tiny; may not do tool calls |
 
 Reasoning models (`gpt-oss`) can spend many hidden output tokens, which would raise these estimates: measure, do not trust the table.
+
+**Measured 2026-11-16: Gemma 4 26B-A4B drawing on Workers AI (first model of the benchmark; the user judges the sheet, `ai/evals/results/drawings-cloudflare-gemma-4-26b-a4b-it-think-off-latest.html`).**
+Smoke test first (raw requests, six shortlisted models): every one answered a forced tool call (HTTP 200, one tool call, 0.7 to 9.4 neurons for a tiny request), so none was dropped.
+**Thinking is the cost.** Left on, Gemma wrote 4,000 completion tokens and was cut off at the cap (229 neurons for one drawing, about $0.0025, four times Haiku's $0.00061); with
+`EVAL_CLOUDFLARE_THINKING=off` (`chat_template_kwargs: {enable_thinking: false}`, undocumented on Cloudflare's model page but it works) the same drawing took 569 tokens and 65 neurons. The spec at 3 trials, thinking off:
+28 drawings scored (3 requests, the cactus, the jellyfish lantern and the excessive-detail one, ran past the 4,000-token cap and were reported as failed runs, not as stand-ins), **3 valid first time, 8 completed, 6 repaired, 11 stand-ins**
+(Haiku: 33 of 36 valid first time, 2 stand-ins), 1.65 calls a drawing (Haiku 1.08), **59.6 neurons a drawing, about $0.00066 (Haiku $0.00061: no cheaper)**, 756 output tokens a call, median 20 s a drawing (Haiku about 6 s end to end), 1,848 neurons for the whole run
+of the free 10,000 a day. **The user judged the sheet (2026-11-16): "for sure worse", so Gemma 4 26B-A4B is marked a bad option and not a Haiku replacement for the drawing.** **So Gemma is neither cheaper nor close in quality: the finding above (only the small models undercut Haiku, if good enough) is not met by this one.** Not yet run: `gpt-oss-120b` for the drawing (see the next block), then stats and moderation.
+
+**Measured 2026-11-16, the next two (same spec, thinking off, 3 trials, free plan; each run used about 1,600 to 1,900 neurons of the day's 10,000).**
+
+| Drawing model | Scored | Valid first time | Completed | Repaired | Stand-ins | Calls a drawing | Neurons a drawing | Median per call |
+| ------------- | ------ | ---------------- | --------- | -------- | --------- | --------------- | ----------------- | --------------- |
+| Haiku 5.5 (baseline) | 36 | 33 | 1 | | 2 | 1.08 | about $0.00061 | about 6 s end to end |
+| Gemma 4 26B-A4B | 28 | 3 | 8 | 6 | 11 | 1.65 | 59.6, about $0.00066 | 11.8 s, 39 tokens/s |
+| GLM-4.7 Flash | 33 | 14 | 2 | 7 | 10 | 1.53 | 55.5, about $0.00061 | 14.9 s, 33 tokens/s |
+| Qwen3 30B-A3B | 33 | 0 | 0 | 0 | **33** | 2.00 | 46.5, about $0.00051 | 3.1 s, 136 tokens/s |
+
+**GLM-4.7 Flash** is the best of the open models and still not a replacement: 14 of 33 valid first time against Haiku's 33 of 36, 10 stand-ins against 2, and **the same cost as Haiku** ($0.00061), so no saving for a worse drawing. One answer was cut off at the cap and failed its run in words.
+**Qwen3 30B-A3B's 33 of 33 stand-ins is one systematic fault, not a verdict on its drawing:** every first answer and every repair fails with `appearance: Invalid input: expected object, received undefined`, so the model never returned the `appearance` object the tool asks for (a tool-call format or schema mismatch through the endpoint, or the model ignoring the schema). It looks fast (3 s a call, 136 tokens/s) because its answers are short and wrong, which is also why its cost per drawing is lowest. **Do not read its numbers as a quality or speed result until a raw answer has been looked at** (a few neurons; not done). `gpt-oss-120b` is not run: it costs about three times as much a token, so a full spec will not fit in what is left of today's free neurons; run it after the next 00:00 UTC (it was then run at 1 trial the same evening, below).
+
+**Measured 2026-11-16, the quality reference: `gpt-oss-120b` (reasoning effort low, 1 trial, so noisy).** 12 drawings scored: **0 valid first time, 8 completed (code filled what the model left out), 3 repaired, 1 stand-in**, so 11 of 12 are the model's own drawing, far better than Gemma, GLM or Qwen. 1.33 calls a drawing, median 6.0 s a call, 651 output tokens a call, **112.6 neurons a drawing, about $0.00124: twice Haiku's $0.00061**. Nothing was cut off or refused. Its sheet is `ai/evals/results/drawings-cloudflare-gpt-oss-120b-think-low-latest.html`; **the user judged it "rubbish too" (2026-11-16)**, so no open model on the shortlist replaces Haiku for the drawing and that comparison is closed.
+
+**Measured 2026-11-16: stats and moderation on Workers AI (the weapon specs, 81 criteria, 1 trial, the drawing stubbed with the canned one; each model plays both roles).** Compared with Haiku's 80 of 81 (the one red is the open "big magazine" finding) at about $0.00029 a request (the 2026-11-14 baseline: $0.018 for 63 requests).
+
+| Model (both roles) | Criteria passed | Neurons a request | About a request | Median per call | What went wrong |
+| ------------------ | --------------- | ----------------- | --------------- | --------------- | --------------- |
+| Gemma 4 26B-A4B (thinking off) | 75 of 81 | 15.6 (24 requests, 54 calls) | $0.00017 | 1.8 s | two legitimate requests rejected (French, a single word); one off-topic request with weapon words accepted (4 calls); two balancing criteria (one is Haiku's own "big magazine" finding) |
+| Qwen3 30B-A3B (thinking off) | 67 of 81 | 3.5 | $0.00004 | 0.5 s | **11 legitimate requests rejected and 14 criteria red**; the same fault as its drawings (a malformed reply makes moderation fail closed), so its low cost is the cost of answering nothing useful |
+| `gpt-oss-20b` | not scored (8 of 81 ran) | | | | **Cloudflare answered every weapon request with HTTP 400 `AiError: Internal Server Error`**, with thinking low and with the default; its raw smoke test (a tiny forced tool call) had passed. Not fixable from our side; treat as unsupported for this request on this endpoint |
+
+**What it means.** Gemma is about 40% cheaper a request than Haiku on stats and moderation, which is about $0.0001 saved on a weapon whose all-in cost is $0.00105 (roughly 10%), and the price is a moderation that wrongly turns away ordinary requests (a French one, a one-word one) and lets one trick through. A rejected legitimate request costs the player half a credit and their trust, and the saving is a tenth of a cent per thousand weapons, so **it is not worth switching: stats and moderation stay on Haiku.** Not run: Granite 4.0 H Micro for moderation only (the cheapest of all, $0.017 / $0.112 per million), `gpt-oss-120b` for stats, and 3 trials of Gemma; none is likely to change the answer, because moderation is where the open models fail and it is the smaller part of the cost.
+ **So the one open model that can draw costs about twice Haiku, and the cheap ones cannot draw: on Cloudflare there is no cheaper replacement for Haiku's drawing in this shortlist.** Not run: stats and moderation on the open models (their saving is at most about $0.0002 to $0.0004 of a weapon, so they matter less), and `gpt-oss-120b` at 3 trials.
+ The 3,000 Haiku drawing cap and Cloudflare's 4,000 differ; the three over-long requests are the ones whose geometry runs long on any model.
 **Not shortlisted:** Kimi, DeepSeek V4 and GLM-5.x (1.2 to 6 times Haiku's drawing cost by estimate, and they need paid billing), and Groq for round one
 (its free tier is 30 requests a minute, 8,000 tokens a minute and 200,000 tokens a day per model, 1,000 requests a day, serving `gpt-oss-20b`, `gpt-oss-120b` and a preview `qwen3.8-27b` at
 $0.075/$0.30, $0.15/$0.60 and $0.80/$4.00 after it; the `gpt-oss` models are already on Cloudflare, and the free numbers conflict between sources, so check the console). Groq is a
