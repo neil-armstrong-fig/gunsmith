@@ -145,6 +145,20 @@ those implementations; art's README records unsupported identities and proposed 
 
 ## Delivery log
 
+- 2026-11-16, `build`: **The closing ring, slice 3 of 3: the bot walks inward, engine tests first and the spec after (proved by mutation), uncommitted for the user's review.** At the user's word the bot, outside the ring or within 2 tiles of its edge once the ring is closing, walks to the ring's centre while still firing at and aiming at the player it sees (`engine/src/opponent/shelter/`, `DIFFICULTY.ringMargin`); a stateless `waypoint/WaypointToward` takes it round a pillar (seed 17 of the 20-seed test jammed on one first). **Contract change: none** (`shared/` untouched, `OpponentContext.ring` is engine-internal; `ai/` imports none of it, its 421 tests pass; no manifest key). **Later the same day, at the user's request, `?ringDamage=` (a multiple of the normal 2 to 20 a second; `RingTiming.damageScale`, `shared/` untouched, the hook's `ring.damagePerSecond` reports it) so a spec can end a round sooner at the ring's usual pace; the spec now takes about 5 s, not 10.** Spec `TheOpponentStayingInTheRing` (the duel with ring timing and boosted damage, DSL `startClosingDuel`); engine 783, webapp 233, 137 of 137 specs on a production build, 710 of 710 at `--repeat-each=10` for the ring, duel, HUD and sparring specs; 15 unit and 4 browser mutants killed (two unit survivors closed). `pnpm test:properties` does not exist yet, so it was not run. Not done: the bot on stairs, a stair-flank or ring-escape validator.
+
+- 2026-11-16, `art`: **precision aim reticle delivered for visual review** in
+  `docs/art/concepts/aim-reticle/`: editable SVG, transparent 32/64 px PNGs,
+  construction/native-size and twelve paired colour/grayscale context reviews.
+  User chose precision crosshair, aim marker only. The 32 px cursor has hotspot
+  (16,16), an 8 px open centre, pale marks and dark borders; the 64 px export's
+  hotspot is (32,32), with density handling explicitly build-owned. Handoff covers
+  arena/UI cursor behaviour, fixed screen size, fallback and test-first build
+  acceptance. **For build:** review/adopt when ready; no runtime change or new
+  manifest key (suggested `ui-aim-reticle`, not registered). No gameplay code,
+  dependency, model call or audio change. User visual approval and live cursor
+  QA remain open. Validation results follow after the final checks.
+
 - 2026-11-15, `art/research`: delivered `docs/art/fair-play-research.md` with
   primary sources, limits, user decisions, verification criteria and build/AI
   sequencing. Public queue sign-in, private completed-match replays with

@@ -1,6 +1,7 @@
 import type {World} from "@gunsmith/engine/game-loop/types/World";
 import {canSee} from "@gunsmith/engine/opponent/sight/CanSee";
 import {noticePlayer} from "@gunsmith/engine/opponent/sight/NoticePlayer";
+import {shelterFromRing} from "@gunsmith/engine/opponent/shelter/ShelterFromRing";
 import {actOnState} from "@gunsmith/engine/opponent/state/ActOnState";
 import {chooseState} from "@gunsmith/engine/opponent/state/ChooseState";
 import {watchForStuck} from "@gunsmith/engine/opponent/steering/WatchForStuck";
@@ -13,21 +14,23 @@ import {unstickBrain} from "@gunsmith/engine/opponent/unstick/UnstickBrain";
 /**
  * What the opponent asks for this step, in the same shape as a player's input so it is played by the same rules, and the
  * brain it carries into the next step. It looks (`canSee`, `noticePlayer`), checks its state's transitions
- * (`chooseState`), lets the state it is in decide the input (`actOnState`), and finally notices if it has been walking
+ * (`chooseState`), lets the state it is in decide the input (`actOnState`), walks it in from the closing ring's edge
+ * if the ring has come near (`shelterFromRing`), and finally notices if it has been walking
  * without getting anywhere (`watchForStuck`). It reads only the world and the brain's own memory and seed, so the same
  * world always gives the same answer. An opponent with no brain, or no opponent at all, asks for nothing: a still target.
  */
 export function thinkOpponent(world: World, seconds: number): OpponentDecision {
-  const {opponent, opponentBrain, player, arena} = world;
+  const {opponent, opponentBrain, player, arena, ring} = world;
   if (!opponent || !opponentBrain) {
     return {input: {direction: {x: 0, y: 0}, firing: false, reload: false}, brain: undefined};
   }
 
   const sees = canSee(arena, opponent, player.position);
-  const context: OpponentContext = {arena, opponent, target: player, sees, seconds};
+  const context: OpponentContext = {arena, opponent, target: player, sees, seconds, ring};
   const noticed = noticePlayer(opponentBrain, {sees, target: player.position, seconds});
   const chosen = chooseState(noticed, context);
-  const act = actOnState({...chosen, secondsInState: chosen.secondsInState + seconds}, context);
+  const acted = actOnState({...chosen, secondsInState: chosen.secondsInState + seconds}, context);
+  const act = shelterFromRing(acted, context);
 
   return {input: act.input, brain: afterStuckCheck(act, context)};
 }

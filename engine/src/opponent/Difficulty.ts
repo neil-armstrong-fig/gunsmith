@@ -21,4 +21,5 @@ export const DIFFICULTY: Difficulty = {
   arrivalRadius: 0.4,
   coverSamples: 12,
   coverReach: 8,
+  ringMargin: 2,
 };

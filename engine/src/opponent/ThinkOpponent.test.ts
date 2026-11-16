@@ -97,6 +97,41 @@ it("holds its fire for its reaction time and then opens fire", () => {
   expect(fired).toBe(true);
 });
 
+it("walks in from outside the closing ring and keeps firing at the player it sees", () => {
+  const closed = {
+    roundSeconds: 10,
+    centre: {x: 6, y: 3.5},
+    startRadius: 18,
+    timing: {startDelaySeconds: 0, closingSeconds: 10},
+  };
+  let world = {...duel(), ring: closed};
+  let decision = thinkOpponent(world, TICK);
+  for (let tick = 0; tick < Math.round((DIFFICULTY.reactionSeconds + 0.2) / TICK); tick++) {
+    decision = thinkOpponent(world, TICK);
+    world = {...world, opponentBrain: decision.brain};
+  }
+
+  expect(decision.brain?.state).toBe("engage");
+  expect(decision.input.firing).toBe(true);
+  expect(decision.input.direction.x).toBeCloseTo(-DIFFICULTY.speedShare, 9);
+  expect(decision.input.aimAt).not.toEqual(closed.centre);
+});
+
+it("walks to the ring's centre when it wanders outside the ring and cannot see the player", () => {
+  const closed = {
+    roundSeconds: 10,
+    centre: {x: 6, y: 3.5},
+    startRadius: 18,
+    timing: {startDelaySeconds: 0, closingSeconds: 10},
+  };
+  const world = duel(1, room, {x: 16.5, y: 3.5});
+  const decision = thinkOpponent({...world, ring: closed, player: {...world.player, position: {x: 2.5, y: 30}}}, TICK);
+
+  expect(decision.brain?.state).toBe("wander");
+  expect(decision.input.direction.x).toBeCloseTo(-DIFFICULTY.speedShare, 9);
+  expect(decision.input.aimAt).toEqual(closed.centre);
+});
+
 it("counts the time it has been in a state", () => {
   let world = duel();
   for (let tick = 0; tick < 3; tick++) {

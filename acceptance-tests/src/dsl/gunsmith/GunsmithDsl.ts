@@ -104,6 +104,19 @@ export class GunsmithDsl {
     }
   }
 
+  /**
+   * Opens a duel with a ring of its own, in place of the 45 seconds the game's ring waits: the opponent fights and walks in
+   * from the ring as it closes. The ring starts after `delaySeconds`, closes over `closingSeconds` and closes on a point drawn from
+   * `seed`, which is also the opponent's.
+   */
+  async startClosingDuel(request: ClosingRingRequest): Promise<void> {
+    try {
+      await this.gunsmith.openClosingDuel(request);
+    } catch (error) {
+      throw new DslError("Failed to open the duel with a ring", error);
+    }
+  }
+
   /** Opens the heights arena: low ground beside a raised platform, with one stair up, a dummy on each level and no opponent. */
   async startHeights(): Promise<void> {
     try {

@@ -7,6 +7,7 @@ import type {Input} from "@gunsmith/engine/game-loop/types/Input";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
 import type {World} from "@gunsmith/engine/game-loop/types/World";
 import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
+import {startRing} from "@gunsmith/engine/ring/StartRing";
 
 // The practice arena's shape: four pillars to be walked around.
 const pillared = arenaFrom([
@@ -138,5 +139,58 @@ it("wanders a whole minute, staying on open floor, never stuck, with a player it
     expect(longestStill).toBeLessThan(6);
     expect(visited.size).toBeGreaterThan(15);
     expect(world.round).toBe("playing");
+  }
+});
+
+// A duel inside a ring that closes in a few seconds. The player is idle and cannot be killed, so the round carries on and
+// the only thing that can hurt the opponent is the ring: its health is the measure of whether it stayed inside.
+function ringedDuel(seed: number): World {
+  const duel = giveOpponentBrain(startingWorld(pillared, [], {x: 18.5, y: 7.5}), seed);
+  const ring = startRing({
+    arena: pillared,
+    starts: [duel.player.position, {x: 18.5, y: 7.5}],
+    seed,
+    timing: {startDelaySeconds: 2, closingSeconds: 10},
+  });
+
+  return {...duel, player: {...duel.player, health: 100000}, ring};
+}
+
+it("never takes a point of damage from the closing ring, whatever its seed", () => {
+  for (const seed of SEEDS) {
+    let world = ringedDuel(seed);
+    for (let tick = 0; tick < 17 / TICK; tick++) {
+      world = step(world, IDLE, TICK);
+
+      expect(world.opponent?.health).toBe(100);
+    }
+  }
+});
+
+it("is inside the final ring when it has closed", () => {
+  for (const seed of SEEDS) {
+    let world = ringedDuel(seed);
+    for (let tick = 0; tick < 17 / TICK; tick++) {
+      world = step(world, IDLE, TICK);
+    }
+    const {ring} = world;
+    const position = opponentPosition(world);
+
+    expect(Math.hypot(position.x - (ring?.centre.x ?? 0), position.y - (ring?.centre.y ?? 0))).toBeLessThanOrEqual(2);
+  }
+});
+
+it("plays the same ringed match out the same way from the same seed", () => {
+  for (const seed of SEEDS.slice(0, 5)) {
+    const play = (): World => {
+      let world = ringedDuel(seed);
+      for (let tick = 0; tick < 600; tick++) {
+        world = step(world, IDLE, TICK);
+      }
+
+      return world;
+    };
+
+    expect(play()).toEqual(play());
   }
 });

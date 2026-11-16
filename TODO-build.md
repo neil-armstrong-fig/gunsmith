@@ -29,7 +29,21 @@ Both are withdrawn until the game is fun (`HANDOFF.md` delivery log, 2026-11-12)
 
 ## Phase 1: the game, test first. Milestone M1 (redefined: the game is fun)
 
-### Resume here (written 2026-11-15, end of the seventh session; read this first)
+### Resume here (written 2026-11-16, end of the eighth session; read this first)
+
+**2026-11-16, eighth session: the closing ring, slice 3 of 3, the bot walks inward (uncommitted for the user's review; slices 1 and 2 were committed as `4307864` and `07146c8`).** Planned in plan mode; **the user chose:** outside the ring and seeing the player, **walk in and keep firing**
+(over "run in, no shooting" and "keep fighting where it is"), and **keep about 2 tiles inside the edge once the ring is closing** (over "only once outside the edge"). Engine (`opponent/shelter/`, test first): `ShelterFromRing(act, context)` runs after the state has acted;
+once `closingProgress(ring) > 0` and the bot is farther from the centre than `radiusOfRing - DIFFICULTY.ringMargin` (2, a tunable), its walk becomes `walkToward` the ring's centre; `firing`, `reload` and (while it `sees` the player) `aimAt` come from the state, otherwise it aims where it walks; the brain is never touched; no ring
+(`OpponentContext.ring`, new, absent in the practice range and unringed sparring) means no change. **The plan's contingency was needed:** the 20-seed test went red on seed 17, where the bot stood pressed against a pillar with the centre dead west (a straight walk does not slide off a face it meets square on), so `shelter/waypoint/WaypointToward`
+(stateless, no random draw) walks to the centre if the line is clear and otherwise to the nearest of 16 directions at reaches 1.5 and 3 that it can walk to in a straight line, preferring one that sees the centre. `ThinkOpponentOverAMatch` gained three ring tests (20 seeds, the idle player given 100000 health so only the ring can hurt the bot: **its health stays 100 for 17 s of a 2 s + 10 s ring, it ends within the final 2 tiles, a replay agrees**).
+Spec `TheOpponentStayingInTheRing` (the duel with `?ringDelay=1&ringClosing=6&ringDamage=10`, new DSL `startClosingDuel`; seeds 12 and 19, where a bot that ignored the ring ends with 10 and 0 health; 3 criteria each: the ring hurts more than the unboosted 20 a second, the opponent's health is exactly 100, it is inside the ring; **`?ringDamage=` was added at the user's request to make it faster: a ring that closes as usual and hurts N times as much, `RingTiming.damageScale`, so the file takes about 5 s, not 10**). **Order, honestly: the engine unit tests were red first (module missing), the spec was written after the code, so its red run is mutants** (shelter disabled: 4 of 6 fall; no margin 3; ring not passed to the bot 4; no detour 3).
+Engine 783, webapp 233, `ai` 421, root `pnpm checks` exit 0; **137 of 137** specs on a production build, **710 of 710** at `--repeat-each=10` for the ring, duel, HUD and sparring specs. **Mutation: 15 unit mutants** (two survivors: the aim at the waypoint rather than the centre, a test gap now closed; a redundant open-floor check, removed since `hasClearLine` already refuses a point in a wall) and 4 browser mutants. `pnpm test:properties` does not exist yet, so it was not run.
+**Measured, for the user's feel:** against an idle player at a 1 s delay and 6 s closing, a bot that ignores the ring is hurt in 14 of 40 duel seeds and a sheltering one in 1 (seed 10, 5 health: it detours round a pillar and the ring, 2.4 tiles a second, outruns the margin); at 1 s and 4 s, 18 of 40 against 3. Stated defaults, to be set by play: margin 2 tiles, the bot walks at its usual 70% speed, it does not shelter while the ring is only waiting to start.
+**Not done:** the bot on stairs (a ring centre on a platform needs a stair route it does not know), a stair-flank or ring-escape arena validator, a bot that fights from the ring's centre rather than beside it, a draw rule.
+
+**What next (none requested yet; ask or pick):** the opponent on stairs and the stair-flank validator (the rest of heights), then `art`'s four queued asks in `TODO-art.md` (reticle in place of the pointer, taking-damage game juice, an empty-weapon click, fair symmetrical arenas, the last of which wants the ring-escape check). Ask the user whether they have played slice 3 (`pnpm --filter @gunsmith/webapp exec vite --port 3100 --strictPort`, then `http://localhost:3100/?scenario=duel&seed=42&ringDelay=3&ringClosing=15`, and `pkill -f "vite.*--port 3100"` after).
+
+### Earlier session (written 2026-11-15, end of the seventh session)
 
 **2026-11-15, seventh session: the closing ring, slice 2 of 3, the ring and its damage (uncommitted for the user's review; slice 1 was committed as `4307864`).** The user had played slice 1 ("fine as is") and chose
 the spec seam: **query parameters** (`?ringDelay=` and `?ringClosing=`, seconds; "useful for players too"), so `Ring` carries its own timing. **One deviation from their wording, for them to veto:** the spec runs on **sparring**, not the duel
@@ -78,7 +92,7 @@ height. `art` has queued four things for `build` in `TODO-art.md` (aim reticle i
 study with equivalent high ground); none is started, and the arena one touches the validator and the ring. **From `TODO.md` (Codex, 2026-11-15): the user settled the appearance call budget as separate
 stats and appearance calls, five at most; `ai` implements, and the renderer/schema consumer is to be coordinated with `build`, with no premature shared schema.** Nothing for `build` to do on that yet.
 
-**First thing next session, in order:**
+**First thing next session, in order (superseded by the eighth session above; kept for the history):**
 1. `git status --short` and `git log --oneline -3`: slice 1 of the ring (and these doc edits) are uncommitted until the user commits them; `art`, `ai` and Codex may have edited the tree since.
 2. Ask whether the user has **played slice 2** (`pnpm --filter @gunsmith/webapp exec vite --port 3100 --strictPort`, open `http://localhost:3100/?scenario=duel&seed=42&ringDelay=3&ringClosing=15`, stand outside the closing circle and watch the health fall;
    `pkill -f "vite.*--port 3100"` after) and what they thought of the numbers (2 to 20 a second, 2 tiles at the end), the red edge and tint, and where the centre falls. Take their word before building slice 3. Also ask whether they accept the sparring-not-duel deviation for the spec.
@@ -420,11 +434,11 @@ RNG, no `Date.now()` or `Math.random()`. The webapp renders it and sends input.
         height; the bot's walking goals and cover search still use walls only. `pnpm test:properties` does not exist yet, so it was not run.
   - [x] Dim arena (original item, now complete): dim arena outside a detailed forward cone, set by equipped weapon and standing/crouched stance, rotating
         with aim through 360 degrees, revealing terrain detail and players/items only in the unoccluded cone, with height blocking sight (slice 2). Cone ownership is settled.
-  - [ ] **The closing ring (planned with the user 2026-11-15; a shrinking circle on a seeded reachable point, the timer starts it, damage ramps until someone dies).** Slices:
+  - [x] **The closing ring (planned with the user 2026-11-15; a shrinking circle on a seeded reachable point, the timer starts it, damage ramps until someone dies).** Slices:
         - [x] 1. **The round timer** (2026-11-15, unit tests first, spec after and proved by mutation, uncommitted): `engine/src/ring/` clock, `World.ring?` (the duel only), the ring's clock stops with the round, `RingHud` ("Ring in 0:43"),
           the hook's `ring.secondsUntilStart`, spec `CountingDownToTheRing` (10 criteria). Engine 700, webapp 191, 112 specs, 460 of 460 at 10 repeats, 22 unit and 10 browser mutants killed.
         - [x] 2. **The ring and its damage** (2026-11-15, uncommitted): seeded reachable centre, radius from the clock, damage 2 to 20 a second, the edge drawn over the veil, the hook's `centre`/`radius`/`damagePerSecond`, ring timing in the query (`?ringDelay=`, `?ringClosing=`), spec `TheClosingRing` on sparring (15 criteria; one round won, one lost). Engine 761, webapp 223, 127 specs, 27 engine, 20 webapp and 8 browser mutants. See "Resume here".
-        - [ ] 3. The bot walks inward (its goal becomes the centre when outside; no pathfinder; 20-seed engine test).
+        - [x] 3. **The bot walks inward** (2026-11-16, uncommitted): once the ring is closing, a bot nearer the edge than `DIFFICULTY.ringMargin` (2 tiles) walks to the centre, still firing and aiming at the player it sees; `opponent/shelter/` with a stateless `waypoint/WaypointToward` round pillars; engine 783, 137 specs. See "Resume here".
   - [ ] Pick up and drop a custom weapon; rough Web Audio gunshots.
 - [ ] **Demo checkpoint:** when the core is playable, tell the user it is ready for a first look. Agree what to cut or add
       before menus. Record the reaction in `docs/fuzzy-frontend.md`'s demo notes (kept for the history).

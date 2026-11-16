@@ -70,8 +70,8 @@ an opponent who has no brain and cannot shoot, `?scenario=heights` a low-ground 
 stair, a dummy on each level (`game/heights/HeightsDummies.ts`) and no opponent. It is a selector only, never a way to write state; it goes when a menu picks
 the match. `worldOfPage()` builds the world (`worldOfScenario(scenario, seed, ringTiming)`) and is also what "Play again" puts in the
 store. **Ring timing** is the query's other setting (`game/scenario/ring-timing/`): `?ringDelay=3` (seconds before the ring starts to close; 0 allowed) and `?ringClosing=15` (seconds it
-takes to close; more than 0), each a plain number or ignored (the other half keeps the game's own, 45 and 30), read once by `ringTimingOfPage()` so every round of a match keeps it. The duel always has a ring; **sparring has one only when
-the query asks for ring timing** (a spec uses it to watch the ring alone hurt a fighter who stands still); the practice range and the heights arena never do. The ring closes on a point drawn from the match's seed, so
+takes to close; more than 0) and `?ringDamage=10` (how many times the normal 2 to 20 a second it hurts; more than 0; the ring closes no faster, so a spec can make a round end sooner and still be fought at the ring's usual pace), each a plain number or ignored (the others keep the game's own, 45 and 30 s and 1 times), read once by `ringTimingOfPage()` so every round of a match keeps it. The duel always has a ring; **sparring has one only when
+the query asks for the ring** (a spec uses it to watch the ring alone hurt a fighter who stands still); the practice range and the heights arena never do. The ring closes on a point drawn from the match's seed, so
 `?scenario=duel&seed=42&ringDelay=3&ringClosing=15` replays the same ring, and each round of a match (seed + rounds played) closes on a new place. The query tunes a match's setup, never its state. The opponent's choices are drawn from a seed (`game/scenario/seed/`): `?seed=42` replays a match exactly (the
 acceptance specs pin one), otherwise each page load and each "Play again" draws a fresh random one, which is the only
 `Math.random` in the game.

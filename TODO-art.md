@@ -19,9 +19,10 @@ cartoon sci-fi machinery at the user's request (Ratchet & Clank inspiration, ada
       shared handoff reconciled. Runtime remains build/AI work with online play;
       no detector, schema, code, infrastructure or paid call was added.
 
-- [ ] **Aim reticle:** design a readable reticle that replaces the mouse pointer
-      over the arena. Show it against all floor levels, fog and combat effects;
-      hand cursor artwork/hotspot and behaviour notes to build for integration.
+- [x] **Aim reticle:** [precision crosshair and build handoff](docs/art/concepts/aim-reticle/README.md)
+      delivered 2026-11-16: SVG, transparent 32/64 px PNGs, native-size and
+      colour/grayscale context sheet. Static aim marker, hotspot (16,16).
+      User visual review and build integration remain open; no production key.
 - [ ] **Taking damage and game juice:** distinguish taking damage from outgoing
       hit confirmation, and study how to make combat feel responsive and satisfying.
       Refer to janggi's docs, including [sound](../janggi/docs/sound.md) (judge in
