@@ -1,6 +1,6 @@
 import type {EvalInput} from "@evals/dsl/pipeline/types/EvalInput";
 import type {EvalScore} from "@evals/dsl/types/EvalScore";
-import type {WeaponOutcomeStatus} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
+import type {WeaponOutcomeStatus} from "@gunsmith/ai/pipeline/types/WeaponOutcomeStatus";
 
 const KEY = "outcomeMatches";
 

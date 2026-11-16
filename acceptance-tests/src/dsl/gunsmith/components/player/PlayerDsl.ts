@@ -57,6 +57,15 @@ export class PlayerDsl {
     }
   }
 
+  /** Walks this way for `seconds` of game time, in whatever stance the player is in, and stops. A wall in the way stops the player short. */
+  async walkFor(heading: Heading, seconds: number): Promise<void> {
+    try {
+      await this.player.walkFor(heading, seconds);
+    } catch (error) {
+      throw new DslError(`Failed to walk ${heading} for ${seconds} seconds`, error);
+    }
+  }
+
   /**
    * Walks this way for `seconds` of game time, in whatever stance the player is in, and says how fast that was, in tiles
    * a second. The player stops again afterwards. Keep clear of walls: a wall in the way makes the answer too low.

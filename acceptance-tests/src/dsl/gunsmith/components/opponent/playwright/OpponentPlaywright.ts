@@ -2,7 +2,7 @@ import type {Page} from "@playwright/test";
 import type {OpponentSnapshot} from "@gunsmith/shared/state-hook/types/OpponentSnapshot";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
 import {lookOfFighter} from "@src/dsl/gunsmith/playwright/look/LookOfFighter";
-import {TEAM_ORANGE} from "@src/dsl/gunsmith/playwright/look/TeamColours";
+import {TEAM_ORANGE} from "@src/dsl/gunsmith/playwright/look/TeamOrange";
 import type {FighterLook} from "@src/dsl/gunsmith/types/FighterLook";
 import type {Point} from "@src/dsl/gunsmith/types/Point";
 

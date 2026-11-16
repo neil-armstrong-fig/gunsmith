@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import {it} from "node:test";
+import {expect, it} from "vitest";
 import {measurePcm} from "@gunsmith/audio-studies/encoding/pcm/MeasurePcm";
 
 function floats(values: number[]): Buffer {
@@ -10,33 +9,33 @@ function floats(values: number[]): Buffer {
 }
 
 it("rejects silent audio", () => {
-  assert.throws(() => measurePcm(floats([0, 0]), 1), /Silent or clipped PCM/);
+  expect(() => measurePcm(floats([0, 0]), 1)).toThrow(/Silent or clipped PCM/);
 });
 
 it("rejects audio that reaches full scale, whichever its sign", () => {
-  assert.throws(() => measurePcm(floats([1, 0]), 1), /Silent or clipped PCM/);
-  assert.throws(() => measurePcm(floats([0, -1]), 1), /Silent or clipped PCM/);
+  expect(() => measurePcm(floats([1, 0]), 1)).toThrow(/Silent or clipped PCM/);
+  expect(() => measurePcm(floats([0, -1]), 1)).toThrow(/Silent or clipped PCM/);
 });
 
 it("rejects a sample that is not a number, and a length that is not whole frames", () => {
-  assert.throws(() => measurePcm(floats([NaN, 0]), 1), /Invalid PCM sample/);
-  assert.throws(() => measurePcm(Buffer.alloc(3), 1), /Invalid PCM length/);
+  expect(() => measurePcm(floats([NaN, 0]), 1)).toThrow(/Invalid PCM sample/);
+  expect(() => measurePcm(Buffer.alloc(3), 1)).toThrow(/Invalid PCM length/);
 });
 
 it("counts the frames, not the samples", () => {
-  assert.equal(measurePcm(floats([0.25, -0.5, 0.125, 0.25]), 2).frames, 2);
+  expect(measurePcm(floats([0.25, -0.5, 0.125, 0.25]), 2).frames).toBe(2);
 });
 
 it("finds the loudest sample whichever its sign", () => {
-  assert.equal(measurePcm(floats([0.25, -0.5, 0.125, 0.25]), 2).peak, 0.5);
+  expect(measurePcm(floats([0.25, -0.5, 0.125, 0.25]), 2).peak).toBe(0.5);
 });
 
 it("measures the RMS over every sample of every channel", () => {
   const {rmsDbfs} = measurePcm(floats([0.25, -0.5, 0.125, 0.25]), 2);
 
-  assert.ok(Math.abs(rmsDbfs + 10.105) < 0.01, String(rmsDbfs));
+  expect(Math.abs(rmsDbfs + 10.105), String(rmsDbfs)).toBeLessThan(0.01);
 });
 
 it("measures the worst join over the channels", () => {
-  assert.equal(measurePcm(floats([0.25, -0.5, 0.125, 0.25]), 2).loopJump, 0.75);
+  expect(measurePcm(floats([0.25, -0.5, 0.125, 0.25]), 2).loopJump).toBe(0.75);
 });

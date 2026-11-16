@@ -3,7 +3,8 @@ import {DUMMY_RADIUS} from "@gunsmith/engine/dummy/DummyRadius";
 import {PLAYER_RADIUS} from "@gunsmith/engine/player/PlayerRadius";
 import {expect, it} from "vitest";
 import {SPRITE_KEYS} from "@src/assets/sprites/SpriteKeys";
-import {SPRITE_MANIFEST, spriteUrl} from "@src/assets/sprites/SpriteManifest";
+import {SPRITE_MANIFEST} from "@src/assets/sprites/SpriteManifest";
+import {spriteUrl} from "@src/assets/sprites/SpriteUrl";
 
 /** The file `spriteUrl` points at, read from `public/`, which the dev server and the build serve from the site's root. */
 function fileOf(url: string): string {
@@ -12,10 +13,6 @@ function fileOf(url: string): string {
 
 it("knows every key", () => {
   expect(Object.keys(SPRITE_MANIFEST).sort()).toEqual([...SPRITE_KEYS].sort());
-});
-
-it("serves a picture from the assets folder, named by its key", () => {
-  expect(spriteUrl("sprite-player-stand-blue")).toBe("/assets/sprites/sprite-player-stand-blue.svg");
 });
 
 it.each(SPRITE_KEYS)("has a file for %s that is as big as the manifest says", key => {

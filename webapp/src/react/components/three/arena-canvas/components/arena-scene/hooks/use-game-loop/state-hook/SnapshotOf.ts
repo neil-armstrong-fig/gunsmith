@@ -9,6 +9,7 @@ import {visibleToPlayer} from "@gunsmith/engine/vision/VisibleToPlayer";
 import type {GameStateSnapshot} from "@gunsmith/shared/state-hook/types/GameStateSnapshot";
 import type {MatchSnapshot} from "@gunsmith/shared/state-hook/types/MatchSnapshot";
 import type {OpponentSnapshot} from "@gunsmith/shared/state-hook/types/OpponentSnapshot";
+import type {PickupSnapshot} from "@gunsmith/shared/state-hook/types/PickupSnapshot";
 import type {RingSnapshot} from "@gunsmith/shared/state-hook/types/RingSnapshot";
 
 /** A copy of the game as it stands, for the state hook. A copy, so nothing that reads it can change the game. */
@@ -37,6 +38,7 @@ export function snapshotOf(world: World): GameStateSnapshot {
     round: world.round,
     match: matchSnapshotOf(world),
     ring: ringSnapshotOf(world),
+    pickup: pickupSnapshotOf(world, visible.pickup),
     bullets: world.bullets.map(bullet => ({x: bullet.position.x, y: bullet.position.y})),
     dummies: world.dummies.map((dummy, index) => ({
       x: dummy.position.x,
@@ -84,5 +86,20 @@ function ringSnapshotOf(world: World): RingSnapshot | undefined {
     centre: {x: ring.centre.x, y: ring.centre.y},
     radius: radiusOfRing(ring),
     damagePerSecond: ringDamageRate(ring),
+  };
+}
+
+function pickupSnapshotOf(world: World, visible: boolean): PickupSnapshot | undefined {
+  const {pickup} = world;
+  if (!pickup) {
+    return undefined;
+  }
+
+  return {
+    x: pickup.position.x,
+    y: pickup.position.y,
+    visible,
+    magazineSize: pickup.weapon.magazineSize,
+    startingReserve: pickup.weapon.startingReserve,
   };
 }

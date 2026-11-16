@@ -1,53 +1,49 @@
-import assert from "node:assert/strict";
-import {it} from "node:test";
+import {assert, expect, it} from "vitest";
 import {makeEffects} from "@gunsmith/audio-studies/generators/effects/MakeEffects";
 
 it("makes the eleven candidate effects and four pairs of footfalls, in a fixed order", () => {
-  assert.deepEqual(
-    makeEffects().map(cue => cue.key),
-    [
-      "sfx-pickup",
-      "sfx-drop",
-      "sfx-reload",
-      "sfx-hit",
-      "sfx-death",
-      "sfx-ring-warning",
-      "sfx-ui-click",
-      "sfx-round-start",
-      "sfx-round-end",
-      "sfx-step-stand",
-      "sfx-step-crouch",
-      "sfx-step-stand-02",
-      "sfx-step-crouch-02",
-      "sfx-step-stand-03",
-      "sfx-step-crouch-03",
-      "sfx-step-stand-04",
-      "sfx-step-crouch-04",
-    ],
-  );
+  expect(makeEffects().map(cue => cue.key)).toStrictEqual([
+    "sfx-pickup",
+    "sfx-drop",
+    "sfx-reload",
+    "sfx-hit",
+    "sfx-death",
+    "sfx-ring-warning",
+    "sfx-ui-click",
+    "sfx-round-start",
+    "sfx-round-end",
+    "sfx-step-stand",
+    "sfx-step-crouch",
+    "sfx-step-stand-02",
+    "sfx-step-crouch-02",
+    "sfx-step-stand-03",
+    "sfx-step-crouch-03",
+    "sfx-step-stand-04",
+    "sfx-step-crouch-04",
+  ]);
 });
 
 it("makes every effect mono, one-shot, and with voices", () => {
   for (const cue of makeEffects()) {
-    assert.equal(cue.channels, 1, cue.key);
-    assert.equal(cue.loop, undefined, cue.key);
-    assert.ok(cue.voices.length > 0, cue.key);
-    assert.ok(cue.duration > 0, cue.key);
+    expect(cue.channels, cue.key).toBe(1);
+    expect(cue.loop, cue.key).toBe(undefined);
+    expect(cue.voices.length, cue.key).toBeGreaterThan(0);
+    expect(cue.duration, cue.key).toBeGreaterThan(0);
   }
 });
 
 it("gives each effect the duration the art notes list", () => {
   const durations = Object.fromEntries(makeEffects().map(cue => [cue.key, cue.duration]));
 
-  assert.equal(durations["sfx-pickup"], 0.38);
-  assert.equal(durations["sfx-drop"], 0.34);
-  assert.equal(durations["sfx-reload"], 0.82);
-  assert.equal(durations["sfx-hit"], 0.2);
-  assert.equal(durations["sfx-death"], 1.35);
-  assert.equal(durations["sfx-ring-warning"], 2.8);
-  assert.equal(durations["sfx-ui-click"], 0.065);
-  assert.equal(durations["sfx-round-start"], 1.35);
-  assert.equal(durations["sfx-round-end"], 1.65);
+  expect(durations["sfx-pickup"]).toBe(0.38);
+  expect(durations["sfx-drop"]).toBe(0.34);
+  expect(durations["sfx-reload"]).toBe(0.82);
+  expect(durations["sfx-hit"]).toBe(0.2);
+  expect(durations["sfx-death"]).toBe(1.35);
+  expect(durations["sfx-ring-warning"]).toBe(2.8);
+  expect(durations["sfx-ui-click"]).toBe(0.065);
+  expect(durations["sfx-round-start"]).toBe(1.35);
+  expect(durations["sfx-round-end"]).toBe(1.65);
 });
 
 it("provides four matched dry footfalls per stance with softer crouch filtering", () => {
@@ -55,10 +51,11 @@ it("provides four matched dry footfalls per stance with softer crouch filtering"
   for (const suffix of ["", "-02", "-03", "-04"]) {
     const stand = effects.find(cue => cue.key === `sfx-step-stand${suffix}`);
     const crouch = effects.find(cue => cue.key === `sfx-step-crouch${suffix}`);
-    assert.ok(stand && crouch, `missing footfall pair ${suffix}`);
-    assert.equal(stand.duration, 0.24);
-    assert.equal(crouch.duration, 0.24);
-    assert.ok((crouch.voices[0]?.cutoff ?? Infinity) < (stand.voices[0]?.cutoff ?? 0));
+    assert(stand, `missing footfall pair ${suffix}`);
+    assert(crouch, `missing footfall pair ${suffix}`);
+    expect(stand.duration).toBe(0.24);
+    expect(crouch.duration).toBe(0.24);
+    expect(crouch.voices[0]?.cutoff ?? Infinity).toBeLessThan(stand.voices[0]?.cutoff ?? 0);
   }
 });
 
@@ -69,6 +66,6 @@ it("makes the footfall variants differ from each other", () => {
       JSON.stringify(effects.find(cue => cue.key === `sfx-step-${stance}${suffix}`)?.voices),
     );
 
-    assert.equal(new Set(variants).size, 4, `${stance}: duplicated variant`);
+    expect(new Set(variants).size, `${stance}: duplicated variant`).toBe(4);
   }
 });

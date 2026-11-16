@@ -89,6 +89,10 @@ placeholder's tone-mapped barrel (unit-tested, `pnpm test` here). `gunsmith.play
 the player must stand still. **A check must look for what only the drawing has**: the placeholder disc was close to the team's blue, so blue alone would have passed; the grey body, a small stripe, an outline at exactly the hitbox's radius and no pale grey say the drawing is there and placed. Counts are the same every run (413 grey and 24 stripe standing, 146 and 16 crouched), thresholds sit well off them.
 **`data-sprites-ready`** is waited for whenever the DSL opens the game (`GunsmithPlaywright.waitForArena`), so a spec never reads the placeholder. `startSparringWithHeldPictures()` holds art's `.svg` files back with a route until `releasePictures()` (so a spec can assert `arena.isWaitingForPictures()` while they are missing, deterministically: a time delay was measured and failed to kill a mutant that set the signal early, since it is a race a fast machine wins), and `startSparringWithMissingPictures()` answers 404 to them, to show the placeholder shows and the page still becomes ready. **The route's glob must end in `.svg`**: the dev server also serves the app's own `src/assets/sprites/*.ts`, and `**/assets/sprites/**` 404'd those and left a blank page.
 
+## Pickups
+
+`PickingUpAWeapon` opens **sparring with a seed** (`gunsmith.startSparringWithSeed(seed)`), whose opponent never moves, so only the player can take the weapon. Seeds were measured in the engine over 0 to 39: **seed 8** puts it on the fighters' own row at (13.5, 6.5), so `player.walkFor("east", 0.7)` walks over it; **seed 6** puts it at (13.5, 2.5), four rows away, so the same walk passes it by. It reads `gunsmith.pickup.get()` (the hook's `pickup`, `undefined` once taken) and `weapon.get()`; "faces it" and "faces away" wait with `expect.poll` on `visible`. `APickupEachRound` loses the duel's first round (seeds 2 then 3 put it on different rows) and checks the next round has a new one. No spec has the bot take it: against an idle player it never gets within reach on the pinned seeds.
+
 ## Running
 
 ```bash

@@ -1,6 +1,6 @@
 import {passingEvalInput} from "@evals/dsl/pipeline/evaluators/testing/input/PassingEvalInput";
 import {nodePath} from "@evals/dsl/pipeline/evaluators/outcome/NodePath";
-import type {WeaponOutcomeStatus} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
+import type {WeaponOutcomeStatus} from "@gunsmith/ai/pipeline/types/WeaponOutcomeStatus";
 
 function ran(nodes: string[], status: WeaponOutcomeStatus = "invalid"): ReturnType<typeof passingEvalInput> {
   return passingEvalInput({outcome: {nodes, status}});

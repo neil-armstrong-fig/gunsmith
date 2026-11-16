@@ -4,6 +4,8 @@ export interface VisibleToPlayer {
   opponent: boolean;
   /** Whether each dummy is in sight, in the order the world lists them. */
   dummies: readonly boolean[];
+  /** Whether the pickup is in sight; false when none lies in the arena. */
+  pickup: boolean;
   /** Whether each bullet in the air is shown, in the order the world lists them: the player's own always are, the opponent's only where the player sees. */
   bullets: readonly boolean[];
 }

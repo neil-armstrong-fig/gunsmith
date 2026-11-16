@@ -1,6 +1,7 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
+import {SUBMACHINE_GUN} from "@gunsmith/engine/weapon/weapons/SubmachineGun";
 import {MARKSMAN_RIFLE} from "@gunsmith/engine/weapon/weapons/MarksmanRifle";
 import {RIFLE} from "@gunsmith/engine/weapon/weapons/Rifle";
 import {MAXIMUM_RING_DAMAGE_PER_SECOND} from "@gunsmith/engine/ring/damage/rate/MaximumRingDamage";
@@ -258,4 +259,26 @@ it("reports the player on a stair as half way between the two levels it joins", 
   const onTheStair = {...hills, player: {...hills.player, position: {x: 2.5, y: 1.5}}};
 
   expect(snapshotOf(onTheStair).player.level).toBe(0.5);
+});
+
+it("reports no pickup when none lies in the arena", () => {
+  expect(snapshotOf(world).pickup).toBeUndefined();
+});
+
+it("reports where the pickup lies, what its weapon holds, and whether the player sees it", () => {
+  const lying = {...world, pickup: {position: {x: 3.5, y: 2.5}, weapon: SUBMACHINE_GUN}};
+
+  expect(snapshotOf(lying).pickup).toEqual({
+    x: 3.5,
+    y: 2.5,
+    visible: true,
+    magazineSize: SUBMACHINE_GUN.magazineSize,
+    startingReserve: SUBMACHINE_GUN.startingReserve,
+  });
+});
+
+it("reports a pickup behind the player as not visible, though the game still lists it", () => {
+  const behind = {...world, pickup: {position: {x: 1.5, y: 2.5}, weapon: SUBMACHINE_GUN}};
+
+  expect(snapshotOf(behind).pickup).toMatchObject({x: 1.5, y: 2.5, visible: false});
 });

@@ -4,7 +4,7 @@ import {screenPositionOfTile} from "@src/dsl/gunsmith/components/player/playwrig
 import type {Heading} from "@src/dsl/gunsmith/components/player/types/Heading";
 import {colourIsNear} from "@src/dsl/gunsmith/playwright/look/ColourIsNear";
 import {lookOfFighter} from "@src/dsl/gunsmith/playwright/look/LookOfFighter";
-import {TEAM_BLUE} from "@src/dsl/gunsmith/playwright/look/TeamColours";
+import {TEAM_BLUE} from "@src/dsl/gunsmith/playwright/look/TeamBlue";
 import {coloursAtTiles} from "@src/dsl/gunsmith/playwright/screen/ColoursAtTiles";
 import type {Colour} from "@src/dsl/gunsmith/types/Colour";
 import type {FighterLook} from "@src/dsl/gunsmith/types/FighterLook";
@@ -51,6 +51,15 @@ export class PlayerPlaywright extends BasePage {
     await this.page.evaluate(() => {
       window.dispatchEvent(new Event("blur"));
     });
+  }
+
+  async walkFor(heading: Heading, seconds: number): Promise<void> {
+    await this.startWalking(heading);
+
+    const before = await this.readGameState();
+    await this.waitForGameState(({elapsedSeconds}) => elapsedSeconds >= before.elapsedSeconds + seconds);
+
+    await this.stopWalking(heading);
   }
 
   async measureWalkingSpeed(heading: Heading, seconds: number): Promise<number> {

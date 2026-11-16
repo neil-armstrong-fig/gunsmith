@@ -1,6 +1,6 @@
 import type {AppearanceEvalInput} from "@evals/dsl/appearance/pipeline/types/AppearanceEvalInput";
 import type {EvalScore} from "@evals/dsl/types/EvalScore";
-import type {AppearanceOutcomeStatus} from "@gunsmith/ai/pipeline/appearance/types/AppearanceOutcome";
+import type {AppearanceOutcomeStatus} from "@gunsmith/ai/pipeline/appearance/types/AppearanceOutcomeStatus";
 
 const KEY = "statusIn";
 

@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import {it} from "node:test";
+import {expect, it} from "vitest";
 import {normalizeInPlace} from "@gunsmith/audio-studies/common/levels/normalize/NormalizeInPlace";
 
 it("scales every channel so a sample at the old peak lands on the target", () => {
@@ -7,8 +6,8 @@ it("scales every channel so a sample at the old peak lands on the target", () =>
 
   normalizeInPlace(channels, {peak: 0.5, target: 0.25});
 
-  assert.deepEqual([...(channels[0] ?? [])], [0.25, -0.125]);
-  assert.deepEqual([...(channels[1] ?? [])], [Math.fround(0.05), Math.fround(0.2)]);
+  expect([...(channels[0] ?? [])]).toStrictEqual([0.25, -0.125]);
+  expect([...(channels[1] ?? [])]).toStrictEqual([Math.fround(0.05), Math.fround(0.2)]);
 });
 
 it("can turn a signal up as well as down", () => {
@@ -16,7 +15,7 @@ it("can turn a signal up as well as down", () => {
 
   normalizeInPlace(channels, {peak: 0.1, target: 0.5});
 
-  assert.equal(channels[0]?.[0], 0.5);
+  expect(channels[0]?.[0]).toBe(0.5);
 });
 
 it("gives the bits of multiplying by the target and then dividing by the peak, as the approved pack was rendered", () => {
@@ -25,7 +24,7 @@ it("gives the bits of multiplying by the target and then dividing by the peak, a
 
   normalizeInPlace(channels, {peak: 0.3, target: 0.52});
 
-  assert.equal(channels[0]?.[0], Math.fround((sample * 0.52) / 0.3));
+  expect(channels[0]?.[0]).toBe(Math.fround((sample * 0.52) / 0.3));
 });
 
 it("gives, for every sample, exactly the bits of multiplying by the target and then dividing by the peak", () => {
@@ -35,6 +34,6 @@ it("gives, for every sample, exactly the bits of multiplying by the target and t
   normalizeInPlace(channels, {peak: 0.43, target: 0.52});
 
   for (const [index, sample] of samples.entries()) {
-    assert.equal(channels[0]?.[index], Math.fround((sample * 0.52) / 0.43), `sample ${index}`);
+    expect(channels[0]?.[index], `sample ${index}`).toBe(Math.fround((sample * 0.52) / 0.43));
   }
 });

@@ -1,7 +1,8 @@
 import type {Page} from "@playwright/test";
 import {colourIsNear} from "@src/dsl/gunsmith/playwright/look/ColourIsNear";
 import {colourIsPaleGrey} from "@src/dsl/gunsmith/playwright/look/ColourIsPaleGrey";
-import {lookSampling, outlineSampling} from "@src/dsl/gunsmith/playwright/look/LookSampling";
+import {lookSampling} from "@src/dsl/gunsmith/playwright/look/LookSampling";
+import {outlineSampling} from "@src/dsl/gunsmith/playwright/look/OutlineSampling";
 import {coloursAtTiles} from "@src/dsl/gunsmith/playwright/screen/ColoursAtTiles";
 import type {Colour} from "@src/dsl/gunsmith/types/Colour";
 import type {FighterLook} from "@src/dsl/gunsmith/types/FighterLook";

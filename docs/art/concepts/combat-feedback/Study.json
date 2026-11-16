@@ -1,0 +1,47 @@
+{
+  "studyVersion": 1,
+  "status": "selected build reference; not a production event schema",
+  "preferredProfile": "punchy",
+  "profile": {
+    "id": "punchy",
+    "label": "03 / Punchy",
+    "note": "Optional shake \u00b7 recoil \u00b7 sharper crunch",
+    "accentSeconds": 0.18,
+    "shakePixels": 2,
+    "recoilPixels": 2,
+    "expansionPixels": 8
+  },
+  "mergeIncomingSeconds": 0.1,
+  "presentation": {
+    "healthTrailSeconds": 0.35,
+    "shakeSeconds": 0.1,
+    "recoilSeconds": 0.12,
+    "muzzleSeconds": 0.08,
+    "incomingColour": "#FF5B62",
+    "outgoingColour": "#8AD4B0",
+    "incomingShape": "local brackets",
+    "outgoingShape": "target-centred diagonal ticks",
+    "easing": "linear return; damped sine for shake",
+    "reticleDesignPixels": 32,
+    "playerDiameterDesignPixels": 32
+  },
+  "audio": {
+    "damage-crunch": "/webapp/audio/studies/combat-feedback/damage-crunch.wav",
+    "sfx-hit": "/webapp/audio/generated-audio/sfx-hit.wav"
+  },
+  "audioMix": {
+    "masterGain": 0.55,
+    "musicGain": 0.22,
+    "cueGain": 0.7,
+    "maximumIncomingVoices": 1
+  },
+  "constraints": {
+    "reticle": "Static marker; never target-sensitive",
+    "hiddenHit": "Suppress all outgoing confirmation",
+    "incomingDirection": "None; no attacker location",
+    "ring": "Sustained state; one onset; no per-tick sounds",
+    "reducedMotion": "Static marks; no shake, recoil or expansion",
+    "gameplay": "No knockback, hit-stop, zoom or aim offset"
+  },
+  "recommendation": "User selected punchy/crunch. Keep current shake as-is; tune it during build. Art study handed over on 2026-11-16; production integration and in-game masking remain open."
+}

@@ -9,7 +9,9 @@ import {TrackedFixtures} from "@evals/eval-criteria-mapping/fixtures/TrackedFixt
 import {isGating} from "@evals/eval-criteria-mapping/gate/IsGating";
 import type {RunCriterion} from "@evals/eval-criteria-mapping/types/RunCriterion";
 import type {FixtureName} from "@evals/eval-criteria-mapping/types/FixtureName";
-import type {DefineGiven, DefineWhen, WhenBlock} from "@evals/eval-criteria-mapping/types/WhenBlock";
+import type {DefineGiven} from "@evals/eval-criteria-mapping/types/DefineGiven";
+import type {DefineWhen} from "@evals/eval-criteria-mapping/types/DefineWhen";
+import type {WhenBlock} from "@evals/eval-criteria-mapping/types/WhenBlock";
 import type {WhenContext} from "@evals/eval-criteria-mapping/types/WhenContext";
 import {specNameOf} from "@evals/eval-criteria-mapping/reporting/spec-name/SpecNameOf";
 import type {CriterionResult} from "@evals/eval-criteria-mapping/reporting/types/CriterionResult";

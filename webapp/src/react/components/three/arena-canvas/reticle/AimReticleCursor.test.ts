@@ -1,3 +1,4 @@
+import type {PngSize} from "@src/react/components/three/arena-canvas/reticle/types/PngSize";
 import {readFileSync} from "node:fs";
 import aimReticleUrl from "@src/react/components/three/arena-canvas/reticle/AimReticle.png";
 import aimReticleSharpUrl from "@src/react/components/three/arena-canvas/reticle/AimReticleSharp.png";
@@ -5,7 +6,7 @@ import {aimReticleCursor} from "@src/react/components/three/arena-canvas/reticle
 import {expect, it} from "vitest";
 
 /** A PNG file starts with an eight-byte signature, then the header chunk: its width and height are the next big-endian numbers. */
-function pngSizeOf(file: Buffer): {width: number; height: number} {
+function pngSizeOf(file: Buffer): PngSize {
   return {width: file.readUInt32BE(16), height: file.readUInt32BE(20)};
 }
 

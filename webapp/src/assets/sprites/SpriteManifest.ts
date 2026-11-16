@@ -28,8 +28,3 @@ export const SPRITE_MANIFEST: Record<SpriteKey, SpriteEntry> = {
   "sprite-player-stand-orange": PLAYER_SPRITE,
   "sprite-dummy": DUMMY_SPRITE,
 };
-
-/** Where a picture is served from: art's files live in `public/assets/sprites`, named by their key. */
-export function spriteUrl(key: SpriteKey): string {
-  return `/assets/sprites/${key}.svg`;
-}

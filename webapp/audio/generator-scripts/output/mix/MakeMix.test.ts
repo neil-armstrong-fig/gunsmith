@@ -1,6 +1,6 @@
-import assert from "node:assert/strict";
-import {it} from "node:test";
-import {STEP_VARIANTS, stepKey} from "@gunsmith/audio-studies/common/step-key/StepKey";
+import {expect, it} from "vitest";
+import {STEP_VARIANTS} from "@gunsmith/audio-studies/common/step-key/StepVariants";
+import {stepKey} from "@gunsmith/audio-studies/common/step-key/StepKey";
 import {peakOf} from "@gunsmith/audio-studies/common/levels/peak/PeakOf";
 import {makeMix} from "@gunsmith/audio-studies/output/mix/MakeMix";
 import type {RenderedCue} from "@gunsmith/audio-studies/common/types/RenderedCue";
@@ -39,15 +39,15 @@ function levelAt(mix: RenderedCue, seconds: number, channel = 0): number {
 it("is the audition mix, and not a loop", () => {
   const mix = makeMix(silentTrack(), effects());
 
-  assert.equal(mix.key, "audition-mix");
-  assert.equal(mix.loop, undefined);
+  expect(mix.key).toBe("audition-mix");
+  expect(mix.loop).toBe(undefined);
 });
 
 it("keeps the track's length and channel count", () => {
   const mix = makeMix(silentTrack(), effects());
 
-  assert.equal(mix.channels.length, 2);
-  assert.equal(mix.channels[0]?.length, SECONDS * RATE);
+  expect(mix.channels.length).toBe(2);
+  expect(mix.channels[0]?.length).toBe(SECONDS * RATE);
 });
 
 it("does not change the track it was given", () => {
@@ -55,25 +55,25 @@ it("does not change the track it was given", () => {
 
   makeMix(track, effects());
 
-  assert.ok(track.channels.every(channel => channel.every(sample => sample === 0)));
+  expect(track.channels.every(channel => channel.every(sample => sample === 0))).toBe(true);
 });
 
 it("places the pickup, reload, ring warning and hit at 1.2, 4.1, 7.2 and 12.3 seconds", () => {
   const mix = makeMix(silentTrack(), effects());
   const table = effects();
 
-  assert.equal(levelAt(mix, 1.2), table.get("sfx-pickup")?.channels[0]?.[0]);
-  assert.equal(levelAt(mix, 4.1), table.get("sfx-reload")?.channels[0]?.[0]);
-  assert.equal(levelAt(mix, 7.2), table.get("sfx-ring-warning")?.channels[0]?.[0]);
-  assert.equal(levelAt(mix, 12.3), table.get("sfx-hit")?.channels[0]?.[0]);
+  expect(levelAt(mix, 1.2)).toBe(table.get("sfx-pickup")?.channels[0]?.[0]);
+  expect(levelAt(mix, 4.1)).toBe(table.get("sfx-reload")?.channels[0]?.[0]);
+  expect(levelAt(mix, 7.2)).toBe(table.get("sfx-ring-warning")?.channels[0]?.[0]);
+  expect(levelAt(mix, 12.3)).toBe(table.get("sfx-hit")?.channels[0]?.[0]);
 });
 
 it("repeats the whole run of effects every 30 seconds, three times", () => {
   const mix = makeMix(silentTrack(), effects());
   const pickup = effects().get("sfx-pickup")?.channels[0]?.[0];
 
-  assert.equal(levelAt(mix, 1.2 + 30), pickup);
-  assert.equal(levelAt(mix, 1.2 + 60), pickup);
+  expect(levelAt(mix, 1.2 + 30)).toBe(pickup);
+  expect(levelAt(mix, 1.2 + 60)).toBe(pickup);
 });
 
 it("steps four standing footfalls from 2 seconds, 0.42 apart, one variant each", () => {
@@ -81,10 +81,8 @@ it("steps four standing footfalls from 2 seconds, 0.42 apart, one variant each",
   const table = effects();
 
   for (let variant = 0; variant < 4; variant += 1) {
-    assert.equal(
-      levelAt(mix, 2 + variant * 0.42),
+    expect(levelAt(mix, 2 + variant * 0.42), `variant ${variant}`).toBe(
       table.get(stepKey("stand", variant))?.channels[0]?.[0],
-      `variant ${variant}`,
     );
   }
 });
@@ -94,10 +92,8 @@ it("steps four crouched footfalls from 9.5 seconds, 0.65 apart, one variant each
   const table = effects();
 
   for (let variant = 0; variant < 4; variant += 1) {
-    assert.equal(
-      levelAt(mix, 9.5 + variant * 0.65),
+    expect(levelAt(mix, 9.5 + variant * 0.65), `variant ${variant}`).toBe(
       table.get(stepKey("crouch", variant))?.channels[0]?.[0],
-      `variant ${variant}`,
     );
   }
 });
@@ -105,15 +101,15 @@ it("steps four crouched footfalls from 9.5 seconds, 0.65 apart, one variant each
 it("puts every effect in the centre, equally in both channels", () => {
   const mix = makeMix(silentTrack(), effects());
 
-  assert.equal(levelAt(mix, 1.2, 0), levelAt(mix, 1.2, 1));
-  assert.ok(levelAt(mix, 1.2, 0) > 0);
+  expect(levelAt(mix, 1.2, 0)).toBe(levelAt(mix, 1.2, 1));
+  expect(levelAt(mix, 1.2, 0)).toBeGreaterThan(0);
 });
 
 it("leaves the track alone between effects", () => {
   const mix = makeMix(silentTrack(), effects());
 
-  assert.equal(levelAt(mix, 20), 0);
-  assert.equal(levelAt(mix, 1.19), 0);
+  expect(levelAt(mix, 20)).toBe(0);
+  expect(levelAt(mix, 1.19)).toBe(0);
 });
 
 it("adds an effect to the music under it", () => {
@@ -123,8 +119,8 @@ it("adds an effect to the music under it", () => {
   }
   const mix = makeMix(track, effects());
 
-  assert.ok(Math.abs(levelAt(mix, 1.2) - (0.1 + 0.01)) < 1e-6);
-  assert.ok(Math.abs(levelAt(mix, 20) - 0.1) < 1e-6);
+  expect(Math.abs(levelAt(mix, 1.2) - (0.1 + 0.01))).toBeLessThan(1e-6);
+  expect(Math.abs(levelAt(mix, 20) - 0.1)).toBeLessThan(1e-6);
 });
 
 it("turns the whole mix down, evenly, so its loudest sample is 0.65, when it would be louder", () => {
@@ -133,8 +129,10 @@ it("turns the whole mix down, evenly, so its loudest sample is 0.65, when it wou
   track.channels[1]?.fill(0.4);
   const mix = makeMix(track, effects());
 
-  assert.ok(Math.abs(peakOf(mix.channels) - 0.65) < 1e-6);
-  assert.ok(Math.abs(levelAt(mix, 20, 0) / levelAt(mix, 20, 1) - 2) < 1e-5, "the balance between channels is kept");
+  expect(Math.abs(peakOf(mix.channels) - 0.65)).toBeLessThan(1e-6);
+  expect(Math.abs(levelAt(mix, 20, 0) / levelAt(mix, 20, 1) - 2), "the balance between channels is kept").toBeLessThan(
+    1e-5,
+  );
 });
 
 it("leaves a mix alone that is already under 0.65", () => {
@@ -142,7 +140,7 @@ it("leaves a mix alone that is already under 0.65", () => {
   track.channels[0]?.fill(0.4);
   const mix = makeMix(track, effects());
 
-  assert.ok(Math.abs(levelAt(mix, 20) - 0.4) < 1e-6);
+  expect(Math.abs(levelAt(mix, 20) - 0.4)).toBeLessThan(1e-6);
 });
 
 it("drops an effect that would run past the end of the track, rather than failing", () => {
@@ -153,13 +151,13 @@ it("drops an effect that would run past the end of the track, rather than failin
 
   const mix = makeMix(short, effects());
 
-  assert.equal(mix.channels[0]?.length, 2 * RATE);
-  assert.ok(levelAt(mix, 1.2) > 0);
+  expect(mix.channels[0]?.length).toBe(2 * RATE);
+  expect(levelAt(mix, 1.2)).toBeGreaterThan(0);
 });
 
 it("refuses a table that lacks an effect the mix needs", () => {
   const table = effects();
   table.delete("sfx-hit");
 
-  assert.throws(() => makeMix(silentTrack(), table));
+  expect(() => makeMix(silentTrack(), table)).toThrow();
 });
