@@ -1,3 +1,4 @@
+import {standardsPlugin} from "./standards/StandardsPlugin.ts";
 import js from "@eslint/js";
 import prettierConfig from "eslint-config-prettier";
 import globals from "globals";
@@ -63,6 +64,7 @@ export function baseConfig({tsconfigRootDir, allowedPackages = [], allowedConsol
     js.configs.recommended,
     ...tseslint.configs.recommended,
     {
+      plugins: {gunsmith: standardsPlugin},
       languageOptions: {
         ecmaVersion: 2022,
         sourceType: "module",
@@ -73,6 +75,8 @@ export function baseConfig({tsconfigRootDir, allowedPackages = [], allowedConsol
         },
       },
       rules: {
+        "gunsmith/import-spacing": "error",
+        "object-shorthand": ["error", "properties"],
         eqeqeq: ["error", "smart"],
         "no-multiple-empty-lines": ["error", {max: 1}],
         "no-console": ["warn", {allow: allowedConsoleMethods}],
@@ -94,6 +98,32 @@ export function baseConfig({tsconfigRootDir, allowedPackages = [], allowedConsol
         "@typescript-eslint/explicit-function-return-type": "off",
         "@typescript-eslint/explicit-module-boundary-types": "off",
       },
+    },
+    {
+      files: [
+        "src/**/*.{ts,tsx}",
+        "evals/**/*.ts",
+        "generator-scripts/**/*.ts",
+        "config/standards/**/*.ts",
+        "config/repository/**/*.ts",
+      ],
+      rules: {
+        "max-params": ["error", 3],
+        "gunsmith/no-return-ternary": "error",
+        "gunsmith/named-object-types": "error",
+        "gunsmith/single-export": "error",
+      },
+    },
+    {
+      files: [
+        "src/acceptance-criteria-mapping/AcceptanceCriteriaMapping.ts",
+        "evals/eval-criteria-mapping/EvalCriteriaMapping.ts",
+      ],
+      rules: {"gunsmith/single-export": "off"},
+    },
+    {
+      files: ["config/standards/**/*.ts", "config/repository/**/*.ts"],
+      rules: {"@typescript-eslint/explicit-function-return-type": ["error", {allowExpressions: true}]},
     },
     prettierConfig,
     // After `prettierConfig`, which switches `curly` off. Prettier reprints code and never adds or

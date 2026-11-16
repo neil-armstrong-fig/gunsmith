@@ -1,3 +1,4 @@
+import type {MutableAppearanceDefaults} from "@gunsmith/ai/pipeline/appearance/check/fix/complete/types/MutableAppearanceDefaults";
 import {completeAppearance} from "@gunsmith/ai/pipeline/appearance/check/fix/complete/CompleteAppearance";
 import {passingAppearance} from "@gunsmith/ai/pipeline/appearance/testing/PassingAppearance";
 import {validateAppearance} from "@gunsmith/ai/pipeline/appearance/check/validate/ValidateAppearance";
@@ -169,10 +170,10 @@ it("does not change what it was given", () => {
 });
 
 it("gives each caller its own defaults, so changing one answer cannot change the next", () => {
-  const first = completeAppearance({body: []}).candidate as {palette: {accent: string}; projectile: unknown[]};
+  const first = completeAppearance({body: []}).candidate as MutableAppearanceDefaults;
   first.palette.accent = "weapon-pink";
   first.projectile.push(1);
-  const second = completeAppearance({body: []}).candidate as {palette: {accent: string}; projectile: unknown[]};
+  const second = completeAppearance({body: []}).candidate as MutableAppearanceDefaults;
 
   expect(second.palette.accent).toBe("weapon-blue");
   expect(second.projectile).toEqual([]);

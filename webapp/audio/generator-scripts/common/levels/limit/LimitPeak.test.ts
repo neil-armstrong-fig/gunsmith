@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import {it} from "node:test";
+import {expect, it} from "vitest";
 import {limitPeak} from "@gunsmith/audio-studies/common/levels/limit/LimitPeak";
 
 it("turns everything down by the same amount when the peak is over the ceiling", () => {
@@ -7,8 +6,8 @@ it("turns everything down by the same amount when the peak is over the ceiling",
 
   limitPeak(channels, 0.5);
 
-  assert.deepEqual([...(channels[0] ?? [])], [0.5, -0.25]);
-  assert.deepEqual([...(channels[1] ?? [])], [0.125, 0]);
+  expect([...(channels[0] ?? [])]).toStrictEqual([0.5, -0.25]);
+  expect([...(channels[1] ?? [])]).toStrictEqual([0.125, 0]);
 });
 
 it("leaves a signal alone that is already under the ceiling", () => {
@@ -16,7 +15,7 @@ it("leaves a signal alone that is already under the ceiling", () => {
 
   limitPeak(channels, 0.5);
 
-  assert.deepEqual([...(channels[0] ?? [])], [Math.fround(0.4), Math.fround(-0.2)]);
+  expect([...(channels[0] ?? [])]).toStrictEqual([Math.fround(0.4), Math.fround(-0.2)]);
 });
 
 it("leaves a signal alone that is exactly at the ceiling", () => {
@@ -24,7 +23,7 @@ it("leaves a signal alone that is exactly at the ceiling", () => {
 
   limitPeak(channels, 0.5);
 
-  assert.equal(channels[0]?.[0], 0.5);
+  expect(channels[0]?.[0]).toBe(0.5);
 });
 
 it("leaves silence alone", () => {
@@ -32,5 +31,5 @@ it("leaves silence alone", () => {
 
   limitPeak(channels, 0.5);
 
-  assert.deepEqual([...(channels[0] ?? [])], [0, 0, 0]);
+  expect([...(channels[0] ?? [])]).toStrictEqual([0, 0, 0]);
 });

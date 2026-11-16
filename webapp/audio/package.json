@@ -12,8 +12,8 @@
     "lint": "eslint --max-warnings=0 .",
     "format:check": "prettier --check generator-scripts generated-audio/measurements.json encoded-audio/*.json *.js *.json README.md",
     "type-check": "tsc --noEmit",
-    "test": "node --test \"generator-scripts/**/*.test.ts\"",
-    "test:render": "FULL_RENDER=1 node --test generator-scripts/pack/verification/RenderedPack.test.ts",
+    "test": "vitest run",
+    "test:render": "FULL_RENDER=1 vitest run generator-scripts/pack/verification/RenderedPack.test.ts",
     "encode": "node generator-scripts/encoding/EncodeAudio.ts",
     "verify:encoded": "node generator-scripts/encoding/verification/VerifyEncoded.ts",
     "verify:browser": "node generator-scripts/browser/VerifyBrowserAudio.ts"
@@ -24,6 +24,7 @@
     "eslint": "catalog:",
     "node-web-audio-api": "catalog:",
     "prettier": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

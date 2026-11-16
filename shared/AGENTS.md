@@ -6,3 +6,6 @@ no pre-emptive types, schemas or constants. A shape moves here when another pack
 puts on `window` and the acceptance specs read, which is why it is shared. Stub: `build` writes the full file in Phase C.
 
 Change a lint, format or compiler rule in `config/`, never in a package.
+
+`config/standards/` holds the local TypeScript ESLint plugin. Its independently named rules survive package syntax overrides. Node 26 loads these `.ts` modules directly; shared's tsconfig checks them and permits their explicit `.ts` imports. Its tests run through real package configurations.
+`config/repository/CheckRepository.ts` powers root `pnpm checks:repository`: instruction-chain size, current instruction links, stale startup wording and art-script validation. Frozen HTML is syntax-checked only; this is not browser/usability coverage. Keep archives outside startup reading and preserve current owner work when editing shared status files.

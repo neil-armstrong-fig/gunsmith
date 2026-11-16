@@ -1,17 +1,16 @@
-import assert from "node:assert/strict";
 import {mkdtemp, readdir, rm, writeFile} from "node:fs/promises";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
-import {after, before, it} from "node:test";
+import {afterAll, beforeAll, expect, it} from "vitest";
 import {removeReports} from "@gunsmith/audio-studies/encoding/report/RemoveReports";
 
 let folder = "";
 
-before(async () => {
+beforeAll(async () => {
   folder = await mkdtemp(join(tmpdir(), "gunsmith-reports-"));
 });
 
-after(async () => {
+afterAll(async () => {
   await rm(folder, {recursive: true, force: true});
 });
 
@@ -21,5 +20,5 @@ it("removes all three reports and leaves the exports, and does not mind a report
   }
   await removeReports(folder);
 
-  assert.deepEqual(await readdir(folder), ["sfx-hit.ogg"]);
+  expect(await readdir(folder)).toStrictEqual(["sfx-hit.ogg"]);
 });

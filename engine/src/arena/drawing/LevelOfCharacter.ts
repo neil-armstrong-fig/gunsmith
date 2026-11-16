@@ -1,4 +1,7 @@
-import {FLOOR, RAISED_LEVELS, STAIRS, WALL} from "@gunsmith/engine/arena/drawing/DrawingCharacters";
+import {FLOOR} from "@gunsmith/engine/arena/drawing/level/Floor";
+import {RAISED_LEVELS} from "@gunsmith/engine/arena/drawing/level/RaisedLevels";
+import {STAIRS} from "@gunsmith/engine/arena/drawing/Stairs";
+import {WALL} from "@gunsmith/engine/arena/drawing/Wall";
 
 /**
  * The level a character of an arena's drawing stands for: 0 for a wall, floor or stair (a stair is given its real level once

@@ -236,20 +236,12 @@ Stale wording for the respective owners to reconcile when the new contract lands
 
 Research 2 sent scope and findings to AI research task
 `01a1dc87-ec7b-7433-8721-52b2a8fef4df`; that thread was awaiting approval when
-inspected, so shared-file ownership is not yet acknowledged. This delivery owns
-only this document. Keep status edits with one confirmed coordinator, re-reading
-each file before a targeted edit. Ready-to-paste sync text:
-
-- **TODO-ai:** `[x] Research 2: stat-balancing study delivered in
-  docs/ai-stat-balancing.md; preference/default-policy comparisons, cadence
-  evidence and test/probe handoff. Implementation and calibration remain open.`
-- **AI status row:** `Research 2 balancing study delivered; preserve deliberate
-  weakness, compare both omitted-stat policies. Stats/appearance integration
-  remains next; no runtime change or model call.`
-- **Delivery log:** `2026-11-16, ai/research 2: delivered
-  docs/ai-stat-balancing.md, documentation only. User decisions, primary sources,
-  preference/balancer comparisons, trigger-cadence measurements and future
-  verification handoff; no schema, manifest, budget, dependency or runtime change.`
+inspected, and acknowledgment remains pending. At the user's explicit request
+before context clearing, Research 2 applied the checklist/resume checkpoint,
+AI status and delivery-log updates in `TODO-ai.md`, `TODO.md` and `HANDOFF.md`,
+notifying the other thread and preserving other personas' edits. These sync
+updates are no longer queued. Next session must establish current ownership
+again before editing shared files; contact does not prove code has been started.
 
 ### Delivery validation (2026-11-16)
 

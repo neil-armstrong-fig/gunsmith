@@ -1,4 +1,5 @@
-import {STAIRS, WALL} from "@gunsmith/engine/arena/drawing/DrawingCharacters";
+import {STAIRS} from "@gunsmith/engine/arena/drawing/Stairs";
+import {WALL} from "@gunsmith/engine/arena/drawing/Wall";
 import {levelOfCharacter} from "@gunsmith/engine/arena/drawing/LevelOfCharacter";
 import {placeStairs} from "@gunsmith/engine/arena/drawing/PlaceStairs";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";

@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import {it} from "node:test";
+import {expect, it} from "vitest";
 import {loopSeamJump} from "@gunsmith/audio-studies/output/wav/seam/LoopSeamJump";
 
 function pcm(samples: readonly number[]): Buffer {
@@ -12,18 +11,18 @@ function pcm(samples: readonly number[]): Buffer {
 }
 
 it("is the step from the last sample back round to the first, as a share of full scale", () => {
-  assert.equal(loopSeamJump(pcm([1000, 5, 9, 4000]), 1), 3000 / 32768);
+  expect(loopSeamJump(pcm([1000, 5, 9, 4000]), 1)).toBe(3000 / 32768);
 });
 
 it("is zero when the loop ends where it begins", () => {
-  assert.equal(loopSeamJump(pcm([700, 1, 2, 700]), 1), 0);
+  expect(loopSeamJump(pcm([700, 1, 2, 700]), 1)).toBe(0);
 });
 
 it("is the same whichever way round the step goes", () => {
-  assert.equal(loopSeamJump(pcm([4000, 0, 1000]), 1), 3000 / 32768);
+  expect(loopSeamJump(pcm([4000, 0, 1000]), 1)).toBe(3000 / 32768);
 });
 
 it("takes the worst channel of a stereo loop", () => {
   // Frames are interleaved: L R L R L R. The left seam steps 100 and the right seam steps 800.
-  assert.equal(loopSeamJump(pcm([100, 10, 5, 5, 200, 810]), 2), 800 / 32768);
+  expect(loopSeamJump(pcm([100, 10, 5, 5, 200, 810]), 2)).toBe(800 / 32768);
 });

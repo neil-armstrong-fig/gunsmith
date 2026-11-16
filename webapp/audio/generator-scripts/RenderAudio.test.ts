@@ -1,11 +1,11 @@
-import assert from "node:assert/strict";
 import {createHash} from "node:crypto";
 import {mkdtemp, readdir, readFile, rm} from "node:fs/promises";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
-import {after, before, it} from "node:test";
+import {afterAll, beforeAll, expect, it} from "vitest";
 import {OfflineAudioContext} from "node-web-audio-api";
-import {STEP_VARIANTS, stepKey} from "@gunsmith/audio-studies/common/step-key/StepKey";
+import {STEP_VARIANTS} from "@gunsmith/audio-studies/common/step-key/StepVariants";
+import {stepKey} from "@gunsmith/audio-studies/common/step-key/StepKey";
 import {readMeasurements} from "@gunsmith/audio-studies/output/measurements/read/ReadMeasurements";
 import {renderAudio} from "@gunsmith/audio-studies/RenderAudio";
 import type {AudioPack} from "@gunsmith/audio-studies/pack/types/AudioPack";
@@ -52,11 +52,11 @@ const pack: AudioPack = {
 
 let folder = "";
 
-before(async () => {
+beforeAll(async () => {
   folder = await mkdtemp(join(tmpdir(), "gunsmith-audio-"));
 });
 
-after(async () => {
+afterAll(async () => {
   await rm(folder, {recursive: true, force: true});
 });
 
@@ -74,10 +74,9 @@ it("renders every effect, both loops and the audition mix, and says how many fil
   const count = await renderAudio(output, pack);
   const wavs = (await readdir(output)).filter(file => file.endsWith(".wav")).sort();
 
-  assert.equal(count, EFFECT_KEYS.length + 3);
-  assert.equal(wavs.length, count);
-  assert.deepEqual(
-    wavs,
+  expect(count).toBe(EFFECT_KEYS.length + 3);
+  expect(wavs.length).toBe(count);
+  expect(wavs).toStrictEqual(
     [...EFFECT_KEYS, "music-loop-match", "music-loop-menu", "audition-mix"].map(key => `${key}.wav`).sort(),
   );
 });
@@ -87,14 +86,14 @@ it("creates the output folder, however deep, when it does not exist", async () =
 
   await renderAudio(output, pack);
 
-  assert.ok((await readdir(output)).includes("measurements.json"));
+  expect(await readdir(output)).toContain("measurements.json");
 });
 
 it("records the measurements in render order: effects, match, menu, then the mix", async () => {
   const output = join(folder, "order");
   await renderAudio(output, pack);
 
-  assert.deepEqual(Object.keys((await readMeasurements(output)).files), [
+  expect(Object.keys((await readMeasurements(output)).files)).toStrictEqual([
     ...EFFECT_KEYS,
     "music-loop-match",
     "music-loop-menu",
@@ -109,7 +108,7 @@ it("records the hash of every file it wrote", async () => {
   for (const [key, measurement] of Object.entries((await readMeasurements(output)).files)) {
     const wav = await readFile(join(output, `${key}.wav`));
 
-    assert.equal(createHash("sha256").update(wav).digest("hex"), measurement.sha256, key);
+    expect(createHash("sha256").update(wav).digest("hex"), key).toBe(measurement.sha256);
   }
 });
 
@@ -123,8 +122,8 @@ it("writes files a standard decoder accepts: effects in mono, loops and the mix 
     const frames = (wav.length - 44) / (channels * 2);
     const decoded = await new OfflineAudioContext(channels, frames, 48000).decodeAudioData(Uint8Array.from(wav).buffer);
 
-    assert.equal(decoded.numberOfChannels, channelsOf(key), key);
-    assert.equal(decoded.length, frames, key);
+    expect(decoded.numberOfChannels, key).toBe(channelsOf(key));
+    expect(decoded.length, key).toBe(frames);
   }
 });
 
@@ -133,10 +132,10 @@ it("measures the join of the loops, and of nothing else", async () => {
   await renderAudio(output, pack);
   const {files} = await readMeasurements(output);
 
-  assert.notEqual(files["music-loop-match"]?.seamJumpDbfs, undefined);
-  assert.notEqual(files["music-loop-menu"]?.seamJumpDbfs, undefined);
-  assert.equal(files["sfx-pickup"]?.seamJumpDbfs, undefined);
-  assert.equal(files["audition-mix"]?.seamJumpDbfs, undefined);
+  expect(files["music-loop-match"]?.seamJumpDbfs).not.toBe(undefined);
+  expect(files["music-loop-menu"]?.seamJumpDbfs).not.toBe(undefined);
+  expect(files["sfx-pickup"]?.seamJumpDbfs).toBe(undefined);
+  expect(files["audition-mix"]?.seamJumpDbfs).toBe(undefined);
 });
 
 it("makes the audition mix as long as the match track it is laid over", async () => {
@@ -144,7 +143,7 @@ it("makes the audition mix as long as the match track it is laid over", async ()
   await renderAudio(output, pack);
   const {files} = await readMeasurements(output);
 
-  assert.equal(files["audition-mix"]?.seconds, files["music-loop-match"]?.seconds);
+  expect(files["audition-mix"]?.seconds).toBe(files["music-loop-match"]?.seconds);
 });
 
 it("renders the same bytes every time", async () => {
@@ -153,6 +152,6 @@ it("renders the same bytes every time", async () => {
   await renderAudio(second, pack);
 
   for (const file of await readdir(first)) {
-    assert.deepEqual(await readFile(join(first, file)), await readFile(join(second, file)), file);
+    expect(await readFile(join(first, file)), file).toStrictEqual(await readFile(join(second, file)));
   }
 });

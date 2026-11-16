@@ -1,22 +1,21 @@
-import assert from "node:assert/strict";
-import {it} from "node:test";
+import {expect, it} from "vitest";
 import {makeAudioPack} from "@gunsmith/audio-studies/pack/MakeAudioPack";
 
 it("is seventeen effects, a 90-second match loop and a 60-second menu loop", () => {
   const pack = makeAudioPack();
 
-  assert.equal(pack.effects.length, 17);
-  assert.equal(pack.match.key, "music-loop-match");
-  assert.equal(pack.match.duration, 90);
-  assert.equal(pack.menu.key, "music-loop-menu");
-  assert.equal(pack.menu.duration, 60);
+  expect(pack.effects.length).toBe(17);
+  expect(pack.match.key).toBe("music-loop-match");
+  expect(pack.match.duration).toBe(90);
+  expect(pack.menu.key).toBe("music-loop-menu");
+  expect(pack.menu.duration).toBe(60);
 });
 
 it("gives every cue its own key", () => {
   const pack = makeAudioPack();
   const keys = [...pack.effects, pack.match, pack.menu].map(cue => cue.key);
 
-  assert.equal(new Set(keys).size, keys.length);
+  expect(new Set(keys).size).toBe(keys.length);
 });
 
 it("has every effect the audition mix needs", () => {
@@ -30,6 +29,6 @@ it("has every effect the audition mix needs", () => {
     "sfx-step-stand",
     "sfx-step-crouch-04",
   ]) {
-    assert.ok(keys.has(key), key);
+    expect(keys.has(key), key).toBe(true);
   }
 });

@@ -1,3 +1,4 @@
+import type {StripAtRequest} from "@src/react/components/three/arena-canvas/components/arena-scene/components/arena-heights/stairs/types/StripAtRequest";
 import type {Uphill} from "@gunsmith/engine/arena/types/Uphill";
 import type {StairStrip} from "@src/react/components/three/arena-canvas/components/arena-scene/components/arena-heights/stairs/types/StairStrip";
 
@@ -15,14 +16,14 @@ export function stairStripsOf(uphill: Uphill): StairStrip[] {
     const fraction = (index + 0.5) * size;
     const along = index * size;
 
-    strips.push(stripAt(uphill, along, size, fraction));
+    strips.push(stripAt({uphill, along, size, fraction}));
   }
 
   return strips;
 }
 
 /** The band that starts `along` the flight from its low end, `size` long, climbing `uphill`. */
-function stripAt(uphill: Uphill, along: number, size: number, fraction: number): StairStrip {
+function stripAt({uphill, along, size, fraction}: StripAtRequest): StairStrip {
   if (uphill === "east") {
     return {x: along, y: 0, width: size, height: 1, fraction};
   }

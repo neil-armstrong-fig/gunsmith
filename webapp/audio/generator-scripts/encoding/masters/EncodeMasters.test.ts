@@ -1,8 +1,7 @@
-import assert from "node:assert/strict";
 import {mkdir, mkdtemp, readdir, rm} from "node:fs/promises";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
-import {afterEach, beforeEach, it} from "node:test";
+import {afterEach, assert, beforeEach, expect, it} from "vitest";
 import {sourceOfOneEffect} from "@gunsmith/audio-studies/encoding/fixture/SourceOfOneEffect";
 import {encodeMasters} from "@gunsmith/audio-studies/encoding/masters/EncodeMasters";
 import {encoderBinary} from "@gunsmith/audio-studies/encoding/process/binary/EncoderBinary";
@@ -29,28 +28,24 @@ afterEach(async () => {
 it("encodes every measured master but the audition mix, in the order they were measured", async () => {
   const files = await encodeMasters({binary: encoderBinary(), source, staging, measurements});
 
-  assert.deepEqual(
-    files.map(file => `${file.key}.${file.format}`),
-    ["sfx-ui-click.ogg", "sfx-ui-click.mp3"],
-  );
+  expect(files.map(file => `${file.key}.${file.format}`)).toStrictEqual(["sfx-ui-click.ogg", "sfx-ui-click.mp3"]);
 });
 
 it("refuses a key that could not be an export's file name, before it encodes anything", async () => {
   const click = measurements.files["sfx-ui-click"];
-  assert.ok(click);
+  assert(click);
   const unsafe = {...measurements, files: {"sfx-ui-click": click, "../escape": click}};
 
-  await assert.rejects(
-    encodeMasters({binary: encoderBinary(), source, staging, measurements: unsafe}),
+  await expect(encodeMasters({binary: encoderBinary(), source, staging, measurements: unsafe})).rejects.toThrow(
     /Invalid master key: \.\.\/escape/,
   );
 });
 
 it("leaves staging empty when it refuses", async () => {
   const click = measurements.files["sfx-ui-click"];
-  assert.ok(click);
+  assert(click);
   const unsafe = {...measurements, files: {"not-an-export": click}};
 
-  await assert.rejects(encodeMasters({binary: encoderBinary(), source, staging, measurements: unsafe}));
-  assert.deepEqual(await readdir(staging), []);
+  await expect(encodeMasters({binary: encoderBinary(), source, staging, measurements: unsafe})).rejects.toThrow();
+  expect(await readdir(staging)).toStrictEqual([]);
 });

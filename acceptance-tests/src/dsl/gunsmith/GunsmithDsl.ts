@@ -8,6 +8,7 @@ import {MatchDsl} from "@src/dsl/gunsmith/components/match/MatchDsl";
 import {DUEL_SEED} from "@src/dsl/gunsmith/duel/DuelSeed";
 import {LONG_DUEL_SEED} from "@src/dsl/gunsmith/duel/LongDuelSeed";
 import {OpponentDsl} from "@src/dsl/gunsmith/components/opponent/OpponentDsl";
+import {PickupDsl} from "@src/dsl/gunsmith/components/pickup/PickupDsl";
 import {PlayerDsl} from "@src/dsl/gunsmith/components/player/PlayerDsl";
 import {RingDsl} from "@src/dsl/gunsmith/components/ring/RingDsl";
 import {RoundDsl} from "@src/dsl/gunsmith/components/round/RoundDsl";
@@ -29,6 +30,7 @@ export class GunsmithDsl {
   readonly hud: HudDsl;
   readonly opponent: OpponentDsl;
   readonly match: MatchDsl;
+  readonly pickup: PickupDsl;
   readonly ring: RingDsl;
   readonly round: RoundDsl;
   readonly vision: VisionDsl;
@@ -44,6 +46,7 @@ export class GunsmithDsl {
     this.hud = new HudDsl(page);
     this.opponent = new OpponentDsl(page);
     this.match = new MatchDsl(page);
+    this.pickup = new PickupDsl(page);
     this.ring = new RingDsl(page);
     this.round = new RoundDsl(page);
     this.vision = new VisionDsl(page);
@@ -89,6 +92,15 @@ export class GunsmithDsl {
       await this.gunsmith.openSparring();
     } catch (error) {
       throw new DslError("Failed to open the sparring match", error);
+    }
+  }
+
+  /** Opens sparring with what the game draws from a seed (where a weapon lies, where a ring closes) drawn from `seed`. */
+  async startSparringWithSeed(seed: number): Promise<void> {
+    try {
+      await this.gunsmith.openSparringWithSeed(seed);
+    } catch (error) {
+      throw new DslError(`Failed to open the sparring match with seed ${seed}`, error);
     }
   }
 

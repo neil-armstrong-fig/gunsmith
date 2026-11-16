@@ -1,0 +1,18 @@
+{
+  "sampleRate": 48000,
+  "sampleBits": 16,
+  "bpm": 128,
+  "key": "D minor",
+  "engine": "node-web-audio-api@2.2.0",
+  "seed": 8231,
+  "files": {
+    "empty-tight": {
+      "seconds": 0.07,
+      "channels": 1,
+      "peakDbfs": -6.02,
+      "rmsDbfs": -25.93,
+      "sha256": "c1ea912790b70b571f229488f641ed81082305a2d673cb1f4bf7b95622c5188f"
+    }
+  },
+  "listeningReview": "pending; regenerated with native Web Audio; measurements do not prove perceived quality"
+}

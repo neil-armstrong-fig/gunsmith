@@ -1,8 +1,7 @@
-import assert from "node:assert/strict";
 import {mkdtemp, readFile, rm} from "node:fs/promises";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
-import {after, before, it} from "node:test";
+import {afterAll, beforeAll, expect, it} from "vitest";
 import {readMeasurements} from "@gunsmith/audio-studies/output/measurements/read/ReadMeasurements";
 import {writeMeasurements} from "@gunsmith/audio-studies/output/measurements/WriteMeasurements";
 import type {Measurement} from "@gunsmith/audio-studies/output/measurements/types/Measurement";
@@ -10,11 +9,11 @@ import type {PackageManifest} from "@gunsmith/audio-studies/output/measurements/
 
 let folder = "";
 
-before(async () => {
+beforeAll(async () => {
   folder = await mkdtemp(join(tmpdir(), "gunsmith-measurements-"));
 });
 
-after(async () => {
+afterAll(async () => {
   await rm(folder, {recursive: true, force: true});
 });
 
@@ -24,7 +23,7 @@ it("writes measurements.json: the format, the key, the engine, the seed, the fil
   await writeMeasurements(folder, {"sfx-a": measurement});
   const report = await readMeasurements(folder);
 
-  assert.deepEqual(report, {
+  expect(report).toStrictEqual({
     sampleRate: 48000,
     sampleBits: 16,
     bpm: 128,
@@ -39,15 +38,15 @@ it("writes measurements.json: the format, the key, the engine, the seed, the fil
 it("lists the files in the order it was given them", async () => {
   await writeMeasurements(folder, {"sfx-b": measurement, "sfx-a": measurement, music: measurement});
 
-  assert.deepEqual(Object.keys((await readMeasurements(folder)).files), ["sfx-b", "sfx-a", "music"]);
+  expect(Object.keys((await readMeasurements(folder)).files)).toStrictEqual(["sfx-b", "sfx-a", "music"]);
 });
 
 it("is indented by two spaces and ends with a newline, so Prettier leaves it alone", async () => {
   await writeMeasurements(folder, {"sfx-a": measurement});
   const text = await readFile(join(folder, "measurements.json"), "utf8");
 
-  assert.ok(text.startsWith('{\n  "sampleRate": 48000,'));
-  assert.ok(text.endsWith("}\n"));
+  expect(text.startsWith('{\n  "sampleRate": 48000,')).toBe(true);
+  expect(text.endsWith("}\n")).toBe(true);
 });
 
 it("names the engine version that is actually installed, so the record cannot drift from the pin", async () => {
@@ -55,5 +54,5 @@ it("names the engine version that is actually installed, so the record cannot dr
   const installed = JSON.parse(await readFile(manifest, "utf8")) as PackageManifest;
   await writeMeasurements(folder, {});
 
-  assert.equal((await readMeasurements(folder)).engine, `node-web-audio-api@${installed.version}`);
+  expect((await readMeasurements(folder)).engine).toBe(`node-web-audio-api@${installed.version}`);
 });
