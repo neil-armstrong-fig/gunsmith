@@ -4,6 +4,10 @@ The design of real-time play. Modelled on janggi's `docs/online-play.md` (read i
 which is unchanged), but the game is real-time, so the room is a ticking authority. Status: design; `build` keeps it in step
 with the code (Phase E in `TODO-build.md`).
 
+The 2026-11-15 [fair-play research and handoff](art/fair-play-research.md)
+adds sign-in for public play, recording, reports and silent restricted matchmaking.
+These are design decisions; the online controls are not implemented yet.
+
 ## Principles
 
 1. **The server is the authority.** Clients send *inputs*, never positions or hits. The server simulates and decides hits.
@@ -43,7 +47,10 @@ Per player, per tick (delta-compressed later if needed):
 - Pickups they can see, ring state, round timer and score.
 - Sound events: a direction sector, a kind, and a loudness, only within hearing range.
 
-Spectators receive a **full view delayed** by the host's setting (a ring buffer of full snapshots in the Durable Object).
+Private-room spectators receive a **full view delayed** by the host's setting
+(a ring buffer of full snapshots in the Durable Object). Public full-view
+spectating and replay access wait until the whole match ends, not just a round;
+a delay alone can still help a player through a second account.
 
 ## Visibility
 
@@ -71,8 +78,11 @@ Spectators receive a **full view delayed** by the host's setting (a ring buffer 
 
 - **Private room:** a friend code, strictly two seats plus up to 8 spectators. The host sets the spectator delay. A
   spectator may request a seat only when a player leaves.
-- **Public queue:** FIFO, a rating window that widens over time, a small Elo updated in D1 when the match ends.
-- **Guests** may play both, signed out, with the built-in pool; their ratings are not kept.
+- **Public queue:** Google sign-in required. FIFO with a widening rating window
+  within each of two pools, normal and restricted. Never widen across that boundary.
+  Normal matches update a small Elo in D1; restricted matches grant no normal rating gains.
+- **Guests** may play practice and private rooms with the built-in pool, not the
+  public queue; their ratings are not kept.
 
 ## Wire messages (draft; `build` owns the final in `shared/`)
 
@@ -86,9 +96,33 @@ Discriminated unions on `kind`, JSON text frames to begin with.
 
 ## Anti-cheat stance
 
-Inputs are validated and everything else is authoritative. Hidden information is never sent. Speed, fire rate, ammo and
-cooldowns are enforced on the server. Aim assist and wall-hack-style cheats via the network are impossible by design;
-client-side tampering with the display is out of scope.
+Inputs are validated and everything else is authoritative. Speed, fire rate,
+ammo and cooldowns are enforced on the server. Bound input processing per tick;
+neither packet volume nor client timestamps grant extra simulation time.
+Hidden information must be absent from every outbound channel, including seeds
+that reveal hidden state, reconnects, effects and the state hook.
+
+Automated aiming can still choose legal inputs using visible information.
+Authority prevents forged hits; it does not prove a human chose the aim.
+Authenticate WebSocket upgrades and seats, validate origins, and enforce
+message limits after upgrade. See the research for sources and acceptance criteria.
+
+## Recordings and reports (planned)
+
+Journal authoritative inputs/events and periodic checkpoints, with resolved
+definitions, engine/replay versions and separate per-player information evidence.
+Use bounded Durable Object storage batches, private R2 chunks and D1 metadata.
+Upload retries must not block simulation; incomplete evidence stays explicitly incomplete.
+Players and moderators can watch completed matches; either participant may share
+a sanitized replay. Ordinary hosted recordings expire after 14 days; flagged
+evidence after 90 days. Shared exports exclude raw prompts and security evidence.
+
+Participant reports attach match evidence and are deduplicated; report counts
+alone never lower trust. Silent restrictions combine calibrated automatic
+corroboration with human review/override. Recovery requires completed clean
+matches resistant to farming, never inactivity; an empty restricted pool may
+prevent recovery. Keep manual correction and never match into the normal pool
+as a timeout fallback. Behavioral detectors start in observation mode.
 
 ## Open questions
 

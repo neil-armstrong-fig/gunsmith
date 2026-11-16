@@ -1,6 +1,7 @@
 import type {Page} from "@playwright/test";
 import {expect} from "@playwright/test";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
+import type {ClosingRingRequest} from "@src/dsl/gunsmith/types/ClosingRingRequest";
 import type {Size} from "@src/dsl/gunsmith/types/Size";
 
 export class GunsmithPlaywright extends BasePage {
@@ -20,6 +21,13 @@ export class GunsmithPlaywright extends BasePage {
 
   async openSparring(): Promise<void> {
     await this.openScenario("sparring");
+  }
+
+  /** Opens sparring with a ring of its own: it starts after `delaySeconds`, closes over `closingSeconds`, and its centre is drawn from `seed`. */
+  async openClosingRing(request: ClosingRingRequest): Promise<void> {
+    const {seed, delaySeconds, closingSeconds} = request;
+
+    await this.openScenario(`sparring&seed=${seed}&ringDelay=${delaySeconds}&ringClosing=${closingSeconds}`);
   }
 
   async openHeights(): Promise<void> {

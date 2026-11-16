@@ -9,6 +9,8 @@ import {scoreRound} from "@gunsmith/engine/match/ScoreRound";
 import {thinkOpponent} from "@gunsmith/engine/opponent/ThinkOpponent";
 import type {Player} from "@gunsmith/engine/player/types/Player";
 import {advanceRing} from "@gunsmith/engine/ring/AdvanceRing";
+import {ringDamageOver} from "@gunsmith/engine/ring/damage/RingDamageOver";
+import type {Ring} from "@gunsmith/engine/ring/types/Ring";
 import {decideRound} from "@gunsmith/engine/round/DecideRound";
 
 /**
@@ -23,7 +25,9 @@ import {decideRound} from "@gunsmith/engine/round/DecideRound";
  * and speed of the weapon in hand; a reload that finishes this step lets the weapon fire in the same step. When either
  * side is out of health the round is decided and, in a match, scored once (the frozen world below never scores it again);
  * after that the world is frozen and only the clock runs. A world with a ring runs the ring's own clock on by `seconds`
- * in each step that is fought, so it stops with the round, unlike `elapsedSeconds`.
+ * in each step that is fought, so it stops with the round, unlike `elapsedSeconds`, and a fighter outside the ring, as it
+ * stands at the end of the step, loses health to it with any bullet damage, before the round is decided; the practice
+ * dummies and the bullets in the air are not hurt by it.
  */
 export function step(world: World, input: Input, seconds: number): World {
   if (world.round !== "playing") {
@@ -51,8 +55,11 @@ export function step(world: World, input: Input, seconds: number): World {
     }
   }
 
-  const player = hurt(playerShot.fighter, bulletFlight.playerDamage);
-  const opponent = opponentShot && hurt(opponentShot.fighter, bulletFlight.opponentDamage);
+  const ring = world.ring && advanceRing(world.ring, seconds);
+  const player = hurt(playerShot.fighter, bulletFlight.playerDamage + ringDamageTo(ring, playerShot.fighter, seconds));
+  const opponent =
+    opponentShot &&
+    hurt(opponentShot.fighter, bulletFlight.opponentDamage + ringDamageTo(ring, opponentShot.fighter, seconds));
 
   const round = decideRound({playerHealth: player.health, opponentHealth: opponent?.health});
 
@@ -66,8 +73,17 @@ export function step(world: World, input: Input, seconds: number): World {
     elapsedSeconds: world.elapsedSeconds + seconds,
     round,
     match: world.match && scoreRound(world.match, round),
-    ring: world.ring && advanceRing(world.ring, seconds),
+    ring,
   };
+}
+
+/** What the ring, as it stands at the end of this step, takes off a fighter: nothing when the world has no ring. */
+function ringDamageTo(ring: Ring | undefined, fighter: Player, seconds: number): number {
+  if (!ring) {
+    return 0;
+  }
+
+  return ringDamageOver(ring, fighter.position, seconds);
 }
 
 function hurt(fighter: Player, damage: number): Player {

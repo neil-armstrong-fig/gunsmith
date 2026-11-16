@@ -48,11 +48,11 @@ end), never exact positions or tick counts. A wait that can take longer than the
 duel long enough for the opponent to run dry has its own seed (`LONG_DUEL_SEED`, `startLongDuel()`); only 2 of 40 seeds get
 that far. A round that has just begun is live, so a spec never asserts that the opponent is "full" in it (a quick bot has fired by the time it reads): it measures what was restored against the frozen end of the round before. Sparring has no brain, so its opponent never moves; the specs aim at where it stands. The duel is a best-of-three
 (`PlayingABestOfThree`): it loses rounds by standing still, and round _n_ of a match plays seed `DUEL_SEED + n - 1`. No spec
-_wins_ a round, and that was measured: over 60 seeds, with the player idle for a start delay, then aiming at where the opponent
+wins a round **by shooting**, and that was measured: over 60 seeds, with the player idle for a start delay, then aiming at where the opponent
 stands and holding fire, a round is won only when the aim is taken at exactly 0.50 s of game time (60 of 60 seeds; 0 of 60 at 0.45 s
 or 0.55 s, with up to 0.1 s of lag from aiming to firing), so it is a timing window narrower than a spec can hit, not a property of a
-seed. A spec-only way to win would be a seam, so winning is covered by engine and webapp unit tests (`Step`, `ScoreRound`,
-`DecideMatch`, `RoundMessage`).
+seed. Winning a match is covered by engine and webapp unit tests (`Step`, `ScoreRound`, `DecideMatch`, `RoundMessage`). **A round is won in a
+browser by the closing ring** (`TheClosingRing`, below), whose seeded centre leaves the opponent outside it.
 
 ## Vision
 
@@ -73,7 +73,9 @@ from the platform. Written after the engine code, so proved by mutation: sight i
 
 ## The ring
 
-`CountingDownToTheRing` (in `ring/`) reads `gunsmith.ring` (the state hook's `ring.secondsUntilStart` and the HUD's `ring-countdown`): the duel counts down from 45 game seconds, falls as the round is played, stops when the round is lost (the game's clock runs on, the ring's does not) and starts again in the next round; sparring and the practice range have no ring and no countdown. The ring itself (its damage) is not built yet, and 45 seconds of real play is too long for a spec to sit through, so no spec waits for the ring to start: the later slices will need a way to reach it, decided then.
+`CountingDownToTheRing` (in `ring/`) reads `gunsmith.ring` (the state hook's `ring.secondsUntilStart` and the HUD's `ring-countdown`): the duel counts down from 45 game seconds, falls as the round is played, stops when the round is lost (the game's clock runs on, the ring's does not) and starts again in the next round; sparring and the practice range have no ring and no countdown.
+
+`TheClosingRing` opens **sparring with ring timing in the query** (`gunsmith.startClosingRing({seed, delaySeconds, closingSeconds})` opens `?scenario=sparring&seed=..&ringDelay=..&ringClosing=..`), so 45 real seconds is never waited for. Sparring's opponent stands still and cannot shoot but **does take ring damage**, so the ring alone decides the round, and **where the seeded centre falls decides who is left outside**: so each outcome has a pinned seed, measured in the engine like `LONG_DUEL_SEED` (seed 26: the opponent is outside, the round is **won**, the player untouched; seed 14: the player is outside, **lost**, the opponent untouched). The delay is three seconds so reading the page cannot be late for "the whole arena is inside the ring". A spec never steers the player to the centre (full-speed overshoot is the heights flake). The ring edge's drawing is a shader on the canvas: `DrawingTheClosingRing` reads it from a screenshot (`gunsmith.ring.isEdgeDrawn()`, `isInsideUntinted()`, `isOutsideTinted()`, decoded in the page, since the canvas is not in the DOM) at the places the hook's `ring.centre`, `radius` and `damagePerSecond` say it is, and `gunsmith.ring.getShaderErrors()` is the console's shader errors, listened for from the moment the page is created (a shader compiles on first draw). The ring closes slowly there (30 s), so the half second between reading the ring and the screenshot moves its edge less than the line's width; the pixel mapping assumes the camera fits the arena to the window and centres it. **The freeze criteria need a slow ring** (`SLOW_CLOSING_SECONDS`, 30): at the quick one the ring has finished closing before anyone dies, so "it stopped closing with the round" would pass for a ring that never stopped (a mutant that kept the ring's clock running survived until it got its own slower `given`, plus a criterion that the ring was still closing when the round ended). The HUD's health is whole points rounded up, so `hud.waitForHealthToMatchTheGame()` compares with the hook's health rounded up (the game's own account is fractional once the ring hurts).
 
 ## Running
 

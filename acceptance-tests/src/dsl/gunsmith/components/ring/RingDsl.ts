@@ -29,6 +29,69 @@ export class RingDsl {
     }
   }
 
+  /** Waits until the ring has started to close, for as long as `timeoutSeconds` when that is known to take longer than the default. */
+  async waitForClosing(timeoutSeconds?: number): Promise<void> {
+    try {
+      await this.ring.waitForClosing(timeoutSeconds);
+    } catch (error) {
+      throw new DslError("Failed to see the ring start to close", error);
+    }
+  }
+
+  /** Waits until the safe ground reaches less than `radius` tiles from the ring's centre. */
+  async waitForRadiusBelow(radius: number, timeoutSeconds?: number): Promise<void> {
+    try {
+      await this.ring.waitForRadiusBelow(radius, timeoutSeconds);
+    } catch (error) {
+      throw new DslError(`Failed to see the ring close in to under ${radius} tiles`, error);
+    }
+  }
+
+  /** Whether the countdown over the arena says "Ring closing", once the screen has caught up with the game. */
+  async isClosingOnScreen(): Promise<boolean> {
+    try {
+      return await this.ring.isClosingOnScreen();
+    } catch (error) {
+      throw new DslError("Failed to see the screen say the ring is closing", error);
+    }
+  }
+
+  /** The shader errors the browser has reported since the page was opened: none when the ring's shader compiled. */
+  getShaderErrors(): string[] {
+    try {
+      return this.ring.getShaderErrors();
+    } catch (error) {
+      throw new DslError("Failed to read the shader errors", error);
+    }
+  }
+
+  /** Whether a bright red line is on the screen where the game says the ring's edge is (a screenshot: what a player sees). */
+  async isEdgeDrawn(): Promise<boolean> {
+    try {
+      return await this.ring.isEdgeDrawn();
+    } catch (error) {
+      throw new DslError("Failed to see whether the ring's edge is drawn", error);
+    }
+  }
+
+  /** Whether the ground at the ring's centre is drawn without the ring's red tint. */
+  async isInsideUntinted(): Promise<boolean> {
+    try {
+      return await this.ring.isInsideUntinted();
+    } catch (error) {
+      throw new DslError("Failed to see whether the inside of the ring is untinted", error);
+    }
+  }
+
+  /** Whether the ground just outside the ring's edge is drawn with the ring's red tint. */
+  async isOutsideTinted(): Promise<boolean> {
+    try {
+      return await this.ring.isOutsideTinted();
+    } catch (error) {
+      throw new DslError("Failed to see whether the outside of the ring is tinted", error);
+    }
+  }
+
   /** The words the countdown over the arena shows. */
   async getCountdownOnScreen(): Promise<string> {
     try {

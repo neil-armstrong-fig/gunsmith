@@ -94,11 +94,20 @@ everything else is a domain folder. Tiles are the unit; `x` grows to the east an
   it never scores it again. A simultaneous kill is the opponent's round, as `DecideRound` already says. Starting the next
   round's world (full health, full magazines, back at the start) is the caller's, since the engine has no arena of its own:
   the webapp's `nextRoundOfPage`.
-- `ring/`: the round's closing ring, slice 1 of 3 (the clock only). A `Ring` (`types/Ring.ts`: `roundSeconds`, how much of the round has been played) is plain data,
-  optional on the `World` (`World.ring`; the duel has one, sparring, the practice range and the heights arena stay endless). `StartRing` (none played), `AdvanceRing(ring, seconds)` and
-  `SecondsUntilRing(ring)` (the start delay less the round played, never below 0; `countdown/RingStartDelaySeconds`, 45, a tunable, is its own). `step` runs the ring's clock on while the round is
-  `playing`, so it stops when the round is decided, unlike `elapsedSeconds`, which keeps running so a wait on it never hangs. **Not built yet:** the ring itself (its seeded centre, its
-  shrinking radius, damage outside it) and the bot walking inward; the plan is in `TODO-build.md`.
+- `ring/`: the round's closing ring, slices 1 and 2 of 3 (the clock, the circle and its damage). A `Ring` (`types/Ring.ts`: `roundSeconds`, how much of the round has been played; the `centre` it closes
+  on; the `startRadius` that covers the arena; its `timing`, `types/RingTiming.ts`: `startDelaySeconds` and `closingSeconds`) is plain data, optional on the `World` (`World.ring`; the duel has one, sparring only when the page
+  asks for ring timing, the practice range and the heights arena never). Root, six files: `StartRing(request)` (a `types/RingRequest`: the arena, where each fighter starts, the seed and the timing; none of the round played, the centre
+  from `centre/ReachableCentre`, the start radius the distance to the arena's farthest corner so the ring covers all of it), `AdvanceRing(ring, seconds)`, `SecondsUntilRing(ring)` (the start delay less the round played, never below 0),
+  `ClosingProgress(ring)` (0 until the ring starts, a straight line to 1 over the closing time, 1 after; used by the radius and the damage), `RadiusOfRing(ring)` (the start radius until the ring starts, a straight line down to
+  `radius/FinalRingRadius`, 2 tiles, then that; a pure function of the clock, so a round replays from its seed and inputs; a ring that began smaller than the final radius never grows) and `DefaultRingTiming` (45 s then 30 s, tunables; the
+  webapp's duel uses it, so it stays at the root). `centre/`: `ReachableCentre(request)` is the middle of one floor tile that every fighter can walk to, drawn from the seed on a stream of its own (`seed/RingSeedSalt` is mixed in, so the ring never
+  shares draws with the opponent's brain: a pinned duel plays as it did before the ring had a centre), the tiles put in row order first so the order the fighters are listed in does not matter; `reach/TilesReachableFrom(arena, start)` is a
+  4-connected flood fill that honours `height/BlockedFrom` from each tile, so a platform is reachable only by its stair; walking is symmetric, so the fighters either share ground or cannot reach each other, and the latter throws (as `ArenaFrom` does for a
+  bad drawing). `damage/`: `RingDamageRate(ring)` (nothing until the ring starts, then a straight line from `rate/MinimumRingDamage`, 2 a second, to `rate/MaximumRingDamage`, 20, over the closing time, and 20 after, so a round the ring is
+  deciding always ends) and `RingDamageOver(ring, point, seconds)` (the rate for the seconds, for a fighter beyond the edge, which is `over/OutsideRing`; the edge itself is safe). `step` advances the ring's clock while the round is `playing`
+  (so it stops when the round is decided, unlike `elapsedSeconds`, which keeps running so a wait on it never hangs), then takes the ring's damage, at the rate the ring has at the end of the step, off each fighter outside it with any bullet damage, before the
+  round is decided: both falling in one step is the opponent's win, as any simultaneous kill is. Bullets and dummies ignore the ring. **Not built yet:** the bot walking inward (slice 3: until then it stands outside and takes the damage), the ring's escape time
+  as an arena check, and a centre that is fair to both starts (it may fall close to one of them; art's fairness study is the place for it).
 - `random/`: `NextRandom(seed)` is a mulberry32 generator whose whole state is the seed, handed back with each draw
   (`types/RandomDraw`), so it sits in the `World` as plain data. The engine has no `Math.random`; the caller picks the seed.
 - `opponent/`: a small bot, a finite state machine, to test weapons and arenas against. It exists to be played against, so it
@@ -149,7 +158,7 @@ seed)` give an opponent a brain; **an opponent with no brain takes no action at 
   reload, so a switch and a reload asked for together reload the new weapon; walk, turn, judge the trigger). Then the bullets
   fly on and hurt what they reach, then the triggers are let go (`fighter/ShootFighter`), so a shot fired this step first
   moves on the next, and a reload that finishes this step lets the weapon fire in it. Health falls, the round is decided
-  and, in a match, scored once, and once it is not `playing` the world is frozen: only `elapsedSeconds` runs on, so a wait on the clock never hangs. The loop that calls `step` at a fixed rate lives in the caller (the webapp's
+  and, in a match, scored once, and once it is not `playing` the world is frozen: only `elapsedSeconds` runs on, so a wait on the clock never hangs (the ring's own clock stops too). The loop that calls `step` at a fixed rate lives in the caller (the webapp's
   `useGameLoop` today, the server's match later), because the engine has no clock. `types/World.ts` (now with `opponent?`, `opponentBrain?`, `round`, `match?` and `ring?`) and `types/Input.ts` (direction, aim, firing, reload and the slot to switch to).
 
 Several entry points here have a single caller (`AdvanceBullets`, `AimPlayer`, `TriggerPull`, `PushOutOfWalls` are called

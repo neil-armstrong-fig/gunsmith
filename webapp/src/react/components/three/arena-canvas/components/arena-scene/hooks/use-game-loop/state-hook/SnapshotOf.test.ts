@@ -3,7 +3,9 @@ import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
 import {MARKSMAN_RIFLE} from "@gunsmith/engine/weapon/weapons/MarksmanRifle";
 import {RIFLE} from "@gunsmith/engine/weapon/weapons/Rifle";
-import {RING_START_DELAY_SECONDS} from "@gunsmith/engine/ring/countdown/RingStartDelaySeconds";
+import {MAXIMUM_RING_DAMAGE_PER_SECOND} from "@gunsmith/engine/ring/damage/rate/MaximumRingDamage";
+import {FINAL_RING_RADIUS} from "@gunsmith/engine/ring/radius/FinalRingRadius";
+import type {Ring} from "@gunsmith/engine/ring/types/Ring";
 import {CROUCH_RANGE_FACTOR} from "@gunsmith/engine/vision/cone/CrouchRangeFactor";
 import {snapshotOf} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/state-hook/SnapshotOf";
 
@@ -194,11 +196,50 @@ it("reports no ring when the world has none", () => {
   expect(snapshotOf(world).ring).toBeUndefined();
 });
 
+const RING_START_DELAY_SECONDS = 10;
+const ringAt = (roundSeconds: number): Ring => ({
+  roundSeconds,
+  centre: {x: 2.5, y: 1.5},
+  startRadius: 8,
+  timing: {startDelaySeconds: RING_START_DELAY_SECONDS, closingSeconds: 20},
+});
+
 it("reports the seconds still to play before the ring starts", () => {
-  expect(snapshotOf({...world, ring: {roundSeconds: 0}}).ring).toEqual({secondsUntilStart: RING_START_DELAY_SECONDS});
-  expect(snapshotOf({...world, ring: {roundSeconds: 12.5}}).ring).toEqual({
-    secondsUntilStart: RING_START_DELAY_SECONDS - 12.5,
-  });
+  expect(snapshotOf({...world, ring: ringAt(0)}).ring?.secondsUntilStart).toBe(RING_START_DELAY_SECONDS);
+  expect(snapshotOf({...world, ring: ringAt(2.5)}).ring?.secondsUntilStart).toBe(RING_START_DELAY_SECONDS - 2.5);
+});
+
+it("reports the point the ring closes on", () => {
+  expect(snapshotOf({...world, ring: ringAt(0)}).ring?.centre).toEqual({x: 2.5, y: 1.5});
+});
+
+it("reports the whole arena inside the ring, and no damage, before it starts", () => {
+  const {ring} = snapshotOf({...world, ring: ringAt(4)});
+
+  expect(ring?.radius).toBe(8);
+  expect(ring?.damagePerSecond).toBe(0);
+});
+
+it("reports a smaller ring, and damage, once it has started to close", () => {
+  const {ring} = snapshotOf({...world, ring: ringAt(20)});
+
+  expect(ring?.radius).toBeLessThan(8);
+  expect(ring?.radius).toBeGreaterThan(FINAL_RING_RADIUS);
+  expect(ring?.damagePerSecond).toBeGreaterThan(0);
+  expect(ring?.damagePerSecond).toBeLessThan(MAXIMUM_RING_DAMAGE_PER_SECOND);
+});
+
+it("reports the final radius and the worst damage once the ring has closed", () => {
+  const {ring} = snapshotOf({...world, ring: ringAt(300)});
+
+  expect(ring?.radius).toBe(FINAL_RING_RADIUS);
+  expect(ring?.damagePerSecond).toBe(MAXIMUM_RING_DAMAGE_PER_SECOND);
+});
+
+it("reports the whole health the player has, fractions and all: the screen rounds it, the game's account does not", () => {
+  const hurt = {...world, player: {...world.player, health: 87.25}};
+
+  expect(snapshotOf(hurt).player.health).toBe(87.25);
 });
 
 const hills = startingWorld(arenaFrom(["#######", "#.>111#", "#######"]));

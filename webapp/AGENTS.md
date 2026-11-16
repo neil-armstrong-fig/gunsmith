@@ -68,8 +68,11 @@ managers are fine for updates that are not rapid). The decision and its sources 
 `?scenario=duel` is the duel, a best-of-three (an opponent with a brain who moves and shoots back; first to two rounds, `World.match`), `?scenario=sparring` the same arena with
 an opponent who has no brain and cannot shoot, `?scenario=heights` a low-ground and platform arena (`game/heights/HeightsArena.ts`) with one
 stair, a dummy on each level (`game/heights/HeightsDummies.ts`) and no opponent. It is a selector only, never a way to write state; it goes when a menu picks
-the match. `worldOfPage()` builds the world (`worldOfScenario(scenario, seed)`) and is also what "Play again" puts in the
-store. The opponent's choices are drawn from a seed (`game/scenario/seed/`): `?seed=42` replays a match exactly (the
+the match. `worldOfPage()` builds the world (`worldOfScenario(scenario, seed, ringTiming)`) and is also what "Play again" puts in the
+store. **Ring timing** is the query's other setting (`game/scenario/ring-timing/`): `?ringDelay=3` (seconds before the ring starts to close; 0 allowed) and `?ringClosing=15` (seconds it
+takes to close; more than 0), each a plain number or ignored (the other half keeps the game's own, 45 and 30), read once by `ringTimingOfPage()` so every round of a match keeps it. The duel always has a ring; **sparring has one only when
+the query asks for ring timing** (a spec uses it to watch the ring alone hurt a fighter who stands still); the practice range and the heights arena never do. The ring closes on a point drawn from the match's seed, so
+`?scenario=duel&seed=42&ringDelay=3&ringClosing=15` replays the same ring, and each round of a match (seed + rounds played) closes on a new place. The query tunes a match's setup, never its state. The opponent's choices are drawn from a seed (`game/scenario/seed/`): `?seed=42` replays a match exactly (the
 acceptance specs pin one), otherwise each page load and each "Play again" draws a fresh random one, which is the only
 `Math.random` in the game.
 
@@ -84,14 +87,22 @@ its high one (`stairs/StairStripsOf`). Every edge where a raised floor drops to 
 helpers have unit tests.
 
 The HUD is plain React over the canvas (`react/components/dom/ammo-hud/`, `health-hud/`, `score-hud/` (the round and the score, top
-middle, only in a match), `ring-hud/` ("Ring in 0:43", just under it, only when the world has a ring; `text/CountdownText`) and the `round-banner/` overlay that appears when a round is won or lost), styled with Tailwind and the
+middle, only in a match), `ring-hud/` ("Ring in 0:43", then "Ring closing", just under it, only when the world has a ring; `text/CountdownText`) and the `round-banner/` overlay that appears when a round is won or lost), styled with Tailwind and the
 `--color-gs-*` tokens. In a match the banner keeps "You won" / "You lost" for a round, adds the score, and offers **"Next round"**
 (`game/scenario/NextRoundOfPage.ts`: a fresh duel, the score kept, the opponent's seed the page's plus the rounds already played,
 so `?seed=` still replays a whole match); when the match is decided it says "You won the match" / "You lost the match" and offers
 "Play again" (a new match), as does a game with no match. `score-text/` holds the one sentence of the score both the banner and the
 HUD say. **A click on a `button` is not a shot** (`use-firing/trigger/PullsTheTrigger.ts`): the trigger listens on `window`, so
-without it pressing "Next round" fired a shot into the round it started. Anything
+without it pressing "Next round" fired a shot into the round it started. The health shows
+in whole points, a part of a point rounded up (`selectPlayerHealth` is `Math.ceil`): the ring takes health a fraction at a time, so the number never reads 0 while the player stands and the
+component re-renders only when the number on the screen would change; the state hook keeps the exact value. Anything
 animated on a timer (the reload fill) is a CSS animation, so React never sees a per-frame value.
+
+**The ring is drawn** by `three/arena-canvas/.../ring-edge/RingEdge.tsx`: one plane the size of the arena, above the veil and below the fighters, with a small shader (`shaders/RingEdgeVertex.glsl` and `RingEdgeFragment.glsl`: real GLSL files, so the editor highlights them, imported as strings with Vite's `?raw`; a shader goes in a `.glsl` file, not a string in a `.ts` file; `RingEdgeShaders.test.ts` compiles both with `glslangValidator`, which must be on the PATH, `docs/shaders.md`) that draws a bright
+edge (a fixed 0.12 tile wide, the palette's `--color-gs-ring` repeated as a vector, since WebGL cannot read CSS) and a faint red tint on the ground outside the circle, nothing inside. `useFrame` writes the centre and radius
+(`radiusOfRing`, the same circle `step` hurts by) into the material's own uniforms each frame, so no per-frame value goes through React state; **write them through `materialRef.current.uniforms`, not through the object handed to
+`uniforms={...}`: the second left the radius at 0 and tinted the whole arena**. The plane is the arena, so a circle bigger than the arena is clipped by it. The canvas is not in the DOM, so `DrawingTheClosingRing` (acceptance) reads what a player sees from a screenshot, at the places the hook's
+`ring.centre`, `radius` and `damagePerSecond` say the ring is, and checks the browser reported no shader error.
 
 ## Folders inside `react/`
 

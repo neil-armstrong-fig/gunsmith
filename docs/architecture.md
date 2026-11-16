@@ -64,7 +64,7 @@ validation). It is shared code, not a service.
 | Component tests via DOM | The canvas is not in the DOM; the DSL reads a tiny read-only state hook | react-three-fiber |
 | English and Korean `Messages` layer | English only, hard-coded | A far less text-heavy game |
 | PWA, service worker, cross-origin isolation, push, bot engine | None | Not needed |
-| Opt-in Google sign-in for sync only | Opt-in Google sign-in for credits and the library; guests can play | The AI costs money |
+| Opt-in Google sign-in for sync only | Google sign-in for public matchmaking, credits and library; guests retain practice/private rooms | AI cost controls and public-play abuse friction |
 | Plain imperative commit messages | Conventional Commits | The user's global rule |
 
 ## What is copied from janggi unchanged
@@ -77,6 +77,12 @@ Drizzle generates and Wrangler applies migrations; Alchemy 0.x with pinned names
 with a post-deploy run against production.
 
 ## Hosting and DNS
+
+The [fair-play research](art/fair-play-research.md) adds a planned recording path:
+bounded Match Durable Object journals export to private R2, with D1 metadata and
+authorized Worker reads. Reports and trust decisions are private server data.
+The Matchmaker maintains normal/restricted pools without cross-pool fallback.
+These are future online capabilities, not existing packages or shared contracts.
 
 `gunsmith.neilarmstrong.dev`, DNS at Cloudflare. One label below the registrable domain (a deeper name has no free
 certificate). The custom domain is attached by hand (`MANUAL-SETUP-STEPS.md`). Environments: local and `prod` only.

@@ -29,7 +29,7 @@ $0.00061 of it and roughly triples the cost of a weapon. Detail in `docs/cost-an
 - [x] Docs, checklist, AI row, delivery log.
 
 **Open, for the user.**
-1. **The cheaper-model benchmark: the user approved the shortlist and plan (2026-11-15), see below; waiting only on the user's Cloudflare token.** Shortlist, prices, the finding that Haiku is already cheap, and why Cloudflare: `docs/cost-and-budget.md` ("Cheaper models for the drawing, stats and moderation"). Until it lands fake and local stub the drawing.
+1. **The cheaper-model benchmark: the user approved the shortlist and plan (2026-11-15), see below; PAUSED (2026-11-15, the user's word) until they make the Cloudflare token (`MANUAL-SETUP-STEPS.md` step 19; links were given in chat). Main merged in again the same day (root `pnpm checks` exit 0: engine 833, `ai` 485, webapp 233; `evals:fake` the 8 by-design failures; no paid or local run, spend still $0.623 of the $1).** Shortlist, prices, the finding that Haiku is already cheap, and why Cloudflare: `docs/cost-and-budget.md` ("Cheaper models for the drawing, stats and moderation"). Until it lands fake and local stub the drawing.
 2. The per-stat overshoot finding below (a magazine of 100 against a range of 60), still in a `given.inProgress`.
 3. `build`: renderer and schema home when the webapp imports the appearance (nothing moves to `shared/` before); `HANDOFF.md` has no contract change from this (the outcome shape is local to `ai/`).
 

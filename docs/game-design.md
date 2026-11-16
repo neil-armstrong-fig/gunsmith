@@ -99,14 +99,23 @@ drop keys are decided in the fuzzy frontend and kept in one key-binding config. 
 
 ## Players, rooms and rating
 
-- **Guests** can play (practice arena, private rooms, public queue) with the built-in pool; signing in with Google
-  (opt-in) unlocks credits and the library.
+- **Guests** can play practice and private rooms with the built-in pool.
+  Google sign-in unlocks public matchmaking, credits and the library.
 - **Private room:** strictly 1v1 plus spectators (up to 8, *tunable*). Spectators see a **delayed full view** with a
   **host-set delay**.
-- **Public queue:** FIFO with a rating window that widens over time, and a small Elo.
+- **Public queue:** sign-in required; FIFO with a widening rating window within
+  normal and restricted pools, never across them. Silent restrictions use
+  corroborated evidence, automatic decisions after calibration, and human review.
+  Clean completed matches can restore trust; inactivity cannot. Restricted
+  matches grant no normal rating gains. See [fair play](art/fair-play-research.md).
 - **Disconnects:** 30 s to reconnect, then the round is forfeited; no input for about 60 s counts as idle and is treated
   the same.
-- **History:** a match history list (result, rating change, arena, weapons). *Stretch:* replays.
+- **History and recordings (planned with online play):** a match history list
+  (result, rating change, arena, weapons), participant reports and completed-match
+  replays for players/moderators. Either player may share a sanitized replay.
+  Ordinary hosted replays last 14 days; flagged evidence lasts 90 days. Public
+  full-view spectators wait until the whole match ends; private rooms retain
+  their host-set delay. Recording is data replay, not server video capture.
 
 ## Credits and the library
 
@@ -120,7 +129,7 @@ drop keys are decided in the fuzzy frontend and kept in one key-binding config. 
 ## Out of scope for the first pass
 
 Mobile and touch play, accessibility features, other languages (English only, hard-coded), health or ammo pickups, a
-public gallery, paid credits, replays, bots as opponents (a small scripted bot exists, in `engine/src/opponent/`, as a target to test weapons and arenas
+public gallery, paid credits, server-rendered replay video, bots as opponents (a small scripted bot exists, in `engine/src/opponent/`, as a target to test weapons and arenas
 against while the game is built, not as a feature; and practice dummies).
 
 ## Tunables checklist
