@@ -6,7 +6,7 @@ import type {Ring} from "@gunsmith/engine/ring/types/Ring";
 /**
  * The health a fighter outside the ring loses each second right now: nothing until the ring starts to close, then a
  * straight line from the minimum up to the maximum over the closing time, and the maximum from then on, so a round the ring
- * is deciding always ends.
+ * is deciding always ends. The whole line is multiplied by the ring's `damageScale` (1 when it has none).
  */
 export function ringDamageRate(ring: Ring): number {
   const progress = closingProgress(ring);
@@ -14,5 +14,8 @@ export function ringDamageRate(ring: Ring): number {
     return 0;
   }
 
-  return MINIMUM_RING_DAMAGE_PER_SECOND + (MAXIMUM_RING_DAMAGE_PER_SECOND - MINIMUM_RING_DAMAGE_PER_SECOND) * progress;
+  const normal =
+    MINIMUM_RING_DAMAGE_PER_SECOND + (MAXIMUM_RING_DAMAGE_PER_SECOND - MINIMUM_RING_DAMAGE_PER_SECOND) * progress;
+
+  return normal * (ring.timing.damageScale ?? 1);
 }

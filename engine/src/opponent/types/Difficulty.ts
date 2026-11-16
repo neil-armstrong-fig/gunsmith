@@ -38,4 +38,6 @@ export interface Difficulty {
   coverSamples: number;
   /** How far from itself it looks for cover, in tiles. */
   coverReach: number;
+  /** Once the ring is closing it keeps this far inside its edge, in tiles, so the edge never reaches it. */
+  ringMargin: number;
 }

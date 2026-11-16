@@ -36,3 +36,27 @@ it("is at the maximum once the ring has closed", () => {
 it("stays at the maximum afterwards, so someone always dies in the end", () => {
   expect(ringDamageRate(playedFor(600))).toBe(MAXIMUM_RING_DAMAGE_PER_SECOND);
 });
+
+it("is the normal rate times the damage scale the ring was given", () => {
+  const scaled: Ring = {...playedFor(20), timing: {...ring.timing, damageScale: 10}};
+
+  expect(ringDamageRate(scaled)).toBeCloseTo(ringDamageRate(playedFor(20)) * 10, 12);
+});
+
+it("scales the maximum too, so a stronger ring ends the round sooner", () => {
+  const scaled: Ring = {...playedFor(600), timing: {...ring.timing, damageScale: 3}};
+
+  expect(ringDamageRate(scaled)).toBe(MAXIMUM_RING_DAMAGE_PER_SECOND * 3);
+});
+
+it("is still nothing before the ring starts, however strong it is", () => {
+  const scaled: Ring = {...playedFor(5), timing: {...ring.timing, damageScale: 10}};
+
+  expect(ringDamageRate(scaled)).toBe(0);
+});
+
+it("is the normal rate for a damage scale of one", () => {
+  const scaled: Ring = {...playedFor(20), timing: {...ring.timing, damageScale: 1}};
+
+  expect(ringDamageRate(scaled)).toBe(ringDamageRate(playedFor(20)));
+});

@@ -98,6 +98,13 @@ it("gives the duel the ring timing it is asked for", () => {
   expect(worldOfScenario("duel", 7, timing).ring).toEqual(duelRing(7, timing));
 });
 
+it("gives the ring the damage scale it is asked for, so it hurts as much as the page said", () => {
+  const timing = {startDelaySeconds: 2, closingSeconds: 9, damageScale: 10};
+
+  expect(worldOfScenario("duel", 7, timing).ring?.timing.damageScale).toBe(10);
+  expect(worldOfScenario("sparring", 7, timing).ring?.timing.damageScale).toBe(10);
+});
+
 it("draws the ring's centre from the seed: another seed, another place", () => {
   const centres = new Set<string>();
   for (let seed = 0; seed < 30; seed++) {

@@ -19,16 +19,21 @@ cartoon sci-fi machinery at the user's request (Ratchet & Clank inspiration, ada
       shared handoff reconciled. Runtime remains build/AI work with online play;
       no detector, schema, code, infrastructure or paid call was added.
 
-- [ ] **Aim reticle:** design a readable reticle that replaces the mouse pointer
-      over the arena. Show it against all floor levels, fog and combat effects;
-      hand cursor artwork/hotspot and behaviour notes to build for integration.
-- [ ] **Taking damage and game juice:** distinguish taking damage from outgoing
+- [x] **Aim reticle:** [precision crosshair and build handoff](docs/art/concepts/aim-reticle/README.md)
+      delivered 2026-11-16: SVG, transparent 32/64 px PNGs, native-size and
+      colour/grayscale context sheet. Static aim marker, hotspot (16,16).
+      User visual review and build integration remain open; no production key.
+- [x] **Taking damage and game juice:** distinguish taking damage from outgoing
       hit confirmation, and study how to make combat feel responsive and satisfying.
       Refer to janggi's docs, including [sound](../janggi/docs/sound.md) (judge in
       context, not only in isolation) and [rules](../janggi/docs/rules.md) (motion
       and reduced-motion presentation). Compare restrained visual/audio feedback
       and motion treatments at game scale; document recommended effects and tradeoffs
       for build. Feedback must preserve aim readability and hidden-opponent privacy.
+      Delivered 2026-11-16: [animated/audible comparison and Claude handoff](docs/art/concepts/combat-feedback/README.md),
+      JSON cue table, two separate incoming-damage WAV candidates, browser review
+      frames and measurements. Restrained is the proposed starting point; user
+      audition and production integration remain open. Approved audio preserved.
 - [ ] **Empty-weapon click:** create and audition a short dry click when trying to
       fire with an empty magazine. Preserve approved audio; agree its new manifest
       key and trigger/repetition rules with build before production integration.

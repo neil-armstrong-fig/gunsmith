@@ -25,9 +25,12 @@ export class GunsmithPlaywright extends BasePage {
 
   /** Opens sparring with a ring of its own: it starts after `delaySeconds`, closes over `closingSeconds`, and its centre is drawn from `seed`. */
   async openClosingRing(request: ClosingRingRequest): Promise<void> {
-    const {seed, delaySeconds, closingSeconds} = request;
+    await this.openScenario(`sparring&seed=${request.seed}${this.ringQuery(request)}`);
+  }
 
-    await this.openScenario(`sparring&seed=${seed}&ringDelay=${delaySeconds}&ringClosing=${closingSeconds}`);
+  /** Opens the duel with a ring of its own: it starts after `delaySeconds`, closes over `closingSeconds`, and its centre and the opponent's choices are drawn from `seed`. */
+  async openClosingDuel(request: ClosingRingRequest): Promise<void> {
+    await this.openScenario(`duel&seed=${request.seed}${this.ringQuery(request)}`);
   }
 
   async openHeights(): Promise<void> {
@@ -57,5 +60,15 @@ export class GunsmithPlaywright extends BasePage {
   private async openScenario(scenario: string): Promise<void> {
     await this.page.goto(`/?scenario=${scenario}`);
     await expect(this.page.getByTestId("arena")).toHaveAttribute("data-ready", "true");
+  }
+
+  /** The ring's part of the query: its timings, and its damage when the request boosts it. */
+  private ringQuery(request: ClosingRingRequest): string {
+    const timings = `&ringDelay=${request.delaySeconds}&ringClosing=${request.closingSeconds}`;
+    if (request.damageScale === undefined) {
+      return timings;
+    }
+
+    return `${timings}&ringDamage=${request.damageScale}`;
   }
 }
