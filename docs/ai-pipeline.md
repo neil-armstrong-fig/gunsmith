@@ -280,7 +280,7 @@ calls, five at most), after the stats have passed `validate`, `balance` and `rat
   disclosed stand-in: the stats are never held hostage to the picture, and the picture never changes a stat.
 - **Its own model.** `appearanceGenerator` sits beside `generator` and `moderator` in `weaponPipelineDependencies`, because a drawing
   needs far more output than the stats (about 3,000 tokens of cap against a hundred) and a temperature above zero locally.
-- **Where it lives.** `ai/src/pipeline/weapon-drawing/DrawCreatedWeapon.ts`; the schema stays in `ai/` until the webapp renderer imports it.
+- **Where it lives.** The `draw` node of the weapon graph (`ai/src/pipeline/weapon-graph/drawing/AppearanceNode.ts`, 2026-11-16; it was `weapon-drawing/DrawCreatedWeapon.ts`); the schema stays in `ai/` until the webapp renderer imports it.
 
 Measurements, failure classes, candidate defaults and open questions are in `docs/ai-visual-generation.md`.
 
