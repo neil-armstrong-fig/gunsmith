@@ -1,16 +1,15 @@
-import assert from "node:assert/strict";
-import {it} from "node:test";
+import {expect, it} from "vitest";
 import {noteFrequency} from "@gunsmith/audio-studies/generators/music/bar/note/NoteFrequency";
 
 it("puts concert A at 440 Hz", () => {
-  assert.equal(noteFrequency(69), 440);
+  expect(noteFrequency(69)).toBe(440);
 });
 
 it("doubles every octave", () => {
-  assert.equal(noteFrequency(81), 880);
-  assert.equal(noteFrequency(57), 220);
+  expect(noteFrequency(81)).toBe(880);
+  expect(noteFrequency(57)).toBe(220);
 });
 
 it("tunes D4, the key of the music, to its even-tempered pitch", () => {
-  assert.ok(Math.abs(noteFrequency(62) - 293.6648) < 1e-3);
+  expect(Math.abs(noteFrequency(62) - 293.6648)).toBeLessThan(1e-3);
 });

@@ -13,12 +13,13 @@
     "acceptance-tests": "pnpm --filter @gunsmith/acceptance-tests acceptance-tests",
     "install-browsers": "pnpm --filter @gunsmith/acceptance-tests install-browsers",
     "build": "pnpm --recursive build",
-    "checks": "pnpm --recursive checks",
+    "checks": "pnpm checks:repository && pnpm --recursive checks",
     "lint": "pnpm --recursive lint",
     "lint:fix": "pnpm --recursive lint:fix",
     "format": "pnpm --recursive format",
     "format:check": "pnpm --recursive format:check",
     "type-check": "pnpm --recursive type-check",
-    "test": "pnpm --recursive test"
+    "test": "pnpm --recursive test",
+    "checks:repository": "pnpm --filter @gunsmith/shared exec node config/repository/CheckRepository.ts"
   }
 }

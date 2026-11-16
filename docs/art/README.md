@@ -1,6 +1,6 @@
 # Art direction
 
-Owner: `art` (Codex). Read `HANDOFF.md`, `TODO.md` and all three persona checklists first. You write **only** under
+Owner: `art` (Codex). Follow the startup protocol in `TODO.md`; read the current handoff and art checklist. You write **only** under
 `docs/art/`, `webapp/public/assets/` and `webapp/audio/`.
 
 ## Direction (A1, 2026-11-12)
@@ -10,8 +10,14 @@ Owner: `art` (Codex). Read `HANDOFF.md`, `TODO.md` and all three persona checkli
 silent restricted queues with clean-match recovery, and open-source boundaries.
 Documentation only; runtime work belongs with online play.
 [Precision aim reticle](concepts/aim-reticle/README.md) artwork and build handoff
-are delivered for review (2026-11-16). Damage feedback, empty-weapon click and
-arena-symmetry studies remain queued.
+are delivered for review (2026-11-16). The selected empty-weapon click is ready for build.
+[Fair symmetrical arena study](arena-fairness-research.md) supplies four illustrated
+fixtures, route/ring measurements and build/AI checks. Matching spawn pairs and
+unchanged random ring centres are user decisions; runtime/playtests remain open.
+[Combat-feedback handover](concepts/combat-feedback/Handover.md) is complete:
+user chose punchy/crunch and asked to keep current shake for tuning during build.
+The minimal handover retains its frozen preview, selected cue data, crunch
+source/tests and build instructions. Build owns integration of these delivered studies.
 
 **Industrial arena:** clean flat vector, slate surfaces, blue and orange teams, heavier geometry and sparse neon.
 Top-down orthographic camera; desktop only. Technical markings are functional: level ticks, stair treads and team
@@ -259,3 +265,9 @@ The user clarified that outside-cone terrain is **dim, not completely dark**. Th
 its rotating detailed cone. The SVG/PNG studies now show dim layout outlines, brighter detailed terrain inside the cone
 and pickup markers only in that cone. Active guidance and build TODOs follow this; earlier opaque-fog assumptions are
 superseded. Visual inspection and XML/reference checks pass; `pnpm checks` passes (51 unit tests). No runtime changed.
+
+## Empty-magazine handover (2026-11-16)
+
+[Selected tight click and build brief](concepts/empty-weapon-click/README.md).
+User chose `empty-tight` and will tune it in game. Source, selected master and
+regression tests retained; comparison scaffolding removed. Ready for build.

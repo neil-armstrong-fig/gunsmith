@@ -1,11 +1,6 @@
+import type {ArtAppearanceFixture} from "@gunsmith/ai/pipeline/appearance/testing/types/ArtAppearanceFixture";
 import {readdirSync, readFileSync} from "node:fs";
 import {resolve} from "node:path";
-
-/** One of `art`'s appearance-only examples: the file's name and what it holds, unparsed, as a model's answer would be. */
-export interface ArtAppearanceFixture {
-  name: string;
-  appearance: unknown;
-}
 
 const CONCEPTS_FOLDER = resolve(import.meta.dirname, "../../../../../docs/art/concepts");
 

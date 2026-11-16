@@ -7,7 +7,11 @@ function sloppyAnswer(): Record<string, unknown> {
   const bare = (source.body as Record<string, unknown>[]).map(part => {
     const {opacity: _opacity, rotation: _rotation, detail: _detail, ...rest} = part;
 
-    return part.kind === "polygon" ? {...rest, x: undefined, y: undefined} : rest;
+    if (part.kind === "polygon") {
+      return {...rest, x: undefined, y: undefined};
+    }
+
+    return rest;
   });
 
   return {body: JSON.stringify(bare)};

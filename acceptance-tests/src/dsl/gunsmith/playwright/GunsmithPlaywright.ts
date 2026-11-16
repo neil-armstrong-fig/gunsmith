@@ -23,6 +23,11 @@ export class GunsmithPlaywright extends BasePage {
     await this.openScenario("sparring");
   }
 
+  /** Opens sparring with everything the game draws (a ring's centre, a pickup's place) drawn from `seed`, so the same seed plays the same match. */
+  async openSparringWithSeed(seed: number): Promise<void> {
+    await this.openScenario(`sparring&seed=${seed}`);
+  }
+
   /** Opens sparring with a ring of its own: it starts after `delaySeconds`, closes over `closingSeconds`, and its centre is drawn from `seed`. */
   async openClosingRing(request: ClosingRingRequest): Promise<void> {
     await this.openScenario(`sparring&seed=${request.seed}${this.ringQuery(request)}`);

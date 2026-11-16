@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import {it} from "node:test";
+import {assert, expect, it} from "vitest";
 import {MATCH_ARRANGEMENT} from "@gunsmith/audio-studies/generators/music/arrangements/match/MatchArrangement";
 import {MENU_ARRANGEMENT} from "@gunsmith/audio-studies/generators/music/arrangements/menu/MenuArrangement";
 import {noteFrequency} from "@gunsmith/audio-studies/generators/music/bar/note/NoteFrequency";
@@ -24,23 +23,23 @@ it("composes full-length tracks: 90 seconds of match and 60 of menu, in stereo, 
   const match = makeMusic(MATCH_ARRANGEMENT);
   const menu = makeMusic(MENU_ARRANGEMENT);
 
-  assert.equal(match.duration, 90);
-  assert.equal(menu.duration, 60);
+  expect(match.duration).toBe(90);
+  expect(menu.duration).toBe(60);
   for (const cue of [match, menu]) {
-    assert.equal(cue.channels, 2);
-    assert.equal(cue.loop, true);
-    assert.equal(cue.peak, 0.25);
+    expect(cue.channels).toBe(2);
+    expect(cue.loop).toBe(true);
+    expect(cue.peak).toBe(0.25);
   }
-  assert.equal(match.key, "music-loop-match");
-  assert.equal(menu.key, "music-loop-menu");
+  expect(match.key).toBe("music-loop-match");
+  expect(menu.key).toBe("music-loop-menu");
 });
 
 it("lasts eight bars at 128 beats a minute for every section of the arrangement", () => {
   const section = MENU_ARRANGEMENT.sections[0];
-  assert.ok(section);
+  assert(section);
 
-  assert.equal(makeMusic({key: "one", sections: [section]}).duration, SECTION_SECONDS);
-  assert.equal(makeMusic({key: "two", sections: [section, section]}).duration, SECTION_SECONDS * 2);
+  expect(makeMusic({key: "one", sections: [section]}).duration).toBe(SECTION_SECONDS);
+  expect(makeMusic({key: "two", sections: [section, section]}).duration).toBe(SECTION_SECONDS * 2);
 });
 
 it("composes distinct eight-bar sections, not one section repeated", () => {
@@ -52,12 +51,12 @@ it("composes distinct eight-bar sections, not one section repeated", () => {
     const sections = new Set<string>();
     for (let start = 0; start < seconds; start += 15) {
       const voices = cue.voices.filter(voice => voice.at >= start && voice.at < start + 15);
-      assert.ok(voices.length > 0);
+      expect(voices.length).toBeGreaterThan(0);
       // Ignore noise seeds: new noise alone is not a new musical section.
       sections.add(JSON.stringify(voices.map(voice => ({...withoutSeed(voice), at: voice.at - start}))));
     }
 
-    assert.equal(sections.size, seconds / 15, `${cue.key}: repeated arrangement`);
+    expect(sections.size, `${cue.key}: repeated arrangement`).toBe(seconds / 15);
   }
 });
 
@@ -67,14 +66,14 @@ it("starts every voice inside the track, except an echo of the last note, which 
     const beat = 60 / 128;
     const pastTheEnd = cue.voices.filter(voice => voice.at >= cue.duration);
 
-    assert.ok(
+    expect(
       cue.voices.every(voice => voice.at >= 0 && voice.at < cue.duration + beat / 2),
       cue.key,
-    );
-    assert.ok(
+    ).toBe(true);
+    expect(
       pastTheEnd.every(voice => voice.gain === 0.04),
       `${cue.key}: only an echo may start past the end`,
-    );
+    ).toBe(true);
   }
 });
 
@@ -86,11 +85,11 @@ it("plays the four instruments of each bar in order: drums, hats, bass, melody",
   const firstBar = makeMusic(arrangement).voices.filter(voice => voice.at < BAR_SECONDS);
   const kinds = firstBar.map(voice => `${voice.kind}:${voice.gain}`);
 
-  assert.deepEqual(kinds.slice(0, 2), ["tone:0.65", "noise:0.25"]);
-  assert.equal(kinds[2], "noise:0.25");
-  assert.ok(kinds.indexOf("noise:0.1") > kinds.indexOf("noise:0.25"));
-  assert.ok(kinds.indexOf("tone:0.28") > kinds.lastIndexOf("noise:0.1"));
-  assert.ok(kinds.indexOf("tone:0.14") > kinds.indexOf("tone:0.28"));
+  expect(kinds.slice(0, 2)).toStrictEqual(["tone:0.65", "noise:0.25"]);
+  expect(kinds[2]).toBe("noise:0.25");
+  expect(kinds.indexOf("noise:0.1")).toBeGreaterThan(kinds.indexOf("noise:0.25"));
+  expect(kinds.indexOf("tone:0.28")).toBeGreaterThan(kinds.lastIndexOf("noise:0.1"));
+  expect(kinds.indexOf("tone:0.14")).toBeGreaterThan(kinds.indexOf("tone:0.28"));
 });
 
 it("builds each bar on the bass round's root for that bar", () => {
@@ -100,8 +99,7 @@ it("builds each bar on the bass round's root for that bar", () => {
   };
   const bass = makeMusic(arrangement).voices.filter(voice => voice.kind === "tone" && voice.wave === "sawtooth");
 
-  assert.deepEqual(
-    bass.slice(0, 4).map(voice => voice.kind === "tone" && voice.frequency),
+  expect(bass.slice(0, 4).map(voice => voice.kind === "tone" && voice.frequency)).toStrictEqual(
     [38, 38, 34, 36].map(noteFrequency),
   );
 });

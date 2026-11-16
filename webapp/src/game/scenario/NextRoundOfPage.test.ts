@@ -1,5 +1,8 @@
 import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
+import type {Pickup} from "@gunsmith/engine/pickup/types/Pickup";
+import {startPickup} from "@gunsmith/engine/pickup/StartPickup";
+import {SUBMACHINE_GUN} from "@gunsmith/engine/weapon/weapons/SubmachineGun";
 import {startRing} from "@gunsmith/engine/ring/StartRing";
 import {DEFAULT_RING_TIMING} from "@gunsmith/engine/ring/DefaultRingTiming";
 import type {Ring} from "@gunsmith/engine/ring/types/Ring";
@@ -23,6 +26,7 @@ it("makes a fresh duel round with the opponent's seed moved on by one", () => {
     ...giveOpponentBrain(startingWorld(DUEL_ARENA, [], DUEL_OPPONENT), 6),
     match: {playerWins: 0, opponentWins: 1, roundNumber: 2},
     ring: duelRing(6),
+    pickup: duelPickup(6),
   });
 });
 
@@ -68,4 +72,10 @@ function duelRing(seed: number, timing: RingTiming = DEFAULT_RING_TIMING): Ring 
   const {player} = startingWorld(DUEL_ARENA, [], DUEL_OPPONENT);
 
   return startRing({arena: DUEL_ARENA, starts: [player.position, DUEL_OPPONENT], seed, timing});
+}
+
+function duelPickup(seed: number): Pickup {
+  const {player} = startingWorld(DUEL_ARENA, [], DUEL_OPPONENT);
+
+  return startPickup({arena: DUEL_ARENA, starts: [player.position, DUEL_OPPONENT], seed, weapon: SUBMACHINE_GUN});
 }

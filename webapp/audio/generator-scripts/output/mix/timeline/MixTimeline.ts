@@ -1,4 +1,5 @@
-import {STEP_VARIANTS, stepKey} from "@gunsmith/audio-studies/common/step-key/StepKey";
+import {STEP_VARIANTS} from "@gunsmith/audio-studies/common/step-key/StepVariants";
+import {stepKey} from "@gunsmith/audio-studies/common/step-key/StepKey";
 import type {MixEvent} from "@gunsmith/audio-studies/output/mix/timeline/types/MixEvent";
 
 /** How long one run of effects takes, in seconds, and how many runs the audition plays back to back over the music. */

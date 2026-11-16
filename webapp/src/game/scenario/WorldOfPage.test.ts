@@ -1,6 +1,9 @@
 import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import {startMatch} from "@gunsmith/engine/match/StartMatch";
+import type {Pickup} from "@gunsmith/engine/pickup/types/Pickup";
+import {startPickup} from "@gunsmith/engine/pickup/StartPickup";
+import {SUBMACHINE_GUN} from "@gunsmith/engine/weapon/weapons/SubmachineGun";
 import {startRing} from "@gunsmith/engine/ring/StartRing";
 import {DEFAULT_RING_TIMING} from "@gunsmith/engine/ring/DefaultRingTiming";
 import type {Ring} from "@gunsmith/engine/ring/types/Ring";
@@ -20,6 +23,7 @@ it("makes the duel the page asks for, with the seed the page asks for", () => {
     ...giveOpponentBrain(startingWorld(DUEL_ARENA, [], DUEL_OPPONENT), 5),
     match: startMatch(),
     ring: duelRing(5),
+    pickup: duelPickup(5),
   });
 });
 
@@ -58,4 +62,10 @@ function duelRing(seed: number, timing: RingTiming = DEFAULT_RING_TIMING): Ring 
   const {player} = startingWorld(DUEL_ARENA, [], DUEL_OPPONENT);
 
   return startRing({arena: DUEL_ARENA, starts: [player.position, DUEL_OPPONENT], seed, timing});
+}
+
+function duelPickup(seed: number): Pickup {
+  const {player} = startingWorld(DUEL_ARENA, [], DUEL_OPPONENT);
+
+  return startPickup({arena: DUEL_ARENA, starts: [player.position, DUEL_OPPONENT], seed, weapon: SUBMACHINE_GUN});
 }

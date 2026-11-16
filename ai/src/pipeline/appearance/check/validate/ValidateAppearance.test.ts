@@ -1,3 +1,4 @@
+import type {RingRequest} from "@gunsmith/ai/pipeline/appearance/check/validate/types/RingRequest";
 import {validateAppearance} from "@gunsmith/ai/pipeline/appearance/check/validate/ValidateAppearance";
 import {readArtAppearanceFixtures} from "@gunsmith/ai/pipeline/appearance/testing/ArtAppearanceFixtures";
 import {passingAppearance} from "@gunsmith/ai/pipeline/appearance/testing/PassingAppearance";
@@ -12,13 +13,17 @@ function withBodyPart(index: number, change: Record<string, unknown>): unknown {
 }
 
 /** A closed shape of `count` points on a small ring, so it stays inside the space whatever the count. */
-function ring(count: number, centreX: number, centreY: number, decimals?: number): number[][] {
+function ring({count, centreX, centreY, decimals}: RingRequest): number[][] {
   return Array.from({length: count}, (_, index) => {
     const angle = (index / count) * 2 * Math.PI;
     const x = centreX + 3 * Math.cos(angle);
     const y = centreY + 3 * Math.sin(angle);
 
-    return decimals === undefined ? [x, y] : [Number(x.toFixed(decimals)), Number(y.toFixed(decimals))];
+    if (decimals === undefined) {
+      return [x, y];
+    }
+
+    return [Number(x.toFixed(decimals)), Number(y.toFixed(decimals))];
   });
 }
 
@@ -40,7 +45,10 @@ function polygonOf(points: number[][]): Record<string, unknown> {
 function errorsOf(candidate: unknown): string[] {
   const result = validateAppearance(candidate);
 
-  return result.ok ? [] : result.errors;
+  if (result.ok) {
+    return [];
+  }
+  return result.errors;
 }
 
 it("accepts every appearance art has drawn", () => {
@@ -201,54 +209,58 @@ it("says a turned-out edge to two decimals, so floating-point noise does not fil
 
 it("refuses more body parts than allowed", () => {
   const appearance = passingAppearance();
-  appearance.body = Array.from({length: 25}, () => polygonOf(ring(3, 32, 32)));
+  appearance.body = Array.from({length: 25}, () => polygonOf(ring({count: 3, centreX: 32, centreY: 32})));
 
   expect(errorsOf(appearance)).toEqual([expect.stringContaining("body:")]);
 });
 
 it("accepts exactly the most body parts allowed", () => {
   const appearance = passingAppearance();
-  appearance.body = Array.from({length: 24}, () => polygonOf(ring(3, 32, 32)));
+  appearance.body = Array.from({length: 24}, () => polygonOf(ring({count: 3, centreX: 32, centreY: 32})));
 
   expect(errorsOf(appearance)).toEqual([]);
 });
 
 it("accepts exactly the most projectile parts allowed", () => {
   const appearance = passingAppearance();
-  appearance.projectile = Array.from({length: 8}, () => polygonOf(ring(3, 32, 32)));
+  appearance.projectile = Array.from({length: 8}, () => polygonOf(ring({count: 3, centreX: 32, centreY: 32})));
 
   expect(errorsOf(appearance)).toEqual([]);
 });
 
 it("refuses more projectile parts than allowed", () => {
   const appearance = passingAppearance();
-  appearance.projectile = Array.from({length: 9}, () => polygonOf(ring(3, 32, 32)));
+  appearance.projectile = Array.from({length: 9}, () => polygonOf(ring({count: 3, centreX: 32, centreY: 32})));
 
   expect(errorsOf(appearance)).toEqual([expect.stringContaining("projectile:")]);
 });
 
 it("refuses more points in one part than allowed, and accepts the most allowed", () => {
-  expect(errorsOf(withBodyPart(2, {points: ring(33, 32, 32)}))).toEqual([expect.stringContaining("body.2.points:")]);
-  expect(errorsOf(withBodyPart(2, {points: ring(32, 32, 32)}))).toEqual([]);
+  expect(errorsOf(withBodyPart(2, {points: ring({count: 33, centreX: 32, centreY: 32})}))).toEqual([
+    expect.stringContaining("body.2.points:"),
+  ]);
+  expect(errorsOf(withBodyPart(2, {points: ring({count: 32, centreX: 32, centreY: 32})}))).toEqual([]);
 });
 
 it("refuses more points in all than allowed, and says how many", () => {
   const appearance = passingAppearance();
-  appearance.body = Array.from({length: 13}, () => polygonOf(ring(30, 32, 32, 1)));
+  appearance.body = Array.from({length: 13}, () => polygonOf(ring({count: 30, centreX: 32, centreY: 32, decimals: 1})));
 
   expect(errorsOf(appearance)).toEqual(["appearance: 390 points in all, over the limit of 384"]);
 });
 
 it("accepts exactly the most points in all that are allowed", () => {
   const appearance = passingAppearance();
-  appearance.body = Array.from({length: 12}, () => polygonOf(ring(32, 32, 32, 1)));
+  appearance.body = Array.from({length: 12}, () => polygonOf(ring({count: 32, centreX: 32, centreY: 32, decimals: 1})));
 
   expect(errorsOf(appearance)).toEqual([]);
 });
 
 it("refuses more bytes than allowed, and says how many", () => {
   const appearance = passingAppearance();
-  appearance.body = Array.from({length: 12}, () => polygonOf(ring(32, 32, 32, 12)));
+  appearance.body = Array.from({length: 12}, () =>
+    polygonOf(ring({count: 32, centreX: 32, centreY: 32, decimals: 12})),
+  );
 
   expect(errorsOf(appearance)).toEqual([expect.stringMatching(/^appearance: \d+ bytes, over the limit of 12288$/)]);
 });

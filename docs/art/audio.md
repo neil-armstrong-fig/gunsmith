@@ -82,3 +82,19 @@ native and Chromium pass all 38 exports; WebKit failures fall from 34 candidates
 to 23. The crouch-level failure is resolved. Remaining: 17 MP3 effect durations,
 four Vorbis effect durations and both Vorbis music seams. Approved masters and
 MP3 exports are unchanged. Production remains blocked; limits are unchanged.
+
+## Incoming-damage study (2026-11-16)
+
+[Combat-feedback build handover](concepts/combat-feedback/Handover.md) records the
+user's punchy/crunch choice and retained shake settings for build to tune. Separate
+study WAVs and their generator are retained; approved outgoing `sfx-hit` and the
+original pack are unchanged. Production keys, codec/playback integration and actual
+weapon-shot masking remain build work. The art direction needs no repeat audition.
+
+## Empty-magazine handover (2026-11-16)
+
+[Selected tight click and build brief](concepts/empty-weapon-click/README.md):
+the user chose `empty-tight` (70 ms) and will tune it in game. Once per continuous
+hold; `sfx-empty-click` is proposed, not registered. Selected master/source/tests
+remain; the heavier alternative and A/B preview were removed. Build owns event/
+manifest agreement, shot masking and runtime integration. Approved pack preserved.

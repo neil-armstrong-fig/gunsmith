@@ -2,11 +2,14 @@ import {disarmOpponent} from "@gunsmith/engine/opponent/DisarmOpponent";
 import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
 import {engine} from "@gunsmith/engine/Engine";
 import type {World} from "@gunsmith/engine/game-loop/types/World";
+import {startPickup} from "@gunsmith/engine/pickup/StartPickup";
+import type {Pickup} from "@gunsmith/engine/pickup/types/Pickup";
 import {startMatch} from "@gunsmith/engine/match/StartMatch";
 import {startRing} from "@gunsmith/engine/ring/StartRing";
 import {DEFAULT_RING_TIMING} from "@gunsmith/engine/ring/DefaultRingTiming";
 import type {Ring} from "@gunsmith/engine/ring/types/Ring";
 import type {RingTiming} from "@gunsmith/engine/ring/types/RingTiming";
+import {SUBMACHINE_GUN} from "@gunsmith/engine/weapon/weapons/SubmachineGun";
 import {DUEL_ARENA} from "@src/game/duel/DuelArena";
 import {DUEL_OPPONENT} from "@src/game/duel/DuelOpponent";
 import {HEIGHTS_ARENA} from "@src/game/heights/HeightsArena";
@@ -25,6 +28,8 @@ import type {Scenario} from "@src/game/scenario/types/Scenario";
  * heights arena is the player and a dummy on each level, with one stair up to a platform, and the terraced duel is the duel's opponent
  * on low ground below a platform where the player starts, in one round (no score) with a ring.
  *
+ * The duel and sparring also have a weapon lying between the fighters (`pickupOf`), drawn from `seed`.
+ *
  * The ring closes on a point drawn from `seed`, and keeps `ringTiming` when the page asked for one (`?ringDelay=`,
  * `?ringClosing=`), otherwise the game's own. Sparring has a ring only when the page asks for ring timing, so a spec can watch
  * the ring alone hurt a fighter who stands still; the practice range and the heights arena never have one.
@@ -33,11 +38,17 @@ export function worldOfScenario(scenario: Scenario, seed: number, ringTiming?: R
   if (scenario === "duel") {
     const world = giveOpponentBrain(engine.startingWorld(DUEL_ARENA, [], DUEL_OPPONENT), seed);
 
-    return {...world, match: startMatch(), ring: ringOf(world, seed, ringTiming ?? DEFAULT_RING_TIMING)};
+    return {
+      ...world,
+      match: startMatch(),
+      ring: ringOf(world, seed, ringTiming ?? DEFAULT_RING_TIMING),
+      pickup: pickupOf(world, seed),
+    };
   }
 
   if (scenario === "sparring") {
-    const world = disarmOpponent(engine.startingWorld(DUEL_ARENA, [], DUEL_OPPONENT));
+    const standing = engine.startingWorld(DUEL_ARENA, [], DUEL_OPPONENT);
+    const world = {...disarmOpponent(standing), pickup: pickupOf(standing, seed)};
     if (!ringTiming) {
       return world;
     }
@@ -66,4 +77,14 @@ function ringOf(world: World, seed: number, timing: RingTiming): Ring {
   }
 
   return startRing({arena: world.arena, starts, seed, timing});
+}
+
+/** The weapon lying in the arena for a world that has an opponent: as far from one fighter as the other by the way they would walk, drawn from `seed`. */
+function pickupOf(world: World, seed: number): Pickup {
+  const starts = [world.player.position];
+  if (world.opponent) {
+    starts.push(world.opponent.position);
+  }
+
+  return startPickup({arena: world.arena, starts, seed, weapon: SUBMACHINE_GUN});
 }

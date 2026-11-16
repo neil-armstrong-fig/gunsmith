@@ -40,6 +40,15 @@ export class PlayerPlaywright extends BasePage {
     });
   }
 
+  async walkFor(heading: Heading, seconds: number): Promise<void> {
+    await this.startWalking(heading);
+
+    const before = await this.readGameState();
+    await this.waitForGameState(({elapsedSeconds}) => elapsedSeconds >= before.elapsedSeconds + seconds);
+
+    await this.stopWalking(heading);
+  }
+
   async measureWalkingSpeed(heading: Heading, seconds: number): Promise<number> {
     await this.startWalking(heading);
 

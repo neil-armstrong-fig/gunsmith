@@ -6,6 +6,9 @@ import {disarmOpponent} from "@gunsmith/engine/opponent/DisarmOpponent";
 import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import {startMatch} from "@gunsmith/engine/match/StartMatch";
+import type {Pickup} from "@gunsmith/engine/pickup/types/Pickup";
+import {startPickup} from "@gunsmith/engine/pickup/StartPickup";
+import {SUBMACHINE_GUN} from "@gunsmith/engine/weapon/weapons/SubmachineGun";
 import {startRing} from "@gunsmith/engine/ring/StartRing";
 import {DEFAULT_RING_TIMING} from "@gunsmith/engine/ring/DefaultRingTiming";
 import type {Ring} from "@gunsmith/engine/ring/types/Ring";
@@ -35,6 +38,7 @@ it("makes the duel with the opponent where it stands and no dummies", () => {
     ...giveOpponentBrain(startingWorld(DUEL_ARENA, [], DUEL_OPPONENT), 7),
     match: startMatch(),
     ring: duelRing(7),
+    pickup: duelPickup(7),
   });
   expect(world.opponent?.position).toEqual(DUEL_OPPONENT);
   expect(world.dummies).toEqual([]);
@@ -53,7 +57,7 @@ it("has nothing between the player and the opponent in the duel", () => {
 it("makes sparring the duel with an opponent who has nothing to shoot with", () => {
   const world = worldOfScenario("sparring", 7);
 
-  expect(world).toEqual(disarmOpponent(startingWorld(DUEL_ARENA, [], DUEL_OPPONENT)));
+  expect(world).toEqual({...disarmOpponent(startingWorld(DUEL_ARENA, [], DUEL_OPPONENT)), pickup: duelPickup(7)});
   expect(world.opponent?.loadout.every(carried => carried.rounds === 0 && carried.reserve === 0)).toBe(true);
   expect(world.player.loadout.every(carried => carried.rounds > 0)).toBe(true);
 });
@@ -204,8 +208,28 @@ describe("the terraced duel", () => {
   });
 });
 
+it("lays a weapon between the fighters in the duel and in sparring, drawn from the seed", () => {
+  for (const scenario of ["duel", "sparring"] as const) {
+    expect(worldOfScenario(scenario, 8).pickup).toEqual(duelPickup(8));
+    expect(worldOfScenario(scenario, 8).pickup).toEqual(worldOfScenario(scenario, 8).pickup);
+    expect(worldOfScenario(scenario, 8).pickup?.position.x).toBe(13.5);
+  }
+  expect(worldOfScenario("duel", 8).pickup?.position).not.toEqual(worldOfScenario("duel", 6).pickup?.position);
+});
+
+it("lays no weapon in the practice range or the heights arena, which have no opponent to be as far from", () => {
+  expect(worldOfScenario("practice", 8).pickup).toBeUndefined();
+  expect(worldOfScenario("heights", 8).pickup).toBeUndefined();
+});
+
 function duelRing(seed: number, timing: RingTiming = DEFAULT_RING_TIMING): Ring {
   const {player} = startingWorld(DUEL_ARENA, [], DUEL_OPPONENT);
 
   return startRing({arena: DUEL_ARENA, starts: [player.position, DUEL_OPPONENT], seed, timing});
+}
+
+function duelPickup(seed: number): Pickup {
+  const {player} = startingWorld(DUEL_ARENA, [], DUEL_OPPONENT);
+
+  return startPickup({arena: DUEL_ARENA, starts: [player.position, DUEL_OPPONENT], seed, weapon: SUBMACHINE_GUN});
 }

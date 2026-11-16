@@ -1,3 +1,4 @@
+import type {RingPixel} from "@src/dsl/gunsmith/components/ring/playwright/types/RingPixel";
 import type {Page} from "@playwright/test";
 import {expect} from "@playwright/test";
 import type {RingSnapshot} from "@gunsmith/shared/state-hook/types/RingSnapshot";
@@ -84,7 +85,7 @@ export class RingPlaywright extends BasePage {
         context.drawImage(image, 0, 0);
         const pixelsPerTile = Math.min(window.innerWidth / size.width, window.innerHeight / size.height);
         const pixelsPerCssPixel = image.width / window.innerWidth;
-        const colours: {red: number; green: number; blue: number}[] = [];
+        const colours: RingPixel[] = [];
         for (let sample = 0; sample < line.samples; sample += 1) {
           const along = line.samples === 1 ? 0 : sample / (line.samples - 1);
           const x = line.from.x + (line.to.x - line.from.x) * along;

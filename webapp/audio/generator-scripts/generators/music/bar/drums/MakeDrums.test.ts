@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import {it} from "node:test";
+import {expect, it} from "vitest";
 import {makeDrums} from "@gunsmith/audio-studies/generators/music/bar/drums/MakeDrums";
 import type {BarPosition} from "@gunsmith/audio-studies/generators/music/bar/types/BarPosition";
 import type {Voice} from "@gunsmith/audio-studies/common/types/Voice";
@@ -29,11 +28,8 @@ function snares(voices: readonly Voice[]): Voice[] {
 it("plays a kick, a falling thud, on each beat the section names", () => {
   const voices = makeDrums(position({}, {kickBeats: [0, 2]}));
 
-  assert.deepEqual(
-    kicks(voices).map(voice => voice.at),
-    [4, 5],
-  );
-  assert.deepEqual(kicks(voices)[0], {
+  expect(kicks(voices).map(voice => voice.at)).toStrictEqual([4, 5]);
+  expect(kicks(voices)[0]).toStrictEqual({
     kind: "tone",
     at: 4,
     duration: 0.3,
@@ -47,11 +43,8 @@ it("plays a kick, a falling thud, on each beat the section names", () => {
 it("plays a snare, a burst of noise, on beats two and four of every bar of a full section", () => {
   const voices = makeDrums(position({bar: 2}));
 
-  assert.deepEqual(
-    snares(voices).map(voice => voice.at),
-    [4.5, 5.5],
-  );
-  assert.deepEqual(snares(voices)[0], {
+  expect(snares(voices).map(voice => voice.at)).toStrictEqual([4.5, 5.5]);
+  expect(snares(voices)[0]).toStrictEqual({
     kind: "noise",
     at: 4.5,
     duration: 0.16,
@@ -62,25 +55,29 @@ it("plays a snare, a burst of noise, on beats two and four of every bar of a ful
 });
 
 it("plays the snare only on odd bars of a sparse section", () => {
-  assert.equal(snares(makeDrums(position({bar: 2}, {sparse: true}))).length, 0);
-  assert.equal(snares(makeDrums(position({bar: 3}, {sparse: true}))).length, 2);
+  expect(snares(makeDrums(position({bar: 2}, {sparse: true}))).length).toBe(0);
+  expect(snares(makeDrums(position({bar: 3}, {sparse: true}))).length).toBe(2);
 });
 
 it("seeds each snare from its bar and beat, so no two hits are the same noise", () => {
   const seeds = snares(makeDrums(position({bar: 5}))).map(voice => voice.kind === "noise" && voice.seed);
 
-  assert.deepEqual(seeds, [310 + 5 * 4 + 1, 310 + 5 * 4 + 3]);
+  expect(seeds).toStrictEqual([310 + 5 * 4 + 1, 310 + 5 * 4 + 3]);
 });
 
 it("puts each beat's kick before its snare, beat by beat", () => {
   const voices = makeDrums(position());
 
-  assert.deepEqual(
-    voices.map(voice => `${voice.kind}@${voice.at}`),
-    ["tone@4", "tone@4.5", "noise@4.5", "tone@5", "tone@5.5", "noise@5.5"],
-  );
+  expect(voices.map(voice => `${voice.kind}@${voice.at}`)).toStrictEqual([
+    "tone@4",
+    "tone@4.5",
+    "noise@4.5",
+    "tone@5",
+    "tone@5.5",
+    "noise@5.5",
+  ]);
 });
 
 it("plays no kick at all when the section names no beats", () => {
-  assert.equal(kicks(makeDrums(position({}, {kickBeats: []}))).length, 0);
+  expect(kicks(makeDrums(position({}, {kickBeats: []}))).length).toBe(0);
 });

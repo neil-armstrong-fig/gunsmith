@@ -6,6 +6,7 @@ import type {Input} from "@gunsmith/engine/game-loop/types/Input";
 import type {World} from "@gunsmith/engine/game-loop/types/World";
 import {takeDamage} from "@gunsmith/engine/health/TakeDamage";
 import {scoreRound} from "@gunsmith/engine/match/ScoreRound";
+import {takePickup} from "@gunsmith/engine/pickup/TakePickup";
 import {thinkOpponent} from "@gunsmith/engine/opponent/ThinkOpponent";
 import type {Player} from "@gunsmith/engine/player/types/Player";
 import {advanceRing} from "@gunsmith/engine/ring/AdvanceRing";
@@ -27,16 +28,19 @@ import {decideRound} from "@gunsmith/engine/round/DecideRound";
  * after that the world is frozen and only the clock runs. A world with a ring runs the ring's own clock on by `seconds`
  * in each step that is fought, so it stops with the round, unlike `elapsedSeconds`, and a fighter outside the ring, as it
  * stands at the end of the step, loses health to it with any bullet damage, before the round is decided; the practice
- * dummies and the bullets in the air are not hurt by it.
+ * dummies and the bullets in the air are not hurt by it. Last, a fighter with health left who stands within reach of the
+ * pickup lying in the arena takes it (`takePickup`), and a frozen world takes nothing.
  */
 export function step(world: World, input: Input, seconds: number): World {
   if (world.round !== "playing") {
     return {...world, elapsedSeconds: world.elapsedSeconds + seconds};
   }
 
-  const playerTurn = prepareFighter(world.arena, world.player, input, seconds);
+  const playerTurn = prepareFighter({arena: world.arena, fighter: world.player, input, seconds});
   const opponentDecision = thinkOpponent(world, seconds);
-  const opponentTurn = world.opponent && prepareFighter(world.arena, world.opponent, opponentDecision.input, seconds);
+  const opponentTurn =
+    world.opponent &&
+    prepareFighter({arena: world.arena, fighter: world.opponent, input: opponentDecision.input, seconds});
 
   const bulletFlight = advanceBullets(world.arena, {
     bullets: world.bullets,
@@ -62,11 +66,13 @@ export function step(world: World, input: Input, seconds: number): World {
     hurt(opponentShot.fighter, bulletFlight.opponentDamage + ringDamageTo(ring, opponentShot.fighter, seconds));
 
   const round = decideRound({playerHealth: player.health, opponentHealth: opponent?.health});
+  const taking = takePickup(world.pickup, {player, opponent});
 
   return {
     ...world,
-    player,
-    opponent,
+    player: taking.player,
+    opponent: taking.opponent,
+    pickup: taking.pickup,
     opponentBrain: opponentDecision.brain,
     bullets,
     dummies: bulletFlight.dummies,

@@ -122,3 +122,29 @@ it("shows an opponent on the low ground to a player who has climbed up to the pl
 
   expect(visibleToPlayer(onThePlatform).opponent).toBe(true);
 });
+
+it("shows a pickup in front of the player and hides one behind them", () => {
+  const world = startingWorld(room, [], {x: 20.5, y: 3.5});
+
+  expect(visibleToPlayer({...world, pickup: {position: {x: 15.5, y: 3.5}, weapon: RIFLE}}).pickup).toBe(true);
+  expect(visibleToPlayer({...world, pickup: {position: {x: 9.5, y: 3.5}, weapon: RIFLE}}).pickup).toBe(false);
+});
+
+it("hides a pickup beyond the weapon's range or behind a wall, and has none to show when none lies there", () => {
+  const world = startingWorld(room, [], {x: 20.5, y: 3.5});
+  const walled = arenaFrom([
+    "########################",
+    "#...........#..........#",
+    "#...........#..........#",
+    "#...........#..........#",
+    "########################",
+  ]);
+
+  expect(
+    visibleToPlayer({...world, pickup: {position: {x: 12.5 + RIFLE.visionRange + 0.5, y: 3.5}, weapon: RIFLE}}).pickup,
+  ).toBe(false);
+  expect(visibleToPlayer({...startingWorld(walled), pickup: {position: {x: 16.5, y: 2.5}, weapon: RIFLE}}).pickup).toBe(
+    false,
+  );
+  expect(visibleToPlayer(world).pickup).toBe(false);
+});

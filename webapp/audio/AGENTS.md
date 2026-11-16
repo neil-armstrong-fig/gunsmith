@@ -15,7 +15,7 @@ When a sound is meant to change, re-render with `pnpm render`, say so, and let t
 ## Commands
 
 ```bash
-pnpm --filter @gunsmith/audio-studies checks   # lint, format, types and the fast tests (a few seconds)
+pnpm --filter @gunsmith/audio-studies checks   # lint, format, types and the fast tests (a few seconds; vitest, see vitest.config.ts)
 pnpm --filter @gunsmith/audio-studies render        # re-render the pack into generated-audio/ (replaces the files)
 pnpm --filter @gunsmith/audio-studies test:render   # render the whole pack into a temp folder and compare every file
                                                     # to generated-audio/ byte for byte (minutes; not in checks)
@@ -56,7 +56,8 @@ it to `common/` rather than reaching across.
   mix refers to as well as the effects. `levels/` has `peak/` (finds a peak), `normalize/` (scales to a target) and `limit/`
   (pulls a mix down).
 - `generators/effects/`: `MakeEffects` lists the cues. `metallic/` builds a strike (`recipes/` has the effects as data,
-  `strike/` the tuned numbers); `steps/` builds a footfall (`stance/` has the stance table).
+  `strike/` the tuned numbers); `steps/` builds a footfall (`stance/` has the stance table); `damage/` makes the two
+  selected incoming-damage crunch (`MakeDamageCandidates`), which `MakeEffects` does not list, so it is not in the pack.
 - `generators/music/`: `MakeMusic` plays each bar of an `Arrangement`, a list of eight-bar `Section`s. `arrangements/` has one
   folder per track (`match/`, `menu/`) and the shared `bass/` and `kick/` patterns; `bar/` has one folder per instrument
   (`bass/`, `drums/`, `hats/`, `melody/`) plus `note/` and `pan/`. Change the music by editing a section, not by adding a branch.
@@ -69,6 +70,11 @@ it to `common/` rather than reaching across.
 - `pack/`: `MakeAudioPack` is the real pack (`types/AudioPack`). `verification/` holds the tests that look at the whole pack:
   `PackFingerprint` (the recipes), `CommittedPack` (the committed WAVs against their hashes) and `RenderedPack` (the slow
   byte-for-byte render).
+- `studies/`: renders that are not the approved pack, one folder per study. `combat-feedback/RenderCombatFeedback` writes the
+  selected crunch and its `measurements.json` into the `output` it is given (run as a script, into
+  `webapp/audio/studies/combat-feedback/`, with `node generator-scripts/studies/combat-feedback/RenderCombatFeedback.ts`); its
+  test checks the render against that committed folder byte for byte, as `CommittedPack` does for the pack, so a changed recipe
+  needs a re-render and a listen.
 - `encoding/`: `EncodeAudio` encodes every measured master but the audition mix into a staging folder and publishes only if all
   succeeded, the report last (`publish/`). `masters/` loops the masters and `masters/master/` encodes one (hash checked
   before and after, so the approved masters are never changed); `encoder-arguments/` is the one list of `ffmpeg` arguments

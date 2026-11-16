@@ -1,34 +1,10 @@
 # AGENTS.md
 
-Gunsmith: a 1v1 top-down 2D shooter with fog of war, where the players write (via AI) the weapons and the arena before
-each match. Built with React and react-three-fiber, hosted on Cloudflare, with the AI side on LangChain, LangGraph and
-LangSmith. It follows the janggi model (`/Users/neilarmstrong/Development/Personal/janggi`) for structure, standards
-and acceptance-test-driven development.
-
-> **Status: the game's core is being built, test first.** Five of the seven packages exist (`webapp/`,
-> `engine/`, `acceptance-tests/`, `shared/`, `ai/`); `api/` and `infra/` are planned. `pnpm checks`, `pnpm start`,
-> `pnpm acceptance-tests` and `pnpm install-browsers` work today; the other commands, CI and deployment below are
-> **planned** and become true as `build` builds them (see `TODO-build.md`). Where this file describes a package or command
-> that does not exist yet, read "will be". Delete this note when the last of the seven packages lands.
-
-pnpm workspace, seven planned packages (`@gunsmith/*`):
-
-| Package             | Contains                                                                                           |
-| ------------------- | -------------------------------------------------------------------------------------------------- |
-| `webapp/`           | The React app. Vite, React 19, Zustand, Tailwind v4, react-three-fiber.                            |
-| `acceptance-tests/` | The acceptance-test DSL and specs, run by Playwright.                                              |
-| `shared/`           | The gunsmith vocabulary, wire types, the weapon and arena zod schemas, and base tool config.       |
-| `engine/`           | The deterministic simulation and rules: movement, projectiles, visibility, power rating, arena checks. |
-| `ai/`               | The LangChain / LangGraph pipeline, judges, token pre-check, and the evals.                         |
-| `api/`              | The Cloudflare Worker: sign-in, credits, library, the match and matchmaker Durable Objects.         |
-| `infra/`            | The Cloudflare infrastructure as code (Alchemy).                                                    |
-
-Each has its own `AGENTS.md` (written when the package is scaffolded), and webapp has one per subfolder besides.
-
-`docs/` holds research a decision in the code rests on, linked from the code it justifies. Add a document only when
-losing the reasoning would mean someone re-deriving it. Today: `docs/fuzzy-frontend.md`, `docs/game-design.md`, `docs/architecture.md`,
-`docs/match-netcode.md`, `docs/schemas.md`, `docs/ai-pipeline.md`, `docs/ai-hosting.md`, `docs/ai-visual-generation.md`, `docs/cost-and-budget.md`,
-`docs/privacy-and-data.md`, `docs/focused-case-study.md`, `docs/state-management.md`, `docs/shaders.md`, `docs/art/`.
+Gunsmith is a deterministic 1v1 top-down shooter: players use AI to define weapons and arenas.
+The project is on M1: build a fun full-screen game first, acceptance-test first; add menus and contracts when needed.
+Packages: webapp, engine, acceptance-tests, shared and ai exist; api and infra remain planned.
+Use pnpm. Design decisions are in `docs/`; add research only when losing it would require re-deriving a decision.
+Read [operational reference](docs/agent-reference/Operations.md) for command details, worktrees, environment gotchas, planned deployment and manual setup.
 
 ## The three builders
 
@@ -37,12 +13,8 @@ Work is split across three personas so a session can be cleared and resumed with
 makes art, text and audio. Stay inside your own folders; a contract another persona plugs into changes only in
 `HANDOFF.md` first.
 
-**Every fresh session starts by reading all of these, whichever persona it is:** this file, `HANDOFF.md` (table,
-ownership, contracts, start prompts), `TODO.md` (the shared north-star path, the status board and the blockers) and **all
-three persona checklists**: `TODO-build.md`, `TODO-ai.md`, `TODO-art.md`. Then say, in a few lines, which milestone the
-project is on, what the other two personas are doing or waiting on, and what you are about to do. At the end of the
-session, tick your own checklist, update your row on the status board in `TODO.md`, and add a line to the delivery log in
-`HANDOFF.md`. The sync protocol is spelled out at the top of `TODO.md`.
+**Every fresh session follows the startup protocol in `TODO.md`:** read current shared status and handoff, then your own current checklist and task references. The other checklists and historical archives are read only for dependencies. Before coding, explicitly read every applicable package and nested instruction file; they are not guaranteed to be preloaded. Recover truncated reads before continuing.
+At the end, update your checklist, status and a concise handoff delivery.
 
 ## Before changing code
 
@@ -57,29 +29,6 @@ session, tick your own checklist, update your row on the status board in `TODO.m
    beside code, a helper with one caller beside it): for every folder you created or added to, `ls` it, count the
    callers of each root file with `grep`, and move the one-caller helpers beneath their caller and the types to
    `types/` *before* you run the final checks. Say in your summary that you did it.
-
-## Commands (planned)
-
-While working, scope tools to what you changed (e.g. `pnpm --filter @gunsmith/engine exec vitest run
-src/visibility`). Before finishing:
-
-```bash
-pnpm checks              # lint + format check + type check + unit tests, every package
-pnpm format              # apply Prettier; fixes most format:check failures
-pnpm lint:fix            # apply the ESLint fixes that are automatic
-pnpm start               # dev server on http://localhost:3000 — fine for a few specs, or work in progress
-pnpm start:preview       # compile, then serve the build on http://localhost:3000 — what CI tests
-pnpm acceptance-tests    # needs one of the two running in another terminal; preview for the whole suite
-pnpm install-browsers    # one-time Playwright chromium download
-pnpm api:dev             # the API Worker locally (`wrangler dev`, port 8787); see `api/AGENTS.md`
-pnpm test:properties     # the property tests, which `pnpm checks` leaves out
-pnpm evals               # the AI evals (`ai`); costs money, so `pnpm checks` leaves them out
-```
-
-`pnpm checks` is the gate (`--max-warnings=0`). It deliberately leaves out the property tests — a
-fresh seed every run means a failure isn't reproducible from the same commit, so it can't gate a
-deploy — and the evals, which call a model, cost money, and are non-deterministic. Run `pnpm test:properties`
-before finishing work in `engine/src/`, and `pnpm evals` before finishing work in `ai/src/` prompts or graph nodes.
 
 ## How work is done here
 
@@ -134,6 +83,9 @@ This governs unit tests only — acceptance specs are the opposite case, their `
 
 ## Code style
 
+- Keep import declarations contiguous, with no blank lines between them, and one blank line before code.
+- Use property shorthand when key and value have the same name (`{voice}`, not `{voice: voice}`).
+
 Prettier owns formatting (`pnpm format`). What it won't tell you:
 
 - **Declare functions below their callers**, so a file reads top to bottom. Helpers must be
@@ -169,6 +121,7 @@ Prettier owns formatting (`pnpm format`). What it won't tell you:
 - **A union of literals is read off the list, not written twice.** Declare it `as const` and derive
   the type from it (`(typeof X)[number]`), so the two can't drift apart. A union with no runtime list
   to keep it honest stays a plain `type`.
+- **Use interfaces by default for object shapes, with one field per line.** Use a type alias when its syntax is needed (unions, function types, mapped/conditional types or derivation from runtime values).
 - **Give every type a name.** No inline object type or union in a signature, a field, or a `Record`'s
   value. Exception: a component's own `Props`.
 - **Use `undefined` for absence, never `null`, inside the codebase.** Optional
@@ -263,36 +216,6 @@ tells you when another one starts. The working tree, the index, the stash and th
 `pgrep -a claude` shows what else is live — each session is one line carrying
 `--permission-prompt-tool`. More than one and you're not alone: ask first, naming the command and why.
 
-## Working on a feature in a worktree
-
-**Work in the main checkout, however big the change. Use a worktree only when asked.** The rest of
-this section is for then. `EnterWorktree` makes one under `.claude/worktrees/<name>` on branch
-`worktree-<name>` (`git worktree add` does the same by hand).
-
-1. **Install its own dependencies** — a worktree has no `node_modules`:
-   `pnpm install --frozen-lockfile --offline`.
-2. **The files are yours; the repository isn't.** Branches, remotes and the stash are shared with
-   every other checkout, so the concurrency rules above still hold — above all, never `git stash` in
-   a worktree. Set work aside with a WIP commit on your own branch instead.
-3. **Run the app on a port of your own** and point specs at it (`pnpm start:preview --port 3100`, or
-   `pnpm start --port 3100 --strictPort` while writing a spec, then
-   `WEBAPP_URL=http://localhost:3100` for Playwright), or you'll test somebody else's code.
-4. **Verify before handing over**: `pnpm checks` and the acceptance suite against your own port.
-5. **Stop, and leave the work uncommitted.** Say what changed and what you ran — the branch is
-   reviewed and committed by hand.
-6. **Integrate from the main checkout only, once that commit exists.** Default to a real merge
-   (`git -C /path/to/main-checkout merge worktree-<name>`), not a fast-forward — it's the safer choice
-   where main may have moved on. For a linear history instead, rebase the worktree branch onto main
-   first and fast-forward main onto the result (`git merge --ff-only worktree-<name>`); ask before
-   rewriting a worktree branch that another worktree or session might still be building on. **A clean text
-   merge proves nothing**: re-run `pnpm checks` (and the acceptance suite where both sides touched the same
-   area) from the main checkout after either route, then tear down: `git worktree remove
-   .claude/worktrees/<name>` and `git branch -d worktree-<name>`.
-7. **Kill any dev server you started by process, not wrapper** — `pkill -f "vite.*--port <port>"`, or
-   the next `--strictPort` start fails with "Port is already in use".
-
-Pushing is the human's, always.
-
 ## Keeping the context small
 
 Every tool result is re-read on each later API call in the session, so a large one is paid for again
@@ -300,8 +223,7 @@ and again, not once.
 
 - **Read the part of a file you need, not the file** — `grep -n` to find it, `sed -n` to read it.
   Never `cat` a source file, and never sweep a directory with a `for f in …; do cat "$f"; done` loop.
-- **This file and the current package's `AGENTS.md` are already in your context** — both are loaded
-  before your first turn. Don't `cat` either.
+- **Do not assume package instructions are already in context.** Read each applicable file explicitly, record the sources used, and re-read after relevant changes. Avoid repeating unchanged reads.
 - **Keep these files worth what they cost.** Every session pays for the ones in its chain in full —
   when you add to an `AGENTS.md`, take out whatever it supersedes.
 - **A batched check is the cheap shape.** `pnpm checks` is quiet when it passes — never skip a check
@@ -324,61 +246,16 @@ and again, not once.
 - **Reading or printing secrets.** Never read `.env*`, `.dev.vars`, `appsettings.<Environment>.json` or user-secrets.
   Ask the user to run the command with `!` or to say whether a value is set.
 
-## Gotchas that will waste your time
-
-These are janggi's, carried over until each is re-checked against the versions actually installed.
-
-- **Do not upgrade TypeScript past 6.0.3.** Re-checked 2026-11-12: TS 7.0.2 is `latest`, but `typescript-eslint` 8.72.x
-  still declares `typescript >=4.8.4 <6.1.0`, so ESLint cannot read TS 7. Re-check when typescript-eslint's peer range
-  moves.
-- **Port 3000 may already be taken by janggi's dev server** (`strictPort` makes `pnpm start` fail rather than move). Do not
-  kill it; run `pnpm --filter @gunsmith/webapp exec vite --port 3100 --strictPort` instead.
-- **Do not add `baseUrl` to a tsconfig.** TS 6 made it an error — `paths` already resolve relative to
-  the tsconfig's own directory.
-- **`pnpm setup` and `pnpm deploy` are built-in pnpm commands**, not ours. The scripts are `pnpm install-browsers` and
-  `pnpm --filter @gunsmith/infra provision`.
-- **Root-level files get no Prettier config from a package directory** — `AGENTS.md` and `docs/`
-  fall back to 80 columns and rewrap content you never touched. Edit them by hand.
-- **The canvas is not in the DOM.** react-three-fiber draws to a `<canvas>`, so Playwright cannot find a player or a
-  wall by role. The DSL reads game state through one deliberate state hook (`HANDOFF.md`); it is shipped code, so keep it
-  read-only and tiny.
-- **`pnpm checks` needs `glslangValidator` on the PATH** (`brew install glslang`; `apt install glslang-tools`): the webapp's shader test runs it
-  (`docs/shaders.md`), and without it that test fails saying so. A CI runner must install it too.
-- On Linux/WSL, Chromium needs system libraries once:
-  `pnpm --filter @gunsmith/acceptance-tests exec playwright install-deps chromium` (needs sudo), or
-  every acceptance test fails on browser launch with `libnspr4.so`.
-- **LangSmith on Workers:** with `nodejs_compat_populate_process_env` the tracing variables are read (checked 2026-11-12;
-  without the flag, pass the config to the client explicitly). **Flush on every request path with
-  `ctx.waitUntil(awaitAllCallbacks())`**: an unflushed trace is lost and the orphaned batch can hang the next request that
-  awaits a flush (`docs/ai-hosting.md`). Avoid streaming until it is verified.
-- **Cloudflare has no hard spend cap.** Budget alerts are email only. The kill switch is ours (`docs/cost-and-budget.md`).
-
-## CI and deployment (planned)
-
-`ci.yml` runs `checks`, then `acceptance-tests` against a production build (`vite preview`), then
-deploys `main` with Alchemy (`deploy`: the database, its migrations, the Worker with its static assets and the Durable
-Objects, from `infra/`), gated on both, and does nothing until the `CLOUDFLARE_API_TOKEN` secret exists. After the deploy it
-runs the acceptance suite once more against the live address. `property-tests.yml` and `evals.yml` run on push/PR
-and on demand, and go **red on failure but gate nothing** (a fresh seed, or a model, means a failure isn't reproducible
-from the same commit) — except that `evals.yml` is the AI regression gate **for changes under `ai/`**; `ai` decides
-whether that becomes a required check, as `docs/ai-pipeline.md` explains. **If branch protection is ever turned on,
-leave the property tests out of required checks.**
-
-One Worker serves both the site (static assets) and `/api/*` (`run_worker_first: ["/api/*"]`) at
-`gunsmith.neilarmstrong.dev`, DNS at Cloudflare, so the session cookie is same-origin. Environments: local and `prod`
-only (a throwaway Cloudflare account for the first deploy).
-
-## Manual setup
-
-Some of this project lives outside the repository: the Google OAuth client, the Cloudflare API token and Worker domain,
-the AI Gateway and its spend limits, the provider key and its hard cap, the LangSmith key, the Cloudflare budget
-alerts, the GitHub secrets. `MANUAL-SETUP-STEPS.md` lists every such step, and why. **Update it in the same pass as any
-change that creates, renames or removes one** (a new secret, console setting, DNS record or workflow permission), and
-never put an account id, token, secret or personal address in it.
-
 ## Tool configuration
 
 Base config lives in `shared/config/` — change a rule there, not in a package. A package's
 `eslint.config.js` must call `baseConfig({tsconfigRootDir: import.meta.dirname, ...})` or it throws:
 the editor runs one ESLint server for the whole workspace, and without an explicit root the parser
 mixes up which package a file belongs to.
+
+## Enforced standards and limits
+
+The shared ESLint config enforces return-ternary prohibition, three parameters maximum, named object types at boundaries, and one public subject per source file. Runtime values may keep their directly derived types; a class may keep interfaces it needs. Component-local `Props` and the two acceptance/eval mapping interfaces retain their documented exceptions.
+Folder ownership, helper placement and design quality still require the explicit review above. Do not describe a passing gate as proof of those properties.
+`pnpm checks` also checks instruction chains against a 65536-byte budget and validates executable art scripts. Frozen HTML receives syntax checks, not a claim of usability or complete standards compliance. New standalone art scripts receive JavaScript lint checks.
+Codex's global `project_doc_max_bytes` should be 65536; start a fresh session after changing configuration or startup guidance. Model and reasoning settings are unchanged.

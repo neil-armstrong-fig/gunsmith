@@ -1,8 +1,7 @@
-import assert from "node:assert/strict";
 import {mkdir, mkdtemp, readFile, readdir, rm, writeFile} from "node:fs/promises";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
-import {afterEach, beforeEach, it} from "node:test";
+import {afterEach, beforeEach, expect, it} from "vitest";
 import {encodeAudio} from "@gunsmith/audio-studies/encoding/EncodeAudio";
 import {shimEncoder} from "@gunsmith/audio-studies/encoding/verification/shim/ShimEncoder";
 import {sourceOfOneEffect} from "@gunsmith/audio-studies/encoding/fixture/SourceOfOneEffect";
@@ -29,25 +28,25 @@ it("passes exports that are the ones reported, and says so in verification.json"
   await verifyEncoded(output);
   const verification = await verificationOf(output);
 
-  assert.equal(verification.passed, true);
-  assert.deepEqual(verification.failures, []);
-  assert.deepEqual(Object.keys(verification.files), ["sfx-ui-click.ogg", "sfx-ui-click.mp3"]);
-  assert.match(verification.decoder, /^ffmpeg version/);
+  expect(verification.passed).toBe(true);
+  expect(verification.failures).toStrictEqual([]);
+  expect(Object.keys(verification.files)).toStrictEqual(["sfx-ui-click.ogg", "sfx-ui-click.mp3"]);
+  expect(verification.decoder).toMatch(/^ffmpeg version/);
 });
 
 it("stops at an export that is not the reported one, and writes no verification", async () => {
   await writeFile(join(output, "sfx-ui-click.mp3"), "truncated");
 
-  await assert.rejects(verifyEncoded(output), /sfx-ui-click.mp3: hash mismatch/);
-  assert.equal((await readdir(output)).includes("verification.json"), false);
+  await expect(verifyEncoded(output)).rejects.toThrow(/sfx-ui-click.mp3: hash mismatch/);
+  expect((await readdir(output)).includes("verification.json")).toBe(false);
 });
 
 it("removes an old verification before it checks, so a stop never leaves a passing one", async () => {
   await verifyEncoded(output);
   await writeFile(join(output, "sfx-ui-click.mp3"), "truncated");
 
-  await assert.rejects(verifyEncoded(output));
-  assert.equal((await readdir(output)).includes("verification.json"), false);
+  await expect(verifyEncoded(output)).rejects.toThrow();
+  expect((await readdir(output)).includes("verification.json")).toBe(false);
 });
 
 it("refuses a report that names a file this package would never write", async () => {
@@ -57,17 +56,17 @@ it("refuses a report that names a file this package would never write", async ()
     files: report.files.map(file => ({...file, key: "../sfx-ui-click"})),
   });
 
-  await assert.rejects(verifyEncoded(output), /Invalid export name/);
+  await expect(verifyEncoded(output)).rejects.toThrow(/Invalid export name/);
 });
 
 it("records a finding, writes the report with passed false, and then fails", async () => {
   const report = await readEncodingReport(output);
   await writeReport(join(output, "report.json"), {...report, files: report.files.map(file => ({...file, seconds: 1}))});
 
-  await assert.rejects(verifyEncoded(output), /sfx-ui-click.mp3: duration mismatch/);
+  await expect(verifyEncoded(output)).rejects.toThrow(/sfx-ui-click.mp3: duration mismatch/);
   const verification = await verificationOf(output);
-  assert.equal(verification.passed, false);
-  assert.equal(verification.failures.length, 2);
+  expect(verification.passed).toBe(false);
+  expect(verification.failures.length).toBe(2);
 });
 
 it("runs the encoder it is given for the version, the probe and the decode, and no other", async () => {
@@ -75,13 +74,13 @@ it("runs the encoder it is given for the version, the probe and the decode, and 
   await verifyEncoded(output, encoder);
   const calls = (await readFile(join(folder, "calls.log"), "utf8")).split("\n");
 
-  assert.ok(calls.includes("ffmpeg -version"), "the version");
-  assert.ok(calls.includes("ffprobe -v"), "the probe");
-  assert.ok(calls.includes("ffmpeg -v"), "the decode");
+  expect(calls, "the version").toContain("ffmpeg -version");
+  expect(calls, "the probe").toContain("ffprobe -v");
+  expect(calls, "the decode").toContain("ffmpeg -v");
 });
 
 it("fails when the encoder it is given cannot be run", async () => {
-  await assert.rejects(verifyEncoded(output, "/missing/ffmpeg"), /ENOENT/);
+  await expect(verifyEncoded(output, "/missing/ffmpeg")).rejects.toThrow(/ENOENT/);
 });
 
 it("keeps the hit cue at its measured length in both formats", async () => {
@@ -94,9 +93,9 @@ it("keeps the hit cue at its measured length in both formats", async () => {
   await verifyEncoded(hitOutput);
   const verification = await verificationOf(hitOutput);
 
-  assert.equal(verification.passed, true);
-  assert.equal(verification.files["sfx-hit.ogg"]?.frames, 9600);
-  assert.equal(verification.files["sfx-hit.mp3"]?.frames, 9600);
+  expect(verification.passed).toBe(true);
+  expect(verification.files["sfx-hit.ogg"]?.frames).toBe(9600);
+  expect(verification.files["sfx-hit.mp3"]?.frames).toBe(9600);
 });
 
 async function verificationOf(folderOfExports: string): Promise<VerificationReport> {

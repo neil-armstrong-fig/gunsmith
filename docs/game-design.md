@@ -61,6 +61,13 @@ drop keys are decided in the fuzzy frontend and kept in one key-binding config. 
   **penetration** property and a **`sound` block** (synthesised-audio parameters). Draft fields: `docs/schemas.md`.
 - A player carries the **default rifle and one custom weapon**. To pick up another, drop the custom one first.
 - Custom weapons have a magazine and a finite reserve. There are **no health, armour or ammo pickups**.
+- **A pickup is one weapon lying in the arena each round (decided 2026-11-16, built as slice 1).** It lies on the tile that is
+  as near as can be to equally far from both fighters by the way they would walk (steps, with stairs the only way across a
+  drop), drawn from the round's seed among the tiles that tie. Walking onto it (within half a tile) takes it, no key: it
+  replaces the weapon in the second slot and is in hand, with a full magazine and its reserve. Either fighter can take it by
+  the same rule; if both are in reach the nearer wins, an exact tie is the opponent's, and a fighter who falls that step
+  takes nothing. Only the player sees it, inside their cone, like any other item. Slice 1 uses a fixed placeholder weapon
+  and the bot does not seek it; the open question is whether it should replace the weapon in hand instead.
 - **Power is capped, not balanced.** Each stat has a wide hard cap set by what physics, the 20 Hz tick and performance can
   carry. Inside the caps the weapon is used as written. The reveal screen shows a code-computed **power rating**, so the
   gamble is visible. Nothing is silently nerfed.

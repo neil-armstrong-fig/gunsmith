@@ -1,7 +1,7 @@
 import {makeMetallic} from "@gunsmith/audio-studies/generators/effects/metallic/MakeMetallic";
 import {METALLIC_EFFECTS} from "@gunsmith/audio-studies/generators/effects/metallic/recipes/MetallicEffects";
 import {makeStep} from "@gunsmith/audio-studies/generators/effects/steps/MakeStep";
-import {STEP_VARIANTS} from "@gunsmith/audio-studies/common/step-key/StepKey";
+import {STEP_VARIANTS} from "@gunsmith/audio-studies/common/step-key/StepVariants";
 import type {Cue} from "@gunsmith/audio-studies/common/types/Cue";
 
 /** Original metallic gestures, neutral stingers and dry single footfalls, in the order they are rendered and measured. */

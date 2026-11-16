@@ -11,9 +11,9 @@ export function scheduleVoice(context: OfflineAudioContext, voice: Voice, offset
   const window = {at: voice.at + offset, end: voice.at + offset + voice.duration};
   const filter = connectVoiceChain(context, voice, window);
   if (voice.kind === "noise") {
-    startNoise(context, voice, filter, window);
+    startNoise({context, voice, destination: filter, window});
     return;
   }
 
-  startTone(context, voice, filter, window);
+  startTone({context, voice, destination: filter, window});
 }

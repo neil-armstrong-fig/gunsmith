@@ -1,12 +1,5 @@
+import type {AppearanceOutcomeStatus} from "@gunsmith/ai/pipeline/appearance/types/AppearanceOutcomeStatus";
 import type {ModelUsage} from "@gunsmith/ai/pipeline/appearance/types/ModelUsage";
-
-/**
- * Every way a weapon's appearance can end: the model's first drawing passed as written (`valid`), passed once the code had read
- * nested fields out of text or filled what was left out (`completed`), passed after the one repair (`repaired`), or nothing passed
- * and the plain stand-in is shown (`fallback`, disclosed, never passed off as the model's own).
- */
-export const appearanceOutcomeStatuses = ["valid", "completed", "repaired", "fallback"] as const;
-export type AppearanceOutcomeStatus = (typeof appearanceOutcomeStatuses)[number];
 
 /** The result of drawing a weapon from a player's words. DRAFT, local to `ai/`: a candidate for `build` and `art` to react to, not a contract. */
 export interface AppearanceOutcome {

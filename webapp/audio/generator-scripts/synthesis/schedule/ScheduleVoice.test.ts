@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import {it} from "node:test";
+import {assert, expect, it} from "vitest";
 import {OfflineAudioContext} from "node-web-audio-api";
 import {peakOf} from "@gunsmith/audio-studies/common/levels/peak/PeakOf";
 import {scheduleVoice} from "@gunsmith/audio-studies/synthesis/schedule/ScheduleVoice";
@@ -33,16 +32,16 @@ function crossings(samples: Float32Array): number {
 it("plays a tone at its pitch: a 1 kHz sine for a quarter second crosses zero about 500 times", async () => {
   const [left] = await render({kind: "tone", at: 0, duration: 0.25, frequency: 1000, gain: 1});
 
-  assert.ok(left);
-  assert.ok(Math.abs(crossings(left) - 500) <= 4, `${crossings(left)} crossings`);
+  assert(left);
+  expect(Math.abs(crossings(left) - 500), `${crossings(left)} crossings`).toBeLessThanOrEqual(4);
 });
 
 it("starts a voice at its time, and is silent before it", async () => {
   const [left] = await render({kind: "tone", at: 0.2, duration: 0.2, frequency: 800, gain: 1});
 
-  assert.ok(left);
-  assert.equal(energy(left.subarray(0, Math.floor(RATE * 0.199))), 0);
-  assert.ok(energy(left.subarray(Math.floor(RATE * 0.22), Math.floor(RATE * 0.4))) > 0);
+  assert(left);
+  expect(energy(left.subarray(0, Math.floor(RATE * 0.199)))).toBe(0);
+  expect(energy(left.subarray(Math.floor(RATE * 0.22), Math.floor(RATE * 0.4)))).toBeGreaterThan(0);
 });
 
 it("starts the world's offset later again, which is how a looped cue schedules its repeats", async () => {
@@ -50,47 +49,50 @@ it("starts the world's offset later again, which is how a looped cue schedules i
   scheduleVoice(context, {kind: "tone", at: 0.1, duration: 0.1, frequency: 800, gain: 1}, 0.5);
   const [samples] = [(await context.startRendering()).getChannelData(0)];
 
-  assert.equal(energy(samples.subarray(0, Math.floor(RATE * 0.59))), 0);
-  assert.ok(energy(samples.subarray(Math.floor(RATE * 0.61), Math.floor(RATE * 0.69))) > 0);
+  expect(energy(samples.subarray(0, Math.floor(RATE * 0.59)))).toBe(0);
+  expect(energy(samples.subarray(Math.floor(RATE * 0.61), Math.floor(RATE * 0.69)))).toBeGreaterThan(0);
 });
 
 it("fades in from silence and out to silence, so a voice never clicks", async () => {
   const [left] = await render({kind: "tone", at: 0, duration: 0.2, frequency: 200, gain: 1});
 
-  assert.ok(left);
-  assert.ok(Math.abs(left[0] ?? 1) < 0.01);
-  assert.ok(Math.abs(left[Math.floor(RATE * 0.2) - 1] ?? 1) < 0.01);
+  assert(left);
+  expect(Math.abs(left[0] ?? 1)).toBeLessThan(0.01);
+  expect(Math.abs(left[Math.floor(RATE * 0.2) - 1] ?? 1)).toBeLessThan(0.01);
 });
 
 it("stops at the end of its duration", async () => {
   const [left] = await render({kind: "tone", at: 0, duration: 0.1, frequency: 600, gain: 1});
 
-  assert.ok(left);
-  assert.equal(energy(left.subarray(Math.ceil(RATE * 0.1) + 8)), 0);
+  assert(left);
+  expect(energy(left.subarray(Math.ceil(RATE * 0.1) + 8))).toBe(0);
 });
 
 it("holds a pan to the right by leaving the left channel silent", async () => {
   const [left, right] = await render({kind: "tone", at: 0, duration: 0.2, frequency: 500, gain: 1, pan: 1});
 
-  assert.ok(left && right);
-  assert.equal(energy(left), 0);
-  assert.ok(energy(right) > 0);
+  assert(left);
+  assert(right);
+  expect(energy(left)).toBe(0);
+  expect(energy(right)).toBeGreaterThan(0);
 });
 
 it("centres a voice that names no pan, in both channels equally", async () => {
   const [left, right] = await render({kind: "tone", at: 0, duration: 0.2, frequency: 500, gain: 1});
 
-  assert.ok(left && right);
-  assert.ok(energy(left) > 0);
-  assert.ok(Math.abs(energy(left) - energy(right)) < energy(left) * 1e-6);
+  assert(left);
+  assert(right);
+  expect(energy(left)).toBeGreaterThan(0);
+  expect(Math.abs(energy(left) - energy(right))).toBeLessThan(energy(left) * 1e-6);
 });
 
 it("sweeps a tone from its pitch to its end pitch over its first moments", async () => {
   const [left] = await render({kind: "tone", at: 0, duration: 0.3, frequency: 2000, endFrequency: 200, gain: 1});
   const [steady] = await render({kind: "tone", at: 0, duration: 0.3, frequency: 2000, gain: 1});
 
-  assert.ok(left && steady);
-  assert.ok(crossings(left) < crossings(steady) / 3, `${crossings(left)} against ${crossings(steady)}`);
+  assert(left);
+  assert(steady);
+  expect(crossings(left), `${crossings(left)} against ${crossings(steady)}`).toBeLessThan(crossings(steady) / 3);
 });
 
 it("makes a triangle wave quieter in its harmonics than a sawtooth of the same pitch", async () => {
@@ -113,8 +115,9 @@ it("makes a triangle wave quieter in its harmonics than a sawtooth of the same p
     cutoff: 6000,
   });
 
-  assert.ok(triangle && saw);
-  assert.notDeepEqual(triangle, saw);
+  assert(triangle);
+  assert(saw);
+  expect(triangle).not.toStrictEqual(saw);
 });
 
 it("renders noise that is the same for the same seed and different for another", async () => {
@@ -123,10 +126,12 @@ it("renders noise that is the same for the same seed and different for another",
   const [second] = await render(noise);
   const [other] = await render({...noise, seed: 8});
 
-  assert.ok(first && second && other);
-  assert.ok(energy(first) > 0);
-  assert.deepEqual(first, second);
-  assert.notDeepEqual(first, other);
+  assert(first);
+  assert(second);
+  assert(other);
+  expect(energy(first)).toBeGreaterThan(0);
+  expect(first).toStrictEqual(second);
+  expect(first).not.toStrictEqual(other);
 });
 
 it("keeps what is below the cutoff with a lowpass, and what is above it with a highpass", async () => {
@@ -134,9 +139,10 @@ it("keeps what is below the cutoff with a lowpass, and what is above it with a h
   const [low] = await render(noise);
   const [high] = await render({...noise, filter: "highpass"});
 
-  assert.ok(low && high);
+  assert(low);
+  assert(high);
   // Crossings count the highest content: a lowpassed noise wobbles slowly, a highpassed one fast.
-  assert.ok(crossings(high) > crossings(low) * 2, `${crossings(high)} against ${crossings(low)}`);
+  expect(crossings(high), `${crossings(high)} against ${crossings(low)}`).toBeGreaterThan(crossings(low) * 2);
 });
 
 it("lowpasses by default, at a cutoff that lets bright content through", async () => {
@@ -144,23 +150,25 @@ it("lowpasses by default, at a cutoff that lets bright content through", async (
   const [open] = await render(bright);
   const [dull] = await render({...bright, cutoff: 500});
 
-  assert.ok(open && dull);
-  assert.ok(energy(open) > energy(dull) * 100);
+  assert(open);
+  assert(dull);
+  expect(energy(open)).toBeGreaterThan(energy(dull) * 100);
 });
 
 it("scales a voice's peak by its gain", async () => {
   const [loud] = await render({kind: "tone", at: 0, duration: 0.2, frequency: 500, gain: 1});
   const [quiet] = await render({kind: "tone", at: 0, duration: 0.2, frequency: 500, gain: 0.5});
 
-  assert.ok(loud && quiet);
-  assert.ok(Math.abs(peakOf([quiet]) / peakOf([loud]) - 0.5) < 0.03, `${peakOf([quiet]) / peakOf([loud])}`);
+  assert(loud);
+  assert(quiet);
+  expect(Math.abs(peakOf([quiet]) / peakOf([loud]) - 0.5), `${peakOf([quiet]) / peakOf([loud])}`).toBeLessThan(0.03);
 });
 
 it("finishes a pitch sweep in the first 80 milliseconds, then holds the end pitch", async () => {
   const [swept] = await render({kind: "tone", at: 0, duration: 0.4, frequency: 3000, endFrequency: 300, gain: 1});
-  assert.ok(swept);
+  assert(swept);
   // From 90 to 140 ms the tone is at its end pitch, 300 Hz: about 30 crossings. Still sweeping, it would cross far more.
   const window = swept.subarray(Math.floor(RATE * 0.09), Math.floor(RATE * 0.14));
 
-  assert.ok(Math.abs(crossings(window) - 30) <= 4, `${crossings(window)} crossings`);
+  expect(Math.abs(crossings(window) - 30), `${crossings(window)} crossings`).toBeLessThanOrEqual(4);
 });
