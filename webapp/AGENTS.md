@@ -113,6 +113,11 @@ edge (a fixed 0.12 tile wide, the palette's `--color-gs-ring` repeated as a vect
 `uniforms={...}`: the second left the radius at 0 and tinted the whole arena**. The plane is the arena, so a circle bigger than the arena is clipped by it. The canvas is not in the DOM, so `DrawingTheClosingRing` (acceptance) reads what a player sees from a screenshot, at the places the hook's
 `ring.centre`, `radius` and `damagePerSecond` say the ring is, and checks the browser reported no shader error.
 
+**The mouse cursor is the aim reticle** (`three/arena-canvas/reticle/`: `AimReticle.png`, a copy of `art`'s `docs/art/concepts/aim-reticle/precision/reticle.png`, and
+`AimReticleCursor.ts`, `image-set(url(32 px) 1x, url(64 px) 2x) 16 16, crosshair`; `AimReticleSharp.png` is `art`'s `reticle@2x.png`, and the hotspot is in CSS pixels, so 16 is the middle of both), set as a style on the arena div in `ArenaCanvas.tsx` **and nowhere else**: the HUDs are `pointer-events-none`
+(keep them so, or they become an aim dead zone) and the round banner is a sibling overlay, so it keeps the ordinary pointer; a cursor on `body` would leak onto it.
+`AimingWithAReticle` reads the cursor under a point. A native cursor is not in any screenshot, so how it looks on a real display (the 2x picture on Retina, and that the browser scales the hotspot as the spec says) is judged by eye.
+
 ## Folders inside `react/`
 
 - **One folder per component**, named in kebab-case for its file: `arena-canvas/ArenaCanvas.tsx`. Its children go in its

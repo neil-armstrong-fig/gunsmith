@@ -1,6 +1,8 @@
 import type {Page} from "@playwright/test";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
 import {ArenaPlaywright} from "@src/dsl/gunsmith/components/arena/playwright/ArenaPlaywright";
+import type {Cursor} from "@src/dsl/gunsmith/components/arena/types/Cursor";
+import type {CursorPlace} from "@src/dsl/gunsmith/components/arena/types/CursorPlace";
 import type {Size} from "@src/dsl/gunsmith/types/Size";
 
 /** The arena the match is played in, reached as `gunsmith.arena`. */
@@ -26,6 +28,15 @@ export class ArenaDsl {
       return await this.arena.isWaitingForPictures();
     } catch (error) {
       throw new DslError("Failed to see whether the arena is waiting for its pictures", error);
+    }
+  }
+
+  /** The mouse cursor the browser shows while the mouse is over `place`: a picture and its hotspot, or a plain keyword. */
+  async getCursorOver(place: CursorPlace): Promise<Cursor> {
+    try {
+      return await this.arena.getCursorOver(place);
+    } catch (error) {
+      throw new DslError(`Failed to read the mouse cursor over ${place}`, error);
     }
   }
 
