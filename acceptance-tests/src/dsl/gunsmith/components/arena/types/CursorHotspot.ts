@@ -1,4 +1,4 @@
-/** The pixel of a cursor's image that sits exactly on the mouse position, counted from the image's top-left corner. */
+/** The point of a cursor's picture that sits exactly on the mouse position, in CSS pixels from the picture's top-left corner. */
 export interface CursorHotspot {
   x: number;
   y: number;

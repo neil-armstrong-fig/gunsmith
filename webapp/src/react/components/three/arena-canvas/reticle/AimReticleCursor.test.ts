@@ -1,5 +1,6 @@
 import {readFileSync} from "node:fs";
 import aimReticleUrl from "@src/react/components/three/arena-canvas/reticle/AimReticle.png";
+import aimReticleSharpUrl from "@src/react/components/three/arena-canvas/reticle/AimReticleSharp.png";
 import {aimReticleCursor} from "@src/react/components/three/arena-canvas/reticle/AimReticleCursor";
 import {expect, it} from "vitest";
 
@@ -8,14 +9,23 @@ function pngSizeOf(file: Buffer): {width: number; height: number} {
   return {width: file.readUInt32BE(16), height: file.readUInt32BE(20)};
 }
 
-it("puts the mouse position at the middle of the real picture", () => {
+it("puts the mouse position at the middle of the ordinary picture, in CSS pixels", () => {
   const {width, height} = pngSizeOf(readFileSync(new URL("AimReticle.png", import.meta.url)));
 
-  expect(aimReticleCursor).toContain(`") ${width / 2} ${height / 2}, `);
+  expect(aimReticleCursor).toContain(` 2x) ${width / 2} ${height / 2}, `);
 });
 
-it("uses the reticle picture", () => {
-  expect(aimReticleCursor.startsWith(`url("${aimReticleUrl}")`)).toBe(true);
+it("has a sharp picture exactly twice as big, so the same hotspot is its middle too", () => {
+  const ordinary = pngSizeOf(readFileSync(new URL("AimReticle.png", import.meta.url)));
+  const sharp = pngSizeOf(readFileSync(new URL("AimReticleSharp.png", import.meta.url)));
+
+  expect(sharp).toEqual({width: ordinary.width * 2, height: ordinary.height * 2});
+});
+
+it("offers the ordinary picture at 1x and the sharp one at 2x", () => {
+  expect(aimReticleCursor.startsWith(`image-set(url("${aimReticleUrl}") 1x, url("${aimReticleSharpUrl}") 2x) `)).toBe(
+    true,
+  );
 });
 
 it("ends with the browser's crosshair, the fallback CSS requires", () => {

@@ -4,25 +4,38 @@ import {beforeEach, expect, given, then, when} from "@src/acceptance-criteria-ma
 // in the engine, so fifteen is the longest this spec waits for a round to be lost.
 const LONGEST_LOSS_SECONDS = 15;
 
-// `art`'s precision crosshair (`docs/art/concepts/aim-reticle/`): a 32 by 32 picture whose centre is the mouse position.
-const RETICLE_SIZE = {width: 32, height: 32};
+// `art`'s precision crosshair (`docs/art/concepts/aim-reticle/`): a 32 by 32 picture for an ordinary screen and a 64 by 64 one for a
+// sharp screen (twice the pixels for each CSS pixel), whose middle is the mouse position: 16 CSS pixels in from the corner.
+const ORDINARY_PICTURE = {scale: 1, size: {width: 32, height: 32}};
+const SHARP_PICTURE = {scale: 2, size: {width: 64, height: 64}};
 const RETICLE_HOTSPOT = {x: 16, y: 16};
 
 given("the game has opened", () => {
   when("the mouse is over the open arena", () => {
-    then("the cursor is a 32 by 32 picture", async ({gunsmith}) => {
+    then("the cursor has a 32 by 32 picture for an ordinary screen", async ({gunsmith}) => {
       const cursor = await gunsmith.arena.getCursorOver("the open arena");
 
-      expect(cursor.image?.size).toEqual(RETICLE_SIZE);
+      expect(cursor.image?.pictures).toContainEqual(ORDINARY_PICTURE);
     });
 
-    then("the mouse position is the middle of that picture", async ({gunsmith}) => {
+    then("the cursor has a 64 by 64 picture for a sharp screen, so it is not soft there", async ({gunsmith}) => {
+      const cursor = await gunsmith.arena.getCursorOver("the open arena");
+
+      expect(cursor.image?.pictures).toContainEqual(SHARP_PICTURE);
+    });
+
+    then("the mouse position is the middle of each picture", async ({gunsmith}) => {
       const cursor = await gunsmith.arena.getCursorOver("the open arena");
 
       expect(cursor.image?.hotspot).toEqual(RETICLE_HOTSPOT);
+      for (const picture of cursor.image?.pictures ?? []) {
+        expect(picture.size).toEqual({width: picture.scale * 32, height: picture.scale * 32});
+        expect(RETICLE_HOTSPOT.x * picture.scale).toBe(picture.size.width / 2);
+        expect(RETICLE_HOTSPOT.y * picture.scale).toBe(picture.size.height / 2);
+      }
     });
 
-    then("a plain crosshair is the fallback if the picture cannot be used", async ({gunsmith}) => {
+    then("a plain crosshair is the fallback if the pictures cannot be used", async ({gunsmith}) => {
       const cursor = await gunsmith.arena.getCursorOver("the open arena");
 
       expect(cursor.keyword).toBe("crosshair");
@@ -33,7 +46,7 @@ given("the game has opened", () => {
     then("it is still the reticle, so the readout is no dead zone for aiming", async ({gunsmith}) => {
       const cursor = await gunsmith.arena.getCursorOver("the ammunition readout");
 
-      expect(cursor.image).toEqual({size: RETICLE_SIZE, hotspot: RETICLE_HOTSPOT});
+      expect(cursor.image).toEqual({pictures: [ORDINARY_PICTURE, SHARP_PICTURE], hotspot: RETICLE_HOTSPOT});
     });
   });
 });
