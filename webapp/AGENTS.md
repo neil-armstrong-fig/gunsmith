@@ -9,6 +9,7 @@ habit and review (`AGENTS.md` at the root, "Code style").
 ```
 src/
   Main.tsx, index.css        the entry and the palette tokens
+  assets/                    plain data about art's files (`assets/sprites/`: the keys, sizes and anchors); no React, no renderer
   react/                     top layer: everything drawn, and the logic only one component uses, beneath that component
   store/                     middle layer: Zustand stores; may import game/ and the engine, never react/
     game/                    the game store: the engine's `World` and nothing else
@@ -85,6 +86,14 @@ canvas is not in the DOM (`vision.range` is the cone's own, so it grows while th
 palette's `--color-gs-floor-l1` to `l3` repeated, since WebGL cannot read CSS variables), and each stair as four bands shaded from its low floor to
 its high one (`stairs/StairStripsOf`). Every edge where a raised floor drops to lower open ground (not against a wall, and not on the side a stair arrives) gets a bright lip on the raised side and a shadow on the lower ground (`drops/DropStripsOf`, `drops/DropLipColour`; `heightTilesOf` finds them), so the edge reads as a cliff. The snapshot's `player.level` is the engine's `levelAt`; the drawing itself has no spec (canvas), its
 helpers have unit tests.
+
+**Art's pictures are drawn** (the player so far; the rest in `TODO-build.md`, "Build 2"). Files are art's SVGs in `public/assets/sprites/<key>.svg` (`art` owns the folder; `build` copied the first ones from `docs/art/asset-reference/` unmodified, and art may replace them with no code change).
+`assets/sprites/` is the manifest: `SpriteKeys.ts` lists the keys (a team has its own file per stance, so a key ends in `-blue` or `-orange`), `SpriteManifest.ts` gives each its size, its **anchor** (the pixel that sits on a fighter's body centre, (27, 32), not the picture's centre) and its scale
+(`pixelsPerTile`: the body's 18 pixels are `PLAYER_RADIUS`, one scale for every stance, so a crouched drawing shrinks and the circle walls stop does not), and `SpritePlacementOf` turns that into a plane's size and offset. In the canvas,
+`arena-canvas/sprites/` loads them (`LoadSprites.ts`: each SVG drawn onto a canvas four times its size, so it stays sharp when the arena zooms, then a `CanvasTexture`; a failed file warns once and is left out), `hooks/use-sprite/` reads a texture and `components/sprite-plane/SpritePlane.tsx` draws one,
+**with `toneMapped={false}`** (the scene tone-maps, which paled the old placeholder discs; the palette's colours would not survive it). Until a picture has loaded, or if its file is missing, the **placeholder** (`fighter-placeholder/`, the old disc and barrel) shows, so the game never waits on art.
+**`data-sprites-ready` on the arena** (`hooks/use-sprites-ready/`, which also starts the loading) is false until every picture has loaded or been given up on, and the acceptance DSL waits for it whenever it opens the game, since a spec that read the screen first would see the placeholder.
+The canvas is not in the DOM, so `DrawingThePlayer` reads colours from a screenshot (`acceptance-tests/AGENTS.md`).
 
 The HUD is plain React over the canvas (`react/components/dom/ammo-hud/`, `health-hud/`, `score-hud/` (the round and the score, top
 middle, only in a match), `ring-hud/` ("Ring in 0:43", then "Ring closing", just under it, only when the world has a ring; `text/CountdownText`) and the `round-banner/` overlay that appears when a round is won or lost), styled with Tailwind and the

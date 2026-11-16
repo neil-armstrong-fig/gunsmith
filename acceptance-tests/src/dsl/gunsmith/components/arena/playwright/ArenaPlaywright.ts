@@ -1,4 +1,5 @@
 import type {Page} from "@playwright/test";
+import {expect} from "@playwright/test";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
 import type {Size} from "@src/dsl/gunsmith/types/Size";
 
@@ -14,6 +15,13 @@ export class ArenaPlaywright extends BasePage {
     }
 
     return {width: Math.round(box.width), height: Math.round(box.height)};
+  }
+
+  /** Whether the arena says it is still waiting for art's pictures (`data-sprites-ready` is false); waits a moment for the page to say so. */
+  async isWaitingForPictures(): Promise<boolean> {
+    await expect(this.page.getByTestId("arena")).toHaveAttribute("data-sprites-ready", "false");
+
+    return true;
   }
 
   async getSizeInTiles(): Promise<Size> {

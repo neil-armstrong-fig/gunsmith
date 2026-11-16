@@ -7,13 +7,13 @@ import {ArenaWalls} from "@src/react/components/three/arena-canvas/components/ar
 import {VisionOverlay} from "@src/react/components/three/arena-canvas/components/arena-scene/components/vision-overlay/VisionOverlay";
 import {RingEdge} from "@src/react/components/three/arena-canvas/components/arena-scene/components/ring-edge/RingEdge";
 import {Opponent} from "@src/react/components/three/arena-canvas/components/arena-scene/components/opponent/Opponent";
-import {PlayerDisc} from "@src/react/components/three/arena-canvas/components/arena-scene/components/player-disc/PlayerDisc";
+import {Player} from "@src/react/components/three/arena-canvas/components/arena-scene/components/player/Player";
 import {useGameLoop} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/UseGameLoop";
 import {gameState} from "@src/store/game/selectors/game-state/GameState";
 import {useGameStore} from "@src/store/game/UseGameStore";
 import type {JSX} from "react";
 
-/** Everything drawn in the arena: the camera fitted to the window, the walls with the dim veil over what the player does not see, the closing ring over it, the dummies, the bullets, the opponent and the player. */
+/** Everything drawn in the arena: the camera fitted to the window, the walls with the dim veil over what the player does not see, the closing ring over it, the dummies, the bullets, the opponent and the player (drawn from art's pictures once they have loaded). */
 export function ArenaScene(): JSX.Element {
   useGameLoop();
 
@@ -51,7 +51,7 @@ export function ArenaScene(): JSX.Element {
 
       <Opponent />
 
-      <PlayerDisc />
+      <Player />
     </>
   );
 }

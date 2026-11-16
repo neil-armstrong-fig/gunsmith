@@ -1,14 +1,21 @@
 import {useFrame} from "@react-three/fiber";
-import {PLAYER_RADIUS} from "@gunsmith/engine/player/PlayerRadius";
 import {visibleToPlayer} from "@gunsmith/engine/vision/VisibleToPlayer";
+import {FighterPlaceholder} from "@src/react/components/three/arena-canvas/components/arena-scene/components/fighter-placeholder/FighterPlaceholder";
+import {SpritePlane} from "@src/react/components/three/arena-canvas/components/arena-scene/components/sprite-plane/SpritePlane";
+import {useSprite} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-sprite/UseSprite";
 import {gameState} from "@src/store/game/selectors/game-state/GameState";
 import type {JSX} from "react";
 import {useRef} from "react";
 import type {Group} from "three";
 
-/** The opponent: a disc the size of the player's, in the other team's colour, with a barrel pointing the way it faces. Hidden when the match has none, and while the player does not see it. */
+/**
+ * The opponent, drawn from art's pictures as the player is: the same neutral body with the other team's mark (two orange stripes), turned the way it faces about the
+ * centre of the body. It never crouches, so it has one picture. Hidden when the match has none, and while the player does not see it: the whole group is, so
+ * nothing of it is drawn where the cone does not reach. A placeholder disc shows until the picture has loaded.
+ */
 export function Opponent(): JSX.Element {
   const opponentRef = useRef<Group>(null);
+  const picture = useSprite("sprite-player-stand-orange");
 
   useFrame(() => {
     if (!opponentRef.current) {
@@ -29,17 +36,9 @@ export function Opponent(): JSX.Element {
 
   return (
     <group ref={opponentRef} name="opponent" visible={false}>
-      <mesh>
-        <circleGeometry args={[PLAYER_RADIUS, 32]} />
+      {!picture && <FighterPlaceholder colour="#ff9b54" />}
 
-        <meshBasicMaterial color="#ff9b54" />
-      </mesh>
-
-      <mesh position={[PLAYER_RADIUS + 0.1, 0, 0.1]}>
-        <planeGeometry args={[0.5, 0.14]} />
-
-        <meshBasicMaterial color="#e5eaf0" />
-      </mesh>
+      <SpritePlane spriteKey="sprite-player-stand-orange" />
     </group>
   );
 }

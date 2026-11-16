@@ -2,6 +2,12 @@ import type {Page} from "@playwright/test";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
 import {screenPositionOfTile} from "@src/dsl/gunsmith/components/player/playwright/screen/ScreenPositionOfTile";
 import type {Heading} from "@src/dsl/gunsmith/components/player/types/Heading";
+import {colourIsNear} from "@src/dsl/gunsmith/playwright/look/ColourIsNear";
+import {lookOfFighter} from "@src/dsl/gunsmith/playwright/look/LookOfFighter";
+import {TEAM_BLUE} from "@src/dsl/gunsmith/playwright/look/TeamColours";
+import {coloursAtTiles} from "@src/dsl/gunsmith/playwright/screen/ColoursAtTiles";
+import type {Colour} from "@src/dsl/gunsmith/types/Colour";
+import type {FighterLook} from "@src/dsl/gunsmith/types/FighterLook";
 import type {Point} from "@src/dsl/gunsmith/types/Point";
 
 const KEY_FOR: Record<Heading, string> = {
@@ -12,6 +18,13 @@ const KEY_FOR: Record<Heading, string> = {
 };
 
 const CROUCH_KEY = "KeyC";
+
+// Art draws the hand (`docs/art/asset-reference/players/`) 15 pixels ahead of the body's centre and 3 to its right, filled with a slate that nothing
+// near it shares, at 45 pixels to a tile (the body's 18 are the hitbox's 0.4 tile).
+const HAND_AHEAD_TILES = 15 / 45;
+const HAND_RIGHT_TILES = 3 / 45;
+const HAND_FILL: Colour = {red: 0x46, green: 0x5a, blue: 0x6b};
+const TOLERANCE = 6;
 
 export class PlayerPlaywright extends BasePage {
   constructor(page: Page) {
@@ -75,6 +88,29 @@ export class PlayerPlaywright extends BasePage {
     const {player} = await this.readGameState();
 
     return {x: player.x, y: player.y};
+  }
+
+  /** What a player sees where the player stands: their drawing counted by colour, and the compass points on their outline. The player must be standing still. */
+  async getLookOnScreen(): Promise<FighterLook> {
+    const {player} = await this.readGameState();
+
+    return await lookOfFighter(this.page, {x: player.x, y: player.y}, TEAM_BLUE);
+  }
+
+  /**
+   * Whether the hand in the player's drawing is where the player aims: art draws the hand a third of a tile ahead of the body's centre and a fifteenth to its right
+   * (the drawing faces east at rest), and it turns with the aim about that centre. The player must be standing still.
+   */
+  async isHandOnTheFacingSide(): Promise<boolean> {
+    const {player} = await this.readGameState();
+    const angle = (player.aimDegrees * Math.PI) / 180;
+    const hand = {
+      x: player.x + HAND_AHEAD_TILES * Math.cos(angle) + HAND_RIGHT_TILES * Math.sin(angle),
+      y: player.y + HAND_AHEAD_TILES * Math.sin(angle) - HAND_RIGHT_TILES * Math.cos(angle),
+    };
+    const [colour] = await coloursAtTiles(this.page, [hand]);
+
+    return colour !== undefined && colourIsNear(colour, HAND_FILL, TOLERANCE);
   }
 
   async aimAtTile(tile: Point): Promise<void> {

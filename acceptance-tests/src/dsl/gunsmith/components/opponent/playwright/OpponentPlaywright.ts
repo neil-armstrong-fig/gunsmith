@@ -1,6 +1,9 @@
 import type {Page} from "@playwright/test";
 import type {OpponentSnapshot} from "@gunsmith/shared/state-hook/types/OpponentSnapshot";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
+import {lookOfFighter} from "@src/dsl/gunsmith/playwright/look/LookOfFighter";
+import {TEAM_ORANGE} from "@src/dsl/gunsmith/playwright/look/TeamColours";
+import type {FighterLook} from "@src/dsl/gunsmith/types/FighterLook";
 import type {Point} from "@src/dsl/gunsmith/types/Point";
 
 export class OpponentPlaywright extends BasePage {
@@ -16,6 +19,13 @@ export class OpponentPlaywright extends BasePage {
     }
 
     return opponent;
+  }
+
+  /** What a player sees where the opponent stands: its drawing counted by colour, and the compass points on its outline. The opponent must be standing still (sparring's is). */
+  async getLookOnScreen(): Promise<FighterLook> {
+    const {x, y} = await this.get();
+
+    return await lookOfFighter(this.page, {x, y}, TEAM_ORANGE);
   }
 
   /** Waits until the opponent has less health than `health`. */
