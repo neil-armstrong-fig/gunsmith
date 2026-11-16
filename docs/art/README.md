@@ -8,8 +8,10 @@ Owner: `art` (Codex). Read `HANDOFF.md`, `TODO.md` and all three persona checkli
 [Fair-play research and build handoff](fair-play-research.md) records the user's
 2026-11-15 research pivot: anti-cheat, account farming, recordings, reports,
 silent restricted queues with clean-match recovery, and open-source boundaries.
-Documentation only; runtime work belongs with online play. The reticle, damage
-feedback, empty-weapon click and arena-symmetry studies remain queued.
+Documentation only; runtime work belongs with online play.
+[Precision aim reticle](concepts/aim-reticle/README.md) artwork and build handoff
+are delivered for review (2026-11-16). Damage feedback, empty-weapon click and
+arena-symmetry studies remain queued.
 
 **Industrial arena:** clean flat vector, slate surfaces, blue and orange teams, heavier geometry and sparse neon.
 Top-down orthographic camera; desktop only. Technical markings are functional: level ticks, stair treads and team

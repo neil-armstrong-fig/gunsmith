@@ -157,7 +157,16 @@ those implementations; art's README records unsupported identities and proposed 
   acceptance. **For build:** review/adopt when ready; no runtime change or new
   manifest key (suggested `ui-aim-reticle`, not registered). No gameplay code,
   dependency, model call or audio change. User visual approval and live cursor
-  QA remain open. Validation results follow after the final checks.
+  QA remain open. Validation: final root `pnpm checks` exit 0 outside the sandbox
+  (lint, format, types; engine 787, AI 421, webapp 239, audio 254 tests pass;
+  one slow audio render skipped). The sandboxed run stalled in audio and was
+  interrupted; the first unrestricted run stopped on build's temporary engine
+  probe formatting, since resolved by its owner. Pixel-by-pixel geometry/alpha,
+  rotational symmetry, exact 2× replication, SVG safety, PNG dimensions, local
+  links and preservation checks pass. Native-size/context inspection and
+  folder/reference standards review completed; existing art/audio preserved
+  apart from the intended art-guide link. Gameplay acceptance, AI evals and
+  native OS cursor integration were not run for this static art delivery.
 
 - 2026-11-15, `art/research`: delivered `docs/art/fair-play-research.md` with
   primary sources, limits, user decisions, verification criteria and build/AI
