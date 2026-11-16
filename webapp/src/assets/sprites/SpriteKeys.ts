@@ -7,4 +7,5 @@ export const SPRITE_KEYS = [
   "sprite-player-stand-blue",
   "sprite-player-crouch-blue",
   "sprite-player-stand-orange",
+  "sprite-dummy",
 ] as const;

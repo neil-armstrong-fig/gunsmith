@@ -1,6 +1,9 @@
 import type {Page} from "@playwright/test";
 import type {DummySnapshot} from "@gunsmith/shared/state-hook/types/DummySnapshot";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
+import {DUMMY_GOLD} from "@src/dsl/gunsmith/playwright/look/DummyColours";
+import {lookOfFighter} from "@src/dsl/gunsmith/playwright/look/LookOfFighter";
+import type {FighterLook} from "@src/dsl/gunsmith/types/FighterLook";
 import type {Point} from "@src/dsl/gunsmith/types/Point";
 
 /** How near a dummy's centre must be to a place to count as the dummy standing there, in tiles. */
@@ -33,6 +36,14 @@ export class DummiesPlaywright extends BasePage {
     }
 
     return standing.visible;
+  }
+
+  /**
+   * What a player sees where the dummy standing at `place` is drawn: its drawing counted by colour (`teamPixels` counts the gold of its ring and centre) and the
+   * compass points on its outline. Nothing is drawn where a dummy is not seen.
+   */
+  async getLookOnScreen(place: Point): Promise<FighterLook> {
+    return await lookOfFighter(this.page, place, DUMMY_GOLD);
   }
 
   /** Waits until the dummy standing at `dummy` has less health than `health`. A dummy that is gone has none. */

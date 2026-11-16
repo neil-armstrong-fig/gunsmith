@@ -1,4 +1,5 @@
 import {readFileSync} from "node:fs";
+import {DUMMY_RADIUS} from "@gunsmith/engine/dummy/DummyRadius";
 import {PLAYER_RADIUS} from "@gunsmith/engine/player/PlayerRadius";
 import {expect, it} from "vitest";
 import {SPRITE_KEYS} from "@src/assets/sprites/SpriteKeys";
@@ -39,6 +40,14 @@ it("anchors a player picture on the centre of the body, which the art draws at (
   expect(fileOf(spriteUrl("sprite-player-stand-orange"))).toContain('cx="27" cy="32" r="18"');
   expect(fileOf(spriteUrl("sprite-player-stand-blue"))).toContain('cx="27" cy="32" r="18"');
   expect(fileOf(spriteUrl("sprite-player-crouch-blue"))).toContain('cx="27" cy="32" r="13"');
+});
+
+it("draws a dummy's body, 17 pixels in radius, as big as the circle a bullet must touch, centred on (32, 32)", () => {
+  const {pixelsPerTile, anchor} = SPRITE_MANIFEST["sprite-dummy"];
+
+  expect(17 / pixelsPerTile).toBeCloseTo(DUMMY_RADIUS);
+  expect(anchor).toEqual({x: 32, y: 32});
+  expect(fileOf(spriteUrl("sprite-dummy"))).toContain('cx="32" cy="32" r="17"');
 });
 
 it("draws a crouched player at the same scale as a standing one, so the drawing shrinks and the circle walls stop does not", () => {
