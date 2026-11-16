@@ -8,12 +8,6 @@ import {DUEL_ARENA} from "@src/game/duel/DuelArena";
 import {DUEL_OPPONENT} from "@src/game/duel/DuelOpponent";
 import {nextRoundOfPage} from "@src/game/scenario/NextRoundOfPage";
 
-function duelRing(seed: number, timing: RingTiming = DEFAULT_RING_TIMING): Ring {
-  const {player} = startingWorld(DUEL_ARENA, [], DUEL_OPPONENT);
-
-  return startRing({arena: DUEL_ARENA, starts: [player.position, DUEL_OPPONENT], seed, timing});
-}
-
 beforeEach(() => {
   vi.stubGlobal("location", {search: "?scenario=duel&seed=5"});
 });
@@ -69,3 +63,9 @@ it("puts both fighters back at full health and full magazines", () => {
   expect(world.round).toBe("playing");
   expect(world.bullets).toEqual([]);
 });
+
+function duelRing(seed: number, timing: RingTiming = DEFAULT_RING_TIMING): Ring {
+  const {player} = startingWorld(DUEL_ARENA, [], DUEL_OPPONENT);
+
+  return startRing({arena: DUEL_ARENA, starts: [player.position, DUEL_OPPONENT], seed, timing});
+}

@@ -66,6 +66,8 @@ what it means (`x`, `y`, `health`), not whole snapshots, since turning changes `
 `ClimbingAStair` opens `?scenario=heights` (`gunsmith.startHeights()`), whose player starts at (8.5, 3.5) on the low ground with a platform one level up from
 x = 10 and a single stair at (9, 3). It reads `gunsmith.player.getLevel()` (the state hook's `player.level`: 0 low ground, 1 platform, half way on a
 stair) and asserts the edge stops the player as a wall does (x between 9.4 and 9.7, level 0), the stair climbs (x past 11, level 1) and comes down again.
+
+`TheOpponentClimbingToTheRing` opens `?scenario=terraced` (`gunsmith.startTerracedDuel(...)`, with the ring's timing and `?ringDamage=` as in `startClosingDuel`): a duel whose arena has low ground in the west, where the opponent starts, and a platform in the east, where the idle player stands, so the opponent cannot see them until it has climbed. The seeds (9, 29, 30) put the ring's centre on the platform; with an opponent that cannot use a stair the boosted ring kills it and the round is won, with one the round is lost with the opponent at full health on the platform (`opponent.level`, the hook's new field, 1).
 `SeeingAcrossLevels` (in `vision/`) opens the same arena, which has a dummy four tiles east on the platform (12.5, 3.5) and one four tiles west on the low ground (4.5, 3.5),
 both on the player's row and inside the rifle's reach. It reads `gunsmith.dummies.isSeenAt(place)` (the snapshot's `dummy.visible`): the platform dummy is not seen from the low
 ground, though in front and in reach (the spec checks the reach first, so only the height can hide it), and is seen after the climb; the low-ground dummy is seen from the low ground and

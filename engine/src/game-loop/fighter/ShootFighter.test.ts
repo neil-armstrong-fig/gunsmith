@@ -7,12 +7,6 @@ import type {Point} from "@gunsmith/engine/geometry/types/Point";
 // Low ground at x 1, a stair at x 2 up to level 1 at x 3, a stair at x 4 up to level 2 at x 5.
 const terraces = arenaFrom(["#######", "#.>1>2#", "#######"]);
 
-function turnAt(position: Point, fires: boolean): FighterTurn {
-  const fighter = {...startingWorld(terraces).player, position, aim: {x: 1, y: 0}};
-
-  return {fighter, fires};
-}
-
 it("lets no bullet go when the trigger did not fire", () => {
   const shot = shootFighter(terraces, "player", turnAt({x: 1.5, y: 1.5}, false));
 
@@ -32,3 +26,9 @@ it("fires a bullet at the level of the ground the shooter stands on", () => {
 it("fires a bullet from a stair at the upper of the two levels it joins", () => {
   expect(shootFighter(terraces, "player", turnAt({x: 2.5, y: 1.5}, true)).bullet?.level).toBe(1);
 });
+
+function turnAt(position: Point, fires: boolean): FighterTurn {
+  const fighter = {...startingWorld(terraces).player, position, aim: {x: 1, y: 0}};
+
+  return {fighter, fires};
+}

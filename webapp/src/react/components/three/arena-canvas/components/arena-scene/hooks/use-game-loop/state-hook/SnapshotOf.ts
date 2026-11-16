@@ -58,6 +58,7 @@ function opponentSnapshotOf(world: World, visible: boolean): OpponentSnapshot | 
     x: opponent.position.x,
     y: opponent.position.y,
     health: opponent.health,
+    level: levelAt(world.arena, opponent.position),
     rounds: equippedWeapon(opponent).rounds,
     visible,
     behaviour: world.opponentBrain?.state,

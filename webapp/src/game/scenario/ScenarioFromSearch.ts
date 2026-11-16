@@ -1,7 +1,7 @@
 import type {Scenario} from "@src/game/scenario/types/Scenario";
 
 /**
- * The scenario a page's query string asks for (`?scenario=duel`, `sparring` or `heights`). Anything else, or nothing, is the practice range.
+ * The scenario a page's query string asks for (`?scenario=duel`, `sparring`, `heights` or `terraced`). Anything else, or nothing, is the practice range.
  * The query picks between matches and can tune one's setup, never its state: `?seed=` (`seed/`) replays a match from the same draws,
  * and `?ringDelay=` and `?ringClosing=` (`ring-timing/`) set when its ring starts and how long it takes to close.
  */
@@ -17,6 +17,10 @@ export function scenarioFromSearch(search: string): Scenario {
 
   if (asked === "heights") {
     return "heights";
+  }
+
+  if (asked === "terraced") {
+    return "terraced";
   }
 
   return "practice";

@@ -15,20 +15,6 @@ const room = arenaFrom([
 ]);
 const everywhere = {centre: {x: 5, y: 4}, radius: 100};
 
-function cornerOf(point: Point): string {
-  if (point.x < 5 && point.y < 4) {
-    return "west-south";
-  }
-  if (point.x < 5) {
-    return "west-north";
-  }
-  if (point.y < 4) {
-    return "east-south";
-  }
-
-  return "east-north";
-}
-
 it("finds the centre of an open tile", () => {
   let seed = 1;
   for (let index = 0; index < 200; index++) {
@@ -95,3 +81,17 @@ it("gives the same answer for the same seed", () => {
 it("moves the seed on, so the next look is a different one", () => {
   expect(randomOpenPoint(room, 42, everywhere).seed).not.toBe(42);
 });
+
+function cornerOf(point: Point): string {
+  if (point.x < 5 && point.y < 4) {
+    return "west-south";
+  }
+  if (point.x < 5) {
+    return "west-north";
+  }
+  if (point.y < 4) {
+    return "east-south";
+  }
+
+  return "east-north";
+}

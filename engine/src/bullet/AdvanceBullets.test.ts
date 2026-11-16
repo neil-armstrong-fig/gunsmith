@@ -6,29 +6,8 @@ import type {Dummy} from "@gunsmith/engine/dummy/types/Dummy";
 // Floor is x 1 to 5 and y 1 to 3, with a one-tile pillar at x 3, y 2.
 const hall = arenaFrom(["#######", "#.....#", "#..#..#", "#.....#", "#######"]);
 
-function dummyAt(x: number, y: number, health = 100): Dummy {
-  return {position: {x, y}, health};
-}
-
-/** The bullets still in the air after flying `bullets` on, with no dummies about. */
-function flown(bullets: readonly Bullet[], seconds: number): Bullet[] {
-  return advanceBullets(hall, {bullets, dummies: [], seconds}).bullets;
-}
-
 const SPEED = 20;
 const DAMAGE = 25;
-
-function bulletAt(x: number, y: number, directionX: number, directionY: number, changes: Partial<Bullet> = {}): Bullet {
-  return {
-    position: {x, y},
-    direction: {x: directionX, y: directionY},
-    damage: DAMAGE,
-    speed: SPEED,
-    shooter: "player",
-    level: 0,
-    ...changes,
-  };
-}
 
 it("moves a bullet along its direction at the bullet speed", () => {
   const [moved] = flown([bulletAt(1.5, 2.5, 1, 0)], 0.05);
@@ -108,16 +87,6 @@ it("does not change the bullets it was given", () => {
 it("drops a bullet that starts inside a wall even when its flight ends in open floor", () => {
   expect(flown([bulletAt(3.95, 2.5, 1, 0)], 0.1)).toEqual([]);
 });
-
-// The dummies below have a radius of 0.4 (`DUMMY_RADIUS`); the row y 1.5 is clear floor from x 1 to 5.
-
-function fly(
-  bullets: readonly Bullet[],
-  dummies: readonly Dummy[],
-  seconds: number,
-): ReturnType<typeof advanceBullets> {
-  return advanceBullets(hall, {bullets, dummies, seconds});
-}
 
 it("hurts a dummy that a bullet reaches, and uses the bullet up", () => {
   const flight = fly([bulletAt(1.5, 1.5, 1, 0)], [dummyAt(3.5, 1.5)], 0.1);
@@ -414,3 +383,34 @@ it("adds up the damage of every bullet that lands on the player in the same step
 
   expect(flight.playerDamage).toBe(DAMAGE + 50);
 });
+
+function dummyAt(x: number, y: number, health = 100): Dummy {
+  return {position: {x, y}, health};
+}
+
+/** The bullets still in the air after flying `bullets` on, with no dummies about. */
+function flown(bullets: readonly Bullet[], seconds: number): Bullet[] {
+  return advanceBullets(hall, {bullets, dummies: [], seconds}).bullets;
+}
+
+function bulletAt(x: number, y: number, directionX: number, directionY: number, changes: Partial<Bullet> = {}): Bullet {
+  return {
+    position: {x, y},
+    direction: {x: directionX, y: directionY},
+    damage: DAMAGE,
+    speed: SPEED,
+    shooter: "player",
+    level: 0,
+    ...changes,
+  };
+}
+
+// The dummies below have a radius of 0.4 (`DUMMY_RADIUS`); the row y 1.5 is clear floor from x 1 to 5.
+
+function fly(
+  bullets: readonly Bullet[],
+  dummies: readonly Dummy[],
+  seconds: number,
+): ReturnType<typeof advanceBullets> {
+  return advanceBullets(hall, {bullets, dummies, seconds});
+}

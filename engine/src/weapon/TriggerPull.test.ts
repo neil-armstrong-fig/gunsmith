@@ -4,19 +4,6 @@ import type {TriggerRequest} from "@gunsmith/engine/weapon/types/TriggerRequest"
 const TICK = 1 / 60;
 const INTERVAL = 0.2;
 
-/** A weapon that is ready, loaded and not reloading, with the trigger held; `changes` says what differs. */
-function pull(changes: Partial<TriggerRequest> = {}): ReturnType<typeof pullTrigger> {
-  return pullTrigger({
-    cooldownSeconds: 0,
-    firing: true,
-    seconds: TICK,
-    fireIntervalSeconds: INTERVAL,
-    rounds: 5,
-    reloading: false,
-    ...changes,
-  });
-}
-
 it("fires when the trigger is held and the weapon is ready", () => {
   expect(pull().fires).toBe(true);
 });
@@ -75,3 +62,16 @@ it("keeps cooling down while the weapon is being reloaded", () => {
 it("does not start the cool-down when it cannot fire", () => {
   expect(pull({rounds: 0}).cooldownSeconds).toBe(0);
 });
+
+/** A weapon that is ready, loaded and not reloading, with the trigger held; `changes` says what differs. */
+function pull(changes: Partial<TriggerRequest> = {}): ReturnType<typeof pullTrigger> {
+  return pullTrigger({
+    cooldownSeconds: 0,
+    firing: true,
+    seconds: TICK,
+    fireIntervalSeconds: INTERVAL,
+    rounds: 5,
+    reloading: false,
+    ...changes,
+  });
+}

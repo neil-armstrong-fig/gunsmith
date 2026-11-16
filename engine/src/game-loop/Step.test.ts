@@ -32,14 +32,6 @@ const arena = arenaFrom([
 ]);
 const TICK = 1 / 60;
 
-function walking(x: number, y: number): Input {
-  return {direction: {x, y}, firing: false, reload: false};
-}
-
-function centred(): World {
-  return startingWorld(arena);
-}
-
 it("leaves the player where they are when nothing is held", () => {
   const world = centred();
 
@@ -152,10 +144,6 @@ it("plays the same way every time from the same inputs", () => {
 
 const IDLE: Input = {direction: {x: 0, y: 0}, firing: false, reload: false};
 
-function firingAt(target: {x: number; y: number}): Input {
-  return {...IDLE, aimAt: target, firing: true};
-}
-
 it("turns the player to face the point being aimed at", () => {
   const world = step(centred(), {...IDLE, aimAt: {x: 7.5, y: 14}}, TICK);
 
@@ -239,25 +227,6 @@ it("starts a new bullet at the muzzle of the player where they now stand, and do
   );
 });
 
-// The player starts at (7.5, 4.5) facing east; four tiles east of that is a dummy on the same row.
-function withDummyEast(): World {
-  return startingWorld(arena, [{x: 11.5, y: 4.5}]);
-}
-
-/** Holds the trigger toward the east for `heldTicks` steps, then lets go for `idleTicks` more. */
-function shoot(world: World, heldTicks: number, idleTicks: number): World {
-  let later = world;
-  for (let tick = 0; tick < heldTicks; tick += 1) {
-    later = step(later, firingAt({x: 20, y: 4.5}), TICK);
-  }
-
-  for (let tick = 0; tick < idleTicks; tick += 1) {
-    later = step(later, IDLE, TICK);
-  }
-
-  return later;
-}
-
 it("hurts a dummy the player shoots at", () => {
   const after = shoot(withDummyEast(), 1, 30);
 
@@ -295,33 +264,6 @@ it("does not change the dummies of the world it was given", () => {
 // The weapons: the player carries the rifle in slot 1 and the marksman rifle in slot 2, both full.
 
 const EAST = {x: 20, y: 4.5};
-
-function withPlayer(world: World, changes: Partial<Player>): World {
-  return {...world, player: {...world.player, ...changes}};
-}
-
-/** The world with `rounds` in the magazine of the weapon at `index`. */
-function withRounds(world: World, index: number, rounds: number): World {
-  const loadout = world.player.loadout.map((carried, at) => {
-    if (at === index) {
-      return {...carried, rounds};
-    }
-
-    return carried;
-  });
-
-  return withPlayer(world, {loadout});
-}
-
-/** Plays `ticks` steps of `input`. */
-function playTicks(world: World, input: Input, ticks: number): World {
-  let later = world;
-  for (let tick = 0; tick < ticks; tick += 1) {
-    later = step(later, input, TICK);
-  }
-
-  return later;
-}
 
 it("spends a round from the magazine when it fires", () => {
   const after = step(centred(), firingAt(EAST), TICK);
@@ -454,26 +396,6 @@ it("lets the switch land first when it is asked for with a reload, so the reload
   expect(after.player.reloadRemainingSeconds).toBe(MARKSMAN_RIFLE.reloadSeconds);
 });
 
-// The opponent stands four tiles east of the player on the same row, in the open. A sparring opponent has no rounds and
-// no reserve, so it can be shot at without shooting back.
-function sparring(): World {
-  return disarmOpponent(startingWorld(arena, [], {x: 11.5, y: 4.5}));
-}
-
-// The same, with the opponent armed as it starts a match, and with a brain to play it by.
-function duel(seed = 1): World {
-  return giveOpponentBrain(startingWorld(arena, [], {x: 11.5, y: 4.5}), seed);
-}
-
-function opponentOf(world: World): Player {
-  const {opponent} = world;
-  if (!opponent) {
-    throw new Error("The world has no opponent.");
-  }
-
-  return opponent;
-}
-
 it("hurts the opponent the player shoots at, by the damage of the weapon", () => {
   const after = shoot(sparring(), 1, 30);
 
@@ -503,21 +425,6 @@ it("keeps the round playing while the opponent still has health", () => {
 it("wins the round when the opponent runs out of health", () => {
   expect(shoot(sparring(), 180, 0).round).toBe("won");
 });
-
-// An opponent's bullet is on the row of the player, two tiles to the east and flying west.
-function shotAtPlayer(playerHealth: number): World {
-  const world = sparring();
-  const bullet = {
-    position: {x: 9.5, y: 4.5},
-    direction: {x: -1, y: 0},
-    damage: RIFLE.bulletDamage,
-    speed: RIFLE.bulletSpeed,
-    shooter: "opponent",
-    level: 0,
-  } as const;
-
-  return {...world, player: {...world.player, health: playerHealth}, bullets: [bullet]};
-}
 
 it("hurts the player an opponent's bullet reaches, by that bullet's damage", () => {
   const after = playTicks(shotAtPlayer(100), IDLE, 30);
@@ -551,11 +458,6 @@ it("freezes the world once the round is over, but lets the clock run", () => {
   expect(after.round).toBe("won");
   expect(after.elapsedSeconds).toBeCloseTo(won.elapsedSeconds + TICK, 9);
 });
-
-// A match in its first round, the opponent still and unarmed, or armed and in a fight.
-function sparringMatch(): World {
-  return {...sparring(), match: startMatch()};
-}
 
 it("gives the player a round win in the match when the opponent runs out of health", () => {
   expect(shoot(sparringMatch(), 180, 0).match).toEqual({playerWins: 1, opponentWins: 0, roundNumber: 1});
@@ -648,20 +550,6 @@ it("lets different seeds play a match out differently", () => {
 
   expect(positions.size).toBeGreaterThan(1);
 });
-
-// Plays ticks, standing still, until `found` returns something or `limit` ticks pass.
-function untilFound<Found>(world: World, limit: number, found: (world: World) => Found | undefined): Found | undefined {
-  let current = world;
-  for (let tick = 0; tick < limit; tick++) {
-    current = step(current, IDLE, TICK);
-    const result = found(current);
-    if (result !== undefined) {
-      return result;
-    }
-  }
-
-  return undefined;
-}
 
 it("has the opponent open fire, with a bullet marked as its own, once its reaction time has passed", () => {
   const bullet = untilFound(duel(), 120, world => world.bullets.find(candidate => candidate.shooter === "opponent"));
@@ -760,16 +648,8 @@ const PLAYER_AT = {x: 7.5, y: 4.5};
 const OPPONENT_AT = {x: 11.5, y: 4.5};
 const FAR_CORNER = {x: 1.5, y: 1.5};
 
-function ringOn(centre: Point, roundSeconds: number): Ring {
-  return {roundSeconds, centre, startRadius: 12, timing: RING_TIMING};
-}
-
 // A ring closed to its final size and hurting at its worst: only the ground within two tiles of its centre is safe.
 const CLOSED = 100;
-
-function withRing(world: World, ring: Ring): World {
-  return {...world, ring};
-}
 
 it("runs the ring's clock on by the seconds stepped while the round is being fought", () => {
   const after = step(withRing(centred(), ringOn(PLAYER_AT, 2)), IDLE, 0.5);
@@ -876,3 +756,123 @@ it("leaves the practice dummies and the bullets in the air alone: the ring hurts
 
   expect(after.dummies[0]?.health).toBe(DUMMY_HEALTH);
 });
+
+function walking(x: number, y: number): Input {
+  return {direction: {x, y}, firing: false, reload: false};
+}
+
+function centred(): World {
+  return startingWorld(arena);
+}
+
+function firingAt(target: {x: number; y: number}): Input {
+  return {...IDLE, aimAt: target, firing: true};
+}
+
+// The player starts at (7.5, 4.5) facing east; four tiles east of that is a dummy on the same row.
+function withDummyEast(): World {
+  return startingWorld(arena, [{x: 11.5, y: 4.5}]);
+}
+
+/** Holds the trigger toward the east for `heldTicks` steps, then lets go for `idleTicks` more. */
+function shoot(world: World, heldTicks: number, idleTicks: number): World {
+  let later = world;
+  for (let tick = 0; tick < heldTicks; tick += 1) {
+    later = step(later, firingAt({x: 20, y: 4.5}), TICK);
+  }
+
+  for (let tick = 0; tick < idleTicks; tick += 1) {
+    later = step(later, IDLE, TICK);
+  }
+
+  return later;
+}
+
+function withPlayer(world: World, changes: Partial<Player>): World {
+  return {...world, player: {...world.player, ...changes}};
+}
+
+/** The world with `rounds` in the magazine of the weapon at `index`. */
+function withRounds(world: World, index: number, rounds: number): World {
+  const loadout = world.player.loadout.map((carried, at) => {
+    if (at === index) {
+      return {...carried, rounds};
+    }
+
+    return carried;
+  });
+
+  return withPlayer(world, {loadout});
+}
+
+/** Plays `ticks` steps of `input`. */
+function playTicks(world: World, input: Input, ticks: number): World {
+  let later = world;
+  for (let tick = 0; tick < ticks; tick += 1) {
+    later = step(later, input, TICK);
+  }
+
+  return later;
+}
+
+// The opponent stands four tiles east of the player on the same row, in the open. A sparring opponent has no rounds and
+// no reserve, so it can be shot at without shooting back.
+function sparring(): World {
+  return disarmOpponent(startingWorld(arena, [], {x: 11.5, y: 4.5}));
+}
+
+// The same, with the opponent armed as it starts a match, and with a brain to play it by.
+function duel(seed = 1): World {
+  return giveOpponentBrain(startingWorld(arena, [], {x: 11.5, y: 4.5}), seed);
+}
+
+function opponentOf(world: World): Player {
+  const {opponent} = world;
+  if (!opponent) {
+    throw new Error("The world has no opponent.");
+  }
+
+  return opponent;
+}
+
+// An opponent's bullet is on the row of the player, two tiles to the east and flying west.
+function shotAtPlayer(playerHealth: number): World {
+  const world = sparring();
+  const bullet = {
+    position: {x: 9.5, y: 4.5},
+    direction: {x: -1, y: 0},
+    damage: RIFLE.bulletDamage,
+    speed: RIFLE.bulletSpeed,
+    shooter: "opponent",
+    level: 0,
+  } as const;
+
+  return {...world, player: {...world.player, health: playerHealth}, bullets: [bullet]};
+}
+
+// A match in its first round, the opponent still and unarmed, or armed and in a fight.
+function sparringMatch(): World {
+  return {...sparring(), match: startMatch()};
+}
+
+// Plays ticks, standing still, until `found` returns something or `limit` ticks pass.
+function untilFound<Found>(world: World, limit: number, found: (world: World) => Found | undefined): Found | undefined {
+  let current = world;
+  for (let tick = 0; tick < limit; tick++) {
+    current = step(current, IDLE, TICK);
+    const result = found(current);
+    if (result !== undefined) {
+      return result;
+    }
+  }
+
+  return undefined;
+}
+
+function ringOn(centre: Point, roundSeconds: number): Ring {
+  return {roundSeconds, centre, startRadius: 12, timing: RING_TIMING};
+}
+
+function withRing(world: World, ring: Ring): World {
+  return {...world, ring};
+}

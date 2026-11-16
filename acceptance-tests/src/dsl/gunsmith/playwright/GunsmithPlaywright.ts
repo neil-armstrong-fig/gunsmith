@@ -33,6 +33,11 @@ export class GunsmithPlaywright extends BasePage {
     await this.openScenario(`duel&seed=${request.seed}${this.ringQuery(request)}`);
   }
 
+  /** Opens the duel on the terraced arena (one round, two levels) with a ring of its own: its centre and the opponent's choices are drawn from `seed`. */
+  async openTerracedDuel(request: ClosingRingRequest): Promise<void> {
+    await this.openScenario(`terraced&seed=${request.seed}${this.ringQuery(request)}`);
+  }
+
   async openHeights(): Promise<void> {
     await this.openScenario("heights");
   }

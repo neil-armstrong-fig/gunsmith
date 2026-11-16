@@ -1,14 +1,6 @@
 import {firstContact} from "@gunsmith/engine/bullet/flight/meeting/FirstContact";
 import type {Reach} from "@gunsmith/engine/bullet/flight/meeting/types/Reach";
 
-function reach(changes: Partial<Reach>): Reach {
-  return {wallDistance: Infinity, dummyHit: undefined, fighterDistance: undefined, ...changes};
-}
-
-function dummyAt(distance: number): Reach["dummyHit"] {
-  return {dummyIndex: 0, distance};
-}
-
 it("meets nothing when nothing is in reach, and flies on", () => {
   expect(firstContact(reach({}))).toBe("none");
 });
@@ -76,3 +68,11 @@ it("meets a dummy that is nearer than the wall even when a fighter is beyond the
 it("meets the wall when a dummy and a fighter are both beyond it", () => {
   expect(firstContact(reach({wallDistance: 1, dummyHit: dummyAt(2), fighterDistance: 3}))).toBe("wall");
 });
+
+function reach(changes: Partial<Reach>): Reach {
+  return {wallDistance: Infinity, dummyHit: undefined, fighterDistance: undefined, ...changes};
+}
+
+function dummyAt(distance: number): Reach["dummyHit"] {
+  return {dummyIndex: 0, distance};
+}

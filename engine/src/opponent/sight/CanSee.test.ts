@@ -13,16 +13,6 @@ const hall = arenaFrom([
 ]);
 const walled = arenaFrom(["###########", "#....#....#", "#....#....#", "###########"]);
 
-// An opponent at `position`, facing east with the rifle in hand.
-function opponentAt(x: number, y: number, aim = {x: 1, y: 0}): Player {
-  const opponent = startingWorld(hall, [], {x, y}).opponent;
-  if (!opponent) {
-    throw new Error("The world has no opponent.");
-  }
-
-  return {...opponent, aim};
-}
-
 it("sees a player in front of it within its weapon's range", () => {
   expect(canSee(hall, opponentAt(2.5, 2.5), {x: 2.5 + RIFLE.visionRange - 1, y: 2.5})).toBe(true);
 });
@@ -61,3 +51,13 @@ it("does not see a player on a platform when it stands on the low ground below, 
 it("sees a player on the low ground when it stands on the platform", () => {
   expect(canSee(platformAhead, opponentAt(7.5, 2.5), {x: 12.5, y: 2.5})).toBe(true);
 });
+
+// An opponent at `position`, facing east with the rifle in hand.
+function opponentAt(x: number, y: number, aim = {x: 1, y: 0}): Player {
+  const opponent = startingWorld(hall, [], {x, y}).opponent;
+  if (!opponent) {
+    throw new Error("The world has no opponent.");
+  }
+
+  return {...opponent, aim};
+}

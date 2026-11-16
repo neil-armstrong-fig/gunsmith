@@ -16,13 +16,9 @@ import {HEIGHTS_ARENA} from "@src/game/heights/HeightsArena";
 import {HEIGHTS_DUMMIES} from "@src/game/heights/HeightsDummies";
 import {PRACTICE_ARENA} from "@src/game/practice/PracticeArena";
 import {PRACTICE_DUMMIES} from "@src/game/practice/PracticeDummies";
+import {TERRACED_ARENA} from "@src/game/terraced/TerracedArena";
+import {TERRACED_OPPONENT} from "@src/game/terraced/TerracedOpponent";
 import {worldOfScenario} from "@src/game/scenario/WorldOfScenario";
-
-function duelRing(seed: number, timing: RingTiming = DEFAULT_RING_TIMING): Ring {
-  const {player} = startingWorld(DUEL_ARENA, [], DUEL_OPPONENT);
-
-  return startRing({arena: DUEL_ARENA, starts: [player.position, DUEL_OPPONENT], seed, timing});
-}
 
 it("makes the practice range with its dummies and no opponent", () => {
   const world = worldOfScenario("practice", 1);
@@ -135,42 +131,81 @@ it("leaves sparring's opponent without a brain and its match unscored when it ha
   expect(world.match).toBeUndefined();
 });
 
-it("makes the heights arena with a dummy on each level and no opponent", () => {
-  const world = worldOfScenario("heights", 1);
+describe("the heights arena", () => {
+  it("has a dummy on each level and no opponent", () => {
+    const world = worldOfScenario("heights", 1);
 
-  expect(world).toEqual(startingWorld(HEIGHTS_ARENA, HEIGHTS_DUMMIES));
-  expect(world.opponent).toBeUndefined();
-});
+    expect(world).toEqual(startingWorld(HEIGHTS_ARENA, HEIGHTS_DUMMIES));
+    expect(world.opponent).toBeUndefined();
+  });
 
-it("stands one dummy on the low ground and one on the platform, each four tiles from the player along their row", () => {
-  const {dummies, player, arena} = worldOfScenario("heights", 1);
-  const levels = dummies.map(dummy => levelAt(arena, dummy.position)).sort();
+  it("stands one dummy on the low ground and one on the platform, each four tiles from the player along their row", () => {
+    const {dummies, player, arena} = worldOfScenario("heights", 1);
+    const levels = dummies.map(dummy => levelAt(arena, dummy.position)).sort();
 
-  expect(levels).toEqual([0, 1]);
-  expect(dummies.map(dummy => Math.abs(dummy.position.x - player.position.x))).toEqual([4, 4]);
-  expect(dummies.every(dummy => dummy.position.y === player.position.y)).toBe(true);
-});
+    expect(levels).toEqual([0, 1]);
+    expect(dummies.map(dummy => Math.abs(dummy.position.x - player.position.x))).toEqual([4, 4]);
+    expect(dummies.every(dummy => dummy.position.y === player.position.y)).toBe(true);
+  });
 
-it("starts the player on the low ground, with a stair climbing east from their row onto a platform", () => {
-  const {player, arena} = worldOfScenario("heights", 1);
-  const row = Math.floor(player.position.y);
-  const column = Math.floor(player.position.x);
+  it("starts the player on the low ground, with a stair climbing east from their row onto a platform", () => {
+    const {player, arena} = worldOfScenario("heights", 1);
+    const row = Math.floor(player.position.y);
+    const column = Math.floor(player.position.x);
 
-  expect(levelAt(arena, player.position)).toBe(0);
-  expect(stairOfTile(arena, column + 1, row)).toBe("east");
-  expect(levelOfTile(arena, column + 2, row)).toBe(1);
-});
+    expect(levelAt(arena, player.position)).toBe(0);
+    expect(stairOfTile(arena, column + 1, row)).toBe("east");
+    expect(levelOfTile(arena, column + 2, row)).toBe(1);
+  });
 
-it("keeps the platform's edge a drop everywhere but the stair's row", () => {
-  const {player, arena} = worldOfScenario("heights", 1);
-  const stairRow = Math.floor(player.position.y);
+  it("keeps the platform's edge a drop everywhere but the stair's row", () => {
+    const {player, arena} = worldOfScenario("heights", 1);
+    const stairRow = Math.floor(player.position.y);
 
-  for (let row = 1; row < arena.height - 1; row += 1) {
-    const edgeColumn = Math.floor(player.position.x) + 2;
-    if (row !== stairRow) {
-      expect(levelOfTile(arena, edgeColumn, row)).toBe(1);
-      expect(levelOfTile(arena, edgeColumn - 1, row)).toBe(0);
-      expect(stairOfTile(arena, edgeColumn - 1, row)).toBeUndefined();
+    for (let row = 1; row < arena.height - 1; row += 1) {
+      const edgeColumn = Math.floor(player.position.x) + 2;
+      if (row !== stairRow) {
+        expect(levelOfTile(arena, edgeColumn, row)).toBe(1);
+        expect(levelOfTile(arena, edgeColumn - 1, row)).toBe(0);
+        expect(stairOfTile(arena, edgeColumn - 1, row)).toBeUndefined();
+      }
     }
-  }
+  });
 });
+
+describe("the terraced duel", () => {
+  it("is in its own arena, with the opponent on the low ground and the player on the platform", () => {
+    const world = worldOfScenario("terraced", 1);
+
+    expect(world.arena).toBe(TERRACED_ARENA);
+    expect(world.opponent?.position).toEqual(TERRACED_OPPONENT);
+    expect(levelAt(world.arena, TERRACED_OPPONENT)).toBe(0);
+    expect(levelAt(world.arena, world.player.position)).toBe(1);
+  });
+
+  it("gives the opponent a brain drawn from the seed, and is one round with no score, and no dummies", () => {
+    const world = worldOfScenario("terraced", 5);
+
+    expect(world.opponentBrain).toEqual(
+      giveOpponentBrain(startingWorld(TERRACED_ARENA, [], TERRACED_OPPONENT), 5).opponentBrain,
+    );
+    expect(world.match).toBeUndefined();
+    expect(world.dummies).toEqual([]);
+  });
+
+  it("has a ring on ground both fighters can walk to, with the timing the page asked for", () => {
+    const timing = {startDelaySeconds: 1, closingSeconds: 6, damageScale: 10};
+    const {player} = startingWorld(TERRACED_ARENA, [], TERRACED_OPPONENT);
+
+    expect(worldOfScenario("terraced", 9, timing).ring).toEqual(
+      startRing({arena: TERRACED_ARENA, starts: [player.position, TERRACED_OPPONENT], seed: 9, timing}),
+    );
+    expect(worldOfScenario("terraced", 9).ring?.timing).toEqual(DEFAULT_RING_TIMING);
+  });
+});
+
+function duelRing(seed: number, timing: RingTiming = DEFAULT_RING_TIMING): Ring {
+  const {player} = startingWorld(DUEL_ARENA, [], DUEL_OPPONENT);
+
+  return startRing({arena: DUEL_ARENA, starts: [player.position, DUEL_OPPONENT], seed, timing});
+}

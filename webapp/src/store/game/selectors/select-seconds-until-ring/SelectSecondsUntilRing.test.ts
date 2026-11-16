@@ -10,14 +10,6 @@ const world = startingWorld(arenaFrom(["###", "#.#", "###"]));
 
 const RING_START_DELAY_SECONDS = DEFAULT_RING_TIMING.startDelaySeconds;
 
-function playedFor(roundSeconds: number): Ring {
-  return {roundSeconds, centre: {x: 1.5, y: 1.5}, startRadius: 3, timing: DEFAULT_RING_TIMING};
-}
-
-function storeHolding(held: World): GameStore {
-  return {world: held, setWorld: () => undefined};
-}
-
 it("reads nothing when the world has no ring", () => {
   expect(selectSecondsUntilRing(storeHolding(world))).toBeUndefined();
 });
@@ -44,3 +36,11 @@ it("reads the same number on every frame inside one second, so a component re-re
 
   expect(later).toBe(early);
 });
+
+function playedFor(roundSeconds: number): Ring {
+  return {roundSeconds, centre: {x: 1.5, y: 1.5}, startRadius: 3, timing: DEFAULT_RING_TIMING};
+}
+
+function storeHolding(held: World): GameStore {
+  return {world: held, setWorld: () => undefined};
+}

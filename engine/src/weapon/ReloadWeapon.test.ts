@@ -13,20 +13,6 @@ const WEAPON: Weapon = {
   visionRange: 12,
 };
 
-/** A player holding one weapon with `rounds` in the magazine and `reserve` in the bag. */
-function playerWith(rounds: number, reserve: number, reloadRemainingSeconds?: number): Player {
-  return {
-    position: {x: 1.5, y: 1.5},
-    aim: {x: 1, y: 0},
-    cooldownSeconds: 0,
-    loadout: [{weapon: WEAPON, rounds, reserve}],
-    equippedIndex: 0,
-    crouching: false,
-    health: 100,
-    reloadRemainingSeconds,
-  };
-}
-
 it("starts a reload when asked, with the whole reload time still to go", () => {
   const after = reloadWeapon(playerWith(4, 30), true, 0.1);
 
@@ -129,3 +115,17 @@ it("does not change the player it was given", () => {
 
   expect(player).toEqual(before);
 });
+
+/** A player holding one weapon with `rounds` in the magazine and `reserve` in the bag. */
+function playerWith(rounds: number, reserve: number, reloadRemainingSeconds?: number): Player {
+  return {
+    position: {x: 1.5, y: 1.5},
+    aim: {x: 1, y: 0},
+    cooldownSeconds: 0,
+    loadout: [{weapon: WEAPON, rounds, reserve}],
+    equippedIndex: 0,
+    crouching: false,
+    health: 100,
+    reloadRemainingSeconds,
+  };
+}

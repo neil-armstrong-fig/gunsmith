@@ -13,21 +13,6 @@ const WEAPON: Weapon = {
   visionRange: 12,
 };
 
-function playerHolding(equippedIndex: number): Player {
-  return {
-    position: {x: 1.5, y: 1.5},
-    aim: {x: 1, y: 0},
-    cooldownSeconds: 0,
-    loadout: [
-      {weapon: WEAPON, rounds: 3, reserve: 30},
-      {weapon: WEAPON, rounds: 7, reserve: 12},
-    ],
-    equippedIndex,
-    crouching: false,
-    health: 100,
-  };
-}
-
 it("takes one round out of the magazine of the first weapon when it is the one equipped", () => {
   expect(spendRound(playerHolding(0)).loadout[0]).toEqual({weapon: WEAPON, rounds: 2, reserve: 30});
 });
@@ -55,3 +40,18 @@ it("does not change the player it was given", () => {
 
   expect(player).toEqual(before);
 });
+
+function playerHolding(equippedIndex: number): Player {
+  return {
+    position: {x: 1.5, y: 1.5},
+    aim: {x: 1, y: 0},
+    cooldownSeconds: 0,
+    loadout: [
+      {weapon: WEAPON, rounds: 3, reserve: 30},
+      {weapon: WEAPON, rounds: 7, reserve: 12},
+    ],
+    equippedIndex,
+    crouching: false,
+    health: 100,
+  };
+}

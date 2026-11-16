@@ -12,10 +12,6 @@ const bullet: Bullet = {
   level: 0,
 };
 
-function dummyAt(x: number, y: number): Dummy {
-  return {position: {x, y}, health: 100};
-}
-
 it("finds nothing when there are no dummies", () => {
   expect(nearestDummyHit([], bullet, 10)).toBeUndefined();
 });
@@ -47,3 +43,7 @@ it("picks the nearest of several, whichever order they are listed in", () => {
   expect(nearestDummyHit([dummyAt(6, 0), dummyAt(3, 0), dummyAt(9, 0)], bullet, 20)?.dummyIndex).toBe(1);
   expect(nearestDummyHit([dummyAt(3, 0), dummyAt(6, 0)], bullet, 20)?.dummyIndex).toBe(0);
 });
+
+function dummyAt(x: number, y: number): Dummy {
+  return {position: {x, y}, health: 100};
+}

@@ -17,33 +17,6 @@ const hall = arenaFrom([
 const TICK = 1 / 60;
 const HERE = {x: 5.5, y: 5.5};
 
-function contextWith(playerAt: Point, overrides: Partial<OpponentContext> = {}): OpponentContext {
-  const world = startingWorld(hall, [], HERE);
-  if (!world.opponent) {
-    throw new Error("The world has no opponent.");
-  }
-
-  return {
-    arena: hall,
-    opponent: world.opponent,
-    target: {...world.player, position: playerAt},
-    sees: true,
-    seconds: TICK,
-    ...overrides,
-  };
-}
-
-function engaging(overrides: Partial<OpponentBrain> = {}): OpponentBrain {
-  return {
-    ...startingBrain({seed: 3, position: HERE}),
-    state: "engage",
-    reactionRemainingSeconds: 0,
-    strafeSide: 1,
-    strafeRemainingSeconds: 1.5,
-    ...overrides,
-  };
-}
-
 const IN_BAND = {x: HERE.x + (DIFFICULTY.nearRange + DIFFICULTY.farRange) / 2, y: HERE.y};
 
 it("stands and faces the player, with its fire held, while it waits out its reaction time", () => {
@@ -130,3 +103,30 @@ it("carries its burst clock and strafe clock on in the brain it returns", () => 
 it("gives the same answer for the same brain and context", () => {
   expect(actEngage(engaging(), contextWith(IN_BAND))).toEqual(actEngage(engaging(), contextWith(IN_BAND)));
 });
+
+function contextWith(playerAt: Point, overrides: Partial<OpponentContext> = {}): OpponentContext {
+  const world = startingWorld(hall, [], HERE);
+  if (!world.opponent) {
+    throw new Error("The world has no opponent.");
+  }
+
+  return {
+    arena: hall,
+    opponent: world.opponent,
+    target: {...world.player, position: playerAt},
+    sees: true,
+    seconds: TICK,
+    ...overrides,
+  };
+}
+
+function engaging(overrides: Partial<OpponentBrain> = {}): OpponentBrain {
+  return {
+    ...startingBrain({seed: 3, position: HERE}),
+    state: "engage",
+    reactionRemainingSeconds: 0,
+    strafeSide: 1,
+    strafeRemainingSeconds: 1.5,
+    ...overrides,
+  };
+}

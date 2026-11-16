@@ -13,6 +13,8 @@ import {HEIGHTS_ARENA} from "@src/game/heights/HeightsArena";
 import {HEIGHTS_DUMMIES} from "@src/game/heights/HeightsDummies";
 import {PRACTICE_ARENA} from "@src/game/practice/PracticeArena";
 import {PRACTICE_DUMMIES} from "@src/game/practice/PracticeDummies";
+import {TERRACED_ARENA} from "@src/game/terraced/TerracedArena";
+import {TERRACED_OPPONENT} from "@src/game/terraced/TerracedOpponent";
 import type {Scenario} from "@src/game/scenario/types/Scenario";
 
 /**
@@ -20,7 +22,8 @@ import type {Scenario} from "@src/game/scenario/types/Scenario";
  * brain that draws its choices from `seed`, and no dummies, and is the first round of a best-of-three with a ring
  * counting down to its start (the only scenario that is a match, and the only one that always has a ring), and sparring is
  * the duel with an opponent who has no brain and cannot shoot, so it stands and takes it, in one round with no score, and the
- * heights arena is the player and a dummy on each level, with one stair up to a platform.
+ * heights arena is the player and a dummy on each level, with one stair up to a platform, and the terraced duel is the duel's opponent
+ * on low ground below a platform where the player starts, in one round (no score) with a ring.
  *
  * The ring closes on a point drawn from `seed`, and keeps `ringTiming` when the page asked for one (`?ringDelay=`,
  * `?ringClosing=`), otherwise the game's own. Sparring has a ring only when the page asks for ring timing, so a spec can watch
@@ -40,6 +43,12 @@ export function worldOfScenario(scenario: Scenario, seed: number, ringTiming?: R
     }
 
     return {...world, ring: ringOf(world, seed, ringTiming)};
+  }
+
+  if (scenario === "terraced") {
+    const world = giveOpponentBrain(engine.startingWorld(TERRACED_ARENA, [], TERRACED_OPPONENT), seed);
+
+    return {...world, ring: ringOf(world, seed, ringTiming ?? DEFAULT_RING_TIMING)};
   }
 
   if (scenario === "heights") {

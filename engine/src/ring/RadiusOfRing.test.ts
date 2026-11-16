@@ -9,10 +9,6 @@ const ring: Ring = {
   timing: {startDelaySeconds: 10, closingSeconds: 20},
 };
 
-function playedFor(roundSeconds: number, startRadius = 10): Ring {
-  return {...ring, roundSeconds, startRadius};
-}
-
 it("covers the whole arena until the ring starts", () => {
   expect(radiusOfRing(playedFor(0))).toBe(10);
   expect(radiusOfRing(playedFor(10))).toBe(10);
@@ -48,3 +44,7 @@ it("does not change the ring it is given", () => {
 it("is the same for the same clock, so a replay agrees", () => {
   expect(radiusOfRing(playedFor(17.3))).toBe(radiusOfRing(playedFor(17.3)));
 });
+
+function playedFor(roundSeconds: number, startRadius = 10): Ring {
+  return {...ring, roundSeconds, startRadius};
+}

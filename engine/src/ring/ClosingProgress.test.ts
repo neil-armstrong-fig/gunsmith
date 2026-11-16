@@ -8,10 +8,6 @@ const ring: Ring = {
   timing: {startDelaySeconds: 10, closingSeconds: 20},
 };
 
-function playedFor(roundSeconds: number): Ring {
-  return {...ring, roundSeconds};
-}
-
 it("is nothing while the ring has not started", () => {
   expect(closingProgress(playedFor(0))).toBe(0);
   expect(closingProgress(playedFor(9.9))).toBe(0);
@@ -33,3 +29,7 @@ it("is whole once the ring has closed", () => {
 it("stays whole afterwards, never beyond", () => {
   expect(closingProgress(playedFor(300))).toBe(1);
 });
+
+function playedFor(roundSeconds: number): Ring {
+  return {...ring, roundSeconds};
+}

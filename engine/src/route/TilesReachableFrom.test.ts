@@ -1,10 +1,6 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
-import {tilesReachableFrom} from "@gunsmith/engine/ring/centre/reach/TilesReachableFrom";
-
-function tileKeys(tiles: readonly Point[]): string[] {
-  return tiles.map(tile => `${tile.x},${tile.y}`).sort();
-}
+import {tilesReachableFrom} from "@gunsmith/engine/route/TilesReachableFrom";
 
 it("reaches every open tile of a room from where the walker stands, and no wall", () => {
   const room = arenaFrom(["####", "#..#", "#..#", "####"]);
@@ -38,3 +34,7 @@ it("reaches the low ground back down from the platform, as the stair works both 
 
   expect(tileKeys(tilesReachableFrom(withStair, {x: 5.5, y: 1.5}))).toContain("1.5,1.5");
 });
+
+function tileKeys(tiles: readonly Point[]): string[] {
+  return tiles.map(tile => `${tile.x},${tile.y}`).sort();
+}

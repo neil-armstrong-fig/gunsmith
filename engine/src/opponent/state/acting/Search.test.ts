@@ -18,25 +18,6 @@ const TICK = 1 / 60;
 const HERE = {x: 2.5, y: 2.5};
 const LAST_SEEN = {x: 9.5, y: 2.5};
 
-function context(): OpponentContext {
-  const world = startingWorld(room, [], HERE);
-  if (!world.opponent) {
-    throw new Error("The world has no opponent.");
-  }
-
-  return {arena: room, opponent: world.opponent, target: world.player, sees: false, seconds: TICK};
-}
-
-function searching(overrides: Partial<OpponentBrain> = {}): OpponentBrain {
-  return {
-    ...startingBrain({seed: 2, position: HERE}),
-    state: "search",
-    lastSeen: LAST_SEEN,
-    goal: LAST_SEEN,
-    ...overrides,
-  };
-}
-
 it("walks to the place it last saw the player, looking where it goes, without firing or reloading", () => {
   const act = actSearch(searching(), context());
 
@@ -92,3 +73,50 @@ it("walks to a place due north of it, and does not count the walk as waiting", (
   expect(act.input.direction.y).toBeCloseTo(DIFFICULTY.speedShare, 9);
   expect(act.brain.idleSeconds).toBe(0);
 });
+
+it("walks to where it last saw the player on a platform by way of the stair", () => {
+  const terraced = arenaFrom([
+    "########################",
+    "#...............>111111#",
+    "#................111111#",
+    "########################",
+  ]);
+  const atTheFoot = {x: 16.5, y: 1.5};
+  const platformSpot = {x: 20.5, y: 1.5};
+  const world = startingWorld(terraced, [], atTheFoot);
+  if (!world.opponent) {
+    throw new Error("The world has no opponent.");
+  }
+  const onTheLow: OpponentContext = {
+    arena: terraced,
+    opponent: world.opponent,
+    target: world.player,
+    sees: false,
+    seconds: TICK,
+  };
+
+  const act = actSearch(searching({lastSeen: platformSpot, goal: platformSpot}), onTheLow);
+
+  expect(act.input.direction.x).toBeCloseTo(0, 9);
+  expect(act.input.direction.y).toBeCloseTo(DIFFICULTY.speedShare, 9);
+  expect(act.input.aimAt).toEqual({x: 16.5, y: 2.5});
+});
+
+function context(): OpponentContext {
+  const world = startingWorld(room, [], HERE);
+  if (!world.opponent) {
+    throw new Error("The world has no opponent.");
+  }
+
+  return {arena: room, opponent: world.opponent, target: world.player, sees: false, seconds: TICK};
+}
+
+function searching(overrides: Partial<OpponentBrain> = {}): OpponentBrain {
+  return {
+    ...startingBrain({seed: 2, position: HERE}),
+    state: "search",
+    lastSeen: LAST_SEEN,
+    goal: LAST_SEEN,
+    ...overrides,
+  };
+}

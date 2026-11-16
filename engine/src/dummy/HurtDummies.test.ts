@@ -2,14 +2,6 @@ import {hurtDummies} from "@gunsmith/engine/dummy/HurtDummies";
 import type {Dummy} from "@gunsmith/engine/dummy/types/Dummy";
 import type {Strike} from "@gunsmith/engine/dummy/types/Strike";
 
-function dummyAt(x: number, health: number): Dummy {
-  return {position: {x, y: 1}, health};
-}
-
-function strike(dummyIndex: number, damage: number): Strike {
-  return {dummyIndex, damage};
-}
-
 it("takes the damage off the dummy that was hit", () => {
   expect(hurtDummies([dummyAt(1, 100)], [strike(0, 25)])).toEqual([dummyAt(1, 75)]);
 });
@@ -58,3 +50,11 @@ it("does not change the dummies it was given", () => {
 
   expect(dummies).toEqual(before);
 });
+
+function dummyAt(x: number, health: number): Dummy {
+  return {position: {x, y: 1}, health};
+}
+
+function strike(dummyIndex: number, damage: number): Strike {
+  return {dummyIndex, damage};
+}

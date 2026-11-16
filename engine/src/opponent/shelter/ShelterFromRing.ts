@@ -1,5 +1,7 @@
+import type {Point} from "@gunsmith/engine/geometry/types/Point";
 import {DIFFICULTY} from "@gunsmith/engine/opponent/Difficulty";
 import {waypointToward} from "@gunsmith/engine/opponent/shelter/waypoint/WaypointToward";
+import {routeWaypoint} from "@gunsmith/engine/opponent/steering/RouteWaypoint";
 import {walkToward} from "@gunsmith/engine/opponent/steering/WalkToward";
 import type {OpponentContext} from "@gunsmith/engine/opponent/types/OpponentContext";
 import type {StateAct} from "@gunsmith/engine/opponent/types/StateAct";
@@ -23,7 +25,7 @@ export function shelterFromRing(act: StateAct, context: OpponentContext): StateA
     return act;
   }
 
-  const waypoint = waypointToward(context.arena, opponent.position, ring.centre);
+  const waypoint = waypointOf(context, ring.centre);
   const direction = walkToward(opponent.position, waypoint);
 
   if (sees) {
@@ -31,4 +33,14 @@ export function shelterFromRing(act: StateAct, context: OpponentContext): StateA
   }
 
   return {...act, input: {...act.input, direction, aimAt: waypoint}};
+}
+
+/** By the stair when the way to the centre needs one, and otherwise as it has always gone: straight, or round a pillar. */
+function waypointOf(context: OpponentContext, centre: Point): Point {
+  const routed = routeWaypoint(context.arena, context.opponent.position, centre);
+  if (routed.x !== centre.x || routed.y !== centre.y) {
+    return routed;
+  }
+
+  return waypointToward(context.arena, context.opponent.position, centre);
 }
