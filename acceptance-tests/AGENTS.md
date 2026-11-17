@@ -73,6 +73,10 @@ Use seeded sparring to isolate player pickup behavior. Assert visibility and inv
 
 `DrawingAGeneratedWeapon` (`tests/pickup/`) opens `gunsmith.startSparringWithPickupDrawing({seed, drawing: "lantern" | "refused"})` (seed 8) and reads `gunsmith.pickup.getLookOnScreen()` (`playwright/look/look-of-pickup/`) over the place the hook says the weapon lies. Count only colours the drawing alone has (weapon blue, the core's pale `#E5EAF0`; the body grey is the wall's and the outline the background's). The old disc reads as `(168, 216, 202)`, **not** its source `#7ee0c3`, because its material is tone-mapped (matching the source colour let "the disc is gone" pass with the disc on screen). **The fog dims a drawing, it does not hide it**, so exact colours are never found there: the fog criterion counts `markedPixels`, places that are not the floor's colour (0 with the fog check, 244 for the lantern and 460 for the disc without it; an exact-colour count survived that mutant). Measured: lantern 38 blue and 24 pale, stand-in 6 blue and 0 pale; thresholds sit well off them.
 
+## Hit confirmation
+
+`HittingATargetOnTheScreen` / `HittingATarget` hold the game and fire, turn away before the bullet lands (a hidden hit), and read the four mint corners from a screenshot (`player|opponent|dummies.getHitOnScreen`, `runUntilHurt` runs the held game until that target loses health, seen or not; `playwright/hold/RunHeldUntil`). Hidden-hit criteria need the unit guard _and_ the draw-time sight gate both broken to fail: mutate both.
+
 ## Sound
 
 Sound is not part of the state hook. The DSL instruments fetch/decode/play calls by manifest key. A recorded buffer start does not prove device playback, first-interaction context wake-up, masking or listening quality. The 100 ms burst merge cannot be arranged reliably in a browser, so it is unit-tested in `webapp/src/sound/damage-crunch/`.

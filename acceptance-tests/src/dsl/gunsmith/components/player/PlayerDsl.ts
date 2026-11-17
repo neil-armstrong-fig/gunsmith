@@ -1,7 +1,8 @@
 import type {Page} from "@playwright/test";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
 import {PlayerPlaywright} from "@src/dsl/gunsmith/components/player/playwright/PlayerPlaywright";
-import type {HurtWatch} from "@src/dsl/gunsmith/components/player/types/HurtWatch";
+import type {HitLook} from "@src/dsl/gunsmith/types/HitLook";
+import type {HurtWatch} from "@src/dsl/gunsmith/types/HurtWatch";
 import type {DamageLook} from "@src/dsl/gunsmith/types/DamageLook";
 import type {Heading} from "@src/dsl/gunsmith/components/player/types/Heading";
 import type {FighterLook} from "@src/dsl/gunsmith/types/FighterLook";
@@ -131,6 +132,15 @@ export class PlayerDsl {
       return await this.player.getDamageOnScreen();
     } catch (error) {
       throw new DslError("Failed to read the damage the screen shows round the player", error);
+    }
+  }
+
+  /** What the screen shows of a hit landed round the player right now (mint ticks, which belong to a target the player hit, never to the player). The player must be standing still. */
+  async getHitOnScreen(): Promise<HitLook> {
+    try {
+      return await this.player.getHitOnScreen();
+    } catch (error) {
+      throw new DslError("Failed to read the hit confirmation the screen shows round the player", error);
     }
   }
 

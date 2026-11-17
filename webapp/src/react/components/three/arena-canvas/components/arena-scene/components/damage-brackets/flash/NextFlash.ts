@@ -1,6 +1,6 @@
 import type {Flash} from "@src/react/components/three/arena-canvas/components/arena-scene/components/damage-brackets/flash/types/Flash";
 import type {FlashRequest} from "@src/react/components/three/arena-canvas/components/arena-scene/components/damage-brackets/flash/types/FlashRequest";
-import {BURST_SECONDS} from "@src/sound/damage-crunch/BurstSeconds";
+import {BURST_SECONDS} from "@src/sound/burst-window/BurstSeconds";
 
 /**
  * Where the flash of a hit stands after one frame. A hit flashes at once, at age 0. A hit that lands within `BURST_SECONDS` of the flash already running

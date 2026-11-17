@@ -113,6 +113,8 @@ The tables above say "local brackets" and "sustained unsafe-state treatment" wit
 - **Health trail:** the part a **burst of bullets** took, in the warning amber `#F2C66D`, behind the green bar, draining over 350 ms. The ring's loss has no trail.
 - **Health panel position:** bottom right, as in the game. (The [inventory concept](../inventory-display/README.md) puts health bottom left; see its placement note.)
 
+- **Outgoing hit (built 2026-11-17):** four 2-pixel mint (`#8AD4B0`) diagonal ticks, each 7 pixels long between 17 and 24 pixels out from the target's centre along both axes, tips toward the body, for 180 ms, no expansion (`Study.html`). `sfx-hit` plays once per burst (hits inside 100 ms merge: play's decision, the study is silent). Both only for a target the player sees, and the ticks go the moment its place leaves sight.
+
 Two lines above are stale and are corrected here: the acceptance bullet "Sustained ring damage has one onset" predates the user's decision (table, 2026-11-17)
 that there is **no onset cue**; the criterion now is: the ring's marks are steady while it hurts, never pulse per tick, and clear when exposure or the round ends.
 The study also plays `sfx-death` at a local death, which no slice here covers yet; it needs an owner (play, with art's file, which already exists as
