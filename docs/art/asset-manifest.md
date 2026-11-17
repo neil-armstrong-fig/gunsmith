@@ -9,7 +9,8 @@ are reference examples; they add no production keys or frozen contracts.
 
 Current M1 sound mapping: `sfx-empty-click` is integrated in
 `webapp/src/assets/sounds/` as a separate MP3 asset, encoded from the approved
-`empty-tight` WAV master. MP3 is the approved production format for future
+`empty-tight` WAV master; `sfx-damage-crunch` is integrated beside it, encoded by play from
+`webapp/audio/studies/combat-feedback/damage-crunch.wav` with the audio workspace's recipe. MP3 is the approved production format for future
 static cues. The broader manifest and planned keys below remain unfrozen.
 
 ## Rules

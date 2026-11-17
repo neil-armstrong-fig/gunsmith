@@ -16,7 +16,8 @@ given("the game has opened", () => {
       });
 
       then("the arena fills the whole window", async ({gunsmith}) => {
-        expect(await gunsmith.arena.getSizeOnScreen()).toEqual(gunsmith.getWindowSize());
+        // The canvas follows the window a moment after the resize returns (a read at once was stale in about a third of tries), so wait for it.
+        await expect.poll(async () => gunsmith.arena.getSizeOnScreen()).toEqual(gunsmith.getWindowSize());
       });
     },
   );
