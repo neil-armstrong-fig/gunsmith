@@ -221,6 +221,9 @@ catalogs:
     eslint-plugin-react-hooks:
       specifier: 7.1.1
       version: 7.1.1
+    fast-check:
+      specifier: 4.9.0
+      version: 4.9.0
     globals:
       specifier: 17.14.0
       version: 17.14.0
@@ -309,6 +312,9 @@ importers:
 
   ai:
     dependencies:
+      '@gunsmith/engine':
+        specifier: workspace:*
+        version: link:../engine
       '@langchain/core':
         specifier: 'catalog:'
         version: 1.3.4(ws@8.22.1)
@@ -385,6 +391,9 @@ importers:
       eslint-config-prettier:
         specifier: 'catalog:'
         version: 10.1.8(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
+      fast-check:
+        specifier: 'catalog:'
+        version: 4.9.0
       globals:
         specifier: 'catalog:'
         version: 17.14.0
@@ -2030,6 +2039,10 @@ packages:
     engines: {node: '>= 10.17.0'}
     hasBin: true
 
+  fast-check@4.9.0:
+    resolution: {integrity: sha512-7ms6T7SybUev/PQITciI0yLM2pOSFy5zpG8Ty7tQofcVaQUvrMXp6CBwqF6fThLCLOrfBtuHAtwq6Yu4XPCllg==}
+    engines: {node: '>=12.17.0'}
+
   fast-deep-equal@3.1.3:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
 
@@ -2594,6 +2607,9 @@ packages:
   punycode@2.3.1:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
+
+  pure-rand@8.4.2:
+    resolution: {integrity: sha512-vvuOGgcuPJAirlHvuQw1TrOiw7ptaIXXmIbNuiNOY6lNGJJH49PQ1Kj4nd783nPdQhQdicgOjVI2yI/9BD6/Ng==}
 
   qified@0.10.1:
     resolution: {integrity: sha512-+Owyggi9IxT1ePKGafcI87ubSmxol6smwJ+RAHDQlx9+9cPwFWDiKFFCPuWhr9ignlGpZ9vDQLw67N4dcTVFEA==}
@@ -4525,6 +4541,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  fast-check@4.9.0:
+    dependencies:
+      pure-rand: 8.4.2
+
   fast-deep-equal@3.1.3: {}
 
   fast-json-stable-stringify@2.1.0: {}
@@ -4989,6 +5009,8 @@ snapshots:
       once: 1.4.0
 
   punycode@2.3.1: {}
+
+  pure-rand@8.4.2: {}
 
   qified@0.10.1:
     dependencies:

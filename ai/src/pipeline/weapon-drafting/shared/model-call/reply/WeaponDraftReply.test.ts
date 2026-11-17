@@ -33,6 +33,7 @@ it("names every field of the weapon, so the model is shown what to fill", () => 
     "magazineSize",
     "reloadSeconds",
     "startingReserve",
+    "preference",
   ]);
 });
 
@@ -42,4 +43,18 @@ it("asks for numbers as numbers: a stat written as text is refused here, not car
 
 it("refuses a reply that is not an object", () => {
   expect(weaponDraftReplySchema.safeParse("a rifle").success).toBe(false);
+});
+
+it("accepts a preference naming a stat there is not, for validate to refuse", () => {
+  const reply = {name: "Cannon", preference: {favoured: ["accuracy"], sacrificed: []}};
+
+  expect(weaponDraftReplySchema.safeParse(reply).success).toBe(true);
+});
+
+it("accepts a reply with no preference", () => {
+  expect(weaponDraftReplySchema.safeParse({name: "Cannon"}).success).toBe(true);
+});
+
+it("keeps the preference's two lists as lists of text, so the model writes names and not numbers", () => {
+  expect(weaponDraftReplySchema.safeParse({preference: {favoured: [3], sacrificed: []}}).success).toBe(false);
 });

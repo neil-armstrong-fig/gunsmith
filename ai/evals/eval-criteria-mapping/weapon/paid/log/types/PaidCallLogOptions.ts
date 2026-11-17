@@ -7,6 +7,8 @@ export interface PaidCallLogOptions {
   prompt: string;
   /** How long the whole request took, in milliseconds. */
   durationMs: number;
+  /** How many of the calls were the stats stage's (moderation, generation, its repair); the rest drew the weapon. */
+  statsCalls: number;
   /** Every paid call the request made, in order. */
   calls: PaidCall[];
 }

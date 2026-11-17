@@ -7,6 +7,8 @@ Follow `TODO.md`'s startup protocol. Work under the owned asset/audio/research p
 
 The inventory study is delivered and visually approved: two compact icons and only the selected weapon's name. Review new build/AI integration evidence or continue the open production/audio work below; do not repeat the completed desk studies or saved-drawing review.
 
+Committed player/opponent and dummy art is now integrated into main alongside stair routing and the AI pipeline. Research 2 should review concrete renderer/gameplay evidence rather than extend the completed balancing desk study. Unreviewed work remains in the source worktrees.
+
 ## Delivered references
 
 - Research 2: [stat-preference probe brief](docs/ai-stat-preference-probe.md) has user-approved v1 labels and AI-chosen unspecified values/trade-offs (2026-11-17). Feeble means overall weakness; bad arena weapons can be tactical. Next: AI/build owner agreement, integration and authorized probes. See `HANDOFF.md` for AI-owned wording follow-ups. Session 1 retains audio QA.

@@ -11,7 +11,7 @@ import type {RunCriterion} from "@evals/eval-criteria-mapping/types/RunCriterion
 import type {FixtureName} from "@evals/eval-criteria-mapping/types/FixtureName";
 import type {DefineGiven} from "@evals/eval-criteria-mapping/types/DefineGiven";
 import type {DefineWhen} from "@evals/eval-criteria-mapping/types/DefineWhen";
-import type {WhenBlock} from "@evals/eval-criteria-mapping/types/WhenBlock";
+import type {GivenBlock} from "@evals/eval-criteria-mapping/types/GivenBlock";
 import type {WhenContext} from "@evals/eval-criteria-mapping/types/WhenContext";
 import {specNameOf} from "@evals/eval-criteria-mapping/reporting/spec-name/SpecNameOf";
 import type {CriterionResult} from "@evals/eval-criteria-mapping/reporting/types/CriterionResult";
@@ -24,6 +24,7 @@ const weaponDriver = createWeaponPipelineDriver(tier, process.env.EVAL_TRIALS);
 const appearanceDriver = createAppearanceDriver(tier, process.env.EVAL_TRIALS);
 const results: CriterionResult[] = [];
 let currentGiven = "";
+let currentSuite: EvalSuite = "regression";
 let currentWhen: WhenContext | undefined;
 let firstTaken: FixtureName | undefined;
 
@@ -42,17 +43,36 @@ afterAll(() => {
  * `given` and `when` are native `describe` blocks underneath, except that each `when` is a LangSmith `ls.describe` (the wrapper
  * cannot nest, and a `when` is the right grain for a LangSmith dataset: one scenario, one example per `then`).
  */
-export function given(description: string, define: DefineGiven): void {
-  describe(`given ${description}`, () => {
+export const given: GivenBlock = Object.assign(
+  (description: string, define: DefineGiven): void => defineGiven("regression", description, define),
+  {inProgress: (description: string, define: DefineGiven): void => defineGiven("inProgress", description, define)},
+);
+
+/** Every `when` in a `given` takes its suite from it: a feature is in progress as a whole, never one scenario at a time. */
+function defineGiven(suite: EvalSuite, description: string, define: DefineGiven): void {
+  describe(suite === "inProgress" ? `given (in progress) ${description}` : `given ${description}`, () => {
     currentGiven = description;
+    currentSuite = suite;
     define();
   });
 }
 
-export const when: WhenBlock = Object.assign(
-  (description: string, define: DefineWhen): void => defineWhen("regression", description, define),
-  {capability: (description: string, define: DefineWhen): void => defineWhen("capability", description, define)},
-);
+export function when(description: string, define: DefineWhen): void {
+  ls.describe(`when ${description}`, () => {
+    const whenContext: WhenContext = {given: currentGiven, description, suite: currentSuite};
+    // One of each DSL per `when`, so its `then`s share the answers its `beforeAll` asked for, and no other `when` does.
+    const tracked = new TrackedFixtures({
+      weaponSmith: new WeaponSmithDsl(weaponDriver),
+      appearance: new AppearanceDsl(appearanceDriver),
+    });
+
+    currentWhen = whenContext;
+    define(tracked.fixtures);
+    registerStandingCriteria(whenContext, tracked);
+    firstTaken ??= tracked.taken()[0];
+    currentWhen = undefined;
+  });
+}
 
 /**
  * The request a `when` names, carried out once before its `then`s. It is `beforeAll` and not `beforeEach` (the acceptance
@@ -73,23 +93,6 @@ export function beforeAll(arrange: RunCriterion): void {
  */
 export function thenExpect(description: string, check: RunCriterion): void {
   registerCriterion(requireWhen("thenExpect"), description, check);
-}
-
-function defineWhen(suite: EvalSuite, description: string, define: DefineWhen): void {
-  ls.describe(`when ${description}`, () => {
-    const whenContext: WhenContext = {given: currentGiven, description, suite};
-    // One of each DSL per `when`, so its `then`s share the answers its `beforeAll` asked for, and no other `when` does.
-    const tracked = new TrackedFixtures({
-      weaponSmith: new WeaponSmithDsl(weaponDriver),
-      appearance: new AppearanceDsl(appearanceDriver),
-    });
-
-    currentWhen = whenContext;
-    define(tracked.fixtures);
-    registerStandingCriteria(whenContext, tracked);
-    firstTaken ??= tracked.taken()[0];
-    currentWhen = undefined;
-  });
 }
 
 /** What holds whatever was asked is each DSL's to say; the mapping only reports it under every `when`, after the test's own criteria. */
@@ -134,7 +137,7 @@ async function runCriterion(whenContext: WhenContext, description: string, check
       throw error;
     }
 
-    console.warn(`capability "when ${whenContext.description}, then ${description}" is red (not gating): ${comment}`);
+    console.warn(`in-progress "when ${whenContext.description}, then ${description}" is red (not gating): ${comment}`);
 
     return;
   }

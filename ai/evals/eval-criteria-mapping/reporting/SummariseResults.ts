@@ -11,7 +11,7 @@ export function summariseResults(run: ResultsRun): ResultsSummary {
     criteria: run.results.length,
     criteriaPassed: run.results.filter(result => result.passed).length,
     regression: tally(run.results, "regression"),
-    capability: tally(run.results, "capability"),
+    inProgress: tally(run.results, "inProgress"),
   };
 }
 

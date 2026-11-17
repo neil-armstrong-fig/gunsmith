@@ -51,7 +51,7 @@ it("carries the weapon smith's standing criteria when it took the weapon smith",
   expect(weaponSmith).toBeDefined();
   expect(descriptions(tracked)).toEqual([
     "whatever is asked, what the player sees is safe to show",
-    "whatever is asked, the pipeline keeps to its fixed path, within three model calls",
+    "whatever is asked, the pipeline keeps to its fixed path, within five model calls",
   ]);
 });
 
@@ -74,7 +74,7 @@ it("carries both sets when it took both, the weapon smith's first", () => {
   expect(appearance).toBeDefined();
   expect(weaponSmith).toBeDefined();
   expect(descriptions(tracked)).toHaveLength(5);
-  expect(descriptions(tracked)[1]).toContain("three model calls");
+  expect(descriptions(tracked)[1]).toContain("five model calls");
 });
 
 it("refuses a when that took no DSL, so it cannot go without standing criteria unnoticed", () => {

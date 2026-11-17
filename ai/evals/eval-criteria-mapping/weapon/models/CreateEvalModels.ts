@@ -1,7 +1,10 @@
+import type {BaseChatModel} from "@langchain/core/language_models/chat_models";
 import {FakeListChatModel} from "@langchain/core/utils/testing";
 import {ChatOllama} from "@langchain/ollama";
+import {createAppearanceModels} from "@evals/eval-criteria-mapping/appearance/models/CreateAppearanceModels";
 import {FAKE_WEAPON_REPLY} from "@evals/eval-criteria-mapping/weapon/models/FakeWeaponReply";
 import {createPaidWeaponModels} from "@evals/eval-criteria-mapping/weapon/models/PaidWeaponModels";
+import {unreachableTier} from "@evals/eval-criteria-mapping/tier/UnreachableTier";
 import type {EvalTier} from "@evals/eval-criteria-mapping/tier/types/EvalTier";
 import type {WeaponPipelineDependencies} from "@gunsmith/ai/pipeline/types/WeaponPipelineDependencies";
 
@@ -18,7 +21,11 @@ export function createEvalModels(tier: EvalTier): WeaponPipelineDependencies {
     return createLocalModels();
   }
 
-  return createPaidWeaponModels();
+  if (tier === "paid") {
+    return createPaidWeaponModels();
+  }
+
+  return unreachableTier(tier);
 }
 
 function createFakeModels(): WeaponPipelineDependencies {
@@ -27,7 +34,16 @@ function createFakeModels(): WeaponPipelineDependencies {
     moderator: new FakeListChatModel({
       responses: [JSON.stringify({isWeaponRequest: true, reason: "A weapon request."})],
     }),
+    appearanceGenerator: cannedDrawer(),
   };
+}
+
+// Interim policy (2026-11-15), until a cheaper hosted model has been benchmarked as the test tier: the weapon specs on the fake and
+// local tiers draw with a canned valid drawing. A real local drawing takes about 30 seconds, which would take the whole local weapon
+// run from about 85 seconds to well over half an hour, and its drawings were judged poor. The wiring, the call budget and the path
+// are still proved; `DrawingAWeapon` tests the real local model's drawings by itself, and the paid tier draws for real.
+function cannedDrawer(): BaseChatModel {
+  return createAppearanceModels("fake").generator;
 }
 
 // Temperature 0 and thinking off: repeatable output for a loop that has to be fast. This model build (qwen3.5:9b, NVFP4) has no
@@ -38,5 +54,9 @@ function createLocalModels(): WeaponPipelineDependencies {
   const model = process.env.EVAL_LOCAL_MODEL ?? LOCAL_MODEL;
   const options = {baseUrl: LOCAL_BASE_URL, model, temperature: 0, think: false, numPredict: 400};
 
-  return {generator: new ChatOllama(options), moderator: new ChatOllama({...options, numPredict: 100})};
+  return {
+    generator: new ChatOllama(options),
+    moderator: new ChatOllama({...options, numPredict: 100}),
+    appearanceGenerator: cannedDrawer(),
+  };
 }

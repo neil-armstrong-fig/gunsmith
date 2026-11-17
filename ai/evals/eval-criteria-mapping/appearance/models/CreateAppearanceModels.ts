@@ -2,6 +2,7 @@ import {ChatOllama} from "@langchain/ollama";
 import {passingAppearance} from "@gunsmith/ai/pipeline/appearance/testing/PassingAppearance";
 import {ToolCallingFakeModel} from "@gunsmith/ai/pipeline/appearance/testing/ToolCallingFakeModel";
 import type {AppearanceDependencies} from "@gunsmith/ai/pipeline/appearance/types/AppearanceDependencies";
+import {unreachableTier} from "@evals/eval-criteria-mapping/tier/UnreachableTier";
 import {createPaidAppearanceModel} from "@evals/eval-criteria-mapping/appearance/models/PaidAppearanceModel";
 import type {EvalTier} from "@evals/eval-criteria-mapping/tier/types/EvalTier";
 
@@ -18,7 +19,11 @@ export function createAppearanceModels(tier: EvalTier): AppearanceDependencies {
     return {generator: createLocalGenerator()};
   }
 
-  return {generator: createPaidAppearanceModel()};
+  if (tier === "paid") {
+    return {generator: createPaidAppearanceModel()};
+  }
+
+  return unreachableTier(tier);
 }
 
 // Not the weapon's settings: a drawing is about a thousand tokens, so the weapon's 400-token budget would cut it off, and at

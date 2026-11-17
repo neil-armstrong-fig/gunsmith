@@ -43,6 +43,6 @@ files a folder is a smell: split it by subject.
   entry points needs a reason (`vision/` has five, all about seeing). Move a file with its test, with plain `mv`.
 - **A step never changes the world it is given**; it returns a new one.
 - **Tunables are constants in their own file** (`PlayerSpeed.ts`) until there are enough to want a table.
-- Property tests (`fast-check`) are deliberately not here yet.
+- Property tests use `fast-check` and run separately through `pnpm test:properties`; `PROPERTY_TEST_RUNS` sets the cases. Preserve seed/counterexample output. `power-rating/` and `weapon-balance/` own deterministic stat costs and downward balancing, including deliberate weakness. These initial coefficients require gameplay calibration.
 
 Stair arenas use deterministic `route/` walking paths for wandering, searching and ring shelter. Flat arenas retain existing steering. Arena parsing rejects raised stair flanks that bypass landings. Cross-level engagement and cover remain pending.

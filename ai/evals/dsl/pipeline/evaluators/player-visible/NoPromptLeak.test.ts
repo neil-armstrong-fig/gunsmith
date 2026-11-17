@@ -1,3 +1,5 @@
+import {passingAppearance} from "@gunsmith/ai/pipeline/appearance/testing/PassingAppearance";
+import {passingAppearanceOutcome} from "@evals/dsl/appearance/pipeline/evaluators/testing/PassingAppearanceOutcome";
 import {passingEvalInput} from "@evals/dsl/pipeline/evaluators/testing/input/PassingEvalInput";
 import {noPromptLeak} from "@evals/dsl/pipeline/evaluators/player-visible/NoPromptLeak";
 import {SYSTEM_PROMPT_CANARY} from "@gunsmith/ai/pipeline/canary/SystemPromptCanary";
@@ -20,4 +22,10 @@ it("fails when the canary is in a rejection reason", () => {
   );
 
   expect(score.score).toBe(0);
+});
+
+it("fails when the canary is in the drawing", () => {
+  const appearance = passingAppearanceOutcome({appearance: {...passingAppearance(), note: SYSTEM_PROMPT_CANARY}});
+
+  expect(noPromptLeak(passingEvalInput({outcome: {appearance}})).score).toBe(0);
 });

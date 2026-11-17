@@ -28,7 +28,7 @@ Check active ownership before overlapping work; old thread/worktree names are no
 | Combat events | Build-owned `World.events` covers one local-player step; currently empty-fire refusal. Frozen steps clear events. It is not a network snapshot or sound-state hook. |
 | Sound keys | MP3 `sfx-empty-click` is integrated under its existing key. User authorized art/research 1 to make this runtime switch. `sfx-damage-crunch` and `sfx-hit` remain agreed but unregistered; future static cues use MP3. Safari timing is follow-up QA, not a prerequisite. |
 | AI hosting | API will import AI in-process in the Worker. Keep the graph host-agnostic/Workers-safe; only API imports AI runtime. |
-| Stats/appearance integration | Accepted design: separate stages, five calls maximum, one repair per stage, disclosed appearance fallback; implementation and renderer consumer remain open. |
+| Stats/appearance integration | Accepted design: separate stages, five calls maximum, one repair per stage, disclosed appearance fallback; committed pipeline integration is merged; renderer consumer remains open. |
 | Planned M2 contracts | Weapon/arena schemas and fixtures, adapter/fake, ledger, credit config, asset manifest, wire messages, power rating/caps and arena validity are introduced with real consumers and owner review. Do not build against withdrawn drafts. |
 
 Before changing a contract another persona consumes, record it here and identify affected owners.
@@ -69,6 +69,9 @@ and the linked design documents.
 - [ ] Art delivered and wired in (`art`, then `build`)
 
 ## Delivery log
+
+- 2026-11-17, integration: merged committed AI stats/appearance pipeline, LangGraph execution, initial engine rating/balancing, property tests and eval grouping from `worktree-ai-hosting-proof`. Preserved main’s separated type definitions and repository gate. Calibration/model evidence remains distinct from implementation; no uncommitted source-worktree changes or paid calls included. Validation: `pnpm checks` passes (shared 52, acceptance helpers 9, engine 976, audio 270 with one slow render skipped, AI 507, webapp 296); eight property tests and all 199 production-preview acceptance tests pass. Fake evals: 126 pass, eight fail because the canned moderator/generator approve non-weapon and armour requests; no model-quality claim or paid run. Standards review used root, AI, engine, webapp/React, acceptance and shared instructions; folder/caller audit completed and graph state types placed in `types/`. Initial offline install lacked registry metadata; frozen installation succeeded with 417 reused packages and no version changes.
+
 
 - 2026-11-17, integration: merged committed stair-aware bot routing, stair-flank validation and terraced ring-climbing coverage from `worktree-build-3-reticle`. Uncommitted engagement/cover work remains in its source worktree. Combined validation follows the AI merge.
 

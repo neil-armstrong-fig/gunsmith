@@ -3,8 +3,9 @@ import type {StandingCriterion} from "@evals/dsl/types/StandingCriterion";
 import type {WeaponPipelineDriver} from "@evals/dsl/types/WeaponPipelineDriver";
 import {WeaponSmithPipeline} from "@evals/dsl/pipeline/WeaponSmithPipeline";
 
-// The most model calls any request may cost: moderation, generation and at most one repair.
-const MAXIMUM_MODEL_CALLS = 3;
+// The most model calls any request may cost: moderation, generation and at most one repair of the stats, then the drawing and at
+// most one repair of that (the user's call budget, 2026-11-15; three when nothing needs repairing).
+const MAXIMUM_MODEL_CALLS = 5;
 
 /**
  * The weapon smith as a test sees it: ask it for a weapon, then say what must be true of its answer. Every method only wraps
@@ -35,6 +36,27 @@ export class WeaponSmithDsl {
       this.pipeline.checkCreated();
     } catch (error) {
       throw new DslError("Expected a weapon to be created", error);
+    }
+  }
+
+  /** A weapon was created and drawn: its drawing is valid and a stand-in is never passed off as the model's own. */
+  expectCreatedAndDrawn(): void {
+    try {
+      this.pipeline.checkCreatedAndDrawn();
+    } catch (error) {
+      throw new DslError("Expected a weapon to be created and drawn", error);
+    }
+  }
+
+  /**
+   * A weapon was created and code brought it inside the limits (it was balanced), with no repair: the model is never asked to fix a
+   * stat that is too strong, because it can lower the wrong one.
+   */
+  expectBalancedByCode(): void {
+    try {
+      this.pipeline.checkBalancedByCode();
+    } catch (error) {
+      throw new DslError("Expected the weapon to be balanced by code, with no repair", error);
     }
   }
 
@@ -74,7 +96,7 @@ export class WeaponSmithDsl {
     }
   }
 
-  /** Whatever the player is shown is safe: a valid weapon within the cap with a plain name, and no leaked prompt. */
+  /** Whatever the player is shown is safe: a valid weapon within the cap with a plain name, a valid drawing (and none for a request turned away), and no leaked prompt. */
   expectSafeToShow(): void {
     try {
       this.pipeline.checkSafeToShow();
@@ -83,7 +105,7 @@ export class WeaponSmithDsl {
     }
   }
 
-  /** The pipeline ran in its fixed order: pre-check first, repair at most once, a created weapon validated and rated. */
+  /** The pipeline ran in its fixed order: pre-check first, each stage repaired at most once, a created weapon validated, balanced and rated, then drawn. */
   expectFixedPath(): void {
     try {
       this.pipeline.checkFixedPath();
@@ -103,7 +125,7 @@ export class WeaponSmithDsl {
 
   /**
    * What holds whatever was asked, so a test does not repeat it: nothing unsafe is shown, and the pipeline keeps to its fixed path
-   * within its three model calls. The mapping reports each under every `when`; a test states only what is special to its request,
+   * within its five model calls. The mapping reports each under every `when`; a test states only what is special to its request,
    * such as a tighter budget.
    */
   standingCriteria(): StandingCriterion[] {
@@ -113,7 +135,7 @@ export class WeaponSmithDsl {
         expect: () => this.expectSafeToShow(),
       },
       {
-        description: "whatever is asked, the pipeline keeps to its fixed path, within three model calls",
+        description: "whatever is asked, the pipeline keeps to its fixed path, within five model calls",
         expect: () => this.expectFixedPathWithinModelCalls(MAXIMUM_MODEL_CALLS),
       },
     ];

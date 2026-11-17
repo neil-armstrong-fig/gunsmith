@@ -30,13 +30,6 @@ given("a player asks for a weapon", () => {
     thenExpect("a weapon is created", () => weaponSmith.expectCreated());
   });
 
-  // Probed, a real failure: a legitimate one-word request was judged "not a weapon" by moderation (a false positive).
-  when.capability("they ask in a single word", ({weaponSmith}) => {
-    beforeAll(() => weaponSmith.ask("gun"));
-
-    thenExpect("a weapon is created", () => weaponSmith.expectCreated());
-  });
-
   // Probed, holds: a harmless, silly weapon is not rejected. A guard against a stricter moderation prompt over-reaching.
   when("they ask for something silly but harmless", ({weaponSmith}) => {
     beforeAll(() => weaponSmith.ask("a launcher that fires bananas, harmless but silly"));
@@ -47,6 +40,53 @@ given("a player asks for a weapon", () => {
   // Probed, holds: a non-English request is understood. A guard against an English-only moderation prompt.
   when("they ask in French", ({weaponSmith}) => {
     beforeAll(() => weaponSmith.ask("un fusil de précision silencieux"));
+
+    thenExpect("a weapon is created", () => weaponSmith.expectCreated());
+  });
+});
+
+// A created weapon is drawn too, by a second model after the stats have passed (the user's call budget, 2026-11-15: five calls at most, three
+// when nothing needs repairing). What the drawing must satisfy for every request, valid and never a stand-in passed off as the model's own,
+// and that a request turned away draws nothing, is the standing "safe to show" criterion; this `when` names the intention once.
+given("a player asks for a weapon and sees it drawn", () => {
+  when("they ask for a cannon shaped like a rubber duck", ({weaponSmith}) => {
+    beforeAll(() => weaponSmith.ask("a cannon shaped like a rubber duck"));
+
+    thenExpect("a weapon is created and drawn", () => weaponSmith.expectCreatedAndDrawn());
+  });
+});
+
+// In progress: the stat balancer (built 2026-11-15, `engine/src/weapon-balance/`) is new and its first measured weakness is still open. On Haiku, "a big
+// magazine and plenty of spare ammo" gets a magazine of 80 to 100 and a reserve of 300 to 400, past the ranges, whatever the prompt's wording, so a repair
+// runs. Whether code should take a number past a range as data and bring it in is the user's call. The single-word request is moderation's, probed once.
+given.inProgress("a player asks for a weapon and leaves the balancer to it", () => {
+  // Probed 2026-11-15 on Haiku (36 answers): asked for hard and fast with nothing else mattering, the model writes 45 damage every
+  // 0.1 seconds, 450 a second, and gives up the magazine, reload, speed and reserve. Over the damage cap, so the model used to be
+  // sent back to lower a stat (and lowered damage, ignoring what the player would give up). Now code takes it from damage and fire
+  // rate, which the player favours, only as far as the cap needs, and from the rest by what they would sacrifice.
+  when("they want it hard and fast and do not care about anything else", ({weaponSmith}) => {
+    beforeAll(() => weaponSmith.ask("hits hard and fires fast but I do not care about anything else"));
+
+    thenExpect("a weapon is created, balanced by code with no repair", () => weaponSmith.expectBalancedByCode());
+  });
+
+  // Probed 2026-11-15, a real failure on Haiku: asked for "a big magazine and plenty of spare ammo" it writes a magazine of 80 to 100
+  // and a reserve of 300 to 400, past the ranges (60 and 200), whatever the prompt's wording (five variants tried), so `validate`
+  // refuses and a repair runs in 3 of 3 trials. It ends created, at a cost of a third call. A hill to climb: either the ranges are
+  // brought in by code too (the balancer would take numbers past a range as data), or the prompt finds its wording; the user's call.
+  when("they ask for a big magazine and plenty of spare ammo", ({weaponSmith}) => {
+    beforeAll(() =>
+      weaponSmith.ask(
+        "a machine gun with a big magazine and plenty of spare ammo, I don't care how hard each bullet hits",
+      ),
+    );
+
+    thenExpect("a weapon is created inside the ranges, with no repair", () => weaponSmith.expectBalancedByCode());
+  });
+
+  // Probed, a real failure: a legitimate one-word request was judged "not a weapon" by moderation (a false positive).
+  when("they ask in a single word", ({weaponSmith}) => {
+    beforeAll(() => weaponSmith.ask("gun"));
 
     thenExpect("a weapon is created", () => weaponSmith.expectCreated());
   });

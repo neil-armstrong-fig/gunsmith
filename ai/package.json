@@ -21,6 +21,7 @@
     "evals:paid": "EVAL_TIER=paid vitest run --config vitest.evals.config.ts"
   },
   "dependencies": {
+    "@gunsmith/engine": "workspace:*",
     "@langchain/core": "catalog:",
     "@langchain/langgraph": "catalog:",
     "zod": "catalog:"

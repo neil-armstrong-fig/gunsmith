@@ -18,9 +18,9 @@ Start a session with: **"You are build|ai|art, continue the TODO."**
 
 | Persona | Current focus | Updated |
 | ------- | ------------- | ------- |
-| build | M1: finish stairs/bot work in its existing session; incoming damage, hit feedback, shake and approved inventory integration. Pickups and empty click are committed. | 2026-11-17 |
-| ai | Integrate separate stats/appearance calls (five maximum); preserve cumulative spend. Research 2's v1 labels and AI-chosen omitted-stat policy are approved; owner agreement, probes and balancing remain pending. | 2026-11-17 |
-| art | Session 1: MP3 runtime switch authorized; empty click now uses MP3. Safari timing and combat masking remain follow-up QA. Inventory approved. Research 2: labels/policy review complete; handoff ready. | 2026-11-17 |
+| build | M1: committed sprite and stair-routing work merged; cross-level bot fixes remain in their session; incoming damage, hit feedback, shake and approved inventory integration. Pickups and empty click are committed. | 2026-11-17 |
+| ai | Committed five-call stats/appearance integration, LangGraph and initial engine balancing merged; preserve cumulative spend. Research 2's v1 labels and AI-chosen omitted-stat policy are approved; owner agreement, probes and balancing remain pending. | 2026-11-17 |
+| art | Session 1: MP3 runtime switch authorized; empty click now uses MP3. Safari timing and combat masking remain follow-up QA. Inventory approved. Research 2: labels/policy review complete; committed worktree integration validated (199 acceptance tests); fake evals retain eight canned-response failures. | 2026-11-17 |
 
 Detailed current tasks: [build](TODO-build.md), [AI](TODO-ai.md), [art](TODO-art.md).
 Earlier status, requests and measurements: [snapshot](docs/history/2026-11-17-compaction/SharedTodo.md).

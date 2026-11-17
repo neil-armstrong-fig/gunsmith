@@ -1,14 +1,16 @@
 # TODO: ai
 
-Follow `TODO.md`'s startup protocol. Integration is next; stat balancing follows it.
+Follow `TODO.md`'s startup protocol. Committed stats/appearance integration, LangGraph execution and engine balancing are now merged; further reviewed improvements remain in the source worktree.
 [Earlier checklist, completed probes and detailed criteria](docs/history/2026-11-17-compaction/AiTodo.md).
 The weapon pipeline, separate appearance generator, eval DSL and paid spend guard are merged. Appearance integration, production hosting/credits and calibration remain open. The Haiku probe is complete; kit generation was shelved. Do not restart either from obsolete unchecked rows.
+
+Integration validation: root checks, eight property tests and 199 production-preview acceptance tests pass. Fake evals have 126 passing and eight failing criteria with the canned always-approve responses. Keep that limitation visible; no live model was evaluated.
 
 ## AI coding session resume
 
 Read the [accepted integration handoff](docs/ai-visual-generation.md#ai-session-handoff-2026-11-15).
 
-- [ ] Write failing integration evals, then combine separate stats/appearance stages: five calls maximum, one repair per stage, skip appearance when stats fail and disclose a visual stand-in. Three calls is the clean path.
+- [x] Committed integration combines separate stats/appearance stages: five calls maximum, one repair per stage, skip appearance when stats fail and disclose a visual stand-in. Three calls is the clean path.
 - [ ] Coordinate the renderer consumer and schema move with build; keep schemas local until another package genuinely imports them. Preserve accepted drawings and strict bounds.
 - [ ] Before authorized paid validation, reconcile the actual cumulative ledger across checkouts; preserve the $1 total ceiling. Measure combined cost/latency against the recorded estimate, not a fresh/reset balance. No budget or credit-price increase is approved.
 - [ ] Mutation-prove integration and report checks/evals. Preserve gameplay under malformed/partial appearance, unknown versions/roles, geometry excess and unsupported identity/mechanics; compare validity with human recognisability.
@@ -19,9 +21,9 @@ Read the [accepted integration handoff](docs/ai-visual-generation.md#ai-session-
 The current research assignment remains documentation/review only. Coordinate ownership with the active coding/research sessions before reserving files; an old thread ID is not proof that its owner is still active.
 
 - [x] 2026-11-17, Research 2: inspected current source; no integrated preference output/general balancer found. Delivered the [human-review probe brief](docs/ai-stat-preference-probe.md): twelve proposed label rows, three encoding arms, scorecard and paired omitted-stat illustrations; no model call.
-- [ ] Obtain human label approval and review the paired policy illustrations before future probes. The user chose **compare both first**; omitted-stat policy remains open. Run interpretation probes only after integration and required authorization.
+- [x] Human labels v1 and AI-chosen unspecified values/trade-offs approved on 2026-11-17. Run interpretation probes only after integration and required authorization.
 - [ ] Coordinate AI-owned preference parsing and engine-owned rating/balancing; document a contract before code work.
-- [ ] Bring paired modest-default versus AI-chosen-weakness examples to the user before choosing omitted-stat policy. Keep explicit and inferred preferences separate. No additional generation call is approved.
+- [x] Paired policy illustrations reviewed; AI inference selected. Keep explicit and inferred preferences separate. No additional generation call is approved.
 
 ## O2: the pipeline (a deterministic LangGraph `StateGraph`, not a free agent). Milestones M3 to M5
 

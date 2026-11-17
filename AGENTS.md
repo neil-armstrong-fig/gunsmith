@@ -105,7 +105,10 @@ Prettier owns formatting (`pnpm format`). What it won't tell you:
   exports `useMoveSelection`). A test takes the name of its subject and sits beside it.
 - **A file lives as close to its caller as it can, in a subdirectory of it.** A helper used by one
   file goes in a folder beneath it, never beside it; something shared rises to its callers' nearest
-  common ancestor and no further.
+  common ancestor and no further. **Do not extract a file for what only one file uses and nobody tunes or tests alone**: a
+  fixed sentence or message, a one-off constant, a three-line helper stays in its one caller, a `const` above its use (the
+  player-facing "invalid" message lives in the file that returns it). A constant gets its own file only when it is a tunable
+  (a number or limit set by play, read by more than one file or by a test) or is shared.
 - **A folder's root is its table of contents.** The handful of entry points that say what's in there
   stay at the top; everything else drops into a subfolder named for its subject. Around six files is
   where a folder starts reading as a bucket rather than a list — a smell, not a hard limit.

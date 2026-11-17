@@ -5,7 +5,7 @@ import {z} from "zod";
  * model writes numbers as numbers (with no type at all it wrote every number as text, measured 2026-11-12), but no limits, no
  * whole-number rule, none required, and any extra field kept. LangChain parses a structured answer against the schema it is
  * given and throws on a value outside it, which would hide the answer from `validate` and `repair`. So the limits live in the
- * prompt, and the strict `weaponDraftSchema` is applied afterwards, by code, where a refusal can be repaired. A value of the
+ * prompt, and the strict schema (`weaponDraftSchema` and the preference's) is applied afterwards, by code, where a refusal can be repaired. A value of the
  * wrong type still throws here, and `generateWeaponDraft` turns that into no answer.
  */
 export const weaponDraftReplySchema = z.looseObject({
@@ -16,4 +16,11 @@ export const weaponDraftReplySchema = z.looseObject({
   magazineSize: z.number().optional().describe("rounds in the magazine, a whole number"),
   reloadSeconds: z.number().optional().describe("seconds a reload takes"),
   startingReserve: z.number().optional().describe("spare rounds at the start, a whole number"),
+  preference: z
+    .object({
+      favoured: z.array(z.string()).optional().describe("the stats the request wants high"),
+      sacrificed: z.array(z.string()).optional().describe("the stats the request would give up, to be low"),
+    })
+    .optional()
+    .describe("where the request wants the weapon's strength to go"),
 });
