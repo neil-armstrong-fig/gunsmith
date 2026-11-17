@@ -99,6 +99,33 @@ export class GunsmithDsl {
     }
   }
 
+  /** Opens a sparring match whose pictures are held back on their way to the page until `releasePictures`, and returns while they are. */
+  async startSparringWithHeldPictures(): Promise<void> {
+    try {
+      await this.gunsmith.openSparringWithHeldPictures();
+    } catch (error) {
+      throw new DslError("Failed to open the sparring match with held pictures", error);
+    }
+  }
+
+  /** Lets the held pictures through, and waits until the page has them. */
+  async releasePictures(): Promise<void> {
+    try {
+      await this.gunsmith.releasePictures();
+    } catch (error) {
+      throw new DslError("Failed to release the held pictures", error);
+    }
+  }
+
+  /** Opens a sparring match whose pictures are not on the server at all. */
+  async startSparringWithMissingPictures(): Promise<void> {
+    try {
+      await this.gunsmith.openSparringWithMissingPictures();
+    } catch (error) {
+      throw new DslError("Failed to open the sparring match with the pictures missing", error);
+    }
+  }
+
   /** Opens sparring with what the game draws from a seed (where a weapon lies, where a ring closes) drawn from `seed`. */
   async startSparringWithSeed(seed: number): Promise<void> {
     try {

@@ -1,7 +1,7 @@
 # Asset manifest (spec)
 
 The contract between `build` and `art` so art can be dropped in without code changes. **`build` creates the real manifest in
-`webapp/src/assets/manifest` and keeps this spec in step;** `art` reviews it before it freezes (Milestone M2).
+`webapp/src/assets/sprites/` (the pictures; started 2026-11-16 with the player, other families as they are wired) and keeps this spec in step. A team has its own file per stance, so those keys end in `-blue` or `-orange` (`sprite-player-stand-blue`);** `art` reviews it before it freezes (Milestone M2).
 
 [Visual examples and build guide](asset-reference/README.md) cover every family
 below, with labelled sizes, placement, variants and approved audio links. These

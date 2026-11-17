@@ -14,6 +14,8 @@ Committed through `8acad87`: playable best-of-three, seeded opponent, forward vi
 - [ ] Add art's pickup glow when a key is agreed. Custom/dropped weapons, shot synthesis and weapon variety remain open. Existing pickups equip slot 2, discard its previous weapon and break a simultaneous claim in the opponent's favour; do not reopen these choices implicitly.
 - [ ] Merge duplicated pickup/ring route-distance logic after the stairs session's route code lands. Close stair-flank access and validate routes to high ground/ring escape.
 
+Committed art integration now includes player/opponent sprites, crouched player art, dummy styling, sprite fallback/readiness and visual acceptance coverage. Projectile artwork remains unfinished in its source worktree.
+
 ## Research-informed playtests
 
 - [ ] Tune crouch's movement/vision tradeoff; quieter movement and cover protection remain future mechanics. Check reasons to stand and vulnerability while repositioning.

@@ -56,6 +56,16 @@ Use the heights scenario for stair and level criteria. Cover blocked drops, lega
 
 Use query-configured ring timing rather than waiting the default countdown. A freeze assertion needs a ring still closing when the round ends; an already-closed ring gives false coverage. Read shader errors and compare screenshot samples with the hook's ring geometry.
 
+## Drawings (art's pictures)
+
+`DrawingTheOpponent` does the same for the opponent (sparring's stands still): grey body, two small orange stripes, the outline, no placeholder; turned away (`vision.isOpponentSeen()` false) **nothing at all** is drawn at its place, which is the fog rule seen on the screen; turned back it is drawn again. The look helpers are shared in `playwright/look/` (`lookOfFighter(page, centre, teamColour)`, `TeamColours`).
+`DrawingThePlayer` also checks the drawing **turns with the aim** (`isHandOnTheFacingSide()`, aiming in four directions): the body is round, so its colour counts and outline are the same turned any way, and only the hand, a third of a tile ahead of the centre, shows which way it faces.
+
+`DrawingThePlayer` reads what a player sees from a screenshot, like `DrawingTheClosingRing` (the canvas is not in the DOM): `playwright/screen/ColoursAtTiles.ts` returns the colours at a list of places in tiles (the ring's line sampling and the player's grid both use it); in `playwright/look/`, `ColourIsNear` matches a flat fill within a tolerance and `ColourIsPaleGrey` matches the
+placeholder's tone-mapped barrel (unit-tested, `pnpm test` here). `gunsmith.player.getLookOnScreen()` samples a 1.5-tile square on the player (gap 0.025 tile) and counts the body's grey (`#30404F`), the team's blue (`#62B5FF`) and pale grey, and checks the body's outline (`#91A2B2`) at the circle walls stop (0.4 tile, eight compass points, three radii each, since a 2-pixel line blurs at its edge):
+the player must stand still. **A check must look for what only the drawing has**: the placeholder disc was close to the team's blue, so blue alone would have passed; the grey body, a small stripe, an outline at exactly the hitbox's radius and no pale grey say the drawing is there and placed. Counts are the same every run (413 grey and 24 stripe standing, 146 and 16 crouched), thresholds sit well off them.
+**`data-sprites-ready`** is waited for whenever the DSL opens the game (`GunsmithPlaywright.waitForArena`), so a spec never reads the placeholder. `startSparringWithHeldPictures()` holds art's `.svg` files back with a route until `releasePictures()` (so a spec can assert `arena.isWaitingForPictures()` while they are missing, deterministically: a time delay was measured and failed to kill a mutant that set the signal early, since it is a race a fast machine wins), and `startSparringWithMissingPictures()` answers 404 to them, to show the placeholder shows and the page still becomes ready. **The route's glob must end in `.svg`**: the dev server also serves the app's own `src/assets/sprites/*.ts`, and `**/assets/sprites/**` 404'd those and left a blank page.
+
 ## Pickups
 
 Use seeded sparring to isolate player pickup behavior. Assert visibility and inventory consequences as well as pickup disappearance. Keep duel round-reset coverage separate from a bot taking a weapon.

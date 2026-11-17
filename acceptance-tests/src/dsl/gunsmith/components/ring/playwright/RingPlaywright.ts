@@ -1,10 +1,10 @@
-import type {RingPixel} from "@src/dsl/gunsmith/components/ring/playwright/types/RingPixel";
 import type {Page} from "@playwright/test";
 import {expect} from "@playwright/test";
 import type {RingSnapshot} from "@gunsmith/shared/state-hook/types/RingSnapshot";
-import type {Colour} from "@src/dsl/gunsmith/components/ring/types/Colour";
 import type {ColourSampling} from "@src/dsl/gunsmith/components/ring/types/ColourSampling";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
+import {coloursAtTiles} from "@src/dsl/gunsmith/playwright/screen/ColoursAtTiles";
+import type {Colour} from "@src/dsl/gunsmith/types/Colour";
 
 /** What the browser says when a shader fails to compile: three.js reports it as an error naming its program or the shader. */
 const SHADER_ERROR = /WebGLProgram|shader error|GLSL/i;
@@ -64,47 +64,18 @@ export class RingPlaywright extends BasePage {
     return colour !== undefined && colour.red > colour.blue;
   }
 
-  /**
-   * The colours the screen shows along a line across the arena, read from a screenshot of the page (the canvas is not in the DOM
-   * and its drawing buffer is cleared after each frame, so a screenshot is what a player sees). The arena is fitted to the window
-   * and centred on it, which is where a place in tiles lands on the screen; reading is done in the page, since it decodes the picture.
-   */
+  /** The colours the screen shows along a line across the arena, evenly spaced from one end to the other. */
   private async getColoursAlong(sampling: ColourSampling): Promise<Colour[]> {
-    const {arena} = await this.readGameState();
-    const png = (await this.page.screenshot()).toString("base64");
+    const tiles = Array.from({length: sampling.samples}, (_, sample) => {
+      const along = sampling.samples === 1 ? 0 : sample / (sampling.samples - 1);
 
-    return await this.page.evaluate(
-      async ({png: encoded, sampling: line, arena: size}) => {
-        const image = await createImageBitmap(await (await fetch(`data:image/png;base64,${encoded}`)).blob());
-        const canvas = new OffscreenCanvas(image.width, image.height);
-        const context = canvas.getContext("2d");
-        if (!context) {
-          throw new Error("The page could not make a canvas to read the screenshot with.");
-        }
+      return {
+        x: sampling.from.x + (sampling.to.x - sampling.from.x) * along,
+        y: sampling.from.y + (sampling.to.y - sampling.from.y) * along,
+      };
+    });
 
-        context.drawImage(image, 0, 0);
-        const pixelsPerTile = Math.min(window.innerWidth / size.width, window.innerHeight / size.height);
-        const pixelsPerCssPixel = image.width / window.innerWidth;
-        const colours: RingPixel[] = [];
-        for (let sample = 0; sample < line.samples; sample += 1) {
-          const along = line.samples === 1 ? 0 : sample / (line.samples - 1);
-          const x = line.from.x + (line.to.x - line.from.x) * along;
-          const y = line.from.y + (line.to.y - line.from.y) * along;
-          const screenX = (window.innerWidth / 2 + (x - size.width / 2) * pixelsPerTile) * pixelsPerCssPixel;
-          const screenY = (window.innerHeight / 2 - (y - size.height / 2) * pixelsPerTile) * pixelsPerCssPixel;
-          const [red = 0, green = 0, blue = 0] = context.getImageData(
-            Math.round(screenX),
-            Math.round(screenY),
-            1,
-            1,
-          ).data;
-          colours.push({red, green, blue});
-        }
-
-        return colours;
-      },
-      {png, sampling, arena},
-    );
+    return await coloursAtTiles(this.page, tiles);
   }
 
   /** The ring as the game itself reports it. Throws when the game has no ring. */

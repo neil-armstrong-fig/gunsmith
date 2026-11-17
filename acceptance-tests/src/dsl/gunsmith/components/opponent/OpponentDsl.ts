@@ -2,6 +2,7 @@ import type {Page} from "@playwright/test";
 import type {OpponentSnapshot} from "@gunsmith/shared/state-hook/types/OpponentSnapshot";
 import {OpponentPlaywright} from "@src/dsl/gunsmith/components/opponent/playwright/OpponentPlaywright";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
+import type {FighterLook} from "@src/dsl/gunsmith/types/FighterLook";
 import type {Point} from "@src/dsl/gunsmith/types/Point";
 
 /** The opponent in a duel, reached as `gunsmith.opponent`. */
@@ -18,6 +19,15 @@ export class OpponentDsl {
       return await this.opponent.get();
     } catch (error) {
       throw new DslError("Failed to read the opponent", error);
+    }
+  }
+
+  /** How the opponent looks on the screen right now, counted by colour over a grid on its drawing. It must be standing still (sparring's is); a hidden one shows none of it. */
+  async getLookOnScreen(): Promise<FighterLook> {
+    try {
+      return await this.opponent.getLookOnScreen();
+    } catch (error) {
+      throw new DslError("Failed to read how the opponent looks on the screen", error);
     }
   }
 

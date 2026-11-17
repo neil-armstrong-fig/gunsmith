@@ -4,14 +4,20 @@ import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
 import type {ClosingRingRequest} from "@src/dsl/gunsmith/types/ClosingRingRequest";
 import type {Size} from "@src/dsl/gunsmith/types/Size";
 
+/** Art's pictures, served from `public/assets/sprites`. Only the `.svg` files: the dev server also serves the app's own code from a `src/assets/sprites` folder. */
+const PICTURES = "**/assets/sprites/*.svg";
+
 export class GunsmithPlaywright extends BasePage {
+  /** Lets through the pictures `openSparringWithHeldPictures` is holding back. */
+  private releaseHeldPictures: (() => void) | undefined;
+
   constructor(page: Page) {
     super(page);
   }
 
   async open(): Promise<void> {
     await this.page.goto("/");
-    await expect(this.page.getByTestId("arena")).toHaveAttribute("data-ready", "true");
+    await this.waitForArena();
   }
 
   /** Opens the duel with the opponent's every choice drawn from `seed`, so the same seed plays the same match. */
@@ -21,6 +27,42 @@ export class GunsmithPlaywright extends BasePage {
 
   async openSparring(): Promise<void> {
     await this.openScenario("sparring");
+  }
+
+  /**
+   * Opens sparring with every picture art made held back on its way to the page, as a slow connection would, until `releasePictures`. Nothing waits on a clock:
+   * the pictures arrive when the spec says, so it can look at the page while they have not. Returns once the canvas is up, which is before the pictures are.
+   */
+  async openSparringWithHeldPictures(): Promise<void> {
+    const released = new Promise<void>(resolve => {
+      this.releaseHeldPictures = resolve;
+    });
+    await this.page.route(PICTURES, async route => {
+      await released;
+      await route.continue();
+    });
+
+    await this.page.goto("/?scenario=sparring");
+    await expect(this.page.getByTestId("arena")).toHaveAttribute("data-ready", "true");
+  }
+
+  /** Lets the pictures held back by `openSparringWithHeldPictures` through, and waits until the page has them. */
+  async releasePictures(): Promise<void> {
+    if (!this.releaseHeldPictures) {
+      throw new Error("No pictures are being held back.");
+    }
+
+    this.releaseHeldPictures();
+    await expect(this.page.getByTestId("arena")).toHaveAttribute("data-sprites-ready", "true");
+  }
+
+  /** Opens sparring with art's pictures missing from the server, as a bad deploy would leave them. */
+  async openSparringWithMissingPictures(): Promise<void> {
+    await this.page.route(PICTURES, async route => {
+      await route.fulfill({status: 404});
+    });
+
+    await this.openSparring();
   }
 
   /** Opens sparring with everything the game draws (a ring's centre, a pickup's place) drawn from `seed`, so the same seed plays the same match. */
@@ -64,7 +106,18 @@ export class GunsmithPlaywright extends BasePage {
 
   private async openScenario(scenario: string): Promise<void> {
     await this.page.goto(`/?scenario=${scenario}`);
-    await expect(this.page.getByTestId("arena")).toHaveAttribute("data-ready", "true");
+    await this.waitForArena();
+  }
+
+  /**
+   * Waits until the canvas has been sized and drawn into (`data-ready`), and until every picture the scene draws has loaded or been
+   * given up on (`data-sprites-ready`): the pictures decode after the page opens, and until they do a placeholder shows in their place.
+   */
+  private async waitForArena(): Promise<void> {
+    const arena = this.page.getByTestId("arena");
+
+    await expect(arena).toHaveAttribute("data-ready", "true");
+    await expect(arena).toHaveAttribute("data-sprites-ready", "true");
   }
 
   /** The ring's part of the query: its timings, and its damage when the request boosts it. */

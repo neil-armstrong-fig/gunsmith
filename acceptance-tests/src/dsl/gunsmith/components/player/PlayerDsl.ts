@@ -2,6 +2,7 @@ import type {Page} from "@playwright/test";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
 import {PlayerPlaywright} from "@src/dsl/gunsmith/components/player/playwright/PlayerPlaywright";
 import type {Heading} from "@src/dsl/gunsmith/components/player/types/Heading";
+import type {FighterLook} from "@src/dsl/gunsmith/types/FighterLook";
 import type {Point} from "@src/dsl/gunsmith/types/Point";
 
 /** The player's own character, reached as `gunsmith.player`. */
@@ -110,6 +111,24 @@ export class PlayerDsl {
       return await this.player.getPosition();
     } catch (error) {
       throw new DslError("Failed to read where the player is", error);
+    }
+  }
+
+  /** How the player looks on the screen right now, counted by colour over a grid on their drawing. The player must be standing still. */
+  async getLookOnScreen(): Promise<FighterLook> {
+    try {
+      return await this.player.getLookOnScreen();
+    } catch (error) {
+      throw new DslError("Failed to read how the player looks on the screen", error);
+    }
+  }
+
+  /** Whether the hand in the player's drawing is on the side the player aims, so the drawing has turned with the aim. The player must be standing still. */
+  async isHandOnTheFacingSide(): Promise<boolean> {
+    try {
+      return await this.player.isHandOnTheFacingSide();
+    } catch (error) {
+      throw new DslError("Failed to see which side the player's hand is drawn on", error);
     }
   }
 

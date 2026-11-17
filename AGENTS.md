@@ -152,7 +152,7 @@ Prettier owns formatting (`pnpm format`). What it won't tell you:
 - **Nest, don't repeat a condition.** Two `if`s sharing a leading test (`if (a && b) …` then `if (a) …`) become
   `if (a) { if (b) … }`.
 - **A ternary is the last resort**, for a plain value with no clearer form; prefer guards, `&&` or a small
-  function. (JSX and `clsx` have their own rules in `webapp/AGENTS.md` and `webapp/src/react/AGENTS.md`.)
+  function. (JSX and `clsx` have their own rules in `webapp/AGENTS.md` and `webapp/src/react/AGENTS.md`; in JSX it is never a ternary, always `&&` conditionals.)
   **Never `return cond ? a : b`** — write `if (cond) { return a; }` then `return b;`, and unroll a chain
   (`a ? x : b ? y : z`) into one `if` per condition, separated by blank lines. A `const x = cond ? a : b`
   becomes a small function that returns early, not a `let` assigned in branches.

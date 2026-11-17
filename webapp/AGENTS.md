@@ -80,6 +80,10 @@ managers are fine for updates that are not rapid). The decision and its sources 
 [Historical implementation notes](../docs/history/2026-11-17-compaction/WebappInstructions.md)
 retain query fixtures, rendering details and measured limitations. Read the relevant code before relying on old paths or numbers.
 
+## Sprite rendering
+
+SVG assets live in `public/assets/sprites/`; `assets/sprites/` owns keys, anchors and pixels-per-tile scaling. Preserve body-centre anchors and the same scale across stances. Rasterised textures render with `toneMapped={false}`. Missing/loading pictures use the existing placeholders; `data-sprites-ready` becomes true after every load succeeds or fails, and acceptance scenarios wait for it.
+
 ## Folders inside `react/`
 
 - **One folder per component**, named in kebab-case for its file: `arena-canvas/ArenaCanvas.tsx`. Its children go in its

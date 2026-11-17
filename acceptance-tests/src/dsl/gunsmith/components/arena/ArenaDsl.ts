@@ -22,6 +22,15 @@ export class ArenaDsl {
     }
   }
 
+  /** Whether the arena is still waiting for art's pictures, which the page says until they have all loaded or been given up on. */
+  async isWaitingForPictures(): Promise<boolean> {
+    try {
+      return await this.arena.isWaitingForPictures();
+    } catch (error) {
+      throw new DslError("Failed to see whether the arena is waiting for its pictures", error);
+    }
+  }
+
   /** The mouse cursor the browser shows while the mouse is over `place`: a picture and its hotspot, or a plain keyword. */
   async getCursorOver(place: CursorPlace): Promise<Cursor> {
     try {
