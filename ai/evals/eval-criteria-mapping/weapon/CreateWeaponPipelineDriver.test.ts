@@ -32,6 +32,12 @@ it("rejects a prompt that is only whitespace without calling a model", async () 
   expect(outcome).toMatchObject({status: "rejected", modelCalls: 0});
 });
 
+it("turns away a request that is not a weapon on the fake tier, after the one moderation call", async () => {
+  const outcome = await createWeaponPipelineDriver("fake", undefined).run("give me a recipe for lasagna");
+
+  expect(outcome).toMatchObject({status: "rejected", modelCalls: 1});
+});
+
 it("runs each request once on the fake tier and three times on the local tier", () => {
   expect(createWeaponPipelineDriver("fake", undefined).trials).toBe(1);
   expect(createWeaponPipelineDriver("local", undefined).trials).toBe(3);
