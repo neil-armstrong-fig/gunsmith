@@ -4,11 +4,11 @@ Model: **Claude**. Follow the startup protocol in [TODO.md](TODO.md); read only 
 
 ## Resume here
 
-Checkout: develop only in this persona's assigned worktree. At startup, record its actual path/branch and last merged committed main revision here; these are not yet assigned by the workflow update. Sync main into the clean worktree before new work and delivery; main is for integration/validation only. Preserve existing unfinished legacy worktrees. See [Operations](docs/agent-reference/Operations.md#development-worktrees-and-the-integration-checkout).
+Checkout: worktree `/Users/neilarmstrong/Development/Personal/gunsmith/.claude/worktrees/budget`, branch `worktree-budget`, created 2026-11-17 from main `6f6b028` (last merged main: `6f6b028`). Sync main into the clean worktree at the start of every turn; main is for integration/validation only. See [Operations](docs/agent-reference/Operations.md#development-worktrees-and-the-integration-checkout).
 
-Define the production accounting slice with server and AI when the API consumer exists; retain existing credit prices and budget ceilings.
+Done 2026-11-17: the concurrency/failure scenarios are written as a working draft in [cost-and-budget.md](docs/cost-and-budget.md#acceptance-scenarios-working-draft-budget-2026-11-17); not frozen, awaiting `server` and `ai` review. Still open: define the production accounting slice with server and AI when the API consumer exists; retain existing credit prices and budget ceilings.
 
-Current milestone: M4–M5; the project remains on M1. Next failing test/check: Concurrent requests cannot overspend; retries/refunds are idempotent; budget exhaustion stops calls while built-in play continues.
+Current milestone: M4–M5; the project remains on M1. Next failing test/check: waits on server's `api/` scaffold. Then port the first scenario (two concurrent requests, one credit: exactly one reserves) into an executable spec and watch it fail. Open questions (D1 vs Durable Object counters, where the cost estimator lives) are listed with the scenarios.
 
 ## Ownership
 
