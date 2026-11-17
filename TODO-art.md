@@ -9,6 +9,7 @@ The inventory study is delivered and visually approved: two compact icons and on
 
 ## Delivered references
 
+- Research 2: [stat-preference probe brief](docs/ai-stat-preference-probe.md) delivered 2026-11-17; pending human labels/policy review and AI/build agreement are tracked in `TODO-ai.md`. Session 1 retains audio QA.
 - [Inventory display](docs/art/concepts/inventory-display/README.md): approved layout, icons and build requirements; runtime hook/manifest agreement remains build's.
 - [Combat feedback](docs/art/concepts/combat-feedback/Handover.md): punchy/crunch, retained shake and integration criteria. [Empty click](docs/art/concepts/empty-weapon-click/README.md) is integrated as plain-WAV `sfx-empty-click`; tune the user's abrasive/loud impression alongside other game sounds.
 - [Fair arenas](docs/art/arena-fairness-research.md): matching spawn pairs, rotational shared-platform fixture first, unchanged random ring centres; build/AI implementation and paired playtests remain open.
@@ -17,9 +18,11 @@ The inventory study is delivered and visually approved: two compact icons and on
 
 ## Audio production
 
-- [ ] Resolve WebKit format/playback blockers with build: recorded MP3/Vorbis duration, alignment and music-seam findings in `webapp/audio/qa/`. Preserve approved masters and thresholds; diagnose in the actual playback path before proposing corrections.
+- [x] Session 1: [browser listening and live-playback handoff](webapp/audio/qa/runtime-playback/README.md) delivered; MP3 confirmed. Removed the completed listening page, seven one-off JSON files and temporary probes at the user's request. Preserve the decision, original audio and existing codec QA; Safari onset/cadence and production mapping remain open.
+
+- [ ] Validate selected MP3 onset/content and event cadence in Safari with build before production mapping. Retain the recorded codec findings; Ogg correction is no longer the active production path. Preserve approved masters and thresholds.
 - [ ] Check fatigue, masking and levels on headphones/speakers with the real weapon-shot synth. General audition approval is not proof of these tests.
-- [ ] Agree production codec and manifest mappings after QA; support playback/ducking/volume integration. Weapon-shot synthesis belongs to build/AI; art supplies static cues.
+- [ ] Agree production manifest mappings for confirmed MP3 after integration QA; support playback/ducking/volume integration. Weapon-shot synthesis belongs to build/AI; art supplies static cues.
 
 ## A2 to A4: production assets after M2 contracts
 

@@ -18,7 +18,8 @@ Read the [accepted integration handoff](docs/ai-visual-generation.md#ai-session-
 
 The current research assignment remains documentation/review only. Coordinate ownership with the active coding/research sessions before reserving files; an old thread ID is not proof that its owner is still active.
 
-- [ ] Review new integration/rating evidence against [the stat-balancing study](docs/ai-stat-balancing.md). If none exists, prepare a human-labelable preference-probe brief; no model call is required.
+- [x] 2026-11-17, Research 2: inspected current source; no integrated preference output/general balancer found. Delivered the [human-review probe brief](docs/ai-stat-preference-probe.md): twelve proposed label rows, three encoding arms, scorecard and paired omitted-stat illustrations; no model call.
+- [ ] Obtain human label approval and review the paired policy illustrations before future probes. The user chose **compare both first**; omitted-stat policy remains open. Run interpretation probes only after integration and required authorization.
 - [ ] Coordinate AI-owned preference parsing and engine-owned rating/balancing; document a contract before code work.
 - [ ] Bring paired modest-default versus AI-chosen-weakness examples to the user before choosing omitted-stat policy. Keep explicit and inferred preferences separate. No additional generation call is approved.
 

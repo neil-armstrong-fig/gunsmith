@@ -142,6 +142,21 @@ fatigue, device playback and masking with real gunshots.
 Compressed candidates and browser reports are delivered below, with failing production checks. Manifest approval and runtime integration remain outstanding. MP3 fallback loop behaviour needs separate
 verification; WAV continuity alone does not prove compressed playback seamless.
 
+## Selected format after human listening (2026-11-17)
+
+The user reports equivalent good sound across formats in Firefox/Chrome, but
+harsh/clipped-sounding Ogg cues and slower MP3 repetition in Safari. **MP3 is the
+selected compressed format**. See the [listening review and integration
+conditions](qa/runtime-playback/README.md#human-listening-review--2026-11-17).
+Keep the existing WAV click pending Safari onset/cadence checks; measured MP3
+padding findings and production mapping remain open.
+
+## Live playback diagnosis (2026-11-17)
+
+[Findings and build handoff](qa/runtime-playback/README.md) record the live/game
+checks and confirmed MP3 decision. The completed listening page and one-off JSON
+bundle were removed after user review. Existing codec tools and audio remain.
+
 ## Alignment diagnosis (2026-11-14)
 
 [Sample-alignment evidence and build handoff](qa/webkit-alignment/README.md)

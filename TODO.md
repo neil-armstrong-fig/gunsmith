@@ -19,8 +19,8 @@ Start a session with: **"You are build|ai|art, continue the TODO."**
 | Persona | Current focus | Updated |
 | ------- | ------------- | ------- |
 | build | M1: finish stairs/bot work in its existing session; incoming damage, hit feedback, shake and approved inventory integration. Pickups and empty click are committed. | 2026-11-17 |
-| ai | Integrate separate stats/appearance calls (five maximum); preserve cumulative spend. Preference/default-policy research supports later code-owned balancing. | 2026-11-16 |
-| art | Inventory study approved; handovers delivered. Review new integration evidence; production manifest and audio/codec QA remain open. | 2026-11-17 |
+| ai | Integrate separate stats/appearance calls (five maximum); preserve cumulative spend. Research 2's preference-probe brief is ready for human label/policy review; balancing remains pending. | 2026-11-17 |
+| art | Session 1: human browser review received; MP3 confirmed after Safari Ogg issues. Verify Safari onset/cadence before production mapping. Inventory approved. | 2026-11-17 |
 
 Detailed current tasks: [build](TODO-build.md), [AI](TODO-ai.md), [art](TODO-art.md).
 Earlier status, requests and measurements: [snapshot](docs/history/2026-11-17-compaction/SharedTodo.md).
@@ -47,8 +47,8 @@ M0 is complete; M1 is current. Later milestones proceed when their consumers and
 - Build: integrate approved [inventory](docs/art/concepts/inventory-display/README.md) and remaining [combat feedback](docs/art/concepts/combat-feedback/Handover.md), agreeing minimum hook/event/manifest data first.
 - Build/AI: implement [arena fairness](docs/art/arena-fairness-research.md), including transformed stairs/heights, matching spawns, clearance and paired playtests. Preserve random ring centres; use escape measurements as diagnostics.
 - AI coding owner: follow the [five-call integration handoff](docs/ai-visual-generation.md#ai-session-handoff-2026-11-15); reconcile actual cumulative spend before authorized paid runs. The research assignment remains documentation/review only.
-- AI/build/user: settle preference encoding, balancing ownership/rating and omitted-stat defaults from [the study](docs/ai-stat-balancing.md). Power is a ceiling and deliberately weak weapons stay weak; no production solver/budget is frozen.
-- Build/art: compressed audio remains blocked on WebKit duration/alignment/seam findings. Use the recorded QA and real playback evidence; no blanket trimming, threshold change or format switch is approved. Plain WAV click integration does not close this work.
+- AI/build/user: review labels and paired policies in the [preference-probe brief](docs/ai-stat-preference-probe.md), then settle encoding, balancing ownership/rating and omitted-stat defaults from [the study](docs/ai-stat-balancing.md). User chose compare both first; power remains a ceiling preserving deliberate weakness. No production solver/budget is frozen.
+- Build/art: MP3 is the confirmed compressed format after browser listening. Validate Safari onset/content and event cadence before production mapping; retain recorded codec findings. No blanket trimming or threshold change is approved. Existing WAV click integration is unchanged.
 - Build/AI: act on the visual reviews' identity/readability findings during integration (duck/cactus, lantern evidence, pose/muzzle alignment, teapot contrast). Kit generation remains shelved.
 - Build/AI: implement the [fair-play/privacy handover](docs/art/fair-play-research.md) with online play: sign-in for public play, bounded/private replays and reporting, isolated restricted queues, clean-match recovery/human override and retention/erasure checks. This does not block M1.
 - M2 contracts/manifest remain unfrozen until real consumers exist and owners review them. API/infra, root eval/property/API commands and CI remain tracked in the owner checklists.

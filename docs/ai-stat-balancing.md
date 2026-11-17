@@ -6,6 +6,12 @@ runtime implementation follows stats/appearance integration in
 This study proposes a direction, not a frozen schema or calibrated power formula.
 No model was called, no gameplay changed, and no balancing accuracy is claimed.
 
+Follow-up, 2026-11-17: the [human-review probe brief](ai-stat-preference-probe.md)
+provides twelve proposed label rows, encoding comparisons, a future scorecard
+and concrete paired policy illustrations. The user chose **compare both first**;
+labels await human approval and omitted-stat policy remains open. Current source
+inspection still found no integrated preference output or general balancer.
+
 ## Decisions and recommendation
 
 The user's 2026-11-14 design is that the model returns inferred stat values and
