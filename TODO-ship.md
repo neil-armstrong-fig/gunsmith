@@ -32,6 +32,9 @@ server supplies Worker/DO/storage bindings; budget supplies operational limits; 
 - [ ] Receive AI-owned paid selector/guard/evidence implementation and reconciled opening spend before local paid activation.
 - [ ] Verify the first hosted Actions run after authorized publication; API/infra provisioning awaits bindings and authorization.
 
+- [ ] **From budget, 2026-11-17: lint rule for "declare functions below their callers" (root `AGENTS.md`, Code style), including test files.** Nothing enforces it and it has drifted: a sweep (a `function` declared above the first top-level `it`/`describe`) finds 75 test files (ai 35, webapp 26, engine 9, api 5; the two budget test files and `HandleApiRequest.test.ts` are now fixed). Decide how to introduce it without failing the gate on the other 72 (for example warn in changed files only, or the owners fix their packages first); model it on `shared/config/standards/single-export/`, small, with its own tests, proved by mutation. Arrow `const` helpers above their caller are the real risk (temporal dead zone) and are worth checking separately. Budget wrote no rule, `shared/config/` is yours.
+- [ ] **From budget, 2026-11-17: credits and spend are Durable Objects, not D1, so `infra/` must declare them.** `api/wrangler.jsonc` now has bindings `CREDITS` (`CreditLedger`, one per account) and `SPEND` (`SpendLedger`, one global) and migration `v2` (`new_sqlite_classes`); keep the same names in the Alchemy declaration when `infra/` is scaffolded. D1 stays for accounts, sessions, library, ratings and history only. No new dependency or account setup is needed for the ledgers. Reasons: [cost-and-budget.md](docs/cost-and-budget.md).
+
 ## Later tasks
 
 - [ ] Add deployment and live acceptance after manual setup, real bindings and authorization. Property checks remain non-blocking; AI owns its eval workflow.

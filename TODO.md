@@ -21,7 +21,7 @@ Start a session with: **"You are engine, continue the TODO."** Substitute any pe
 | engine | Claude | [TODO-engine.md](TODO-engine.md) | Hit events and structural arena validator integrated; spawn/symmetry work remains in its worktree, limits and built-in pool next. | 2026-11-17 |
 | ai | Claude | [TODO-ai.md](TODO-ai.md) | Generated pickup renderer and fake-tier arena pipeline A3 integrated; readability review, judge A4, engine-validator adoption and calibration next. | 2026-11-17 |
 | server | Claude | [TODO-server.md](TODO-server.md) | First online match green (`TwoBrowsersHidingFromEachOther`); minimal `api/`, per-seat fog, webapp client. Next: round/match flow in a room, reconnect, then sign-in/storage for budget. | 2026-11-17 |
-| budget | Claude | [TODO-budget.md](TODO-budget.md) | API package is integrated; credits/spend work still awaits storage, account identity and the AI route. | 2026-11-17 |
+| budget | Claude | [TODO-budget.md](TODO-budget.md) | Credit ledger and spend meter built on Durable Objects (committed `cb18fdb`, tested); waits on server's generation route and account id. | 2026-11-17 |
 | art | Codex | [TODO-art.md](TODO-art.md) | Terrain SVG candidates and browser review sheets delivered; approval/play integration pending. Audio masking awaits runtime synthesis. | 2026-11-17 |
 | ship | Codex | [TODO-ship.md](TODO-ship.md) | Preview scripts/report exclusions delivered; config standards and @src refactor verified in ship worktree. Hosted CI/deployment remain open. | 2026-11-17 |
 
