@@ -1,6 +1,6 @@
 # Architecture
 
-Gunsmith uses a pnpm TypeScript workspace. Local gameplay works today; the authoritative online service and deployment remain planned.
+Gunsmith uses a pnpm TypeScript workspace. Local gameplay and private-room online play work today; authentication, persistence and deployment remain planned.
 
 ## Existing packages
 
@@ -10,6 +10,7 @@ Gunsmith uses a pnpm TypeScript workspace. Local gameplay works today; the autho
 | `webapp/` | Vite, React, react-three-fiber, Zustand, HUD, input, rendering and sound | shared, engine |
 | `ai/` | Validated weapon stats and appearance, LangGraph, model adapters and evals | shared, engine |
 | `shared/` | Base tooling and the read-only snapshot contract used by browser acceptance tests | none |
+| `api/` | Private rooms, authoritative fog-filtered matches and credit/spend Durable Objects | shared, engine, ai |
 | `acceptance-tests/` | Playwright acceptance DSL and specifications | shared |
 | `webapp/audio/` | Offline synthesis, approved masters, codec studies and verification | none |
 
@@ -23,11 +24,11 @@ The game fills the window. Menus are added only when needed. Browser acceptance 
 
 ## Planned online system
 
-One Cloudflare Worker will serve static assets and `/api/*`, keeping session cookies same-origin. A Match Durable Object will run the same engine authoritatively; clients send inputs and predict locally. Player snapshots must omit hidden opponents, and hidden sounds expose only quantised direction. See [netcode](match-netcode.md).
+One Cloudflare Worker will serve static assets and `/api/*`, keeping session cookies same-origin. A Match Durable Object runs the same engine authoritatively at 60 Hz with 30 Hz snapshots; clients predict local movement and interpolate the opponent. Player snapshots must omit hidden opponents, and hidden sounds expose only quantised direction. See [netcode](match-netcode.md).
 
-The planned API imports `ai/` in-process using Workers-compatible LangChain/LangGraph. D1 stores accounts, credits, library and match history. Budget owns atomic spend enforcement and tracing; server owns routing and common storage configuration. Private recording storage is a future fair-play capability, not an existing binding.
+The planned API imports `ai/` in-process using Workers-compatible LangChain/LangGraph. D1 is planned for accounts, library and match history. CreditLedger and SpendLedger Durable Objects hold credits and spend counters. Budget owns atomic spend enforcement and tracing; server owns routing and common storage configuration. Private recording storage is a future fair-play capability, not an existing binding.
 
-`api/` and `infra/` are not scaffolded. Alchemy deployment, Google sign-in, D1, matchmaking, credits and live acceptance await real consumers, reviewed contracts and provisioning authorization. Intended deployment is `gunsmith.neilarmstrong.dev`; forks will need their own domain and manual setup.
+`api/` exists locally; `infra/` remains planned. Alchemy deployment, Google sign-in, D1, matchmaking, AI generation routes and live acceptance await real consumers, reviewed contracts and provisioning authorization. Intended deployment is `gunsmith.neilarmstrong.dev`; forks will need their own domain and manual setup.
 
 ## Decisions and unresolved measurements
 

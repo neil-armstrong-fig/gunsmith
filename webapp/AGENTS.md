@@ -69,6 +69,7 @@ managers are fine for updates that are not rapid). The decision and its sources 
 
 ## Runtime boundaries
 
+- `online/` (`?room=<code>`) is this browser's end of an online match; the server plays it, `OnlineMatch` makes it feel like the local game. The own fighter is predicted (each fixed step the input is sent when it changes, plus a heartbeat, and played at once with the engine; each snapshot says how far the server has played them, `ack`, and the rest are played again on top of its word, a small disagreement eased out over a fifth of a second and one over a tile put right at once), the other fighter is drawn about 100 ms behind the newest snapshot on a render clock that holds when snapshots are late (`interpolation/`), and the game store still holds only a `World` (`worldToShow`). Shots are not predicted. `?lag=<ms>` holds every frame up that long each way, to feel it on localhost. The online branch of `UseGameLoop` and `online/` are server's; play keeps the local path.
 - `game/scenario/` chooses seeded setup once from the query. Query parameters configure a scenario, never write live state. Preserve the match score and setup when starting another round.
 - Render the engine's visibility result; do not invent a second sight/height rule in React. Keep terrain dim outside the cone while suppressing hidden entities and their effects.
 - HUD animation on a timer uses CSS; per-frame geometry and uniforms use `useFrame`. Update shader uniforms through `materialRef.current.uniforms`, not the object originally passed to JSX.

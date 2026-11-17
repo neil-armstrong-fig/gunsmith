@@ -61,9 +61,9 @@ export class Match {
       return;
     }
 
-    const input = parseInputMessage(data);
-    if (input) {
-      this.room.setInput(seat, input);
+    const message = parseInputMessage(data);
+    if (message) {
+      this.room.setInput(seat, message.input, message.seq);
     }
   }
 

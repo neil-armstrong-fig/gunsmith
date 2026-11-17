@@ -1,5 +1,6 @@
 import type {Page} from "@playwright/test";
 import {RoomPlaywright} from "@src/dsl/gunsmith/components/room/playwright/RoomPlaywright";
+import type {ConnectionDelay} from "@src/dsl/gunsmith/components/room/playwright/wire/delayed-line/types/ConnectionDelay";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
 import type {GunsmithDsl} from "@src/dsl/gunsmith/GunsmithDsl";
 
@@ -61,6 +62,93 @@ export class RoomDsl {
     }
 
     return this.second;
+  }
+
+  /** Holds every frame to and from this browser up by `delay`, in order. Say it before `createPrivateRoom`: it applies to the page that opens next. */
+  async slowTheConnectionBy(delay: ConnectionDelay): Promise<void> {
+    try {
+      await this.room.slowTheConnectionBy(delay);
+    } catch (error) {
+      throw new DslError("Failed to slow the connection", error);
+    }
+  }
+
+  /** Hands this browser only every `n`th snapshot the server sends it, as a server that sent far fewer would. Say it before `createPrivateRoom`. */
+  async receiveOnlyEveryNthSnapshot(n: number): Promise<void> {
+    try {
+      await this.room.receiveOnlyEveryNthSnapshot(n);
+    } catch (error) {
+      throw new DslError(`Failed to thin the snapshots to every ${n}th`, error);
+    }
+  }
+
+  /** Starts noting where this browser draws both fighters on every frame, so the largest jump either was seen to make can be read. */
+  async startRecordingTheShownFighters(): Promise<void> {
+    try {
+      await this.room.startRecordingTheShownFighters();
+    } catch (error) {
+      throw new DslError("Failed to start recording the shown player", error);
+    }
+  }
+
+  /**
+   * The largest step this browser showed the player take between two frames since recording began, in tiles, beyond what walking at the
+   * server's pace explains over the time between them.
+   */
+  async getLargestShownJump(): Promise<number> {
+    try {
+      return await this.room.getLargestShownJump();
+    } catch (error) {
+      throw new DslError("Failed to read the largest shown jump", error);
+    }
+  }
+
+  /**
+   * The largest step this browser showed the other player take between two frames since recording began, in tiles, beyond what walking at
+   * the server's pace explains over the time between them. The pace is the second browser's own, from the snapshots it was sent.
+   */
+  async getLargestShownOpponentJump(): Promise<number> {
+    try {
+      return await this.room.getLargestShownOpponentJump(this.secondBrowser().room.getFastestServerMovement());
+    } catch (error) {
+      throw new DslError("Failed to read the largest shown jump of the other player", error);
+    }
+  }
+
+  /** How many frames this browser drew the other player on since recording began: a jump measured over none says nothing. */
+  async getShownOpponentSamples(): Promise<number> {
+    try {
+      return await this.room.getShownOpponentSamples();
+    } catch (error) {
+      throw new DslError("Failed to count the frames the other player was drawn on", error);
+    }
+  }
+
+  /** The fastest the server moved this browser's player, in tiles a second of game time, from the snapshots it sent. */
+  getFastestServerMovement(): number {
+    try {
+      return this.room.getFastestServerMovement();
+    } catch (error) {
+      throw new DslError("Failed to read the fastest movement the server sent", error);
+    }
+  }
+
+  /** Whether this browser shows the player well ahead of where the latest snapshot has them, as it must when walking over a slow connection. */
+  async isShownAheadOfTheServer(): Promise<boolean> {
+    try {
+      return await this.room.isShownAheadOfTheServer();
+    } catch (error) {
+      throw new DslError("Failed to compare the shown player with the server's", error);
+    }
+  }
+
+  /** Whether this browser shows the player where the latest snapshot has them. */
+  async isShownWhereTheServerHasThem(): Promise<boolean> {
+    try {
+      return await this.room.isShownWhereTheServerHasThem();
+    } catch (error) {
+      throw new DslError("Failed to compare the shown player with the server's", error);
+    }
   }
 
   /** Whether the server has sent this browser any snapshot yet. */

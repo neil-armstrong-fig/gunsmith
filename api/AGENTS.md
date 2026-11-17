@@ -22,8 +22,9 @@ Import with the `@src/*` alias.
 ## Conventions
 
 - **Decide in plain functions and plain classes; keep the runtime at the edge.** A class is for state (`MatchRoom`) or the Durable Object itself.
+- Property tests (`fast-check`, `match/property-tests/*Invariants.test.ts`) are left out of `pnpm checks` and run with `pnpm test:properties`, as the engine's do.
 - Tests run in plain node (`vitest.config.ts`): `@cloudflare/vitest-pool-workers` peers on vitest 4 and the workspace is on 5. A route takes a `Request` and an `ApiEnvironment`, so a test passes a fake `MATCHES` namespace.
-- Pacing is `match/tick/MatchTick.ts`: a clock about 60 times a second plays the engine's 1/60 s steps that real time owes (`StepsOwed`, so a late timer does not slow the game) and sends a snapshot after each. 60 is a localhost stopgap (20 felt choppy: the browser only draws what it is sent); the cure is client prediction and interpolation, then back to 20 to 30.
+- Pacing is `match/tick/MatchTick.ts`: a clock 30 times a second plays the engine's 1/60 s steps that real time owes (`StepsOwed`, so a late timer does not slow the game) and sends a snapshot after each. The browser predicts its own fighter and blends the other between snapshots (`webapp/src/online/`), so 30 is enough; at 20 the plain local-feeling game was choppy only because nothing smoothed it. The wire carries `seq` on each input and `ack` (`seq`, `held`) on each snapshot (`@gunsmith/shared/online/types/InputAck`) so the browser knows which of its inputs the server has played.
 - Not built yet, on purpose: sign-in, D1/Drizzle, the matchmaker, reconnect and idle forfeit, spectators, rate limiting, recordings. Add each when a spec needs it.
 
 ## Running

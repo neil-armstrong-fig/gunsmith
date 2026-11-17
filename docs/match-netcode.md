@@ -23,14 +23,14 @@ These are design decisions; the online controls are not implemented yet.
 | Piece | Responsibility |
 | ----- | -------------- |
 | API Worker | Authenticates the session, routes HTTP and WebSocket upgrades, hands the account id to the right Durable Object in a trusted internal header |
-| `Match` Durable Object | One per match. Fixed 20 Hz tick, input validation, authoritative state, fog-filtered snapshots, round and match logic, reconnect window, spectator fan-out, alarm cleanup |
+| `Match` Durable Object | One per match. Fixed 30 Hz snapshots (the engine steps at 60 Hz), input validation, authoritative state, fog-filtered snapshots, round and match logic, reconnect window, spectator fan-out, alarm cleanup |
 | `Matchmaker` Durable Object | Singleton. Holds the public queue in memory/SQLite and serialises pairing (D1 has no transactions, so two matchers could pair one player twice). Creates a `Match` and hands both players its code |
-| D1 | Accounts, sessions, credits, library, ratings, match history. Not the queue |
+| D1 | Accounts, sessions, library, ratings, match history. Not the queue, and not credits or spend: those are Durable Objects (a `CreditLedger` per account, one `SpendLedger`; budget, `docs/cost-and-budget.md`) |
 | Client | Sends inputs with a sequence number, predicts its own player with the shared engine, reconciles to the server, interpolates the others |
 
 ## The tick
 
-- 20 Hz designed (*tunable*; 30 Hz is possible if the free-plan spike allows). Today's build runs about 60 Hz, a localhost stopgap: with no client prediction or interpolation a browser only draws what it is sent, and 20 Hz was visibly choppy next to the local game (user, 2026-11-17). The clock plays the 1/60 s engine steps real time owes, so a late timer does not slow the match. Each tick: apply validated inputs, step the engine,
+- 30 Hz snapshots (*tunable*; the free-plan spike decides whether to go lower). A browser that only drew what it was sent looked choppy at 20 Hz next to the local game (user, 2026-11-17), so the client now predicts its own fighter and blends the other (see Snapshots and the client row above); the server does not need to run faster for it. The clock plays the 1/60 s engine steps real time owes, so a late timer does not slow the match. Each tick: apply validated inputs, step the engine,
   resolve hits, update the closing ring, compute per-player visibility, send each player their snapshot.
 - Input validation: rate-limit and clamp (a move vector's length, a fire request only if the weapon can fire), reject
   out-of-order sequence numbers, ignore anything for a dead player.
