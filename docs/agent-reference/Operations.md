@@ -32,6 +32,16 @@ before finishing work in `engine/src/`, and `pnpm evals` before finishing work i
 this section is for then. `EnterWorktree` makes one under `.claude/worktrees/<name>` on branch
 `worktree-<name>` (`git worktree add` does the same by hand).
 
+**Every fresh turn in a worktree starts by checking `main` (the user's standing instruction, 2026-11-16).** Run
+`git log --oneline HEAD..main`. If main has moved, merge it in before any work (`git merge main`, on a clean tree) and
+commit the merge as `chore: merge main into <branch>`; this is the one commit a session makes unasked, and only the
+merge, never its own work. Resolve the conflicts yourself: the shared docs (`HANDOFF.md`, `TODO*.md`, a status-board
+row) keep both sides, code is merged by meaning. **Ask the user only when a conflict is a real decision** (two sides
+that disagree on behaviour, not on wording). Then re-run the affected checks (`pnpm checks`, and the specs both
+sides touched) before committing: a clean text merge proves nothing, and main's new lint rules reach your files
+through it. Main's *uncommitted* work in the main checkout cannot be merged: say it is not visible yet. If the tree is
+dirty mid-turn, say so rather than stashing (the stash is shared).
+
 1. **Install its own dependencies** — a worktree has no `node_modules`:
    `pnpm install --frozen-lockfile --offline`.
 2. **The files are yours; the repository isn't.** Branches, remotes and the stash are shared with

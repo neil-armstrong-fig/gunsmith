@@ -45,15 +45,19 @@ it("reports no bullets when none are in the air", () => {
   expect(snapshotOf(world).bullets).toEqual([]);
 });
 
-it("reports where each bullet in the air is", () => {
+it("reports where each bullet in the air is, whose it is and which way it flies", () => {
   const flying = {
     ...world,
     bullets: [
       {position: {x: 1, y: 2}, direction: {x: 1, y: 0}, damage: 25, speed: 20, shooter: "player" as const, level: 0},
+      {position: {x: 3, y: 1}, direction: {x: 0, y: -1}, damage: 25, speed: 20, shooter: "opponent" as const, level: 0},
     ],
   };
 
-  expect(snapshotOf(flying).bullets).toEqual([{x: 1, y: 2}]);
+  expect(snapshotOf(flying).bullets).toEqual([
+    {x: 1, y: 2, shooter: "player", directionDegrees: 0},
+    {x: 3, y: 1, shooter: "opponent", directionDegrees: -90},
+  ]);
 });
 
 it("reports no dummies when the world has none", () => {

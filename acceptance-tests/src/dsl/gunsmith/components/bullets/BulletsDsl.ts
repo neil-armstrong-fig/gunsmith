@@ -1,7 +1,9 @@
 import type {Page} from "@playwright/test";
+import type {BulletSnapshot} from "@gunsmith/shared/state-hook/types/BulletSnapshot";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
 import {BulletsPlaywright} from "@src/dsl/gunsmith/components/bullets/playwright/BulletsPlaywright";
 import type {Point} from "@src/dsl/gunsmith/types/Point";
+import type {ShotLook} from "@src/dsl/gunsmith/types/ShotLook";
 
 /** The shots in the air, reached as `gunsmith.bullets`. */
 export class BulletsDsl {
@@ -44,6 +46,33 @@ export class BulletsDsl {
       return await this.bullets.count();
     } catch (error) {
       throw new DslError("Failed to count the bullets in the air", error);
+    }
+  }
+
+  /** The shots in the air right now, each with whose it is and which way it flies, in degrees (0 is east, 90 is north). */
+  async getAll(): Promise<BulletSnapshot[]> {
+    try {
+      return await this.bullets.getAll();
+    } catch (error) {
+      throw new DslError("Failed to read the bullets in the air", error);
+    }
+  }
+
+  /** How a shot looks on the screen: counted by colour along it, beside it, ahead of it and past its tail. The game must be held still (`gunsmith.holdTheGame()`). */
+  async getLookOnScreen(bullet: BulletSnapshot): Promise<ShotLook> {
+    try {
+      return await this.bullets.getLookOnScreen(bullet);
+    } catch (error) {
+      throw new DslError("Failed to read how the shot looks on the screen", error);
+    }
+  }
+
+  /** Runs a held game on until the opponent, who fights on its own, has a shot in the air that has flown clear of its body. Fails if it has none within `maxSeconds` of the game's time. */
+  async runUntilTheOpponentFires(maxSeconds: number): Promise<void> {
+    try {
+      await this.bullets.runUntilTheOpponentFires(maxSeconds);
+    } catch (error) {
+      throw new DslError("Failed to run the held game until the opponent fired", error);
     }
   }
 }

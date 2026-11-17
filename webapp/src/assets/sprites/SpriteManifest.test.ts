@@ -52,3 +52,18 @@ it("draws a crouched player at the same scale as a standing one, so the drawing 
     SPRITE_MANIFEST["sprite-player-stand-blue"].pixelsPerTile,
   );
 });
+
+it("anchors a shot's picture on its tip, which the art draws at (49, 32), at the same scale as the fighters", () => {
+  const {anchor, pixelsPerTile} = SPRITE_MANIFEST["fx-projectile-rifle-blue"];
+
+  expect(anchor).toEqual({x: 49, y: 32});
+  expect(pixelsPerTile).toBe(SPRITE_MANIFEST["sprite-player-stand-blue"].pixelsPerTile);
+  expect(SPRITE_MANIFEST["fx-projectile-rifle-orange"]).toEqual(SPRITE_MANIFEST["fx-projectile-rifle-blue"]);
+  expect(fileOf(spriteUrl("fx-projectile-rifle-blue"))).toContain("L49 32");
+  expect(fileOf(spriteUrl("fx-projectile-rifle-orange"))).toContain("L49 32");
+});
+
+it("draws the two sides' shots in their team colours: art's blue, and orange for the opponent", () => {
+  expect(fileOf(spriteUrl("fx-projectile-rifle-blue"))).toContain("#62B5FF");
+  expect(fileOf(spriteUrl("fx-projectile-rifle-orange"))).toContain("#FF9B54");
+});

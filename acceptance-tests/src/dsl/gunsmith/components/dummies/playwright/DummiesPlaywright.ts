@@ -2,7 +2,7 @@ import type {Page} from "@playwright/test";
 import type {DummySnapshot} from "@gunsmith/shared/state-hook/types/DummySnapshot";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
 import {DUMMY_GOLD} from "@src/dsl/gunsmith/playwright/look/DummyColours";
-import {lookOfFighter} from "@src/dsl/gunsmith/playwright/look/LookOfFighter";
+import {lookOfFighter} from "@src/dsl/gunsmith/playwright/look/look-of-fighter/LookOfFighter";
 import type {FighterLook} from "@src/dsl/gunsmith/types/FighterLook";
 import type {Point} from "@src/dsl/gunsmith/types/Point";
 
