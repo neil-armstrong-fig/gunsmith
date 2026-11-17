@@ -30,8 +30,8 @@ drawing repair; three when nothing needs repairing).
 | `tokenPrecheck` | Counts tokens in code; rejects over-limit prompts (weapon 150, arena 250, tunable) | No | Free; half-credit rejection |
 | `moderationJudge` | One cheap model: is this a weapon/arena request, is it safe, is it an injection attempt? Structured verdict | Cheap | Small output cap |
 | `generate` | Structured output through a **loose reply shape** (the weapon's fields and types, no limits), with the `sound` block later | Stronger | `maxTokens`, one call |
-| `validate` | The strict zod parse of the weapon and the player's stat `preference` beside it (and, for arenas, the engine's arena validator). Zod only. A missing preference is no preference; a stat there is not is refused | No | Free |
-| `balance` | **The engine's `balanceWeapon`** (`engine/src/weapon-balance/`): brings the weapon inside the power budget and the damage-per-second cap by taking from its stats where the preference says. Never makes a stat stronger | No | Free |
+| `validate` | The strict zod parse of the weapon's shape and the player's stat `preference` beside it (and, for arenas, the engine's arena validator). Zod only. **It does not hold a stat to its range** (2026-11-16): a finite number past either end is data and passes as written (`check/validate/proposal/WeaponProposal`). A missing preference is no preference; a stat there is not, text, `NaN`, a missing field, a fractional magazine or reserve, a stray field and a bad name are refused | No | Free |
+| `balance` | First `clampToRanges` (`ai/`): a stat past a range goes to the end of it, on either side, so a weapon is never useless (damage 0 becomes 1, a magazine of 100 becomes 60). Then **the engine's `balanceWeapon`** (`engine/src/weapon-balance/`): brings the weapon inside the power budget and the damage-per-second cap by taking from its stats where the preference says. The balancing never makes a stat stronger | No | Free |
 | `rate` | The backstop behind `balance`: refuses a weapon over the engine's damage cap or power budget. After `balance` it has nothing to refuse, so a refusal means the balancing was bypassed | No | Free |
 | `repair` | At most one retry with the first answer and the faults (our own sentences, shortened) each in a data block. Now for schema faults only: the model is no longer asked to lower a stat | Same | Counted against the model-call limit |
 | `commit` | Writes to the library through the ledger | No | Atomic credit spend |
@@ -132,11 +132,15 @@ criteria that name it fall, in 3 of 3 trials each. Final run, 3 trials: local 78
 preference's direction is proved in `engine/` (a favoured stat ends higher, a sacrificed one lower, and the random-weapon properties), not in an eval,
 because both models already point the right way, so an eval could not be red first.
 
-**An open finding.** On "a machine gun with a big magazine and plenty of spare ammo" Haiku writes a magazine of 80 to 100 and a
+**The finding, closed in code 2026-11-16.** On "a machine gun with a big magazine and plenty of spare ammo" Haiku writes a magazine of 80 to 100 and a
 reserve of 300 to 400, past the ranges (60 and 200), 3 of 3 times, under every prompt wording tried (five variants, including the
-probe's own), so `validate` refuses and a repair runs (a third call; it still ends `created`). It sits in a `given.inProgress`. The fix the
-user's design points at is for code to take a number past a range as data and bring it in (the balancer already treats a number past
-a range as the end of the range), rather than refuse: **the user's call**, since it changes what `validate` accepts.
+probe's own), so `validate` used to refuse and a repair ran (a third call; it still ended `created`). **The user chose "code clamps it":** `validate`
+accepts a finite number past either end of a range, `balance` brings it to the end of the range (`ai/`'s `clampToRanges`; `engine/` is untouched, and it
+already owns the ranges as `STAT_RANGES`, which `ai/`'s `WEAPON_LIMITS` is built from), and the weak side clamps up too ("we don't want weapons to be
+actually useless"). Proved on the fake and local tiers and by unit tests (mutants: no clamp, strong side only, strict `validate` again, whole-number rule
+dropped, each killed by the tests that name it); **proved on Haiku 5.5 with one paid trial** (2026-11-17, about $0.001, a smoke test since Haiku has no `temperature`): created, three calls, no repair, where it
+was a repair in 3 of 3 before. The spec is now a plain `given`. A shield has no damage in the weapon's shape, so a bare shield (damage 0) is now created at damage 1 with no repair: the same
+weapon as before, one call cheaper, and still only a stand-in for the shield behaviour `build` owes.
 
 **Reconcile with `docs/game-design.md`**, which still says "power is capped, not balanced; nothing is silently nerfed" and
 `docs/schemas.md`, which says the power rating "is displayed, not used to scale anything". The balancer trims by design; those two

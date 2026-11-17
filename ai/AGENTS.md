@@ -19,11 +19,12 @@ another by the package's own name, `@gunsmith/ai/pipeline/GenerateWeapon`, never
 ## Pipeline and eval boundaries
 
 - `src/pipeline/GenerateWeapon.ts` and `appearance/GenerateAppearance.ts` are separate entry points. Models arrive through dependencies; runtime stays Workers-safe. Never import eval-only Ollama or LangSmith test clients into `src/`.
+- Code, not the model, keeps stats in range: `check/validate/` parses the loose `proposal/WeaponProposal` (any finite number for the six stats; text, `NaN`, a missing or stray field or a fractional magazine still go to repair), then `check/balance/clamping/ClampToRanges` brings each stat to the end of its range, both sides, before the engine's `balanceWeapon`. A stat past a range therefore costs no repair.
 - Appearance is integrated after validated, balanced and rated stats, with five calls maximum, one repair per stage and a disclosed visual fallback. Keep schemas local until the renderer is a real second consumer.
 - Evals import only downwards: `tests/` → `eval-criteria-mapping/` → `dsl/`. Specs import the mapping only; a `when` takes its DSL through fixtures so its standing criteria are always registered.
 - The mapping owns model/test-runner setup and drivers. A `*Dsl` only wraps lower pipeline-class calls in contextual `DslError`; no loops, filtering or evaluators there. Pipeline classes throw plain failures; pure evaluators/trial folding are independently unit-tested beneath them.
 - A request runs once in its `when`'s `beforeAll`. Every criterion reads those same trials; every trial must pass. Keep deterministic evaluators independent of pipeline constants so they can detect bad enforcement.
-- `src/graph/` and `src/worker/` contain hosting/trace proofs, not the production API. Check actual Worker CPU and tracing behavior during integration.
+- `src/graph/` and `src/worker/` contain hosting/trace proofs, not the production API. `ai/langgraph.json` registers `weaponProof` and `weaponSmith` (the real `createWeaponGraph` on canned models, for `langgraphjs dev`; it must not import `evals/`). Check actual Worker CPU and tracing behavior during integration.
 
 The [historical package guide](../docs/history/2026-11-17-compaction/AiInstructions.md)
 retains the old file tour and probe/harness measurements. Current code and the instructions here take precedence.

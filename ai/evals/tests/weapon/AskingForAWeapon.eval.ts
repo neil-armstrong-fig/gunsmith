@@ -56,9 +56,8 @@ given("a player asks for a weapon and sees it drawn", () => {
   });
 });
 
-// In progress: the stat balancer (built 2026-11-15, `engine/src/weapon-balance/`) is new and its first measured weakness is still open. On Haiku, "a big
-// magazine and plenty of spare ammo" gets a magazine of 80 to 100 and a reserve of 300 to 400, past the ranges, whatever the prompt's wording, so a repair
-// runs. Whether code should take a number past a range as data and bring it in is the user's call. The single-word request is moderation's, probed once.
+// In progress: the stat balancer (built 2026-11-15, `engine/src/weapon-balance/`) is new and its hard-and-fast request has not been run on Haiku at three trials
+// since the clamp. The single-word request is moderation's, probed once. The big-magazine case, which was the open finding, is fixed and is its own plain `given` below.
 given.inProgress("a player asks for a weapon and leaves the balancer to it", () => {
   // Probed 2026-11-15 on Haiku (36 answers): asked for hard and fast with nothing else mattering, the model writes 45 damage every
   // 0.1 seconds, 450 a second, and gives up the magazine, reload, speed and reserve. Over the damage cap, so the model used to be
@@ -70,10 +69,19 @@ given.inProgress("a player asks for a weapon and leaves the balancer to it", () 
     thenExpect("a weapon is created, balanced by code with no repair", () => weaponSmith.expectBalancedByCode());
   });
 
-  // Probed 2026-11-15, a real failure on Haiku: asked for "a big magazine and plenty of spare ammo" it writes a magazine of 80 to 100
-  // and a reserve of 300 to 400, past the ranges (60 and 200), whatever the prompt's wording (five variants tried), so `validate`
-  // refuses and a repair runs in 3 of 3 trials. It ends created, at a cost of a third call. A hill to climb: either the ranges are
-  // brought in by code too (the balancer would take numbers past a range as data), or the prompt finds its wording; the user's call.
+  // Probed, a real failure: a legitimate one-word request was judged "not a weapon" by moderation (a false positive).
+  when("they ask in a single word", ({weaponSmith}) => {
+    beforeAll(() => weaponSmith.ask("gun"));
+
+    thenExpect("a weapon is created", () => weaponSmith.expectCreated());
+  });
+});
+
+// Fixed 2026-11-16 (the user's call, "code clamps it"). Probed 2026-11-15, a real failure on Haiku: asked for "a big magazine and plenty of spare ammo" it
+// wrote a magazine of 80 to 100 and a reserve of 300 to 400, past the ranges (60 and 200), whatever the prompt's wording (five variants tried), so `validate`
+// refused and a repair ran in 3 of 3 trials, a third call. Now `validate` accepts a finite number past a range and `balance` brings it to the end of the range.
+// Proved on Haiku with one paid trial (a smoke test, since Haiku has no temperature): created, three calls, no repair.
+given("a player asks for a big magazine", () => {
   when("they ask for a big magazine and plenty of spare ammo", ({weaponSmith}) => {
     beforeAll(() =>
       weaponSmith.ask(
@@ -82,12 +90,5 @@ given.inProgress("a player asks for a weapon and leaves the balancer to it", () 
     );
 
     thenExpect("a weapon is created inside the ranges, with no repair", () => weaponSmith.expectBalancedByCode());
-  });
-
-  // Probed, a real failure: a legitimate one-word request was judged "not a weapon" by moderation (a false positive).
-  when("they ask in a single word", ({weaponSmith}) => {
-    beforeAll(() => weaponSmith.ask("gun"));
-
-    thenExpect("a weapon is created", () => weaponSmith.expectCreated());
   });
 });

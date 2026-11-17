@@ -25,9 +25,11 @@ it("keeps a draft that parses, with the preference apart from the weapon, and cl
 });
 
 it("refuses a draft that does not parse, with a sentence for each fault, and keeps nothing", () => {
-  const update = validateNode(weaponGraphStateOf({draft: {...RIFLE, bulletDamage: 9999}}));
+  const update = validateNode(weaponGraphStateOf({draft: {...RIFLE, magazineSize: 12.5}}));
 
-  expect(update).toEqual({errors: ["bulletDamage: Too big: expected number to be <=100"], nodes: ["validate"]});
+  expect(update.errors).toEqual([expect.stringContaining("magazineSize:")]);
+  expect(update.nodes).toEqual(["validate"]);
+  expect(update.candidate).toBeUndefined();
 });
 
 it("refuses a draft that is not an object at all", () => {

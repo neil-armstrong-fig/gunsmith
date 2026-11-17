@@ -33,17 +33,49 @@ it("accepts a stat in both lists, which the balancer counts as neither", () => {
   expect(validateWeaponDraft({...RIFLE, preference})).toEqual({ok: true, weapon: RIFLE, preference});
 });
 
-it("names the field and the problem when a stat is over its cap", () => {
-  const result = validateWeaponDraft({...RIFLE, bulletDamage: 9999});
+it.each([
+  ["bulletDamage", 9999],
+  ["bulletDamage", 0],
+  ["fireIntervalSeconds", 0.01],
+  ["fireIntervalSeconds", 5],
+  ["bulletSpeed", 500],
+  ["bulletSpeed", 1],
+  ["magazineSize", 100],
+  ["magazineSize", 0],
+  ["reloadSeconds", 0.1],
+  ["reloadSeconds", 30],
+  ["startingReserve", 5000],
+  ["startingReserve", -4],
+])("accepts %s of %s, past its range, and hands it on as written for the balancer to bring in", (field, value) => {
+  const weapon = {...RIFLE, [field]: value};
 
-  expect(result).toEqual({ok: false, errors: ["bulletDamage: Too big: expected number to be <=100"]});
+  expect(validateWeaponDraft(weapon)).toEqual({ok: true, weapon, preference: {favoured: [], sacrificed: []}});
+});
+
+it.each([
+  ["Infinity", Infinity],
+  ["NaN", NaN],
+  ["text", "lots"],
+  ["nothing", undefined],
+])("still refuses a stat that is %s, and names the field", (_label, value) => {
+  const result = validateWeaponDraft({...RIFLE, bulletDamage: value});
+
+  expect(result.ok).toBe(false);
+  expect(result.ok ? [] : result.errors.map(error => error.split(":")[0])).toEqual(["bulletDamage"]);
 });
 
 it("lists every problem, not only the first", () => {
-  const result = validateWeaponDraft({...RIFLE, bulletDamage: 0, reloadSeconds: 99});
+  const result = validateWeaponDraft({...RIFLE, magazineSize: 12.5, reloadSeconds: "slow"});
 
   expect(result.ok).toBe(false);
-  expect(result.ok ? [] : result.errors.map(error => error.split(":")[0])).toEqual(["bulletDamage", "reloadSeconds"]);
+  expect(result.ok ? [] : result.errors.map(error => error.split(":")[0])).toEqual(["magazineSize", "reloadSeconds"]);
+});
+
+it("still refuses a fractional magazine or reserve, which the balancer has no way to read as a whole number", () => {
+  const result = validateWeaponDraft({...RIFLE, magazineSize: 12.5, startingReserve: 36.5});
+
+  expect(result.ok).toBe(false);
+  expect(result.ok ? [] : result.errors.map(error => error.split(":")[0])).toEqual(["magazineSize", "startingReserve"]);
 });
 
 it("refuses a field the weapon does not have, and says which", () => {

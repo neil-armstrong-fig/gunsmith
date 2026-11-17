@@ -6,7 +6,7 @@ Model: **Claude**. Follow the startup protocol in [TODO.md](TODO.md); read only 
 
 Checkout: develop only in this persona's assigned worktree. At startup, record its actual path/branch and last merged committed main revision here; these are not yet assigned by the workflow update. Sync main into the clean worktree before new work and delivery; main is for integration/validation only. Preserve existing unfinished legacy worktrees. See [Operations](docs/agent-reference/Operations.md#development-worktrees-and-the-integration-checkout).
 
-Resolve the eight reported fake-eval canned-response failures and review remaining source-worktree improvements. Five-call integration, LangGraph and initial balancing are merged; do not rebuild them.
+Resolve the eight reported fake-eval canned-response failures. Five-call integration, LangGraph, initial balancing, the `weaponSmith` registration and per-stat clamping (`9830023`) are merged; do not rebuild them. The ai-hosting-proof worktree's checkpoint is in [worktree checkpoints](docs/history/2026-11-17-worktree-checkpoints.md).
 
 Current milestone: M3–M5; the project remains on M1. Next failing test/check: Reproduce the eight fake-eval failures before changing canned responses; add renderer/integration criteria before new behavior. Never infer live-model quality from fake scores.
 
@@ -25,9 +25,11 @@ engine owns balancing/rating; server owns production adapter routing; budget sup
 - [ ] Build the accepted bounded appearance renderer/schema consumer with engine, server and budget, then wire the real adapter, AI-off/refund/timeout fallbacks and built-in pool. art owns approved asset/manifest production and play owns runtime feedback integration.
 
 - [ ] Coordinate the renderer consumer and schema move with the relevant owner in HANDOFF.md; keep schemas local until another package genuinely imports them. Preserve accepted drawings and strict bounds.
-- [ ] Before authorized paid validation, reconcile the actual cumulative ledger across checkouts; preserve the $1 total ceiling. Measure combined cost/latency against the recorded estimate, not a fresh/reset balance. No budget or credit-price increase is approved.
+- [ ] Before authorized paid validation, reconcile the actual cumulative ledger across checkouts; preserve the $1 total ceiling. Measure combined cost/latency against the recorded estimate, not a fresh/reset balance. No budget or credit-price increase is approved. Last recorded cumulative spend: $0.6241 of the $1 (2026-11-17, after one Haiku smoke trial of about $0.001).
 - [ ] Mutation-prove integration and report checks/evals. Preserve gameplay under malformed/partial appearance, unknown versions/roles, geometry excess and unsupported identity/mechanics; compare validity with human recognisability.
-- [ ] Re-measure real graph CPU and trace flushing on Workers; the proof spike does not establish production limits.
+- [ ] Re-measure real graph CPU and trace flushing on Workers. Measured so far (wall time only, not CPU): the real graph bundles to 2908.92 KiB (541.20 KiB gzipped) and answered in workerd in 75 ms cold, then 10 and 9 ms; see `docs/ai-hosting.md`.
+- [ ] Shield: a bare shield (damage 0) is now clamped to damage 1 and created with no repair, a stand-in. The shield specs stay `given.inProgress` until the user, engine and play decide the real shield behaviour; the omitted-stat policy also waits on them.
+- [ ] Optional: an eval for a schema fault the balancer cannot fix (a `NaN`, a fractional magazine), so the "repair skipped" mutant stops surviving; it needs a new DSL method.
 - [ ] Coordinate AI-owned preference parsing and engine-owned rating/balancing; document a contract before code work.
 - [ ] Probe preferences and add criteria for max-everything, hard/slow and fast/weak requests, promotion of one stat at the expense of another, and independently valid inferred values/preferences. Deterministic/property tests cover caps, budget, reproducibility and monotone promotion. Keep schema repair separate from balancing.
 

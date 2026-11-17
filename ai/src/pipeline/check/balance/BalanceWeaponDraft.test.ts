@@ -54,3 +54,13 @@ it("does not change the weapon it was given", () => {
 
   expect(given).toEqual(MAXIMUM);
 });
+
+it("brings a stat past its range to the end of the range, then balances: a magazine of 100 against 60 comes back as 60", () => {
+  const balanced = balanceWeaponDraft({...RIFLE, magazineSize: 100}, NO_PREFERENCE);
+
+  expect(balanced).toEqual({...RIFLE, magazineSize: 60});
+});
+
+it("brings a stat that is too weak up to the floor, so a weapon that deals 0 damage deals 1", () => {
+  expect(balanceWeaponDraft({...RIFLE, bulletDamage: 0}, NO_PREFERENCE)).toEqual({...RIFLE, bulletDamage: 1});
+});

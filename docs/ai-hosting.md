@@ -76,6 +76,14 @@ branch `worktree-ai-hosting-proof`, in `ai/` (package, `langgraph.json`, a proof
   under the free plan's 10 ms. This is a fake model and one node: the real pipeline adds several nodes, zod parsing, trace
   serialisation and a real model client (whose waiting time does not count as CPU), so **re-measure with the real graph**
   before relying on the free plan.
+- **The real eight-node graph, measured 2026-11-16 on canned fake models** (`createWeaponGraph`, drawing included, from a
+  throwaway Worker outside the tree). `wrangler deploy --dry-run`: **2908.92 KiB, 541.20 KiB gzipped**, against **2790.17 KiB,
+  526.11 KiB** for the one-node proof measured the same way, so the real pipeline adds about 119 KiB (the two figures were
+  written "MiB" above, but 2790 KiB is 2.72 MiB; the comparison is unaffected). In `wrangler dev` (workerd) three requests
+  took 75 ms (cold), then 10 and 9 ms wall-clock as wrangler logged them, for a created and drawn weapon (three canned model
+  calls, nine nodes in the trail); this is wall time, not CPU, so the free plan's 10 ms CPU limit is **still not measured** (a real model's waiting
+  does not count as CPU, but zod, the engine's balancer and trace serialisation do). Re-measure CPU with the deployed Worker
+  before relying on the free plan.
 - **`langgraph dev` works for a LangGraph.js graph.** `langgraphjs dev --no-browser` started the in-memory Agent Server,
   registered the `weaponProof` assistant, and `POST /runs/wait` returned the validated weapon over HTTP with no key and no
   network call. So the "no Studio" point against option 3 is overstated: the same graph gets the local Studio URL
