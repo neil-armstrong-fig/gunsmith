@@ -48,48 +48,9 @@ and **`synthesis/`**, **`output/`** and **`pack/`** consume cues. A generator im
 imports any other folder; no consumer imports a generator. If a second layer needs something that lives in a generator, move
 it to `common/` rather than reaching across.
 
-- `RenderAudio.ts`: the entry point. `renderAudio(output, pack)` renders every cue, writes the WAVs in a fixed
-  order, the audition mix, and `measurements.json`.
-- `common/`: `types/` is the shared vocabulary: `Cue` (a list of `Voice`s with a length, channel count and peak), `Voice` (a
-  `ToneVoice` or a `NoiseVoice`, in `voice/` with their shared parts) and `RenderedCue`. `format/` is `AudioFormat`, 48 kHz,
-  16-bit, 128 BPM. `noise-seed/` is the house seed the footfalls count up from. `step-key/` names the footfall cues, which the
-  mix refers to as well as the effects. `levels/` has `peak/` (finds a peak), `normalize/` (scales to a target) and `limit/`
-  (pulls a mix down).
-- `generators/effects/`: `MakeEffects` lists the cues. `metallic/` builds a strike (`recipes/` has the effects as data,
-  `strike/` the tuned numbers); `steps/` builds a footfall (`stance/` has the stance table); `damage/` makes the two
-  selected incoming-damage crunch (`MakeDamageCandidates`), which `MakeEffects` does not list, so it is not in the pack.
-- `generators/music/`: `MakeMusic` plays each bar of an `Arrangement`, a list of eight-bar `Section`s. `arrangements/` has one
-  folder per track (`match/`, `menu/`) and the shared `bass/` and `kick/` patterns; `bar/` has one folder per instrument
-  (`bass/`, `drums/`, `hats/`, `melody/`) plus `note/` and `pan/`. Change the music by editing a section, not by adding a branch.
-- `synthesis/`: `RenderCue` (offline render; a loop is rendered three times and the middle kept). `schedule/` holds
-  `ScheduleVoice` and what it leans on: `chain/` (the filter, panner and gain), `tone-source/`, `noise-source/` and `shape/`
-  (the envelope and filter numbers, `VoiceShape`). `noise/` is the seeded generator.
-- `output/`: `mix/` (`MakeMix`, with `layer/` and `timeline/`), `wav/` (`WriteWav`, which checks then writes, with `header/`,
-  `pcm/`, `seam/` and `measure/`), `measurements/` (`WriteMeasurements`, with `read/` and its `types/`) and `mastering/`
-  (the peak ceiling, the mix ceiling, the loop-join limit).
-- `pack/`: `MakeAudioPack` is the real pack (`types/AudioPack`). `verification/` holds the tests that look at the whole pack:
-  `PackFingerprint` (the recipes), `CommittedPack` (the committed WAVs against their hashes) and `RenderedPack` (the slow
-  byte-for-byte render).
-- `studies/`: renders that are not the approved pack, one folder per study. `combat-feedback/RenderCombatFeedback` writes the
-  selected crunch and its `measurements.json` into the `output` it is given (run as a script, into
-  `webapp/audio/studies/combat-feedback/`, with `node generator-scripts/studies/combat-feedback/RenderCombatFeedback.ts`); its
-  test checks the render against that committed folder byte for byte, as `CommittedPack` does for the pack, so a changed recipe
-  needs a re-render and a listen.
-- `encoding/`: `EncodeAudio` encodes every measured master but the audition mix into a staging folder and publishes only if all
-  succeeded, the report last (`publish/`). `masters/` loops the masters and `masters/master/` encodes one (hash checked
-  before and after, so the approved masters are never changed); `encoder-arguments/` is the one list of `ffmpeg` arguments
-  (`codec/` holds each codec's flags), `settings/` the rate and qualities, `files/` what an export may be called, and `format/`
-  the two formats. `process/` runs a program without a shell and finds the build (`binary/`: the `FFMPEG` override, Homebrew's full
-  build, or the system one). `verification/VerifyEncoded` decodes every export **with the same build that encoded it** (its
-  `ffprobe` is the one beside it): a wrong name, hash or codec stops it with no report; a finding (`failures/`: length, loop join,
-  crouch level, against `limits/`) is written to `verification.json` and then fails. `pcm/` measures decoded floats and
-  `report/` reads and writes the three reports (Prettier-formatted, so a report passes `format:check`). `fixture/` builds the
-  small source the tests encode.
-- `browser/`: `VerifyBrowserAudio` serves the check page from this machine (`serve/`, a port the system picks, only the page and
-  `encoded-audio/`), opens it in each browser (`run/`), and proves the check can fail with two controls (`controls/`: a corrupt
-  file, a loop that jumps at its join). `page/` is the page and its script, plain JavaScript because it runs in the browser;
-  it takes its limits from `VERIFICATION_LIMITS`, which the runner injects, so a limit is written once. Playwright is
-  borrowed from `acceptance-tests/` (`playwright/LoadPlaywright`), not a dependency of this package.
+`RenderAudio.ts` is the entry point; `pack/` assembles the approved pack. Separate studies live under `studies/` and must not enter the approved pack implicitly.
+See the [historical module catalogue](../../docs/history/2026-11-17-compaction/AudioInstructions.md#layout-generator-scripts)
+for the earlier file tour. Inspect the current caller and tests when editing.
 
 ## Conventions specific to this package
 

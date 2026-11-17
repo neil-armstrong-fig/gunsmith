@@ -1,8 +1,7 @@
 # AGENTS.md: webapp
 
 The React app: Vite, React 19, Tailwind v4, react-three-fiber. The game is the whole window; menus will appear over it
-only when needed. Full conventions arrive with Phase C; what is here is the structure, which is already enforced by
-habit and review (`AGENTS.md` at the root, "Code style").
+only when needed. Root coding standards and the package layering below apply.
 
 ## Layout
 
@@ -67,52 +66,19 @@ selector and `useShallow`: `useGameStore(useShallow(selectAmmoReadout))` re-rend
 is a few times a second at most. A per-frame value is never bound to a component (react-three-fiber's own guidance: state
 managers are fine for updates that are not rapid). The decision and its sources are in `docs/state-management.md`.
 
-**Which match opens** is chosen once, from the page's query (`game/scenario/`): none is the practice range with its dummies,
-`?scenario=duel` is the duel, a best-of-three (an opponent with a brain who moves and shoots back; first to two rounds, `World.match`), `?scenario=sparring` the same arena with
-an opponent who has no brain and cannot shoot, `?scenario=heights` a low-ground and platform arena (`game/heights/HeightsArena.ts`) with one
-stair, a dummy on each level (`game/heights/HeightsDummies.ts`) and no opponent. It is a selector only, never a way to write state; it goes when a menu picks
-the match. `worldOfPage()` builds the world (`worldOfScenario(scenario, seed, ringTiming)`) and is also what "Play again" puts in the
-store. **Ring timing** is the query's other setting (`game/scenario/ring-timing/`): `?ringDelay=3` (seconds before the ring starts to close; 0 allowed) and `?ringClosing=15` (seconds it
-takes to close; more than 0) and `?ringDamage=10` (how many times the normal 2 to 20 a second it hurts; more than 0; the ring closes no faster, so a spec can make a round end sooner and still be fought at the ring's usual pace), each a plain number or ignored (the others keep the game's own, 45 and 30 s and 1 times), read once by `ringTimingOfPage()` so every round of a match keeps it. The duel always has a ring; **sparring has one only when
-the query asks for the ring** (a spec uses it to watch the ring alone hurt a fighter who stands still); the practice range and the heights arena never do. The ring closes on a point drawn from the match's seed, so
-`?scenario=duel&seed=42&ringDelay=3&ringClosing=15` replays the same ring, and each round of a match (seed + rounds played) closes on a new place. The query tunes a match's setup, never its state. The opponent's choices are drawn from a seed (`game/scenario/seed/`): `?seed=42` replays a match exactly (the
-acceptance specs pin one), otherwise each page load and each "Play again" draws a fresh random one, which is the only
-`Math.random` in the game.
+## Runtime boundaries
 
-**What the player sees** is the engine's `vision/` (`docs/game-design.md`, "Vision"): `three/arena-canvas/.../vision-overlay/` draws a dark
-veil over the arena with the cone cut out (`visibleArea`, rebuilt every frame in `useFrame`), and `Opponent`, `Dummies` and `Bullets` draw
-only what `visibleToPlayer(world)` says is seen. The snapshot reports the same answer (`vision`, `opponent.visible`, `dummy.visible`), since the
-canvas is not in the DOM (`vision.range` is the cone's own, so it grows while the player crouches: C or either Control key, held, read by `use-game-loop/hooks/use-crouch-key/`); the veil's own drawing has no spec, only its geometry (`DimmedGeometry.test.ts`).
+- `game/scenario/` chooses seeded setup once from the query. Query parameters configure a scenario, never write live state. Preserve the match score and setup when starting another round.
+- Render the engine's visibility result; do not invent a second sight/height rule in React. Keep terrain dim outside the cone while suppressing hidden entities and their effects.
+- HUD animation on a timer uses CSS; per-frame geometry and uniforms use `useFrame`. Update shader uniforms through `materialRef.current.uniforms`, not the object originally passed to JSX.
+- Store GLSL in `.glsl` files, imported with `?raw`, and compile it with `glslangValidator` in tests. A valid shader still needs a browser drawing assertion where feasible.
+- The reticle cursor belongs on the arena only. HUD pointer pass-through must not create aim dead zones; buttons and overlays retain normal interaction. A button click must not fire a weapon. Native/Retina cursor appearance requires manual inspection.
+- `sound/` imports no React or store. Consume the engine's local combat events after every simulation tick, because the game store retains only the last world. Muting belongs in the app store.
+- Drop sounds while the audio context is suspended; never queue them for later playback. Preserve the once-per-hold empty-click latch. Browser instrumentation does not prove real first-interaction audio wake-up or listening quality.
+- Compressed audio candidates remain blocked on playback QA. Plain WAV runtime assets do not settle that codec decision.
 
-**Heights are drawn** by `three/arena-canvas/.../arena-heights/` (no labels): raised floor a step lighter per level (`colours/LevelColour`, the
-palette's `--color-gs-floor-l1` to `l3` repeated, since WebGL cannot read CSS variables), and each stair as four bands shaded from its low floor to
-its high one (`stairs/StairStripsOf`). Every edge where a raised floor drops to lower open ground (not against a wall, and not on the side a stair arrives) gets a bright lip on the raised side and a shadow on the lower ground (`drops/DropStripsOf`, `drops/DropLipColour`; `heightTilesOf` finds them), so the edge reads as a cliff. The snapshot's `player.level` is the engine's `levelAt`; the drawing itself has no spec (canvas), its
-helpers have unit tests.
-
-The HUD is plain React over the canvas (`react/components/dom/ammo-hud/`, `health-hud/`, `score-hud/` (the round and the score, top
-middle, only in a match), `ring-hud/` ("Ring in 0:43", then "Ring closing", just under it, only when the world has a ring; `text/CountdownText`) and the `round-banner/` overlay that appears when a round is won or lost), styled with Tailwind and the
-`--color-gs-*` tokens. In a match the banner keeps "You won" / "You lost" for a round, adds the score, and offers **"Next round"**
-(`game/scenario/NextRoundOfPage.ts`: a fresh duel, the score kept, the opponent's seed the page's plus the rounds already played,
-so `?seed=` still replays a whole match); when the match is decided it says "You won the match" / "You lost the match" and offers
-"Play again" (a new match), as does a game with no match. `score-text/` holds the one sentence of the score both the banner and the
-HUD say. **A click on a `button` is not a shot** (`use-firing/trigger/PullsTheTrigger.ts`): the trigger listens on `window`, so
-without it pressing "Next round" fired a shot into the round it started. The health shows
-in whole points, a part of a point rounded up (`selectPlayerHealth` is `Math.ceil`): the ring takes health a fraction at a time, so the number never reads 0 while the player stands and the
-component re-renders only when the number on the screen would change; the state hook keeps the exact value. Anything
-animated on a timer (the reload fill) is a CSS animation, so React never sees a per-frame value.
-
-**The ring is drawn** by `three/arena-canvas/.../ring-edge/RingEdge.tsx`: one plane the size of the arena, above the veil and below the fighters, with a small shader (`shaders/RingEdgeVertex.glsl` and `RingEdgeFragment.glsl`: real GLSL files, so the editor highlights them, imported as strings with Vite's `?raw`; a shader goes in a `.glsl` file, not a string in a `.ts` file; `RingEdgeShaders.test.ts` compiles both with `glslangValidator`, which must be on the PATH, `docs/shaders.md`) that draws a bright
-edge (a fixed 0.12 tile wide, the palette's `--color-gs-ring` repeated as a vector, since WebGL cannot read CSS) and a faint red tint on the ground outside the circle, nothing inside. `useFrame` writes the centre and radius
-(`radiusOfRing`, the same circle `step` hurts by) into the material's own uniforms each frame, so no per-frame value goes through React state; **write them through `materialRef.current.uniforms`, not through the object handed to
-`uniforms={...}`: the second left the radius at 0 and tinted the whole arena**. The plane is the arena, so a circle bigger than the arena is clipped by it. The canvas is not in the DOM, so `DrawingTheClosingRing` (acceptance) reads what a player sees from a screenshot, at the places the hook's
-`ring.centre`, `radius` and `damagePerSecond` say the ring is, and checks the browser reported no shader error.
-
-**The mouse cursor is the aim reticle** (`three/arena-canvas/reticle/`: `AimReticle.png`, a copy of `art`'s `docs/art/concepts/aim-reticle/precision/reticle.png`, and
-`AimReticleCursor.ts`, `image-set(url(32 px) 1x, url(64 px) 2x) 16 16, crosshair`; `AimReticleSharp.png` is `art`'s `reticle@2x.png`, and the hotspot is in CSS pixels, so 16 is the middle of both), set as a style on the arena div in `ArenaCanvas.tsx` **and nowhere else**: the HUDs are `pointer-events-none`
-(keep them so, or they become an aim dead zone) and the round banner is a sibling overlay, so it keeps the ordinary pointer; a cursor on `body` would leak onto it.
-`AimingWithAReticle` reads the cursor under a point. A native cursor is not in any screenshot, so how it looks on a real display (the 2x picture on Retina, and that the browser scales the hotspot as the spec says) is judged by eye.
-
-**Sounds** (`src/sound/`, `src/assets/sounds/`): the loop calls `CombatSounds.afterTick({events, firing, round})` after **every** step with that step's `World.events` (the store keeps only the last world of a frame, so a diff of stored worlds would miss events). `CombatSounds` is plain logic over a `SoundOutput` (`play(key)`, `stopAll()`), so it is unit-tested with a recorder; `web-audio/WebAudioOutput` is the browser's output (an `AudioContext`, each WAV fetched and decoded once, one voice per key, **a sound is dropped, not queued, while the context is suspended**, so a stale cue can never play late; it wakes the context on the first `pointerdown` or `keydown`). `empty-click/ClickLatch` turns the engine's refusal on every step a held trigger meets an empty magazine into **one click per hold**: only letting go rearms it, so a reload or a weapon switch while held does not, and a round that is not being played (a death, the pause before the next round) disarms it. Cues are cosmetic, never read by the engine and never in the game store. `useCombatSounds` (beneath `use-game-loop/hooks/`) makes both, starts the audio with the page, flips the mute with **M** (and `?mute=1` starts silent, `game/sound/MutedOfPage`; the state is `store/app`'s `muted`, passed to the output as a function) and cancels what is playing when the window loses focus. Files are plain WAV, not the compressed copies, which still fail the WebKit checks (`TODO.md`); `sfx-empty-click` is `art`'s `empty-tight`. ESLint keeps `sound/` free of React and stores. **Not covered by a spec, plainly:** that the context is woken by a first press in a browser that holds audio back (the test Chromium starts audio running whatever flag it is given, so removing the wake-up survives), how the click sounds over a real shot, and that it is audible on a speaker.
+[Historical implementation notes](../docs/history/2026-11-17-compaction/WebappInstructions.md)
+retain query fixtures, rendering details and measured limitations. Read the relevant code before relying on old paths or numbers.
 
 ## Folders inside `react/`
 

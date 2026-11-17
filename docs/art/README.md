@@ -19,6 +19,10 @@ user chose punchy/crunch and asked to keep current shake for tuning during build
 The minimal handover retains its frozen preview, selected cue data, crunch
 source/tests and build instructions. Build owns integration of these delivered studies.
 
+[Inventory display study](concepts/inventory-display/README.md) is visually approved
+(2026-11-17): two compact weapon icons and only the selected name, colour/grayscale
+states and native-scale context. Identity metadata and runtime adoption belong to build.
+
 **Industrial arena:** clean flat vector, slate surfaces, blue and orange teams, heavier geometry and sparse neon.
 Top-down orthographic camera; desktop only. Technical markings are functional: level ticks, stair treads and team
 stripes. Avoid decorative distress, perspective, photorealism, pure black, pure white and text over busy backgrounds.

@@ -2,28 +2,27 @@
 
 Read the section relevant to your task. Root `AGENTS.md` remains authoritative. Commands marked planned may not exist; inspect package scripts first.
 
-## Commands (planned)
+## Commands
 
 While working, scope tools to what you changed (e.g. `pnpm --filter @gunsmith/engine exec vitest run
 src/visibility`). Before finishing:
 
 ```bash
 pnpm checks              # lint + format check + type check + unit tests, every package
-pnpm format              # apply Prettier; fixes most format:check failures
-pnpm lint:fix            # apply the ESLint fixes that are automatic
+pnpm format              # exists; in shared checkouts format only explicitly touched paths
+pnpm lint:fix            # exists; do not run repo-wide rewrites in a shared checkout
 pnpm start               # dev server on http://localhost:3000 — fine for a few specs, or work in progress
 pnpm start:preview       # compile, then serve the build on http://localhost:3000 — what CI tests
 pnpm acceptance-tests    # needs one of the two running in another terminal; preview for the whole suite
 pnpm install-browsers    # one-time Playwright chromium download
-pnpm api:dev             # the API Worker locally (`wrangler dev`, port 8787); see `api/AGENTS.md`
-pnpm test:properties     # the property tests, which `pnpm checks` leaves out
-pnpm evals               # the AI evals (`ai`); costs money, so `pnpm checks` leaves them out
+pnpm api:dev             # planned, not implemented: the API Worker locally (`wrangler dev`, port 8787); see `api/AGENTS.md`
+pnpm test:properties     # planned, not implemented: the property tests, which `pnpm checks` leaves out
+pnpm evals               # root command planned; use package evals:fake/local/paid today. The AI evals (`ai`); costs money, so `pnpm checks` leaves them out
 ```
 
 `pnpm checks` is the gate (`--max-warnings=0`). It deliberately leaves out the property tests — a
 fresh seed every run means a failure isn't reproducible from the same commit, so it can't gate a
-deploy — and the evals, which call a model, cost money, and are non-deterministic. Run `pnpm test:properties`
-before finishing work in `engine/src/`, and `pnpm evals` before finishing work in `ai/src/` prompts or graph nodes.
+deploy — and the evals, which call a model, cost money, and are non-deterministic. The property-test command is not implemented yet: report that limitation rather than claiming a property run. For prompt/graph changes, use the implemented AI package eval commands and preserve paid authorization/spend controls.
 
 
 ## Working on a feature in a worktree

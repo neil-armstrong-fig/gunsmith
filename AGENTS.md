@@ -22,7 +22,9 @@ At the end, update your checklist, status and a concise handoff delivery.
    planning — root, package, and any nested one on the path to the file you're editing.
 2. Inspect the nearest existing implementation and test that establish the local structure and
    naming. If none exists, say so (for a new package, name the janggi file you are following instead).
-3. Before editing, say which instruction files and reference implementations you used.
+3. Before editing, say which instruction files and reference implementations you used,
+   the behavior in scope, and which failing test or check will demonstrate it. Work in
+   small, independently reviewable changes; validate each before expanding the change.
 4. Before finishing, re-read the applicable instructions and perform a standards-only review of
    the diff. Fix deviations that lint and tests cannot detect before reporting completion.
    **The folder rule is the one most often missed** (a new domain folder with everything loose at its root, types
@@ -237,7 +239,7 @@ and again, not once.
   between it and the work now starting — check the catalog's versions (`pnpm outdated -r`) before beginning, and
   say which are behind and which of those are held on purpose (Gotchas). Propose the bumps; do not apply them unasked.
 - **Deleting or rebuilding `pnpm-lock.yaml`.** It re-resolves every transitive dependency.
-- **Any git commit, branch or push.** The one standing exception: the worktree-merge flow above,
+- **Any git commit, branch or push.** The one standing exception: the worktree integration flow in `docs/agent-reference/Operations.md`,
   agreed in advance. Pushing never is. Commit messages, once asked, are Conventional Commits (`feat:`, `fix:`,
   `chore:` …), small and focused.
 - **Any git command that writes to the index, the stash or the working tree.**
