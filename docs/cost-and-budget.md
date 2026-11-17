@@ -21,7 +21,7 @@ library and the built-in weapon and arena pool; guests are unaffected.
 
 ## The layers
 
-1. **Provider hard cap.** A spend limit on the provider key itself (as the learning repo does with its OpenRouter key), set a
+1. **Provider hard cap.** A spend limit on the provider key itself, set a
    little above the global ceiling. The only layer that truly cannot be exceeded by our bugs.
 2. **AI Gateway spend limits.** Dollar budgets on the gateway: up to 20 rules, rolling or fixed window, scoped by provider,
    model or custom metadata, **split by `user_id`** for a per-user budget. Exceeding returns HTTP 429. *Weakness:* limits are
@@ -37,7 +37,7 @@ library and the built-in weapon and arena pool; guests are unaffected.
 
 ## Cloudflare costs to understand
 
-- **Free plan:** an over-limit operation fails until 00:00 UTC rather than billing (janggi's reason to stay on it). A Durable
+- **Free plan:** an over-limit operation fails until 00:00 UTC rather than billing. A Durable
   Object with a running tick loop does not hibernate, so duration (billed in GB-seconds) accrues for the whole match.
   *Estimate, unverified:* at 128 MB, one match-hour is about 450 GB-seconds against the free daily allowance; the spike measures
   the real numbers.
@@ -285,4 +285,3 @@ $1 total ledger are separate and untouched.
 - [AI Gateway spend limits](https://developers.cloudflare.com/ai-gateway/features/spend-limits/index.md)
 - [Workers AI pricing](https://developers.cloudflare.com/workers-ai/platform/pricing/)
 - [Durable Objects WebSocket best practices](https://developers.cloudflare.com/durable-objects/best-practices/websockets)
-- janggi `api/AGENTS.md` ("Never enable Workers Paid") and `docs/online-play.md` (free-plan figures, re-checked 2026-10-02)

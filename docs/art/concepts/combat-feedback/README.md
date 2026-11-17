@@ -8,7 +8,7 @@ asked to retain the current camera shake for adjustment during build.
 - [Study.json](Study.json): the selected treatment's cue table, timings and profile;
   study data, not a production schema.
 - [Handover.md](Handover.md): assets, decisions, integration order, acceptance
-  criteria, remaining work and a Claude resume prompt.
+  criteria, remaining work and integration requirements.
 
 The HTML includes its script, data and audition audio. Separate prototype build
 scripts, templates, screenshots, measurement duplicates and review notes were

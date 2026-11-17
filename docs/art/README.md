@@ -233,51 +233,10 @@ new keys; ask `build` to add one in `TODO.md` blockers.
 - Check readability at the game's real scale: a player is a few tens of pixels across on screen.
 - Licences: only original or properly licensed material; record any font or asset licence here.
 
-## A1 verification (2026-11-12)
+## Preserved integration constraints
 
-- SVG XML parsed; dimensions, unique IDs, internal references and absence of external resources checked.
-- Chromium rendering reviewed at full size, including the 64 px and 32 px samples, in colour and grayscale.
-  Player posture, team stripe count, weapon silhouettes, height steps and wall/cover patterns remain distinguishable.
-  The PNG preview is a browser render of the SVG, not a separate source.
-- `pnpm checks` passed using installed Node 26.13.0 on PATH: lint, formatting and typecheck for shared/webapp;
-  2 webapp test files, 8 tests passed. Shared has no tests yet. The initial attempt through mise failed because
-  Node 26.13.1 was missing and installation outside the writable area was denied. No dependency or config changed.
-- No game runtime, schema, production asset or manifest changed. Review production anchors, tint layers and behaviour
-  variants with `build` at M2 before A2–A4 delivery.
+Stairs need visible flights and landings; terrain outside vision stays dim. The weapon/stance cone reveals detail and dynamic entities, while the engine owns range, occlusion and crouch values. Concept ratios are illustrative.
 
-## Revision: stairs and forward vision (2026-11-12)
+Weapons remain prompt-malleable; concept sheets explore identities rather than promising new mechanics. Review at native scale and preserve original or licensed provenance. Approved audio masters and frozen evidence stay byte-identical unless an explicit sound change is requested.
 
-The user replaced ramps with explicit stairs, requested no arena level text, and changed circular vision to a
-prompt-configured forward cone. The sheet now shows a continuous stair flight straddling each level boundary,
-with upper and lower landings; the silhouette studies show the forward cone and longer-range crouched cone.
-`HANDOFF.md` records the required build/AI contract follow-up and the pending omission/default policy.
-
-Revision verification: SVG parsed with unique IDs and resolved references; no ramp symbol or 360° vision wording
-remains in the art guide/sheet. Both flights cross their level boundary and have 2 landings. In-arena level text
-is removed; colour and grayscale renders reviewed. Lint and all 57 tests pass (49 shared, 8 webapp). Typecheck fails
-in build-owned shared schema tests because `it`/`expect` globals are missing, with resulting implicit parameter types;
-`pnpm checks` also stops on formatting in 3 shared files. Art changed no runtime source or config.
-
-## Latest delivery: malleable identities and crouch range (2026-11-12)
-
-- Six wild weapon concepts with 2 visual variants each are saved in `concepts/prompt-built-oddities.png`;
-  matching player prompts, supported interpretations and extension boundaries are in its sibling Markdown file.
-  They explore identities in profile, not production top-down sprites. The art system must support more than colour swaps.
-- Main SVG and PNG now compare a standing cone with a longer crouched cone at the same aperture. Range values are
-  illustrative; the engine owns the bonus. All active guidance and shared design/netcode notes retain occlusion.
-- Reviewed both sheets visually; SVG XML and references pass. Latest typecheck passes and 99 tests pass
-  (49 shared, 50 webapp). `pnpm checks` passed shared's checks, then stopped on a missing explicit return type in
-  build-owned `webapp/src/redux/pre-round/thunks/GenerateRoundContent.test.ts:30`. No runtime code changed by art.
-
-## Corrected terrain presentation (2026-11-12)
-
-The user clarified that outside-cone terrain is **dim, not completely dark**. The equipped weapon and stance configure
-its rotating detailed cone. The SVG/PNG studies now show dim layout outlines, brighter detailed terrain inside the cone
-and pickup markers only in that cone. Active guidance and build TODOs follow this; earlier opaque-fog assumptions are
-superseded. Visual inspection and XML/reference checks pass; `pnpm checks` passes (51 unit tests). No runtime changed.
-
-## Empty-magazine handover (2026-11-16)
-
-[Selected tight click and build brief](concepts/empty-weapon-click/README.md).
-User chose `empty-tight` and will tune it in game. Source, selected master and
-regression tests retained; comparison scaffolding removed. Ready for build.
+The selected empty-tight click and damage crunch are integrated. [Empty-click source and brief](concepts/empty-weapon-click/README.md), [combat feedback](concepts/combat-feedback/Handover.md), and the [audio brief](audio.md) retain acceptance requirements and pending runtime work. Current reservations and next actions belong in the root persona checklists and HANDOFF.

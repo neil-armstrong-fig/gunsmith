@@ -1,7 +1,6 @@
 # AGENTS.md: acceptance-tests
 
-Playwright runs the specs, desktop only (gunsmith is a desktop game). Modelled on janggi's `acceptance-tests/` and kept
-smaller: nothing is here until a spec needs it. Three layers, imports only point downwards, and every arrow is a lint
+Playwright runs the specs, desktop only (gunsmith is a desktop game). Kept small: nothing is here until a spec needs it. Three layers, imports only point downwards, and every arrow is a lint
 rule in `eslint.config.js`, so a violation fails `pnpm checks`:
 
 ```
@@ -76,9 +75,6 @@ Use seeded sparring to isolate player pickup behavior. Assert visibility and inv
 
 Sound is not part of the state hook. The DSL instruments fetch/decode/play calls by manifest key. A recorded buffer start does not prove device playback, first-interaction context wake-up, masking or listening quality. The 100 ms burst merge cannot be arranged reliably in a browser, so it is unit-tested in `webapp/src/sound/damage-crunch/`.
 
-[Historical scenario notes](../docs/history/2026-11-17-compaction/AcceptanceInstructions.md)
-retain seed choices, timing measurements and mutation evidence. Current fixtures and tests are authoritative.
-
 ## Running
 
 ```bash
@@ -89,9 +85,8 @@ WEBAPP_URL=http://localhost:3100 pnpm acceptance-tests   # against another port
 pnpm --filter @gunsmith/acceptance-tests acceptance-tests:headed
 ```
 
-Port 3000 may be taken by janggi's dev server (`AGENTS.md` gotchas): start ours with
-`pnpm --filter @gunsmith/webapp exec vite --port 3100 --strictPort` and point `WEBAPP_URL` at it, or the specs drive
-janggi. Kill the server you started by process (`pkill -f "vite.*--port 3100"`). `pnpm test` here is Vitest, for
+Port 3000 may be occupied by another local server: start ours with
+`pnpm --filter @gunsmith/webapp exec vite --port 3100 --strictPort` and point `WEBAPP_URL` at it, or the specs could drive the wrong application. Kill the server you started by process (`pkill -f "vite.*--port 3100"`). `pnpm test` here is Vitest, for
 DSL helpers only; it excludes `src/tests/`. Failure screenshots and video land in `test-results/`.
 
 `TheOpponentClimbingToTheRing` uses the seeded terraced scenario to assert actual climbing and ring escape. `TheOpponentComingDownFromThePlatform` (in `duel/`) opens `?scenario=overlook` (`gunsmith.startOverlookDuel(seed)`; seeds 2, 17, 28): the opponent starts on the platform and the player idles on the low ground 11 tiles away, past its far range. The round is lost either way, so the criterion is the level: `gunsmith.opponent.get().level` is 0 once it has come down, and `gunsmith.player.getLevel()` is unchanged. It fails with the engage route switched off. Preserve this alongside sprite drawing/readiness criteria.

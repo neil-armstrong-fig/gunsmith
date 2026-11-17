@@ -78,7 +78,7 @@ or schema changed. Preserve the approved direction when expanding the pack; no r
 ## Compressed production-preparation result (2026-11-13)
 
 38 Ogg/MP3 candidates and reproducible native/Chromium/WebKit QA are in `webapp/audio/encoded-audio/`;
-see the [commands and findings](../../webapp/audio/README.md#compressed-candidate-delivery-2026-11-13).
+see the [commands and findings](../../webapp/audio/README.md#compressed-candidate-delivery-2026-11-13-historical-baseline).
 Masters are unchanged. Production approval remains open: measured effect durations differ across codecs/browsers,
 WebKit Vorbis music joins fail, and one WebKit crouch pair misses the 6 dB margin. Both MP3 music loops pass in both browsers.
 No manifest keys registered and no runtime integration. Keep these as candidates pending resolution and listening QA.

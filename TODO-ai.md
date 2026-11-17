@@ -6,7 +6,7 @@ Model: **Claude**. Follow the startup protocol in [TODO.md](TODO.md); read only 
 
 Checkout: worktree `.claude/worktrees/ai` (branch `worktree-ai`, created 2026-11-17 from main `6f6b028`; last merged main `6f6b028`). Sync main into the clean worktree before new work and delivery; main is for integration/validation only. See [Operations](docs/agent-reference/Operations.md#development-worktrees-and-the-integration-checkout).
 
-The eight fake-eval canned-response failures are resolved (2026-11-17, uncommitted in the `ai` worktree, for the user to review). Five-call integration, LangGraph, initial balancing, the `weaponSmith` registration and per-stat clamping (`9830023`) are merged; do not rebuild them. The ai-hosting-proof worktree's checkpoint is in [worktree checkpoints](docs/history/2026-11-17-worktree-checkpoints.md).
+The eight fake-eval canned-response failures are resolved and integrated. Five-call integration, LangGraph, initial balancing, the `weaponSmith` registration and per-stat clamping (`9830023`) are merged; do not rebuild them.
 
 Current milestone: M3–M5; the project remains on M1. Next failing test/check: add renderer/integration criteria before new behavior; reconcile the cumulative paid ledger before any authorized probe. Never infer live-model quality from fake scores.
 
@@ -48,13 +48,4 @@ engine owns balancing/rating; server owns production adapter routing; budget sup
 
 ## Verification/latest delivery
 
-- [x] 2026-11-17, fake-eval failures: the fake moderator always said yes, so NotAWeaponRequest (6) and the armour case of ShieldsAndArmour (2) could not be rejected. New `ai/evals/eval-criteria-mapping/weapon/models/fake/ModerationFakeModel` (a canned table of those four requests, word for word, not a keyword rule) replaces it in `createFakeModels`. Red first (8 failed: "expected rejected, got created", "3 model calls, allowed 1"), now `evals:fake` 134 of 134; `pnpm checks` in `ai` green (541 tests). Mutants: approve-everything brings back exactly the 8 and fails 5 unit tests; reject-everything fails 14 evals and 6 unit tests. Local and paid tiers untouched, no model call. Fake passes still prove only the harness; the three `NotAWeaponRequest` cases stay `given.inProgress`.
-
-- [x] Committed integration combines separate stats/appearance stages: five calls maximum, one repair per stage, skip appearance when stats fail and disclose a visual stand-in. Three calls is the clean path.
-- [x] 2026-11-17, Research 2: inspected the then-current source before the later integration merge; no integrated preference output/general balancer existed at that checkpoint. Delivered the [human-review probe brief](docs/ai-stat-preference-probe.md): twelve proposed label rows, three encoding arms, scorecard and paired omitted-stat illustrations; no model call.
-- [x] Human labels v1 and AI-chosen unspecified values/trade-offs approved on 2026-11-17. Run interpretation probes only after integration and required authorization.
-- [x] Paired policy illustrations reviewed; AI inference selected. Keep explicit and inferred preferences separate. No additional generation call is approved.
-
-2026-11-17 migration: tasks redistributed from the former build/ai/art checklists; no gameplay change. Latest merged validation in HANDOFF.md: root checks, eight property tests and 199 preview acceptance tests passed; fake evals reported 126 passing and eight failing canned-response criteria. This is inherited evidence, not a new run.
-
-At session end, record actual checks, mutation/red evidence where applicable, standards and folder/caller review; update this resume, your TODO.md status row and a concise HANDOFF.md delivery. [Pre-migration snapshot](docs/history/2026-11-17-persona-migration.md).
+Record actual checks, red/mutation evidence and the standards/folder review for the current delivery. Update this resume, the shared status row and a concise handoff at session end.

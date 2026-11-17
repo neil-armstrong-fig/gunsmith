@@ -156,14 +156,6 @@ Recorded WebKit Ogg/MP3 findings are preserved; Safari is accepted as good enoug
 this preview**, so its safe headroom does not establish a safe final combat mix.
 These are integration tasks, not reasons to repeat the chosen art direction.
 
-## Resume prompt for Claude
-
-> You are play. Read HANDOFF.md, TODO.md, your current checklist and
-> docs/art/concepts/combat-feedback/Handover.md. Implement the combat-feedback
-> slice test-first when it reaches play's queue. The user chose punchy/crunch;
-> preserve current shake values and tune them during playtests. Agree event/manifest
-> contracts first, preserve fog privacy and the World-only store, verify aiming
-> during camera translation, and keep approved audio unchanged. Leave uncommitted.
 
 ## Handover contents and verification
 

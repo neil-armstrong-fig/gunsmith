@@ -77,9 +77,6 @@ managers are fine for updates that are not rapid). The decision and its sources 
 - Drop sounds while the audio context is suspended; never queue them for later playback. Preserve the once-per-hold empty-click latch. `sound/damage-crunch/DamageCrunch` makes one crunch (`sfx-damage-crunch`) per burst of bullets (hits within `BURST_SECONDS`, 100 ms of game time, are merged; the window is not stretched). The ring never crunches: it hurts every step, so it wants a continuous loop (`sfx-ring-damage-loop`, requested from art; silent until then). The hit that ends a round still crunches; nothing after it does. The loop passes each step's `seconds` so `sound/` reads no clock.
 - MP3 is the user-approved production format. Keep WAV masters in `audio/`; emit runtime MP3s as separate assets with `?url&no-inline`. Safari audio was accepted as good enough by user decision on 2026-11-17; preserve recorded timing findings.
 
-[Historical implementation notes](../docs/history/2026-11-17-compaction/WebappInstructions.md)
-retain query fixtures, rendering details and measured limitations. Read the relevant code before relying on old paths or numbers.
-
 ## Sprite rendering
 
 SVG assets live in `public/assets/sprites/`; `assets/sprites/` owns keys, anchors and pixels-per-tile scaling. Preserve body-centre anchors and the same scale across stances. Rasterised textures render with `toneMapped={false}`. Missing/loading pictures use the existing placeholders; `data-sprites-ready` becomes true after every load succeeds or fails, and acceptance scenarios wait for it.

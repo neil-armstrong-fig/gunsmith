@@ -17,3 +17,16 @@ it("reports both instruction and executable-art failures from the repository ent
     rmSync(root, {recursive: true, force: true});
   }
 });
+
+it("ignores private archived instructions while still checking live instructions", () => {
+  const root = mkdtempSync(join(tmpdir(), "gunsmith-private-"));
+  try {
+    mkdirSync(join(root, "private-source/originals"), {recursive: true});
+    writeFileSync(join(root, "private-source/originals/AGENTS.md"), "[Private](Missing.md)");
+    expect(checkRepository(root)).toEqual([]);
+    writeFileSync(join(root, "AGENTS.md"), "[Live](Missing.md)");
+    expect(checkRepository(root).join("\n")).toContain("AGENTS.md: missing reference Missing.md");
+  } finally {
+    rmSync(root, {recursive: true, force: true});
+  }
+});
