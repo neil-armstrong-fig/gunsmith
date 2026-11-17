@@ -110,6 +110,10 @@ Prettier owns formatting (`pnpm format`). What it won't tell you:
   fixed sentence or message, a one-off constant, a three-line helper stays in its one caller, a `const` above its use (the
   player-facing "invalid" message lives in the file that returns it). A constant gets its own file only when it is a tunable
   (a number or limit set by play, read by more than one file or by a test) or is shared.
+- **A file with helper folders of its own gets a folder of its own** when it shares its folder with files of other
+  subjects. Its helpers go in subfolders inside that folder, never beside it: `look/look-of-fighter/LookOfFighter.ts` with
+  `look/look-of-fighter/places-of-fighter/LookSampling.ts`, not `look/LookOfFighter.ts` and `look/places-of-fighter/` next to
+  `look/TeamBlue.ts`. (A domain root whose files all share one subject, like `engine/src/ring/`, is already that folder.)
 - **A folder's root is its table of contents.** The handful of entry points that say what's in there
   stay at the top; everything else drops into a subfolder named for its subject. Around six files is
   where a folder starts reading as a bucket rather than a list — a smell, not a hard limit.
@@ -243,8 +247,9 @@ and again, not once.
   between it and the work now starting — check the catalog's versions (`pnpm outdated -r`) before beginning, and
   say which are behind and which of those are held on purpose (Gotchas). Propose the bumps; do not apply them unasked.
 - **Deleting or rebuilding `pnpm-lock.yaml`.** It re-resolves every transitive dependency.
-- **Any git commit, branch or push.** The one standing exception: the worktree integration flow in `docs/agent-reference/Operations.md`,
-  agreed in advance. Pushing never is. Commit messages, once asked, are Conventional Commits (`feat:`, `fix:`,
+- **Any git commit, branch or push.** The standing exceptions, agreed in advance: the worktree integration flow in
+  `docs/agent-reference/Operations.md`, including a worktree session's **merge of `main` into its own branch at the start of a
+  turn**. Pushing never is. Commit messages, once asked, are Conventional Commits (`feat:`, `fix:`,
   `chore:` …), small and focused.
 - **Any git command that writes to the index, the stash or the working tree.**
 - **Anything that spends money or changes live infrastructure:** an LLM call outside the evals, a provider key, a

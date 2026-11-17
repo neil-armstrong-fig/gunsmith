@@ -84,6 +84,8 @@ retain query fixtures, rendering details and measured limitations. Read the rele
 
 SVG assets live in `public/assets/sprites/`; `assets/sprites/` owns keys, anchors and pixels-per-tile scaling. Preserve body-centre anchors and the same scale across stances. Rasterised textures render with `toneMapped={false}`. Missing/loading pictures use the existing placeholders; `data-sprites-ready` becomes true after every load succeeds or fails, and acceptance scenarios wait for it.
 
+**Shots** (`components/bullets/`): `Bullets` draws two instanced meshes (`shots/Shots.tsx`), the player's in art's blue (`fx-projectile-rifle-blue`) and the opponent's in orange (`fx-projectile-rifle-orange`, **a build stand-in**: the blue with the fill changed, until `art` draws the real one). The manifest anchors a shot on its tip (49, 32), not the picture's centre, because a bullet is a point that hits when it touches something; `shots/placement/ShotPlacementOf` turns the offset with the bullet's `direction`. Fog is unchanged (`visibleToPlayer(world).bullets`). **The game loop's `useFrame` has priority −1** (`GAME_LOOP_PRIORITY`): at the default it ran after the drawing components and everything was drawn one fixed step (0.33 tile of a rifle bullet) behind the world. No muzzle flash until feature complete (the user, 2026-11-17).
+
 ## Folders inside `react/`
 
 - **One folder per component**, named in kebab-case for its file: `arena-canvas/ArenaCanvas.tsx`. Its children go in its

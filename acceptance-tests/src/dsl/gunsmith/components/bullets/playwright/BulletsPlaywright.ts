@@ -1,12 +1,20 @@
 import type {Page} from "@playwright/test";
 import {STATE_HOOK_NAME} from "@gunsmith/shared/state-hook/StateHookName";
-import type {BulletSnapshot} from "@gunsmith/shared/state-hook/types/BulletSnapshot";
 import type {GameStateSnapshot} from "@gunsmith/shared/state-hook/types/GameStateSnapshot";
+import type {BulletSnapshot} from "@gunsmith/shared/state-hook/types/BulletSnapshot";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
+import {lookOfShot} from "@src/dsl/gunsmith/playwright/look/look-of-shot/LookOfShot";
 import type {Point} from "@src/dsl/gunsmith/types/Point";
+import type {ShotLook} from "@src/dsl/gunsmith/types/ShotLook";
 
 /** Where the in-page recorder keeps what it has seen. */
 const SIGHTINGS_NAME = "gunsmithSpecSightings";
+
+/** How far from its centre a shot's tail is past the body drawn over it: the body's radius, 0.4, and the bar's length, 0.58, to the tip. */
+const CLEAR_OF_THE_OPPONENT_TILES = 1;
+
+/** How far a held game runs between looks for the opponent's shot: a shot is in the air for 0.17 s or more, so a step this short cannot miss it. */
+const FIRE_WATCH_STEP_SECONDS = 0.02;
 
 export class BulletsPlaywright extends BasePage {
   constructor(page: Page) {
@@ -21,7 +29,7 @@ export class BulletsPlaywright extends BasePage {
   async startWatching(): Promise<void> {
     await this.page.addInitScript(
       ({hookName, sightingsName}) => {
-        const sightings: BulletSnapshot[] = [];
+        const sightings: Point[] = [];
         Reflect.set(window, sightingsName, sightings);
         let inTheAir = 0;
 
@@ -48,13 +56,13 @@ export class BulletsPlaywright extends BasePage {
 
   /** Waits until the recorder has seen a bullet, and returns where the first one was when it was first seen. */
   async waitForABullet(): Promise<Point> {
-    const handle = await this.page.waitForFunction<BulletSnapshot | false, string>(sightingsName => {
+    const handle = await this.page.waitForFunction<Point | false, string>(sightingsName => {
       const sightings: unknown = Reflect.get(window, sightingsName);
       if (!Array.isArray(sightings)) {
         return false;
       }
 
-      return (sightings[0] as BulletSnapshot | undefined) ?? false;
+      return (sightings[0] as Point | undefined) ?? false;
     }, SIGHTINGS_NAME);
 
     const bullet = await handle.jsonValue();
@@ -73,5 +81,41 @@ export class BulletsPlaywright extends BasePage {
     const {bullets} = await this.readGameState();
 
     return bullets.length;
+  }
+
+  /** The shots in the air right now, with whose each is and which way it flies. */
+  async getAll(): Promise<BulletSnapshot[]> {
+    const {bullets} = await this.readGameState();
+
+    return bullets;
+  }
+
+  /** How `bullet` looks on the screen: counted by colour along it, beside it, ahead of it and past its tail. The game must be held still. */
+  async getLookOnScreen(bullet: BulletSnapshot): Promise<ShotLook> {
+    return await lookOfShot(this.page, bullet);
+  }
+
+  /**
+   * Runs a held game on in small steps until the opponent has a shot in the air that has flown clear of its body, which the opponent draws over (a shot starts half a tile out
+   * and its bar is over half a tile long). The opponent fires on its own, and a shot at close range can be gone before it gets that far, so it waits for the next. Throws if there is
+   * none after `maxSeconds` of the game's time.
+   */
+  async runUntilTheOpponentFires(maxSeconds: number): Promise<void> {
+    for (let seconds = 0; seconds < maxSeconds; seconds += FIRE_WATCH_STEP_SECONDS) {
+      await this.page.clock.runFor(Math.round(FIRE_WATCH_STEP_SECONDS * 1000));
+      const {bullets, opponent} = await this.readGameState();
+      if (
+        opponent &&
+        bullets.some(
+          bullet =>
+            bullet.shooter === "opponent" &&
+            Math.hypot(bullet.x - opponent.x, bullet.y - opponent.y) >= CLEAR_OF_THE_OPPONENT_TILES,
+        )
+      ) {
+        return;
+      }
+    }
+
+    throw new Error(`The opponent did not have a shot clear of it in ${maxSeconds} seconds.`);
   }
 }

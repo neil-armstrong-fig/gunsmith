@@ -24,6 +24,7 @@ Wait for engine event/data changes before consuming them. Independently specify 
 
 ## Current milestone tasks
 
+- [x] Art's shots are drawn (blue player, orange opponent; `components/bullets/shots/`), with `DrawingTheShots` and the game-loop priority −1 fix; delivered 2026-11-17, details in HANDOFF.md and the [worktree checkpoints](docs/history/2026-11-17-worktree-checkpoints.md). Still shelved by the user until feature complete: the held-weapon picture (slice 3) and the muzzle flash.
 - [ ] Combat feedback slice 2: local `damageTaken` (bullet/ring), selected crunch with 100 ms burst merging and one voice, one ring-onset cue, coral brackets and 350 ms health trail.
 - [ ] Slice 3: `hitLanded` only for visible targets, `sfx-hit` and mint ticks. Slice 4: camera shake/cosmetic recoil, shared pointer/screenshot offsets and reduced motion. Follow [the handover](docs/art/concepts/combat-feedback/Handover.md).
 - [ ] Adopt the approved [inventory display](docs/art/concepts/inventory-display/README.md): two icons, selected name, fixed footprint and pointer pass-through. Agree minimum local inventory/name/icon data before changing the hook or manifest.

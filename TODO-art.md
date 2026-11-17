@@ -18,10 +18,11 @@ Reserve concrete files in [HANDOFF.md](HANDOFF.md) before overlapping another se
 
 ## Dependencies/handoffs
 
-Agree manifest keys/anchors with play and supported visual grammar with AI before production assets. Preserve unfinished projectile artwork in its source worktree. No menus ahead of real consumers.
+Agree manifest keys/anchors with play and supported visual grammar with AI before production assets. The rifle shot is integrated (blue is your unmodified `effects/projectile-rifle`; see HANDOFF.md). No menus ahead of real consumers.
 
 ## Current milestone tasks
 
+- [ ] Draw the real orange rifle shot to replace the stand-in `webapp/public/assets/sprites/fx-projectile-rifle-orange.svg` (the blue file with fill `#FF9B54`). Keep it 64 by 64, the shape's scale and the tip at (49, 32), which the manifest anchors on the bullet's point; no code change is needed. Each later weapon class needs a blue and an orange shot too. The muzzle flash is descoped until feature complete.
 - [ ] Follow up Safari onset/content and event cadence during play; this no longer blocks MP3 integration. Preserve existing thresholds.
 - [ ] Check fatigue, masking and levels on headphones/speakers with the real weapon-shot synth. General audition approval is not proof of these tests.
 - [ ] Map future static cues to approved MP3 as play integrates them; support playback/ducking/volume integration. Weapon-shot synthesis belongs to AI; art supplies static cues.

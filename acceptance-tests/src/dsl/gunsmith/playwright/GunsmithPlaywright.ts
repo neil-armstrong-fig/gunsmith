@@ -7,6 +7,12 @@ import type {Size} from "@src/dsl/gunsmith/types/Size";
 /** Art's pictures, served from `public/assets/sprites`. Only the `.svg` files: the dev server also serves the app's own code from a `src/assets/sprites` folder. */
 const PICTURES = "**/assets/sprites/*.svg";
 
+/**
+ * A held game stops this long after it is asked to. It must be longer than the page can take between reading the time and pausing it, or Playwright refuses to pause "in the past":
+ * a machine running other work (several sessions share this one) has taken more than a second. The game runs on, as fast as it can, up to that point.
+ */
+const HOLD_AFTER_MILLISECONDS = 3000;
+
 export class GunsmithPlaywright extends BasePage {
   /** Lets through the pictures `openSparringWithHeldPictures` is holding back. */
   private releaseHeldPictures: (() => void) | undefined;
@@ -87,6 +93,21 @@ export class GunsmithPlaywright extends BasePage {
 
   async openHeights(): Promise<void> {
     await this.openScenario("heights");
+  }
+
+  /**
+   * Holds the game still: nothing in the page moves, however much real time passes, until `runGameFor` lets it. A shot is in the air for a fraction of a second,
+   * so a spec that wants to look at one holds the game on it. Call it once the game is open.
+   */
+  async holdTheGame(): Promise<void> {
+    await this.page.clock.install();
+    const now = await this.page.evaluate(() => Date.now());
+    await this.page.clock.pauseAt(now + HOLD_AFTER_MILLISECONDS);
+  }
+
+  /** Lets a held game run for `seconds` of its own time, as fast as the machine can, and holds it again. */
+  async runGameFor(seconds: number): Promise<void> {
+    await this.page.clock.runFor(Math.round(seconds * 1000));
   }
 
   async resizeWindowTo(size: Size): Promise<void> {

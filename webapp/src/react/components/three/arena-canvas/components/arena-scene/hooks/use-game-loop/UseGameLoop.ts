@@ -15,6 +15,9 @@ import {useWeaponKeys} from "@src/react/components/three/arena-canvas/components
 import {useWasdMovement} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/hooks/use-wasd-movement/UseWasdMovement";
 import {useEffect, useRef} from "react";
 
+/** Lower runs earlier. Only a priority above zero changes how the scene is rendered (the callback then takes the rendering over), so a negative one is safe. */
+const GAME_LOOP_PRIORITY = -1;
+
 /**
  * Runs the match held in the game store: every frame it plays however many fixed steps the time since the last one
  * owes, with the keys (walking and crouching), mouse and trigger as they are right now as the player's input (a reload or a weapon switch goes to
@@ -40,6 +43,8 @@ export function useGameLoop(): void {
     };
   }, []);
 
+  // Priority -1, so the step runs before every drawing component's own `useFrame` (priority 0) and what they draw is the world as it now stands. At
+  // the default priority the loop ran after them, because a child's effect subscribes before its parent's, and everything was drawn one step behind: 0.33 tile for a rifle bullet.
   useFrame(({size}, frameSeconds) => {
     const owed = fixedTicks(leftoverSecondsRef.current, frameSeconds);
     leftoverSecondsRef.current = owed.leftoverSeconds;
@@ -68,5 +73,5 @@ export function useGameLoop(): void {
     }
 
     trigger.afterTicks(owed.ticks);
-  });
+  }, GAME_LOOP_PRIORITY);
 }

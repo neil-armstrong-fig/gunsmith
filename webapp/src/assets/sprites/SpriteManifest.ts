@@ -21,10 +21,22 @@ const DUMMY_SPRITE: SpriteEntry = {
   pixelsPerTile: DUMMY_BODY_RADIUS_PIXELS / DUMMY_RADIUS,
 };
 
+/**
+ * Art draws the rifle's shot 64 pixels square, travelling east, as a bar with its tip at (49, 32) (`docs/art/asset-reference/effects/projectile-rifle/`). The anchor is the tip,
+ * not the picture's centre (32, 32): a bullet is a point that hits the moment it touches something, so the tip is where the bullet is. At the fighters' scale.
+ */
+const SHOT_SPRITE: SpriteEntry = {
+  sizePixels: 64,
+  anchor: {x: 49, y: 32},
+  pixelsPerTile: PLAYER_SPRITE.pixelsPerTile,
+};
+
 /** What the game knows of each picture, by key. */
 export const SPRITE_MANIFEST: Record<SpriteKey, SpriteEntry> = {
   "sprite-player-stand-blue": PLAYER_SPRITE,
   "sprite-player-crouch-blue": PLAYER_SPRITE,
   "sprite-player-stand-orange": PLAYER_SPRITE,
   "sprite-dummy": DUMMY_SPRITE,
+  "fx-projectile-rifle-blue": SHOT_SPRITE,
+  "fx-projectile-rifle-orange": SHOT_SPRITE,
 };

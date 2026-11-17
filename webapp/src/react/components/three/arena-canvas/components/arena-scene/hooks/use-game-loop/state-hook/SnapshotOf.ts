@@ -39,7 +39,12 @@ export function snapshotOf(world: World): GameStateSnapshot {
     match: matchSnapshotOf(world),
     ring: ringSnapshotOf(world),
     pickup: pickupSnapshotOf(world, visible.pickup),
-    bullets: world.bullets.map(bullet => ({x: bullet.position.x, y: bullet.position.y})),
+    bullets: world.bullets.map(bullet => ({
+      x: bullet.position.x,
+      y: bullet.position.y,
+      shooter: bullet.shooter,
+      directionDegrees: (Math.atan2(bullet.direction.y, bullet.direction.x) * 180) / Math.PI,
+    })),
     dummies: world.dummies.map((dummy, index) => ({
       x: dummy.position.x,
       y: dummy.position.y,

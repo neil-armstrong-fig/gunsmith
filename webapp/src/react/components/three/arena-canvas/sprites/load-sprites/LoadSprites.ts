@@ -3,7 +3,7 @@ import {SPRITE_KEYS} from "@src/assets/sprites/SpriteKeys";
 import {SPRITE_MANIFEST} from "@src/assets/sprites/SpriteManifest";
 import {spriteUrl} from "@src/assets/sprites/SpriteUrl";
 import type {SpriteKey} from "@src/assets/sprites/types/SpriteKey";
-import {rasteriseSvg} from "@src/react/components/three/arena-canvas/sprites/raster/RasteriseSvg";
+import {rasteriseSvg} from "@src/react/components/three/arena-canvas/sprites/load-sprites/raster/RasteriseSvg";
 import {spriteTextures} from "@src/react/components/three/arena-canvas/sprites/loaded/SpriteTextures";
 import {spritesReadiness} from "@src/react/components/three/arena-canvas/sprites/SpritesReadiness";
 
