@@ -1,16 +1,6 @@
-# Weapon stat balancing: Research 2
+# Weapon stat balancing
 
-Owner: `ai/research 2`. Dated 2026-11-16. Documentation and review only;
-runtime implementation follows stats/appearance integration in
-[TODO-ai O2](../TODO-ai.md#o2-the-pipeline-a-deterministic-langgraph-stategraph-not-a-free-agent-milestones-m3-to-m5).
-This study proposes a direction, not a frozen schema or calibrated power formula.
-No model was called, no gameplay changed, and no balancing accuracy is claimed.
-
-Follow-up, 2026-11-17: the [human-review probe brief](ai-stat-preference-probe.md)
-records twelve user-approved label rows (revision v1), encoding comparisons, a
-future scorecard and paired policy illustrations. After comparison, the user
-selected **AI-chosen values and trade-offs for unspecified stats**. Current source
-inspection still found no integrated preference output or general balancer.
+Owner: engine for rating/balancing, ai for preference extraction. Initial balancing is implemented; coefficients and interpretation still need calibration. This document retains research candidates, not a frozen solver specification.
 
 ## Decisions and recommendation
 
@@ -36,22 +26,11 @@ weaknesses. Calibrate the rating before choosing a numerical solver. Keep hard
 caps as independent final checks. Do not treat a sum of unlike raw stats, or
 damage per second alone, as a complete power budget.
 
-### What exists, and what does not
+### Current implementation
 
-The [AI draft](../ai/src/pipeline/weapon/WeaponDraft.ts) has a name and six
-numbers: damage, firing interval, projectile speed, magazine, reload duration and
-reserve. [Its current rating](../ai/src/pipeline/check/rate/RateWeaponDraft.ts)
-accepts `bulletDamage / fireIntervalSeconds <= 150`; it does not change stats.
-The [engine weapon](../engine/src/weapon/types/Weapon.ts) additionally has vision
-angle and range. There is no implemented preference output, general power rating
-or balancer. A passing creation eval currently proves no directional trade-off:
-[the existing shotgun and fast/weak cases](../ai/evals/tests/weapon/AskingForAWeapon.eval.ts)
-assert creation rather than the requested relative stats.
+The AI draft has a name and six numeric gameplay stats. It parses preferences, clamps ranges and invokes the engine’s deterministic downward balancer and rating backstop. The engine weapon also has vision angle/range; generating these fields remains a separate consumer decision. See [schemas](schemas.md) and [pipeline](ai-pipeline.md).
 
-The current cap is a baseline to compare against, not the future total budget.
-Do not silently assign free vision or assume its missing AI fields have already
-been reconciled with the engine. Other proposed behaviours, shields, spread,
-sound and penetration remain outside this first study's implemented vocabulary.
+The alternatives below describe research comparisons. Existing balancing is implementation evidence, not proof of calibrated gameplay or faithful preference interpretation.
 
 ## Evidence and its limits
 
@@ -220,50 +199,13 @@ no ledger reset, higher ceiling or new judge is included here.
   refill an intentionally weak weapon's budget or exceed caps after rounding
   must fail the tests that claim to cover those properties.
 
-Keep property tests in the package owning the balancer. The project's property
-test dependency/script is still deferred; do not add it without authorization.
+Keep property tests in the package owning the balancer. The engine already has the property-test dependency and `pnpm test:properties`; preserve reproducible seed/counterexample output.
 Human playtests should swap weapon and spawn assignments across fixed seeds and
 include open, occluded and height-separated engagements. Report perceived
 identity and usability alongside wins; bot victories alone cannot prove fairness.
 
-## Ownership, next decisions and sync
+## Ownership and next decisions
 
-The proposed boundary is AI-owned inference/preference parsing and engine-owned
-rating/balancing. Agree it with build before implementation and record the
-contract in [HANDOFF](../HANDOFF.md). Keep any local experimental schema inside
-`ai/` until a second package needs it. The reveal should explain the final stats
-and material compromises; this is a future build requirement, not a UI change.
+AI owns inference/preference parsing; engine owns rating and balancing. Coordinate consumed contracts in [HANDOFF](../HANDOFF.md). Current balancing exists; calibration, preference-probe evidence and generated vision reconciliation remain unfinished. Approved omitted-stat policy and v1 labels do not establish model performance.
 
-Implementation remains gated on integration, the engine rating/calibration,
-preference-probe evidence and owner agreement. The omitted-stat policy and v1
-labels are approved; they do not establish model performance. No numerical
-budget, cost weights, production encoding or solver is frozen here. Do not create
-a second rating formula in AI merely to unblock implementation.
-
-Stale wording for the respective owners to reconcile when the new contract lands:
-
-- `docs/game-design.md`, Weapons: "Power is capped, not balanced."
-- `docs/schemas.md`, Principles: inside caps nothing is nerfed.
-- `docs/ai-pipeline.md`: current rate refuses rather than adjusts; distinguish
-  implemented behaviour from the new design instead of claiming it already works.
-- `docs/art/gameplay-research.md`: the introductory capped-only assumption is
-  historical; art owns that document.
-
-Research 2 sent scope and findings to AI research task
-`01a1dc87-ec7b-7433-8721-52b2a8fef4df`; that thread was awaiting approval when
-inspected, and acknowledgment remains pending. At the user's explicit request
-before context clearing, Research 2 applied the checklist/resume checkpoint,
-AI status and delivery-log updates in `TODO-ai.md`, `TODO.md` and `HANDOFF.md`,
-notifying the other thread and preserving other personas' edits. These sync
-updates are no longer queued. Next session must establish current ownership
-again before editing shared files; contact does not prove code has been started.
-
-### Delivery validation (2026-11-16)
-
-Root `pnpm checks` exits 0 outside the sandbox: lint, formatting, strict types,
-engine 787, AI 421, webapp 243 and audio 255 tests pass; one slow audio render is
-skipped. The sandboxed run stalled in audio's local-server tests and was
-interrupted before the unrestricted rerun. Local document links, whitespace and
-folder/reference standards review pass; no code helpers, types or folders were
-added. Future model probes, balancer/property tests and gameplay acceptance are
-specified above but were not executed for this documentation-only delivery.
+The reveal should explain final stats and material compromises. Do not create a second AI rating formula to bypass engine calibration. Research candidates here do not replace the current implementation or authorize numerical budget changes.

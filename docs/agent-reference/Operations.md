@@ -15,14 +15,14 @@ pnpm start               # dev server on http://localhost:3000 — fine for a fe
 pnpm start:preview       # compile, then serve the build on http://localhost:3000 — what CI tests
 pnpm acceptance-tests    # needs one of the two running in another terminal; preview for the whole suite
 pnpm install-browsers    # one-time Playwright chromium download
-pnpm api:dev             # planned, not implemented: the API Worker locally (`wrangler dev`, port 8787); see `api/AGENTS.md`
+pnpm api:dev             # the API Worker locally (`wrangler dev`, port 8787, or `API_PORT=`); the webapp's `/api` proxy points at it (`API_URL=` for another port); see `api/AGENTS.md`
 pnpm test:properties     # engine property tests, which `pnpm checks` leaves out
-pnpm evals               # root command planned; use package evals:fake/local/paid today. The AI evals (`ai`); costs money, so `pnpm checks` leaves them out
+pnpm evals               # complete free fake harness, all criteria gating; no model calls or traces
 ```
 
 `pnpm checks` is the gate (`--max-warnings=0`). It deliberately leaves out the property tests — a
 fresh seed every run means a failure isn't reproducible from the same commit, so it can't gate a
-deploy — and the evals, which call a model, cost money, and are non-deterministic. The property-test command is implemented; run it when engine changes require it. For prompt/graph changes, use the implemented AI package eval commands and preserve paid authorization/spend controls.
+deploy — and model evals, which cost money and are non-deterministic. The free fake harness runs separately through `pnpm evals`. The property-test command is implemented; run it when engine changes require it. For prompt/graph changes, use the implemented AI package eval commands and preserve paid authorization/spend controls.
 
 
 ## Development worktrees and the integration checkout
@@ -46,12 +46,12 @@ Pushing remains the user's. This policy does not authorize extra commits, branch
 
 ## Gotchas that will waste your time
 
-These are janggi's, carried over until each is re-checked against the versions actually installed.
+Re-check version-specific limitations before relying on them.
 
 - **Do not upgrade TypeScript past 6.0.3.** Re-checked 2026-11-12: TS 7.0.2 is `latest`, but `typescript-eslint` 8.72.x
   still declares `typescript >=4.8.4 <6.1.0`, so ESLint cannot read TS 7. Re-check when typescript-eslint's peer range
   moves.
-- **Port 3000 may already be taken by janggi's dev server** (`strictPort` makes `pnpm start` fail rather than move). Do not
+- **Port 3000 may already be taken by another local server** (`strictPort` makes `pnpm start` fail rather than move). Do not
   kill it; run `pnpm --filter @gunsmith/webapp exec vite --port 3100 --strictPort` instead.
 - **Do not add `baseUrl` to a tsconfig.** TS 6 made it an error — `paths` already resolve relative to
   the tsconfig's own directory.
@@ -86,7 +86,7 @@ Local profile (2026-11-17, CI settings, existing dependencies; shards run sequen
 
 The separate `property-tests.yml` runs on main pushes/PRs, daily at 03:17 UTC and manually. It uses 1,000 cases per property for commit runs and 5,000 for scheduled/manual runs, with a positive-integer manual override. Failures remain red and logs preserve fast-check seeds, paths and counterexamples for fourteen days. **Never add property tests to required release checks or make CI/deployment depend on them.** Existing browser retries and two CI workers are preserved; the known `ShootingAcrossLevels` flake remains engine/play follow-up, not an excluded criterion.
 
-Deployment and live acceptance remain planned until server/budget bindings and explicit provisioning authorization exist. The future main deployment uses Alchemy for the database, migrations, Worker/assets and Durable Objects, gated on checks and preview acceptance, followed by acceptance against live. AI owns any future eval workflow and its gating semantics; this CI slice adds no model calls.
+Deployment and live acceptance remain planned until server/budget bindings and explicit provisioning authorization exist. The future main deployment uses Alchemy for the database, migrations, Worker/assets and Durable Objects, gated on checks and preview acceptance, followed by acceptance against live. The independent AI eval harness workflow runs the free full fake suite on relevant changes and preserves JSON summaries for fourteen days. It uses no secrets or model calls. Paid runs remain manual/local only; AI owns their selection, guard and evidence implementation. See [eval policy](EvalPolicy.md).
 
 One Worker serves both the site (static assets) and `/api/*` (`run_worker_first: ["/api/*"]`) at
 `gunsmith.neilarmstrong.dev`, DNS at Cloudflare, so the session cookie is same-origin. Environments: local and `prod`

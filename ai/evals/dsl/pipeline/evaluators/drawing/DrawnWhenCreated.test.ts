@@ -1,4 +1,4 @@
-import {fallbackAppearance} from "@gunsmith/ai/pipeline/appearance/fallback/FallbackAppearance";
+import {fallbackAppearance} from "@gunsmith/shared/appearance/fallback/FallbackAppearance";
 import {passingAppearance} from "@gunsmith/ai/pipeline/appearance/testing/PassingAppearance";
 import {passingAppearanceOutcome} from "@evals/dsl/appearance/pipeline/evaluators/testing/PassingAppearanceOutcome";
 import {drawnWhenCreated} from "@evals/dsl/pipeline/evaluators/drawing/DrawnWhenCreated";

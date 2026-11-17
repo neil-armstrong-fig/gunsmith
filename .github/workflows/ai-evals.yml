@@ -1,0 +1,58 @@
+name: AI eval harness
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "ai/**"
+      - "!ai/evals/results/**"
+      - "!ai/**/*.md"
+      - "engine/src/**"
+      - "shared/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - ".github/workflows/ai-evals.yml"
+  pull_request:
+    paths:
+      - "ai/**"
+      - "!ai/evals/results/**"
+      - "!ai/**/*.md"
+      - "engine/src/**"
+      - "shared/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - ".github/workflows/ai-evals.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ai-eval-harness-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fake-evals:
+    name: AI eval harness (fake, no model calls)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26.13.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm evals
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: fake-eval-results
+          path: ai/evals/results/*-fake-latest.json
+          retention-days: 14
+          if-no-files-found: error

@@ -78,7 +78,7 @@ export default [
     files: ["evals/eval-criteria-mapping/**"],
     rules: {
       "no-restricted-imports": restrictedImports({
-        allowedPackages: ["@gunsmith/ai"],
+        allowedPackages: ["@gunsmith/ai", "@gunsmith/shared"],
         patterns: [
           {group: ["@evals/tests/**"], message: notUpwards},
           {
@@ -96,7 +96,7 @@ export default [
     files: ["evals/dsl/**"],
     rules: {
       "no-restricted-imports": restrictedImports({
-        allowedPackages: ["@gunsmith/ai"],
+        allowedPackages: ["@gunsmith/ai", "@gunsmith/shared"],
         paths: noModelPackages(dslModelMessage),
         patterns: [{group: ["@evals/tests/**", "@evals/eval-criteria-mapping/**"], message: notUpwards}],
       }),
@@ -121,7 +121,7 @@ export default [
         },
       ],
       "no-restricted-imports": restrictedImports({
-        allowedPackages: ["@gunsmith/ai"],
+        allowedPackages: ["@gunsmith/ai", "@gunsmith/shared"],
         paths: noModelPackages(dslModelMessage),
         patterns: [
           {group: ["@evals/tests/**", "@evals/eval-criteria-mapping/**"], message: notUpwards},
@@ -136,10 +136,12 @@ export default [
   },
   {
     // The lower level catches nothing and wraps nothing: it throws a plain sentence, and the DSL above it says what was attempted.
+    // It may read the engine, because an evaluator judges what the player is given by the engine's own rules (an arena is playable
+    // as `arenaFrom` and its routes say), written apart from the pipeline's checks so a pipeline that stops checking is caught. Tech debt, to revisit when engine's `validateArena` lands: see `TODO-ai.md`.
     files: ["evals/dsl/**/pipeline/**"],
     rules: {
       "no-restricted-imports": restrictedImports({
-        allowedPackages: ["@gunsmith/ai"],
+        allowedPackages: ["@gunsmith/ai", "@gunsmith/shared", "@gunsmith/engine"],
         paths: noModelPackages(dslModelMessage),
         patterns: [
           {group: ["@evals/tests/**", "@evals/eval-criteria-mapping/**"], message: notUpwards},

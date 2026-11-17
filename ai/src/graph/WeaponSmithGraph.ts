@@ -1,5 +1,5 @@
 import {FakeListChatModel} from "@langchain/core/utils/testing";
-import {fallbackAppearance} from "@gunsmith/ai/pipeline/appearance/fallback/FallbackAppearance";
+import {fallbackAppearance} from "@gunsmith/shared/appearance/fallback/FallbackAppearance";
 import {createWeaponGraph} from "@gunsmith/ai/pipeline/weapon-graph/CreateWeaponGraph";
 
 const CANNED_WEAPON = {

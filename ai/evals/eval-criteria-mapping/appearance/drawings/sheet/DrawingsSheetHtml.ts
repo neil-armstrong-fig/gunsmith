@@ -1,4 +1,4 @@
-import {appearanceSchema} from "@gunsmith/ai/pipeline/appearance/schema/Appearance";
+import {appearanceSchema} from "@gunsmith/shared/appearance/schema/Appearance";
 import {appearanceSvg} from "@evals/eval-criteria-mapping/appearance/drawings/sheet/svg/AppearanceSvg";
 import {escapeHtml} from "@evals/eval-criteria-mapping/appearance/drawings/sheet/escape/EscapeHtml";
 import type {KeptDrawing} from "@evals/eval-criteria-mapping/appearance/drawings/types/KeptDrawing";

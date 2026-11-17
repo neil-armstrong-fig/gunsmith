@@ -5,7 +5,7 @@ import type {WeaponGraphUpdate} from "@gunsmith/ai/pipeline/weapon-graph/state/t
 
 /** The first node: turns away a request that is empty or too long, before any model is called, so a refusal here costs nothing. */
 export function precheckNode(state: WeaponGraphStateValues): WeaponGraphUpdate {
-  const precheck = tokenPrecheck(state.prompt, WEAPON_PROMPT_TOKEN_LIMIT);
+  const precheck = tokenPrecheck(state.prompt, WEAPON_PROMPT_TOKEN_LIMIT, "Describe the weapon you want.");
   if (!precheck.accepted) {
     return {nodes: ["precheck"], rejectionReason: precheck.reason};
   }

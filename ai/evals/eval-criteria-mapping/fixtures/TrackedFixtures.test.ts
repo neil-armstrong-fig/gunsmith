@@ -1,4 +1,5 @@
 import {AppearanceDsl} from "@evals/dsl/appearance/AppearanceDsl";
+import {ArenaDsl} from "@evals/dsl/arena/ArenaDsl";
 import {WeaponSmithDsl} from "@evals/dsl/WeaponSmithDsl";
 import {TrackedFixtures} from "@evals/eval-criteria-mapping/fixtures/TrackedFixtures";
 
@@ -8,6 +9,7 @@ function trackedFixtures(): TrackedFixtures {
   return new TrackedFixtures({
     weaponSmith: new WeaponSmithDsl({trials: 1, run: notAsked}),
     appearance: new AppearanceDsl({trials: 1, run: notAsked}),
+    arena: new ArenaDsl({trials: 1, run: notAsked}),
   });
 }
 
@@ -64,6 +66,19 @@ it("carries the appearance's standing criteria when it took the appearance", () 
     "whatever is asked, what the player sees is safe to show",
     "whatever is asked, a stand-in is never passed off as the model's own drawing",
     "whatever is asked, the pipeline keeps to its fixed path, within two model calls",
+  ]);
+});
+
+it("carries the arena's standing criteria when it took the arena", () => {
+  const tracked = trackedFixtures();
+  const {arena} = tracked.fixtures;
+
+  expect(arena).toBeInstanceOf(ArenaDsl);
+  expect(tracked.taken()).toEqual(["arena"]);
+  expect(descriptions(tracked)).toEqual([
+    "whatever is asked, what the player sees is safe to show",
+    "whatever is asked, the pipeline keeps to its fixed path, within three model calls",
+    "whatever is asked, the credit is refunded only when a built-in arena is given",
   ]);
 });
 

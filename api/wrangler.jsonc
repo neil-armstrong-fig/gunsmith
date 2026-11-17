@@ -1,0 +1,13 @@
+{
+  // For `wrangler dev` only. Production is declared in `infra/` (planned) and deployed by Alchemy, which keeps the same names and
+  // bindings: change them there too.
+  "name": "gunsmith-api",
+  "main": "src/ApiWorker.ts",
+  "compatibility_date": "2026-11-01",
+  "compatibility_flags": ["nodejs_compat"],
+  // One `Match` object per friend code: the room's authority. SQLite-backed, the only kind the free plan has.
+  "durable_objects": {
+    "bindings": [{"name": "MATCHES", "class_name": "Match"}],
+  },
+  "migrations": [{"tag": "v1", "new_sqlite_classes": ["Match"]}],
+}

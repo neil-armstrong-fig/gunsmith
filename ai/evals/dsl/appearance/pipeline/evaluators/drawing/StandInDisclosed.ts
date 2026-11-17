@@ -1,6 +1,6 @@
 import type {AppearanceEvalInput} from "@evals/dsl/appearance/pipeline/types/AppearanceEvalInput";
 import type {EvalScore} from "@evals/dsl/types/EvalScore";
-import {fallbackAppearance} from "@gunsmith/ai/pipeline/appearance/fallback/FallbackAppearance";
+import {fallbackAppearance} from "@gunsmith/shared/appearance/fallback/FallbackAppearance";
 
 const KEY = "standInDisclosed";
 

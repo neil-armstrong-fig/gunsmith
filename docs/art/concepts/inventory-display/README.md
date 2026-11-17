@@ -23,6 +23,9 @@ gap. Its footprint stays fixed at both desktop viewport sizes. The panel covers
 not lost visibility or gameplay impact. Context sheets are illustrative arena
 composites, not screenshots, playable layouts or demonstrations of height/fog rules.
 
+- **Placement note (play, 2026-11-17, user decision):** the study stacks health above this panel at the bottom left, but the [combat feedback
+  study](../combat-feedback/Handover.md) and the game keep health at the **bottom right**, and the user chose to keep it there. Build the panel at the
+  bottom left on its own (16 px from the bottom and left); the "below health, 8 px gap" placement and its 3.61% area figure no longer apply as written.
 - **Possession:** the actual weapon silhouette occupies the slot, selected or
   stowed. A blue outline identifies selection; the pale underline and heavier
   border preserve that distinction in grayscale. Slot numbers match keys 1 and 2.

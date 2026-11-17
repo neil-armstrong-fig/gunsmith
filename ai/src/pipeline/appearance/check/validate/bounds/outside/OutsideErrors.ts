@@ -1,7 +1,7 @@
-import {APPEARANCE_LIMITS} from "@gunsmith/ai/pipeline/appearance/schema/AppearanceLimits";
+import {APPEARANCE_LIMITS} from "@gunsmith/shared/appearance/schema/AppearanceLimits";
 import {partExtent} from "@gunsmith/ai/pipeline/appearance/check/validate/bounds/extent/PartExtent";
 import {edgeOutside} from "@gunsmith/ai/pipeline/appearance/check/validate/bounds/outside/edge/EdgeOutside";
-import type {AppearancePart} from "@gunsmith/ai/pipeline/appearance/schema/part/AppearancePart";
+import type {AppearancePart} from "@gunsmith/shared/appearance/schema/part/AppearancePart";
 
 /**
  * One sentence for each part in a list that, turned and stroked, reaches outside the design space; `listName` is `body` or

@@ -97,6 +97,27 @@ WAV loops exactly in Chromium/WebKit. MP3 passes the unchanged seam checks,
 but WebKit adds 40 ms of padding: use the WAV for exact looping, or fix and listen to MP3 loop bounds
 before integration. Approved masters, crunch and countdown warning are unchanged.
 
+## Clarifications from the study's drawing code (play, 2026-11-17)
+
+The tables above say "local brackets" and "sustained unsafe-state treatment" without saying where, and the first build put both on the health panel. Read from
+`Study.html`'s own script (open it, pick an event, and look), the study draws:
+
+- **Incoming damage:** a `[ ]` pair of coral (`#FF5B62`) brackets **round the player's body**, not the HUD. Each is a vertical 25 study pixels out from the body's
+  centre and 30 tall, with a 7-pixel foot toward the body at the bottom, 3 pixels thick; they open outward by up to 8 pixels over the 180 ms and vanish (no fade).
+  One pair per burst: hits inside 100 ms of the first merge into it. The brackets never rotate with the aim. 1 study pixel is 0.025 tile (the body is 32 pixels
+  and 0.8 tile).
+- **Ring danger:** the study draws three coral slashes under the player and a red band along the bottom of the view. **The user rejected both on 2026-11-17**
+  (they disliked them in play) and chose instead, while the ring hurts and steady with no pulse: a thin coral highlight circle round the player (0.5 to 0.56
+  tile from the body's centre) and the red 2-pixel border round the health panel. The ring's own edge is drawn only once its timer has run out and it starts to
+  close (before that it covers the arena and its edge would show as a wedge in the farthest corner).
+- **Health trail:** the part a **burst of bullets** took, in the warning amber `#F2C66D`, behind the green bar, draining over 350 ms. The ring's loss has no trail.
+- **Health panel position:** bottom right, as in the game. (The [inventory concept](../inventory-display/README.md) puts health bottom left; see its placement note.)
+
+Two lines above are stale and are corrected here: the acceptance bullet "Sustained ring damage has one onset" predates the user's decision (table, 2026-11-17)
+that there is **no onset cue**; the criterion now is: the ring's marks are steady while it hurts, never pulse per tick, and clear when exposure or the round ends.
+The study also plays `sfx-death` at a local death, which no slice here covers yet; it needs an owner (play, with art's file, which already exists as
+`webapp/audio/generated-audio/sfx-death.wav`). The cosmetic recoil and muzzle flash need the held weapon's drawing, which the user has shelved until the game is feature complete.
+
 ## Integration order and event behaviour
 
 1. Read root, engine, webapp, React and acceptance-test instructions applicable to
@@ -156,14 +177,6 @@ Recorded WebKit Ogg/MP3 findings are preserved; Safari is accepted as good enoug
 this preview**, so its safe headroom does not establish a safe final combat mix.
 These are integration tasks, not reasons to repeat the chosen art direction.
 
-## Resume prompt for Claude
-
-> You are play. Read HANDOFF.md, TODO.md, your current checklist and
-> docs/art/concepts/combat-feedback/Handover.md. Implement the combat-feedback
-> slice test-first when it reaches play's queue. The user chose punchy/crunch;
-> preserve current shake values and tune them during playtests. Agree event/manifest
-> contracts first, preserve fog privacy and the World-only store, verify aiming
-> during camera translation, and keep approved audio unchanged. Leave uncommitted.
 
 ## Handover contents and verification
 

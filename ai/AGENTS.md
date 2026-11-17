@@ -20,14 +20,14 @@ another by the package's own name, `@gunsmith/ai/pipeline/GenerateWeapon`, never
 
 - `src/pipeline/GenerateWeapon.ts` and `appearance/GenerateAppearance.ts` are separate entry points. Models arrive through dependencies; runtime stays Workers-safe. Never import eval-only Ollama or LangSmith test clients into `src/`.
 - Code, not the model, keeps stats in range: `check/validate/` parses the loose `proposal/WeaponProposal` (any finite number for the six stats; text, `NaN`, a missing or stray field or a fractional magazine still go to repair), then `check/balance/clamping/ClampToRanges` brings each stat to the end of its range, both sides, before the engine's `balanceWeapon`. A stat past a range therefore costs no repair.
-- Appearance is integrated after validated, balanced and rated stats, with five calls maximum, one repair per stage and a disclosed visual fallback. Keep schemas local until the renderer is a real second consumer.
+- Appearance is integrated after validated, balanced and rated stats, with five calls maximum, one repair per stage and a disclosed visual fallback. The appearance schema, limits, vocabularies and stand-in live in `shared/src/appearance/` (the webapp renders them); the bounds that need a sum or a transform (`check/validate/`) stay here.
+- The arena pipeline (`src/pipeline/arena/`, entry `GenerateArena.ts`) mirrors the weapon's: precheck at 250 tokens, moderation, generate, `validate`, one repair, then a built-in arena and a refund (`arena-graph/`), three model calls at most. The model writes the engine's drawing rows; `check/validate/` runs zod, `arenaFrom`, then `problems/ArenaProblems`, **an interim check that is replaced by engine's `validateArena` in that one file** (`HANDOFF.md`); `limits/ArenaLimits` is interim too (engine owns the limits). Built-ins are injected (`builtInArenas`). The arena evals (`evals/dsl/arena/`, `evals/tests/arena/`) have no paid tier yet; a paid arena run needs the user's cost review first.
 - Evals import only downwards: `tests/` → `eval-criteria-mapping/` → `dsl/`. Specs import the mapping only; a `when` takes its DSL through fixtures so its standing criteria are always registered.
 - The mapping owns model/test-runner setup and drivers. A `*Dsl` only wraps lower pipeline-class calls in contextual `DslError`; no loops, filtering or evaluators there. Pipeline classes throw plain failures; pure evaluators/trial folding are independently unit-tested beneath them.
 - A request runs once in its `when`'s `beforeAll`. Every criterion reads those same trials; every trial must pass. Keep deterministic evaluators independent of pipeline constants so they can detect bad enforcement.
 - `src/graph/` and `src/worker/` contain hosting/trace proofs, not the production API. `ai/langgraph.json` registers `weaponProof` and `weaponSmith` (the real `createWeaponGraph` on canned models, for `langgraphjs dev`; it must not import `evals/`). Check actual Worker CPU and tracing behavior during integration.
 
-The [historical package guide](../docs/history/2026-11-17-compaction/AiInstructions.md)
-retains the old file tour and probe/harness measurements. Current code and the instructions here take precedence.
+Use current source, adjacent tests and [design decisions](../docs/agent-reference/SessionDecisions.md) when extending the pipeline.
 
 ## How a test reads
 
@@ -54,7 +54,7 @@ Standing criteria apply to every request using the relevant DSL; a spec states o
 - **Why `thenExpect` and not `then`:** a module that exports `then` is a thenable, so Vitest's `await import` calls it with the
   promise machinery's functions and the test file never loads (Playwright's CommonJS loading hides this in `acceptance-tests/`).
   The report still prints `then <criterion>`.
-- Preserve serial eval execution and configured hook timeouts: a timed-out request can skip the criteria beneath it. Keep native `given` grouping separate from the LangSmith `when` boundary; the historical guide records the original harness investigation.
+- Preserve serial eval execution and configured hook timeouts: a timed-out request can skip the criteria beneath it. Keep native `given` grouping separate from the LangSmith `when` boundary.
 
 ## Eval-driven development (the way work is done here, like ATDD but with evals)
 
@@ -68,12 +68,11 @@ Standing criteria apply to every request using the relevant DSL; a spec states o
 
 ## Rules
 
-- **Suite size follows the research, not a cap** (Anthropic: 20 to 50 tasks from real failures is a great start; Focused: 7 to
-  start, 50 to 100 for production). Add a `when` only for a real or probed failure, never to pad. Make every feature a plain `given`
+- **Suite size follows the research, not a cap** (start with tasks from real failures). Add a `when` only for a real or probed failure, never to pad. Make every feature a plain `given`
   (near 100%, gates CI) or `given.inProgress` (a hill to climb). One deterministic evaluator per failure mode, no cap.
 - **Binary, deterministic evaluators first**, written independently of the code they check (the caps in `WithinCaps.ts` are not
   imported from the pipeline). A model judge is **deferred** until a real failure needs one, then calibrated on about 50 human-rated examples.
-- Local-model/SDK limitations and earlier prompt ablations are historical measurements in `docs/ai-hosting.md`, `docs/ai-pipeline.md` and the snapshot. Recheck the current runner before changing generation strategy; failed formatting support in one runner does not establish model capability.
+- Local-model/SDK limitations and earlier prompt ablations must be checked against the current runner and adjacent tests. Recheck the current runner before changing generation strategy; failed formatting support in one runner does not establish model capability.
 - **Three tiers behind one `weaponPipelineDependencies` argument:** `fake` (checks, free), `local` (Ollama `qwen3.5:9b`, free, the working loop),
   `paid` (Haiku 5.5, weapon and appearance specs: the key comes from `ANTHROPIC_API_KEY` or the git-ignored `ai/.env.local`, never printed, loaded by
   `tier/paid/key/LoadAnthropicKey`; a ledger in `evals/results/paid-spend-latest.json` adds up the cost of every paid run from the tokens reported and stops at
@@ -92,7 +91,7 @@ Standing criteria apply to every request using the relevant DSL; a spec states o
   evaluators' and the DSL's, stay flat `it(...)`.
 - Schema validation is separate from model generation: parse untrusted output, preserve field types and let code enforce limits. The engine owns deterministic rating/balancing; AI parses preferences and invokes it before final rating. Do not silently change either policy while editing prompts.
 - Model output is `unknown` until zod has parsed it; the AI proposes, the engine disposes.
-- Schemas and caps here are **drafts** local to `ai/` until the domain owner and real consumers review the contracts in `HANDOFF.md`; do not touch `shared/`.
+- Schemas and caps here are **drafts** until the domain owner and real consumers review the contracts in `HANDOFF.md`. The appearance schema moved to `shared/` (the webapp is its consumer); other schemas stay local, and nothing else goes to `shared/` without a second consumer.
 
 ## Commands
 

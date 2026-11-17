@@ -62,3 +62,6 @@ todo.txt
 .claude/settings.local.json
 .claude/worktrees/
 CLAUDE.local.md
+
+# Local case-study sources; never published.
+/private-source/

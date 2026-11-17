@@ -6,10 +6,13 @@ import type {PrecheckResult} from "@gunsmith/ai/pipeline/prompt-screening/preche
  */
 const CHARACTERS_PER_TOKEN = 4;
 
-/** Whether a prompt is worth a model call. Runs before any model is called, so a rejection here costs nothing. */
-export function tokenPrecheck(prompt: string, maxTokens: number): PrecheckResult {
+/**
+ * Whether a prompt is worth a model call. Runs before any model is called, so a rejection here costs nothing. `emptyReason` is what
+ * an empty prompt is told, because it names what the player was to describe (a weapon, an arena).
+ */
+export function tokenPrecheck(prompt: string, maxTokens: number, emptyReason: string): PrecheckResult {
   if (prompt.trim().length === 0) {
-    return {accepted: false, reason: "Describe the weapon you want."};
+    return {accepted: false, reason: emptyReason};
   }
 
   const estimatedTokens = Math.ceil(prompt.length / CHARACTERS_PER_TOKEN);

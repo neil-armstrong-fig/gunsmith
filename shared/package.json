@@ -17,6 +17,9 @@
     "type-check": "tsc --noEmit",
     "test": "vitest run"
   },
+  "dependencies": {
+    "zod": "catalog:"
+  },
   "devDependencies": {
     "@eslint/js": "catalog:",
     "@types/node": "catalog:",

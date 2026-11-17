@@ -1,5 +1,5 @@
-import {APPEARANCE_LIMITS} from "@gunsmith/ai/pipeline/appearance/schema/AppearanceLimits";
-import type {Appearance} from "@gunsmith/ai/pipeline/appearance/schema/Appearance";
+import {APPEARANCE_LIMITS} from "@gunsmith/shared/appearance/schema/AppearanceLimits";
+import type {Appearance} from "@gunsmith/shared/appearance/schema/Appearance";
 import {partSvg} from "@evals/eval-criteria-mapping/appearance/drawings/sheet/svg/part/PartSvg";
 
 const BACKGROUND = "#222C37";

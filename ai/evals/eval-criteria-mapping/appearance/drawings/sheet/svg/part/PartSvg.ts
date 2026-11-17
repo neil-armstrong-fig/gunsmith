@@ -1,4 +1,4 @@
-import type {AppearancePart} from "@gunsmith/ai/pipeline/appearance/schema/part/AppearancePart";
+import type {AppearancePart} from "@gunsmith/shared/appearance/schema/part/AppearancePart";
 import {roleColour} from "@evals/eval-criteria-mapping/appearance/drawings/sheet/svg/colour/RoleColour";
 import type {AppearancePalette} from "@evals/eval-criteria-mapping/appearance/drawings/sheet/svg/types/AppearancePalette";
 

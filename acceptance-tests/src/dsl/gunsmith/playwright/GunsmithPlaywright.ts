@@ -2,6 +2,7 @@ import type {Page} from "@playwright/test";
 import {expect} from "@playwright/test";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
 import type {ClosingRingRequest} from "@src/dsl/gunsmith/types/ClosingRingRequest";
+import type {PickupDrawingRequest} from "@src/dsl/gunsmith/types/PickupDrawingRequest";
 import type {Size} from "@src/dsl/gunsmith/types/Size";
 
 /** Art's pictures, served from `public/assets/sprites`. Only the `.svg` files: the dev server also serves the app's own code from a `src/assets/sprites` folder. */
@@ -74,6 +75,11 @@ export class GunsmithPlaywright extends BasePage {
   /** Opens sparring with everything the game draws (a ring's centre, a pickup's place) drawn from `seed`, so the same seed plays the same match. */
   async openSparringWithSeed(seed: number): Promise<void> {
     await this.openScenario(`sparring&seed=${seed}`);
+  }
+
+  /** Opens sparring with `seed`, the weapon lying in the arena drawn as the named drawing (`?weaponDrawing=`, a seam for the specs and for looking at a drawing). */
+  async openSparringWithPickupDrawing(request: PickupDrawingRequest): Promise<void> {
+    await this.openScenario(`sparring&seed=${request.seed}&weaponDrawing=${request.drawing}`);
   }
 
   /** Opens sparring with a ring of its own: it starts after `delaySeconds`, closes over `closingSeconds`, and its centre is drawn from `seed`. */

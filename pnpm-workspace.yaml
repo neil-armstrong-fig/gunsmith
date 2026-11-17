@@ -1,6 +1,7 @@
 packages:
   - acceptance-tests
   - ai
+  - api
   - engine
   - shared
   - webapp
@@ -41,6 +42,8 @@ allowBuilds:
 # Every external dependency is declared here once, exact-pinned, and each package says `catalog:`. A version changes in
 # one place for every package that uses it. Chosen 2026-11-12: the newest stable release at least seven days old.
 catalog:
+  # Type declarations for the Workers runtime (Durable Objects, WebSockets); `api/` is checked against them. Approved 2026-11-17, the version janggi's API uses.
+  "@cloudflare/workers-types": 5.20260921.1
   # Offline Web Audio for art's Node-only TypeScript renderer (approved 2026-11-12).
   node-web-audio-api: 2.2.0
   # LangChain core types and the fake chat model used so tests never touch the network (`ai`).

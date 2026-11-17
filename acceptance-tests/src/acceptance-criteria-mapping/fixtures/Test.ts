@@ -9,5 +9,6 @@ export const test = base.extend<AcceptanceTestFixtures>({
 
     await gunsmith.begin();
     await use(gunsmith);
+    await gunsmith.end();
   },
 });

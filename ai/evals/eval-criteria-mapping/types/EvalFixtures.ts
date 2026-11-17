@@ -1,3 +1,4 @@
+import type {ArenaDsl} from "@evals/dsl/arena/ArenaDsl";
 import type {AppearanceDsl} from "@evals/dsl/appearance/AppearanceDsl";
 import type {WeaponSmithDsl} from "@evals/dsl/WeaponSmithDsl";
 
@@ -8,4 +9,5 @@ import type {WeaponSmithDsl} from "@evals/dsl/WeaponSmithDsl";
 export interface EvalFixtures {
   weaponSmith: WeaponSmithDsl;
   appearance: AppearanceDsl;
+  arena: ArenaDsl;
 }

@@ -1,7 +1,7 @@
 import {weaponDraftSchema} from "@gunsmith/ai/pipeline/weapon/WeaponDraft";
 import {FakeListChatModel} from "@langchain/core/utils/testing";
 import {generateWeapon} from "@gunsmith/ai/pipeline/GenerateWeapon";
-import {fallbackAppearance} from "@gunsmith/ai/pipeline/appearance/fallback/FallbackAppearance";
+import {fallbackAppearance} from "@gunsmith/shared/appearance/fallback/FallbackAppearance";
 import {passingAppearance} from "@gunsmith/ai/pipeline/appearance/testing/PassingAppearance";
 import {ToolCallingFakeModel} from "@gunsmith/ai/pipeline/appearance/testing/ToolCallingFakeModel";
 import type {WeaponPipelineDependencies} from "@gunsmith/ai/pipeline/types/WeaponPipelineDependencies";

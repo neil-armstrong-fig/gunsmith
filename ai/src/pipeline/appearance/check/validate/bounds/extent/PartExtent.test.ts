@@ -1,6 +1,6 @@
 import type {Extent} from "@gunsmith/ai/pipeline/appearance/check/validate/bounds/extent/types/Extent";
 import {partExtent} from "@gunsmith/ai/pipeline/appearance/check/validate/bounds/extent/PartExtent";
-import type {AppearancePart} from "@gunsmith/ai/pipeline/appearance/schema/part/AppearancePart";
+import type {AppearancePart} from "@gunsmith/shared/appearance/schema/part/AppearancePart";
 
 const COMMON = {fill: "body", stroke: "edge", strokeWidth: 2, opacity: 1, rotation: 0, detail: "structural"} as const;
 
