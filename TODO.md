@@ -22,7 +22,7 @@ Start a session with: **"You are engine, continue the TODO."** Substitute any pe
 | ai | Claude | [TODO-ai.md](TODO-ai.md) | Fix eight reported canned-response fake-eval failures; renderer, calibration and arena generation. | 2026-11-17 |
 | server | Claude | [TODO-server.md](TODO-server.md) | First authoritative two-browser slice after M1; auth, persistence and online privacy. | 2026-11-17 |
 | budget | Claude | [TODO-budget.md](TODO-budget.md) | Production ledger/spend boundaries with server/AI; credits, refunds, tracing and kill switch. | 2026-11-17 |
-| art | Codex | [TODO-art.md](TODO-art.md) | Empty-click cadence QA complete in Chromium/WebKit; native Safari listening remains. Combat masking awaits runtime shot synthesis. | 2026-11-17 |
+| art | Codex | [TODO-art.md](TODO-art.md) | Safari audio accepted as good enough by the user; combat masking/fatigue and levels await runtime shot synthesis. | 2026-11-17 |
 | ship | Codex | [TODO-ship.md](TODO-ship.md) | Seven-persona migration/checks complete; CI next, infra/release when bindings and authorization exist. | 2026-11-17 |
 
 These are persistent workstreams, not permission for simultaneous edits to the same files. Select one current slice; record concrete reservations and contracts in HANDOFF.md. Model assignments are defaults, not application configuration. `build` is retired; [migration history](docs/history/2026-11-17-persona-migration.md) preserves its tasks.
@@ -53,7 +53,7 @@ M0 is complete; M1 is current. Later milestones proceed when their consumers and
 - **ai → art:** generated-appearance renderer and readability evidence precede further visual review; kit generation remains shelved. Eight canned-response fake-eval failures remain reported, not evidence of live-model quality.
 - **engine → server:** [arena fairness](docs/art/arena-fairness-research.md), visibility and deterministic contracts support online play. Preserve random ring centres and validate built-ins too. Public-play [fair-play/privacy](docs/art/fair-play-research.md) belongs to server, not the M1 gate.
 - **server ↔ budget ↔ ship:** server supplies account/storage/call boundaries; budget owns atomic credit/spend enforcement and tracing; ship provisions approved bindings and deployment automation. No speculative shared contracts or live changes.
-- **art/play:** MP3 is approved and empty click integrated. Safari timing, masking/fatigue and levels remain follow-up QA, with existing thresholds and masters preserved.
+- **art/play:** MP3 is approved and empty click integrated. Safari audio is accepted as good enough by user decision (2026-11-17); its listening follow-up is closed. Combat masking/fatigue and levels await runtime shot synthesis, with existing thresholds and masters preserved.
 - Current milestone remains M1. Add menus, shared contracts and future packages only with real consumers. Later workstreams can refine relevant acceptance scenarios while waiting.
 
 ## Open questions and tunables

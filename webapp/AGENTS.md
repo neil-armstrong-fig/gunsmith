@@ -75,7 +75,7 @@ managers are fine for updates that are not rapid). The decision and its sources 
 - The reticle cursor belongs on the arena only. HUD pointer pass-through must not create aim dead zones; buttons and overlays retain normal interaction. A button click must not fire a weapon. Native/Retina cursor appearance requires manual inspection.
 - `sound/` imports no React or store. Consume the engine's local combat events after every simulation tick, because the game store retains only the last world. Muting belongs in the app store.
 - Drop sounds while the audio context is suspended; never queue them for later playback. Preserve the once-per-hold empty-click latch. Browser instrumentation does not prove real first-interaction audio wake-up or listening quality.
-- MP3 is the user-approved production format. Keep WAV masters in `audio/`; emit runtime MP3s as separate assets with `?url&no-inline`. Recorded Safari timing findings remain follow-up QA, not an integration prerequisite.
+- MP3 is the user-approved production format. Keep WAV masters in `audio/`; emit runtime MP3s as separate assets with `?url&no-inline`. Safari audio was accepted as good enough by user decision on 2026-11-17; preserve recorded timing findings.
 
 [Historical implementation notes](../docs/history/2026-11-17-compaction/WebappInstructions.md)
 retain query fixtures, rendering details and measured limitations. Read the relevant code before relying on old paths or numbers.

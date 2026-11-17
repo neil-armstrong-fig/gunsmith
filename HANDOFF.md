@@ -13,7 +13,7 @@ Ownership follows the assigned persona. Models below are defaults; no applicatio
 | ai | Claude | [TODO-ai.md](TODO-ai.md) | Fix eight reported canned-response fake-eval failures; renderer, calibration and arena generation. |
 | server | Claude | [TODO-server.md](TODO-server.md) | First authoritative two-browser slice after M1; auth, persistence and online privacy. |
 | budget | Claude | [TODO-budget.md](TODO-budget.md) | Production ledger/spend boundaries with server/AI; credits, refunds, tracing and kill switch. |
-| art | Codex | [TODO-art.md](TODO-art.md) | Empty-click cadence QA complete in Chromium/WebKit; native Safari listening remains. Combat masking awaits runtime shot synthesis. |
+| art | Codex | [TODO-art.md](TODO-art.md) | Safari audio accepted as good enough by the user; combat masking/fatigue and levels await runtime shot synthesis. |
 | ship | Codex | [TODO-ship.md](TODO-ship.md) | Repository tooling/CI now; infra/release when bindings and authorization exist. |
 
 ### Start prompts
@@ -52,7 +52,7 @@ No runtime file reservations are open. The three source worktrees (`ai-hosting-p
 | --- | --- |
 | Canvas state hook | play writes the read-only browser hook, with engine owning simulation meanings and all affected consumers reviewing shared snapshot changes. Existing seeded pickup/inventory data is consumed; no write seams |
 | Combat events | engine owns World.events for a local simulation step; currently empty-fire refusal. play consumes each tick; frozen steps clear events. Damage/hit additions remain open; this is not the network sound contract |
-| Asset/sound manifest | art owns keys/loading; play agrees integration needs. MP3 sfx-empty-click is integrated; sfx-damage-crunch and sfx-hit remain agreed but unregistered. Safari timing is follow-up QA |
+| Asset/sound manifest | art owns keys/loading; play agrees integration needs. MP3 sfx-empty-click is integrated; sfx-damage-crunch and sfx-hit remain agreed but unregistered. Safari audio accepted by user decision (2026-11-17) |
 | AI hosting and adapter | API imports AI in-process, Workers-safe. ai owns generation outcomes; server owns API wiring; budget owns production spend/tracing guards |
 | Stats/appearance | Merged separate stages, five calls maximum, one repair per stage, disclosed appearance fallback. ai owns remaining renderer consumer; schema moves require a real second consumer |
 | Initial engine balancing | Merged rating/balancer and eight property tests are implementation evidence. engine and ai still owe calibration/probes; labels and AI-chosen omitted-stat policy are approved |
@@ -62,7 +62,7 @@ Before changing a consumed contract, record the proposal and affected owners her
 
 ## Ready handovers and preserved decisions
 
-- Empty-click game-event cadence passes in Chromium/WebKit, including repeats shorter than decoded buffers. [Timing findings](webapp/audio/qa/runtime-playback/README.md#runtime-onset-and-cadence-follow-up--2026-11-17) retain WebKit’s approximately 12 ms main-transient offset without applying a trim. AI/play: runtime weapon-shot audio is still needed before art can assess combat masking/fatigue; native Safari/device listening remains open.
+- Empty-click game-event cadence passes in Chromium/WebKit, including repeats shorter than decoded buffers. [Timing findings](webapp/audio/qa/runtime-playback/README.md#runtime-onset-and-cadence-follow-up--2026-11-17) retain WebKit’s approximately 12 ms main-transient offset without applying a trim. The user accepted Safari audio as good enough on 2026-11-17, closing native listening follow-up without new device measurements. AI/play: runtime weapon-shot audio is still needed before art can assess combat masking/fatigue and levels.
 
 - Art reviewed the existing orange rifle shot on 2026-11-17; the user selected the matching team silhouette. Keep its file, `#FF9B54`, scale and tip (49, 32). The earlier redraw request is closed; later weapon classes still need both colours. No manifest or gameplay contract changed.
 
@@ -81,6 +81,8 @@ Before changing a consumed contract, record the proposal and affected owners her
 - [ ] Production art/audio and live release: art/play integrate their domains; ship validates release.
 
 ## Delivery log
+
+- 2026-11-17, art (`worktree-art`, main `6f6b028`): user accepted Safari audio as good enough; closed native listening follow-up in the art/shared status, webapp guidance and [audio handoff](webapp/audio/qa/runtime-playback/README.md#safari-acceptance-and-remaining-listening-work). Earlier measurements preserved; no new device-test claim. Combat masking/fatigue and levels await AI/play runtime shot synthesis. `pnpm checks` exits 0 (lint/format/types; 2,170 unit tests, one slow audio render skipped); local links/acceptance anchor, approved WAV/runtime MP3 hashes and diff whitespace pass. Re-read root/webapp/audio instructions; standards and folder/reference audit complete, no new files/folders/helpers/types. Documentation only; no audio/runtime change, paid call, commit or push.
 
 - 2026-11-17, art (`worktree-art`, base `4688a51`): [runtime onset/cadence follow-up](webapp/audio/qa/runtime-playback/README.md#runtime-onset-and-cadence-follow-up--2026-11-17). Six Chromium/WebKit runs at default/44.1/48 kHz recorded 13 clicks per 13 holds; fast repeats started before prior decoded buffers ended. WebKit’s 70 ms MP3 decodes to about 96 ms with a roughly 12 ms main-transient offset and non-silent leading content; no correction or threshold change. Twelve existing production-preview sound acceptance cases pass, six diagnostic controls completed, and 69 audio/evidence hashes preserved. Native Safari/device listening remains; combat masking awaits AI/play runtime shot synthesis. `pnpm checks` exits 0: lint/format/types and 2,170 unit tests pass, with one slow audio render skipped. Re-read root/webapp/audio/acceptance instructions; standards and folder/reference audit complete (no new tracked files, folders, helpers or types). No retained code/assets, paid calls, commits or pushes.
 

@@ -2,8 +2,8 @@
 
 **MP3 is the user-confirmed compressed format.** Keep approved WAV masters.
 The user subsequently authorized art/research 1 to switch the current runtime
-empty click to MP3; future cue integration belongs to build. Safari timing
-checks remain follow-up QA and do not block that approval. The listening
+empty click to MP3; future cue integration belongs to play. The user accepted
+Safari audio as good enough on 2026-11-17, closing its listening follow-up. The listening
 page and this investigation's seven JSON files were removed at the user's
 request after review; this note preserves the decision and useful findings.
 Existing codec tools, audio files and earlier QA evidence remain unchanged.
@@ -55,8 +55,8 @@ human audition are not a claim of music runtime integration or fatigue/masking Q
 
 Use MP3 for production integration. The empty click has been switched under
 its existing key at the user’s request. Schedule one-shot cues from game events,
-independently of when a previous buffer ends. Follow up Safari onset, content
-and intended cadence during play. Preserve approved WAV masters and existing thresholds;
+independently of when a previous buffer ends. Safari listening follow-up is
+closed by user acceptance on 2026-11-17. Preserve approved WAV masters and existing thresholds;
 do not globally trim buffers, apply sampled offsets or fade away broken joins.
 
 The existing codec verifiers can reproduce baseline checks against temporary
@@ -158,11 +158,13 @@ production build: twelve acceptance cases. This confirms the latch, release and
 repress, reload-while-held, mute, non-empty suppression and MP3 path; it does not
 turn the separate diagnostic timing observations into retained regression tests.
 
-### Remaining listening work
+### Safari acceptance and remaining listening work
 
-Native Safari/device output still needs listening for first-gesture wake-up,
-perceived onset and interrupted fast repeats, with browser version, context rate,
-headphones/speakers and output volume recorded. Keep the approved MP3 and WAV
+On 2026-11-17 the user accepted Safari audio as good enough and asked to close
+the native listening follow-up. No additional testing of first-gesture wake-up,
+perceived onset or interrupted fast repeats is required for this follow-up.
+This is user acceptance, not new headphone/speaker measurements; the earlier
+Chromium/WebKit findings above remain unchanged. Keep the approved MP3 and WAV
 master unchanged unless the user requests a sound change.
 
 Combat masking/fatigue cannot yet be judged against the real runtime weapon-shot
