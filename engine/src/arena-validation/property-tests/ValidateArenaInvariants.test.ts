@@ -3,8 +3,8 @@ import {anyArena} from "@gunsmith/engine/arena-validation/property-tests/arbitra
 import {flatArena} from "@gunsmith/engine/arena-validation/property-tests/arbitrary/FlatArena";
 import {flatRegionSizes} from "@gunsmith/engine/arena-validation/property-tests/oracle/FlatRegionSizes";
 import {hasOpenNeighbour} from "@gunsmith/engine/arena-validation/property-tests/oracle/HasOpenNeighbour";
-import {ARENA_TRANSFORMS} from "@gunsmith/engine/arena-validation/property-tests/transform/ArenaTransforms";
-import {transformArena} from "@gunsmith/engine/arena-validation/property-tests/transform/TransformArena";
+import {ARENA_TRANSFORMS} from "@gunsmith/engine/arena-symmetry/transform/ArenaTransforms";
+import {transformArena} from "@gunsmith/engine/arena-symmetry/transform/TransformArena";
 import {openRegionsOf} from "@gunsmith/engine/arena-validation/regions/OpenRegionsOf";
 import {validateArena} from "@gunsmith/engine/arena-validation/ValidateArena";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";

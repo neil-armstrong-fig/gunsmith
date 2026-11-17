@@ -101,6 +101,11 @@ export class GunsmithPlaywright extends BasePage {
     await this.openScenario(`pickup-race&seed=${seed}`);
   }
 
+  /** Opens the fair duel (fixture A: a shared platform in the middle, the fighters at a matching pair of places, one round, a ring), the pair and the opponent's choices drawn from `seed`. */
+  async openFairDuel(seed: number): Promise<void> {
+    await this.openScenario(`fair-duel&seed=${seed}`);
+  }
+
   async openHeights(): Promise<void> {
     await this.openScenario("heights");
   }

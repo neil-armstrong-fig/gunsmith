@@ -198,6 +198,19 @@ export class GunsmithDsl {
     }
   }
 
+  /**
+   * Opens the fair duel: an arena that looks the same turned half way round (a shared platform in the middle), the fighters at a
+   * matching pair of places, each the other's half-turn and both on the low ground, one round, no score, a ring and a weapon lying between them. The pair, who
+   * takes which end, and the opponent's choices are drawn from `seed`.
+   */
+  async startFairDuel(seed: number): Promise<void> {
+    try {
+      await this.gunsmith.openFairDuel(seed);
+    } catch (error) {
+      throw new DslError(`Failed to open the fair duel with seed ${seed}`, error);
+    }
+  }
+
   /** Opens the heights arena: low ground beside a raised platform, with one stair up, a dummy on each level and no opponent. */
   async startHeights(): Promise<void> {
     try {

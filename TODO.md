@@ -18,7 +18,7 @@ Start a session with: **"You are engine, continue the TODO."** Substitute any pe
 | Persona | Model | Checklist | Current focus | Updated |
 | --- | --- | --- | --- | --- |
 | play | Claude | [TODO-play.md](TODO-play.md) | Combat feedback slice 2a (damage event, crunch) integrated into main; 2b (`store/feedback/`, brackets, health trail) next; HUD/inventory, camera, close M1 playtest. | 2026-11-17 |
-| engine | Claude | [TODO-engine.md](TODO-engine.md) | `hitLanded` committed and merged with play's `damageTaken`; structural `validateArena` built (uncommitted, worktree `engine`) for ai's arena generation; next spawn pairs/symmetry, limits and built-in pool. | 2026-11-17 |
+| engine | Claude | [TODO-engine.md](TODO-engine.md) | Symmetrical spawn pairs (half-turn, derived from geometry, `Arena` unchanged) and `?scenario=fair-duel` built, uncommitted for review; main has moved and must be merged after the commit. Next: reflection, stair-legality/tactical warnings, built-in pool and limits, inventory data. | 2026-11-17 |
 | ai | Claude | [TODO-ai.md](TODO-ai.md) | Fake-eval failures fixed and integrated; renderer, calibration and arena generation next. | 2026-11-17 |
 | server | Claude | [TODO-server.md](TODO-server.md) | First authoritative two-browser slice after M1; auth, persistence and online privacy. | 2026-11-17 |
 | budget | Claude | [TODO-budget.md](TODO-budget.md) | Production ledger/spend boundaries with server/AI; credits, refunds, tracing and kill switch. Scenarios drafted; executable specs wait for `api/`. | 2026-11-17 |
