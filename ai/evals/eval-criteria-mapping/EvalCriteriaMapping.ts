@@ -1,9 +1,11 @@
 import * as ls from "langsmith/vitest";
 import {afterAll, beforeAll as runBeforeAll, describe, expect} from "vitest";
 import {createAppearanceDriver} from "@evals/eval-criteria-mapping/appearance/CreateAppearanceDriver";
+import {createArenaPipelineDriver} from "@evals/eval-criteria-mapping/arena/CreateArenaPipelineDriver";
 import {createWeaponPipelineDriver} from "@evals/eval-criteria-mapping/weapon/CreateWeaponPipelineDriver";
 import {parseEvalTier} from "@evals/eval-criteria-mapping/tier/ParseEvalTier";
 import {AppearanceDsl} from "@evals/dsl/appearance/AppearanceDsl";
+import {ArenaDsl} from "@evals/dsl/arena/ArenaDsl";
 import {WeaponSmithDsl} from "@evals/dsl/WeaponSmithDsl";
 import {TrackedFixtures} from "@evals/eval-criteria-mapping/fixtures/TrackedFixtures";
 import {isGating} from "@evals/eval-criteria-mapping/gate/IsGating";
@@ -22,6 +24,7 @@ import type {EvalSuite} from "@evals/eval-criteria-mapping/types/EvalSuite";
 const tier = parseEvalTier(process.env.EVAL_TIER);
 const weaponDriver = createWeaponPipelineDriver(tier, process.env.EVAL_TRIALS);
 const appearanceDriver = createAppearanceDriver(tier, process.env.EVAL_TRIALS);
+const arenaDriver = createArenaPipelineDriver(tier, process.env.EVAL_TRIALS);
 const results: CriterionResult[] = [];
 let currentGiven = "";
 let currentSuite: EvalSuite = "regression";
@@ -32,11 +35,24 @@ afterAll(() => {
   writeEvalResults({
     spec: specNameOf(expect.getState().testPath),
     tier,
-    trials: firstTaken === "appearance" ? appearanceDriver.trials : weaponDriver.trials,
+    trials: trialsOf(firstTaken),
     ranAt: new Date().toISOString(),
     results,
   });
 });
+
+/** How many times a spec file's requests ran, which its first DSL decides: each pipeline has its own trial count. */
+function trialsOf(firstDsl: FixtureName | undefined): number {
+  if (firstDsl === "appearance") {
+    return appearanceDriver.trials;
+  }
+
+  if (firstDsl === "arena") {
+    return arenaDriver.trials;
+  }
+
+  return weaponDriver.trials;
+}
 
 /**
  * `given` / `when` / `then` read back in the report as the criteria a spec was written from, like the acceptance specs do.
@@ -64,6 +80,7 @@ export function when(description: string, define: DefineWhen): void {
     const tracked = new TrackedFixtures({
       weaponSmith: new WeaponSmithDsl(weaponDriver),
       appearance: new AppearanceDsl(appearanceDriver),
+      arena: new ArenaDsl(arenaDriver),
     });
 
     currentWhen = whenContext;
