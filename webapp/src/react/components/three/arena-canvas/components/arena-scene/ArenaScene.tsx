@@ -1,5 +1,6 @@
 import {useFrame, useThree} from "@react-three/fiber";
 import {zoomToFit} from "@src/react/components/three/arena-canvas/components/arena-scene/camera/ZoomToFit";
+import {HitTicks} from "@src/react/components/three/arena-canvas/components/arena-scene/components/hit-ticks/HitTicks";
 import {DamageBrackets} from "@src/react/components/three/arena-canvas/components/arena-scene/components/damage-brackets/DamageBrackets";
 import {RingHighlight} from "@src/react/components/three/arena-canvas/components/arena-scene/components/ring-highlight/RingHighlight";
 import {Pickup} from "@src/react/components/three/arena-canvas/components/arena-scene/components/pickup/Pickup";
@@ -59,6 +60,8 @@ export function ArenaScene(): JSX.Element {
       <Player />
 
       <DamageBrackets />
+
+      <HitTicks />
 
       <RingHighlight />
     </>

@@ -1,7 +1,7 @@
 import {useFrame} from "@react-three/fiber";
 import {nextFlash} from "@src/react/components/three/arena-canvas/components/arena-scene/components/damage-brackets/flash/NextFlash";
 import type {Flash} from "@src/react/components/three/arena-canvas/components/arena-scene/components/damage-brackets/flash/types/Flash";
-import {Stroke} from "@src/react/components/three/arena-canvas/components/arena-scene/components/damage-brackets/components/stroke/Stroke";
+import {Stroke} from "@src/react/components/three/arena-canvas/components/arena-scene/components/stroke/Stroke";
 import {useFeedbackStore} from "@src/store/feedback/UseFeedbackStore";
 import {gameState} from "@src/store/game/selectors/game-state/GameState";
 import type {JSX} from "react";

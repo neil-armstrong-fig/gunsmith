@@ -3,14 +3,17 @@ import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
 import {screenPositionOfTile} from "@src/dsl/gunsmith/components/player/playwright/screen/ScreenPositionOfTile";
 import type {Heading} from "@src/dsl/gunsmith/components/player/types/Heading";
 import {colourIsNear} from "@src/dsl/gunsmith/playwright/look/ColourIsNear";
+import {runHeldUntil} from "@src/dsl/gunsmith/playwright/hold/RunHeldUntil";
 import {lookOfDamage} from "@src/dsl/gunsmith/playwright/look/look-of-damage/LookOfDamage";
+import {lookOfHit} from "@src/dsl/gunsmith/playwright/look/look-of-hit/LookOfHit";
 import {lookOfFighter} from "@src/dsl/gunsmith/playwright/look/look-of-fighter/LookOfFighter";
 import {TEAM_BLUE} from "@src/dsl/gunsmith/playwright/look/TeamBlue";
 import {coloursAtTiles} from "@src/dsl/gunsmith/playwright/screen/ColoursAtTiles";
 import type {Colour} from "@src/dsl/gunsmith/types/Colour";
 import type {FighterLook} from "@src/dsl/gunsmith/types/FighterLook";
 import type {DamageLook} from "@src/dsl/gunsmith/types/DamageLook";
-import type {HurtWatch} from "@src/dsl/gunsmith/components/player/types/HurtWatch";
+import type {HitLook} from "@src/dsl/gunsmith/types/HitLook";
+import type {HurtWatch} from "@src/dsl/gunsmith/types/HurtWatch";
 import type {Point} from "@src/dsl/gunsmith/types/Point";
 
 const KEY_FOR: Record<Heading, string> = {
@@ -116,6 +119,13 @@ export class PlayerPlaywright extends BasePage {
     return await lookOfDamage(this.page, {x: player.x, y: player.y});
   }
 
+  /** What the screen shows of a hit landed round the player right now: the mint ticks of a confirmation, which belong to a target. The player must be standing still. */
+  async getHitOnScreen(): Promise<HitLook> {
+    const {player} = await this.readGameState();
+
+    return await lookOfHit(this.page, {x: player.x, y: player.y});
+  }
+
   /**
    * Runs a held game (`holdTheGame`) in steps of `stepSeconds` until the player has less health than they had, and stops there, so a spec can look at the
    * moment of damage. Throws if nothing has hurt them after `maxSeconds` of the game's time.
@@ -123,15 +133,15 @@ export class PlayerPlaywright extends BasePage {
   async runUntilHurt(request: HurtWatch): Promise<void> {
     const {player: before} = await this.readGameState();
 
-    for (let seconds = 0; seconds < request.maxSeconds; seconds += request.stepSeconds) {
-      await this.page.clock.runFor(Math.round(request.stepSeconds * 1000));
-      const {player} = await this.readGameState();
-      if (player.health < before.health) {
-        return;
-      }
-    }
+    await runHeldUntil(this.page, {
+      watch: request,
+      what: "Something hurting the player",
+      isDone: async () => {
+        const {player} = await this.readGameState();
 
-    throw new Error(`Nothing hurt the player in ${request.maxSeconds} seconds.`);
+        return player.health < before.health;
+      },
+    });
   }
 
   /**

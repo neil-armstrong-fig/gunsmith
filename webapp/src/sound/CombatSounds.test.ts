@@ -93,3 +93,26 @@ it("plays the click and the crunch when a step has both", () => {
 
   expect(output.played).toEqual(["sfx-empty-click", "sfx-damage-crunch"]);
 });
+
+it("plays the hit confirmation for a bullet that landed on a target the player saw", () => {
+  const output = new RecordingOutput();
+
+  new CombatSounds(output).afterTick({...EMPTY_CLICK, events: [{kind: "hitLanded", on: "opponent"}], firing: false});
+
+  expect(output.played).toEqual(["sfx-hit"]);
+});
+
+it("plays the crunch and the hit confirmation as two cues when the players hurt each other in one step", () => {
+  const output = new RecordingOutput();
+
+  new CombatSounds(output).afterTick({
+    ...EMPTY_CLICK,
+    events: [
+      {kind: "damageTaken", cause: "bullet", amount: 20},
+      {kind: "hitLanded", on: "opponent"},
+    ],
+    firing: false,
+  });
+
+  expect(output.played).toEqual(["sfx-damage-crunch", "sfx-hit"]);
+});

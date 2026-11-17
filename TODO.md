@@ -17,7 +17,7 @@ Start a session with: **"You are engine, continue the TODO."** Substitute any pe
 
 | Persona | Model | Checklist | Current focus | Updated |
 | --- | --- | --- | --- | --- |
-| play | Claude | [TODO-play.md](TODO-play.md) | Damage feedback 2b integrated; hit confirmation, HUD/inventory, camera and M1 playtest next. | 2026-11-17 |
+| play | Claude | [TODO-play.md](TODO-play.md) | Hit confirmation (slice 3) built, awaiting the user's review; camera shake/recoil/reduced motion, HUD/inventory and M1 playtest next. | 2026-11-17 |
 | engine | Claude | [TODO-engine.md](TODO-engine.md) | Hit events and structural arena validator integrated; spawn/symmetry work remains in its worktree, limits and built-in pool next. | 2026-11-17 |
 | ai | Claude | [TODO-ai.md](TODO-ai.md) | Generated pickup renderer and fake-tier arena pipeline A3 integrated; readability review, judge A4, engine-validator adoption and calibration next. | 2026-11-17 |
 | server | Claude | [TODO-server.md](TODO-server.md) | First online match green (`TwoBrowsersHidingFromEachOther`); minimal `api/`, per-seat fog, webapp client. Next: round/match flow in a room, reconnect, then sign-in/storage for budget. | 2026-11-17 |
@@ -46,7 +46,7 @@ M0 is complete; M1 is current. Later milestones proceed when their consumers and
 
 ## Blockers and requests
 
-- **engine → play:** local damage/hit events are integrated; play consumes hit confirmation next. Inventory data remains open. Extend merged bot routing and cross-level engagement/cover.
+- **engine → play:** local damage/hit events are integrated; play now consumes both. Inventory data remains open. Extend merged bot routing and cross-level engagement/cover.
 - **art → play:** approved [inventory](docs/art/concepts/inventory-display/README.md) and [combat feedback](docs/art/concepts/combat-feedback/Handover.md) are ready. Art owns assets/manifests; play implements feedback and HUD behavior.
 - **engine ↔ ai:** initial rating/balancing and five-call pipeline are merged. Extend/calibrate rather than restart. Labels v1 and AI-chosen unspecified values are approved; inference probes still need authorization and cumulative spend reconciliation. Preserve deliberate weak weapons.
 - **ai → art:** the generated pickup renderer and six drawing criteria are integrated; readability review is next. Kit generation remains shelved. Fake evals prove the harness only. Reconcile paid spend before any model call; a missing ledger creates no allowance.

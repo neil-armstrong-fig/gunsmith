@@ -90,9 +90,10 @@ export function useGameLoop(): void {
         switchTo: weaponKeys.takeSlot(),
       };
 
+      const before = world;
       world = engine.step(world, input, TICK_SECONDS);
       sounds.afterTick({events: world.events, firing: input.firing, round: world.round, seconds: TICK_SECONDS});
-      recordFeedbackCues({events: world.events, round: world.round});
+      recordFeedbackCues({before, after: world});
     }
 
     if (owed.ticks > 0) {
