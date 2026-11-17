@@ -1,5 +1,5 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
-import {canWalkTo} from "@gunsmith/engine/opponent/state/acting/wander/walkable/CanWalkTo";
+import {canWalkTo} from "@gunsmith/engine/opponent/state/acting/walkable/CanWalkTo";
 
 const withStair = arenaFrom(["##########", "#...>1111#", "#....1111#", "##########"]);
 const PILLARED = arenaFrom(["#######", "#.....#", "#..#..#", "#.....#", "#######"]);

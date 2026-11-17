@@ -1,5 +1,6 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import {solidTilesOf} from "@gunsmith/engine/arena/SolidTilesOf";
+import type {Point} from "@gunsmith/engine/geometry/types/Point";
 import {hasClearLine} from "@gunsmith/engine/vision/sight/HasClearLine";
 import {nearestCover} from "@gunsmith/engine/opponent/state/acting/reload/cover/nearest/NearestCover";
 
@@ -71,4 +72,50 @@ it("takes the first of two equally near places", () => {
 
 it("finds nothing among no candidates", () => {
   expect(nearestCover(room, {from: FROM, threat: THREAT, candidates: []})).toBeUndefined();
+});
+
+// Low ground in the east, with a pillar (column 14, rows 2 to 4) to hide behind, and a platform in the west, one level up, reached
+// only by the stair at the top of the drop (column 9, the first row drawn). Rows run north to south as drawn, so the stair is at y 5.
+const terraced = arenaFrom([
+  "####################",
+  "#11111111<.........#",
+  "#11111111.....#....#",
+  "#11111111.....#....#",
+  "#11111111.....#....#",
+  "#11111111..........#",
+  "####################",
+]);
+const LOW_THREAT = {x: 17.5, y: 3.5};
+const LOW_FROM = {x: 10.5, y: 3.5};
+
+it("takes a platform as cover from a threat on the low ground, which cannot see up onto it", () => {
+  const threat = {x: 17.5, y: 1.5};
+  const platform = {x: 6.5, y: 1.5};
+  expect(hasClearLine(solidTilesOf(terraced), threat, platform)).toBe(true);
+
+  expect(nearestCover(terraced, {from: {x: 10.5, y: 1.5}, threat, candidates: [platform]})).toEqual(platform);
+});
+
+it("does not take the low ground as cover from a threat on a platform, which sees down over it", () => {
+  const onThePlatform = {x: 2.5, y: 3.5};
+  const lowGround = {x: 11.5, y: 2.5};
+
+  expect(
+    nearestCover(terraced, {from: {x: 6.5, y: 3.5}, threat: onThePlatform, candidates: [lowGround]}),
+  ).toBeUndefined();
+});
+
+it("prefers cover it can walk to soonest over a nearer place across the drop that takes a walk round by the stair", () => {
+  const acrossTheDrop = {x: 8.5, y: 3.5};
+  const behindThePillar = {x: 13.5, y: 3.5};
+  const crowFlies = (point: Point): number => Math.hypot(point.x - LOW_FROM.x, point.y - LOW_FROM.y);
+  expect(crowFlies(acrossTheDrop)).toBeLessThan(crowFlies(behindThePillar));
+
+  const cover = nearestCover(terraced, {
+    from: LOW_FROM,
+    threat: LOW_THREAT,
+    candidates: [acrossTheDrop, behindThePillar],
+  });
+
+  expect(cover).toEqual(behindThePillar);
 });

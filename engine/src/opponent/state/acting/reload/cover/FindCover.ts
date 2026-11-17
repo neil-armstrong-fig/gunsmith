@@ -8,7 +8,7 @@ import {randomOpenPoint} from "@gunsmith/engine/opponent/steering/RandomOpenPoin
 
 /**
  * Looks for somewhere to hide to reload: tries `coverSamples` random open places within `coverReach` of the opponent and
- * takes the nearest that the threat cannot see and the opponent can walk straight to. Absent when none of the tries
+ * takes the nearest by the walk there that the threat cannot see (`nearestCover`: by walls and by height) and the opponent can walk to. Absent when none of the tries
  * qualifies (an open room, or bad luck), and the opponent then reloads in the open. Only a sample of places is tried, so
  * the answer depends on the seed, and the seed comes back moved on.
  */

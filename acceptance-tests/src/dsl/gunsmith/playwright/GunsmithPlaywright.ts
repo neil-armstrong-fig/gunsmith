@@ -43,6 +43,11 @@ export class GunsmithPlaywright extends BasePage {
     await this.openScenario(`terraced&seed=${request.seed}${this.ringQuery(request)}`);
   }
 
+  /** Opens the overlook (the terraced arena, the opponent on the platform and the player below it, one round, no ring), its choices drawn from `seed`. */
+  async openOverlookDuel(seed: number): Promise<void> {
+    await this.openScenario(`overlook&seed=${seed}`);
+  }
+
   async openHeights(): Promise<void> {
     await this.openScenario("heights");
   }

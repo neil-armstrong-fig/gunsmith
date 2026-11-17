@@ -8,6 +8,7 @@ import type {Input} from "@gunsmith/engine/game-loop/types/Input";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
 import type {World} from "@gunsmith/engine/game-loop/types/World";
 import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
+import {DIFFICULTY} from "@gunsmith/engine/opponent/Difficulty";
 import {startRing} from "@gunsmith/engine/ring/StartRing";
 
 // The practice arena's shape: four pillars to be walked around.
@@ -58,6 +59,19 @@ const terraced = arenaFrom([
 const IN_THE_POCKET: Point = {x: 1.5, y: 3.5};
 const ON_THE_LOW_GROUND: Point = {x: 8.5, y: 3.5};
 const ON_THE_PLATFORM: Point = {x: 24.5, y: 3.5};
+// The game's terraced arena (`webapp/src/game/terraced/`): low ground in the west, a platform from column 11, one stair at column 10
+// in the top row. In the overlook the opponent stands on the platform and the player on the low ground, eleven tiles apart.
+const overlook = arenaFrom([
+  "#########################",
+  "#.........>1111111111111#",
+  "#..........1111111111111#",
+  "#..........1111111111111#",
+  "#..........1111111111111#",
+  "#..........1111111111111#",
+  "#########################",
+]);
+const OVERLOOK_OPPONENT: Point = {x: 12.5, y: 3.5};
+const OVERLOOK_PLAYER: Point = {x: 1.5, y: 3.5};
 
 const TICK = 1 / 60;
 const IDLE: Input = {direction: {x: 0, y: 0}, firing: false, reload: false};
@@ -216,6 +230,36 @@ describe("on the terraced arena, across two levels", () => {
     }
   });
 
+  it("comes down by the stair to a player who stands on the low ground in its sight, and fights them from its range, whatever its seed", () => {
+    for (const seed of SEEDS) {
+      let world = overlookDuel(seed);
+      for (let tick = 0; tick < 10 / TICK; tick++) {
+        world = step(world, IDLE, TICK);
+      }
+
+      const {x, y} = opponentPosition(world);
+      expect(levelOfTile(overlook, Math.floor(x), Math.floor(y))).toBe(0);
+      expect(Math.hypot(x - world.player.position.x, y - world.player.position.y)).toBeLessThanOrEqual(
+        DIFFICULTY.farRange + 1,
+      );
+    }
+  });
+
+  it("plays the overlook out the same way from the same seed", () => {
+    for (const seed of SEEDS.slice(0, 5)) {
+      const play = (): World => {
+        let world = overlookDuel(seed);
+        for (let tick = 0; tick < 600; tick++) {
+          world = step(world, IDLE, TICK);
+        }
+
+        return world;
+      };
+
+      expect(play()).toEqual(play());
+    }
+  });
+
   it("plays the same match out the same way from the same seed", () => {
     for (const seed of SEEDS.slice(0, 5)) {
       const play = (): World => {
@@ -286,6 +330,14 @@ function ringedDuel(seed: number): World {
   });
 
   return {...duel, player: {...duel.player, health: 100000}, ring};
+}
+
+// The opponent on the platform, 1.5 tiles from its edge, and an idle player who cannot be killed standing on the low ground eleven
+// tiles away, in the rifle's reach: farther than its far range even from the edge, so the way straight at them ends at the drop.
+function overlookDuel(seed: number): World {
+  const duel = giveOpponentBrain(startingWorld(overlook, [], OVERLOOK_OPPONENT), seed);
+
+  return {...duel, player: {...duel.player, position: OVERLOOK_PLAYER, health: 100000}};
 }
 
 // A duel whose ring closes on `centre` over twenty seconds, after two. The player is idle in the pocket and cannot be killed, so

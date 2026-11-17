@@ -108,9 +108,9 @@ everything else is a domain folder. Tiles are the unit; `x` grows to the east an
   `unstick/UnstickBrain`). The states: **wander** (walk to a random open tile it can see, re-pick on arrival, after
   `wanderRepickSeconds` or when stuck), **engage** (after `reactionSeconds` hold the trigger for `burstShots` shots of the
   weapon in hand, rest, repeat; the aim misses by a per-burst angle that settles from `widestAimError` to
-  `narrowestAimError` over `aimSettleSeconds` of sight; close in beyond `farRange`, back off inside `nearRange`, circle in
+  `narrowestAimError` over `aimSettleSeconds` of sight; close in beyond `farRange` (`EngageDirection(arena, ...)` heads for `RouteWaypoint`, so a drop is gone round by its stair, while the range is judged by the player), back off inside `nearRange`, circle in
   between and change sides every second or two), **reload** (an empty magazine, from any state: make for the nearest cover
-  it can walk to in a straight line, circle in the open when there is none, ask to reload, or ask for its other weapon when
+  (by the sight rule, so a platform hides a fighter from the low ground, and nearest by the walk there, `WalkingDistanceTo`; it walks round by a stair where a drop lies between, `RouteWaypoint`), circle in the open when there is none, ask to reload, or ask for its other weapon when
   the one in hand has no rounds and no reserve) and **search** (walk to where it last saw the player, wait
   `searchLingerSeconds`, wander again). There is no pathfinder: goals are only ever tiles it can see, and a stuck bot drops its
   goal (or flips its strafe side). The four states sit in `state/acting/` beneath `ActOnState`, each with its helpers beside it:

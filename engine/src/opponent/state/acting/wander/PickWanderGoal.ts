@@ -1,6 +1,6 @@
 import {DIFFICULTY} from "@gunsmith/engine/opponent/Difficulty";
 import {randomOpenPoint} from "@gunsmith/engine/opponent/steering/RandomOpenPoint";
-import {canWalkTo} from "@gunsmith/engine/opponent/state/acting/wander/walkable/CanWalkTo";
+import {canWalkTo} from "@gunsmith/engine/opponent/state/acting/walkable/CanWalkTo";
 import type {OpponentBrain} from "@gunsmith/engine/opponent/types/OpponentBrain";
 import type {OpponentContext} from "@gunsmith/engine/opponent/types/OpponentContext";
 

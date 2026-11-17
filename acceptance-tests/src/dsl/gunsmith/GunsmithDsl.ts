@@ -142,6 +142,19 @@ export class GunsmithDsl {
     }
   }
 
+  /**
+   * Opens the overlook: the terraced arena with the fighters the other way round, the opponent on the platform and the player on the
+   * low ground, a little more than its far range away and in its sight. One round, no score, no ring; the opponent's choices are
+   * drawn from `seed`.
+   */
+  async startOverlookDuel(seed: number): Promise<void> {
+    try {
+      await this.gunsmith.openOverlookDuel(seed);
+    } catch (error) {
+      throw new DslError(`Failed to open the overlook duel with seed ${seed}`, error);
+    }
+  }
+
   /** Opens the heights arena: low ground beside a raised platform, with one stair up, a dummy on each level and no opponent. */
   async startHeights(): Promise<void> {
     try {
