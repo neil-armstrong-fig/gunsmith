@@ -31,11 +31,15 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm checks
 
-  acceptance-tests:
-    name: Acceptance tests (production preview)
+  acceptance-shards:
+    name: Acceptance shard ${{ matrix.shard }}/4
     needs: checks
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -47,14 +51,72 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @gunsmith/acceptance-tests exec playwright install --with-deps chromium
-      - run: pnpm acceptance-tests:preview
-      # Upload on success too: a passing retry still deserves visible evidence.
+      - name: Build production preview
+        run: pnpm --filter @gunsmith/webapp compile
+      - name: Run acceptance shard
+        run: pnpm acceptance-tests --shard=${{ matrix.shard }}/${{ strategy.job-total }} --reporter=github,blob
+        env:
+          PREVIEW_ACCEPTANCE: "1"
+          PLAYWRIGHT_BLOB_OUTPUT_NAME: shard-${{ matrix.shard }}.zip
+      # Blobs include retry traces, screenshots and videos; preserve failures too.
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-blob-${{ matrix.shard }}
+          path: acceptance-tests/blob-report/
+          overwrite: true
+          retention-days: 7
+          if-no-files-found: error
+
+  acceptance-tests:
+    name: Acceptance tests (production preview)
+    needs: [checks, acceptance-shards]
+    if: ${{ !cancelled() && needs.checks.result == 'success' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26.13.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: playwright-blob-*
+          path: acceptance-tests/all-blob-reports/
+          merge-multiple: true
+      - name: Merge available shard reports
+        run: pnpm --filter @gunsmith/acceptance-tests exec playwright merge-reports --reporter=html all-blob-reports
+        env:
+          PLAYWRIGHT_HTML_OPEN: never
       - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
         with:
           name: playwright-preview
-          path: |
-            acceptance-tests/playwright-report/
-            acceptance-tests/test-results/
+          path: acceptance-tests/playwright-report/
+          overwrite: true
           retention-days: 7
-          if-no-files-found: warn
+          if-no-files-found: error
+      # Merging a failed/partial run must never turn acceptance green.
+      - name: Require every shard and report
+        if: ${{ !cancelled() }}
+        shell: bash
+        env:
+          SHARDS_RESULT: ${{ needs.acceptance-shards.result }}
+        run: |
+          set -euo pipefail
+          missing=0
+          for shard in 1 2 3 4; do
+            if [[ ! -f "acceptance-tests/all-blob-reports/shard-$shard.zip" ]]; then
+              echo "Missing report for shard $shard/4" | tee -a "$GITHUB_STEP_SUMMARY"
+              missing=1
+            fi
+          done
+          if [[ "$SHARDS_RESULT" != success || "$missing" != 0 ]]; then
+            echo "Acceptance incomplete or failed: shards=$SHARDS_RESULT" | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi

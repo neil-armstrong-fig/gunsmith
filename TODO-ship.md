@@ -6,9 +6,9 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 Checkout: `.claude/worktrees/ship`, branch `worktree-ship`, synced from committed main `6f6b028`. Persistent worktree; main stays integration-only. Merge newer committed main before new work/delivery when clean; never stash another session's changes.
 
-Current slice: checks/production-preview CI and independent property workflow, with Playwright-managed preview. Owned files: two workflow YAMLs, root package script, acceptance config and ship coordination/operational docs. Project remains M1; ship supports M3/M7–M8.
+Current slice: four-shard production-preview CI with combined reporting and an all-shards gate. Owned files: CI workflow and ship coordination/operational docs. Project remains M1; ship supports M3/M7–M8.
 
-Next action: review/commit this delivery when authorized, then verify the first hosted Actions run. Provisioning and live acceptance await server/budget bindings and user authorization.
+Next action: review/commit this delivery when authorized, then verify the first hosted Actions run and profile setup/build/test/report overhead. Next failing check: hosted all-shards/combined-report acceptance, including artifact transfer. Provisioning and live acceptance await server/budget bindings and user authorization.
 
 ## Ownership
 
@@ -23,7 +23,8 @@ server supplies Worker/DO/storage bindings; budget supplies operational limits; 
 ## Current milestone tasks
 
 - [x] Add repository checks, production-preview acceptance and independent property-test CI.
-- [ ] Evaluate four-way acceptance sharding against the current 6.3-minute local/two-worker baseline; retain two workers per shard, unique artifacts and all-shards gating. Compare duplicated setup/build runner minutes with budget.
+- [x] Implement four acceptance shards, two workers per shard, unique blob artifacts, combined HTML reporting and an all-shards gate.
+- [ ] Profile the first hosted sharded run: separate setup/build/test/merge time, total runner minutes and elapsed time; compare with the recorded 6.3-minute local baseline with budget.
 - [ ] Coordinate the budget/AI eval-strategy research request in HANDOFF.md; implement agreed CI mechanics after AI defines regression gates and paid authorization/spend controls are settled.
 - [ ] Verify the first hosted Actions run after authorized publication; API/infra provisioning awaits bindings and authorization.
 
@@ -37,6 +38,8 @@ server supplies Worker/DO/storage bindings; budget supplies operational limits; 
 - [ ] Measure infrastructure costs with server/AI runtime measurements before proposing free versus Workers Paid.
 
 ## Verification/latest delivery
+
+- [x] 2026-11-17: four-shard CI/combined HTML delivered; all 221 preview criteria complete (220 first-pass, one viewport-size flake recovered). Full pnpm checks passes (one existing slow render skipped). Red/green workflow contract, failed/partial report probes, five gate scenarios, two gate mutants and build-failure handling verified. Standards/folder/reference review complete; local builds total 5.07 s, tests 327.55 s sequentially. Hosted setup/artifact/report overhead remains next; details in Operations.md and HANDOFF.md.
 
 - [x] 2026-11-17 follow-up: recorded acceptance-sharding evaluation and budget/AI eval-strategy research in HANDOFF.md. Documentation-only; full `pnpm checks` passes (one existing slow audio render skipped), diff whitespace and root standards/folder review pass. No new files or workflow/spend changes; gameplay acceptance was not rerun.
 
