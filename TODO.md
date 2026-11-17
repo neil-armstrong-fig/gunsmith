@@ -17,7 +17,7 @@ Start a session with: **"You are engine, continue the TODO."** Substitute any pe
 
 | Persona | Model | Checklist | Current focus | Updated |
 | --- | --- | --- | --- | --- |
-| play | Claude | [TODO-play.md](TODO-play.md) | Combat feedback, HUD/inventory, camera and runtime audio; close M1 playtest. | 2026-11-17 |
+| play | Claude | [TODO-play.md](TODO-play.md) | Combat feedback slice 2a (damage event, crunch) done in worktree `play`; 2b (`store/feedback/`, brackets, health trail) next; HUD/inventory, camera, close M1 playtest. | 2026-11-17 |
 | engine | Claude | [TODO-engine.md](TODO-engine.md) | Bot pickup-seeking built (uncommitted, worktree `engine`); next arena validation and play's combat events. | 2026-11-17 |
 | ai | Claude | [TODO-ai.md](TODO-ai.md) | Fake-eval failures fixed (worktree `ai`, uncommitted); renderer, calibration and arena generation next. | 2026-11-17 |
 | server | Claude | [TODO-server.md](TODO-server.md) | First authoritative two-browser slice after M1; auth, persistence and online privacy. | 2026-11-17 |
@@ -53,6 +53,7 @@ M0 is complete; M1 is current. Later milestones proceed when their consumers and
 - **ai → art:** generated-appearance renderer and readability evidence precede further visual review; kit generation remains shelved. The fake-eval failures are fixed in the `ai` worktree; fake scores are not evidence of live-model quality.
 - **engine → server:** [arena fairness](docs/art/arena-fairness-research.md), visibility and deterministic contracts support online play. Preserve random ring centres and validate built-ins too. Public-play [fair-play/privacy](docs/art/fair-play-research.md) belongs to server, not the M1 gate.
 - **server ↔ budget ↔ ship:** server supplies account/storage/call boundaries; budget owns atomic credit/spend enforcement and tracing; ship provisions approved bindings and deployment automation. No speculative shared contracts or live changes.
+- **play → art:** a seamless `sfx-ring-damage-loop` for continuous ring damage (spec in [TODO-art.md](TODO-art.md)); the ring is silent until it exists. Play adds loop playback after it lands.
 - **art/play:** MP3 is approved and empty click integrated. Safari timing, masking/fatigue and levels remain follow-up QA, with existing thresholds and masters preserved.
 - Current milestone remains M1. Add menus, shared contracts and future packages only with real consumers. Later workstreams can refine relevant acceptance scenarios while waiting.
 

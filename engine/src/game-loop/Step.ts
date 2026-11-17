@@ -31,7 +31,7 @@ import {decideRound} from "@gunsmith/engine/round/DecideRound";
  * stands at the end of the step, loses health to it with any bullet damage, before the round is decided; the practice
  * dummies and the bullets in the air are not hurt by it. Last, a fighter with health left who stands within reach of the
  * pickup lying in the arena takes it (`takePickup`), and a frozen world takes nothing. The world also carries what happened to the
- * player in this step alone (`eventsOfStep`), so a frozen world and the step after it carry none.
+ * player in this step alone, including what a bullet and the ring each took from their health (`eventsOfStep`), so a frozen world and the step after it carry none.
  */
 export function step(world: World, input: Input, seconds: number): World {
   if (world.round !== "playing") {
@@ -62,7 +62,8 @@ export function step(world: World, input: Input, seconds: number): World {
   }
 
   const ring = world.ring && advanceRing(world.ring, seconds);
-  const player = hurt(playerShot.fighter, bulletFlight.playerDamage + ringDamageTo(ring, playerShot.fighter, seconds));
+  const playerRingDamage = ringDamageTo(ring, playerShot.fighter, seconds);
+  const player = hurt(playerShot.fighter, bulletFlight.playerDamage + playerRingDamage);
   const opponent =
     opponentShot &&
     hurt(opponentShot.fighter, bulletFlight.opponentDamage + ringDamageTo(ring, opponentShot.fighter, seconds));
@@ -82,7 +83,10 @@ export function step(world: World, input: Input, seconds: number): World {
     round,
     match: world.match && scoreRound(world.match, round),
     ring,
-    events: eventsOfStep({playerTurn}),
+    events: eventsOfStep({
+      playerTurn,
+      damage: {health: playerShot.fighter.health, bullet: bulletFlight.playerDamage, ring: playerRingDamage},
+    }),
   };
 }
 

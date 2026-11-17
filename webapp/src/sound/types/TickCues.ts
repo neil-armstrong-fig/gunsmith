@@ -9,4 +9,6 @@ export interface TickCues {
   firing: boolean;
   /** Whether the round was still being fought after the step. */
   round: RoundState;
+  /** The game time the step covered. */
+  seconds: number;
 }

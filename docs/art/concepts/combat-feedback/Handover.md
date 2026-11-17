@@ -78,7 +78,7 @@ incoming-damage key and final format in HANDOFF before wiring it. Keep the exist
 | Hidden target hit | Suppress both outgoing confirmation and its sound; never send hidden exact-position effects |
 | Simultaneous exchange | Preserve incoming and visible outgoing feedback as distinct cues |
 | Burst | All actual losses count; merge visual accents within 100 ms and replace the previous incoming voice |
-| Continuous ring damage | Sustained unsafe-state treatment; one onset cue, no per-tick impacts; a new exposure can have a new onset |
+| Continuous ring damage | Sustained unsafe-state treatment, no per-tick impacts. **Superseded 2026-11-17 by the user: no onset cue; a continuous looping sound while the player is hurt by the ring (`sfx-ring-damage-loop`, requested from art), not the crunch** |
 | Local death / round reset | One local death resolution; cancel stale cues and scheduled audio; reveal no hidden killer |
 
 A hidden opponent's coarse directional sound events are a separate existing
