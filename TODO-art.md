@@ -6,9 +6,9 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 Checkout: `.claude/worktrees/art`, branch `worktree-art`; created from committed main `6f6b028` on 2026-11-17. Main has not advanced at startup. Sync committed main into the clean worktree before new work and delivery; preserve this worktree. See [Operations](docs/agent-reference/Operations.md#development-worktrees-and-the-integration-checkout).
 
-Current slice: approve the matching orange rifle-shot silhouette selected by the user. Native 64/32 px and production-preview review passed; the asset is unchanged. Approved inventory, MP3 and label/policy research are delivered.
+Current slice: runtime empty-click onset/cadence follow-up delivered in the [audio handoff](webapp/audio/qa/runtime-playback/README.md#runtime-onset-and-cadence-follow-up--2026-11-17). Chromium/WebKit preserve event cadence despite WebKit’s longer decoded buffer and about 12 ms main-transient offset. Approved orange shot, inventory, MP3 and label/policy research are delivered.
 
-Current milestone: M1/M6; the project remains on M1. Next action: follow up Safari onset/content and event cadence, then combat masking/fatigue with human listening. Native Safari/device-output checks remain human checks; Chromium screenshots do not replace them. Preserve approved master hashes. Next failing check for any playback change: the relevant browser sound acceptance criterion before implementation.
+Current milestone: M1/M6; the project remains on M1. Next action: native Safari/device listening for onset and fast repeats; combat masking/fatigue waits for runtime weapon-shot synthesis (not yet wired into the game sound output). Native Safari/device-output checks remain human checks; Chromium screenshots do not replace them. Preserve approved master hashes. Next failing check for any playback change: the relevant browser sound acceptance criterion before implementation.
 
 ## Ownership
 
@@ -23,8 +23,9 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 ## Current milestone tasks
 
 - [x] Approve the existing matching orange rifle shot (`fx-projectile-rifle-orange.svg`) as selected by the user on 2026-11-17. Native 64/32 px and in-game review pass; keep the 64×64 canvas, current shape/scale, `#FF9B54` and tip (49, 32). The colour mutation was caught by both manifest and browser assertions; the original asset hash was restored. Later weapon classes still need both team variants; muzzle flash remains descoped until feature complete.
-- [ ] Follow up Safari onset/content and event cadence during play; this no longer blocks MP3 integration. Preserve existing thresholds.
-- [ ] Check fatigue, masking and levels on headphones/speakers with the real weapon-shot synth. General audition approval is not proof of these tests.
+- [x] Measure the shipped empty click’s onset/content and event cadence in Chromium/WebKit at default, 44.1 and 48 kHz: 13 starts per 13 holds in all six runs, including repeats shorter than the buffer. WebKit’s main transient is about 12 ms later; no global correction or threshold change. See the audio handoff.
+- [ ] Finish native Safari/device listening for perceived onset, first-gesture wake-up and interrupted fast repeats; record browser/rate/output details. This does not block approved MP3 integration.
+- [ ] Check fatigue, masking and levels on headphones/speakers once AI/play wire the real weapon-shot synth into runtime audio. The current game output only has the static empty click; general audition approval is not proof of these tests.
 - [ ] Map future static cues to approved MP3 as play integrates them; support playback/ducking/volume integration. Weapon-shot synthesis belongs to AI; art supplies static cues.
 - [ ] Review the visual-schema proposal with AI and engine; validate supported oddities in top-down compositions at 64/32 px using the agreed grammar.
 
@@ -42,6 +43,8 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [ ] Case-study diagrams: pipeline, cost safeguards and eval loop.
 
 ## Verification/latest delivery
+
+- [x] Runtime timing follow-up: twelve production-preview empty-click acceptance cases pass (six each in Chromium/WebKit); six real-play probe runs and six synthetic diagnostic controls completed. All 69 inventoried audio/evidence files retain their hashes. `pnpm checks` exits 0: lint/format/types and 2,170 unit tests pass, with one slow audio render skipped. Re-read root/webapp/audio/acceptance instructions; standards and folder/reference audit complete (no new tracked files, folders, helpers or types).
 
 - [x] Orange-shot review: all 16 `DrawingTheShots` criteria pass on a production build. A temporary blue recolour fails the opponent-orange criterion (0 of 6 orange samples) and exactly one of 13 manifest tests. Native 64/32 px plus in-game screenshots reviewed, including fog and missing-asset fallback. Evidence: `/private/tmp/gunsmith-art-shot-review/` (local, temporary). `pnpm checks` passes: lint/format/types and 2,170 unit tests, with one slow audio render skipped. Standards review re-read root, webapp and acceptance instructions; folder/reference audit complete, with no new tracked files, folders, helpers or types.
 

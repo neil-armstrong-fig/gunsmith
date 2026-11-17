@@ -13,7 +13,7 @@ Ownership follows the assigned persona. Models below are defaults; no applicatio
 | ai | Claude | [TODO-ai.md](TODO-ai.md) | Fix eight reported canned-response fake-eval failures; renderer, calibration and arena generation. |
 | server | Claude | [TODO-server.md](TODO-server.md) | First authoritative two-browser slice after M1; auth, persistence and online privacy. |
 | budget | Claude | [TODO-budget.md](TODO-budget.md) | Production ledger/spend boundaries with server/AI; credits, refunds, tracing and kill switch. |
-| art | Codex | [TODO-art.md](TODO-art.md) | Orange rifle-shot review complete; Safari timing and combat masking QA next. Current sprites/MP3 are integrated. |
+| art | Codex | [TODO-art.md](TODO-art.md) | Empty-click cadence QA complete in Chromium/WebKit; native Safari listening remains. Combat masking awaits runtime shot synthesis. |
 | ship | Codex | [TODO-ship.md](TODO-ship.md) | Repository tooling/CI now; infra/release when bindings and authorization exist. |
 
 ### Start prompts
@@ -62,6 +62,8 @@ Before changing a consumed contract, record the proposal and affected owners her
 
 ## Ready handovers and preserved decisions
 
+- Empty-click game-event cadence passes in Chromium/WebKit, including repeats shorter than decoded buffers. [Timing findings](webapp/audio/qa/runtime-playback/README.md#runtime-onset-and-cadence-follow-up--2026-11-17) retain WebKit’s approximately 12 ms main-transient offset without applying a trim. AI/play: runtime weapon-shot audio is still needed before art can assess combat masking/fatigue; native Safari/device listening remains open.
+
 - Art reviewed the existing orange rifle shot on 2026-11-17; the user selected the matching team silhouette. Keep its file, `#FF9B54`, scale and tip (49, 32). The earlier redraw request is closed; later weapon classes still need both colours. No manifest or gameplay contract changed.
 
 - [Inventory](docs/art/concepts/inventory-display/README.md) and [combat feedback](docs/art/concepts/combat-feedback/Handover.md) are approved: play implements behavior, engine supplies events/data, art supplies manifest assets. Preserve punchy/crunch and retained shake; tune empty-click levels with other sounds.
@@ -79,6 +81,8 @@ Before changing a consumed contract, record the proposal and affected owners her
 - [ ] Production art/audio and live release: art/play integrate their domains; ship validates release.
 
 ## Delivery log
+
+- 2026-11-17, art (`worktree-art`, base `4688a51`): [runtime onset/cadence follow-up](webapp/audio/qa/runtime-playback/README.md#runtime-onset-and-cadence-follow-up--2026-11-17). Six Chromium/WebKit runs at default/44.1/48 kHz recorded 13 clicks per 13 holds; fast repeats started before prior decoded buffers ended. WebKit’s 70 ms MP3 decodes to about 96 ms with a roughly 12 ms main-transient offset and non-silent leading content; no correction or threshold change. Twelve existing production-preview sound acceptance cases pass, six diagnostic controls completed, and 69 audio/evidence hashes preserved. Native Safari/device listening remains; combat masking awaits AI/play runtime shot synthesis. `pnpm checks` exits 0: lint/format/types and 2,170 unit tests pass, with one slow audio render skipped. Re-read root/webapp/audio/acceptance instructions; standards and folder/reference audit complete (no new tracked files, folders, helpers or types). No retained code/assets, paid calls, commits or pushes.
 
 - 2026-11-17, art (`worktree-art`, `.claude/worktrees/art`, main `6f6b028`): retained the existing orange rifle shot per user choice after native 64/32 px and in-game review. All 16 production-preview `DrawingTheShots` criteria pass, including orientation, tip alignment, fog and fallback. A blue recolour failed exactly the manifest team-colour test (12 others pass) and the targeted browser criterion (0/6 orange samples); restored SVG SHA-256 `de9ed3fefd600c5dd206f9d85c04ad9054051cd0725bcf5800240244b205e1f0`. Screenshots remain in `/private/tmp/gunsmith-art-shot-review/`; current stand-in wording and art resume/status updated. `pnpm checks` exits 0: lint/format/types; shared 59, acceptance helpers 9, audio 270 (one slow render skipped), engine 990, AI 533 and webapp 309 tests pass. Re-read root/webapp/acceptance instructions and reviewed the diff; folder/reference audit complete with no new tracked files/folders/helpers/types. No retained asset/runtime change, dependency change, paid call, commit or push.
 
