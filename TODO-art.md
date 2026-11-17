@@ -4,9 +4,9 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 ## Resume here
 
-Checkout: `.claude/worktrees/art`, branch `worktree-art`; last merged main `2347f21` via merge `6f7c38a` on 2026-11-17. Preserve this worktree and sync committed main before new work/delivery.
+Checkout: `.claude/worktrees/art`, branch `worktree-art`; last merged main `9484ad0` by fast-forward on 2026-11-17. Preserve this worktree and sync committed main before new work/delivery.
 
-Current slice: delivered [arena terrain candidates](docs/art/terrain/README.md): three floors and a solid wall, editable SVGs and native/context PNG proofs. User approval and play integration remain pending. Ring damage loop remains delivered; renderer review waits for AI evidence.
+Current slice: [C2 soft octagon approved](docs/art/concepts/top-down-oddities/pickup-markers/README.md) by the user on 2026-11-17. Selected SVG, self-contained native/context proof and integration notes retained; rejected comparisons, scratch scripts and redundant S4 screenshot/metadata bundle removed at user request. Next: coordinate acceptance-first marker integration with play/AI, preserving complete fog/collection suppression and fixed appearance-independent shape. No runtime edits. S4-1 fallback contrast is retained in HANDOFF.md; terrain approval and ring-loop integration remain open.
 
 Current milestone: M1/M6; the project remains on M1. Next audio task: combat masking, fatigue and levels once AI/play integrate runtime weapon-shot synthesis (not yet wired into the game sound output). Safari acceptance does not claim new headphone/speaker measurements. Preserve approved master hashes. Next failing check for any playback change: the relevant browser sound acceptance criterion before implementation.
 
@@ -21,6 +21,10 @@ Reserve concrete files in [HANDOFF.md](HANDOFF.md) before overlapping another se
 Agree manifest keys/anchors with play and supported visual grammar with AI before production assets. The rifle shot is integrated (blue is your unmodified `effects/projectile-rifle`; see HANDOFF.md). No menus ahead of real consumers.
 
 ## Current milestone tasks
+
+- [x] User chose C2 soft octagon after two marker comparisons. Lock artwork and clean rejected studies; acceptance-first runtime integration remains open.
+
+- [x] Complete S4 generated-pickup review at native 64/32 px with hide/restore checks. Lantern passes; S4-1 fallback readability fix is handed to AI. After C2 approval, redundant review artifacts were removed by user request; the approved proof embeds its source images. Broader schema/oddity review stays open.
 
 - [x] Deliver three floor levels and solid-wall SVG candidates with native 64/32 px, repetition, grayscale, dim-terrain and terraced-context proof. Approval and runtime adoption remain open.
 
@@ -48,4 +52,8 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 
 ## Verification/latest delivery
 
+Cleanup validation: `pnpm checks` exits 0 (lint, formatting, strict types and 2,567 tests; one existing audio-render skip). Approved C2 source/proof retained, with all five proof images embedded. Root instructions re-read; folder/caller, link, SVG geometry and whitespace audit complete. Redundant review artifacts removed from disk and staging; S4-1 finding retained in HANDOFF.md. No gameplay change or acceptance rerun. Delivery remains uncommitted.
+
 Record actual checks, red/mutation evidence and the standards/folder review for the current delivery. Update this resume, the shared status row and a concise handoff at session end.
+
+S4 validation before cleanup: production build and 6/6 pickup criteria passed without retries. S1/S3 red/mutation evidence is inherited from `c11dc27`, not repeated. No runtime helpers/types/scripts added; the retained handoff records the unresolved AI defect.
