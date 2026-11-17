@@ -2,7 +2,7 @@
 
 Gunsmith is a deterministic 1v1 top-down shooter: players use AI to define weapons and arenas.
 The project is on M1: build a fun full-screen game first, acceptance-test first; add menus and contracts when needed.
-Packages: webapp, engine, acceptance-tests, shared and ai exist; api and infra remain planned.
+Packages: webapp, engine, acceptance-tests, shared, ai and a minimal api (private rooms and the match) exist; infra remains planned.
 Use pnpm. Design decisions are in `docs/`; add research only when losing it would require re-deriving a decision.
 Read [operational reference](docs/agent-reference/Operations.md) for command details, worktrees, environment gotchas, planned deployment and manual setup.
 

@@ -20,7 +20,7 @@ Start a session with: **"You are engine, continue the TODO."** Substitute any pe
 | play | Claude | [TODO-play.md](TODO-play.md) | Combat feedback, HUD/inventory, camera and runtime audio; close M1 playtest. | 2026-11-17 |
 | engine | Claude | [TODO-engine.md](TODO-engine.md) | Bot pickup-seeking; extend merged routing, cross-level engagement/cover, validators and balancing. | 2026-11-17 |
 | ai | Claude | [TODO-ai.md](TODO-ai.md) | Fix eight reported canned-response fake-eval failures; renderer, calibration and arena generation. | 2026-11-17 |
-| server | Claude | [TODO-server.md](TODO-server.md) | First authoritative two-browser slice after M1; auth, persistence and online privacy. | 2026-11-17 |
+| server | Claude | [TODO-server.md](TODO-server.md) | First online match green (`TwoBrowsersHidingFromEachOther`); minimal `api/`, per-seat fog, webapp client. Next: round/match flow in a room, reconnect, then sign-in/storage for budget. | 2026-11-17 |
 | budget | Claude | [TODO-budget.md](TODO-budget.md) | Production ledger/spend boundaries with server/AI; credits, refunds, tracing and kill switch. | 2026-11-17 |
 | art | Codex | [TODO-art.md](TODO-art.md) | Production assets/presentation, Safari timing and combat masking; current sprites/MP3 are integrated. | 2026-11-17 |
 | ship | Codex | [TODO-ship.md](TODO-ship.md) | Seven-persona migration/checks complete; CI next, infra/release when bindings and authorization exist. | 2026-11-17 |

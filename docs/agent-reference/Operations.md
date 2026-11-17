@@ -15,7 +15,7 @@ pnpm start               # dev server on http://localhost:3000 — fine for a fe
 pnpm start:preview       # compile, then serve the build on http://localhost:3000 — what CI tests
 pnpm acceptance-tests    # needs one of the two running in another terminal; preview for the whole suite
 pnpm install-browsers    # one-time Playwright chromium download
-pnpm api:dev             # planned, not implemented: the API Worker locally (`wrangler dev`, port 8787); see `api/AGENTS.md`
+pnpm api:dev             # the API Worker locally (`wrangler dev`, port 8787, or `API_PORT=`); the webapp's `/api` proxy points at it (`API_URL=` for another port); see `api/AGENTS.md`
 pnpm test:properties     # engine property tests, which `pnpm checks` leaves out
 pnpm evals               # root command planned; use package evals:fake/local/paid today. The AI evals (`ai`); costs money, so `pnpm checks` leaves them out
 ```

@@ -17,7 +17,7 @@ a file that does not share it is a different domain with a folder of its own, an
 caller (`opponent/state/acting/engage/aim/` serves `Engage`). `src/` follows the same rule: its one file is `Engine.ts`, and
 everything else is a domain folder. Tiles are the unit; `x` grows to the east and `y` to the north.
 
-The package front door is `Engine.ts` (`startingWorld` and `step`), not a barrel.
+The package front door is `Engine.ts` (`startingWorld` and `step`), not a barrel. A match between two people is `game-loop/StepFighters.ts` (`step` and it share the core `PlayStep.ts`), and what each seat may be told is `seat/` (`ViewOfSeat` is the server's fog filter, built on `visibleToPlayer` over `MirrorSeats`; `WorldOfSeatView` is its inverse for the browser). A mutual knockout in one step still scores as a loss for the first seat.
 Use the current code and adjacent tests to find a domain's implementation.
 [Historical domain catalogue](../docs/history/2026-11-17-compaction/EngineInstructions.md#what-is-here)
 retains the mechanic descriptions and earlier measurements; it is not a backlog.

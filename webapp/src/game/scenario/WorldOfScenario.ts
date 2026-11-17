@@ -38,6 +38,10 @@ import type {Scenario} from "@src/game/scenario/types/Scenario";
  * the ring alone hurt a fighter who stands still; the practice range and the heights arena never have one.
  */
 export function worldOfScenario(scenario: Scenario, seed: number, ringTiming?: RingTiming): World {
+  if (scenario === "room") {
+    return engine.startingWorld(DUEL_ARENA);
+  }
+
   if (scenario === "duel") {
     const world = giveOpponentBrain(engine.startingWorld(DUEL_ARENA, [], DUEL_OPPONENT), seed);
 

@@ -35,6 +35,15 @@ it("makes the practice range with its dummies and no opponent", () => {
   expect(world.dummies).not.toEqual([]);
 });
 
+it("makes a room's first world the duel's arena with the player alone: the server's snapshots replace it", () => {
+  const world = worldOfScenario("room", 1);
+
+  expect(world.arena).toEqual(DUEL_ARENA);
+  expect(world.opponent).toBeUndefined();
+  expect(world.opponentBrain).toBeUndefined();
+  expect(world.dummies).toEqual([]);
+});
+
 it("makes the duel with the opponent where it stands and no dummies", () => {
   const world = worldOfScenario("duel", 7);
 
