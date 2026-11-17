@@ -4,11 +4,15 @@ Model: **Claude**. Follow the startup protocol in [TODO.md](TODO.md); read only 
 
 ## Resume here
 
-Checkout: worktree `.claude/worktrees/budget`, branch `worktree-budget`, created 2026-11-17 from main `6f6b028` (last merged main: `6f6b028`). Sync main into the clean worktree at the start of every turn; main is for integration/validation only. See [Operations](docs/agent-reference/Operations.md#development-worktrees-and-the-integration-checkout).
+Checkout: worktree `.claude/worktrees/budget`, branch `worktree-budget`, created 2026-11-17 from main `6f6b028` (last merged main: `9484ad0`). Sync main into the clean worktree at the start of every turn; main is for integration/validation only. See [Operations](docs/agent-reference/Operations.md#development-worktrees-and-the-integration-checkout).
+
+Decided 2026-11-17 (the user): credits and spend counters live in Durable Objects (`CreditLedger` per account, `SpendLedger` singleton). **Built, uncommitted:** `api/src/ai/credits/` (`CreditAccount`, prices, daily reset, idempotent reserve/settle/refund), `api/src/ai/spend/` (`SpendMeter`: $1 a day and $20 a month caps, estimate-then-settle, stop return times, 50/80/100 alerts), thin `CreditLedger`/`SpendLedger` Durable Objects, bindings `CREDITS`/`SPEND` and migration `v2` in `api/wrangler.jsonc`. 44 new unit tests, mutation-proved; the real objects were also checked under `wrangler dev` with concurrent requests (see cost-and-budget.md). server informed and agreed (no collision with its prediction slice; it owns the generation route and the account id).
+
+**Not built, waits on server:** the generation route that wraps the ai pipeline with reserve/settle/refund; the token pre-check, AI-off banner/guest play and trace-failure scenarios; sending the alerts (needs an `alarm()` or a cron); a repeatable concurrency spec in the repo; the cost estimator's home and prices; Gateway, tracing, provider hard cap and the shutdown drill (needs your authorization and ship's bindings).
 
 Done 2026-11-17: the concurrency/failure scenarios are written as a working draft in [cost-and-budget.md](docs/cost-and-budget.md#acceptance-scenarios-working-draft-budget-2026-11-17); not frozen, awaiting `server` and `ai` review. Still open: define the production accounting slice with server and AI when the API consumer exists; retain existing credit prices and budget ceilings.
 
-Current milestone: M4–M5; the project remains on M1. Next failing test/check: waits on server's `api/` scaffold. Then port the first scenario (two concurrent requests, one credit: exactly one reserves) into an executable spec and watch it fail. Open questions (D1 vs Durable Object counters, where the cost estimator lives) are listed with the scenarios.
+Current milestone: M4–M5; the project remains on M1. Next failing test/check: waits on server's generation route; then a repeatable spec through it (two concurrent requests, one credit: exactly one reserves; budget exhausted: calls stop, built-in play continues), written red first. Open questions (D1 vs Durable Object counters, where the cost estimator lives) are listed with the scenarios.
 
 ## Ownership
 
