@@ -404,6 +404,9 @@ importers:
       eslint-config-prettier:
         specifier: 'catalog:'
         version: 10.1.8(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
+      fast-check:
+        specifier: 'catalog:'
+        version: 4.9.0
       globals:
         specifier: 'catalog:'
         version: 17.14.0
@@ -546,6 +549,9 @@ importers:
       eslint-plugin-react-hooks:
         specifier: 'catalog:'
         version: 7.1.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)
+      fast-check:
+        specifier: 'catalog:'
+        version: 4.9.0
       globals:
         specifier: 'catalog:'
         version: 17.14.0

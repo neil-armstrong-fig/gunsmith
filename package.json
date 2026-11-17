@@ -23,6 +23,6 @@
     "type-check": "pnpm --recursive type-check",
     "test": "pnpm --recursive test",
     "checks:repository": "pnpm --filter @gunsmith/shared exec node config/repository/CheckRepository.ts",
-    "test:properties": "pnpm --filter @gunsmith/engine test:properties"
+    "test:properties": "pnpm --filter @gunsmith/engine --filter @gunsmith/webapp --filter @gunsmith/api test:properties"
   }
 }

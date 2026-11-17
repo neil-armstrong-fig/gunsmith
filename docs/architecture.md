@@ -13,7 +13,7 @@ pnpm workspace, `@gunsmith/*`, no build step for `shared/` and `engine/` (consum
 | `engine/` | Deterministic simulation: fixed timestep, seeded RNG, movement, collision, projectiles, visibility, power rating and caps, arena validator, output moderation | shared |
 | `ai/` | LangChain / LangGraph pipeline, judges, token pre-check, evals (separate vitest config) | shared, engine |
 | `webapp/` | Vite, React 19, Zustand, Tailwind v4, react-three-fiber | shared, engine |
-| `api/` | The Worker: auth, credits, library, ratings, the `Match` and `Matchmaker` Durable Objects, kill switch | shared, engine (and `ai/` only if hosting decision says so) |
+| `api/` | The Worker: auth, library, ratings, the `Match` and `Matchmaker` Durable Objects, and budget's `CreditLedger` and `SpendLedger` Durable Objects (credits, spend counters, kill switch) | shared, engine (and `ai/` only if hosting decision says so) |
 | `acceptance-tests/` | Playwright DSL and specs | shared |
 | `infra/` | Alchemy: Worker with static assets, D1, Durable Object namespaces, rate limiters | itself |
 
@@ -28,8 +28,8 @@ flowchart LR
   end
   subgraph CF["Cloudflare: one Worker + static assets, gunsmith.neilarmstrong.dev"]
     Worker["API Worker<br/>/api/* , WebSocket router"]
-    D1["D1<br/>accounts, sessions, credits,<br/>library, ratings, history"]
-    Match["Match Durable Object<br/>one per match, 20 Hz tick,<br/>engine, fog filtering"]
+    D1["D1<br/>accounts, sessions,<br/>library, ratings, history"]
+    Match["Match Durable Object<br/>one per match, 30 Hz snapshots,<br/>engine, fog filtering"]
     MM["Matchmaker Durable Object<br/>singleton, serialises pairing"]
     Gate["AI Gateway<br/>cache, rate limit, spend limit"]
   end
