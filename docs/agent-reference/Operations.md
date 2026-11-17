@@ -17,12 +17,12 @@ pnpm acceptance-tests    # needs one of the two running in another terminal; pre
 pnpm install-browsers    # one-time Playwright chromium download
 pnpm api:dev             # the API Worker locally (`wrangler dev`, port 8787, or `API_PORT=`); the webapp's `/api` proxy points at it (`API_URL=` for another port); see `api/AGENTS.md`
 pnpm test:properties     # engine property tests, which `pnpm checks` leaves out
-pnpm evals               # root command planned; use package evals:fake/local/paid today. The AI evals (`ai`); costs money, so `pnpm checks` leaves them out
+pnpm evals               # complete free fake harness, all criteria gating; no model calls or traces
 ```
 
 `pnpm checks` is the gate (`--max-warnings=0`). It deliberately leaves out the property tests — a
 fresh seed every run means a failure isn't reproducible from the same commit, so it can't gate a
-deploy — and the evals, which call a model, cost money, and are non-deterministic. The property-test command is implemented; run it when engine changes require it. For prompt/graph changes, use the implemented AI package eval commands and preserve paid authorization/spend controls.
+deploy — and model evals, which cost money and are non-deterministic. The free fake harness runs separately through `pnpm evals`. The property-test command is implemented; run it when engine changes require it. For prompt/graph changes, use the implemented AI package eval commands and preserve paid authorization/spend controls.
 
 
 ## Development worktrees and the integration checkout
@@ -86,7 +86,7 @@ Local profile (2026-11-17, CI settings, existing dependencies; shards run sequen
 
 The separate `property-tests.yml` runs on main pushes/PRs, daily at 03:17 UTC and manually. It uses 1,000 cases per property for commit runs and 5,000 for scheduled/manual runs, with a positive-integer manual override. Failures remain red and logs preserve fast-check seeds, paths and counterexamples for fourteen days. **Never add property tests to required release checks or make CI/deployment depend on them.** Existing browser retries and two CI workers are preserved; the known `ShootingAcrossLevels` flake remains engine/play follow-up, not an excluded criterion.
 
-Deployment and live acceptance remain planned until server/budget bindings and explicit provisioning authorization exist. The future main deployment uses Alchemy for the database, migrations, Worker/assets and Durable Objects, gated on checks and preview acceptance, followed by acceptance against live. AI owns any future eval workflow and its gating semantics; this CI slice adds no model calls.
+Deployment and live acceptance remain planned until server/budget bindings and explicit provisioning authorization exist. The future main deployment uses Alchemy for the database, migrations, Worker/assets and Durable Objects, gated on checks and preview acceptance, followed by acceptance against live. The independent AI eval harness workflow runs the free full fake suite on relevant changes and preserves JSON summaries for fourteen days. It uses no secrets or model calls. Paid runs remain manual/local only; AI owns their selection, guard and evidence implementation. See [eval policy](EvalPolicy.md).
 
 One Worker serves both the site (static assets) and `/api/*` (`run_worker_first: ["/api/*"]`) at
 `gunsmith.neilarmstrong.dev`, DNS at Cloudflare, so the session cookie is same-origin. Environments: local and `prod`
