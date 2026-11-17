@@ -6,9 +6,9 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 Checkout: `.claude/worktrees/ship`, branch `worktree-ship`, synced from committed main `2d7c568`. Persistent worktree; main stays integration-only. Merge newer committed main before new work/delivery when clean; never stash another session's changes.
 
-Current slice: open-source documentation preparation, preserving the maintained persona workflow and local case-study sources. Owned files: tracked Markdown, root ignore rules and repository discovery/checker tests. Project remains M1.
+Current slice: committed worktree integration and validation in main; documentation cleanup is integrated. Owned integration records: HANDOFF.md, shared status and affected persona resumes. Project remains M1.
 
-Next action: review the uncommitted cleanup. Next failing check: hosted all-shards/report acceptance after publication. Hosted profiling, eval-policy coordination and provisioning remain open; licensing and squashing are left to the user.
+Documentation cleanup is integrated from `4fbc847`. Next action: add managed Worker startup for online acceptance in the ship worktree, coordinating server before changing its paths; then verify hosted CI after authorized publication. Next failing check: hosted all-shards/report acceptance after publication. Hosted profiling, eval-policy coordination and provisioning remain open; licensing and squashing are left to the user.
 
 ## Ownership
 
@@ -41,4 +41,6 @@ server supplies Worker/DO/storage bindings; budget supplies operational limits; 
 
 ## Verification/latest delivery
 
-Cleanup verified: `pnpm checks` passes (2,250 tests, one slow audio render skipped); production compile passes with a chunk-size warning. Links/anchors, archive hashes and ignore behavior pass. Archive exclusion failed first and its removal kills exactly the new criterion. Root/shared/AI/engine/webapp/React/audio/acceptance standards and folder/caller audit complete. Changes remain uncommitted; no gameplay acceptance, paid eval, push or publication.
+Cleanup verified: `pnpm checks` passes (2,250 tests, one slow audio render skipped); production compile passes with a chunk-size warning. Links/anchors, archive hashes and ignore behavior pass. Archive exclusion failed first and its removal kills exactly the new criterion. Root/shared/AI/engine/webapp/React/audio/acceptance standards and folder/caller audit complete. Cleanup is committed and integrated; no gameplay acceptance, paid eval, push or publication.
+
+Integration delivery: code/assets `9d33c98`; full checks pass (2,567 tests, one existing slow render skipped), properties 14/14, fake evals 170/170, production-preview browser exit 0 (255 first-pass, one known `ShootingAcrossLevels` flake recovered). Source tips and merge hashes, conflict decisions, separate standards audit and preserved concurrent staging are in HANDOFF.md. No source checkout was written or synced. CI Worker startup and owner standards corrections remain open; hosted execution, model quality and audio re-render were not claimed.

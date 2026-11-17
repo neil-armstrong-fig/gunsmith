@@ -1,6 +1,6 @@
 # Generated weapon visuals
 
-Owner: ai for generation and renderer; art reviews readability. Stats and appearance are separate stages. Pipeline integration exists; the browser renderer consumer remains active work in [TODO-ai.md](../TODO-ai.md).
+Owner: ai for generation and renderer; art reviews readability. Stats and appearance are separate stages. Pipeline integration exists; the ground-pickup renderer is integrated; readability and held-weapon work remain in [TODO-ai.md](../TODO-ai.md).
 
 ## Accepted constraints
 
@@ -9,7 +9,7 @@ Owner: ai for generation and renderer; art reviews readability. Stats and appear
 - Parse unknown output, complete only code-owned omissions, then enforce strict bounds. Repair sees the previous drawing and its faults as data.
 - Preserve gameplay stats even if drawing fails. Return a validated stand-in and disclose it truthfully.
 - Drawings cannot change hitboxes, visibility, damage, behavior or audio limits. Unsupported identity/mechanics must not be claimed as implemented.
-- The appearance schema stays local until the renderer genuinely consumes it; coordinate any move through HANDOFF.
+- The appearance schema, limits, vocabularies and stand-in live in `shared/src/appearance/`, consumed by AI and the webapp; geometric validation stays in AI.
 
 ## Drawing vocabulary and review
 
