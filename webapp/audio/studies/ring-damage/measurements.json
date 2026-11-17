@@ -1,0 +1,23 @@
+{
+  "synthesis": "Deterministic periodic additive PCM; no native Web Audio render",
+  "sampleRate": 48000,
+  "sampleBits": 16,
+  "master": {
+    "seconds": 2,
+    "channels": 1,
+    "peakDbfs": -21.28,
+    "rmsDbfs": -28.81,
+    "sha256": "c7982be64900c154c0fc2ad347b5f32514458b9221204836d840761b8adc8393",
+    "seamJumpDbfs": -180,
+    "threeRepeatsSeconds": 6
+  },
+  "encoder": "ffmpeg version 9.0.2 Copyright (c) 2000-2026 the FFmpeg developers",
+  "mp3": {
+    "frames": 96000,
+    "peak": 0.08675119280815125,
+    "rmsDbfs": -28.805368842358515,
+    "loopJump": 0.000175467144799768,
+    "sha256": "e9e2dcb0935cd665e52e25da1f5188c6d3c58953715c0c7850de4d88b7239e50"
+  },
+  "listeningReview": "user approved in Visual Studio Code, 2026-11-17; runtime combat masking/fatigue not measured"
+}

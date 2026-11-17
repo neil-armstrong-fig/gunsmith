@@ -1,0 +1,118 @@
+[
+  {
+    "engine": "chromium",
+    "version": "156.0.8078.4",
+    "rows": [
+      {
+        "format": "wav",
+        "rate": 48000,
+        "channels": 1,
+        "frames": 96000,
+        "seconds": 2,
+        "peak": 0.08633686602115631,
+        "rmsDbfs": -28.80520463980078,
+        "loopJump": 0,
+        "maxStep": 0.0036011841148138046,
+        "repeatError": 0,
+        "discontinuityControl": 0.019999999552965164
+      },
+      {
+        "format": "mp3",
+        "rate": 48000,
+        "channels": 1,
+        "frames": 96000,
+        "seconds": 2,
+        "peak": 0.08675120025873184,
+        "rmsDbfs": -28.805367213657888,
+        "loopJump": 0.0001754561144480249,
+        "maxStep": 0.003704315982758999,
+        "repeatError": 0,
+        "discontinuityControl": 0.01999999996587576
+      },
+      {
+        "format": "wav",
+        "rate": 44100,
+        "channels": 1,
+        "frames": 88199,
+        "seconds": 1.9999773242630385,
+        "peak": 0.0863325297832489,
+        "rmsDbfs": -28.805487692671043,
+        "loopJump": 0.0000015828754840185866,
+        "maxStep": 0.003924712538719177,
+        "repeatError": 0,
+        "discontinuityControl": 0.0199999994438258
+      },
+      {
+        "format": "mp3",
+        "rate": 44100,
+        "channels": 1,
+        "frames": 88199,
+        "seconds": 1.9999773242630385,
+        "peak": 0.08674624562263489,
+        "rmsDbfs": -28.805650165353388,
+        "loopJump": 0.00014934844875824638,
+        "maxStep": 0.004028040217235684,
+        "repeatError": 0,
+        "discontinuityControl": 0.019999999280116754
+      }
+    ]
+  },
+  {
+    "engine": "webkit",
+    "version": "27.2",
+    "rows": [
+      {
+        "format": "wav",
+        "rate": 48000,
+        "channels": 1,
+        "frames": 96000,
+        "seconds": 2,
+        "peak": 0.086334228515625,
+        "rmsDbfs": -28.805337175179524,
+        "loopJump": 0,
+        "maxStep": 0.00360107421875,
+        "repeatError": 0,
+        "discontinuityControl": 0.019999999552965164
+      },
+      {
+        "format": "mp3",
+        "rate": 48000,
+        "channels": 1,
+        "frames": 97920,
+        "seconds": 2.04,
+        "peak": 0.086761474609375,
+        "rmsDbfs": -28.891419167984385,
+        "loopJump": 0.000030517578125,
+        "maxStep": 0.003692626953125,
+        "repeatError": 0,
+        "discontinuityControl": 0.019999999552965164
+      },
+      {
+        "format": "wav",
+        "rate": 44100,
+        "channels": 1,
+        "frames": 88200,
+        "seconds": 2,
+        "peak": 0.08633150905370712,
+        "rmsDbfs": -28.80522644036731,
+        "loopJump": 5.7391389418626204e-8,
+        "maxStep": 0.003924880642443895,
+        "repeatError": 0,
+        "discontinuityControl": 0.019999999638912414
+      },
+      {
+        "format": "mp3",
+        "rate": 44100,
+        "channels": 1,
+        "frames": 89964,
+        "seconds": 2.04,
+        "peak": 0.08675069361925125,
+        "rmsDbfs": -28.89130833207738,
+        "loopJump": 0.000028030122848576866,
+        "maxStep": 0.004024270921945572,
+        "repeatError": 0,
+        "discontinuityControl": 0.020000000376967364
+      }
+    ]
+  }
+]

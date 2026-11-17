@@ -22,7 +22,7 @@ Start a session with: **"You are engine, continue the TODO."** Substitute any pe
 | ai | Claude | [TODO-ai.md](TODO-ai.md) | Fake-eval failures fixed (worktree `ai`, uncommitted); renderer, calibration and arena generation next. | 2026-11-17 |
 | server | Claude | [TODO-server.md](TODO-server.md) | First authoritative two-browser slice after M1; auth, persistence and online privacy. | 2026-11-17 |
 | budget | Claude | [TODO-budget.md](TODO-budget.md) | Production ledger/spend boundaries with server/AI; credits, refunds, tracing and kill switch. Scenarios drafted; executable specs wait for `api/`. | 2026-11-17 |
-| art | Codex | [TODO-art.md](TODO-art.md) | Production assets/presentation, Safari timing and combat masking; current sprites/MP3 are integrated. | 2026-11-17 |
+| art | Codex | [TODO-art.md](TODO-art.md) | Ring-damage loop approved by user; use WAV to avoid WebKit MP3 padding. Renderer review awaits AI S3. | 2026-11-17 |
 | ship | Codex | [TODO-ship.md](TODO-ship.md) | Seven-persona migration/checks complete; CI next, infra/release when bindings and authorization exist. | 2026-11-17 |
 
 These are persistent workstreams, not permission for simultaneous edits to the same files. Select one current slice; record concrete reservations and contracts in HANDOFF.md. Model assignments are defaults, not application configuration. `build` is retired; [migration history](docs/history/2026-11-17-persona-migration.md) preserves its tasks.
@@ -53,8 +53,8 @@ M0 is complete; M1 is current. Later milestones proceed when their consumers and
 - **ai → art:** generated-appearance renderer and readability evidence precede further visual review; kit generation remains shelved. The fake-eval failures are fixed in the `ai` worktree; fake scores are not evidence of live-model quality.
 - **engine → server:** [arena fairness](docs/art/arena-fairness-research.md), visibility and deterministic contracts support online play. Preserve random ring centres and validate built-ins too. Public-play [fair-play/privacy](docs/art/fair-play-research.md) belongs to server, not the M1 gate.
 - **server ↔ budget ↔ ship:** server supplies account/storage/call boundaries; budget owns atomic credit/spend enforcement and tracing; ship provisions approved bindings and deployment automation. No speculative shared contracts or live changes.
-- **play → art:** a seamless `sfx-ring-damage-loop` for continuous ring damage (spec in [TODO-art.md](TODO-art.md)); the ring is silent until it exists. Play adds loop playback after it lands.
-- **art/play:** MP3 is approved and empty click integrated. Safari timing, masking/fatigue and levels remain follow-up QA, with existing thresholds and masters preserved.
+- **art → play:** ring-damage WAV/MP3 study delivered; runtime loop playback remains open and the ring stays silent until integrated.
+- **art/play:** MP3 is approved and empty click integrated. Safari audio is accepted as good enough by user decision (2026-11-17); its listening follow-up is closed. Combat masking/fatigue and levels await runtime shot synthesis, with existing thresholds and masters preserved.
 - Current milestone remains M1. Add menus, shared contracts and future packages only with real consumers. Later workstreams can refine relevant acceptance scenarios while waiting.
 
 ## Open questions and tunables
