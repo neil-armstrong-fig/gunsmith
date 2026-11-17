@@ -1,5 +1,5 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
-import {walkingDistanceTo} from "@gunsmith/engine/opponent/state/acting/reload/cover/nearest/walking/WalkingDistanceTo";
+import {walkingDistanceTo} from "@gunsmith/engine/opponent/state/walking/WalkingDistanceTo";
 
 // A platform in the west (columns 1 and 2), the stair at the top of the drop (column 3, the first row drawn, so y 3), low ground east.
 const terraced = arenaFrom(["#########", "#11<....#", "#11.....#", "#11.....#", "#########"]);

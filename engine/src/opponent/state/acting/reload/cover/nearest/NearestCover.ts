@@ -3,7 +3,7 @@ import type {Point} from "@gunsmith/engine/geometry/types/Point";
 import {blocksSightFrom} from "@gunsmith/engine/height/BlocksSightFrom";
 import {eyeLevelAt} from "@gunsmith/engine/height/EyeLevelAt";
 import type {CoverCandidates} from "@gunsmith/engine/opponent/state/acting/reload/cover/nearest/types/CoverCandidates";
-import {walkingDistanceTo} from "@gunsmith/engine/opponent/state/acting/reload/cover/nearest/walking/WalkingDistanceTo";
+import {walkingDistanceTo} from "@gunsmith/engine/opponent/state/walking/WalkingDistanceTo";
 import {hasClearLine} from "@gunsmith/engine/vision/sight/HasClearLine";
 
 /**

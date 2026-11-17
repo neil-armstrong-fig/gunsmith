@@ -19,4 +19,13 @@ export class PickupDsl {
       throw new DslError("Failed to read the pickup", error);
     }
   }
+
+  /** Waits until a fighter has taken the weapon and none lies in the arena, for as long as `timeoutSeconds` when that is longer than the default. */
+  async waitUntilTaken(timeoutSeconds?: number): Promise<void> {
+    try {
+      await this.pickup.waitUntilTaken(timeoutSeconds);
+    } catch (error) {
+      throw new DslError("Failed to see a fighter take the weapon lying in the arena", error);
+    }
+  }
 }
