@@ -1,4 +1,4 @@
-import type {Appearance} from "@gunsmith/ai/pipeline/appearance/schema/Appearance";
+import type {Appearance} from "@gunsmith/shared/appearance/schema/Appearance";
 
 /**
  * The safe visual a weapon gets when its generated appearance cannot be made valid: a plain, readable, right-facing body block

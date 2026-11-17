@@ -1,8 +1,8 @@
 import {z} from "zod";
-import {APPEARANCE_LIMITS} from "@gunsmith/ai/pipeline/appearance/schema/AppearanceLimits";
-import {appearancePointSchema} from "@gunsmith/ai/pipeline/appearance/schema/part/point/AppearancePoint";
-import {COLOUR_ROLES} from "@gunsmith/ai/pipeline/appearance/vocabulary/colour/ColourRole";
-import {DETAIL_TIERS} from "@gunsmith/ai/pipeline/appearance/vocabulary/detail/DetailTier";
+import {APPEARANCE_LIMITS} from "@gunsmith/shared/appearance/schema/AppearanceLimits";
+import {appearancePointSchema} from "@gunsmith/shared/appearance/schema/part/point/AppearancePoint";
+import {COLOUR_ROLES} from "@gunsmith/shared/appearance/vocabulary/colour/ColourRole";
+import {DETAIL_TIERS} from "@gunsmith/shared/appearance/vocabulary/detail/DetailTier";
 
 /** What every part has: where it is, how it is coloured and drawn. A circle or ellipse's `x`, `y` is its centre; a rectangle's is its upper-left corner; a polygon or polyline's is the origin its points are local to. Rotation turns the part about that `x`, `y`. */
 const COMMON_FIELDS = {

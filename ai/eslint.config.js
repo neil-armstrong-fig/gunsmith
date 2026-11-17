@@ -78,7 +78,7 @@ export default [
     files: ["evals/eval-criteria-mapping/**"],
     rules: {
       "no-restricted-imports": restrictedImports({
-        allowedPackages: ["@gunsmith/ai"],
+        allowedPackages: ["@gunsmith/ai", "@gunsmith/shared"],
         patterns: [
           {group: ["@evals/tests/**"], message: notUpwards},
           {
@@ -96,7 +96,7 @@ export default [
     files: ["evals/dsl/**"],
     rules: {
       "no-restricted-imports": restrictedImports({
-        allowedPackages: ["@gunsmith/ai"],
+        allowedPackages: ["@gunsmith/ai", "@gunsmith/shared"],
         paths: noModelPackages(dslModelMessage),
         patterns: [{group: ["@evals/tests/**", "@evals/eval-criteria-mapping/**"], message: notUpwards}],
       }),
@@ -121,7 +121,7 @@ export default [
         },
       ],
       "no-restricted-imports": restrictedImports({
-        allowedPackages: ["@gunsmith/ai"],
+        allowedPackages: ["@gunsmith/ai", "@gunsmith/shared"],
         paths: noModelPackages(dslModelMessage),
         patterns: [
           {group: ["@evals/tests/**", "@evals/eval-criteria-mapping/**"], message: notUpwards},
@@ -139,7 +139,7 @@ export default [
     files: ["evals/dsl/**/pipeline/**"],
     rules: {
       "no-restricted-imports": restrictedImports({
-        allowedPackages: ["@gunsmith/ai"],
+        allowedPackages: ["@gunsmith/ai", "@gunsmith/shared"],
         paths: noModelPackages(dslModelMessage),
         patterns: [
           {group: ["@evals/tests/**", "@evals/eval-criteria-mapping/**"], message: notUpwards},

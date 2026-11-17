@@ -1,5 +1,5 @@
 import {partExtent} from "@gunsmith/ai/pipeline/appearance/check/validate/bounds/extent/PartExtent";
-import {fallbackAppearance} from "@gunsmith/ai/pipeline/appearance/fallback/FallbackAppearance";
+import {fallbackAppearance} from "@gunsmith/shared/appearance/fallback/FallbackAppearance";
 import {validateAppearance} from "@gunsmith/ai/pipeline/appearance/check/validate/ValidateAppearance";
 
 it("is an appearance that passes every rule a generated one must pass", () => {

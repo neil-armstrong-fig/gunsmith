@@ -1,4 +1,4 @@
-import {appearanceSchema} from "@gunsmith/ai/pipeline/appearance/schema/Appearance";
+import {appearanceSchema} from "@gunsmith/shared/appearance/schema/Appearance";
 import {measureAppearance} from "@gunsmith/ai/pipeline/appearance/check/validate/budget/measure/MeasureAppearance";
 import {passingAppearance} from "@gunsmith/ai/pipeline/appearance/testing/PassingAppearance";
 

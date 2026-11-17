@@ -5,7 +5,7 @@ Current ownership: ai owns pipeline/generated renderer; engine owns rules/balanc
 Owner: `ai`. Dated 2026-11-13. Requested by the user via `art`: evaluate JSON-based weapon appearance generation before the
 design freezes (complexity, reliability, safe code-owned defaults, repair and fallback, cost). **This is findings and
 questions, not a contract.** The original local probe and later Haiku results are preserved below; scores do not transfer
-between tiers. Appearance remains local to `ai/`; **since 2026-11-15 `generateWeapon` runs it as a second stage** (see "Integration, 2026-11-15" below).
+between tiers. The appearance schema moved to `shared/src/appearance/` on 2026-11-17 for the webapp's renderer; the pipeline stays in `ai/`; **since 2026-11-15 `generateWeapon` runs it as a second stage** (see "Integration, 2026-11-15" below).
 
 ## AI session handoff (2026-11-15)
 
@@ -43,7 +43,7 @@ record any cross-persona contract change in `HANDOFF.md` before implementing it.
   returning the existing validated stand-in with its fallback disclosure. Appearance must never change gameplay stats.
 - Keep one repair per stage. Count both stages in the outer `modelCalls`; distinguish appearance nodes with an
   `appearance.` prefix while preserving the nested appearance outcome's own path, usage and disclosure.
-- Keep schemas, completion and fallback in `ai/` until a renderer is a second consumer. Coordinate migration with `build`
+- (Done 2026-11-17: the schema, vocabularies and stand-in moved to `shared/src/appearance/` once the webapp became a second consumer; completion stays in `ai/`.) Earlier guidance: keep schemas, completion and fallback in `ai/` until a renderer is a second consumer. Coordinate migration with `build`
   then; do not create a shared schema or renderer ahead of that consumer.
 - Keep paid models behind the same spend guard and log every call in the combined request. Fail evals clearly on provider
   errors, spend stops or truncated answers, rather than presenting these as ordinary rejected requests or stand-ins.

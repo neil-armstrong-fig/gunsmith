@@ -1,5 +1,5 @@
-import type {ColourRole} from "@gunsmith/ai/pipeline/appearance/vocabulary/colour/ColourRole";
-import type {PaletteToken} from "@gunsmith/ai/pipeline/appearance/vocabulary/colour/PaletteToken";
+import type {ColourRole} from "@gunsmith/shared/appearance/vocabulary/colour/ColourRole";
+import type {PaletteToken} from "@gunsmith/shared/appearance/vocabulary/colour/PaletteToken";
 import type {AppearancePalette} from "@evals/eval-criteria-mapping/appearance/drawings/sheet/svg/types/AppearancePalette";
 import type {FixedRole} from "@evals/eval-criteria-mapping/appearance/drawings/sheet/svg/types/FixedRole";
 

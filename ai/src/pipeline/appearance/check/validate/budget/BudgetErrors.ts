@@ -1,4 +1,4 @@
-import {APPEARANCE_LIMITS} from "@gunsmith/ai/pipeline/appearance/schema/AppearanceLimits";
+import {APPEARANCE_LIMITS} from "@gunsmith/shared/appearance/schema/AppearanceLimits";
 import type {AppearanceMeasure} from "@gunsmith/ai/pipeline/appearance/check/validate/budget/types/AppearanceMeasure";
 
 /** What an appearance costs in all, which the schema cannot see (it sees one array at a time): too many points, too many bytes. */

@@ -1,10 +1,10 @@
 import {z} from "zod";
-import {APPEARANCE_LIMITS} from "@gunsmith/ai/pipeline/appearance/schema/AppearanceLimits";
-import {appearancePartSchema} from "@gunsmith/ai/pipeline/appearance/schema/part/AppearancePart";
-import {COLOUR_ROLES} from "@gunsmith/ai/pipeline/appearance/vocabulary/colour/ColourRole";
-import {PALETTE_TOKENS} from "@gunsmith/ai/pipeline/appearance/vocabulary/colour/PaletteToken";
-import {ANIMATION_PRESETS} from "@gunsmith/ai/pipeline/appearance/vocabulary/preset/AnimationPreset";
-import {IMPACT_PRESETS} from "@gunsmith/ai/pipeline/appearance/vocabulary/preset/ImpactPreset";
+import {APPEARANCE_LIMITS} from "@gunsmith/shared/appearance/schema/AppearanceLimits";
+import {appearancePartSchema} from "@gunsmith/shared/appearance/schema/part/AppearancePart";
+import {COLOUR_ROLES} from "@gunsmith/shared/appearance/vocabulary/colour/ColourRole";
+import {PALETTE_TOKENS} from "@gunsmith/shared/appearance/vocabulary/colour/PaletteToken";
+import {ANIMATION_PRESETS} from "@gunsmith/shared/appearance/vocabulary/preset/AnimationPreset";
+import {IMPACT_PRESETS} from "@gunsmith/shared/appearance/vocabulary/preset/ImpactPreset";
 
 /**
  * What a generated weapon looks like: a body drawn in a 64 by 64 space, a projectile, an impact and an animation, all from a

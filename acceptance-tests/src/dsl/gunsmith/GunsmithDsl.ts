@@ -17,6 +17,7 @@ import {VisionDsl} from "@src/dsl/gunsmith/components/vision/VisionDsl";
 import {WeaponDsl} from "@src/dsl/gunsmith/components/weapon/WeaponDsl";
 import {GunsmithPlaywright} from "@src/dsl/gunsmith/playwright/GunsmithPlaywright";
 import type {ClosingRingRequest} from "@src/dsl/gunsmith/types/ClosingRingRequest";
+import type {PickupDrawingRequest} from "@src/dsl/gunsmith/types/PickupDrawingRequest";
 import type {Size} from "@src/dsl/gunsmith/types/Size";
 
 /** The whole game as a spec sees it. Every area is a member of this rather than a fixture of its own. */
@@ -132,6 +133,15 @@ export class GunsmithDsl {
       await this.gunsmith.openSparringWithSeed(seed);
     } catch (error) {
       throw new DslError(`Failed to open the sparring match with seed ${seed}`, error);
+    }
+  }
+
+  /** Opens sparring with the weapon lying in the arena drawn as the named drawing, as the game draws a generated weapon. */
+  async startSparringWithPickupDrawing(request: PickupDrawingRequest): Promise<void> {
+    try {
+      await this.gunsmith.openSparringWithPickupDrawing(request);
+    } catch (error) {
+      throw new DslError(`Failed to open the sparring match with the weapon drawn as ${request.drawing}`, error);
     }
   }
 

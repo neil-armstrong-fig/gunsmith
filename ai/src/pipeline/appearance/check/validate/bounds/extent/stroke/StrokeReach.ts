@@ -1,4 +1,4 @@
-import type {AppearancePart} from "@gunsmith/ai/pipeline/appearance/schema/part/AppearancePart";
+import type {AppearancePart} from "@gunsmith/shared/appearance/schema/part/AppearancePart";
 
 /**
  * How far a part's stroke reaches beyond its geometry: half its width, since a stroke is centred on the edge and the renderer
