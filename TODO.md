@@ -23,7 +23,7 @@ Start a session with: **"You are engine, continue the TODO."** Substitute any pe
 | server | Claude | [TODO-server.md](TODO-server.md) | First online match green (`TwoBrowsersHidingFromEachOther`); minimal `api/`, per-seat fog, webapp client. Next: round/match flow in a room, reconnect, then sign-in/storage for budget. | 2026-11-17 |
 | budget | Claude | [TODO-budget.md](TODO-budget.md) | API package is integrated; credits/spend work still awaits storage, account identity and the AI route. | 2026-11-17 |
 | art | Codex | [TODO-art.md](TODO-art.md) | Terrain SVG candidates and browser review sheets delivered; approval/play integration pending. Audio masking awaits runtime synthesis. | 2026-11-17 |
-| ship | Codex | [TODO-ship.md](TODO-ship.md) | Free eval CI/root command and paid-policy handoff; AI owns paid guard/filter/evidence, opening spend awaits Console export. Managed Worker startup remains next. | 2026-11-17 |
+| ship | Codex | [TODO-ship.md](TODO-ship.md) | Free eval CI/root command integrated; combined checks and 170 fake criteria pass. AI paid guard/filter/evidence and Console opening spend remain pending; managed Worker startup next. | 2026-11-17 |
 
 These are persistent workstreams, not permission for simultaneous edits to the same files. Select one current slice; record concrete reservations and contracts in HANDOFF.md. Model assignments are defaults, not application configuration. `build` is retired; current tasks remain in the seven owner checklists.
 

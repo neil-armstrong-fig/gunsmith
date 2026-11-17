@@ -44,7 +44,7 @@ Main is an integration checkout. All seven personas develop in their own worktre
 
 ## Active reservations and requests
 
-**ship delivery ready for review — free eval gate:** root `package.json`, `.github/workflows/ai-evals.yml`, eval-policy and ship coordination/manual-setup docs. AI retains selection, paid guard and evidence implementation; no AI source files reserved by ship.
+**Ship free eval gate integrated:** root `package.json`, `.github/workflows/ai-evals.yml`, eval-policy and ship coordination/manual-setup docs, from `e8ff270` via `f6039c8`. AI retains selection, paid guard and evidence implementation; no AI source files reserved by ship.
 
 **Integrated 2026-11-17:** ship’s documentation cleanup, engine’s local hit events and structural arena validator, AI’s generated-pickup renderer and fake-tier arena pipeline, play’s screen damage feedback, and server’s initial private-room networking are on main. Engine’s symmetry/spawn work and server’s prediction/interpolation remain unfinished in their worktrees. Owners sync main when clean.
 
@@ -114,7 +114,7 @@ Documentation cleanup is integrated. Current decisions and unfinished tasks rema
 - Standards review (separate from the passing gate): 119 source folders listed with `ls`, root-file import callers counted with `grep`. Owner corrections remain: server’s `api/src/match/room/MatchRoom.ts` has a loose `withoutOneShots` helper beside the class; play’s `places-of-damage/TilesPerStudyPixel.ts` has one caller and should live in that caller; `BracketPlaces` has an unnamed `left | right` parameter type. These predate integration conflict resolution; fix through owner worktrees, preserving their unfinished changes. No standards-complete claim is made.
 - Budget: `api/`, its instructions, tests and AI import allowance are now integrated. Credit/spend storage, account identity and an AI-calling route are still absent, so the complete budget unblock has not landed.
 
-## Latest integration — 2026-11-17
+## Earlier integration — 2026-11-17
 
 Reviewed committed Git objects and merged these fixed tips, in dependency order. Source paths are `.claude/worktrees/<persona>`; locked sources were included in read-only review. Art `9c4e8e8` and budget `a056252` had no unique commits.
 
@@ -133,3 +133,26 @@ Conflicts: retained ship’s documentation cleanup and current owner decisions; 
 Standards review used root, engine, AI, API, shared, webapp, React, audio and acceptance instruction files, with nearby step/event, renderer, feedback and room tests as references. The folder/caller audit is separate from automated success; remaining owner corrections are listed above. Frozen installs first failed on offline cache/metadata misses, then succeeded with registry access using all 417/418 cached packages; no dependency version or lockfile rewrite was introduced by integration. Git emitted stale rerere warnings for absent `WhenBlock.ts`; all merges committed successfully and no tracked conflict remains.
 
 Final source-tip check: every source tip is an ancestor of main and no committed delivery remains unmerged. AI/art/budget/play/ship statuses and index fingerprints match the initial inventory. Engine and server were already dirty; their existing changes were staged during the run, changing their fingerprints while their tips stayed fixed. Integration issued no write command in any source checkout and did not sync them. Their symmetry/spawn and networking work remains outside main. Temporary inventories, index hashes and detailed logs are under `/private/tmp/gunsmith-integration-20261117/` on the integration machine. Only the integration Worker and managed preview were stopped; ports 3478, 3479 and 9478 are closed. Owners merge final main when clean before resuming.
+
+
+## Latest integration — free eval gate, 2026-11-17
+
+Ship tip `e8ff2700991dffeb26a723a208ea776ed09403c3` is merged at `f6039c82ac99b2cbb4bebe5caf0ffffe6ddaff4a`, the tested combined revision. The merge was conflict-free. Delivery adds the root free fake-eval command, independent CI workflow and paid-policy handoff; paid selector, ledger and evidence implementation remain pending. Stale delivery/resume claims were reconciled separately in this coordination update.
+
+Fresh validation: `pnpm checks` passes lint, formatting, strict types and 2,567 tests (one existing slow audio render skipped). The first sandbox run stalled at native audio startup while every other package completed; it was stopped and the unchanged gate passed outside the sandbox. Both logs are preserved. `pnpm evals` passes 170/170 despite inherited paid-tier, regression-gate, nine-trial and tracking settings; all eight result summaries confirm fake tier and one trial. Workflow YAML, read-only permissions, commands, artifact policy and 28 push/PR path probes pass. An initial probe used an incorrect glob approximation for zero nested directories; correcting that verifier required no workflow change.
+
+Standards review is separate: re-read root, AI, shared and engine instructions; references were existing CI/property workflows, the eval mapping, config and result writer. Listed workflow and reference-document folders and counted references with `grep`; workflow files are independent entry points and EvalPolicy is a multiply referenced document. No source helpers/types or domain folders were added. Prior owner standards follow-ups remain open. Browser acceptance, engine properties, production build and audio re-render were not repeated because this delivery changes no runtime, engine or assets. Prior results above are inherited evidence only. No local/paid model, hosted Actions, push or deployment ran.
+
+Final source inventory (absolute prefix `/Users/neilarmstrong/Development/Personal/gunsmith/.claude/worktrees/`):
+
+| Source | Final reviewed tip | Result |
+| --- | --- | --- |
+| ship | `e8ff2700991dffeb26a723a208ea776ed09403c3` | Merged at `f6039c8` |
+| ai | `069986516c60503be9a19ffb32855d35286d2330` | Already integrated |
+| art | `f744267965d2fa47f284405086147b7b485e8030` | Already integrated; owner synced during this run |
+| budget | `a05625222f2389d2e7aacc066c53b50299872178` | Already integrated |
+| engine | `ee95948985bae46a33c7f2dca3d10af5390b0006` | Already integrated; staged work preserved |
+| play | `6ea36b7066b4c1d91cab88c0c7a0c14b3dc68adf` | Already integrated |
+| server | `a543dd1ddc105a8f3046773571bbc5ad12cb4269` | Already integrated; staged work preserved |
+
+Every listed tip is an ancestor of main; no committed delivery remains unmerged. Six sources retain their exact initial tips, status and index fingerprints, including engine/server staging. Art advanced from `9c4e8e8` to existing main `f744267` and acquired an unstaged HANDOFF.md edit concurrently; this integration issued no writes in that checkout or any other source. Art's movement introduced no unique commit. No worktree was synced, unlocked, removed or cleaned by integration. Evidence is under `/private/tmp/gunsmith-integration-20261117-194602/`. No server was started. Git commit emitted stale rerere warnings for the absent WhenBlock.ts; the merge committed successfully, with no tracked conflict or pending merge. Owners merge final main when clean before resuming.

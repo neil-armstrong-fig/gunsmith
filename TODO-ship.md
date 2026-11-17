@@ -6,7 +6,7 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 Checkout: `.claude/worktrees/ship`, branch `worktree-ship`, synced from committed main `f744267`. Persistent worktree; main stays integration-only. Merge newer committed main before new work/delivery when clean; never stash another session's changes.
 
-Current slice: free eval root command/CI and the user-approved paid-eval policy handoff. Owned files: root package scripts, AI harness workflow, eval-policy/operational/manual-setup docs and ship coordination. Project remains M1.
+Current slice: free eval root command/CI and the user-approved paid-eval policy handoff integrated at `f6039c8`; combined validation complete. Owned integration records: HANDOFF.md, TODO.md and this resume. Project remains M1.
 
 Next action: AI owns the paid selector, shared local budget guard and dated samples; activation waits for reconciled November Console spend. Ship's next independent CI slices are generated Playwright-report lint exclusion and managed Worker startup for online acceptance (coordinate server); hosted profiling/publication still await setup. No paid calls or CI are enabled.
 
@@ -42,7 +42,7 @@ server supplies Worker/DO/storage bindings; budget supplies operational limits; 
 
 ## Verification/latest delivery
 
-2026-11-17 free eval gate: `pnpm evals` passes 170/170, including arena fixtures; full `pnpm checks` passes (lint/format/types, 2,567 tests, one skipped) outside sandbox after sandbox audio stalled. Missing-command red observed; five unsafe command mutants rejected with a stub process; YAML/permissions, fourteen trigger-path probes, targeted formatting, diff whitespace and root/AI/shared standards/folder/caller review pass. No new helpers/types. Free workflow remains uncommitted and unverified on hosted Actions. Paid selector/guard/dated samples remain AI-owned and pending; no paid execution or ledger initialization.
+2026-11-17 free eval gate: `pnpm evals` passes 170/170, including arena fixtures; full `pnpm checks` passes (lint/format/types, 2,567 tests, one skipped) outside sandbox after sandbox audio stalled. Missing-command red observed; five unsafe command mutants rejected with a stub process; YAML/permissions, fourteen trigger-path probes, targeted formatting, diff whitespace and root/AI/shared standards/folder/caller review pass. No new helpers/types. Free workflow is committed in `e8ff270` and integrated at `f6039c8`; hosted Actions remains unverified. Integration independently repeated full checks and 170 fake criteria with conflicting inherited settings, plus 28 push/PR path probes. Paid selector/guard/dated samples remain AI-owned and pending; no paid execution or ledger initialization.
 
 Cleanup verified: `pnpm checks` passes (2,250 tests, one slow audio render skipped); production compile passes with a chunk-size warning. Links/anchors, archive hashes and ignore behavior pass. Archive exclusion failed first and its removal kills exactly the new criterion. Root/shared/AI/engine/webapp/React/audio/acceptance standards and folder/caller audit complete. Cleanup is committed and integrated; no gameplay acceptance, paid eval, push or publication.
 
