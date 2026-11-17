@@ -4,11 +4,11 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 ## Resume here
 
-Checkout: `.claude/worktrees/ship`, branch `worktree-ship`, synced from committed main `2d7c568`. Persistent worktree; main stays integration-only. Merge newer committed main before new work/delivery when clean; never stash another session's changes.
+Checkout: `.claude/worktrees/ship`, branch `worktree-ship`, synced from committed main `f744267`. Persistent worktree; main stays integration-only. Merge newer committed main before new work/delivery when clean; never stash another session's changes.
 
-Current slice: committed worktree integration and validation in main; documentation cleanup is integrated. Owned integration records: HANDOFF.md, shared status and affected persona resumes. Project remains M1.
+Current slice: free eval root command/CI and the user-approved paid-eval policy handoff. Owned files: root package scripts, AI harness workflow, eval-policy/operational/manual-setup docs and ship coordination. Project remains M1.
 
-Documentation cleanup is integrated from `4fbc847`. Next action: add managed Worker startup for online acceptance in the ship worktree, coordinating server before changing its paths; then verify hosted CI after authorized publication. Next failing check: hosted all-shards/report acceptance after publication. Hosted profiling, eval-policy coordination and provisioning remain open; licensing and squashing are left to the user.
+Next action: AI owns the paid selector, shared local budget guard and dated samples; activation waits for reconciled November Console spend. Ship's next independent CI slices are generated Playwright-report lint exclusion and managed Worker startup for online acceptance (coordinate server); hosted profiling/publication still await setup. No paid calls or CI are enabled.
 
 ## Ownership
 
@@ -27,7 +27,8 @@ server supplies Worker/DO/storage bindings; budget supplies operational limits; 
 - [x] Add repository checks, production-preview acceptance and independent property-test CI.
 - [x] Implement four acceptance shards, two workers per shard, unique blob artifacts, combined HTML reporting and an all-shards gate.
 - [ ] Profile the first hosted sharded run: separate setup/build/test/merge time, total runner minutes and elapsed time; compare with the recorded 6.3-minute local baseline with budget.
-- [ ] Coordinate the budget/AI eval-strategy research request in HANDOFF.md; implement agreed CI mechanics after AI defines regression gates and paid authorization/spend controls are settled.
+- [x] Settle eval policy with the user and deliver free fake CI/root mechanics; see [policy](docs/agent-reference/EvalPolicy.md).
+- [ ] Receive AI-owned paid selector/guard/evidence implementation and reconciled opening spend before local paid activation.
 - [ ] Verify the first hosted Actions run after authorized publication; API/infra provisioning awaits bindings and authorization.
 
 ## Later tasks
@@ -40,6 +41,8 @@ server supplies Worker/DO/storage bindings; budget supplies operational limits; 
 - [ ] Measure infrastructure costs with server/AI runtime measurements before proposing free versus Workers Paid.
 
 ## Verification/latest delivery
+
+2026-11-17 free eval gate: `pnpm evals` passes 170/170, including arena fixtures; full `pnpm checks` passes (lint/format/types, 2,567 tests, one skipped) outside sandbox after sandbox audio stalled. Missing-command red observed; five unsafe command mutants rejected with a stub process; YAML/permissions, fourteen trigger-path probes, targeted formatting, diff whitespace and root/AI/shared standards/folder/caller review pass. No new helpers/types. Free workflow remains uncommitted and unverified on hosted Actions. Paid selector/guard/dated samples remain AI-owned and pending; no paid execution or ledger initialization.
 
 Cleanup verified: `pnpm checks` passes (2,250 tests, one slow audio render skipped); production compile passes with a chunk-size warning. Links/anchors, archive hashes and ignore behavior pass. Archive exclusion failed first and its removal kills exactly the new criterion. Root/shared/AI/engine/webapp/React/audio/acceptance standards and folder/caller audit complete. Cleanup is committed and integrated; no gameplay acceptance, paid eval, push or publication.
 
