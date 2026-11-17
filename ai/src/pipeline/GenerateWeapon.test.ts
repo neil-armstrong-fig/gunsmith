@@ -1,3 +1,4 @@
+import {weaponDraftSchema} from "@gunsmith/ai/pipeline/weapon/WeaponDraft";
 import {FakeListChatModel} from "@langchain/core/utils/testing";
 import {generateWeapon} from "@gunsmith/ai/pipeline/GenerateWeapon";
 import {fallbackAppearance} from "@gunsmith/ai/pipeline/appearance/fallback/FallbackAppearance";
@@ -75,7 +76,7 @@ const TOO_STRONG = {
   reloadSeconds: 0.5,
   startingReserve: 200,
 };
-const OUT_OF_RANGE = {...RIFLE, bulletDamage: 9999};
+const FRACTIONAL_MAGAZINE = {...RIFLE, magazineSize: 12.5};
 
 /** A drawing the strict check refuses: a part reaching outside the canvas. */
 const REFUSED_DRAWING = {...passingAppearance(), body: [{kind: "rect", x: 60, y: 10, width: 20, height: 5}]};
@@ -133,7 +134,7 @@ it("creates the weapon the generator wrote when it is valid and within the cap, 
 it("repairs a weapon that does not fit the schema, once, and creates and draws the repaired one", async () => {
   const outcome = await generateWeapon(
     {prompt: "a rifle"},
-    weaponPipelineDependenciesWhereGeneratorSays(OUT_OF_RANGE, RIFLE),
+    weaponPipelineDependenciesWhereGeneratorSays(FRACTIONAL_MAGAZINE, RIFLE),
   );
 
   expect(outcome.status).toBe("created");
@@ -198,7 +199,7 @@ it("repairs a refused drawing, once, and the weapon stays as it was", async () =
 
 it("reaches the five-call ceiling when the stats and the drawing are both repaired", async () => {
   const weaponPipelineDependencies = {
-    ...weaponPipelineDependenciesWhereGeneratorSays(OUT_OF_RANGE, RIFLE),
+    ...weaponPipelineDependenciesWhereGeneratorSays(FRACTIONAL_MAGAZINE, RIFLE),
     appearanceGenerator: appearanceModelSaying(REFUSED_DRAWING, passingAppearance()),
   };
 
@@ -235,7 +236,7 @@ it("never lets a drawing that cannot be made change a stat", async () => {
 });
 
 it("shows the model its first answer and the faults when it repairs", async () => {
-  const weaponPipelineDependencies = weaponPipelineDependenciesWhereGeneratorSays(OUT_OF_RANGE, RIFLE);
+  const weaponPipelineDependencies = weaponPipelineDependenciesWhereGeneratorSays(FRACTIONAL_MAGAZINE, RIFLE);
   const invoke = vi.spyOn(weaponPipelineDependencies.generator, "invoke");
 
   await generateWeapon({prompt: "a rifle"}, weaponPipelineDependencies);
@@ -243,8 +244,10 @@ it("shows the model its first answer and the faults when it repairs", async () =
   const repairMessages = String(
     (invoke.mock.calls[1]?.[0] as {content: unknown}[]).map(message => message.content).join("\n"),
   );
-  expect(repairMessages).toContain('<previous>\n{"name":"Proof Rifle","bulletDamage":9999');
-  expect(repairMessages).toContain("bulletDamage: Too big");
+  expect(repairMessages).toContain(
+    '<previous>\n{"name":"Proof Rifle","bulletDamage":24,"fireIntervalSeconds":0.2,"bulletSpeed":20,"magazineSize":12.5',
+  );
+  expect(repairMessages).toContain("magazineSize: Invalid input: expected int");
 });
 
 it("balances a weapon that is over the limits instead of repairing it, so the model is asked once", async () => {
@@ -258,6 +261,31 @@ it("balances a weapon that is over the limits instead of repairing it, so the mo
   expect(outcome.modelCalls).toBe(3);
   expect(invoke).toHaveBeenCalledTimes(1);
   expect((outcome.weapon as {bulletDamage: number}).bulletDamage).toBeLessThan(100);
+});
+
+it("clamps a stat the model wrote past its range instead of repairing it: a magazine of 100 is created as 60, the model asked once", async () => {
+  const weaponPipelineDependencies = weaponPipelineDependenciesWhereGeneratorSays({...RIFLE, magazineSize: 100});
+  const invoke = vi.spyOn(weaponPipelineDependencies.generator, "invoke");
+
+  const outcome = await generateWeapon({prompt: "a big magazine and plenty of spare ammo"}, weaponPipelineDependencies);
+
+  expect(outcome.status).toBe("created");
+  expect(outcome.nodes).toEqual([...STATS_NODES, ...DRAWING_NODES]);
+  expect(outcome.modelCalls).toBe(3);
+  expect(invoke).toHaveBeenCalledTimes(1);
+  expect(weaponDraftSchema.safeParse(outcome.weapon).success).toBe(true);
+  expect(outcome.weapon).toEqual({...RIFLE, magazineSize: 60});
+});
+
+it("brings a weapon that deals no damage up to the floor instead of repairing it", async () => {
+  const outcome = await generateWeapon(
+    {prompt: "a riot shield"},
+    weaponPipelineDependenciesWhereGeneratorSays({...RIFLE, bulletDamage: 0}),
+  );
+
+  expect(outcome.status).toBe("created");
+  expect(outcome.nodes).not.toContain("repair");
+  expect(outcome.weapon).toEqual({...RIFLE, bulletDamage: 1});
 });
 
 it("gives a favoured stat more of the weapon than the same request with no preference", async () => {
@@ -307,8 +335,11 @@ it("repairs a preference that names a stat there is not, once", async () => {
   ]);
 });
 
-it("is invalid, with no weapon and no drawing, when the repaired weapon is still out of range", async () => {
-  const weaponPipelineDependencies = weaponPipelineDependenciesWhereGeneratorSays(OUT_OF_RANGE, OUT_OF_RANGE);
+it("is invalid, with no weapon and no drawing, when the repaired weapon still fails the schema", async () => {
+  const weaponPipelineDependencies = weaponPipelineDependenciesWhereGeneratorSays(
+    FRACTIONAL_MAGAZINE,
+    FRACTIONAL_MAGAZINE,
+  );
   const appearanceCall = vi.spyOn(weaponPipelineDependencies.appearanceGenerator, "invoke");
 
   const outcome = await generateWeapon({prompt: "a rifle"}, weaponPipelineDependencies);
@@ -322,8 +353,8 @@ it("is invalid, with no weapon and no drawing, when the repaired weapon is still
   expect(appearanceCall).not.toHaveBeenCalled();
 });
 
-it("is invalid when the repaired weapon is still out of range, and never repairs a second time", async () => {
-  const generator = new FakeListChatModel({responses: [JSON.stringify(OUT_OF_RANGE)]});
+it("is invalid when the repaired weapon still fails the schema, and never repairs a second time", async () => {
+  const generator = new FakeListChatModel({responses: [JSON.stringify(FRACTIONAL_MAGAZINE)]});
   const invoke = vi.spyOn(generator, "invoke");
   const weaponPipelineDependencies: WeaponPipelineDependencies = {
     ...weaponPipelineDependenciesWhereGeneratorSays(),
