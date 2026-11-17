@@ -1,0 +1,341 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1420" viewBox="0 0 1440 1420" role="img" aria-label="Arena terrain candidates, native samples and static context"><defs><g id="tile-floor-l1">
+  <rect x="0" y="0" width="64" height="64" fill="#202B36"/>
+  <path d="M0 63.5H64M63.5 0V64" fill="none" stroke="#91A2B2" stroke-opacity="0.16" stroke-width="1"/>
+  <path d="M8 8v8" fill="none" stroke="#91A2B2" stroke-width="2"/>
+</g><g id="tile-floor-l2">
+  <rect x="0" y="0" width="64" height="64" fill="#30404F"/>
+  <path d="M0 63.5H64M63.5 0V64" fill="none" stroke="#91A2B2" stroke-opacity="0.16" stroke-width="1"/>
+  <path d="M8 8v8 M14 8v8" fill="none" stroke="#91A2B2" stroke-width="2"/>
+</g><g id="tile-floor-l3">
+  <rect x="0" y="0" width="64" height="64" fill="#465A6B"/>
+  <path d="M0 63.5H64M63.5 0V64" fill="none" stroke="#91A2B2" stroke-opacity="0.16" stroke-width="1"/>
+  <path d="M8 8v8 M14 8v8 M20 8v8" fill="none" stroke="#91A2B2" stroke-width="2"/>
+</g><g id="tile-wall">
+  <rect x="0" y="0" width="64" height="64" fill="#18212B"/>
+  <rect x="2" y="2" width="60" height="60" fill="none" stroke="#91A2B2" stroke-width="2"/>
+  <path d="M9 19V9H19M45 9H55V19M55 45V55H45M19 55H9V45" fill="none" stroke="#91A2B2" stroke-width="2"/>
+</g><g id="sprite-player-stand-blue"><circle cx="27" cy="32" r="18" fill="#30404F" stroke="#91A2B2" stroke-width="2"/><circle cx="30" cy="32" r="8" fill="#465A6B" stroke="none" stroke-width="2"/><rect x="23" y="17" width="10" height="4" rx="0" fill="#62B5FF" stroke="none" stroke-width="2"/><circle cx="42" cy="35" r="3" fill="#465A6B" stroke="#91A2B2" stroke-width="1"/></g><g id="sprite-player-stand-orange"><circle cx="27" cy="32" r="18" fill="#30404F" stroke="#91A2B2" stroke-width="2"/><circle cx="30" cy="32" r="8" fill="#465A6B" stroke="none" stroke-width="2"/><rect x="21" y="17" width="4" height="4" rx="0" fill="#FF9B54" stroke="none" stroke-width="2"/><rect x="29" y="17" width="4" height="4" rx="0" fill="#FF9B54" stroke="none" stroke-width="2"/><circle cx="42" cy="35" r="3" fill="#465A6B" stroke="#91A2B2" stroke-width="1"/></g><g id="fx-projectile-rifle-blue"><path d="M23 29H42L49 32L42 35H23Z" fill="#62B5FF" stroke="#62B5FF" stroke-width="1" stroke-linejoin="round"/></g><g id="fx-projectile-rifle-orange"><path d="M23 29H42L49 32L42 35H23Z" fill="#FF9B54" stroke="#FF9B54" stroke-width="1" stroke-linejoin="round"/></g><filter id="gray"><feColorMatrix type="saturate" values="0"/></filter></defs><rect width="1440" height="1420" fill="#10151B"/>
+<text x="48" y="64" font-family="Arial,sans-serif" font-size="32" fill="#E5EAF0">GUNSMITH / ARENA SURFACES</text>
+<text x="48" y="99" font-family="Arial,sans-serif" font-size="16" fill="#A7B3C2">Production candidates · flat industrial · artwork review, not runtime integration</text>
+<text x="48" y="130" font-family="Arial,sans-serif" font-size="16" fill="#A7B3C2">01 / Native samples — design pixels equal screen pixels at 100%</text>
+<rect x="48" y="152" width="320" height="210" rx="4" fill="#19222D"/>
+<text x="64" y="185" font-family="Arial,sans-serif" font-size="18" fill="#E5EAF0">tile-floor-l1</text>
+<use href="#tile-floor-l1" transform="translate(68 210) scale(1.0)"/>
+<use href="#tile-floor-l1" transform="translate(168 226) scale(0.5)"/>
+<text x="68" y="306" font-family="Arial,sans-serif" font-size="16" fill="#A7B3C2">64 px</text>
+<text x="168" y="306" font-family="Arial,sans-serif" font-size="16" fill="#A7B3C2">32 px</text>
+<text x="64" y="340" font-family="Arial,sans-serif" font-size="14" fill="#A7B3C2">Low ground / one tick</text>
+<rect x="388" y="152" width="320" height="210" rx="4" fill="#19222D"/>
+<text x="404" y="185" font-family="Arial,sans-serif" font-size="18" fill="#E5EAF0">tile-floor-l2</text>
+<use href="#tile-floor-l2" transform="translate(408 210) scale(1.0)"/>
+<use href="#tile-floor-l2" transform="translate(508 226) scale(0.5)"/>
+<text x="408" y="306" font-family="Arial,sans-serif" font-size="16" fill="#A7B3C2">64 px</text>
+<text x="508" y="306" font-family="Arial,sans-serif" font-size="16" fill="#A7B3C2">32 px</text>
+<text x="404" y="340" font-family="Arial,sans-serif" font-size="14" fill="#A7B3C2">Middle level / two ticks</text>
+<rect x="728" y="152" width="320" height="210" rx="4" fill="#19222D"/>
+<text x="744" y="185" font-family="Arial,sans-serif" font-size="18" fill="#E5EAF0">tile-floor-l3</text>
+<use href="#tile-floor-l3" transform="translate(748 210) scale(1.0)"/>
+<use href="#tile-floor-l3" transform="translate(848 226) scale(0.5)"/>
+<text x="748" y="306" font-family="Arial,sans-serif" font-size="16" fill="#A7B3C2">64 px</text>
+<text x="848" y="306" font-family="Arial,sans-serif" font-size="16" fill="#A7B3C2">32 px</text>
+<text x="744" y="340" font-family="Arial,sans-serif" font-size="14" fill="#A7B3C2">Upper level / three ticks</text>
+<rect x="1068" y="152" width="320" height="210" rx="4" fill="#19222D"/>
+<text x="1084" y="185" font-family="Arial,sans-serif" font-size="18" fill="#E5EAF0">tile-wall</text>
+<use href="#tile-wall" transform="translate(1088 210) scale(1.0)"/>
+<use href="#tile-wall" transform="translate(1188 226) scale(0.5)"/>
+<text x="1088" y="306" font-family="Arial,sans-serif" font-size="16" fill="#A7B3C2">64 px</text>
+<text x="1188" y="306" font-family="Arial,sans-serif" font-size="16" fill="#A7B3C2">32 px</text>
+<text x="1084" y="340" font-family="Arial,sans-serif" font-size="14" fill="#A7B3C2">Solid fill / inset boundary</text>
+<text x="48" y="415" font-family="Arial,sans-serif" font-size="16" fill="#A7B3C2">02 / Repetition and joins — 3 × 3 floors, wall run, corner and block</text>
+<use href="#tile-floor-l1" transform="translate(48 440) scale(1.0)"/>
+<use href="#tile-floor-l1" transform="translate(112 440) scale(1.0)"/>
+<use href="#tile-floor-l1" transform="translate(176 440) scale(1.0)"/>
+<use href="#tile-floor-l1" transform="translate(48 504) scale(1.0)"/>
+<use href="#tile-floor-l1" transform="translate(112 504) scale(1.0)"/>
+<use href="#tile-floor-l1" transform="translate(176 504) scale(1.0)"/>
+<use href="#tile-floor-l1" transform="translate(48 568) scale(1.0)"/>
+<use href="#tile-floor-l1" transform="translate(112 568) scale(1.0)"/>
+<use href="#tile-floor-l1" transform="translate(176 568) scale(1.0)"/>
+<text x="48" y="663" font-family="Arial,sans-serif" font-size="16" fill="#A7B3C2">Level 1 · 64 px tiles</text>
+<use href="#tile-floor-l2" transform="translate(308 440) scale(1.0)"/>
+<use href="#tile-floor-l2" transform="translate(372 440) scale(1.0)"/>
+<use href="#tile-floor-l2" transform="translate(436 440) scale(1.0)"/>
+<use href="#tile-floor-l2" transform="translate(308 504) scale(1.0)"/>
+<use href="#tile-floor-l2" transform="translate(372 504) scale(1.0)"/>
+<use href="#tile-floor-l2" transform="translate(436 504) scale(1.0)"/>
+<use href="#tile-floor-l2" transform="translate(308 568) scale(1.0)"/>
+<use href="#tile-floor-l2" transform="translate(372 568) scale(1.0)"/>
+<use href="#tile-floor-l2" transform="translate(436 568) scale(1.0)"/>
+<text x="308" y="663" font-family="Arial,sans-serif" font-size="16" fill="#A7B3C2">Level 2 · 64 px tiles</text>
+<use href="#tile-floor-l3" transform="translate(568 440) scale(1.0)"/>
+<use href="#tile-floor-l3" transform="translate(632 440) scale(1.0)"/>
+<use href="#tile-floor-l3" transform="translate(696 440) scale(1.0)"/>
+<use href="#tile-floor-l3" transform="translate(568 504) scale(1.0)"/>
+<use href="#tile-floor-l3" transform="translate(632 504) scale(1.0)"/>
+<use href="#tile-floor-l3" transform="translate(696 504) scale(1.0)"/>
+<use href="#tile-floor-l3" transform="translate(568 568) scale(1.0)"/>
+<use href="#tile-floor-l3" transform="translate(632 568) scale(1.0)"/>
+<use href="#tile-floor-l3" transform="translate(696 568) scale(1.0)"/>
+<text x="568" y="663" font-family="Arial,sans-serif" font-size="16" fill="#A7B3C2">Level 3 · 64 px tiles</text>
+<use href="#tile-wall" transform="translate(868 440) scale(1.0)"/>
+<use href="#tile-wall" transform="translate(932 440) scale(1.0)"/>
+<use href="#tile-wall" transform="translate(996 440) scale(1.0)"/>
+<use href="#tile-wall" transform="translate(868 504) scale(1.0)"/>
+<use href="#tile-wall" transform="translate(868 568) scale(1.0)"/>
+<use href="#tile-wall" transform="translate(1060 504) scale(1.0)"/>
+<use href="#tile-wall" transform="translate(1124 504) scale(1.0)"/>
+<use href="#tile-wall" transform="translate(1060 568) scale(1.0)"/>
+<use href="#tile-wall" transform="translate(1124 568) scale(1.0)"/>
+<text x="868" y="663" font-family="Arial,sans-serif" font-size="16" fill="#A7B3C2">Opaque joins / no navigable gaps</text>
+<text x="48" y="718" font-family="Arial,sans-serif" font-size="16" fill="#A7B3C2">03 / Readability — grayscale and current 50% fog veil</text>
+<g filter="url(#gray)">
+<use href="#tile-floor-l1" transform="translate(48 742) scale(0.5)"/>
+<use href="#tile-floor-l1" transform="translate(80 742) scale(0.5)"/>
+<use href="#tile-floor-l1" transform="translate(112 742) scale(0.5)"/>
+<use href="#tile-floor-l1" transform="translate(48 774) scale(0.5)"/>
+<use href="#tile-floor-l1" transform="translate(80 774) scale(0.5)"/>
+<use href="#tile-floor-l1" transform="translate(112 774) scale(0.5)"/>
+<use href="#tile-floor-l2" transform="translate(196 742) scale(0.5)"/>
+<use href="#tile-floor-l2" transform="translate(228 742) scale(0.5)"/>
+<use href="#tile-floor-l2" transform="translate(260 742) scale(0.5)"/>
+<use href="#tile-floor-l2" transform="translate(196 774) scale(0.5)"/>
+<use href="#tile-floor-l2" transform="translate(228 774) scale(0.5)"/>
+<use href="#tile-floor-l2" transform="translate(260 774) scale(0.5)"/>
+<use href="#tile-floor-l3" transform="translate(344 742) scale(0.5)"/>
+<use href="#tile-floor-l3" transform="translate(376 742) scale(0.5)"/>
+<use href="#tile-floor-l3" transform="translate(408 742) scale(0.5)"/>
+<use href="#tile-floor-l3" transform="translate(344 774) scale(0.5)"/>
+<use href="#tile-floor-l3" transform="translate(376 774) scale(0.5)"/>
+<use href="#tile-floor-l3" transform="translate(408 774) scale(0.5)"/>
+<use href="#tile-wall" transform="translate(492 742) scale(0.5)"/>
+<use href="#tile-wall" transform="translate(524 742) scale(0.5)"/>
+<use href="#tile-wall" transform="translate(556 742) scale(0.5)"/>
+<use href="#tile-wall" transform="translate(492 774) scale(0.5)"/>
+<use href="#tile-wall" transform="translate(524 774) scale(0.5)"/>
+<use href="#tile-wall" transform="translate(556 774) scale(0.5)"/>
+</g>
+<text x="48" y="839" font-family="Arial,sans-serif" font-size="16" fill="#A7B3C2">32 px tiles · grayscale</text>
+<g>
+<use href="#tile-floor-l1" transform="translate(750 742) scale(0.5)"/>
+<use href="#tile-floor-l1" transform="translate(782 742) scale(0.5)"/>
+<use href="#tile-floor-l1" transform="translate(814 742) scale(0.5)"/>
+<use href="#tile-floor-l1" transform="translate(750 774) scale(0.5)"/>
+<use href="#tile-floor-l1" transform="translate(782 774) scale(0.5)"/>
+<use href="#tile-floor-l1" transform="translate(814 774) scale(0.5)"/>
+<use href="#tile-floor-l2" transform="translate(898 742) scale(0.5)"/>
+<use href="#tile-floor-l2" transform="translate(930 742) scale(0.5)"/>
+<use href="#tile-floor-l2" transform="translate(962 742) scale(0.5)"/>
+<use href="#tile-floor-l2" transform="translate(898 774) scale(0.5)"/>
+<use href="#tile-floor-l2" transform="translate(930 774) scale(0.5)"/>
+<use href="#tile-floor-l2" transform="translate(962 774) scale(0.5)"/>
+<use href="#tile-floor-l3" transform="translate(1046 742) scale(0.5)"/>
+<use href="#tile-floor-l3" transform="translate(1078 742) scale(0.5)"/>
+<use href="#tile-floor-l3" transform="translate(1110 742) scale(0.5)"/>
+<use href="#tile-floor-l3" transform="translate(1046 774) scale(0.5)"/>
+<use href="#tile-floor-l3" transform="translate(1078 774) scale(0.5)"/>
+<use href="#tile-floor-l3" transform="translate(1110 774) scale(0.5)"/>
+<use href="#tile-wall" transform="translate(1194 742) scale(0.5)"/>
+<use href="#tile-wall" transform="translate(1226 742) scale(0.5)"/>
+<use href="#tile-wall" transform="translate(1258 742) scale(0.5)"/>
+<use href="#tile-wall" transform="translate(1194 774) scale(0.5)"/>
+<use href="#tile-wall" transform="translate(1226 774) scale(0.5)"/>
+<use href="#tile-wall" transform="translate(1258 774) scale(0.5)"/>
+<rect x="750" y="742" width="540" height="64" fill="#05080C" opacity="0.5"/>
+</g>
+<text x="750" y="839" font-family="Arial,sans-serif" font-size="16" fill="#A7B3C2">32 px tiles · dim terrain (SVG approximation)</text>
+<text x="48" y="904" font-family="Arial,sans-serif" font-size="16" fill="#A7B3C2">04 / Terraced arena — static placement proof at 48 px per tile</text>
+<text x="48" y="932" font-family="Arial,sans-serif" font-size="16" fill="#A7B3C2">Current 25 × 7 layout; stair/edge cues illustrative. Actors retain manifest world scale; no hidden actors.</text>
+<g transform="translate(48 958)">
+<use href="#tile-wall" transform="translate(0 0) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(48 0) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(96 0) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(144 0) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(192 0) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(240 0) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(288 0) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(336 0) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(384 0) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(432 0) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(480 0) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(528 0) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(576 0) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(624 0) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(672 0) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(720 0) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(768 0) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(816 0) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(864 0) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(912 0) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(960 0) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(1008 0) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(1056 0) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(1104 0) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(1152 0) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(0 48) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(48 48) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(96 48) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(144 48) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(192 48) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(240 48) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(288 48) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(336 48) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(384 48) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(432 48) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(480 48) scale(0.75)"/>
+<rect x="480" y="48" width="8" height="48" fill="#91A2B2" opacity="0.12"/>
+<rect x="488" y="48" width="8" height="48" fill="#91A2B2" opacity="0.16499999999999998"/>
+<rect x="496" y="48" width="8" height="48" fill="#91A2B2" opacity="0.21"/>
+<rect x="504" y="48" width="8" height="48" fill="#91A2B2" opacity="0.255"/>
+<rect x="512" y="48" width="8" height="48" fill="#91A2B2" opacity="0.3"/>
+<rect x="520" y="48" width="8" height="48" fill="#91A2B2" opacity="0.345"/>
+<use href="#tile-floor-l2" transform="translate(528 48) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(576 48) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(624 48) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(672 48) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(720 48) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(768 48) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(816 48) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(864 48) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(912 48) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(960 48) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(1008 48) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(1056 48) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(1104 48) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(1152 48) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(0 96) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(48 96) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(96 96) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(144 96) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(192 96) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(240 96) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(288 96) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(336 96) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(384 96) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(432 96) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(480 96) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(528 96) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(576 96) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(624 96) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(672 96) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(720 96) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(768 96) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(816 96) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(864 96) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(912 96) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(960 96) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(1008 96) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(1056 96) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(1104 96) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(1152 96) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(0 144) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(48 144) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(96 144) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(144 144) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(192 144) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(240 144) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(288 144) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(336 144) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(384 144) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(432 144) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(480 144) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(528 144) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(576 144) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(624 144) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(672 144) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(720 144) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(768 144) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(816 144) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(864 144) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(912 144) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(960 144) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(1008 144) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(1056 144) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(1104 144) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(1152 144) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(0 192) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(48 192) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(96 192) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(144 192) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(192 192) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(240 192) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(288 192) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(336 192) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(384 192) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(432 192) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(480 192) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(528 192) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(576 192) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(624 192) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(672 192) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(720 192) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(768 192) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(816 192) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(864 192) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(912 192) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(960 192) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(1008 192) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(1056 192) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(1104 192) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(1152 192) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(0 240) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(48 240) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(96 240) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(144 240) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(192 240) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(240 240) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(288 240) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(336 240) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(384 240) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(432 240) scale(0.75)"/>
+<use href="#tile-floor-l1" transform="translate(480 240) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(528 240) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(576 240) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(624 240) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(672 240) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(720 240) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(768 240) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(816 240) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(864 240) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(912 240) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(960 240) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(1008 240) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(1056 240) scale(0.75)"/>
+<use href="#tile-floor-l2" transform="translate(1104 240) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(1152 240) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(0 288) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(48 288) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(96 288) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(144 288) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(192 288) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(240 288) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(288 288) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(336 288) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(384 288) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(432 288) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(480 288) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(528 288) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(576 288) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(624 288) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(672 288) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(720 288) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(768 288) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(816 288) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(864 288) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(912 288) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(960 288) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(1008 288) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(1056 288) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(1104 288) scale(0.75)"/>
+<use href="#tile-wall" transform="translate(1152 288) scale(0.75)"/>
+<path d="M528 96V288" fill="none" stroke="#91A2B2" stroke-width="2"/>
+<rect x="816" y="48" width="336" height="240" fill="#05080C" opacity="0.5"/>
+<g transform="translate(600.0 168.0) scale(1.0666666666666667) translate(-27 -32)"><use href="#sprite-player-stand-blue"/></g>
+<g transform="translate(120.0 168.0) scale(1.0666666666666667) translate(-27 -32)"><use href="#sprite-player-stand-orange"/></g>
+<g transform="translate(192 168.0) scale(1.0666666666666667) translate(-49 -32)"><use href="#fx-projectile-rifle-orange"/></g>
+<g transform="translate(672 168.0) scale(1.0666666666666667) translate(-49 -32)"><use href="#fx-projectile-rifle-blue"/></g>
+</g>
+<text x="48" y="1332" font-family="Arial,sans-serif" font-size="15" fill="#A7B3C2">Ground / engine level 0</text>
+<text x="576" y="1332" font-family="Arial,sans-serif" font-size="15" fill="#A7B3C2">Platform / engine level 1</text>
+<text x="864" y="1332" font-family="Arial,sans-serif" font-size="15" fill="#A7B3C2">Dim known terrain</text>
+<text x="48" y="1380" font-family="Arial,sans-serif" font-size="15" fill="#A7B3C2">Review only · SVG sources + placement notes in README.md · no new manifest keys or gameplay behavior</text>
+</svg>

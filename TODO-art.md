@@ -4,9 +4,9 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 ## Resume here
 
-Checkout: `.claude/worktrees/art`, branch `worktree-art`; created from committed main `6f6b028` on 2026-11-17. Main has not advanced at startup. Sync committed main into the clean worktree before new work and delivery; preserve this worktree. See [Operations](docs/agent-reference/Operations.md#development-worktrees-and-the-integration-checkout).
+Checkout: `.claude/worktrees/art`, branch `worktree-art`; last merged main `2347f21` via merge `6f7c38a` on 2026-11-17. Preserve this worktree and sync committed main before new work/delivery.
 
-Current slice: delivered the [ring damage loop candidate](webapp/audio/studies/ring-damage/README.md) requested by play: two-second mono 48 kHz WAV and MP3, with reproducible synthesis and browser/native measurements. The user approved the sound in Visual Studio Code. WAV loops exactly; WebKit adds 40 ms to the MP3, so play should use WAV for this loop or handle MP3 loop bounds before integration. The user superseded the former one-crunch-per-exposure mapping. Renderer review still awaits AI S3.
+Current slice: delivered [arena terrain candidates](docs/art/terrain/README.md): three floors and a solid wall, editable SVGs and native/context PNG proofs. User approval and play integration remain pending. Ring damage loop remains delivered; renderer review waits for AI evidence.
 
 Current milestone: M1/M6; the project remains on M1. Next audio task: combat masking, fatigue and levels once AI/play integrate runtime weapon-shot synthesis (not yet wired into the game sound output). Safari acceptance does not claim new headphone/speaker measurements. Preserve approved master hashes. Next failing check for any playback change: the relevant browser sound acceptance criterion before implementation.
 
@@ -21,6 +21,8 @@ Reserve concrete files in [HANDOFF.md](HANDOFF.md) before overlapping another se
 Agree manifest keys/anchors with play and supported visual grammar with AI before production assets. The rifle shot is integrated (blue is your unmodified `effects/projectile-rifle`; see HANDOFF.md). No menus ahead of real consumers.
 
 ## Current milestone tasks
+
+- [x] Deliver three floor levels and solid-wall SVG candidates with native 64/32 px, repetition, grayscale, dim-terrain and terraced-context proof. Approval and runtime adoption remain open.
 
 - [x] Generate `sfx-ring-damage-loop` for play: separate continuous electrical bed with no impacts or baked-in fades. WAV/MP3 and codec caveat delivered; sound approved in Visual Studio Code; runtime integration remains open.
 
@@ -45,6 +47,8 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [ ] Case-study diagrams: pipeline, cost safeguards and eval loop.
 
 ## Verification/latest delivery
+
+- [x] Terrain candidates (2026-11-17): four missing-file reds before artwork; static SVG checks pass. Chromium/WebKit pass 16 native renders and reject a rendered middle-floor recolour. Both sheets visually inspected. `pnpm checks` passes outside sandbox (2,175 tests, one skipped); sandbox audio server setup timed out. Root/webapp standards and folder/caller audit complete; reference/sprite/master hashes preserved. Artwork remains uncommitted; no runtime/manifest change.
 
 - [x] Ring damage loop delivered and approved after listening in Visual Studio Code (2026-11-17); `Listen.html` removed. Five new audio tests pass with red/mutation evidence; eight browser checks pass seam/repeat limits, with WebKit’s 40 ms MP3 padding recorded (use WAV). `pnpm checks` passes: 2,175 tests, one slow render skipped; separate approved-pack re-render passes byte for byte in 308.73 s. All 62 preserved asset/evidence hashes unchanged. Requested root/audio code review and folder/caller audit complete; format duplication and measurement naming fixed. No runtime integration or combat-masking claim.
 

@@ -22,7 +22,7 @@ Start a session with: **"You are engine, continue the TODO."** Substitute any pe
 | ai | Claude | [TODO-ai.md](TODO-ai.md) | Fake-eval failures fixed (worktree `ai`, uncommitted); renderer, calibration and arena generation next. | 2026-11-17 |
 | server | Claude | [TODO-server.md](TODO-server.md) | First authoritative two-browser slice after M1; auth, persistence and online privacy. | 2026-11-17 |
 | budget | Claude | [TODO-budget.md](TODO-budget.md) | Production ledger/spend boundaries with server/AI; credits, refunds, tracing and kill switch. Scenarios drafted; executable specs wait for `api/`. | 2026-11-17 |
-| art | Codex | [TODO-art.md](TODO-art.md) | Ring-damage loop approved by user; use WAV to avoid WebKit MP3 padding. Renderer review awaits AI S3. | 2026-11-17 |
+| art | Codex | [TODO-art.md](TODO-art.md) | Terrain SVG candidates and browser review sheets delivered; approval/play integration pending. Audio masking awaits runtime synthesis. | 2026-11-17 |
 | ship | Codex | [TODO-ship.md](TODO-ship.md) | Four-shard preview CI with combined reporting; hosted timing/validation next, infra/release awaits bindings and authorization. | 2026-11-17 |
 
 These are persistent workstreams, not permission for simultaneous edits to the same files. Select one current slice; record concrete reservations and contracts in HANDOFF.md. Model assignments are defaults, not application configuration. `build` is retired; [migration history](docs/history/2026-11-17-persona-migration.md) preserves its tasks.
