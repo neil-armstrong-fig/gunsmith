@@ -13,9 +13,9 @@ no baked panning or reverb. [Measurements](../../../../webapp/audio/studies/empt
 record technical results; the tool's generic listening-review field is not the
 approval record. This handover records the user's choice.
 
-Suggested production key: `sfx-empty-click`, **not registered**. `empty-tight` is
-the current asset identifier. Build owns final manifest/playback agreement and
-shipping formats. The original approved pack is unchanged; existing WebKit codec
+Production key: `sfx-empty-click`, integrated and now shipped as MP3 at the
+user’s request. `empty-tight` remains the selected master identifier. Build owns
+future playback integration. The original approved pack is unchanged; existing WebKit codec
 findings remain open. Weapon-shot masking and final gain need checking in game.
 
 ## Behaviour to implement, test first

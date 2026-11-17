@@ -16,6 +16,9 @@ given("a match has just begun", () => {
       await expect.poll(async () => (await gunsmith.sound.getPlays(EMPTY_CLICK)).length).toBe(1);
 
       expect((await gunsmith.sound.getPlays(EMPTY_CLICK)).map(play => play.contextState)).toEqual(["running"]);
+      expect((await gunsmith.sound.getPlays(EMPTY_CLICK)).map(play => new URL(play.url).pathname)).toEqual([
+        expect.stringMatching(/\/sfx-empty-click[^/]*\.mp3$/),
+      ]);
     });
 
     then("it does not click again, however long the trigger stays held", async ({gunsmith}) => {
@@ -30,6 +33,8 @@ given("a match has just begun", () => {
         await expect.poll(async () => (await gunsmith.sound.getPlays(EMPTY_CLICK)).length).toBe(1);
 
         await gunsmith.player.stopFiring();
+        // Let the fixed-step loop observe the release before the next press.
+        await gunsmith.waitForGameSeconds(0.05);
         await gunsmith.player.startFiring();
       });
 

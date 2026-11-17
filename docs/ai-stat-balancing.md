@@ -7,21 +7,26 @@ This study proposes a direction, not a frozen schema or calibrated power formula
 No model was called, no gameplay changed, and no balancing accuracy is claimed.
 
 Follow-up, 2026-11-17: the [human-review probe brief](ai-stat-preference-probe.md)
-provides twelve proposed label rows, encoding comparisons, a future scorecard
-and concrete paired policy illustrations. The user chose **compare both first**;
-labels await human approval and omitted-stat policy remains open. Current source
+records twelve user-approved label rows (revision v1), encoding comparisons, a
+future scorecard and paired policy illustrations. After comparison, the user
+selected **AI-chosen values and trade-offs for unspecified stats**. Current source
 inspection still found no integrated preference output or general balancer.
 
 ## Decisions and recommendation
 
 The user's 2026-11-14 design is that the model returns inferred stat values and
-the player's preferences; deterministic code balances the result. On 2026-11-16
-the user chose two further constraints:
+the player's preferences; deterministic code balances the result. The power
+ceiling was chosen on 2026-11-16; human review on 2026-11-17 settled the
+omitted-stat policy and clarified deliberate weakness:
 
 - The power budget is a **ceiling**, not an equal-power target. Preserve a
   deliberately weak weapon rather than spending its unused budget.
-- Compare modest code defaults with AI-chosen weaknesses before deciding how to
-  fill unspecified gameplay stats. Neither policy is selected by this document.
+- Following the requested comparison, on 2026-11-17 the user selected AI-chosen
+  values and trade-offs for unspecified gameplay stats. Keep inferred choices
+  distinct from explicit preferences; deterministic code enforces limits.
+- The user clarified that deliberate weakness can be tactical: players may put
+  bad weapons in the arena. "Feeble" requires overall weakness, not low damage
+  specifically or weakness in every stat. Preserve unused power headroom.
 
 **Recommendation (inference):** start the preference probe with semantic
 directions per stat; compare ranked priorities and numeric weights on the same
@@ -81,8 +86,8 @@ model to certify its own balance or add an uncalibrated judge.
 
 The following are candidate representations, not public interface definitions.
 In every candidate, retain the inferred values separately from preferences.
-Record whether a preference is explicit or inferred so the defaults comparison
-does not conflate a player's instruction with a model's guess.
+Record whether a preference is explicit or inferred so the selected AI-inference
+policy does not conflate a player's instruction with a model's guess.
 
 | Candidate | Expressiveness | Main risk | Probe judgement |
 | --- | --- | --- | --- |
@@ -100,7 +105,9 @@ supported movement penalty: carrying weight is not an engine field today.
 
 These are illustrative interpretations, not model results or numerical presets.
 Both policies must respect explicit preferences and preserve intentional
-weakness. Compare them using the same prompt and the same rating/budget.
+weakness. The user selected AI-chosen values and trade-offs on 2026-11-17 after
+reviewing the numerical pairs in the brief. Retain this comparison as context;
+it does not establish equal power or approve presets.
 
 | Request | Modest code defaults | AI-chosen weaknesses |
 | --- | --- | --- |
@@ -109,7 +116,7 @@ weakness. Compare them using the same prompt and the same rating/budget.
 | "Fires as fast as allowed but barely hurts" | Favour cadence, sacrifice damage; default the rest | Same explicit pair; inferred magazine/reload weaknesses may vary |
 | "100 damage, 20 shots a second" | Record both desired strengths; reduce what the budget cannot support | Same, with inferred sacrifices; never interpret the request as a budget override |
 | "High damage; reload speed matters most" | Preserve stated ranking while filling other fields predictably | Same ranking; infer which unspecified fields can pay for it |
-| "A deliberately feeble pistol with one spare round" | Keep low damage and one reserve round even if under budget | Preserve both weaknesses; do not compensate by strengthening other fields |
+| "A deliberately feeble pistol with one spare round" | Preserve overall weakness and exactly one reserve round even if under budget | Infer individual limitations while preserving overall weakness and exactly one reserve round |
 | "Fast firing and slow firing, equally important" | Mark the same-stat conflict for an explicit policy; do not invent a priority | Same conflict; a model guess is not a resolved user preference |
 
 Code defaults improve repeatability and make omissions explainable, but may
@@ -117,7 +124,8 @@ flatten identities and still need adjustment when an explicit strength exceeds
 the budget. AI-chosen weaknesses offer more variation but introduce another
 interpretation to validate; sparse wording can produce unexpectedly poor
 weapons. Judge both on prompt fidelity, usefulness, clarity at reveal and
-variation. The user decides the omitted-stat policy after reviewing examples.
+variation in future generated examples and playtests; the policy choice itself
+is now settled.
 
 ## Rating and adjustment candidates
 
@@ -227,7 +235,8 @@ contract in [HANDOFF](../HANDOFF.md). Keep any local experimental schema inside
 and material compromises; this is a future build requirement, not a UI change.
 
 Implementation remains gated on integration, the engine rating/calibration,
-preference-probe evidence and the user's omitted-stat decision. No numerical
+preference-probe evidence and owner agreement. The omitted-stat policy and v1
+labels are approved; they do not establish model performance. No numerical
 budget, cost weights, production encoding or solver is frozen here. Do not create
 a second rating formula in AI merely to unblock implementation.
 

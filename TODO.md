@@ -19,8 +19,8 @@ Start a session with: **"You are build|ai|art, continue the TODO."**
 | Persona | Current focus | Updated |
 | ------- | ------------- | ------- |
 | build | M1: finish stairs/bot work in its existing session; incoming damage, hit feedback, shake and approved inventory integration. Pickups and empty click are committed. | 2026-11-17 |
-| ai | Integrate separate stats/appearance calls (five maximum); preserve cumulative spend. Research 2's preference-probe brief is ready for human label/policy review; balancing remains pending. | 2026-11-17 |
-| art | Session 1: human browser review received; MP3 confirmed after Safari Ogg issues. Verify Safari onset/cadence before production mapping. Inventory approved. | 2026-11-17 |
+| ai | Integrate separate stats/appearance calls (five maximum); preserve cumulative spend. Research 2's v1 labels and AI-chosen omitted-stat policy are approved; owner agreement, probes and balancing remain pending. | 2026-11-17 |
+| art | Session 1: MP3 runtime switch authorized; empty click now uses MP3. Safari timing and combat masking remain follow-up QA. Inventory approved. Research 2: labels/policy review complete; handoff ready. | 2026-11-17 |
 
 Detailed current tasks: [build](TODO-build.md), [AI](TODO-ai.md), [art](TODO-art.md).
 Earlier status, requests and measurements: [snapshot](docs/history/2026-11-17-compaction/SharedTodo.md).
@@ -47,8 +47,8 @@ M0 is complete; M1 is current. Later milestones proceed when their consumers and
 - Build: integrate approved [inventory](docs/art/concepts/inventory-display/README.md) and remaining [combat feedback](docs/art/concepts/combat-feedback/Handover.md), agreeing minimum hook/event/manifest data first.
 - Build/AI: implement [arena fairness](docs/art/arena-fairness-research.md), including transformed stairs/heights, matching spawns, clearance and paired playtests. Preserve random ring centres; use escape measurements as diagnostics.
 - AI coding owner: follow the [five-call integration handoff](docs/ai-visual-generation.md#ai-session-handoff-2026-11-15); reconcile actual cumulative spend before authorized paid runs. The research assignment remains documentation/review only.
-- AI/build/user: review labels and paired policies in the [preference-probe brief](docs/ai-stat-preference-probe.md), then settle encoding, balancing ownership/rating and omitted-stat defaults from [the study](docs/ai-stat-balancing.md). User chose compare both first; power remains a ceiling preserving deliberate weakness. No production solver/budget is frozen.
-- Build/art: MP3 is the confirmed compressed format after browser listening. Validate Safari onset/content and event cadence before production mapping; retain recorded codec findings. No blanket trimming or threshold change is approved. Existing WAV click integration is unchanged.
+- AI/build: use the approved v1 labels and AI-chosen unspecified values/trade-offs in the [preference-probe brief](docs/ai-stat-preference-probe.md). Agree balancing ownership/rating, then probe encodings after integration; see [the study](docs/ai-stat-balancing.md). Power remains a ceiling preserving deliberate weakness, including tactical bad weapons in the arena. No production solver/budget is frozen.
+- Build/art: MP3 is approved for production; the empty click now uses MP3. Retain recorded Safari timing findings as follow-up QA, with no blanket trimming or threshold changes. Future static cues use MP3 as build integrates them.
 - Build/AI: act on the visual reviews' identity/readability findings during integration (duck/cactus, lantern evidence, pose/muzzle alignment, teapot contrast). Kit generation remains shelved.
 - Build/AI: implement the [fair-play/privacy handover](docs/art/fair-play-research.md) with online play: sign-in for public play, bounded/private replays and reporting, isolated restricted queues, clean-match recovery/human override and retention/erasure checks. This does not block M1.
 - M2 contracts/manifest remain unfrozen until real consumers exist and owners review them. API/infra, root eval/property/API commands and CI remain tracked in the owner checklists.

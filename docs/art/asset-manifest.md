@@ -7,6 +7,11 @@ The contract between `build` and `art` so art can be dropped in without code cha
 below, with labelled sizes, placement, variants and approved audio links. These
 are reference examples; they add no production keys or frozen contracts.
 
+Current M1 sound mapping: `sfx-empty-click` is integrated in
+`webapp/src/assets/sounds/` as a separate MP3 asset, encoded from the approved
+`empty-tight` WAV master. MP3 is the approved production format for future
+static cues. The broader manifest and planned keys below remain unfrozen.
+
 ## Rules
 
 - Every sprite, tile, icon and sound has a **stable key**, a size, a format and a **placeholder** (a drawn primitive or a
@@ -37,8 +42,8 @@ are reference examples; they add no production keys or frozen contracts.
 | `ui-hud-frame`, `ui-slot-1`, `ui-slot-2`, `ui-health`, `ui-ammo`, `ui-credit` | HUD | varies | SVG |
 | `ui-button`, `ui-panel`, `ui-power-gauge`, `ui-progress-step` | Menus and the reveal | varies | SVG |
 | `brand-logo`, `brand-favicon-*`, `brand-social` | Logo, icons, social-preview image | varies | SVG and PNG |
-| `sfx-pickup`, `sfx-drop`, `sfx-reload`, `sfx-step-stand`, `sfx-step-crouch`, `sfx-hit`, `sfx-death`, `sfx-ring-warning`, `sfx-ui-click`, `sfx-round-start`, `sfx-round-end` | Static sounds (`docs/art/audio.md`) | n/a | `.ogg` (+ `.mp3` fallback) |
-| `music-loop-menu`, `music-loop-match` | Looping music | n/a | `.ogg` (+ `.mp3`) |
+| `sfx-pickup`, `sfx-drop`, `sfx-reload`, `sfx-step-stand`, `sfx-step-crouch`, `sfx-hit`, `sfx-death`, `sfx-ring-warning`, `sfx-ui-click`, `sfx-round-start`, `sfx-round-end` | Static sounds (`docs/art/audio.md`) | n/a | `.mp3` |
+| `music-loop-menu`, `music-loop-match` | Looping music | n/a | `.mp3` |
 
 ## Delivery protocol
 

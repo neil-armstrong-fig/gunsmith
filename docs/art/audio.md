@@ -2,6 +2,15 @@
 
 Two kinds of sound, with different owners.
 
+## Production decision — 2026-11-17
+
+MP3 is approved for production after browser listening. The user authorized
+art/research 1 to switch the integrated `sfx-empty-click` to MP3 under its
+existing key. Keep approved WAV masters and recorded codec findings. Safari
+timing and real-weapon masking remain follow-up QA, without blocking the swap.
+Future static cues use MP3 when build integrates their events and mappings.
+Older dated delivery sections below describe their status at delivery time.
+
 ## 1. Weapon sounds: synthesised in the browser (not `art`'s job)
 
 The planned weapon schema has a `sound` block (`docs/schemas.md`), part of what the AI generates. The webapp will turn it into
@@ -27,7 +36,7 @@ the audition pack is in [webapp/audio/](../../webapp/audio/README.md), with repr
 
 ## Technical requirements
 
-- Format: Ogg Vorbis plus an MP3 fallback. Mono for effects, stereo for music.
+- Format: MP3 for production; retain approved WAV masters. Mono for effects, stereo for music.
 - Loudness: normalise effects to a consistent level, leave headroom; music about 6 dB below effects.
 - Length: effects under 2 s except the ring warning; music loops of 60 to 120 s.
 - Footsteps and other positional sounds are played with direction by the game; supply dry, centred mono files.

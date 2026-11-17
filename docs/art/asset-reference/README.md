@@ -174,7 +174,8 @@ sit beside the SVG with the same stem. Placement uses SVG coordinates.
 ## Approved audio examples
 
 The user approved pack 02 (“Sounds great”). These WAVs demonstrate the intended
-sound. The Ogg/MP3 candidates remain blocked by recorded WebKit findings. Read
+sound. MP3 is now approved for production; recorded WebKit findings remain
+follow-up QA. Read
 [the audio guide](../../../webapp/audio/README.md) and
 [playback handoff](../../../webapp/audio/qa/webkit-alignment/README.md) before
 integration. No approved master or compressed candidate is changed here.

@@ -1,7 +1,9 @@
 # Audio format decision and build handoff — 2026-11-17
 
 **MP3 is the user-confirmed compressed format.** Keep approved WAV masters.
-Production mappings and Safari timing checks belong to build. The listening
+The user subsequently authorized art/research 1 to switch the current runtime
+empty click to MP3; future cue integration belongs to build. Safari timing
+checks remain follow-up QA and do not block that approval. The listening
 page and this investigation's seven JSON files were removed at the user's
 request after review; this note preserves the decision and useful findings.
 Existing codec tools, audio files and earlier QA evidence remain unchanged.
@@ -51,10 +53,10 @@ human audition are not a claim of music runtime integration or fatigue/masking Q
 
 ## Build next
 
-Use MP3 for compressed integration. Schedule one-shot cues from game events,
-independently of when a previous buffer ends. Check Safari onset, content and
-intended cadence in game before replacing short WAV feedback or freezing mappings.
-Keep the integrated WAV click for that comparison. Preserve existing thresholds;
+Use MP3 for production integration. The empty click has been switched under
+its existing key at the user’s request. Schedule one-shot cues from game events,
+independently of when a previous buffer ends. Follow up Safari onset, content
+and intended cadence during play. Preserve approved WAV masters and existing thresholds;
 do not globally trim buffers, apply sampled offsets or fade away broken joins.
 
 The existing codec verifiers can reproduce baseline checks against temporary
@@ -66,3 +68,24 @@ During delivery, seven synthetic probe checks, six production-preview empty-clic
 acceptance tests and Chromium/WebKit listening-page checks passed after recorded
 red cases. These describe the completed investigation, not retained test coverage.
 Final project checks and cleanup validation are recorded in `HANDOFF.md`.
+
+## Runtime MP3 export — 2026-11-17
+
+The selected 70 ms `empty-tight.wav` master is shipped as
+`webapp/src/assets/sounds/files/sfx-empty-click.mp3`. Its stable key and
+event-driven playback are unchanged. No gain, fade, trim or tempo processing
+was applied. The redundant runtime WAV copy was removed; the approved master
+remains in `studies/empty-weapon-click/`.
+
+Encoder: FFmpeg 9.0.2, Homebrew full build. Reproduce from the repository root:
+
+```sh
+/opt/homebrew/opt/ffmpeg-full/bin/ffmpeg -v error -nostdin -y \
+  -i webapp/audio/studies/empty-weapon-click/empty-tight.wav \
+  -map 0:a:0 -map_metadata -1 -ar 48000 -c:a libmp3lame -q:a 2 \
+  -write_xing 1 webapp/src/assets/sounds/files/sfx-empty-click.mp3
+```
+
+SHA-256 master: `c1ea912790b70b571f229488f641ed81082305a2d673cb1f4bf7b95622c5188f`.
+SHA-256 MP3: `59d229cb1cce800c2e545800067b5c367e16a36794319a3d0b78591e767ded3e`.
+Native probe confirms MP3, mono, 48 kHz; full native decoding succeeds.
