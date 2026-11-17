@@ -8,7 +8,7 @@ Checkout: `.claude/worktrees/ship`, branch `worktree-ship`, synced from committe
 
 Current slice: four-shard production-preview CI with combined reporting and an all-shards gate. Owned files: CI workflow and ship coordination/operational docs. Project remains M1; ship supports M3/M7–M8.
 
-Next action: review/commit this delivery when authorized, then verify the first hosted Actions run and profile setup/build/test/report overhead. Next failing check: hosted all-shards/combined-report acceptance, including artifact transfer. Provisioning and live acceptance await server/budget bindings and user authorization.
+Integration delivery is committed to main; sync the final integration record into the clean ship worktree before continuing. Next action: verify the first hosted Actions run and profile setup/build/test/report overhead. Next failing check: hosted all-shards/combined-report acceptance, including artifact transfer. Provisioning and live acceptance await server/budget bindings and user authorization.
 
 ## Ownership
 
@@ -38,6 +38,8 @@ server supplies Worker/DO/storage bindings; budget supplies operational limits; 
 - [ ] Measure infrastructure costs with server/AI runtime measurements before proposing free versus Workers Paid.
 
 ## Verification/latest delivery
+
+- [x] 2026-11-17 integration: committed work from all six delivering personas is merged, including CI sharding and the subsequent terrain delivery; server has no unique commit. Code/assets `d28b13e`: full checks pass (2,249 tests, one skipped), properties 8/8, fake evals 134/134 and production-preview acceptance 234/234. Source indexes preserved; owners retain ongoing uncommitted work. Separate full audio render passes byte for byte (511.22 s); the initial timed-out run and all merge details are recorded in HANDOFF.md. Sync final main before resuming; hosted CI remains unverified.
 
 - [x] 2026-11-17: four-shard CI/combined HTML delivered; all 221 preview criteria complete (220 first-pass, one viewport-size flake recovered). Full pnpm checks passes (one existing slow render skipped). Red/green workflow contract, failed/partial report probes, five gate scenarios, two gate mutants and build-failure handling verified. Standards/folder/reference review complete; local builds total 5.07 s, tests 327.55 s sequentially. Hosted setup/artifact/report overhead remains next; details in Operations.md and HANDOFF.md.
 
