@@ -77,6 +77,10 @@ Use seeded sparring to isolate player pickup behavior. Assert visibility and inv
 
 Sound is not part of the state hook. The DSL instruments fetch/decode/play calls by manifest key. A recorded buffer start does not prove device playback, first-interaction context wake-up, masking or listening quality. The 100 ms burst merge cannot be arranged reliably in a browser, so it is unit-tested in `webapp/src/sound/damage-crunch/`.
 
+## Online rooms
+
+`gunsmith.room` (`components/room/`) is for two browsers in one private room. **A fog criterion reads what the browser was sent, never the state hook or the drawing**: `room.hasBeenToldWhereTheOtherPlayerIs()` looks at the latest `snapshot` frame the page's WebSocket received (`playwright/wire/SnapshotsOfFrames`), and each absence is paired with `room.hasReceivedSnapshots()` so a dead socket cannot pass. The second browser is `gunsmith.room.secondBrowser()`, opened lazily in a context of its own and closed by `gunsmith.end()` in the fixture teardown, so no other spec pays for it. An online spec needs the Worker: start it (`API_PORT=<port> pnpm api:dev`) and serve the build with `API_URL=http://localhost:<port>` so the preview's `/api` proxy reaches it (`api/AGENTS.md`); without it the spec fails at `createPrivateRoom`.
+
 ## Running
 
 ```bash
