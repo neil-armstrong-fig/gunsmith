@@ -4,11 +4,11 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 ## Resume here
 
-Checkout: develop only in this persona's assigned worktree. At startup, record its actual path/branch and last merged committed main revision here; these are not yet assigned by the workflow update. Sync main into the clean worktree before new work and delivery; main is for integration/validation only. Preserve existing unfinished legacy worktrees. See [Operations](docs/agent-reference/Operations.md#development-worktrees-and-the-integration-checkout).
+Checkout: `.claude/worktrees/art`, branch `worktree-art`; created from committed main `6f6b028` on 2026-11-17. Main has not advanced at startup. Sync committed main into the clean worktree before new work and delivery; preserve this worktree. See [Operations](docs/agent-reference/Operations.md#development-worktrees-and-the-integration-checkout).
 
-Review integrated player/dummy art and concrete renderer evidence; continue Safari timing and combat masking QA. Approved inventory, MP3 and label/policy research are delivered.
+Current slice: approve the matching orange rifle-shot silhouette selected by the user. Native 64/32 px and production-preview review passed; the asset is unchanged. Approved inventory, MP3 and label/policy research are delivered.
 
-Current milestone: M1/M6; the project remains on M1. Next failing test/check: Browser drawing/asset fallback tests before presentation changes; listening and native/Retina QA remain human checks. Preserve approved master hashes.
+Current milestone: M1/M6; the project remains on M1. Next action: follow up Safari onset/content and event cadence, then combat masking/fatigue with human listening. Native Safari/device-output checks remain human checks; Chromium screenshots do not replace them. Preserve approved master hashes. Next failing check for any playback change: the relevant browser sound acceptance criterion before implementation.
 
 ## Ownership
 
@@ -22,7 +22,7 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 
 ## Current milestone tasks
 
-- [ ] Draw the real orange rifle shot to replace the stand-in `webapp/public/assets/sprites/fx-projectile-rifle-orange.svg` (the blue file with fill `#FF9B54`). Keep it 64 by 64, the shape's scale and the tip at (49, 32), which the manifest anchors on the bullet's point; no code change is needed. Each later weapon class needs a blue and an orange shot too. The muzzle flash is descoped until feature complete.
+- [x] Approve the existing matching orange rifle shot (`fx-projectile-rifle-orange.svg`) as selected by the user on 2026-11-17. Native 64/32 px and in-game review pass; keep the 64×64 canvas, current shape/scale, `#FF9B54` and tip (49, 32). The colour mutation was caught by both manifest and browser assertions; the original asset hash was restored. Later weapon classes still need both team variants; muzzle flash remains descoped until feature complete.
 - [ ] Follow up Safari onset/content and event cadence during play; this no longer blocks MP3 integration. Preserve existing thresholds.
 - [ ] Check fatigue, masking and levels on headphones/speakers with the real weapon-shot synth. General audition approval is not proof of these tests.
 - [ ] Map future static cues to approved MP3 as play integrates them; support playback/ducking/volume integration. Weapon-shot synthesis belongs to AI; art supplies static cues.
@@ -42,6 +42,8 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [ ] Case-study diagrams: pipeline, cost safeguards and eval loop.
 
 ## Verification/latest delivery
+
+- [x] Orange-shot review: all 16 `DrawingTheShots` criteria pass on a production build. A temporary blue recolour fails the opponent-orange criterion (0 of 6 orange samples) and exactly one of 13 manifest tests. Native 64/32 px plus in-game screenshots reviewed, including fog and missing-asset fallback. Evidence: `/private/tmp/gunsmith-art-shot-review/` (local, temporary). `pnpm checks` passes: lint/format/types and 2,170 unit tests, with one slow audio render skipped. Standards review re-read root, webapp and acceptance instructions; folder/reference audit complete, with no new tracked files, folders, helpers or types.
 
 - [x] Session 1: [browser listening and live-playback handoff](webapp/audio/qa/runtime-playback/README.md) delivered; MP3 confirmed. Removed the completed listening page, seven one-off JSON files and temporary probes at the user's request. Preserve the decision, original audio and existing codec QA; Safari onset/cadence and production mapping remain open.
 - [x] Session 1: lock in MP3 and switch the integrated empty click at the user’s request. Approved WAV masters and codec evidence remain unchanged. Production-preview sound acceptance passes in Chromium/WebKit; project checks and full master re-render pass.

@@ -13,7 +13,7 @@ Ownership follows the assigned persona. Models below are defaults; no applicatio
 | ai | Claude | [TODO-ai.md](TODO-ai.md) | Fix eight reported canned-response fake-eval failures; renderer, calibration and arena generation. |
 | server | Claude | [TODO-server.md](TODO-server.md) | First authoritative two-browser slice after M1; auth, persistence and online privacy. |
 | budget | Claude | [TODO-budget.md](TODO-budget.md) | Production ledger/spend boundaries with server/AI; credits, refunds, tracing and kill switch. |
-| art | Codex | [TODO-art.md](TODO-art.md) | Production assets/presentation, Safari timing and combat masking; current sprites/MP3 are integrated. |
+| art | Codex | [TODO-art.md](TODO-art.md) | Orange rifle-shot review complete; Safari timing and combat masking QA next. Current sprites/MP3 are integrated. |
 | ship | Codex | [TODO-ship.md](TODO-ship.md) | Repository tooling/CI now; infra/release when bindings and authorization exist. |
 
 ### Start prompts
@@ -62,6 +62,8 @@ Before changing a consumed contract, record the proposal and affected owners her
 
 ## Ready handovers and preserved decisions
 
+- Art reviewed the existing orange rifle shot on 2026-11-17; the user selected the matching team silhouette. Keep its file, `#FF9B54`, scale and tip (49, 32). The earlier redraw request is closed; later weapon classes still need both colours. No manifest or gameplay contract changed.
+
 - [Inventory](docs/art/concepts/inventory-display/README.md) and [combat feedback](docs/art/concepts/combat-feedback/Handover.md) are approved: play implements behavior, engine supplies events/data, art supplies manifest assets. Preserve punchy/crunch and retained shake; tune empty-click levels with other sounds.
 - [Fair arenas](docs/art/arena-fairness-research.md): engine owns matching spawns, transformed geometry/stairs, clearance and paired playtests; random ring centres remain unchanged.
 - [AI integration](docs/ai-visual-generation.md#ai-session-handoff-2026-11-15) is merged; [stat balancing](docs/ai-stat-balancing.md) and [preference brief](docs/ai-stat-preference-probe.md) guide calibration. Preserve deliberate weakness and cumulative paid spend; no new budget/paid authorization is implied.
@@ -77,6 +79,8 @@ Before changing a consumed contract, record the proposal and affected owners her
 - [ ] Production art/audio and live release: art/play integrate their domains; ship validates release.
 
 ## Delivery log
+
+- 2026-11-17, art (`worktree-art`, `.claude/worktrees/art`, main `6f6b028`): retained the existing orange rifle shot per user choice after native 64/32 px and in-game review. All 16 production-preview `DrawingTheShots` criteria pass, including orientation, tip alignment, fog and fallback. A blue recolour failed exactly the manifest team-colour test (12 others pass) and the targeted browser criterion (0/6 orange samples); restored SVG SHA-256 `de9ed3fefd600c5dd206f9d85c04ad9054051cd0725bcf5800240244b205e1f0`. Screenshots remain in `/private/tmp/gunsmith-art-shot-review/`; current stand-in wording and art resume/status updated. `pnpm checks` exits 0: lint/format/types; shared 59, acceptance helpers 9, audio 270 (one slow render skipped), engine 990, AI 533 and webapp 309 tests pass. Re-read root/webapp/acceptance instructions and reviewed the diff; folder/reference audit complete with no new tracked files/folders/helpers/types. No retained asset/runtime change, dependency change, paid call, commit or push.
 
 - 2026-11-17, integration workflow: user selected integration-only main and persistent persona development worktrees, with explicit worktree → main → worktree merges. Updated startup/ownership guidance and all persona resumes. Existing staged migration and unfinished legacy worktrees preserved; no worktree, index or branch mutation performed. Validation: pnpm checks passes (lint/format/types and shared 59, acceptance helpers 9, engine 976, audio 270 with one slow render skipped, AI 507, webapp 296 tests). Repository gate, thirteen workflow/startup documents, 82 local references and diff whitespace pass. Re-read root instructions and Operations.md; standards/folder/caller review complete, with no new source files, helpers, types or folders. This is coordination guidance only; no runtime/acceptance/eval changes or paid calls.
 
