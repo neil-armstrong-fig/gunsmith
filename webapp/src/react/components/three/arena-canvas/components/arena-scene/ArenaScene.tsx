@@ -1,5 +1,7 @@
 import {useFrame, useThree} from "@react-three/fiber";
 import {zoomToFit} from "@src/react/components/three/arena-canvas/components/arena-scene/camera/ZoomToFit";
+import {DamageBrackets} from "@src/react/components/three/arena-canvas/components/arena-scene/components/damage-brackets/DamageBrackets";
+import {RingHighlight} from "@src/react/components/three/arena-canvas/components/arena-scene/components/ring-highlight/RingHighlight";
 import {Pickup} from "@src/react/components/three/arena-canvas/components/arena-scene/components/pickup/Pickup";
 import {Dummies} from "@src/react/components/three/arena-canvas/components/arena-scene/components/dummies/Dummies";
 import {Bullets} from "@src/react/components/three/arena-canvas/components/arena-scene/components/bullets/Bullets";
@@ -14,7 +16,7 @@ import {gameState} from "@src/store/game/selectors/game-state/GameState";
 import {useGameStore} from "@src/store/game/UseGameStore";
 import type {JSX} from "react";
 
-/** Everything drawn in the arena: the camera fitted to the window, the walls with the dim veil over what the player does not see, the closing ring over it, the dummies, the weapon lying in the arena, the bullets, the opponent and the player (drawn from art's pictures once they have loaded). */
+/** Everything drawn in the arena: the camera fitted to the window, the walls with the dim veil over what the player does not see, the closing ring over it, the dummies, the weapon lying in the arena, the bullets, the opponent and the player (drawn from art's pictures once they have loaded), with the brackets of a hit and the red highlight of the ring over the player. */
 export function ArenaScene(): JSX.Element {
   useGameLoop();
 
@@ -55,6 +57,10 @@ export function ArenaScene(): JSX.Element {
       <Opponent />
 
       <Player />
+
+      <DamageBrackets />
+
+      <RingHighlight />
     </>
   );
 }

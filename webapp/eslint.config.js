@@ -15,6 +15,9 @@ const allowedPackages = ["@gunsmith/shared", "@gunsmith/engine"];
 // gitignore-style group cannot re-include a child of an excluded parent (`@gunsmith/engine/**`).
 const gameStoreMayImport = "^(?!zustand$|zustand/|@gunsmith/engine(?:/|$)|@src/game/|@src/store/game/|\\./).+$";
 
+// The feedback store (`src/store/feedback/`) is smaller still: Zustand and its own folder, no engine and no world.
+const feedbackStoreMayImport = "^(?!zustand$|zustand/|@src/store/feedback/|\\./).+$";
+
 export default [
   ...baseConfig({tsconfigRootDir: import.meta.dirname, allowedPackages}),
   {
@@ -121,6 +124,22 @@ export default [
             regex: gameStoreMayImport,
             message:
               "The game store may import only zustand, the engine, @src/game/** and its own folder. Menus, lobby, library and credits state belong in the app store; a value worked out from the world is a selector.",
+          },
+        ],
+      }),
+    },
+  },
+  {
+    // The feedback store holds the cues of the damage the player takes and nothing else. After the store block above.
+    files: ["src/store/feedback/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": restrictedImports({
+        allowedPackages: [],
+        patterns: [
+          {
+            regex: feedbackStoreMayImport,
+            message:
+              "The feedback store may import only zustand and its own folder: it holds the cues of the damage taken, not the world and not a choice.",
           },
         ],
       }),

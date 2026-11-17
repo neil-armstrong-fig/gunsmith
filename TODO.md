@@ -17,7 +17,7 @@ Start a session with: **"You are engine, continue the TODO."** Substitute any pe
 
 | Persona | Model | Checklist | Current focus | Updated |
 | --- | --- | --- | --- | --- |
-| play | Claude | [TODO-play.md](TODO-play.md) | Combat feedback slice 2a (damage event, crunch) integrated into main; 2b (`store/feedback/`, brackets, health trail) next; HUD/inventory, camera, close M1 playtest. | 2026-11-17 |
+| play | Claude | [TODO-play.md](TODO-play.md) | Combat feedback slices 2a (damage event, crunch) and 2b (`store/feedback/`, brackets round the player, ring marks, amber health trail) done in worktree `play`; slice 3 (hit confirmation) next; HUD/inventory, camera, close M1 playtest. | 2026-11-17 |
 | engine | Claude | [TODO-engine.md](TODO-engine.md) | `hitLanded` committed and merged with play's `damageTaken`; structural `validateArena` built (uncommitted, worktree `engine`) for ai's arena generation; next spawn pairs/symmetry, limits and built-in pool. | 2026-11-17 |
 | ai | Claude | [TODO-ai.md](TODO-ai.md) | Generated-weapon pickup renderer S0 to S3 committed (`c11dc27`), awaiting integration; arena pipeline built on the fake tier (A3, uncommitted; no spend), judge next, with requests to engine for the arena validator and built-in pool; calibration after. | 2026-11-17 |
 | server | Claude | [TODO-server.md](TODO-server.md) | First authoritative two-browser slice after M1; auth, persistence and online privacy. | 2026-11-17 |

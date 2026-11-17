@@ -3,11 +3,14 @@ import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
 import {screenPositionOfTile} from "@src/dsl/gunsmith/components/player/playwright/screen/ScreenPositionOfTile";
 import type {Heading} from "@src/dsl/gunsmith/components/player/types/Heading";
 import {colourIsNear} from "@src/dsl/gunsmith/playwright/look/ColourIsNear";
+import {lookOfDamage} from "@src/dsl/gunsmith/playwright/look/look-of-damage/LookOfDamage";
 import {lookOfFighter} from "@src/dsl/gunsmith/playwright/look/look-of-fighter/LookOfFighter";
 import {TEAM_BLUE} from "@src/dsl/gunsmith/playwright/look/TeamBlue";
 import {coloursAtTiles} from "@src/dsl/gunsmith/playwright/screen/ColoursAtTiles";
 import type {Colour} from "@src/dsl/gunsmith/types/Colour";
 import type {FighterLook} from "@src/dsl/gunsmith/types/FighterLook";
+import type {DamageLook} from "@src/dsl/gunsmith/types/DamageLook";
+import type {HurtWatch} from "@src/dsl/gunsmith/components/player/types/HurtWatch";
 import type {Point} from "@src/dsl/gunsmith/types/Point";
 
 const KEY_FOR: Record<Heading, string> = {
@@ -83,8 +86,8 @@ export class PlayerPlaywright extends BasePage {
   }
 
   /** Waits until the player has less health than `health`. */
-  async waitForHealthBelow(health: number): Promise<void> {
-    await this.waitForGameState(({player}) => player.health < health);
+  async waitForHealthBelow(health: number, timeoutSeconds?: number): Promise<void> {
+    await this.waitForGameState(({player}) => player.health < health, timeoutSeconds);
   }
 
   async getLevel(): Promise<number> {
@@ -104,6 +107,31 @@ export class PlayerPlaywright extends BasePage {
     const {player} = await this.readGameState();
 
     return await lookOfFighter(this.page, {x: player.x, y: player.y}, TEAM_BLUE);
+  }
+
+  /** What the screen shows of damage round the player right now: the brackets of a hit either side, and the ring's slashes under. The player must be standing still. */
+  async getDamageOnScreen(): Promise<DamageLook> {
+    const {player} = await this.readGameState();
+
+    return await lookOfDamage(this.page, {x: player.x, y: player.y});
+  }
+
+  /**
+   * Runs a held game (`holdTheGame`) in steps of `stepSeconds` until the player has less health than they had, and stops there, so a spec can look at the
+   * moment of damage. Throws if nothing has hurt them after `maxSeconds` of the game's time.
+   */
+  async runUntilHurt(request: HurtWatch): Promise<void> {
+    const {player: before} = await this.readGameState();
+
+    for (let seconds = 0; seconds < request.maxSeconds; seconds += request.stepSeconds) {
+      await this.page.clock.runFor(Math.round(request.stepSeconds * 1000));
+      const {player} = await this.readGameState();
+      if (player.health < before.health) {
+        return;
+      }
+    }
+
+    throw new Error(`Nothing hurt the player in ${request.maxSeconds} seconds.`);
   }
 
   /**
