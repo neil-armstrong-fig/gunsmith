@@ -16,6 +16,7 @@ import {HEIGHTS_ARENA} from "@src/game/heights/HeightsArena";
 import {HEIGHTS_DUMMIES} from "@src/game/heights/HeightsDummies";
 import {OVERLOOK_OPPONENT} from "@src/game/overlook/OverlookOpponent";
 import {OVERLOOK_PLAYER} from "@src/game/overlook/OverlookPlayer";
+import {PICKUP_RACE_PICKUP} from "@src/game/pickup-race/PickupRacePickup";
 import {PRACTICE_ARENA} from "@src/game/practice/PracticeArena";
 import {PRACTICE_DUMMIES} from "@src/game/practice/PracticeDummies";
 import {TERRACED_ARENA} from "@src/game/terraced/TerracedArena";
@@ -29,7 +30,8 @@ import type {Scenario} from "@src/game/scenario/types/Scenario";
  * the duel with an opponent who has no brain and cannot shoot, so it stands and takes it, in one round with no score, and the
  * heights arena is the player and a dummy on each level, with one stair up to a platform, and the terraced duel is the duel's opponent
  * on low ground below a platform where the player starts, in one round (no score) with a ring, and the overlook is the same arena the
- * other way round, the opponent on the platform and the player on the low ground in its sight, in one round with no ring.
+ * other way round, the opponent on the platform and the player on the low ground in its sight, in one round with no ring, and the pickup race is the
+ * duel's arena and fighters in one round with no ring, with the weapon lying close to the opponent and far from the player.
  *
  * The duel and sparring also have a weapon lying between the fighters (`pickupOf`), drawn from `seed`.
  *
@@ -69,6 +71,12 @@ export function worldOfScenario(scenario: Scenario, seed: number, ringTiming?: R
     const world = giveOpponentBrain(engine.startingWorld(TERRACED_ARENA, [], OVERLOOK_OPPONENT), seed);
 
     return {...world, player: {...world.player, position: OVERLOOK_PLAYER}};
+  }
+
+  if (scenario === "pickup-race") {
+    const world = giveOpponentBrain(engine.startingWorld(DUEL_ARENA, [], DUEL_OPPONENT), seed);
+
+    return {...world, pickup: {position: PICKUP_RACE_PICKUP, weapon: SUBMACHINE_GUN}};
   }
 
   if (scenario === "heights") {

@@ -18,6 +18,12 @@ it("drops the cover of a reloading opponent, so it looks for another", () => {
   expect(brain.goal).toBeUndefined();
 });
 
+it("changes nothing that matters for a seeking opponent: the weapon is the world's, so it keeps seeking and a stuck seek is not recovered", () => {
+  const seeking = brainIn("seek");
+
+  expect(unstickBrain(seeking)).toEqual({...seeking, goal: undefined});
+});
+
 it("gives up the search and wanders instead", () => {
   const brain = unstickBrain(brainIn("search"));
 

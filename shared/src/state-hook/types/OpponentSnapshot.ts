@@ -13,7 +13,7 @@ export interface OpponentSnapshot {
   /** Whether the player sees it: inside the player's cone, with no wall or higher ground in the way. The game does not draw it when not. */
   visible: boolean;
   /**
-   * What it is doing (`wander`, `engage`, `reload` or `search`), as the engine names it. Plain text here, since `shared/`
+   * What it is doing (`wander`, `engage`, `reload`, `search` or `seek`), as the engine names it. Plain text here, since `shared/`
    * cannot read the engine's list; absent when the opponent has no brain and takes no action.
    */
   behaviour?: string | undefined;

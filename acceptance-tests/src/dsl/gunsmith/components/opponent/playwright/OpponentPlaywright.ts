@@ -34,7 +34,7 @@ export class OpponentPlaywright extends BasePage {
   }
 
   /**
-   * Waits until the opponent's behaviour is `behaviour` (`wander`, `engage`, `reload` or `search`), for as long as the
+   * Waits until the opponent's behaviour is `behaviour` (`wander`, `engage`, `reload`, `search` or `seek`), for as long as the
    * expect timeout or `timeoutSeconds` allows.
    */
   async waitForBehaviour(behaviour: string, timeoutSeconds?: number): Promise<void> {

@@ -20,13 +20,13 @@ import {unstickBrain} from "@gunsmith/engine/opponent/unstick/UnstickBrain";
  * world always gives the same answer. An opponent with no brain, or no opponent at all, asks for nothing: a still target.
  */
 export function thinkOpponent(world: World, seconds: number): OpponentDecision {
-  const {opponent, opponentBrain, player, arena, ring} = world;
+  const {opponent, opponentBrain, player, arena, ring, pickup} = world;
   if (!opponent || !opponentBrain) {
     return {input: {direction: {x: 0, y: 0}, firing: false, reload: false}, brain: undefined};
   }
 
   const sees = canSee(arena, opponent, player.position);
-  const context: OpponentContext = {arena, opponent, target: player, sees, seconds, ring};
+  const context: OpponentContext = {arena, opponent, target: player, sees, seconds, ring, pickup};
   const noticed = noticePlayer(opponentBrain, {sees, target: player.position, seconds});
   const chosen = chooseState(noticed, context);
   const acted = actOnState({...chosen, secondsInState: chosen.secondsInState + seconds}, context);
