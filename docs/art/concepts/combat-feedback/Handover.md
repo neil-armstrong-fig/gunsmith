@@ -47,9 +47,55 @@ finished game mix or sound-design contract.
 Recipe source: `webapp/audio/generator-scripts/generators/effects/damage/MakeDamageCandidates.ts`.
 Render entry (selected crunch only): `webapp/audio/generator-scripts/studies/combat-feedback/RenderCombatFeedback.ts`.
 [Study measurements](../../../../webapp/audio/studies/combat-feedback/measurements.json)
-record hashes and mastering. No production manifest key is registered; agree the
-incoming-damage key and final format in HANDOFF before wiring it. Keep the existing
-`sfx-hit` meaning as outgoing confirmation.
+record hashes and mastering. The agreed incoming key is `sfx-damage-crunch`,
+using MP3; play has wired it in its uncommitted slice 2a (not yet integrated into
+main or art). Keep `sfx-hit` as outgoing confirmation, still unregistered here.
+
+## Crunch MP3 review — 2026-11-17
+
+Art reviewed play’s uncommitted `webapp/src/assets/sounds/files/sfx-damage-crunch.mp3`
+in worktree `play`, against the approved WAV master. FFmpeg 9.0.2 and the existing
+`encoderArguments`, `decodePcm`, `measurePcm` and `durationFailure` helpers were used
+from art’s worktree at `5c7be84`. A fresh temporary encode using the workspace’s
+48 kHz / libmp3lame quality 2 / Xing recipe matches play’s export byte for byte.
+No gain, fade, trim or tempo processing was added.
+
+- Approved WAV SHA-256: `e0b7c4cf6093a9abe1a4ba542c2afd0139c48ebe6115e9d79f0f0ef7e9c35ca7`.
+- Reviewed MP3 SHA-256: `2d7a1f9e58d99a29b800890f4a8fcda6b228a9d38075de76ec5b4e5dd9136825`.
+- Native probe: MP3, mono, 48 kHz. Native decode: 8,640 frames (180 ms),
+  matching the master within the unchanged one-frame tolerance.
+- Decoded peak: 0.39964 (master 0.49997); RMS: −29.21 dBFS (master −28.28).
+  These are sample measurements, not perceived loudness or true-peak measurements.
+- Native decoded empty-click peak is 0.51663; one click plus one crunch at unity
+  has a conservative sample-peak sum bound of 0.91627. This only covers these two
+  native-decoded voices, not browser decoding, device output or future combat sounds.
+- Negative controls rejected silent PCM, clipped PCM and two-frame duration padding.
+  The reviewed export and approved master were not changed.
+
+The codec/provenance review passes. Keep current levels pending gameplay listening;
+this review does not settle the earlier report that the click sounded abrasive/loud.
+For the current M1 slice, reusing crunch once when ring damage starts is an acceptable
+mapping: keep the sustained unsafe visual and no per-tick impacts. Do not use the
+2.8-second `sfx-ring-warning` countdown as a damage-onset cue. A dedicated onset cue
+is not required for this slice. Play retains responsibility for scheduling/coalescing,
+mute and reset behavior; this review does not replace its acceptance coverage.
+
+Safari is accepted as good enough by user decision. Weapon-shot masking, sustained
+combat fatigue and headphone/speaker levels remain open until runtime synthesis exists.
+This is native asset review, not new browser or listening evidence.
+
+## Continuous ring damage cue — 2026-11-17
+
+The user superseded the one-crunch-per-exposure mapping: ring damage needs a
+continuous bed, with no impact/onset cue. Art delivered the separate
+[ring damage study](../../../../webapp/audio/studies/ring-damage/README.md)
+(`sfx-ring-damage-loop`, two seconds, mono 48 kHz, quiet electrical texture,
+no baked-in fades). The user approved the sound after listening in Visual Studio Code. Play owns registration,
+one looping voice per exposure, roughly 100 ms fades and mute/reset cancellation.
+
+WAV loops exactly in Chromium/WebKit. MP3 passes the unchanged seam checks,
+but WebKit adds 40 ms of padding: use the WAV for exact looping, or fix and listen to MP3 loop bounds
+before integration. Approved masters, crunch and countdown warning are unchanged.
 
 ## Integration order and event behaviour
 
@@ -78,7 +124,7 @@ incoming-damage key and final format in HANDOFF before wiring it. Keep the exist
 | Hidden target hit | Suppress both outgoing confirmation and its sound; never send hidden exact-position effects |
 | Simultaneous exchange | Preserve incoming and visible outgoing feedback as distinct cues |
 | Burst | All actual losses count; merge visual accents within 100 ms and replace the previous incoming voice |
-| Continuous ring damage | Sustained unsafe-state treatment; one onset cue, no per-tick impacts; a new exposure can have a new onset |
+| Continuous ring damage | Sustained unsafe-state treatment and one continuous looping bed while hurt; no onset cue, crunch or per-tick impacts |
 | Local death / round reset | One local death resolution; cancel stale cues and scheduled audio; reveal no hidden killer |
 
 A hidden opponent's coarse directional sound events are a separate existing
@@ -92,7 +138,7 @@ Build's acceptance criteria should cover:
   health changes immediately and all losses survive coalescing.
 - A hidden hit generates no outgoing visual or audio confirmation. Turning/fog/height
   changes cannot leave effects revealing a now-hidden target.
-- Sustained ring damage has one onset, stops when exposure ends, and does not pulse
+- Sustained ring damage has a continuous bed, stops when exposure ends, and does not pulse
   each tick. Death and the next round clear pending effects and sounds.
 - Shake occurs on incoming impacts at the retained settings; off/reduced motion
   removes it. The reticle, HUD and cursor-to-arena alignment remain correct across
@@ -104,9 +150,9 @@ Run `pnpm checks` and the relevant game acceptance specs on a production build.
 Follow engine property-test and audio render requirements when touching those
 areas; report unavailable commands rather than inventing a passing result.
 
-Still needed in build: actual weapon-shot masking, headphone/speaker fatigue,
-latency and live aiming checks; production asset key and codec/playback integration.
-Existing WebKit Ogg/MP3 findings remain open. There are **no weapon gunshots in
+Still needed in play: actual weapon-shot masking, headphone/speaker fatigue,
+latency and live aiming checks; remaining cue/playback integration.
+Recorded WebKit Ogg/MP3 findings are preserved; Safari is accepted as good enough. There are **no weapon gunshots in
 this preview**, so its safe headroom does not establish a safe final combat mix.
 These are integration tasks, not reasons to repeat the chosen art direction.
 

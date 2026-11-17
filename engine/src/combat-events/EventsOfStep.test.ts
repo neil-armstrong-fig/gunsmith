@@ -13,7 +13,7 @@ function turn(changes: Partial<FighterTurn> = {}): FighterTurn {
 
 /** What `eventsOfStep` says about a quiet step, with `changes` made to what happened in it. */
 function eventsOf(changes: Partial<EventsRequest>): readonly CombatEvent[] | undefined {
-  return eventsOfStep({playerTurn: turn(), damageToPlayer: UNHURT, visibleHits: [], ...changes});
+  return eventsOfStep({playerTurn: turn(), damage: UNHURT, visibleHits: [], ...changes});
 }
 
 it("reports nothing when nothing happened to the player", () => {
@@ -28,35 +28,10 @@ it("reports a refused trigger with its reason", () => {
   expect(eventsOf({playerTurn: turn({refusal: "empty"})})).toEqual([{kind: "fireRefused", reason: "empty"}]);
 });
 
-it("reports the damage of the bullets that landed as a bullet loss", () => {
-  expect(eventsOf({damageToPlayer: {...UNHURT, bullet: 25}})).toEqual([
-    {kind: "damageTaken", cause: "bullet", amount: 25},
-  ]);
-});
-
-it("reports the ring's damage as a ring loss", () => {
-  expect(eventsOf({damageToPlayer: {...UNHURT, ring: 4}})).toEqual([{kind: "damageTaken", cause: "ring", amount: 4}]);
-});
-
-it("reports a loss no bigger than the health the player had", () => {
-  expect(eventsOf({damageToPlayer: {health: 10, bullet: 25, ring: 0}})).toEqual([
-    {kind: "damageTaken", cause: "bullet", amount: 10},
-  ]);
-  expect(eventsOf({damageToPlayer: {health: 3, bullet: 0, ring: 4}})).toEqual([
-    {kind: "damageTaken", cause: "ring", amount: 3},
-  ]);
-});
-
-it("takes the bullets' damage first and leaves the ring only the health that is left", () => {
-  expect(eventsOf({damageToPlayer: {health: 30, bullet: 25, ring: 20}})).toEqual([
-    {kind: "damageTaken", cause: "bullet", amount: 25},
-    {kind: "damageTaken", cause: "ring", amount: 5},
-  ]);
-});
-
-it("reports no ring loss once the bullets have taken all the health", () => {
-  expect(eventsOf({damageToPlayer: {health: 25, bullet: 25, ring: 20}})).toEqual([
-    {kind: "damageTaken", cause: "bullet", amount: 25},
+it("reports the damage the step did to the player, with its cause", () => {
+  expect(eventsOf({damage: {...UNHURT, bullet: 20, ring: 0.25}})).toEqual([
+    {kind: "damageTaken", cause: "bullet", amount: 20},
+    {kind: "damageTaken", cause: "ring", amount: 0.25},
   ]);
 });
 
@@ -72,7 +47,7 @@ it("reports a refusal, a loss and a hit together, the loss before the hit", () =
   expect(
     eventsOf({
       playerTurn: turn({refusal: "empty"}),
-      damageToPlayer: {...UNHURT, bullet: 25},
+      damage: {...UNHURT, bullet: 25},
       visibleHits: ["opponent"],
     }),
   ).toEqual([

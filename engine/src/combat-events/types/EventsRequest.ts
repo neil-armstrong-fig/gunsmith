@@ -6,8 +6,8 @@ import type {FighterTurn} from "@gunsmith/engine/game-loop/fighter/types/Fighter
 export interface EventsRequest {
   /** The player's own turn: the opponent's is deliberately not here. */
   playerTurn: FighterTurn;
-  /** What hurt the player in this step, by cause. */
-  damageToPlayer: DamageToPlayer;
+  /** What the step meant to take off the player, by cause. */
+  damage: DamageToPlayer;
   /** What the player's bullets landed on in this step, only where the player could see it: a hidden target is not here. */
   visibleHits: readonly HitTarget[];
 }

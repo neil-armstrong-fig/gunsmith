@@ -68,6 +68,12 @@ The user accepted the review. Frozen inputs distinguish available artwork from
 newer eval summaries and AI-reported results; concrete AI/build follow-up is
 recorded there. No kit-selection comparison or production approval is implied.
 
+## Terrain candidates (2026-11-17)
+
+[Three floor levels and solid wall](terrain/README.md) now have production-candidate
+SVGs, native-size browser exports and a static terraced-arena context. User approval
+and runtime integration remain pending; the earlier references stay intact.
+
 ## Build asset reference (2026-11-14)
 
 [Start with the build guide](asset-reference/README.md): five visual sheets,

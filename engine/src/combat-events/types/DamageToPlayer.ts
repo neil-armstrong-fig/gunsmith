@@ -1,9 +1,8 @@
-/** The damage that reached the local player in one step, by cause, and the health it landed on. The opponent's is not here. */
+/** What one step meant to take off the player: the health they had going in and the damage each cause was worth, before health ran out. */
 export interface DamageToPlayer {
-  /** The player's health before this step's damage. */
   health: number;
-  /** The damage of every bullet that landed on the player. */
+  /** What the bullets that reached the player in this step were worth together. */
   bullet: number;
-  /** The damage the ring does to the player for standing outside it. */
+  /** What the ring took over this step. */
   ring: number;
 }

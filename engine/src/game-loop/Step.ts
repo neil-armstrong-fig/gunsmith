@@ -70,12 +70,8 @@ export function step(world: World, input: Input, seconds: number): World {
   }
 
   const ring = world.ring && advanceRing(world.ring, seconds);
-  const damageToPlayer = {
-    health: playerShot.fighter.health,
-    bullet: bulletFlight.playerDamage,
-    ring: ringDamageTo(ring, playerShot.fighter, seconds),
-  };
-  const player = hurt(playerShot.fighter, damageToPlayer.bullet + damageToPlayer.ring);
+  const playerRingDamage = ringDamageTo(ring, playerShot.fighter, seconds);
+  const player = hurt(playerShot.fighter, bulletFlight.playerDamage + playerRingDamage);
   const opponent =
     opponentShot &&
     hurt(opponentShot.fighter, bulletFlight.opponentDamage + ringDamageTo(ring, opponentShot.fighter, seconds));
@@ -95,7 +91,11 @@ export function step(world: World, input: Input, seconds: number): World {
     round,
     match: world.match && scoreRound(world.match, round),
     ring,
-    events: eventsOfStep({playerTurn, damageToPlayer, visibleHits}),
+    events: eventsOfStep({
+      playerTurn,
+      damage: {health: playerShot.fighter.health, bullet: bulletFlight.playerDamage, ring: playerRingDamage},
+      visibleHits,
+    }),
   };
 }
 
