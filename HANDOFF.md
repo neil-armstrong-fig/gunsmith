@@ -10,7 +10,7 @@ Ownership follows the assigned persona. Models below are defaults; no applicatio
 | --- | --- | --- | --- |
 | play | Claude | [TODO-play.md](TODO-play.md) | Combat feedback, HUD/inventory, camera and runtime audio; close M1 playtest. |
 | engine | Claude | [TODO-engine.md](TODO-engine.md) | Bot pickup-seeking; extend merged routing, cross-level engagement/cover, validators and balancing. |
-| ai | Claude | [TODO-ai.md](TODO-ai.md) | Fix eight reported canned-response fake-eval failures; renderer, calibration and arena generation. |
+| ai | Claude | [TODO-ai.md](TODO-ai.md) | Fake-eval failures fixed (worktree `ai`, uncommitted); renderer, calibration and arena generation next. |
 | server | Claude | [TODO-server.md](TODO-server.md) | First authoritative two-browser slice after M1; auth, persistence and online privacy. |
 | budget | Claude | [TODO-budget.md](TODO-budget.md) | Production ledger/spend boundaries with server/AI; credits, refunds, tracing and kill switch. |
 | art | Codex | [TODO-art.md](TODO-art.md) | Production assets/presentation, Safari timing and combat masking; current sprites/MP3 are integrated. |
@@ -77,6 +77,8 @@ Before changing a consumed contract, record the proposal and affected owners her
 - [ ] Production art/audio and live release: art/play integrate their domains; ship validates release.
 
 ## Delivery log
+
+- 2026-11-17, `ai` (worktree `.claude/worktrees/ai`, branch `worktree-ai` from main `6f6b028`, **uncommitted for the user's review**): the eight fake-eval failures are fixed. Cause: the fake tier's moderator answered `isWeaponRequest: true` to everything, so NotAWeaponRequest (6) and the armour case (2) could never be rejected. New `ModerationFakeModel` (`ai/evals/eval-criteria-mapping/weapon/models/fake/`, one caller, `CreateEvalModels`) turns away those four requests by exact text and approves the rest. **Contract change: none** (`src/`, `shared/`, `engine/` untouched; no model call, no spend). Red first (8 failed), then `evals:fake` 134 of 134 and `pnpm --filter @gunsmith/ai checks` green (82 files, 541 tests). Mutation: approve-all gives back exactly the 8 failures; reject-all fails 14 evals and 6 unit tests. A fake pass proves only the harness; local and paid results are unchanged and `NotAWeaponRequest` stays `given.inProgress`. Standards review re-read root and `ai/AGENTS.md`; folder/caller audit done (`models/fake/` holds the class and its test, `FakeWeaponReply` is an older one-caller file at `models/` root, left alone).
 
 - 2026-11-17, integration workflow: user selected integration-only main and persistent persona development worktrees, with explicit worktree → main → worktree merges. Updated startup/ownership guidance and all persona resumes. Existing staged migration and unfinished legacy worktrees preserved; no worktree, index or branch mutation performed. Validation: pnpm checks passes (lint/format/types and shared 59, acceptance helpers 9, engine 976, audio 270 with one slow render skipped, AI 507, webapp 296 tests). Repository gate, thirteen workflow/startup documents, 82 local references and diff whitespace pass. Re-read root instructions and Operations.md; standards/folder/caller review complete, with no new source files, helpers, types or folders. This is coordination guidance only; no runtime/acceptance/eval changes or paid calls.
 

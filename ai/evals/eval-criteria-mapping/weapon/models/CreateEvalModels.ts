@@ -3,6 +3,7 @@ import {FakeListChatModel} from "@langchain/core/utils/testing";
 import {ChatOllama} from "@langchain/ollama";
 import {createAppearanceModels} from "@evals/eval-criteria-mapping/appearance/models/CreateAppearanceModels";
 import {FAKE_WEAPON_REPLY} from "@evals/eval-criteria-mapping/weapon/models/FakeWeaponReply";
+import {ModerationFakeModel} from "@evals/eval-criteria-mapping/weapon/models/fake/ModerationFakeModel";
 import {createPaidWeaponModels} from "@evals/eval-criteria-mapping/weapon/models/PaidWeaponModels";
 import {unreachableTier} from "@evals/eval-criteria-mapping/tier/UnreachableTier";
 import type {EvalTier} from "@evals/eval-criteria-mapping/tier/types/EvalTier";
@@ -31,9 +32,7 @@ export function createEvalModels(tier: EvalTier): WeaponPipelineDependencies {
 function createFakeModels(): WeaponPipelineDependencies {
   return {
     generator: new FakeListChatModel({responses: [JSON.stringify(FAKE_WEAPON_REPLY)]}),
-    moderator: new FakeListChatModel({
-      responses: [JSON.stringify({isWeaponRequest: true, reason: "A weapon request."})],
-    }),
+    moderator: new ModerationFakeModel(),
     appearanceGenerator: cannedDrawer(),
   };
 }

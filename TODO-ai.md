@@ -4,11 +4,11 @@ Model: **Claude**. Follow the startup protocol in [TODO.md](TODO.md); read only 
 
 ## Resume here
 
-Checkout: develop only in this persona's assigned worktree. At startup, record its actual path/branch and last merged committed main revision here; these are not yet assigned by the workflow update. Sync main into the clean worktree before new work and delivery; main is for integration/validation only. Preserve existing unfinished legacy worktrees. See [Operations](docs/agent-reference/Operations.md#development-worktrees-and-the-integration-checkout).
+Checkout: worktree `.claude/worktrees/ai` (branch `worktree-ai`, created 2026-11-17 from main `6f6b028`; last merged main `6f6b028`). Sync main into the clean worktree before new work and delivery; main is for integration/validation only. See [Operations](docs/agent-reference/Operations.md#development-worktrees-and-the-integration-checkout).
 
-Resolve the eight reported fake-eval canned-response failures. Five-call integration, LangGraph, initial balancing, the `weaponSmith` registration and per-stat clamping (`9830023`) are merged; do not rebuild them. The ai-hosting-proof worktree's checkpoint is in [worktree checkpoints](docs/history/2026-11-17-worktree-checkpoints.md).
+The eight fake-eval canned-response failures are resolved (2026-11-17, uncommitted in the `ai` worktree, for the user to review). Five-call integration, LangGraph, initial balancing, the `weaponSmith` registration and per-stat clamping (`9830023`) are merged; do not rebuild them. The ai-hosting-proof worktree's checkpoint is in [worktree checkpoints](docs/history/2026-11-17-worktree-checkpoints.md).
 
-Current milestone: M3–M5; the project remains on M1. Next failing test/check: Reproduce the eight fake-eval failures before changing canned responses; add renderer/integration criteria before new behavior. Never infer live-model quality from fake scores.
+Current milestone: M3–M5; the project remains on M1. Next failing test/check: add renderer/integration criteria before new behavior; reconcile the cumulative paid ledger before any authorized probe. Never infer live-model quality from fake scores.
 
 ## Ownership
 
@@ -47,6 +47,8 @@ engine owns balancing/rating; server owns production adapter routing; budget sup
 - [ ] Clearly label deferred Plus-only features; optional interrupt review queues, OpenTelemetry and provider bake-offs need a concrete brief/authorization. Gather case-study evidence and shutdown measurements as work lands.
 
 ## Verification/latest delivery
+
+- [x] 2026-11-17, fake-eval failures: the fake moderator always said yes, so NotAWeaponRequest (6) and the armour case of ShieldsAndArmour (2) could not be rejected. New `ai/evals/eval-criteria-mapping/weapon/models/fake/ModerationFakeModel` (a canned table of those four requests, word for word, not a keyword rule) replaces it in `createFakeModels`. Red first (8 failed: "expected rejected, got created", "3 model calls, allowed 1"), now `evals:fake` 134 of 134; `pnpm checks` in `ai` green (541 tests). Mutants: approve-everything brings back exactly the 8 and fails 5 unit tests; reject-everything fails 14 evals and 6 unit tests. Local and paid tiers untouched, no model call. Fake passes still prove only the harness; the three `NotAWeaponRequest` cases stay `given.inProgress`.
 
 - [x] Committed integration combines separate stats/appearance stages: five calls maximum, one repair per stage, skip appearance when stats fail and disclose a visual stand-in. Three calls is the clean path.
 - [x] 2026-11-17, Research 2: inspected the then-current source before the later integration merge; no integrated preference output/general balancer existed at that checkpoint. Delivered the [human-review probe brief](docs/ai-stat-preference-probe.md): twelve proposed label rows, three encoding arms, scorecard and paired omitted-stat illustrations; no model call.
