@@ -17,7 +17,7 @@ Start a session with: **"You are engine, continue the TODO."** Substitute any pe
 
 | Persona | Model | Checklist | Current focus | Updated |
 | --- | --- | --- | --- | --- |
-| play | Claude | [TODO-play.md](TODO-play.md) | Combat feedback slice 2a (damage event, crunch) done in worktree `play`; 2b (`store/feedback/`, brackets, health trail) next; HUD/inventory, camera, close M1 playtest. | 2026-11-17 |
+| play | Claude | [TODO-play.md](TODO-play.md) | Combat feedback slices 2a (damage event, crunch) and 2b (`store/feedback/`, brackets round the player, ring marks, amber health trail) done in worktree `play`; slice 3 (hit confirmation) next; HUD/inventory, camera, close M1 playtest. | 2026-11-17 |
 | engine | Claude | [TODO-engine.md](TODO-engine.md) | Bot pickup-seeking; extend merged routing, cross-level engagement/cover, validators and balancing. | 2026-11-17 |
 | ai | Claude | [TODO-ai.md](TODO-ai.md) | Fix eight reported canned-response fake-eval failures; renderer, calibration and arena generation. | 2026-11-17 |
 | server | Claude | [TODO-server.md](TODO-server.md) | First authoritative two-browser slice after M1; auth, persistence and online privacy. | 2026-11-17 |

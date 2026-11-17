@@ -4,6 +4,7 @@ import {STATE_HOOK_NAME} from "@gunsmith/shared/state-hook/StateHookName";
 import {gameState} from "@src/store/game/selectors/game-state/GameState";
 import {useGameStore} from "@src/store/game/UseGameStore";
 import {arenaPointAtPixel} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/pointer/ArenaPointAtPixel";
+import {recordFeedbackCues} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/feedback/RecordFeedbackCues";
 import {fixedTicks} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/clock/FixedTicks";
 import {TICK_SECONDS} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/clock/TickSeconds";
 import {snapshotOf} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/state-hook/SnapshotOf";
@@ -24,7 +25,7 @@ const GAME_LOOP_PRIORITY = -1;
  * the first step of the frame, once), and puts the resulting world back in the store once, not once per step. It reads the
  * world with `gameState` and renders nothing itself: a per-frame value never goes through React state. It also puts the
  * acceptance specs' read-only state hook on the page. After every step, not once a frame, it tells the sounds what the step
- * reported (`World.events`), since a frame can run several steps and the store keeps only the last world.
+ * reported (`World.events`), and tells the feedback store the same, since a frame can run several steps and the game store keeps only the last world.
  */
 export function useGameLoop(): void {
   const leftoverSecondsRef = useRef(0);
@@ -66,6 +67,7 @@ export function useGameLoop(): void {
 
       world = engine.step(world, input, TICK_SECONDS);
       sounds.afterTick({events: world.events, firing: input.firing, round: world.round, seconds: TICK_SECONDS});
+      recordFeedbackCues({events: world.events, round: world.round});
     }
 
     if (owed.ticks > 0) {

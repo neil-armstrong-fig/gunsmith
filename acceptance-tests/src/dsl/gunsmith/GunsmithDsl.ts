@@ -60,6 +60,7 @@ export class GunsmithDsl {
     try {
       await this.bullets.startWatching();
       await this.sound.startWatching();
+      await this.hud.startWatching();
       await this.gunsmith.open();
     } catch (error) {
       throw new DslError("Failed to open the game", error);
