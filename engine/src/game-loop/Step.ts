@@ -5,6 +5,7 @@ import {prepareFighter} from "@gunsmith/engine/game-loop/fighter/PrepareFighter"
 import {shootFighter} from "@gunsmith/engine/game-loop/fighter/ShootFighter";
 import type {Input} from "@gunsmith/engine/game-loop/types/Input";
 import type {World} from "@gunsmith/engine/game-loop/types/World";
+import {visibleHitsOf} from "@gunsmith/engine/game-loop/visible-hits/VisibleHitsOf";
 import {takeDamage} from "@gunsmith/engine/health/TakeDamage";
 import {scoreRound} from "@gunsmith/engine/match/ScoreRound";
 import {takePickup} from "@gunsmith/engine/pickup/TakePickup";
@@ -31,7 +32,9 @@ import {decideRound} from "@gunsmith/engine/round/DecideRound";
  * stands at the end of the step, loses health to it with any bullet damage, before the round is decided; the practice
  * dummies and the bullets in the air are not hurt by it. Last, a fighter with health left who stands within reach of the
  * pickup lying in the arena takes it (`takePickup`), and a frozen world takes nothing. The world also carries what happened to the
- * player in this step alone (`eventsOfStep`), so a frozen world and the step after it carry none.
+ * player in this step alone (`eventsOfStep`): an empty click, the health lost to bullets and to the ring, and the player's
+ * bullets that landed on a target in sight (`visibleHitsOf`, judged with both fighters as they stand after their turns), so a
+ * frozen world and the step after it carry none.
  */
 export function step(world: World, input: Input, seconds: number): World {
   if (world.round !== "playing") {
@@ -52,6 +55,11 @@ export function step(world: World, input: Input, seconds: number): World {
     seconds,
   });
 
+  const visibleHits = visibleHitsOf(
+    {...world, player: playerTurn.fighter, opponent: opponentTurn?.fighter},
+    bulletFlight.playerHits,
+  );
+
   const playerShot = shootFighter(world.arena, "player", playerTurn);
   const opponentShot = opponentTurn && shootFighter(world.arena, "opponent", opponentTurn);
   const bullets: Bullet[] = [...bulletFlight.bullets];
@@ -62,7 +70,12 @@ export function step(world: World, input: Input, seconds: number): World {
   }
 
   const ring = world.ring && advanceRing(world.ring, seconds);
-  const player = hurt(playerShot.fighter, bulletFlight.playerDamage + ringDamageTo(ring, playerShot.fighter, seconds));
+  const damageToPlayer = {
+    health: playerShot.fighter.health,
+    bullet: bulletFlight.playerDamage,
+    ring: ringDamageTo(ring, playerShot.fighter, seconds),
+  };
+  const player = hurt(playerShot.fighter, damageToPlayer.bullet + damageToPlayer.ring);
   const opponent =
     opponentShot &&
     hurt(opponentShot.fighter, bulletFlight.opponentDamage + ringDamageTo(ring, opponentShot.fighter, seconds));
@@ -82,7 +95,7 @@ export function step(world: World, input: Input, seconds: number): World {
     round,
     match: world.match && scoreRound(world.match, round),
     ring,
-    events: eventsOfStep({playerTurn}),
+    events: eventsOfStep({playerTurn, damageToPlayer, visibleHits}),
   };
 }
 

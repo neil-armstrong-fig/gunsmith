@@ -1,4 +1,5 @@
 import type {Bullet} from "@gunsmith/engine/bullet/types/Bullet";
+import type {LandedHit} from "@gunsmith/engine/bullet/types/LandedHit";
 import type {Dummy} from "@gunsmith/engine/dummy/types/Dummy";
 
 /**
@@ -12,4 +13,6 @@ export interface BulletFlight {
   playerDamage: number;
   /** The damage of every player's bullet that landed on the opponent. */
   opponentDamage: number;
+  /** Every player's bullet that landed on the opponent or a dummy, in order, whether or not the player could see it. */
+  playerHits: LandedHit[];
 }

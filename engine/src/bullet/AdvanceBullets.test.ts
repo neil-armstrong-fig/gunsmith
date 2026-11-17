@@ -465,6 +465,42 @@ it("adds up the damage of every bullet that lands on the player in the same step
   expect(flight.playerDamage).toBe(DAMAGE + 50);
 });
 
+it("reports a hit on the opponent for the player's bullet that reaches it, and on no one for the opponent's own", () => {
+  const request = {dummies: [], opponentPosition: {x: 3.5, y: 1.5}, playerPosition: {x: 3.5, y: 1.5}, seconds: 0.1};
+  const player = advanceBullets(hall, {
+    ...request,
+    bullets: [bulletAt({x: 1.5, y: 1.5, directionX: 1, directionY: 0})],
+  });
+  const opponent = advanceBullets(hall, {
+    ...request,
+    bullets: [bulletAt({x: 1.5, y: 1.5, directionX: 1, directionY: 0, changes: OPPONENT_SHOT})],
+  });
+
+  expect(player.playerHits).toEqual([{on: "opponent", dummyIndex: undefined}]);
+  expect(opponent.playerHits).toEqual([]);
+});
+
+it("reports a hit on the dummy, by place in the list, for the player's bullet that reaches it", () => {
+  const flight = fly(
+    [bulletAt({x: 1.5, y: 1.5, directionX: 1, directionY: 0})],
+    [dummyAt(3.5, 2.5), dummyAt(3.5, 1.5)],
+    0.1,
+  );
+
+  expect(flight.playerHits).toEqual([{on: "dummy", dummyIndex: 1}]);
+});
+
+it("reports a hit on a dummy the bullet takes the last health from", () => {
+  const flight = fly([bulletAt({x: 1.5, y: 1.5, directionX: 1, directionY: 0})], [dummyAt(3.5, 1.5, DAMAGE)], 0.1);
+
+  expect(flight.dummies).toEqual([]);
+  expect(flight.playerHits).toEqual([{on: "dummy", dummyIndex: 0}]);
+});
+
+it("reports no hit for a bullet that only reaches the wall", () => {
+  expect(fly([bulletAt({x: 4.5, y: 1.5, directionX: 1, directionY: 0})], [], 0.1).playerHits).toEqual([]);
+});
+
 function dummyAt(x: number, y: number, health = 100): Dummy {
   return {position: {x, y}, health};
 }
