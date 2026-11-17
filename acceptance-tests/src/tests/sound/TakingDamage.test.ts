@@ -3,7 +3,7 @@ import {beforeEach, expect, given, then, when} from "@src/acceptance-criteria-ma
 const DAMAGE_CRUNCH = "sfx-damage-crunch";
 
 // The ring starts to close after three seconds and is closed in six more, on a point drawn from the seed. Seed 14 closes on a point
-// one tile from the opponent's start, so the player, who stands still in sparring where nothing else can hurt them, leaves the ring
+// one tile from the opponent's start, so the player, who stands still in sparring where nothing else can hurt them (so no bullet crunch can be heard), leaves the ring
 // at about 7.5 s and falls at about 12.6 s (`TheClosingRing`, measured at a delay of one second plus the two more here).
 const DELAY_SECONDS = 3;
 const CLOSING_SECONDS = 6;
@@ -88,17 +88,11 @@ given("a sparring match whose ring closes on the opponent's side of the arena", 
       await gunsmith.round.waitForState("lost", LONGEST_ROUND_SECONDS);
     });
 
-    then("the ring crunched once when it began to hurt, not for each step it went on hurting", async ({gunsmith}) => {
-      await expect.poll(async () => (await gunsmith.sound.getPlays(DAMAGE_CRUNCH)).length).toBe(1);
-
-      expect((await gunsmith.sound.getPlays(DAMAGE_CRUNCH)).map(play => play.contextState)).toEqual(["running"]);
-    });
-
-    then("nothing crunches once the round is lost", async ({gunsmith}) => {
-      await expect.poll(async () => (await gunsmith.sound.getPlays(DAMAGE_CRUNCH)).length).toBe(1);
+    then("the ring never crunched: it hurts continuously and has no impact to hear", async ({gunsmith}) => {
       await gunsmith.waitForGameSeconds(1);
 
-      expect(await gunsmith.sound.getPlays(DAMAGE_CRUNCH)).toHaveLength(1);
+      expect(await gunsmith.player.getHealth()).toBe(0);
+      expect(await gunsmith.sound.getPlays(DAMAGE_CRUNCH)).toHaveLength(0);
     });
   });
 });

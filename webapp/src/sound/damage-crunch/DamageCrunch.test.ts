@@ -57,24 +57,14 @@ it("does not stretch the burst by the hits it merged", () => {
   expect(crunchesOf(steps)).toEqual([0, STEPS_IN_BURST + 1]);
 });
 
-it("crunches once when the ring starts to hurt, and not for each step it keeps hurting", () => {
-  expect(crunchesOf([RING, RING, RING, RING])).toEqual([0]);
+it("does not crunch for the ring, however long it keeps hurting", () => {
+  expect(crunchesOf([RING, RING, RING, QUIET, RING])).toEqual([]);
 });
 
-it("crunches again when the ring starts to hurt a second time", () => {
-  expect(crunchesOf([RING, RING, QUIET, QUIET, RING, RING])).toEqual([0, 4]);
-});
-
-it("crunches once for a bullet and the ring in the same step", () => {
-  const both: CrunchRequest = {...BULLET, events: [...(BULLET.events ?? []), ...(RING.events ?? [])]};
-
-  expect(crunchesOf([both, RING])).toEqual([0]);
-});
-
-it("crunches for a bullet that lands while the ring is already hurting, without starting the ring's crunch again", () => {
+it("crunches for a bullet that lands while the ring is hurting, and for that alone", () => {
   const bulletInRing: CrunchRequest = {...BULLET, events: [...(BULLET.events ?? []), ...(RING.events ?? [])]};
 
-  expect(crunchesOf([RING, RING, bulletInRing, RING])).toEqual([0, 2]);
+  expect(crunchesOf([RING, RING, bulletInRing, RING])).toEqual([2]);
 });
 
 it("crunches for a hit that ends the round, and for nothing after it", () => {
@@ -82,10 +72,6 @@ it("crunches for a hit that ends the round, and for nothing after it", () => {
   const after: CrunchRequest = {events: undefined, round: "lost", seconds: TICK};
 
   expect(crunchesOf([fatal, after, after])).toEqual([0]);
-});
-
-it("crunches for the ring's onset in a new round, though the last round ended with the ring hurting", () => {
-  expect(crunchesOf([RING, {...RING, round: "lost"}, RING])).toEqual([0, 2]);
 });
 
 it("crunches for the first hit of a new round straight away, though the last round ended inside a burst", () => {

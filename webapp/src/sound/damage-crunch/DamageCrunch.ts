@@ -5,35 +5,29 @@ import type {CrunchRequest} from "@src/sound/damage-crunch/types/CrunchRequest";
 const ROUNDING_SECONDS = 1e-9;
 
 /**
- * Decides when the player's damage crunches. A bullet crunches at once, and bullets that hit within `BURST_SECONDS` of that
- * crunch are merged into it, so a burst is one crunch (the window runs from the first hit and is not stretched by the merged
- * ones). The ring takes health every step the player stands outside it, so it crunches once when it starts to hurt and again
- * only after a step it did not (a new exposure); its onset opens no window for bullets, which crunch for themselves. Time is the game's own, the seconds each step covers, so nothing here reads
- * a clock. A round that is not being fought clears both, after the step that ended it has been heard: the hit that killed the
- * player still crunches.
+ * Decides when a bullet hitting the player crunches. A bullet crunches at once, and bullets that hit within `BURST_SECONDS`
+ * of that crunch are merged into it, so a burst is one crunch (the window runs from the first hit and is not stretched by the
+ * merged ones). The ring never crunches: it hurts every step the player is outside it, which is a continuous state and wants
+ * a continuous sound of its own, not an impact (art has been asked for one). Time is the game's own, the seconds each step
+ * covers, so nothing here reads a clock. A round that is not being fought clears the window, after the step that ended it has
+ * been heard: the hit that killed the player still crunches.
  */
 export class DamageCrunch {
-  private secondsSinceBulletCrunch = Number.POSITIVE_INFINITY;
-  private ringHurting = false;
+  private secondsSinceCrunch = Number.POSITIVE_INFINITY;
 
   /** Whether this step should crunch. Call it once per step, in order. */
   shouldPlay({events, round, seconds}: CrunchRequest): boolean {
-    this.secondsSinceBulletCrunch += seconds;
+    this.secondsSinceCrunch += seconds;
     const bullet = events?.some(event => event.kind === "damageTaken" && event.cause === "bullet") === true;
-    const ring = events?.some(event => event.kind === "damageTaken" && event.cause === "ring") === true;
-    const ringStarted = ring && !this.ringHurting;
-    this.ringHurting = ring;
-
-    const bulletStarted = bullet && this.secondsSinceBulletCrunch >= BURST_SECONDS - ROUNDING_SECONDS;
-    if (bulletStarted) {
-      this.secondsSinceBulletCrunch = 0;
+    const crunches = bullet && this.secondsSinceCrunch >= BURST_SECONDS - ROUNDING_SECONDS;
+    if (crunches) {
+      this.secondsSinceCrunch = 0;
     }
 
     if (round !== "playing") {
-      this.secondsSinceBulletCrunch = Number.POSITIVE_INFINITY;
-      this.ringHurting = false;
+      this.secondsSinceCrunch = Number.POSITIVE_INFINITY;
     }
 
-    return bulletStarted || ringStarted;
+    return crunches;
   }
 }

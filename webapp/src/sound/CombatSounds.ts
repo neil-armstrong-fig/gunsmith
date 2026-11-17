@@ -6,7 +6,7 @@ import type {TickCues} from "@src/sound/types/TickCues";
 /**
  * The sounds the fight makes, played from what each step of the simulation reports: the empty click (the latch turns the
  * engine's refusal on every step a held trigger meets an empty magazine into one click for the hold) and the crunch of damage
- * (`DamageCrunch` makes one of a burst of bullets and one for each time the ring starts to hurt).
+ * (`DamageCrunch` makes one of a burst of bullets; the ring has no sound yet).
  * Cosmetic and outside the simulation: nothing here is ever read back by the engine or kept in the game store.
  */
 export class CombatSounds {
