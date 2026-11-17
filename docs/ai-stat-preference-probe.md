@@ -1,26 +1,13 @@
 # Weapon preference probe: human review brief
 
-Owner: Research 2. Prepared 2026-11-17 for the AI coding owner and build.
+Owner: ai, with engine reviewing rating/balancing. Labels approved 2026-11-17.
 Status: user-approved labels and omitted-stat policy; illustrative comparisons,
 with no model outputs or measured scores. This accompanies the
 [stat-balancing study](ai-stat-balancing.md), without repeating its desk research.
 
 ## Current evidence and boundary
 
-Read-only inspection on 2026-11-17 found that
-[generateWeapon](../ai/src/pipeline/GenerateWeapon.ts) still runs stats separately
-from appearance. The [draft](../ai/src/pipeline/weapon/WeaponDraft.ts) contains a
-name and six numbers; the [rating](../ai/src/pipeline/check/rate/RateWeaponDraft.ts)
-rejects nominal damage/interval above 150 rather than balancing it. Existing
-[trade-off evals](../ai/evals/tests/weapon/AskingForAWeapon.eval.ts) check creation,
-not directional fidelity. No new preference output or general balancer was
-found in the current pipeline/engine source. This brief supplies the next
-research input, not evidence of integrated model performance.
-
-AI-owned interpretation/parsing and engine-owned rating/balancing remain a
-**proposed boundary pending owner agreement**. The power budget is a ceiling;
-deliberate weakness must survive unused headroom. Integration comes first.
-No schema, default baseline, cost weights, solver or numerical budget is frozen.
+Stats/appearance integration and initial engine balancing exist. This brief tests preference interpretation and omitted-stat choices; it does not establish calibration or directional fidelity. AI owns interpretation/parsing; engine owns rating/balancing. The power budget remains a ceiling and deliberate weakness must survive unused headroom. See [pipeline](ai-pipeline.md).
 
 ## Human annotation sheet
 
@@ -98,7 +85,7 @@ Keep requests delimited as player data, including P12. Human annotators should
 review outputs without arm labels where practicable.
 
 Preference extraction belongs in the existing stats-generation call. The
-[five-call integrated ceiling](ai-visual-generation.md#ai-session-handoff-2026-11-15)
+[five-call integrated ceiling](ai-visual-generation.md#accepted-constraints)
 and one repair per stage remain constraints. Stats and preferences must each
 parse independently; record each failure separately rather than hiding a broken
 preference behind valid stats. Schema repair is not deterministic balancing.
@@ -176,11 +163,3 @@ records design intent, not a new weapon-placement mechanic or runtime contract.
 Prompt fidelity, usefulness, clarity at reveal and variation still need evaluation
 on generated outputs and in gameplay. No per-pair scores were supplied.
 Equal-budget comparisons require the engine owner's calibrated rating.
-
-## Resume and validation
-
-Human review is complete: use label revision v1 and the selected AI-inference
-policy. Next: AI/build agreement on ownership, then authorized interpretation
-probes after integration. No production contract is agreed through this document.
-Research 2 owns this brief and its study link; the shared checklist/handoff describe this documentation
-delivery without marking model evidence, calibration or implementation complete.

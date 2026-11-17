@@ -1,7 +1,6 @@
 # Match netcode, fog and rooms
 
-The design of real-time play. Modelled on janggi's `docs/online-play.md` (read it for the sign-in and room-token flow,
-which is unchanged), but the game is real-time, so the room is a ticking authority. Status: design; `build` keeps it in step
+The design of real-time play. The planned room is a ticking authority. Sign-in uses OAuth code + PKCE and opaque session tokens. Status: design; `build` keeps it in step
 with the code (`TODO-server.md`).
 
 The 2026-11-15 [fair-play research and handoff](art/fair-play-research.md)
@@ -23,7 +22,7 @@ These are design decisions; the online controls are not implemented yet.
 
 | Piece | Responsibility |
 | ----- | -------------- |
-| API Worker | Authenticates the session, routes HTTP and WebSocket upgrades, hands the account id to the right Durable Object in a trusted internal header (as janggi does) |
+| API Worker | Authenticates the session, routes HTTP and WebSocket upgrades, hands the account id to the right Durable Object in a trusted internal header |
 | `Match` Durable Object | One per match. Fixed 20 Hz tick, input validation, authoritative state, fog-filtered snapshots, round and match logic, reconnect window, spectator fan-out, alarm cleanup |
 | `Matchmaker` Durable Object | Singleton. Holds the public queue in memory/SQLite and serialises pairing (D1 has no transactions, so two matchers could pair one player twice). Creates a `Match` and hands both players its code |
 | D1 | Accounts, sessions, credits, library, ratings, match history. Not the queue |
@@ -71,8 +70,8 @@ a delay alone can still help a player through a second account.
 
 - A disconnected player has 30 s to return; their character is frozen in place and still vulnerable. After that the round is
   forfeited; two forfeits lose the match. No input for about 60 s counts as idle and is treated the same.
-- The client re-sends `introduce` on every connection and the server replies with a full snapshot (janggi's pattern).
-- Close code for "match is gone, stop retrying", as janggi's 4404.
+- The client re-sends `introduce` on every connection and the server replies with a full snapshot.
+- Close code for "match is gone, stop retrying", a documented application close code.
 
 ## Rooms
 

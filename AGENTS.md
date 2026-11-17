@@ -22,7 +22,7 @@ At the end, update your checklist, status and a concise handoff delivery.
 1. Identify every package in scope and read each applicable package `AGENTS.md` in full before
    planning — root, package, and any nested one on the path to the file you're editing.
 2. Inspect the nearest existing implementation and test that establish the local structure and
-   naming. If none exists, say so (for a new package, name the janggi file you are following instead).
+   naming. If none exists, say so (for a new package, identify the existing workspace pattern you are following).
 3. Before editing, say which instruction files and reference implementations you used,
    the behavior in scope, and which failing test or check will demonstrate it. Work in
    small, independently reviewable changes; validate each before expanding the change.
@@ -36,13 +36,9 @@ At the end, update your checklist, status and a concise handoff delivery.
 ## How work is done here
 
 This project is Acceptance Test Driven. **Write the acceptance test first**, watch it fail for the
-right reason, then make it pass. See `acceptance-tests/AGENTS.md` (written by `build`, modelled on janggi's).
+right reason, then make it pass. See `acceptance-tests/AGENTS.md` for its DSL and specification rules.
 
-**There is no exception.** A fuzzy-frontend phase (every screen clickable with fakes, built without tests,
-`docs/fuzzy-frontend.md`) was tried on 2026-11-12 and dropped at the user's request: it produced a pile of menus and
-contracts around a game that was not yet fun. The order now is **a fun game first, then everything built around it**:
-the canvas fills the whole screen, menus appear over it only when needed, and each mechanic starts as an acceptance spec.
-Do not build screens or fakes ahead of the game.
+Build the playable game before menus or surrounding contracts: the canvas fills the screen, overlays appear only when needed, and every mechanic starts as an acceptance spec. Do not build screens or fakes ahead of the game.
 
 **Nothing goes in `shared/` until a second package needs it.** No pre-emptive schemas, adapters or constants. Code
 lives in the one package that uses it, and moves to `shared/` only when another package genuinely imports it.

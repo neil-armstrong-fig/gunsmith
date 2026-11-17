@@ -57,11 +57,3 @@ Tests verify deterministic renders, exact selected-master agreement, format,
 duration, audible headroom and quiet tails. Final cleanup checks and pack
 preservation results are recorded in HANDOFF. Tune deliberately during build;
 update the master and measurements together if the sound changes.
-
-## Resume prompt
-
-> You are build. Read the shared status and applicable instructions, then implement
-> the empty-magazine click test-first when it reaches the queue. Use empty-tight;
-> the user selected it and will tune it in game. Preserve one click per continuous
-> hold, agree the event/manifest contract, keep approved pack audio unchanged and
-> verify cancellation, bounded playback and real shot masking. Leave uncommitted.

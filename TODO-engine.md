@@ -4,7 +4,7 @@ Model: **Claude**. Follow the startup protocol in [TODO.md](TODO.md); read only 
 
 ## Resume here
 
-Checkout: worktree `/Users/neilarmstrong/Development/Personal/gunsmith/.claude/worktrees/engine`, branch `worktree-engine`, last merged committed main `6f6b028` (main had not moved at the end of the 2026-11-17 session). Sync main into the clean worktree before new work and delivery; main is for integration/validation only. See [Operations](docs/agent-reference/Operations.md#development-worktrees-and-the-integration-checkout). Dev ports: 3400 (dev) and 3401 (preview) were mine; stop only your own.
+Checkout: worktree `.claude/worktrees/engine`, branch `worktree-engine`, last merged committed main `6f6b028` (main had not moved at the end of the 2026-11-17 session). Sync main into the clean worktree before new work and delivery; main is for integration/validation only. See [Operations](docs/agent-reference/Operations.md#development-worktrees-and-the-integration-checkout). Dev ports: 3400 (dev) and 3401 (preview) were mine; stop only your own.
 
 Bot pickup-seeking is built, uncommitted for the user's review (HANDOFF delivery, 2026-11-17): the `seek` state, `WinningTheRace`, `?scenario=pickup-race` and spec `TheOpponentFetchingTheWeapon`. `seekLead` (2) and `seekGrace` (1) in `opponent/Difficulty.ts` are guesses: try a real duel (`?scenario=duel&seed=...`) and walk away from the weapon: the bot then breaks off to take it, since it starts equally far from both. Cross-level engagement/cover is merged (`4d058dc`): extend it, do not restart. Server session adds `stepFighters` and `visibleToSeat` in its worktree (asked and agreed 2026-11-17); merge main once the user has integrated them.
 
@@ -43,6 +43,4 @@ play needs damage/hit events and inventory data. AI owns inferred preferences; e
 
 ## Verification/latest delivery
 
-2026-11-17 migration: tasks redistributed from the former build/ai/art checklists; no gameplay change. Latest merged validation in HANDOFF.md: root checks, eight property tests and 199 preview acceptance tests passed; fake evals reported 126 passing and eight failing canned-response criteria. This is inherited evidence, not a new run.
-
-At session end, record actual checks, mutation/red evidence where applicable, standards and folder/caller review; update this resume, your TODO.md status row and a concise HANDOFF.md delivery. [Pre-migration snapshot](docs/history/2026-11-17-persona-migration.md).
+Record actual checks, red/mutation evidence and the standards/folder review for the current delivery. Update this resume, the shared status row and a concise handoff at session end.

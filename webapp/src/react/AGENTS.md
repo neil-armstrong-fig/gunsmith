@@ -1,8 +1,7 @@
 # AGENTS.md: react
 
 Components. The folder layout (`components/dom|three/<name>/`, hooks, helpers, types) is in `webapp/AGENTS.md`; this file
-holds the two things the root `AGENTS.md` points here for, and the JSX conventions. Modelled on janggi's
-`webapp/src/react/AGENTS.md`. They hold for DOM components and react-three-fiber elements alike.
+holds the two things the root `AGENTS.md` points here for, and the JSX conventions. They hold for DOM components and react-three-fiber elements alike.
 
 - **Every component gets its own file, in its own folder**, however small it is or how few callers it has. This is the one
   place the root rule about declaring functions below their callers does not apply: that rule is for plain functions.

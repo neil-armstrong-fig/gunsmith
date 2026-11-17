@@ -1,7 +1,7 @@
 # Privacy and data
 
 What is stored, what leaves for third parties, and what deletion covers. The repo is private for now; this is written as if it
-will be public. Janggi is the model: store only what is needed.
+will be public. Store only what is needed.
 
 Status: design, including the user-approved 2026-11-15
 [fair-play and recording direction](art/fair-play-research.md). The online
@@ -17,7 +17,7 @@ storage and controls described here are not implemented by the research delivery
 - **The internal account id is random and opaque.** It, never the Google `sub` and never a display name, is the only user
   identifier sent to LangSmith or the AI Gateway (`metadata.user_id`). The user was right that an opaque id is not an email;
   the real exposure is the *prompt text*, which can contain anything a player types.
-- **Logs contain closed application events, never request data** (janggi's `logApiEvent`): route, transport, outcome,
+- **Logs contain closed application events, never request data**: route, transport, outcome,
   status, operation, exception class. No URLs, queries, origins, headers, cookies, account ids, room codes, prompts or
   stacks.
 
@@ -70,7 +70,7 @@ traced for quality, the retention, and how to delete.
 
 ## Deletion
 
-`DELETE /api/account` removes the account, sessions, credits, library, ratings and history (janggi's cascade). Traces already
+`DELETE /api/account` removes the account, sessions, credits, library, ratings and history. Traces already
 in LangSmith expire on its retention schedule; the privacy page says so.
 
 Remove account links and ordinary recording/share access with deletion, deleting
