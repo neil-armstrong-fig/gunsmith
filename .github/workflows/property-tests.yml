@@ -1,0 +1,67 @@
+name: Property tests
+
+# Goes red on failure, but CI and future deployment must never depend on it.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+    inputs:
+      runs:
+        description: Cases per property (positive integer)
+        required: false
+        default: "5000"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: property-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  properties:
+    name: Property tests (non-blocking)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26.13.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Run properties and preserve reproduction evidence
+        shell: bash
+        env:
+          REQUESTED_RUNS: ${{ inputs.runs }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          runs=1000
+          if [[ "$EVENT_NAME" == schedule || "$EVENT_NAME" == workflow_dispatch ]]; then
+            runs="${REQUESTED_RUNS:-5000}"
+          fi
+          if [[ ! "$runs" =~ ^[1-9][0-9]*$ ]]; then
+            echo "Cases per property must be a positive integer" >&2
+            exit 1
+          fi
+          export PROPERTY_TEST_RUNS="$runs"
+          pnpm test:properties 2>&1 | tee property-tests.log
+      - name: Explain failures
+        if: failure()
+        run: |
+          echo 'Property tests failed. CI is independent; do not require this check for release.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'See property-tests.log for the fast-check seed, path and counterexample.' >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: property-tests-log
+          path: property-tests.log
+          retention-days: 14
+          if-no-files-found: warn

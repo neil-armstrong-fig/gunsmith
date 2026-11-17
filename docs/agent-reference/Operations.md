@@ -74,16 +74,15 @@ These are janggi's, carried over until each is re-checked against the versions a
 - **Cloudflare has no hard spend cap.** Budget alerts are email only. The kill switch is ours (`docs/cost-and-budget.md`).
 
 
-## CI and deployment (planned)
+## CI and deployment
 
-`ci.yml` runs `checks`, then `acceptance-tests` against a production build (`vite preview`), then
-deploys `main` with Alchemy (`deploy`: the database, its migrations, the Worker with its static assets and the Durable
-Objects, from `infra/`), gated on both, and does nothing until the `CLOUDFLARE_API_TOKEN` secret exists. After the deploy it
-runs the acceptance suite once more against the live address. `property-tests.yml` and `evals.yml` run on push/PR
-and on demand, and go **red on failure but gate nothing** (a fresh seed, or a model, means a failure isn't reproducible
-from the same commit) — except that `evals.yml` is the AI regression gate **for changes under `ai/`**; `ai` decides
-whether that becomes a required check, as `docs/ai-pipeline.md` explains. **If branch protection is ever turned on,
-leave the property tests out of required checks.**
+Implemented CI (`.github/workflows/ci.yml`) runs on main pushes, pull requests and manual dispatch: `pnpm checks`, then production-preview acceptance. Ubuntu runners use Node 26.13.0, the root's pinned pnpm, frozen installation, FFmpeg and `glslang-tools`; acceptance installs Chromium with system dependencies. Reports and failure artifacts are retained for seven days, including retry evidence. Both workflows have read-only contents permissions and need no repository secrets.
+
+`pnpm acceptance-tests:preview` compiles first, then opts into Playwright-managed Vite preview via `PREVIEW_ACCEPTANCE=1`. It waits for readiness, refuses server reuse, and stops its process group on completion or failure. Default: `http://127.0.0.1:3107`; choose another worktree port with `PREVIEW_PORT=3108 pnpm acceptance-tests:preview`. `PREVIEW_PORT` must be an integer from 1 to 65535. Preview mode sets its own local URL; ordinary `pnpm acceptance-tests` continues to use `WEBAPP_URL` (default `http://localhost:3000`) without starting a server. Extra Playwright arguments pass through the preview command.
+
+The separate `property-tests.yml` runs on main pushes/PRs, daily at 03:17 UTC and manually. It uses 1,000 cases per property for commit runs and 5,000 for scheduled/manual runs, with a positive-integer manual override. Failures remain red and logs preserve fast-check seeds, paths and counterexamples for fourteen days. **Never add property tests to required release checks or make CI/deployment depend on them.** Existing browser retries and two CI workers are preserved; the known `ShootingAcrossLevels` flake remains engine/play follow-up, not an excluded criterion.
+
+Deployment and live acceptance remain planned until server/budget bindings and explicit provisioning authorization exist. The future main deployment uses Alchemy for the database, migrations, Worker/assets and Durable Objects, gated on checks and preview acceptance, followed by acceptance against live. AI owns any future eval workflow and its gating semantics; this CI slice adds no model calls.
 
 One Worker serves both the site (static assets) and `/api/*` (`run_worker_first: ["/api/*"]`) at
 `gunsmith.neilarmstrong.dev`, DNS at Cloudflare, so the session cookie is same-origin. Environments: local and `prod`
