@@ -13,7 +13,7 @@ Ownership follows the assigned persona. Models below are defaults; no applicatio
 | ai | Claude | [TODO-ai.md](TODO-ai.md) | Fix eight reported canned-response fake-eval failures; renderer, calibration and arena generation. |
 | server | Claude | [TODO-server.md](TODO-server.md) | First authoritative two-browser slice after M1; auth, persistence and online privacy. |
 | budget | Claude | [TODO-budget.md](TODO-budget.md) | Production ledger/spend boundaries with server/AI; credits, refunds, tracing and kill switch. |
-| art | Codex | [TODO-art.md](TODO-art.md) | Safari audio accepted as good enough by the user; combat masking/fatigue and levels await runtime shot synthesis. |
+| art | Codex | [TODO-art.md](TODO-art.md) | Crunch MP3/cue mapping reviewed for play’s pending slice; Safari accepted. Combat masking/fatigue and levels await runtime shot synthesis. |
 | ship | Codex | [TODO-ship.md](TODO-ship.md) | Repository tooling/CI now; infra/release when bindings and authorization exist. |
 
 ### Start prompts
@@ -44,7 +44,7 @@ Main is an integration checkout. All seven personas develop in their own worktre
 
 ## Active reservations and requests
 
-No runtime file reservations are open. The three source worktrees (`ai-hosting-proof`, `build-2-art`, `build-3-reticle`) were merged into main on 2026-11-17 (see the delivery log) and are to be regenerated, so their engagement/cover, projectile and AI work is no longer unfinished source-worktree work. Record the persona, slice, concrete files, dependencies and handoff when reserving new work.
+Art crunch review delivered (2026-11-17); no art runtime reservation. Play’s uncommitted sound/manifest/runtime slice and AI’s generated-pickup renderer are reserved in their own worktrees; do not duplicate or edit them. Their work is not yet integrated into art/main. The three source worktrees (`ai-hosting-proof`, `build-2-art`, `build-3-reticle`) were merged into main on 2026-11-17 (see the delivery log) and are to be regenerated, so their engagement/cover, projectile and AI work is no longer unfinished source-worktree work. Record the persona, slice, concrete files, dependencies and handoff when reserving new work.
 
 ## Contracts between sessions
 
@@ -52,7 +52,7 @@ No runtime file reservations are open. The three source worktrees (`ai-hosting-p
 | --- | --- |
 | Canvas state hook | play writes the read-only browser hook, with engine owning simulation meanings and all affected consumers reviewing shared snapshot changes. Existing seeded pickup/inventory data is consumed; no write seams |
 | Combat events | engine owns World.events for a local simulation step; currently empty-fire refusal. play consumes each tick; frozen steps clear events. Damage/hit additions remain open; this is not the network sound contract |
-| Asset/sound manifest | art owns keys/loading; play agrees integration needs. MP3 sfx-empty-click is integrated; sfx-damage-crunch and sfx-hit remain agreed but unregistered. Safari audio accepted by user decision (2026-11-17) |
+| Asset/sound manifest | art owns keys/loading; play agrees integration needs. MP3 sfx-empty-click is integrated in main/art; play’s pending slice wires sfx-damage-crunch (art’s native export review passes). One crunch per ring-damage exposure is acceptable for M1; sfx-hit remains agreed but unregistered. Safari audio accepted by user decision (2026-11-17) |
 | AI hosting and adapter | API imports AI in-process, Workers-safe. ai owns generation outcomes; server owns API wiring; budget owns production spend/tracing guards |
 | Stats/appearance | Merged separate stages, five calls maximum, one repair per stage, disclosed appearance fallback. ai owns remaining renderer consumer; schema moves require a real second consumer |
 | Initial engine balancing | Merged rating/balancer and eight property tests are implementation evidence. engine and ai still owe calibration/probes; labels and AI-chosen omitted-stat policy are approved |
@@ -81,6 +81,8 @@ Before changing a consumed contract, record the proposal and affected owners her
 - [ ] Production art/audio and live release: art/play integrate their domains; ship validates release.
 
 ## Delivery log
+
+- 2026-11-17, art (`worktree-art`, base `5c7be84`, main `6f6b028`): [crunch MP3/cue review](docs/art/concepts/combat-feedback/Handover.md#crunch-mp3-review--2026-11-17). Play’s pending export matches canonical FFmpeg 9.0.2 encoding byte for byte; mono 48 kHz, 8,640 decoded frames, unclipped PCM. Silent/clipped/padded controls rejected. Keep current levels pending listening; one crunch per ring exposure is acceptable for M1. Runtime/renderer remain with play/AI in their worktrees. `pnpm checks` exits 0 (lint/format/types, 2,170 tests, one slow audio render skipped). Standalone handover Prettier warning also occurs on its committed baseline; only the new section was formatted. Root/webapp/audio standards and folder/reference review complete; no new tracked files/helpers/types/folders, audio/runtime change, paid call, commit or push. No new browser/listening evidence.
 
 - 2026-11-17, art (`worktree-art`, main `6f6b028`): user accepted Safari audio as good enough; closed native listening follow-up in the art/shared status, webapp guidance and [audio handoff](webapp/audio/qa/runtime-playback/README.md#safari-acceptance-and-remaining-listening-work). Earlier measurements preserved; no new device-test claim. Combat masking/fatigue and levels await AI/play runtime shot synthesis. `pnpm checks` exits 0 (lint/format/types; 2,170 unit tests, one slow audio render skipped); local links/acceptance anchor, approved WAV/runtime MP3 hashes and diff whitespace pass. Re-read root/webapp/audio instructions; standards and folder/reference audit complete, no new files/folders/helpers/types. Documentation only; no audio/runtime change, paid call, commit or push.
 

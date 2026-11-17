@@ -6,7 +6,7 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 Checkout: `.claude/worktrees/art`, branch `worktree-art`; created from committed main `6f6b028` on 2026-11-17. Main has not advanced at startup. Sync committed main into the clean worktree before new work and delivery; preserve this worktree. See [Operations](docs/agent-reference/Operations.md#development-worktrees-and-the-integration-checkout).
 
-Current slice: Safari audio accepted as good enough by the user on 2026-11-17; native listening follow-up closed by that decision. The [audio handoff](webapp/audio/qa/runtime-playback/README.md#safari-acceptance-and-remaining-listening-work) preserves the earlier Chromium/WebKit measurements. Approved orange shot, inventory, MP3 and label/policy research are delivered.
+Current slice: reviewed play’s uncommitted crunch MP3 against the approved master; canonical encoding and native duration/PCM checks pass. [Cue mapping and findings](docs/art/concepts/combat-feedback/Handover.md#crunch-mp3-review--2026-11-17) preserve current levels and accept one crunch per ring-damage exposure for M1. Play’s runtime work is not yet integrated; leave its reserved files alone.
 
 Current milestone: M1/M6; the project remains on M1. Next audio task: combat masking, fatigue and levels once AI/play integrate runtime weapon-shot synthesis (not yet wired into the game sound output). Safari acceptance does not claim new headphone/speaker measurements. Preserve approved master hashes. Next failing check for any playback change: the relevant browser sound acceptance criterion before implementation.
 
@@ -26,7 +26,7 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [x] Measure the shipped empty click’s onset/content and event cadence in Chromium/WebKit at default, 44.1 and 48 kHz: 13 starts per 13 holds in all six runs, including repeats shorter than the buffer. WebKit’s main transient is about 12 ms later; no global correction or threshold change. See the audio handoff.
 - [x] Accept native Safari audio as good enough by user decision on 2026-11-17; close the onset, first-gesture wake-up and fast-repeat listening follow-up without additional device testing. This records acceptance, not new headphone/speaker measurements.
 - [ ] Check fatigue, masking and levels on headphones/speakers once AI/play wire the real weapon-shot synth into runtime audio. The current game output only has the static empty click; general audition approval is not proof of these tests.
-- [ ] Map future static cues to approved MP3 as play integrates them; support playback/ducking/volume integration. Weapon-shot synthesis belongs to AI; art supplies static cues.
+- [ ] Map future static cues to approved MP3 as play integrates them; support playback/ducking/volume integration. Weapon-shot synthesis belongs to AI; art supplies static cues. Crunch export and current ring-onset mapping reviewed on 2026-11-17; future outgoing-hit/static cues remain open.
 - [ ] Review the visual-schema proposal with AI and engine; validate supported oddities in top-down compositions at 64/32 px using the agreed grammar.
 
 ## Later tasks
@@ -43,6 +43,8 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [ ] Case-study diagrams: pipeline, cost safeguards and eval loop.
 
 ## Verification/latest delivery
+
+- [x] Crunch MP3/cue mapping review (2026-11-17): play’s pending export matches canonical encoding; native duration/probe/PCM pass, three negative controls rejected. No audio/runtime changes. `pnpm checks` exits 0 (2,170 tests, one slow audio render skipped); standalone handover formatting warning predates this slice, new section formatted. Root/webapp/audio standards and folder/reference audit complete; no new files/helpers/types/folders. Next audio QA still needs runtime shot synthesis; renderer review waits for AI’s drawing.
 
 - [x] Safari audio accepted as good enough by user decision (2026-11-17); closed native listening follow-up and updated active status/guidance. No new listening or device measurements. `pnpm checks` exits 0: lint/format/types and 2,170 unit tests pass, one slow audio render skipped. All 56 local documentation links, the new acceptance anchor, diff whitespace and approved master/runtime MP3 hashes pass. Re-read root/webapp/audio instructions; standards and folder/reference audit complete, with no new files, folders, helpers or types. Next audio QA awaits AI/play runtime weapon-shot synthesis.
 
