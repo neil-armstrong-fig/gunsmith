@@ -19,6 +19,7 @@ const EMPTY_CLICK: TickCues = {
   events: [{kind: "fireRefused", reason: "empty"}],
   firing: true,
   round: "playing",
+  seconds: 1 / 60,
 };
 
 it("plays the empty click for a refused trigger", () => {
@@ -57,4 +58,38 @@ it("stops what is playing when told to cancel, and wants a fresh press after", (
 
   expect(output.stops).toBe(1);
   expect(output.played).toEqual([]);
+});
+
+it("plays the crunch for a bullet that hurt the player", () => {
+  const output = new RecordingOutput();
+
+  new CombatSounds(output).afterTick({
+    ...EMPTY_CLICK,
+    events: [{kind: "damageTaken", cause: "bullet", amount: 20}],
+    firing: false,
+  });
+
+  expect(output.played).toEqual(["sfx-damage-crunch"]);
+});
+
+it("plays no crunch for the ring, which has a sound of its own to come", () => {
+  const output = new RecordingOutput();
+  const sounds = new CombatSounds(output);
+  const ring: TickCues = {...EMPTY_CLICK, events: [{kind: "damageTaken", cause: "ring", amount: 0.2}], firing: false};
+
+  sounds.afterTick(ring);
+  sounds.afterTick(ring);
+
+  expect(output.played).toEqual([]);
+});
+
+it("plays the click and the crunch when a step has both", () => {
+  const output = new RecordingOutput();
+
+  new CombatSounds(output).afterTick({
+    ...EMPTY_CLICK,
+    events: [...(EMPTY_CLICK.events ?? []), {kind: "damageTaken", cause: "bullet", amount: 20}],
+  });
+
+  expect(output.played).toEqual(["sfx-empty-click", "sfx-damage-crunch"]);
 });

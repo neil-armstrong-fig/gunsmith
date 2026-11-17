@@ -196,6 +196,18 @@ export class GunsmithDsl {
     }
   }
 
+  /**
+   * Opens the pickup race: the duel's arena with the player standing still and the opponent six tiles east, and a weapon lying
+   * four tiles from the opponent and eight from the player. One round, no score, no ring; the opponent's choices are drawn from `seed`.
+   */
+  async startPickupRace(seed: number): Promise<void> {
+    try {
+      await this.gunsmith.openPickupRace(seed);
+    } catch (error) {
+      throw new DslError(`Failed to open the pickup race with seed ${seed}`, error);
+    }
+  }
+
   /** Opens the heights arena: low ground beside a raised platform, with one stair up, a dummy on each level and no opponent. */
   async startHeights(): Promise<void> {
     try {

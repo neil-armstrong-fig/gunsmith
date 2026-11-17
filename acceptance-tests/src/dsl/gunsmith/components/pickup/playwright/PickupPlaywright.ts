@@ -25,4 +25,9 @@ export class PickupPlaywright extends BasePage {
 
     return await lookOfPickup(this.page, {x: pickup.x, y: pickup.y});
   }
+
+  /** Waits until no weapon lies in the arena, for as long as the expect timeout or `timeoutSeconds` allows. A game that never had one counts as taken, so read `get` first. */
+  async waitUntilTaken(timeoutSeconds?: number): Promise<void> {
+    await this.waitForGameState(({pickup}) => pickup === undefined, timeoutSeconds);
+  }
 }

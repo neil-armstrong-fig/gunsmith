@@ -1,4 +1,5 @@
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
+import type {Pickup} from "@gunsmith/engine/pickup/types/Pickup";
 import type {Player} from "@gunsmith/engine/player/types/Player";
 import type {Ring} from "@gunsmith/engine/ring/types/Ring";
 
@@ -13,4 +14,6 @@ export interface OpponentContext {
   seconds: number;
   /** The round's closing ring; absent when the round has none. */
   ring?: Ring | undefined;
+  /** The weapon lying in the arena for the taking; absent when none lies there. */
+  pickup?: Pickup | undefined;
 }

@@ -22,4 +22,6 @@ export const DIFFICULTY: Difficulty = {
   coverSamples: 12,
   coverReach: 8,
   ringMargin: 2,
+  seekLead: 2,
+  seekGrace: 1,
 };

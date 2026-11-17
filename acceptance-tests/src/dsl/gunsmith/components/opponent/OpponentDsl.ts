@@ -40,7 +40,7 @@ export class OpponentDsl {
     }
   }
 
-  /** Waits until the opponent is doing `behaviour` (`wander`, `engage`, `reload` or `search`), for as long as `timeoutSeconds` when that is longer than the default. */
+  /** Waits until the opponent is doing `behaviour` (`wander`, `engage`, `reload`, `search` or `seek`), for as long as `timeoutSeconds` when that is longer than the default. */
   async waitForBehaviour(behaviour: string, timeoutSeconds?: number): Promise<void> {
     try {
       await this.opponent.waitForBehaviour(behaviour, timeoutSeconds);

@@ -4,7 +4,7 @@ Model: **Claude**. Follow the startup protocol in [TODO.md](TODO.md); read only 
 
 ## Resume here
 
-Checkout: worktree `.claude/worktrees/ai` (branch `worktree-ai`, created 2026-11-17 from main `6f6b028`; last merged main `6f6b028`). Sync main into the clean worktree before new work and delivery; main is for integration/validation only. See [Operations](docs/agent-reference/Operations.md#development-worktrees-and-the-integration-checkout).
+Checkout: worktree `.claude/worktrees/ai` (branch `worktree-ai`, created 2026-11-17 from main `6f6b028`; last merged main `2d7c568`, 2026-11-17). Sync main into the clean worktree before new work and delivery; main is for integration/validation only. See [Operations](docs/agent-reference/Operations.md#development-worktrees-and-the-integration-checkout).
 
 The eight fake-eval canned-response failures are resolved (2026-11-17, committed by the user as `b99745a`). Five-call integration, LangGraph, initial balancing, the `weaponSmith` registration and per-stat clamping (`9830023`) are merged; do not rebuild them. The ai-hosting-proof worktree's checkpoint is in [worktree checkpoints](docs/history/2026-11-17-worktree-checkpoints.md).
 

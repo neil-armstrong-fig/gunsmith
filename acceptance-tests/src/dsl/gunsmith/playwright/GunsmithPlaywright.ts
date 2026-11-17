@@ -102,6 +102,11 @@ export class GunsmithPlaywright extends BasePage {
     await this.openScenario(`overlook&seed=${seed}`);
   }
 
+  /** Opens the pickup race (the duel's arena and fighters, one round, no ring, a weapon lying much nearer the opponent than the player), its choices drawn from `seed`. */
+  async openPickupRace(seed: number): Promise<void> {
+    await this.openScenario(`pickup-race&seed=${seed}`);
+  }
+
   async openHeights(): Promise<void> {
     await this.openScenario("heights");
   }
