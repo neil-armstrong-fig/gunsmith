@@ -3,20 +3,6 @@ import type {Bullet} from "@gunsmith/engine/bullet/types/Bullet";
 import type {Contact} from "@gunsmith/engine/bullet/types/Contact";
 import type {Meeting} from "@gunsmith/engine/bullet/types/Meeting";
 
-function meeting(contact: Contact, changes: Partial<Bullet> = {}): Meeting {
-  const bullet: Bullet = {
-    position: {x: 0, y: 0},
-    direction: {x: 1, y: 0},
-    damage: 25,
-    speed: 20,
-    shooter: "player",
-    level: 0,
-    ...changes,
-  };
-
-  return {bullet, contact, dummyIndex: undefined};
-}
-
 it("is zero when there are no meetings", () => {
   expect(damageDealtBy([], "player")).toBe(0);
 });
@@ -39,3 +25,17 @@ it("leaves out bullets that met a dummy, a wall or nothing", () => {
 
   expect(damageDealtBy(meetings, "player")).toBe(0);
 });
+
+function meeting(contact: Contact, changes: Partial<Bullet> = {}): Meeting {
+  const bullet: Bullet = {
+    position: {x: 0, y: 0},
+    direction: {x: 1, y: 0},
+    damage: 25,
+    speed: 20,
+    shooter: "player",
+    level: 0,
+    ...changes,
+  };
+
+  return {bullet, contact, dummyIndex: undefined};
+}

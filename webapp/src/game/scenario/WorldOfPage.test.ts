@@ -12,18 +12,6 @@ import {DUEL_ARENA} from "@src/game/duel/DuelArena";
 import {DUEL_OPPONENT} from "@src/game/duel/DuelOpponent";
 import {worldOfPage} from "@src/game/scenario/WorldOfPage";
 
-function duelRing(seed: number, timing: RingTiming = DEFAULT_RING_TIMING): Ring {
-  const {player} = startingWorld(DUEL_ARENA, [], DUEL_OPPONENT);
-
-  return startRing({arena: DUEL_ARENA, starts: [player.position, DUEL_OPPONENT], seed, timing});
-}
-
-function duelPickup(seed: number): Pickup {
-  const {player} = startingWorld(DUEL_ARENA, [], DUEL_OPPONENT);
-
-  return startPickup({arena: DUEL_ARENA, starts: [player.position, DUEL_OPPONENT], seed, weapon: SUBMACHINE_GUN});
-}
-
 afterEach(() => {
   vi.unstubAllGlobals();
 });
@@ -69,3 +57,15 @@ it("makes the practice range when the page asks for nothing", () => {
 
   expect(worldOfPage().opponent).toBeUndefined();
 });
+
+function duelRing(seed: number, timing: RingTiming = DEFAULT_RING_TIMING): Ring {
+  const {player} = startingWorld(DUEL_ARENA, [], DUEL_OPPONENT);
+
+  return startRing({arena: DUEL_ARENA, starts: [player.position, DUEL_OPPONENT], seed, timing});
+}
+
+function duelPickup(seed: number): Pickup {
+  const {player} = startingWorld(DUEL_ARENA, [], DUEL_OPPONENT);
+
+  return startPickup({arena: DUEL_ARENA, starts: [player.position, DUEL_OPPONENT], seed, weapon: SUBMACHINE_GUN});
+}

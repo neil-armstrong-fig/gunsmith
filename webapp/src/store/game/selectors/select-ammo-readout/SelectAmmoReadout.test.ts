@@ -8,11 +8,6 @@ import type {GameStore} from "@src/store/game/types/GameStore";
 
 const world = startingWorld(arenaFrom(["###", "#.#", "###"]));
 
-/** The store as the selector sees it, holding `held`. */
-function storeHolding(held: World): GameStore {
-  return {world: held, setWorld: () => undefined};
-}
-
 it("reads the rifle's ammunition at the start of a match", () => {
   expect(selectAmmoReadout(storeHolding(world))).toEqual({
     slot: 1,
@@ -69,3 +64,8 @@ it("says the weapon is reloading while a reload has time left", () => {
 it("says the weapon is not reloading when no reload is under way", () => {
   expect(selectAmmoReadout(storeHolding(world)).reloading).toBe(false);
 });
+
+/** The store as the selector sees it, holding `held`. */
+function storeHolding(held: World): GameStore {
+  return {world: held, setWorld: () => undefined};
+}

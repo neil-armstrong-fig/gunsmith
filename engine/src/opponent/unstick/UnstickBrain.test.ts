@@ -4,18 +4,6 @@ import {unstickBrain} from "@gunsmith/engine/opponent/unstick/UnstickBrain";
 import type {OpponentBrain} from "@gunsmith/engine/opponent/types/OpponentBrain";
 import type {OpponentState} from "@gunsmith/engine/opponent/types/OpponentState";
 
-function brainIn(state: OpponentState): OpponentBrain {
-  return {
-    ...startingBrain({seed: 1, position: {x: 0, y: 0}}),
-    state,
-    goal: {x: 5, y: 5},
-    lastSeen: {x: 5, y: 5},
-    strafeSide: 1,
-    strafeRemainingSeconds: 1.7,
-    secondsInState: 3,
-  };
-}
-
 it("drops the goal of a wandering opponent, so it chooses another", () => {
   const brain = unstickBrain(brainIn("wander"));
 
@@ -48,3 +36,15 @@ it("turns an engaging opponent round to circle the other way, for the shortest t
 it("turns the other side round too", () => {
   expect(unstickBrain({...brainIn("engage"), strafeSide: -1}).strafeSide).toBe(1);
 });
+
+function brainIn(state: OpponentState): OpponentBrain {
+  return {
+    ...startingBrain({seed: 1, position: {x: 0, y: 0}}),
+    state,
+    goal: {x: 5, y: 5},
+    lastSeen: {x: 5, y: 5},
+    strafeSide: 1,
+    strafeRemainingSeconds: 1.7,
+    secondsInState: 3,
+  };
+}

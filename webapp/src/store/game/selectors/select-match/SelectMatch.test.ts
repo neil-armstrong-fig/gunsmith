@@ -7,10 +7,6 @@ import type {GameStore} from "@src/store/game/types/GameStore";
 
 const world = startingWorld(arenaFrom(["###", "#.#", "###"]));
 
-function storeHolding(held: World): GameStore {
-  return {world: held, setWorld: () => undefined};
-}
-
 it("reads nothing when the game is not a match", () => {
   expect(selectMatch(storeHolding(world))).toBeUndefined();
 });
@@ -27,3 +23,7 @@ it("reads the very same match on every frame in which the score has not changed"
 
   expect(selectMatch(next)).toBe(selectMatch(first));
 });
+
+function storeHolding(held: World): GameStore {
+  return {world: held, setWorld: () => undefined};
+}

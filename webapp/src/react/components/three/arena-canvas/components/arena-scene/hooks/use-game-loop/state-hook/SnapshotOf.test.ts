@@ -1,5 +1,6 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
+import type {World} from "@gunsmith/engine/game-loop/types/World";
 import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
 import {SUBMACHINE_GUN} from "@gunsmith/engine/weapon/weapons/SubmachineGun";
 import {MARKSMAN_RIFLE} from "@gunsmith/engine/weapon/weapons/MarksmanRifle";
@@ -259,6 +260,14 @@ it("reports the player on a stair as half way between the two levels it joins", 
   const onTheStair = {...hills, player: {...hills.player, position: {x: 2.5, y: 1.5}}};
 
   expect(snapshotOf(onTheStair).player.level).toBe(0.5);
+});
+
+it("reports the opponent's level as it does the player's: the low ground 0, a stair half way, a platform its own", () => {
+  const opponentAt = (x: number): World => startingWorld(hills.arena, [], {x, y: 1.5});
+
+  expect(snapshotOf(opponentAt(1.5)).opponent?.level).toBe(0);
+  expect(snapshotOf(opponentAt(2.5)).opponent?.level).toBe(0.5);
+  expect(snapshotOf(opponentAt(4.5)).opponent?.level).toBe(1);
 });
 
 it("reports no pickup when none lies in the arena", () => {

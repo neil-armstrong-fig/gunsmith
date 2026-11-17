@@ -13,23 +13,6 @@ const WEAPON: Weapon = {
   visionRange: 12,
 };
 
-/** A player carrying two weapons with different rounds left, holding slot `equippedSlot`. */
-function playerHolding(equippedSlot: number, reloadRemainingSeconds?: number): Player {
-  return {
-    position: {x: 1.5, y: 1.5},
-    aim: {x: 1, y: 0},
-    cooldownSeconds: 0,
-    loadout: [
-      {weapon: WEAPON, rounds: 3, reserve: 30},
-      {weapon: WEAPON, rounds: 7, reserve: 12},
-    ],
-    equippedIndex: equippedSlot - 1,
-    crouching: false,
-    health: 100,
-    reloadRemainingSeconds,
-  };
-}
-
 it("equips the second weapon when slot 2 is asked for", () => {
   expect(switchWeapon(playerHolding(1), 2).equippedIndex).toBe(1);
 });
@@ -77,3 +60,20 @@ it("does not change the player it was given", () => {
 
   expect(player).toEqual(before);
 });
+
+/** A player carrying two weapons with different rounds left, holding slot `equippedSlot`. */
+function playerHolding(equippedSlot: number, reloadRemainingSeconds?: number): Player {
+  return {
+    position: {x: 1.5, y: 1.5},
+    aim: {x: 1, y: 0},
+    cooldownSeconds: 0,
+    loadout: [
+      {weapon: WEAPON, rounds: 3, reserve: 30},
+      {weapon: WEAPON, rounds: 7, reserve: 12},
+    ],
+    equippedIndex: equippedSlot - 1,
+    crouching: false,
+    health: 100,
+    reloadRemainingSeconds,
+  };
+}

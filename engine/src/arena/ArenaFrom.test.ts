@@ -106,3 +106,12 @@ it("refuses a stair whose landing is another stair", () => {
 it("refuses a stair at the edge of the drawing, with no landing beyond it", () => {
   expect(() => arenaFrom([".>"])).toThrow("plain floor");
 });
+
+it("refuses raised floor beside a stair's middle, which would let a walker skip its landing", () => {
+  expect(() => arenaFrom(["#####", "#.1.#", "#.>1#", "#...#", "#####"])).toThrow("beside");
+});
+
+it("accepts a stair between walls, and a stair beside low ground", () => {
+  expect(() => arenaFrom(["#####", "#.>1#", "#####"])).not.toThrow();
+  expect(() => arenaFrom(["#####", "#...#", "#.>1#", "#...#", "#####"])).not.toThrow();
+});

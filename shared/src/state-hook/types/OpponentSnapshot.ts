@@ -6,6 +6,8 @@ export interface OpponentSnapshot {
   x: number;
   y: number;
   health: number;
+  /** Which level of the arena it stands on, as `PlayerSnapshot.level` says: 0 is the low ground, and on a stair it is half way between two. */
+  level: number;
   /** The rounds in the magazine of the weapon in its hands. */
   rounds: number;
   /** Whether the player sees it: inside the player's cone, with no wall or higher ground in the way. The game does not draw it when not. */

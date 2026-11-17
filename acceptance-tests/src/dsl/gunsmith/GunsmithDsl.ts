@@ -160,6 +160,19 @@ export class GunsmithDsl {
     }
   }
 
+  /**
+   * Opens a duel on the terraced arena, across two levels (low ground in the west where the opponent starts, a platform one level up
+   * in the east where the player starts, one stair between them), with a ring of its own as in `startClosingDuel`. One round, no
+   * score: the arena, not the match, is what this one is for.
+   */
+  async startTerracedDuel(request: ClosingRingRequest): Promise<void> {
+    try {
+      await this.gunsmith.openTerracedDuel(request);
+    } catch (error) {
+      throw new DslError("Failed to open the duel across two levels", error);
+    }
+  }
+
   /** Opens the heights arena: low ground beside a raised platform, with one stair up, a dummy on each level and no opponent. */
   async startHeights(): Promise<void> {
     try {

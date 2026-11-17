@@ -26,20 +26,6 @@ const wallInTheMiddle = arenaFrom([
   "########################",
 ]);
 
-// The player stands at the middle of the arena's centre tile; the opponent four tiles east of that, or where it is told.
-function duel(seed = 1, arena = room, opponentAt = {x: 16.5, y: 3.5}): World {
-  return giveOpponentBrain(startingWorld(arena, [], opponentAt), seed);
-}
-
-function brainOf(world: World): OpponentBrain {
-  const decision = thinkOpponent(world, TICK);
-  if (!decision.brain) {
-    throw new Error("The opponent has no brain.");
-  }
-
-  return decision.brain;
-}
-
 it("asks for nothing, and has no brain, when the world has no opponent", () => {
   const decision = thinkOpponent(startingWorld(room), TICK);
 
@@ -244,3 +230,17 @@ it("plays a searching brain by the search state: it waits at the place it reache
   expect(decision.brain?.state).toBe("search");
   expect(decision.brain?.idleSeconds).toBeCloseTo(TICK, 9);
 });
+
+// The player stands at the middle of the arena's centre tile; the opponent four tiles east of that, or where it is told.
+function duel(seed = 1, arena = room, opponentAt = {x: 16.5, y: 3.5}): World {
+  return giveOpponentBrain(startingWorld(arena, [], opponentAt), seed);
+}
+
+function brainOf(world: World): OpponentBrain {
+  const decision = thinkOpponent(world, TICK);
+  if (!decision.brain) {
+    throw new Error("The opponent has no brain.");
+  }
+
+  return decision.brain;
+}

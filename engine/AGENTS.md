@@ -44,3 +44,5 @@ files a folder is a smell: split it by subject.
 - **A step never changes the world it is given**; it returns a new one.
 - **Tunables are constants in their own file** (`PlayerSpeed.ts`) until there are enough to want a table.
 - Property tests (`fast-check`) are deliberately not here yet.
+
+Stair arenas use deterministic `route/` walking paths for wandering, searching and ring shelter. Flat arenas retain existing steering. Arena parsing rejects raised stair flanks that bypass landings. Cross-level engagement and cover remain pending.

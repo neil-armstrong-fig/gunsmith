@@ -28,35 +28,6 @@ const ring: Ring = {
   timing: {startDelaySeconds: 10, closingSeconds: 20},
 };
 
-function actWith(overrides: Partial<Input> = {}): StateAct {
-  const brain = giveOpponentBrain(startingWorld(room, [], {x: 20, y: 3}), 1).opponentBrain;
-  if (!brain) {
-    throw new Error("The opponent has no brain.");
-  }
-
-  return {
-    input: {direction: {x: -0.7, y: 0.1}, aimAt: {x: 5, y: 5}, firing: true, reload: false, ...overrides},
-    brain,
-  };
-}
-
-function contextAt(position: Point, overrides: Partial<OpponentContext> = {}): OpponentContext {
-  const world = startingWorld(room, [], position);
-  if (!world.opponent) {
-    throw new Error("The world has no opponent.");
-  }
-
-  return {
-    arena: room,
-    opponent: world.opponent,
-    target: {...world.player, position: PLAYER_AT},
-    sees: false,
-    seconds: 1 / 60,
-    ring,
-    ...overrides,
-  };
-}
-
 it("changes nothing when there is no ring", () => {
   const act = actWith();
 
@@ -161,3 +132,70 @@ it("looks where it walks round the pillar, not at the centre behind it, when it 
   expect(sheltered.input.aimAt).not.toEqual(behind.centre);
   expect(sheltered.input.aimAt?.y).not.toBeCloseTo(4.5, 3);
 });
+
+// The low ground in the west, a platform one level up in the east, and a stair between them at column 16.
+const terraced = arenaFrom([
+  "########################",
+  "#...............>111111#",
+  "#................111111#",
+  "########################",
+]);
+
+it("climbs toward the stair, not straight at the drop, when the ring's centre is on a platform", () => {
+  const onThePlatform = {...ring, centre: {x: 22.5, y: 1.5}};
+  const atTheFoot = {...contextAt({x: 16.5, y: 1.5}, {ring: onThePlatform}), arena: terraced};
+  const sheltered = shelterFromRing(actWith(), atTheFoot);
+
+  expect(sheltered.input.direction.x).toBeCloseTo(0, 9);
+  expect(sheltered.input.direction.y).toBeCloseTo(DIFFICULTY.speedShare, 9);
+  expect(sheltered.input.aimAt).toEqual({x: 16.5, y: 2.5});
+});
+
+it("goes round to the stair to come down when the ring's centre is on the low ground", () => {
+  const onTheLow = {...ring, centre: {x: 3.5, y: 1.5}};
+  const onThePlatform = {...contextAt({x: 17.5, y: 1.5}, {ring: onTheLow}), arena: terraced};
+  const sheltered = shelterFromRing(actWith(), onThePlatform);
+
+  expect(sheltered.input.direction.x).toBeCloseTo(0, 9);
+  expect(sheltered.input.direction.y).toBeCloseTo(DIFFICULTY.speedShare, 9);
+});
+
+it("still walks straight at the centre across the platform it is already on", () => {
+  const onThePlatform = {...ring, centre: {x: 22.5, y: 2.5}};
+  const sheltered = shelterFromRing(actWith(), {
+    ...contextAt({x: 17.5, y: 2.5}, {ring: onThePlatform}),
+    arena: terraced,
+  });
+
+  expect(sheltered.input.direction.x).toBeCloseTo(DIFFICULTY.speedShare, 9);
+  expect(sheltered.input.direction.y).toBeCloseTo(0, 9);
+});
+
+function actWith(overrides: Partial<Input> = {}): StateAct {
+  const brain = giveOpponentBrain(startingWorld(room, [], {x: 20, y: 3}), 1).opponentBrain;
+  if (!brain) {
+    throw new Error("The opponent has no brain.");
+  }
+
+  return {
+    input: {direction: {x: -0.7, y: 0.1}, aimAt: {x: 5, y: 5}, firing: true, reload: false, ...overrides},
+    brain,
+  };
+}
+
+function contextAt(position: Point, overrides: Partial<OpponentContext> = {}): OpponentContext {
+  const world = startingWorld(room, [], position);
+  if (!world.opponent) {
+    throw new Error("The world has no opponent.");
+  }
+
+  return {
+    arena: room,
+    opponent: world.opponent,
+    target: {...world.player, position: PLAYER_AT},
+    sees: false,
+    seconds: 1 / 60,
+    ring,
+    ...overrides,
+  };
+}

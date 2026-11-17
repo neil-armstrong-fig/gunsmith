@@ -27,3 +27,7 @@ it("asks for the sparring match when the query says so", () => {
 it("asks for the heights arena when the query says so", () => {
   expect(scenarioFromSearch("?scenario=heights")).toBe("heights");
 });
+
+it("asks for the terraced duel when the query says so", () => {
+  expect(scenarioFromSearch("?scenario=terraced")).toBe("terraced");
+});

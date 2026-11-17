@@ -16,6 +16,8 @@ Committed through `8acad87`: playable best-of-three, seeded opponent, forward vi
 
 Committed art integration now includes player/opponent sprites, crouched player art, dummy styling, sprite fallback/readiness and visual acceptance coverage. Projectile artwork remains unfinished in its source worktree.
 
+Committed stairs work includes deterministic walking routes, flank validation, the terraced duel fixture and browser ring-climbing coverage. Cross-level engagement/cover fixes remain unfinished in the source worktree.
+
 ## Research-informed playtests
 
 - [ ] Tune crouch's movement/vision tradeoff; quieter movement and cover protection remain future mechanics. Check reasons to stand and vulnerability while repositioning.

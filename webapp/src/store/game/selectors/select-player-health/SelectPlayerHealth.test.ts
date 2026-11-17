@@ -7,10 +7,6 @@ import type {GameStore} from "@src/store/game/types/GameStore";
 
 const world = startingWorld(arenaFrom(["###", "#.#", "###"]));
 
-function storeHolding(held: World): GameStore {
-  return {world: held, setWorld: () => undefined};
-}
-
 it("reads full health at the start of a match", () => {
   expect(selectPlayerHealth(storeHolding(world))).toBe(PLAYER_HEALTH);
 });
@@ -28,3 +24,7 @@ it("rounds a part of a point up, so it never reads 0 while the player stands, an
 it("reads 0 only when there is no health at all", () => {
   expect(selectPlayerHealth(storeHolding({...world, player: {...world.player, health: 0}}))).toBe(0);
 });
+
+function storeHolding(held: World): GameStore {
+  return {world: held, setWorld: () => undefined};
+}

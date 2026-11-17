@@ -3,20 +3,6 @@ import type {Bullet} from "@gunsmith/engine/bullet/types/Bullet";
 import type {Contact} from "@gunsmith/engine/bullet/types/Contact";
 import type {Meeting} from "@gunsmith/engine/bullet/types/Meeting";
 
-function meeting(contact: Contact, changes: Partial<Bullet> = {}): Meeting {
-  const bullet: Bullet = {
-    position: {x: 1, y: 2},
-    direction: {x: 1, y: 0},
-    damage: 25,
-    speed: 20,
-    shooter: "player",
-    level: 0,
-    ...changes,
-  };
-
-  return {bullet, contact, dummyIndex: undefined};
-}
-
 it("keeps only the bullets that met nothing", () => {
   const meetings = [meeting("none"), meeting("wall"), meeting("dummy"), meeting("fighter")];
 
@@ -41,3 +27,17 @@ it("keeps the order of the bullets", () => {
 
   expect(bulletsStillFlying(meetings, 0.01).map(bullet => bullet.position.y)).toEqual([1, 3]);
 });
+
+function meeting(contact: Contact, changes: Partial<Bullet> = {}): Meeting {
+  const bullet: Bullet = {
+    position: {x: 1, y: 2},
+    direction: {x: 1, y: 0},
+    damage: 25,
+    speed: 20,
+    shooter: "player",
+    level: 0,
+    ...changes,
+  };
+
+  return {bullet, contact, dummyIndex: undefined};
+}

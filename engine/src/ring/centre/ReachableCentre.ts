@@ -1,7 +1,7 @@
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
 import {nextRandom} from "@gunsmith/engine/random/NextRandom";
 import {RING_SEED_SALT} from "@gunsmith/engine/ring/centre/seed/RingSeedSalt";
-import {tilesReachableFrom} from "@gunsmith/engine/ring/centre/reach/TilesReachableFrom";
+import {tilesReachableFrom} from "@gunsmith/engine/route/TilesReachableFrom";
 import type {RingRequest} from "@gunsmith/engine/ring/types/RingRequest";
 
 /**

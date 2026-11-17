@@ -23,19 +23,6 @@ const room = arenaFrom([
 const TICK = 1 / 60;
 const HERE = {x: 3.5, y: 1.5};
 
-function contextIn(arena: Arena, at: Point): OpponentContext {
-  const world = startingWorld(arena, [], at);
-  if (!world.opponent) {
-    throw new Error("The world has no opponent.");
-  }
-
-  return {arena, opponent: world.opponent, target: world.player, sees: false, seconds: TICK};
-}
-
-function wandering(seed: number, at: Point): OpponentBrain {
-  return startingBrain({seed, position: at});
-}
-
 it("chooses somewhere to go when it has no goal, a place it can see from where it stands and not too near", () => {
   for (let seed = 1; seed <= 30; seed++) {
     const act = actWander(wandering(seed, HERE), contextIn(room, HERE));
@@ -123,3 +110,60 @@ it("gives the same answer for the same brain and context", () => {
     actWander(wandering(8, HERE), contextIn(room, HERE)),
   );
 });
+
+// The low ground in the west, a platform one level up in the east, and a stair between them at column 16.
+const terraced = arenaFrom([
+  "########################",
+  "#...............>111111#",
+  "#................111111#",
+  "########################",
+]);
+
+it("walks to a spot on a platform by way of its stair: toward the stair, not straight at the drop", () => {
+  const atTheFoot = {x: 16.5, y: 1.5};
+  const brain = {...wandering(3, atTheFoot), goal: {x: 20.5, y: 1.5}, secondsInState: 0};
+  const act = actWander(brain, contextIn(terraced, atTheFoot));
+
+  expect(act.input.direction.x).toBeCloseTo(0, 9);
+  expect(act.input.direction.y).toBeCloseTo(DIFFICULTY.speedShare, 9);
+});
+
+it("chooses a spot on a platform it can climb to, from the low ground, though the straight line crosses a drop", () => {
+  const onPlatform = new Set<boolean>();
+  for (let seed = 1; seed <= 60; seed++) {
+    const act = actWander(wandering(seed, {x: 5.5, y: 1.5}), contextIn(terraced, {x: 5.5, y: 1.5}));
+    if (act.brain.goal) {
+      onPlatform.add(act.brain.goal.x >= 17);
+    }
+  }
+
+  expect(onPlatform.has(true)).toBe(true);
+  expect(onPlatform.has(false)).toBe(true);
+});
+
+it("never chooses a spot it cannot walk to, a platform with no stair of its own", () => {
+  const sealed = arenaFrom([
+    "########################",
+    "#...............>111222#",
+    "#................111222#",
+    "########################",
+  ]);
+  for (let seed = 1; seed <= 60; seed++) {
+    const act = actWander(wandering(seed, {x: 5.5, y: 1.5}), contextIn(sealed, {x: 5.5, y: 1.5}));
+
+    expect(act.brain.goal === undefined || act.brain.goal.x < 20).toBe(true);
+  }
+});
+
+function contextIn(arena: Arena, at: Point): OpponentContext {
+  const world = startingWorld(arena, [], at);
+  if (!world.opponent) {
+    throw new Error("The world has no opponent.");
+  }
+
+  return {arena, opponent: world.opponent, target: world.player, sees: false, seconds: TICK};
+}
+
+function wandering(seed: number, at: Point): OpponentBrain {
+  return startingBrain({seed, position: at});
+}

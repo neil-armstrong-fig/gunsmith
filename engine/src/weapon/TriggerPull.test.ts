@@ -4,19 +4,6 @@ import type {TriggerRequest} from "@gunsmith/engine/weapon/types/TriggerRequest"
 const TICK = 1 / 60;
 const INTERVAL = 0.2;
 
-/** A weapon that is ready, loaded and not reloading, with the trigger held; `changes` says what differs. */
-function pull(changes: Partial<TriggerRequest> = {}): ReturnType<typeof pullTrigger> {
-  return pullTrigger({
-    cooldownSeconds: 0,
-    firing: true,
-    seconds: TICK,
-    fireIntervalSeconds: INTERVAL,
-    rounds: 5,
-    reloading: false,
-    ...changes,
-  });
-}
-
 it("fires when the trigger is held and the weapon is ready", () => {
   expect(pull().fires).toBe(true);
 });
@@ -99,3 +86,16 @@ it("does not refuse when the trigger is not held", () => {
 it("does not refuse when it fires", () => {
   expect(pull().refusal).toBeUndefined();
 });
+
+/** A weapon that is ready, loaded and not reloading, with the trigger held; `changes` says what differs. */
+function pull(changes: Partial<TriggerRequest> = {}): ReturnType<typeof pullTrigger> {
+  return pullTrigger({
+    cooldownSeconds: 0,
+    firing: true,
+    seconds: TICK,
+    fireIntervalSeconds: INTERVAL,
+    rounds: 5,
+    reloading: false,
+    ...changes,
+  });
+}

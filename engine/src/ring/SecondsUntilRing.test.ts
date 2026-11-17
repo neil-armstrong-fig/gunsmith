@@ -8,10 +8,6 @@ const ring: Ring = {
   timing: {startDelaySeconds: 45, closingSeconds: 30},
 };
 
-function playedFor(roundSeconds: number): Ring {
-  return {...ring, roundSeconds};
-}
-
 it("is the whole start delay before any of the round is played", () => {
   expect(secondsUntilRing(playedFor(0))).toBe(45);
 });
@@ -33,3 +29,7 @@ it("is the ring's own start delay, so a page can ask for a shorter one", () => {
 
   expect(secondsUntilRing(quick)).toBe(2);
 });
+
+function playedFor(roundSeconds: number): Ring {
+  return {...ring, roundSeconds};
+}

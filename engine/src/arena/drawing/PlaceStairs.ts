@@ -1,10 +1,13 @@
+import {checkStairFlanks} from "@gunsmith/engine/arena/drawing/stairs/CheckStairFlanks";
 import {landingIndex} from "@gunsmith/engine/arena/drawing/stairs/LandingIndex";
 import {uphillStep} from "@gunsmith/engine/arena/drawing/stairs/UphillStep";
+import {whereIsTile} from "@gunsmith/engine/arena/drawing/stairs/WhereIsTile";
 import type {DrawnArena} from "@gunsmith/engine/arena/types/DrawnArena";
 
 /**
  * Checks each stair's landings, then gives the stair the level of the floor behind it. It throws for a stair with no plain floor
- * behind or ahead of it, or whose far landing is not exactly one level higher than its near one. Changes `arena` in place.
+ * behind or ahead of it, whose far landing is not exactly one level higher than its near one, or with raised floor beside it
+ * (`checkStairFlanks`). Changes `arena` in place.
  */
 export function placeStairs(arena: DrawnArena): void {
   for (let index = 0; index < arena.stairs.length; index += 1) {
@@ -18,7 +21,7 @@ export function placeStairs(arena: DrawnArena): void {
     const step = uphillStep(uphill);
     const behind = landingIndex(arena, {x: x - step.x, y: y - step.y});
     const ahead = landingIndex(arena, {x: x + step.x, y: y + step.y});
-    const where = `column ${x + 1}, row ${arena.height - y}`;
+    const where = whereIsTile(arena.height, {x, y});
 
     if (behind === undefined || ahead === undefined) {
       throw new Error(`The stair at ${where} needs plain floor behind it and ahead of it.`);
@@ -31,4 +34,6 @@ export function placeStairs(arena: DrawnArena): void {
 
     arena.levels[index] = lowLevel;
   }
+
+  checkStairFlanks(arena);
 }

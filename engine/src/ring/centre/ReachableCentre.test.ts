@@ -12,10 +12,6 @@ const withStair = arenaFrom(["#########", "#...>111#", "#...#111#", "#########"]
 const noStair = arenaFrom(["#########", "#...1111#", "#...1111#", "#########"]);
 const SEEDS = Array.from({length: 120}, (_, seed) => seed);
 
-function requestIn(arena: Arena, seed: number, starts: readonly Point[] = [{x: 1.5, y: 1.5}]): RingRequest {
-  return {arena, starts, seed, timing: DEFAULT_RING_TIMING};
-}
-
 it("is the middle of a floor tile", () => {
   const centre = reachableCentre(requestIn(room, 3));
 
@@ -87,3 +83,7 @@ it("does not depend on which fighter is listed first", () => {
     );
   }
 });
+
+function requestIn(arena: Arena, seed: number, starts: readonly Point[] = [{x: 1.5, y: 1.5}]): RingRequest {
+  return {arena, starts, seed, timing: DEFAULT_RING_TIMING};
+}

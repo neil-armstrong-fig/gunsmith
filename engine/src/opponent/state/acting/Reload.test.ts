@@ -34,45 +34,6 @@ const TICK = 1 / 60;
 const HERE = {x: 3.5, y: 4.5};
 const PLAYER = {x: 10.5, y: 4.5};
 
-function contextIn(arena: Arena, overrides: Partial<OpponentContext> = {}, dry = true): OpponentContext {
-  const world = startingWorld(arena, [], HERE);
-  if (!world.opponent) {
-    throw new Error("The world has no opponent.");
-  }
-  const loadout = world.opponent.loadout.map((carried, index) => {
-    if (index === 0 && dry) {
-      return {...carried, rounds: 0};
-    }
-
-    return carried;
-  });
-
-  return {
-    arena,
-    opponent: {...world.opponent, loadout},
-    target: {...world.player, position: PLAYER},
-    sees: true,
-    seconds: TICK,
-    ...overrides,
-  };
-}
-
-function reloading(overrides: Partial<OpponentBrain> = {}): OpponentBrain {
-  return {...startingBrain({seed: 1, position: HERE}), state: "reload", ...overrides};
-}
-
-function emptied(opponent: Player, slots: readonly number[]): Player {
-  const loadout = opponent.loadout.map((carried, index) => {
-    if (slots.includes(index)) {
-      return {...carried, rounds: 0, reserve: 0};
-    }
-
-    return carried;
-  });
-
-  return {...opponent, loadout};
-}
-
 it("asks for a reload", () => {
   expect(actReload(reloading(), contextIn(blocked)).input.reload).toBe(true);
 });
@@ -166,3 +127,42 @@ it("gives the same answer for the same brain and context", () => {
     actReload(reloading({seed: 4}), contextIn(blocked)),
   );
 });
+
+function contextIn(arena: Arena, overrides: Partial<OpponentContext> = {}, dry = true): OpponentContext {
+  const world = startingWorld(arena, [], HERE);
+  if (!world.opponent) {
+    throw new Error("The world has no opponent.");
+  }
+  const loadout = world.opponent.loadout.map((carried, index) => {
+    if (index === 0 && dry) {
+      return {...carried, rounds: 0};
+    }
+
+    return carried;
+  });
+
+  return {
+    arena,
+    opponent: {...world.opponent, loadout},
+    target: {...world.player, position: PLAYER},
+    sees: true,
+    seconds: TICK,
+    ...overrides,
+  };
+}
+
+function reloading(overrides: Partial<OpponentBrain> = {}): OpponentBrain {
+  return {...startingBrain({seed: 1, position: HERE}), state: "reload", ...overrides};
+}
+
+function emptied(opponent: Player, slots: readonly number[]): Player {
+  const loadout = opponent.loadout.map((carried, index) => {
+    if (slots.includes(index)) {
+      return {...carried, rounds: 0, reserve: 0};
+    }
+
+    return carried;
+  });
+
+  return {...opponent, loadout};
+}

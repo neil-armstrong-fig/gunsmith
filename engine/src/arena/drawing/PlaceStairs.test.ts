@@ -1,17 +1,6 @@
 import {placeStairs} from "@gunsmith/engine/arena/drawing/PlaceStairs";
 import type {DrawnArena} from "@gunsmith/engine/arena/types/DrawnArena";
 
-// One row, west to east: floor, a stair climbing east, raised floor.
-function row(levels: number[]): DrawnArena {
-  return {
-    width: 3,
-    height: 1,
-    solid: [false, false, false],
-    levels,
-    stairs: [undefined, "east", undefined],
-  };
-}
-
 it("gives a stair the level of the floor behind it", () => {
   const arena = row([1, 0, 2]);
 
@@ -50,3 +39,14 @@ it("counts the row from the top of the drawing, as it is drawn, in that message"
 
   expect(() => placeStairs(arena)).toThrow("column 2, row 2");
 });
+
+// One row, west to east: floor, a stair climbing east, raised floor.
+function row(levels: number[]): DrawnArena {
+  return {
+    width: 3,
+    height: 1,
+    solid: [false, false, false],
+    levels,
+    stairs: [undefined, "east", undefined],
+  };
+}

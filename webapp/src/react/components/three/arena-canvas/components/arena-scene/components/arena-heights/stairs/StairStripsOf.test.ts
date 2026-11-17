@@ -2,10 +2,6 @@ import type {Uphill} from "@gunsmith/engine/arena/types/Uphill";
 import {UPHILLS} from "@gunsmith/engine/arena/types/Uphill";
 import {stairStripsOf} from "@src/react/components/three/arena-canvas/components/arena-scene/components/arena-heights/stairs/StairStripsOf";
 
-function areaOf(uphill: Uphill): number {
-  return stairStripsOf(uphill).reduce((total, strip) => total + strip.width * strip.height, 0);
-}
-
 it("draws the flight as four bands, low end first", () => {
   expect(stairStripsOf("east")).toHaveLength(4);
   expect(stairStripsOf("east").map(strip => strip.fraction)).toEqual([0.125, 0.375, 0.625, 0.875]);
@@ -45,3 +41,7 @@ it("keeps each band full width across the way the stair climbs", () => {
   expect(stairStripsOf("east").every(strip => strip.height === 1 && strip.y === 0)).toBe(true);
   expect(stairStripsOf("north").every(strip => strip.width === 1 && strip.x === 0)).toBe(true);
 });
+
+function areaOf(uphill: Uphill): number {
+  return stairStripsOf(uphill).reduce((total, strip) => total + strip.width * strip.height, 0);
+}

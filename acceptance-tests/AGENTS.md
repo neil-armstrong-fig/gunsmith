@@ -91,3 +91,5 @@ Port 3000 may be taken by janggi's dev server (`AGENTS.md` gotchas): start ours 
 `pnpm --filter @gunsmith/webapp exec vite --port 3100 --strictPort` and point `WEBAPP_URL` at it, or the specs drive
 janggi. Kill the server you started by process (`pkill -f "vite.*--port 3100"`). `pnpm test` here is Vitest, for
 DSL helpers only; it excludes `src/tests/`. Failure screenshots and video land in `test-results/`.
+
+`TheOpponentClimbingToTheRing` uses the seeded terraced scenario to assert actual climbing and ring escape. Preserve this alongside sprite drawing/readiness criteria.

@@ -6,22 +6,6 @@ import type {FlightRequest} from "@gunsmith/engine/bullet/types/FlightRequest";
 // Floor is x 1 to 5 and y 1 to 3, with a one-tile pillar at x 3, y 2.
 const hall = arenaFrom(["#######", "#.....#", "#..#..#", "#.....#", "#######"]);
 
-function bulletAt(y: number, changes: Partial<Bullet> = {}): Bullet {
-  return {
-    position: {x: 1.5, y},
-    direction: {x: 1, y: 0},
-    damage: 25,
-    speed: 20,
-    shooter: "player",
-    level: 0,
-    ...changes,
-  };
-}
-
-function request(changes: Partial<FlightRequest>): FlightRequest {
-  return {bullets: [], dummies: [], seconds: 0.1, ...changes};
-}
-
 it("meets nothing in open floor within reach", () => {
   expect(meetBullet(hall, request({seconds: 0.01}), bulletAt(1.5)).contact).toBe("none");
 });
@@ -120,3 +104,19 @@ it("still stops a bullet fired from the platform at the wall beyond the drop", (
 
   expect(meeting.contact).toBe("wall");
 });
+
+function bulletAt(y: number, changes: Partial<Bullet> = {}): Bullet {
+  return {
+    position: {x: 1.5, y},
+    direction: {x: 1, y: 0},
+    damage: 25,
+    speed: 20,
+    shooter: "player",
+    level: 0,
+    ...changes,
+  };
+}
+
+function request(changes: Partial<FlightRequest>): FlightRequest {
+  return {bullets: [], dummies: [], seconds: 0.1, ...changes};
+}

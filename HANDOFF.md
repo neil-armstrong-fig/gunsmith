@@ -70,6 +70,9 @@ and the linked design documents.
 
 ## Delivery log
 
+- 2026-11-17, integration: merged committed stair-aware bot routing, stair-flank validation and terraced ring-climbing coverage from `worktree-build-3-reticle`. Uncommitted engagement/cover work remains in its source worktree. Combined validation follows the AI merge.
+
+
 - 2026-11-17, integration: merged committed player/opponent and dummy art from `worktree-build-2-art`; preserved sprite anchors, fallback/readiness and visual acceptance coverage. Uncommitted projectile work remains in its source worktree. Combined validation follows the remaining merges.
 
 

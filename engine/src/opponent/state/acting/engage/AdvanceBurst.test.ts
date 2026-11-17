@@ -12,10 +12,6 @@ const ready: OpponentBrain = {
   reactionRemainingSeconds: 0,
 };
 
-function advance(brain: OpponentBrain): ReturnType<typeof advanceBurst> {
-  return advanceBurst(brain, {fireIntervalSeconds: INTERVAL, seconds: TICK});
-}
-
 it("holds its fire while it waits out its reaction time, and counts the wait down", () => {
   const result = advance({...ready, reactionRemainingSeconds: 0.3});
 
@@ -119,3 +115,7 @@ it("draws rolls that miss to the left and to the right, across the seeds", () =>
   expect(Math.min(...rolls)).toBeLessThan(-0.5);
   expect(Math.max(...rolls)).toBeGreaterThan(0.5);
 });
+
+function advance(brain: OpponentBrain): ReturnType<typeof advanceBurst> {
+  return advanceBurst(brain, {fireIntervalSeconds: INTERVAL, seconds: TICK});
+}

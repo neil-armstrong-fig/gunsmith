@@ -10,10 +10,6 @@ const ring: Ring = {
   timing: {startDelaySeconds: 10, closingSeconds: 20},
 };
 
-function playedFor(roundSeconds: number): Ring {
-  return {...ring, roundSeconds};
-}
-
 it("is nothing until the ring starts to close", () => {
   expect(ringDamageRate(playedFor(0))).toBe(0);
   expect(ringDamageRate(playedFor(10))).toBe(0);
@@ -60,3 +56,7 @@ it("is the normal rate for a damage scale of one", () => {
 
   expect(ringDamageRate(scaled)).toBe(ringDamageRate(playedFor(20)));
 });
+
+function playedFor(roundSeconds: number): Ring {
+  return {...ring, roundSeconds};
+}

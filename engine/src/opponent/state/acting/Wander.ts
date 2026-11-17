@@ -1,4 +1,5 @@
 import {DIFFICULTY} from "@gunsmith/engine/opponent/Difficulty";
+import {routeWaypoint} from "@gunsmith/engine/opponent/steering/RouteWaypoint";
 import {walkToward} from "@gunsmith/engine/opponent/steering/WalkToward";
 import {pickWanderGoal} from "@gunsmith/engine/opponent/state/acting/wander/PickWanderGoal";
 import type {OpponentBrain} from "@gunsmith/engine/opponent/types/OpponentBrain";
@@ -6,7 +7,7 @@ import type {OpponentContext} from "@gunsmith/engine/opponent/types/OpponentCont
 import type {StateAct} from "@gunsmith/engine/opponent/types/StateAct";
 
 /**
- * Wandering: walk to a spot it can see, aiming where it walks, and choose another on arrival or after
+ * Wandering: walk to a spot it can walk to (by a stair, if the arena has one), aiming where it walks, and choose another on arrival or after
  * `wanderRepickSeconds` on the way. It does not fire and does not reload. Spotting the player is `chooseState`'s business.
  */
 export function actWander(brain: OpponentBrain, context: OpponentContext): StateAct {
@@ -16,8 +17,10 @@ export function actWander(brain: OpponentBrain, context: OpponentContext): State
     return {input: {direction: {x: 0, y: 0}, firing: false, reload: false}, brain: planned};
   }
 
+  const waypoint = routeWaypoint(context.arena, context.opponent.position, goal);
+
   return {
-    input: {direction: walkToward(context.opponent.position, goal), aimAt: goal, firing: false, reload: false},
+    input: {direction: walkToward(context.opponent.position, waypoint), aimAt: waypoint, firing: false, reload: false},
     brain: planned,
   };
 }
