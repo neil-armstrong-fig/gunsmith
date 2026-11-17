@@ -20,6 +20,15 @@ export class RoundDsl {
     }
   }
 
+  /** How many seconds of game time the round has been fought: it starts again from zero with each round. */
+  async getElapsedSeconds(): Promise<number> {
+    try {
+      return await this.round.getElapsedSeconds();
+    } catch (error) {
+      throw new DslError("Failed to read how long the round has been fought", error);
+    }
+  }
+
   /** Waits until the round stands at `state`, for as long as `timeoutSeconds` when a round is known to take longer than the default. */
   async waitForState(state: RoundSnapshot, timeoutSeconds?: number): Promise<void> {
     try {

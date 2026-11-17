@@ -14,6 +14,12 @@ export class RoundPlaywright extends BasePage {
     return round;
   }
 
+  async getElapsedSeconds(): Promise<number> {
+    const {elapsedSeconds} = await this.readGameState();
+
+    return elapsedSeconds;
+  }
+
   /** Waits until the round stands at `state`, for as long as the expect timeout or `timeoutSeconds` allows. */
   async waitForState(state: RoundSnapshot, timeoutSeconds?: number): Promise<void> {
     await this.waitForGameState(({round}) => round === state, timeoutSeconds);

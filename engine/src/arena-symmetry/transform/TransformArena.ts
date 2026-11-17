@@ -1,5 +1,5 @@
-import type {AxisFlips} from "@gunsmith/engine/arena-validation/property-tests/transform/types/AxisFlips";
-import type {ArenaTransform} from "@gunsmith/engine/arena-validation/property-tests/transform/types/ArenaTransform";
+import type {AxisFlips} from "@gunsmith/engine/arena-symmetry/transform/types/AxisFlips";
+import type {ArenaTransform} from "@gunsmith/engine/arena-symmetry/transform/types/ArenaTransform";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import type {TileStair} from "@gunsmith/engine/arena/types/TileStair";
 import type {Uphill} from "@gunsmith/engine/arena/types/Uphill";
