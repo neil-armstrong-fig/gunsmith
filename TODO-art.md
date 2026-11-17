@@ -6,7 +6,7 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 Checkout: `.claude/worktrees/art`, branch `worktree-art`; created from committed main `6f6b028` on 2026-11-17. Main has not advanced at startup. Sync committed main into the clean worktree before new work and delivery; preserve this worktree. See [Operations](docs/agent-reference/Operations.md#development-worktrees-and-the-integration-checkout).
 
-Current slice: reviewed play’s uncommitted crunch MP3 against the approved master; canonical encoding and native duration/PCM checks pass. [Cue mapping and findings](docs/art/concepts/combat-feedback/Handover.md#crunch-mp3-review--2026-11-17) preserve current levels and accept one crunch per ring-damage exposure for M1. Play’s runtime work is not yet integrated; leave its reserved files alone.
+Current slice: delivered the [ring damage loop candidate](webapp/audio/studies/ring-damage/README.md) requested by play: two-second mono 48 kHz WAV and MP3, with reproducible synthesis and browser/native measurements. The user approved the sound in Visual Studio Code. WAV loops exactly; WebKit adds 40 ms to the MP3, so play should use WAV for this loop or handle MP3 loop bounds before integration. The user superseded the former one-crunch-per-exposure mapping. Renderer review still awaits AI S3.
 
 Current milestone: M1/M6; the project remains on M1. Next audio task: combat masking, fatigue and levels once AI/play integrate runtime weapon-shot synthesis (not yet wired into the game sound output). Safari acceptance does not claim new headphone/speaker measurements. Preserve approved master hashes. Next failing check for any playback change: the relevant browser sound acceptance criterion before implementation.
 
@@ -21,6 +21,8 @@ Reserve concrete files in [HANDOFF.md](HANDOFF.md) before overlapping another se
 Agree manifest keys/anchors with play and supported visual grammar with AI before production assets. The rifle shot is integrated (blue is your unmodified `effects/projectile-rifle`; see HANDOFF.md). No menus ahead of real consumers.
 
 ## Current milestone tasks
+
+- [x] Generate `sfx-ring-damage-loop` for play: separate continuous electrical bed with no impacts or baked-in fades. WAV/MP3 and codec caveat delivered; sound approved in Visual Studio Code; runtime integration remains open.
 
 - [x] Approve the existing matching orange rifle shot (`fx-projectile-rifle-orange.svg`) as selected by the user on 2026-11-17. Native 64/32 px and in-game review pass; keep the 64×64 canvas, current shape/scale, `#FF9B54` and tip (49, 32). The colour mutation was caught by both manifest and browser assertions; the original asset hash was restored. Later weapon classes still need both team variants; muzzle flash remains descoped until feature complete.
 - [x] Measure the shipped empty click’s onset/content and event cadence in Chromium/WebKit at default, 44.1 and 48 kHz: 13 starts per 13 holds in all six runs, including repeats shorter than the buffer. WebKit’s main transient is about 12 ms later; no global correction or threshold change. See the audio handoff.
@@ -43,6 +45,10 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [ ] Case-study diagrams: pipeline, cost safeguards and eval loop.
 
 ## Verification/latest delivery
+
+- [x] Ring damage loop delivered and approved after listening in Visual Studio Code (2026-11-17); `Listen.html` removed. Five new audio tests pass with red/mutation evidence; eight browser checks pass seam/repeat limits, with WebKit’s 40 ms MP3 padding recorded (use WAV). `pnpm checks` passes: 2,175 tests, one slow render skipped; separate approved-pack re-render passes byte for byte in 308.73 s. All 62 preserved asset/evidence hashes unchanged. Requested root/audio code review and folder/caller audit complete; format duplication and measurement naming fixed. No runtime integration or combat-masking claim.
+
+- [x] Generated-pickup review preparation (2026-11-17): documented the exact lantern/refused review and requested S3 evidence through the connected AI session. Renderer/readability review remains open: S3 is absent. No runtime/assets changed and no new browser, listening or mutation result claimed. `pnpm checks` exits 0 outside the sandbox (2,170 tests, one slow audio render skipped); initial audio run stalled and was stopped. Links/new anchor, diff whitespace and root standards/folder/reference review pass. No new files, folders, helpers or types.
 
 - [x] Crunch MP3/cue mapping review (2026-11-17): play’s pending export matches canonical encoding; native duration/probe/PCM pass, three negative controls rejected. No audio/runtime changes. `pnpm checks` exits 0 (2,170 tests, one slow audio render skipped); standalone handover formatting warning predates this slice, new section formatted. Root/webapp/audio standards and folder/reference audit complete; no new files/helpers/types/folders. Next audio QA still needs runtime shot synthesis; renderer review waits for AI’s drawing.
 

@@ -84,6 +84,19 @@ Safari is accepted as good enough by user decision. Weapon-shot masking, sustain
 combat fatigue and headphone/speaker levels remain open until runtime synthesis exists.
 This is native asset review, not new browser or listening evidence.
 
+## Continuous ring damage cue — 2026-11-17
+
+The user superseded the one-crunch-per-exposure mapping: ring damage needs a
+continuous bed, with no impact/onset cue. Art delivered the separate
+[ring damage study](../../../../webapp/audio/studies/ring-damage/README.md)
+(`sfx-ring-damage-loop`, two seconds, mono 48 kHz, quiet electrical texture,
+no baked-in fades). The user approved the sound after listening in Visual Studio Code. Play owns registration,
+one looping voice per exposure, roughly 100 ms fades and mute/reset cancellation.
+
+WAV loops exactly in Chromium/WebKit. MP3 passes the unchanged seam checks,
+but WebKit adds 40 ms of padding: use the WAV for exact looping, or fix and listen to MP3 loop bounds
+before integration. Approved masters, crunch and countdown warning are unchanged.
+
 ## Integration order and event behaviour
 
 1. Read root, engine, webapp, React and acceptance-test instructions applicable to
@@ -111,7 +124,7 @@ This is native asset review, not new browser or listening evidence.
 | Hidden target hit | Suppress both outgoing confirmation and its sound; never send hidden exact-position effects |
 | Simultaneous exchange | Preserve incoming and visible outgoing feedback as distinct cues |
 | Burst | All actual losses count; merge visual accents within 100 ms and replace the previous incoming voice |
-| Continuous ring damage | Sustained unsafe-state treatment; one onset cue, no per-tick impacts; a new exposure can have a new onset |
+| Continuous ring damage | Sustained unsafe-state treatment and one continuous looping bed while hurt; no onset cue, crunch or per-tick impacts |
 | Local death / round reset | One local death resolution; cancel stale cues and scheduled audio; reveal no hidden killer |
 
 A hidden opponent's coarse directional sound events are a separate existing
@@ -125,7 +138,7 @@ Build's acceptance criteria should cover:
   health changes immediately and all losses survive coalescing.
 - A hidden hit generates no outgoing visual or audio confirmation. Turning/fog/height
   changes cannot leave effects revealing a now-hidden target.
-- Sustained ring damage has one onset, stops when exposure ends, and does not pulse
+- Sustained ring damage has a continuous bed, stops when exposure ends, and does not pulse
   each tick. Death and the next round clear pending effects and sounds.
 - Shake occurs on incoming impacts at the retained settings; off/reduced motion
   removes it. The reticle, HUD and cursor-to-arena alignment remain correct across
