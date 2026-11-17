@@ -17,13 +17,13 @@ Start a session with: **"You are engine, continue the TODO."** Substitute any pe
 
 | Persona | Model | Checklist | Current focus | Updated |
 | --- | --- | --- | --- | --- |
-| play | Claude | [TODO-play.md](TODO-play.md) | Combat feedback, HUD/inventory, camera and runtime audio; close M1 playtest. | 2026-11-17 |
-| engine | Claude | [TODO-engine.md](TODO-engine.md) | Bot pickup-seeking; extend merged routing, cross-level engagement/cover, validators and balancing. | 2026-11-17 |
-| ai | Claude | [TODO-ai.md](TODO-ai.md) | Fix eight reported canned-response fake-eval failures; renderer, calibration and arena generation. | 2026-11-17 |
+| play | Claude | [TODO-play.md](TODO-play.md) | Combat feedback slice 2a (damage event, crunch) integrated into main; 2b (`store/feedback/`, brackets, health trail) next; HUD/inventory, camera, close M1 playtest. | 2026-11-17 |
+| engine | Claude | [TODO-engine.md](TODO-engine.md) | Bot pickup-seeking integrated; next arena validation and play's combat events. | 2026-11-17 |
+| ai | Claude | [TODO-ai.md](TODO-ai.md) | Fake-eval failures fixed and integrated; renderer, calibration and arena generation next. | 2026-11-17 |
 | server | Claude | [TODO-server.md](TODO-server.md) | First online match green (`TwoBrowsersHidingFromEachOther`); minimal `api/`, per-seat fog, webapp client. Next: round/match flow in a room, reconnect, then sign-in/storage for budget. | 2026-11-17 |
-| budget | Claude | [TODO-budget.md](TODO-budget.md) | Production ledger/spend boundaries with server/AI; credits, refunds, tracing and kill switch. | 2026-11-17 |
-| art | Codex | [TODO-art.md](TODO-art.md) | Production assets/presentation, Safari timing and combat masking; current sprites/MP3 are integrated. | 2026-11-17 |
-| ship | Codex | [TODO-ship.md](TODO-ship.md) | Seven-persona migration/checks complete; CI next, infra/release when bindings and authorization exist. | 2026-11-17 |
+| budget | Claude | [TODO-budget.md](TODO-budget.md) | Production ledger/spend boundaries with server/AI; credits, refunds, tracing and kill switch. Scenarios drafted; executable specs wait for `api/`. | 2026-11-17 |
+| art | Codex | [TODO-art.md](TODO-art.md) | Terrain SVG candidates and browser review sheets delivered; approval/play integration pending. Audio masking awaits runtime synthesis. | 2026-11-17 |
+| ship | Codex | [TODO-ship.md](TODO-ship.md) | Four-shard preview CI with combined reporting; hosted timing/validation next, infra/release awaits bindings and authorization. | 2026-11-17 |
 
 These are persistent workstreams, not permission for simultaneous edits to the same files. Select one current slice; record concrete reservations and contracts in HANDOFF.md. Model assignments are defaults, not application configuration. `build` is retired; [migration history](docs/history/2026-11-17-persona-migration.md) preserves its tasks.
 
@@ -50,10 +50,11 @@ M0 is complete; M1 is current. Later milestones proceed when their consumers and
 - **engine → play:** agree local damage/hit events and inventory data; engine writes simulation changes, play consumes them. Cross-level bot engagement and cover are merged; extend them rather than restart.
 - **art → play:** approved [inventory](docs/art/concepts/inventory-display/README.md) and [combat feedback](docs/art/concepts/combat-feedback/Handover.md) are ready. Art owns assets/manifests; play implements feedback and HUD behavior.
 - **engine ↔ ai:** initial rating/balancing and five-call pipeline are merged. Extend/calibrate rather than restart. Labels v1 and AI-chosen unspecified values are approved; inference probes still need authorization and cumulative spend reconciliation. Preserve deliberate weak weapons.
-- **ai → art:** generated-appearance renderer and readability evidence precede further visual review; kit generation remains shelved. Eight canned-response fake-eval failures remain reported, not evidence of live-model quality.
+- **ai → art:** generated-appearance renderer and readability evidence precede further visual review; kit generation remains shelved. The fake-eval failures are fixed in the `ai` worktree; fake scores are not evidence of live-model quality.
 - **engine → server:** [arena fairness](docs/art/arena-fairness-research.md), visibility and deterministic contracts support online play. Preserve random ring centres and validate built-ins too. Public-play [fair-play/privacy](docs/art/fair-play-research.md) belongs to server, not the M1 gate.
 - **server ↔ budget ↔ ship:** server supplies account/storage/call boundaries; budget owns atomic credit/spend enforcement and tracing; ship provisions approved bindings and deployment automation. No speculative shared contracts or live changes.
-- **art/play:** MP3 is approved and empty click integrated. Safari timing, masking/fatigue and levels remain follow-up QA, with existing thresholds and masters preserved.
+- **art → play:** ring-damage WAV/MP3 study delivered; runtime loop playback remains open and the ring stays silent until integrated.
+- **art/play:** MP3 is approved and empty click integrated. Safari audio is accepted as good enough by user decision (2026-11-17); its listening follow-up is closed. Combat masking/fatigue and levels await runtime shot synthesis, with existing thresholds and masters preserved.
 - Current milestone remains M1. Add menus, shared contracts and future packages only with real consumers. Later workstreams can refine relevant acceptance scenarios while waiting.
 
 ## Open questions and tunables

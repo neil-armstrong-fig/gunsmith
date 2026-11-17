@@ -90,7 +90,7 @@ export function useGameLoop(): void {
       };
 
       world = engine.step(world, input, TICK_SECONDS);
-      sounds.afterTick({events: world.events, firing: input.firing, round: world.round});
+      sounds.afterTick({events: world.events, firing: input.firing, round: world.round, seconds: TICK_SECONDS});
     }
 
     if (owed.ticks > 0) {

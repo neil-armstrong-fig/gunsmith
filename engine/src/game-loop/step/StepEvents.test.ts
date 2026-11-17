@@ -6,7 +6,14 @@ import {centred} from "@gunsmith/engine/game-loop/step/testing/Centred";
 import {firingAt} from "@gunsmith/engine/game-loop/step/testing/FiringAt";
 import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
+import {sparring} from "@gunsmith/engine/game-loop/step/testing/Sparring";
 import {arena} from "@gunsmith/engine/game-loop/step/testing/Arena";
+import {shotAtPlayer} from "@gunsmith/engine/game-loop/step/testing/ShotAtPlayer";
+import {MAXIMUM_RING_DAMAGE_PER_SECOND} from "@gunsmith/engine/ring/damage/rate/MaximumRingDamage";
+import type {CombatEvent} from "@gunsmith/engine/combat-events/types/CombatEvent";
+import type {Point} from "@gunsmith/engine/geometry/types/Point";
+import type {Ring} from "@gunsmith/engine/ring/types/Ring";
+import {RIFLE} from "@gunsmith/engine/weapon/weapons/Rifle";
 
 const EAST = firingAt({x: 20, y: 4.5});
 
@@ -91,8 +98,69 @@ it("never reports the opponent running dry", () => {
   let reportedAClick = false;
   for (let tick = 0; tick < 3600; tick += 1) {
     world = step(world, IDLE, TICK);
-    reportedAClick = reportedAClick || world.events !== undefined;
+    reportedAClick = reportedAClick || world.events?.some(event => event.kind === "fireRefused") === true;
   }
 
   expect(reportedAClick).toBe(false);
+});
+
+const PLAYER_AT = {x: 7.5, y: 4.5};
+const FAR_CORNER = {x: 1.5, y: 1.5};
+const CLOSED_SECONDS = 100;
+
+/** A ring closed to its final size and hurting at its worst, centred on `centre`. */
+function ringOn(centre: Point): Ring {
+  return {roundSeconds: CLOSED_SECONDS, centre, startRadius: 12, timing: {startDelaySeconds: 10, closingSeconds: 20}};
+}
+
+/** Every event of the steps from `world` until the bullet has been and gone, in order, one list per step that reported any. */
+function eventsOver(world: World, ticks: number): CombatEvent[][] {
+  const steps: CombatEvent[][] = [];
+  let current = world;
+  for (let tick = 0; tick < ticks; tick += 1) {
+    current = step(current, IDLE, TICK);
+    if (current.events) {
+      steps.push([...current.events]);
+    }
+  }
+
+  return steps;
+}
+
+it("reports the damage a bullet did to the player, once, in the step it landed", () => {
+  expect(eventsOver(shotAtPlayer(100), 30)).toEqual([
+    [{kind: "damageTaken", cause: "bullet", amount: RIFLE.bulletDamage}],
+  ]);
+});
+
+it("reports only the health a bullet really took from a player with little left", () => {
+  expect(eventsOver(shotAtPlayer(3), 30)).toEqual([[{kind: "damageTaken", cause: "bullet", amount: 3}]]);
+});
+
+it("reports the ring's damage in every step the player stands outside it", () => {
+  const steps = eventsOver({...centred(), ring: ringOn(FAR_CORNER)}, 5);
+
+  expect(steps).toHaveLength(5);
+  for (const events of steps) {
+    expect(events).toEqual([
+      {kind: "damageTaken", cause: "ring", amount: expect.closeTo(MAXIMUM_RING_DAMAGE_PER_SECOND * TICK, 9)},
+    ]);
+  }
+});
+
+it("reports no damage to a player inside the ring", () => {
+  expect(eventsOver({...centred(), ring: ringOn(PLAYER_AT)}, 5)).toEqual([]);
+});
+
+it("reports no damage when only the opponent stands outside the ring", () => {
+  const world = {...sparring(), ring: ringOn({x: 1.5, y: 1.5})};
+
+  expect(eventsOver({...world, player: {...world.player, position: {x: 1.5, y: 1.5}}}, 5)).toEqual([]);
+});
+
+it("reports a bullet and the ring in one step as two events, the bullet first", () => {
+  const steps = eventsOver({...shotAtPlayer(100), ring: ringOn(FAR_CORNER)}, 30);
+  const landed = steps.find(events => events.some(event => event.kind === "damageTaken" && event.cause === "bullet"));
+
+  expect(landed?.map(event => event.kind === "damageTaken" && event.cause)).toEqual(["bullet", "ring"]);
 });

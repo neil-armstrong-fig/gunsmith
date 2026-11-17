@@ -74,16 +74,19 @@ These are janggi's, carried over until each is re-checked against the versions a
 - **Cloudflare has no hard spend cap.** Budget alerts are email only. The kill switch is ours (`docs/cost-and-budget.md`).
 
 
-## CI and deployment (planned)
+## CI and deployment
 
-`ci.yml` runs `checks`, then `acceptance-tests` against a production build (`vite preview`), then
-deploys `main` with Alchemy (`deploy`: the database, its migrations, the Worker with its static assets and the Durable
-Objects, from `infra/`), gated on both, and does nothing until the `CLOUDFLARE_API_TOKEN` secret exists. After the deploy it
-runs the acceptance suite once more against the live address. `property-tests.yml` and `evals.yml` run on push/PR
-and on demand, and go **red on failure but gate nothing** (a fresh seed, or a model, means a failure isn't reproducible
-from the same commit) — except that `evals.yml` is the AI regression gate **for changes under `ai/`**; `ai` decides
-whether that becomes a required check, as `docs/ai-pipeline.md` explains. **If branch protection is ever turned on,
-leave the property tests out of required checks.**
+Implemented CI (`.github/workflows/ci.yml`) runs on main pushes, pull requests and manual dispatch: `pnpm checks`, then production-preview acceptance. Ubuntu runners use Node 26.13.0, the root's pinned pnpm, frozen installation, FFmpeg and `glslang-tools`; acceptance installs Chromium with system dependencies. Acceptance uses four independent runners with two Playwright workers each, after checks pass. Each runner installs Chromium, builds production preview in its own timed step and runs `--shard=N/4` with GitHub/blob reporters. Matrix fail-fast is disabled. Both workflows have read-only contents permissions and need no repository secrets.
+
+Each shard preserves its blob (including failure/retry attachments) as `playwright-blob-N` for seven days. The final `Acceptance tests (production preview)` job downloads available blobs and publishes one combined HTML artifact, `playwright-preview`, also for seven days. It runs after failed shards too, but succeeds only when every shard succeeds, all four reports exist and merging/publication succeed. Partial reports identify missing shards; they never satisfy the gate. Reruns replace that shard's artifact and the combined report. The report job installs dependencies but no browser. Future deployment must depend on checks and this final acceptance job.
+
+Local profile (2026-11-17, CI settings, existing dependencies; shards run sequentially to avoid sharing eight browser workers): builds 1.10/1.68/1.14/1.15 s, tests 71.67/33.80/144.86/77.22 s. All 221 criteria completed (220 first-pass, one recovered viewport-size failure). Four builds total 5.07 s, versus 1.10 s for the first build alone; test time totals 327.55 s and is uneven despite a 56/55/55/55 test partition. The earlier unsharded local baseline was 6.3 minutes, under different load; these figures do not establish hosted speedup. On the first hosted run, record install/browser/build/test/upload durations for each runner and setup/download/merge/upload for reporting. Compare both elapsed time and summed runner minutes, including checks and reporting, with budget.
+
+`pnpm acceptance-tests:preview` compiles first, then opts into Playwright-managed Vite preview via `PREVIEW_ACCEPTANCE=1`. It waits for readiness, refuses server reuse, and stops its process group on completion or failure. Default: `http://127.0.0.1:3107`; choose another worktree port with `PREVIEW_PORT=3108 pnpm acceptance-tests:preview`. `PREVIEW_PORT` must be an integer from 1 to 65535. Preview mode sets its own local URL; ordinary `pnpm acceptance-tests` continues to use `WEBAPP_URL` (default `http://localhost:3000`) without starting a server. Extra Playwright arguments pass through the preview command.
+
+The separate `property-tests.yml` runs on main pushes/PRs, daily at 03:17 UTC and manually. It uses 1,000 cases per property for commit runs and 5,000 for scheduled/manual runs, with a positive-integer manual override. Failures remain red and logs preserve fast-check seeds, paths and counterexamples for fourteen days. **Never add property tests to required release checks or make CI/deployment depend on them.** Existing browser retries and two CI workers are preserved; the known `ShootingAcrossLevels` flake remains engine/play follow-up, not an excluded criterion.
+
+Deployment and live acceptance remain planned until server/budget bindings and explicit provisioning authorization exist. The future main deployment uses Alchemy for the database, migrations, Worker/assets and Durable Objects, gated on checks and preview acceptance, followed by acceptance against live. AI owns any future eval workflow and its gating semantics; this CI slice adds no model calls.
 
 One Worker serves both the site (static assets) and `/api/*` (`run_worker_first: ["/api/*"]`) at
 `gunsmith.neilarmstrong.dev`, DNS at Cloudflare, so the session cookie is same-origin. Environments: local and `prod`

@@ -12,6 +12,7 @@
     "start:preview": "pnpm --filter @gunsmith/webapp start:preview",
     "api:dev": "pnpm --filter @gunsmith/api start",
     "acceptance-tests": "pnpm --filter @gunsmith/acceptance-tests acceptance-tests",
+    "acceptance-tests:preview": "pnpm --filter @gunsmith/webapp compile && PREVIEW_ACCEPTANCE=1 pnpm acceptance-tests",
     "install-browsers": "pnpm --filter @gunsmith/acceptance-tests install-browsers",
     "build": "pnpm --recursive build",
     "checks": "pnpm checks:repository && pnpm --recursive checks",

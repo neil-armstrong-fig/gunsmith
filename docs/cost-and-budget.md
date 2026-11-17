@@ -249,6 +249,36 @@ spends nothing, so the eval spend needs its own ceiling (the user's current one 
 the same model, prompt and case is free). An arena suite costs about twice as much a case (bigger prompt and output). The
 estimates use guessed token counts; replace them with measured usage once a paid run exists.
 
+## Acceptance scenarios (working draft, `budget`, 2026-11-17)
+
+**Working scenarios, not a frozen M2 contract.** No credit, ledger or kill-switch code exists yet, and `api/` does not; the numbers below are
+the targets table above, not code. They are written in `given` / `when` / `then` nesting so they port into the acceptance mapping once `api/`
+exists; freezing them waits for `server` and `ai` to review them. Each names the rule it comes from. A scenario that needs a model call runs
+against the fake AI adapter, never a paid one.
+
+- **given a player with 1 credit**
+  - **when two generation requests arrive at the same moment** then exactly one reserves its credit and runs; the other is refused with no model call and the balance never goes below 0 (layer 4, atomic decrement).
+  - **when a request times out after reserving** then the credit is refunded exactly once; **when the refund is retried** then it is a no-op (layer 4, refund on timeout).
+- **given a player with 10 credits**
+  - **when a weapon, an arena or an edit is created** then 1 credit is taken; **when a prompt is rejected** then 0.5 is taken; **when a saved item is reused** then nothing is taken (credit prices).
+  - **when a prompt is over the limit (weapon 150 tokens, arena 250)** then it is rejected before any model call and charges nothing (prompt limits, layer 6).
+  - **when 00:00 UTC passes** then the balance is 10 again, whatever was spent the day before (credits per player).
+- **given today's global spend is just under $1**
+  - **when a request's estimated cost would cross it** then AI is off until 00:00 UTC and the banner says so (daily soft cap).
+- **given this month's global spend is just under $20**
+  - **when a request's estimated cost would cross it** then AI is off until the first of the next month, 00:00 UTC, and the banner says that, not the daily time (monthly hard cap; the early stop is accepted).
+  - **when many requests arrive at once** then the total reserved never exceeds the ceiling: each reserves its estimated cost before its call and is reconciled to the provider's reported usage after (layer 3; this is what covers the Gateway's eventual consistency, layer 2).
+- **given AI is off, for either cap**
+  - **when the API and the UI each ask whether AI is on** then both read the one kill-switch function and agree (layer 3).
+  - **when a player or a guest starts a match** then built-in weapons and arenas, the saved library and guest play all work as before, and no model call is made (AI off, game stays up).
+- **given tracing is failing or returning 429**
+  - **when a generation runs** then it neither fails nor waits on the trace, and play is not delayed (tracing, `TODO-budget.md`).
+- **given the month's spend rises past 50, 80 and 100 percent** then each threshold raises its alert once (layer 5).
+
+**Open, not decided here:** whether the counters live in D1 or a Durable Object (depends on `server`'s storage boundary); where the cost
+estimator lives and who owns its prices; who writes the first executable spec once `api/` exists. `ai`'s eval `paidSpendGuard` and its
+$1 total ledger are separate and untouched.
+
 ## Sources
 
 - [Cloudflare budget alerts](https://developers.cloudflare.com/billing/manage/budget-alerts/) (informational, email only)

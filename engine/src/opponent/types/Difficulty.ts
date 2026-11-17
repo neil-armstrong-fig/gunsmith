@@ -40,4 +40,8 @@ export interface Difficulty {
   coverReach: number;
   /** Once the ring is closing it keeps this far inside its edge, in tiles, so the edge never reaches it. */
   ringMargin: number;
+  /** It sets out for a weapon lying in the arena only when it is nearer to it than the player by more than this, in tiles of walking. */
+  seekLead: number;
+  /** Once on its way to the weapon it turns back only when the player is nearer to it than itself by more than this, in tiles of walking. */
+  seekGrace: number;
 }

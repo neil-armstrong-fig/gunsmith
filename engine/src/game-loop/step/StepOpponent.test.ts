@@ -5,6 +5,7 @@ import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import {step} from "@gunsmith/engine/game-loop/Step";
 import type {World} from "@gunsmith/engine/game-loop/types/World";
 import {RIFLE} from "@gunsmith/engine/weapon/weapons/Rifle";
+import {SUBMACHINE_GUN} from "@gunsmith/engine/weapon/weapons/SubmachineGun";
 import {arena} from "@gunsmith/engine/game-loop/step/testing/Arena";
 import {TICK} from "@gunsmith/engine/game-loop/step/testing/Tick";
 import {IDLE} from "@gunsmith/engine/game-loop/step/testing/Idle";
@@ -129,6 +130,28 @@ describe("with a seeded opponent", () => {
   });
 
   // The same, with the opponent armed as it starts a match, and with a brain to play it by.
+  it("sends the opponent to the weapon lying near it, in sight of the player, without firing on the way, and it takes it", () => {
+    const lying = {position: {x: 12.5, y: 7.5}, weapon: SUBMACHINE_GUN};
+    const taken = untilFound({...duel(), pickup: lying}, 600, world => {
+      if (world.pickup === undefined) {
+        return world;
+      }
+
+      return undefined;
+    });
+
+    expect(taken?.opponent?.loadout[1]?.weapon).toBe(SUBMACHINE_GUN);
+    expect(taken?.player.health).toBe(PLAYER_HEALTH);
+  });
+
+  it("leaves the weapon lying while the player is nearer to it than the opponent is, and the opponent fights", () => {
+    const lying = {position: {x: 3.5, y: 4.5}, weapon: SUBMACHINE_GUN};
+    const after = playTicks({...duel(), pickup: lying}, IDLE, 60);
+
+    expect(after.pickup).toBe(lying);
+    expect(after.opponentBrain?.state).toBe("engage");
+  });
+
   function duel(seed = 1): World {
     return giveOpponentBrain(startingWorld(arena, [], {x: 11.5, y: 4.5}), seed);
   }

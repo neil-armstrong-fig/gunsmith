@@ -21,6 +21,7 @@ import {HEIGHTS_ARENA} from "@src/game/heights/HeightsArena";
 import {HEIGHTS_DUMMIES} from "@src/game/heights/HeightsDummies";
 import {OVERLOOK_OPPONENT} from "@src/game/overlook/OverlookOpponent";
 import {OVERLOOK_PLAYER} from "@src/game/overlook/OverlookPlayer";
+import {PICKUP_RACE_PICKUP} from "@src/game/pickup-race/PickupRacePickup";
 import {PRACTICE_ARENA} from "@src/game/practice/PracticeArena";
 import {PRACTICE_DUMMIES} from "@src/game/practice/PracticeDummies";
 import {TERRACED_ARENA} from "@src/game/terraced/TerracedArena";
@@ -244,6 +245,33 @@ describe("the overlook duel", () => {
     const seeded = giveOpponentBrain(startingWorld(TERRACED_ARENA, [], OVERLOOK_OPPONENT), 5);
 
     expect(world.opponentBrain).toEqual(seeded.opponentBrain);
+    expect(world.match).toBeUndefined();
+    expect(world.ring).toBeUndefined();
+    expect(world.dummies).toEqual([]);
+  });
+});
+
+describe("the pickup race", () => {
+  it("is the duel's arena and fighters with a weapon lying close to the opponent and far from the player", () => {
+    const world = worldOfScenario("pickup-race", 1);
+    const nearTheOpponent = Math.hypot(PICKUP_RACE_PICKUP.x - DUEL_OPPONENT.x, PICKUP_RACE_PICKUP.y - DUEL_OPPONENT.y);
+    const nearThePlayer = Math.hypot(
+      PICKUP_RACE_PICKUP.x - world.player.position.x,
+      PICKUP_RACE_PICKUP.y - world.player.position.y,
+    );
+
+    expect(world.arena).toBe(DUEL_ARENA);
+    expect(world.opponent?.position).toEqual(DUEL_OPPONENT);
+    expect(world.pickup).toEqual({position: PICKUP_RACE_PICKUP, weapon: SUBMACHINE_GUN});
+    expect(nearTheOpponent).toBeLessThan(nearThePlayer - 3);
+  });
+
+  it("gives the opponent a brain drawn from the seed, and is one round with no score, no ring and no dummies", () => {
+    const world = worldOfScenario("pickup-race", 5);
+
+    expect(world.opponentBrain).toEqual(
+      giveOpponentBrain(startingWorld(DUEL_ARENA, [], DUEL_OPPONENT), 5).opponentBrain,
+    );
     expect(world.match).toBeUndefined();
     expect(world.ring).toBeUndefined();
     expect(world.dummies).toEqual([]);
