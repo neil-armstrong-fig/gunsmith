@@ -14,6 +14,8 @@ import {DUEL_ARENA} from "@src/game/duel/DuelArena";
 import {DUEL_OPPONENT} from "@src/game/duel/DuelOpponent";
 import {HEIGHTS_ARENA} from "@src/game/heights/HeightsArena";
 import {HEIGHTS_DUMMIES} from "@src/game/heights/HeightsDummies";
+import {OVERLOOK_OPPONENT} from "@src/game/overlook/OverlookOpponent";
+import {OVERLOOK_PLAYER} from "@src/game/overlook/OverlookPlayer";
 import {PRACTICE_ARENA} from "@src/game/practice/PracticeArena";
 import {PRACTICE_DUMMIES} from "@src/game/practice/PracticeDummies";
 import {TERRACED_ARENA} from "@src/game/terraced/TerracedArena";
@@ -26,7 +28,8 @@ import type {Scenario} from "@src/game/scenario/types/Scenario";
  * counting down to its start (the only scenario that is a match, and the only one that always has a ring), and sparring is
  * the duel with an opponent who has no brain and cannot shoot, so it stands and takes it, in one round with no score, and the
  * heights arena is the player and a dummy on each level, with one stair up to a platform, and the terraced duel is the duel's opponent
- * on low ground below a platform where the player starts, in one round (no score) with a ring.
+ * on low ground below a platform where the player starts, in one round (no score) with a ring, and the overlook is the same arena the
+ * other way round, the opponent on the platform and the player on the low ground in its sight, in one round with no ring.
  *
  * The duel and sparring also have a weapon lying between the fighters (`pickupOf`), drawn from `seed`.
  *
@@ -60,6 +63,12 @@ export function worldOfScenario(scenario: Scenario, seed: number, ringTiming?: R
     const world = giveOpponentBrain(engine.startingWorld(TERRACED_ARENA, [], TERRACED_OPPONENT), seed);
 
     return {...world, ring: ringOf(world, seed, ringTiming ?? DEFAULT_RING_TIMING)};
+  }
+
+  if (scenario === "overlook") {
+    const world = giveOpponentBrain(engine.startingWorld(TERRACED_ARENA, [], OVERLOOK_OPPONENT), seed);
+
+    return {...world, player: {...world.player, position: OVERLOOK_PLAYER}};
   }
 
   if (scenario === "heights") {

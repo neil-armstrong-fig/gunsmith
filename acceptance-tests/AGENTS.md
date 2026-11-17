@@ -94,4 +94,4 @@ Port 3000 may be taken by janggi's dev server (`AGENTS.md` gotchas): start ours 
 janggi. Kill the server you started by process (`pkill -f "vite.*--port 3100"`). `pnpm test` here is Vitest, for
 DSL helpers only; it excludes `src/tests/`. Failure screenshots and video land in `test-results/`.
 
-`TheOpponentClimbingToTheRing` uses the seeded terraced scenario to assert actual climbing and ring escape. Preserve this alongside sprite drawing/readiness criteria.
+`TheOpponentClimbingToTheRing` uses the seeded terraced scenario to assert actual climbing and ring escape. `TheOpponentComingDownFromThePlatform` (in `duel/`) opens `?scenario=overlook` (`gunsmith.startOverlookDuel(seed)`; seeds 2, 17, 28): the opponent starts on the platform and the player idles on the low ground 11 tiles away, past its far range. The round is lost either way, so the criterion is the level: `gunsmith.opponent.get().level` is 0 once it has come down, and `gunsmith.player.getLevel()` is unchanged. It fails with the engage route switched off. Preserve this alongside sprite drawing/readiness criteria.

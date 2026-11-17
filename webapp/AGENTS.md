@@ -115,4 +115,4 @@ SVG assets live in `public/assets/sprites/`; `assets/sprites/` owns keys, anchor
 Unit tests are `node`, not jsdom: reducers, clocks and pure functions. A component is covered by an acceptance spec
 (`acceptance-tests/`), through the one read-only state hook (`shared/src/state-hook/`), never by a unit test.
 
-The `terraced` scenario preserves its arena and seeded opponent across rounds. The read-only snapshot includes opponent level for stair acceptance coverage.
+The `terraced` scenario preserves its arena and seeded opponent across rounds. `?scenario=overlook` (`game/overlook/`) is the terraced arena the other way round: the opponent on the platform at (12.5, 3.5), the player idle on the low ground at (1.5, 3.5), eleven tiles apart; one round, no ring, no match. The read-only snapshot includes opponent level for stair acceptance coverage.

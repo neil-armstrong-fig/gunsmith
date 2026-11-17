@@ -1,3 +1,4 @@
+import type {Point} from "@gunsmith/engine/geometry/types/Point";
 import {equippedWeapon} from "@gunsmith/engine/loadout/EquippedWeapon";
 import {aimErrorFor} from "@gunsmith/engine/opponent/state/acting/engage/aim/AimErrorFor";
 import {missedAimPoint} from "@gunsmith/engine/opponent/state/acting/engage/aim/MissedAimPoint";
@@ -7,6 +8,7 @@ import {engageDirection} from "@gunsmith/engine/opponent/state/acting/engage/Eng
 import type {OpponentBrain} from "@gunsmith/engine/opponent/types/OpponentBrain";
 import type {OpponentContext} from "@gunsmith/engine/opponent/types/OpponentContext";
 import type {StateAct} from "@gunsmith/engine/opponent/types/StateAct";
+import type {StrafeSide} from "@gunsmith/engine/opponent/types/StrafeSide";
 
 /**
  * Engaging: it has the player in sight. It stands and turns to face them while it waits out its reaction time, then holds
@@ -24,15 +26,22 @@ export function actEngage(brain: OpponentBrain, context: OpponentContext): State
 
   return {
     input: {
-      direction: walking(brain)
-        ? engageDirection({from: opponent.position, to: target.position, side: burst.brain.strafeSide})
-        : {x: 0, y: 0},
+      direction: heading(brain, context, burst.brain.strafeSide),
       aimAt: missedAimPoint(opponent.position, target.position, error),
       firing: burst.firing,
       reload: false,
     },
     brain: burst.brain,
   };
+}
+
+/** Where it walks: nowhere while it waits out its reaction time, then the way `engageDirection` says. */
+function heading(brain: OpponentBrain, context: OpponentContext, side: StrafeSide): Point {
+  if (!walking(brain)) {
+    return {x: 0, y: 0};
+  }
+
+  return engageDirection(context.arena, {from: context.opponent.position, to: context.target.position, side});
 }
 
 function walking(brain: OpponentBrain): boolean {

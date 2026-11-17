@@ -2,6 +2,7 @@ import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import {solidTilesOf} from "@gunsmith/engine/arena/SolidTilesOf";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
+import type {Point} from "@gunsmith/engine/geometry/types/Point";
 import {DIFFICULTY} from "@gunsmith/engine/opponent/Difficulty";
 import {hasClearLine} from "@gunsmith/engine/vision/sight/HasClearLine";
 import {actReload} from "@gunsmith/engine/opponent/state/acting/Reload";
@@ -128,6 +129,19 @@ it("gives the same answer for the same brain and context", () => {
   );
 });
 
+it("walks to cover on a platform by way of the stair, not straight at it across the drop", () => {
+  // A platform in the west (columns 1 and 2), the stair at the top of the drop (column 3, the first row drawn, y 3), low ground east.
+  const terraced = arenaFrom(["#########", "#11<....#", "#11.....#", "#11.....#", "#########"]);
+  const below = {x: 3.5, y: 1.5};
+  const context = contextIn(terraced, {opponent: opponentAt(terraced, below)});
+  const onThePlatform = {x: 1.5, y: 1.5};
+
+  const act = actReload(reloading({goal: onThePlatform}), context);
+
+  expect(act.input.direction.x).toBeCloseTo(0, 9);
+  expect(act.input.direction.y).toBeCloseTo(DIFFICULTY.speedShare, 9);
+});
+
 function contextIn(arena: Arena, overrides: Partial<OpponentContext> = {}, dry = true): OpponentContext {
   const world = startingWorld(arena, [], HERE);
   if (!world.opponent) {
@@ -149,6 +163,15 @@ function contextIn(arena: Arena, overrides: Partial<OpponentContext> = {}, dry =
     seconds: TICK,
     ...overrides,
   };
+}
+
+function opponentAt(arena: Arena, position: Point): Player {
+  const {opponent} = startingWorld(arena, [], position);
+  if (!opponent) {
+    throw new Error("The world has no opponent.");
+  }
+
+  return opponent;
 }
 
 function reloading(overrides: Partial<OpponentBrain> = {}): OpponentBrain {

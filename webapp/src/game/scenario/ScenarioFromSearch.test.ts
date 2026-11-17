@@ -31,3 +31,7 @@ it("asks for the heights arena when the query says so", () => {
 it("asks for the terraced duel when the query says so", () => {
   expect(scenarioFromSearch("?scenario=terraced")).toBe("terraced");
 });
+
+it("asks for the overlook duel when the query says so", () => {
+  expect(scenarioFromSearch("?scenario=overlook")).toBe("overlook");
+});

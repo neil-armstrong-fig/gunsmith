@@ -3,6 +3,7 @@ import type {Point} from "@gunsmith/engine/geometry/types/Point";
 import {findCover} from "@gunsmith/engine/opponent/state/acting/reload/cover/FindCover";
 import {advanceStrafe} from "@gunsmith/engine/opponent/state/acting/engage/AdvanceStrafe";
 import {otherLoadedSlot} from "@gunsmith/engine/opponent/state/acting/reload/OtherLoadedSlot";
+import {routeWaypoint} from "@gunsmith/engine/opponent/steering/RouteWaypoint";
 import {strafeDirection} from "@gunsmith/engine/opponent/steering/StrafeDirection";
 import {walkToward} from "@gunsmith/engine/opponent/steering/WalkToward";
 import type {OpponentBrain} from "@gunsmith/engine/opponent/types/OpponentBrain";
@@ -11,8 +12,8 @@ import type {StateAct} from "@gunsmith/engine/opponent/types/StateAct";
 
 /**
  * Reloading: the magazine is empty. It asks for a reload every step (asking again mid-reload changes nothing), and
- * while the player can see it, it makes for the nearest cover it can walk to in a straight line, or circles in the open
- * when there is none. Out of the player's sight it reloads where it stands. A weapon with no rounds and no reserve cannot
+ * while the player can see it, it makes for the nearest cover it can walk to (round by a stair where there is a drop, `routeWaypoint`),
+ * or circles in the open when there is none. Out of the player's sight it reloads where it stands. A weapon with no rounds and no reserve cannot
  * be reloaded, so it asks for its other weapon instead. It never fires. Leaving is `chooseState`'s business: once the
  * magazine has rounds again.
  */
@@ -78,7 +79,7 @@ function fallbackSlot(context: OpponentContext): number | undefined {
 function direction(brain: OpponentBrain, context: OpponentContext): Point {
   const {opponent, target, sees} = context;
   if (brain.goal) {
-    return walkToward(opponent.position, brain.goal);
+    return walkToward(opponent.position, routeWaypoint(context.arena, opponent.position, brain.goal));
   }
   if (sees) {
     return strafeDirection({from: opponent.position, to: target.position, side: brain.strafeSide});

@@ -2,7 +2,9 @@ import {isSolid} from "@gunsmith/engine/arena/IsSolid";
 import {levelOfTile} from "@gunsmith/engine/arena/LevelOfTile";
 import {stairOfTile} from "@gunsmith/engine/arena/StairOfTile";
 import {levelAt} from "@gunsmith/engine/height/LevelAt";
+import {DIFFICULTY} from "@gunsmith/engine/opponent/Difficulty";
 import {disarmOpponent} from "@gunsmith/engine/opponent/DisarmOpponent";
+import {RIFLE} from "@gunsmith/engine/weapon/weapons/Rifle";
 import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import {startMatch} from "@gunsmith/engine/match/StartMatch";
@@ -17,6 +19,8 @@ import {DUEL_ARENA} from "@src/game/duel/DuelArena";
 import {DUEL_OPPONENT} from "@src/game/duel/DuelOpponent";
 import {HEIGHTS_ARENA} from "@src/game/heights/HeightsArena";
 import {HEIGHTS_DUMMIES} from "@src/game/heights/HeightsDummies";
+import {OVERLOOK_OPPONENT} from "@src/game/overlook/OverlookOpponent";
+import {OVERLOOK_PLAYER} from "@src/game/overlook/OverlookPlayer";
 import {PRACTICE_ARENA} from "@src/game/practice/PracticeArena";
 import {PRACTICE_DUMMIES} from "@src/game/practice/PracticeDummies";
 import {TERRACED_ARENA} from "@src/game/terraced/TerracedArena";
@@ -205,6 +209,35 @@ describe("the terraced duel", () => {
       startRing({arena: TERRACED_ARENA, starts: [player.position, TERRACED_OPPONENT], seed: 9, timing}),
     );
     expect(worldOfScenario("terraced", 9).ring?.timing).toEqual(DEFAULT_RING_TIMING);
+  });
+});
+
+describe("the overlook duel", () => {
+  it("is in the terraced arena, with the opponent on the platform and the player on the low ground", () => {
+    const world = worldOfScenario("overlook", 1);
+
+    expect(world.arena).toBe(TERRACED_ARENA);
+    expect(world.opponent?.position).toEqual(OVERLOOK_OPPONENT);
+    expect(world.player.position).toEqual(OVERLOOK_PLAYER);
+    expect(levelAt(world.arena, OVERLOOK_OPPONENT)).toBe(1);
+    expect(levelAt(world.arena, OVERLOOK_PLAYER)).toBe(0);
+  });
+
+  it("puts the player beyond the opponent's far range, so it closes in, but inside the rifle's reach, so it sees them", () => {
+    const apart = Math.hypot(OVERLOOK_OPPONENT.x - OVERLOOK_PLAYER.x, OVERLOOK_OPPONENT.y - OVERLOOK_PLAYER.y);
+
+    expect(apart).toBeGreaterThan(DIFFICULTY.farRange);
+    expect(apart).toBeLessThan(RIFLE.visionRange);
+  });
+
+  it("gives the opponent a brain drawn from the seed, and is one round with no score, no ring and no dummies", () => {
+    const world = worldOfScenario("overlook", 5);
+    const seeded = giveOpponentBrain(startingWorld(TERRACED_ARENA, [], OVERLOOK_OPPONENT), 5);
+
+    expect(world.opponentBrain).toEqual(seeded.opponentBrain);
+    expect(world.match).toBeUndefined();
+    expect(world.ring).toBeUndefined();
+    expect(world.dummies).toEqual([]);
   });
 });
 
