@@ -1,7 +1,7 @@
 import {checkAppearance} from "@gunsmith/ai/pipeline/appearance/check/CheckAppearance";
 import {generateAppearanceDraft} from "@gunsmith/ai/pipeline/appearance/drafting/generate/GenerateAppearanceDraft";
 import {repairAppearanceDraft} from "@gunsmith/ai/pipeline/appearance/drafting/repair/RepairAppearanceDraft";
-import {fallbackAppearance} from "@gunsmith/ai/pipeline/appearance/fallback/FallbackAppearance";
+import {fallbackAppearance} from "@gunsmith/shared/appearance/fallback/FallbackAppearance";
 import type {AppearanceDependencies} from "@gunsmith/ai/pipeline/appearance/types/AppearanceDependencies";
 import type {AppearanceOutcome} from "@gunsmith/ai/pipeline/appearance/types/AppearanceOutcome";
 import type {GenerateAppearanceInput} from "@gunsmith/ai/pipeline/appearance/types/GenerateAppearanceInput";

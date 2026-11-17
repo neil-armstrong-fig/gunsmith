@@ -20,7 +20,8 @@ another by the package's own name, `@gunsmith/ai/pipeline/GenerateWeapon`, never
 
 - `src/pipeline/GenerateWeapon.ts` and `appearance/GenerateAppearance.ts` are separate entry points. Models arrive through dependencies; runtime stays Workers-safe. Never import eval-only Ollama or LangSmith test clients into `src/`.
 - Code, not the model, keeps stats in range: `check/validate/` parses the loose `proposal/WeaponProposal` (any finite number for the six stats; text, `NaN`, a missing or stray field or a fractional magazine still go to repair), then `check/balance/clamping/ClampToRanges` brings each stat to the end of its range, both sides, before the engine's `balanceWeapon`. A stat past a range therefore costs no repair.
-- Appearance is integrated after validated, balanced and rated stats, with five calls maximum, one repair per stage and a disclosed visual fallback. Keep schemas local until the renderer is a real second consumer.
+- Appearance is integrated after validated, balanced and rated stats, with five calls maximum, one repair per stage and a disclosed visual fallback. The appearance schema, limits, vocabularies and stand-in live in `shared/src/appearance/` (the webapp renders them); the bounds that need a sum or a transform (`check/validate/`) stay here.
+- The arena pipeline (`src/pipeline/arena/`, entry `GenerateArena.ts`) mirrors the weapon's: precheck at 250 tokens, moderation, generate, `validate`, one repair, then a built-in arena and a refund (`arena-graph/`), three model calls at most. The model writes the engine's drawing rows; `check/validate/` runs zod, `arenaFrom`, then `problems/ArenaProblems`, **an interim check that is replaced by engine's `validateArena` in that one file** (`HANDOFF.md`); `limits/ArenaLimits` is interim too (engine owns the limits). Built-ins are injected (`builtInArenas`). The arena evals (`evals/dsl/arena/`, `evals/tests/arena/`) have no paid tier yet; a paid arena run needs the user's cost review first.
 - Evals import only downwards: `tests/` → `eval-criteria-mapping/` → `dsl/`. Specs import the mapping only; a `when` takes its DSL through fixtures so its standing criteria are always registered.
 - The mapping owns model/test-runner setup and drivers. A `*Dsl` only wraps lower pipeline-class calls in contextual `DslError`; no loops, filtering or evaluators there. Pipeline classes throw plain failures; pure evaluators/trial folding are independently unit-tested beneath them.
 - A request runs once in its `when`'s `beforeAll`. Every criterion reads those same trials; every trial must pass. Keep deterministic evaluators independent of pipeline constants so they can detect bad enforcement.
@@ -90,7 +91,7 @@ Standing criteria apply to every request using the relevant DSL; a spec states o
   evaluators' and the DSL's, stay flat `it(...)`.
 - Schema validation is separate from model generation: parse untrusted output, preserve field types and let code enforce limits. The engine owns deterministic rating/balancing; AI parses preferences and invokes it before final rating. Do not silently change either policy while editing prompts.
 - Model output is `unknown` until zod has parsed it; the AI proposes, the engine disposes.
-- Schemas and caps here are **drafts** local to `ai/` until the domain owner and real consumers review the contracts in `HANDOFF.md`; do not touch `shared/`.
+- Schemas and caps here are **drafts** until the domain owner and real consumers review the contracts in `HANDOFF.md`. The appearance schema moved to `shared/` (the webapp is its consumer); other schemas stay local, and nothing else goes to `shared/` without a second consumer.
 
 ## Commands
 

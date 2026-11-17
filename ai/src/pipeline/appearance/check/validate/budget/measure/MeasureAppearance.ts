@@ -1,5 +1,5 @@
 import type {AppearanceMeasure} from "@gunsmith/ai/pipeline/appearance/check/validate/budget/types/AppearanceMeasure";
-import type {Appearance} from "@gunsmith/ai/pipeline/appearance/schema/Appearance";
+import type {Appearance} from "@gunsmith/shared/appearance/schema/Appearance";
 
 /** Counts what an appearance costs: its parts, its points and the bytes of its JSON, which `validateAppearance` holds to the limits. */
 export function measureAppearance(appearance: Appearance): AppearanceMeasure {

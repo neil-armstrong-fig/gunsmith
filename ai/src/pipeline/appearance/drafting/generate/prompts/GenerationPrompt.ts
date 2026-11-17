@@ -1,9 +1,9 @@
-import {APPEARANCE_LIMITS} from "@gunsmith/ai/pipeline/appearance/schema/AppearanceLimits";
-import {COLOUR_ROLES} from "@gunsmith/ai/pipeline/appearance/vocabulary/colour/ColourRole";
-import {DETAIL_TIERS} from "@gunsmith/ai/pipeline/appearance/vocabulary/detail/DetailTier";
-import {PALETTE_TOKENS} from "@gunsmith/ai/pipeline/appearance/vocabulary/colour/PaletteToken";
-import {ANIMATION_PRESETS} from "@gunsmith/ai/pipeline/appearance/vocabulary/preset/AnimationPreset";
-import {IMPACT_PRESETS} from "@gunsmith/ai/pipeline/appearance/vocabulary/preset/ImpactPreset";
+import {APPEARANCE_LIMITS} from "@gunsmith/shared/appearance/schema/AppearanceLimits";
+import {COLOUR_ROLES} from "@gunsmith/shared/appearance/vocabulary/colour/ColourRole";
+import {DETAIL_TIERS} from "@gunsmith/shared/appearance/vocabulary/detail/DetailTier";
+import {PALETTE_TOKENS} from "@gunsmith/shared/appearance/vocabulary/colour/PaletteToken";
+import {ANIMATION_PRESETS} from "@gunsmith/shared/appearance/vocabulary/preset/AnimationPreset";
+import {IMPACT_PRESETS} from "@gunsmith/shared/appearance/vocabulary/preset/ImpactPreset";
 
 const SPACE = APPEARANCE_LIMITS.space;
 

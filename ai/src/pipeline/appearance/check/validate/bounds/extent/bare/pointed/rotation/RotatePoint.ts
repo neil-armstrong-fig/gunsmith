@@ -1,4 +1,4 @@
-import type {AppearancePoint} from "@gunsmith/ai/pipeline/appearance/schema/part/point/AppearancePoint";
+import type {AppearancePoint} from "@gunsmith/shared/appearance/schema/part/point/AppearancePoint";
 
 /** Turns a point about the origin by `degrees`, clockwise on a screen whose y runs down (as SVG's `rotate` does). */
 export function rotatePoint(point: AppearancePoint, degrees: number): AppearancePoint {

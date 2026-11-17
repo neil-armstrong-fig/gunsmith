@@ -1,7 +1,7 @@
 import {ellipseExtent} from "@gunsmith/ai/pipeline/appearance/check/validate/bounds/extent/bare/ellipse/EllipseExtent";
 import {pointedExtent} from "@gunsmith/ai/pipeline/appearance/check/validate/bounds/extent/bare/pointed/PointedExtent";
 import type {Extent} from "@gunsmith/ai/pipeline/appearance/check/validate/bounds/extent/types/Extent";
-import type {AppearancePart} from "@gunsmith/ai/pipeline/appearance/schema/part/AppearancePart";
+import type {AppearancePart} from "@gunsmith/shared/appearance/schema/part/AppearancePart";
 
 /** The box round a part's geometry once it is turned, before any stroke. A circle looks the same turned. */
 export function bareExtent(part: AppearancePart): Extent {

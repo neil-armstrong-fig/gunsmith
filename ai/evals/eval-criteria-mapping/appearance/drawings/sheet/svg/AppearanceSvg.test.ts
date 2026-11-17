@@ -1,4 +1,4 @@
-import {appearanceSchema} from "@gunsmith/ai/pipeline/appearance/schema/Appearance";
+import {appearanceSchema} from "@gunsmith/shared/appearance/schema/Appearance";
 import {readArtAppearanceFixtures} from "@gunsmith/ai/pipeline/appearance/testing/ArtAppearanceFixtures";
 import {passingAppearance} from "@gunsmith/ai/pipeline/appearance/testing/PassingAppearance";
 import {appearanceSvg} from "@evals/eval-criteria-mapping/appearance/drawings/sheet/svg/AppearanceSvg";

@@ -1,6 +1,8 @@
 import type {Page} from "@playwright/test";
 import type {PickupSnapshot} from "@gunsmith/shared/state-hook/types/PickupSnapshot";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
+import {lookOfPickup} from "@src/dsl/gunsmith/playwright/look/look-of-pickup/LookOfPickup";
+import type {PickupLook} from "@src/dsl/gunsmith/types/PickupLook";
 
 export class PickupPlaywright extends BasePage {
   constructor(page: Page) {
@@ -12,6 +14,16 @@ export class PickupPlaywright extends BasePage {
     const {pickup} = await this.readGameState();
 
     return pickup;
+  }
+
+  /** What a player sees where the weapon lies, counted by colour. Throws when none lies in the arena. */
+  async getLookOnScreen(): Promise<PickupLook> {
+    const pickup = await this.get();
+    if (!pickup) {
+      throw new Error("No weapon lies in the arena to look at.");
+    }
+
+    return await lookOfPickup(this.page, {x: pickup.x, y: pickup.y});
   }
 
   /** Waits until no weapon lies in the arena, for as long as the expect timeout or `timeoutSeconds` allows. A game that never had one counts as taken, so read `get` first. */

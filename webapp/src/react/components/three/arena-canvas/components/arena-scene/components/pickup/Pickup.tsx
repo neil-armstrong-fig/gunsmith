@@ -1,38 +1,36 @@
 import {useFrame} from "@react-three/fiber";
 import {visibleToPlayer} from "@gunsmith/engine/vision/VisibleToPlayer";
 import {gameState} from "@src/store/game/selectors/game-state/GameState";
+import {PickupDisc} from "@src/react/components/three/arena-canvas/components/arena-scene/components/pickup/components/pickup-disc/PickupDisc";
+import {WeaponDrawingPlane} from "@src/react/components/three/arena-canvas/components/arena-scene/components/pickup/components/weapon-drawing-plane/WeaponDrawingPlane";
+import {useWeaponDrawing} from "@src/react/components/three/arena-canvas/components/arena-scene/components/pickup/hooks/use-weapon-drawing/UseWeaponDrawing";
 import type {JSX} from "react";
 import {useRef} from "react";
-import type {Mesh} from "three";
+import type {Group} from "three";
 
-/** How big the disc is, in tiles: a little smaller than a fighter, so it reads as something lying on the floor. */
-const PICKUP_DISC_RADIUS = 0.3;
-
-/** A plain placeholder colour; `art`'s pickup glow replaces it once the manifest has one. */
-const PICKUP_COLOUR = "#7ee0c3";
-
-/** The weapon lying in the arena, drawn as a disc where the simulation says it is, and only while the player sees it. */
+/** The weapon lying in the arena, where the simulation says it is, drawn as its drawing (the placeholder disc when it has none) and only while the player sees it. */
 export function Pickup(): JSX.Element {
-  const meshRef = useRef<Mesh>(null);
+  const groupRef = useRef<Group>(null);
+  const drawing = useWeaponDrawing();
 
   useFrame(() => {
-    if (!meshRef.current) {
+    if (!groupRef.current) {
       return;
     }
 
     const world = gameState();
     const {pickup} = world;
-    meshRef.current.visible = pickup !== undefined && visibleToPlayer(world).pickup;
+    groupRef.current.visible = pickup !== undefined && visibleToPlayer(world).pickup;
     if (pickup) {
-      meshRef.current.position.set(pickup.position.x, pickup.position.y, 0.7);
+      groupRef.current.position.set(pickup.position.x, pickup.position.y, 0.7);
     }
   });
 
   return (
-    <mesh ref={meshRef} visible={false} frustumCulled={false}>
-      <circleGeometry args={[PICKUP_DISC_RADIUS, 32]} />
+    <group ref={groupRef} visible={false}>
+      {!drawing && <PickupDisc />}
 
-      <meshBasicMaterial color={PICKUP_COLOUR} />
-    </mesh>
+      {drawing && <WeaponDrawingPlane texture={drawing} />}
+    </group>
   );
 }

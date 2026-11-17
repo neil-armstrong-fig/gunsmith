@@ -1,0 +1,16 @@
+import {validateArenaDraft} from "@gunsmith/ai/pipeline/arena/check/validate/ValidateArenaDraft";
+import type {ArenaGraphStateValues} from "@gunsmith/ai/pipeline/arena/arena-graph/state/types/ArenaGraphStateValues";
+import type {ArenaGraphUpdate} from "@gunsmith/ai/pipeline/arena/arena-graph/state/types/ArenaGraphUpdate";
+
+/**
+ * The first place the model's answer is trusted as an arena: zod, the engine's reading of the drawing and the playability rules. A
+ * draft that passes becomes the arena and the last refusal is cleared; one that does not is refused with a sentence for each fault.
+ */
+export function validateNode(state: ArenaGraphStateValues): ArenaGraphUpdate {
+  const validation = validateArenaDraft(state.draft);
+  if (!validation.ok) {
+    return {errors: validation.errors, nodes: ["validate"]};
+  }
+
+  return {arena: validation.arena, errors: [], nodes: ["validate"]};
+}

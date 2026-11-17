@@ -1,4 +1,4 @@
-import type {Appearance} from "@gunsmith/ai/pipeline/appearance/schema/Appearance";
+import type {Appearance} from "@gunsmith/shared/appearance/schema/Appearance";
 
 /**
  * What `checkAppearance` answers: the appearance, or one sentence for each thing still wrong with the answer, and in both cases
