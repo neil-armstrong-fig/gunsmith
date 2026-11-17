@@ -1,0 +1,7 @@
+import emptyClickUrl from "@src/assets/sounds/files/sfx-empty-click.wav?url";
+import type {SoundKey} from "@src/assets/sounds/types/SoundKey";
+
+/** Where each sound's file is served from, by key. The build gives a file its own address, which is why they are imported. */
+export const SOUND_URLS: Record<SoundKey, string> = {
+  "sfx-empty-click": emptyClickUrl,
+};

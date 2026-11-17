@@ -12,6 +12,7 @@ import {PickupDsl} from "@src/dsl/gunsmith/components/pickup/PickupDsl";
 import {PlayerDsl} from "@src/dsl/gunsmith/components/player/PlayerDsl";
 import {RingDsl} from "@src/dsl/gunsmith/components/ring/RingDsl";
 import {RoundDsl} from "@src/dsl/gunsmith/components/round/RoundDsl";
+import {SoundDsl} from "@src/dsl/gunsmith/components/sound/SoundDsl";
 import {VisionDsl} from "@src/dsl/gunsmith/components/vision/VisionDsl";
 import {WeaponDsl} from "@src/dsl/gunsmith/components/weapon/WeaponDsl";
 import {GunsmithPlaywright} from "@src/dsl/gunsmith/playwright/GunsmithPlaywright";
@@ -33,6 +34,7 @@ export class GunsmithDsl {
   readonly pickup: PickupDsl;
   readonly ring: RingDsl;
   readonly round: RoundDsl;
+  readonly sound: SoundDsl;
   readonly vision: VisionDsl;
 
   constructor(page: Page) {
@@ -49,6 +51,7 @@ export class GunsmithDsl {
     this.pickup = new PickupDsl(page);
     this.ring = new RingDsl(page);
     this.round = new RoundDsl(page);
+    this.sound = new SoundDsl(page);
     this.vision = new VisionDsl(page);
   }
 
@@ -56,6 +59,7 @@ export class GunsmithDsl {
   async begin(): Promise<void> {
     try {
       await this.bullets.startWatching();
+      await this.sound.startWatching();
       await this.gunsmith.open();
     } catch (error) {
       throw new DslError("Failed to open the game", error);

@@ -12,6 +12,9 @@ src/
   react/                     top layer: everything drawn, and the logic only one component uses, beneath that component
   store/                     middle layer: Zustand stores; may import game/ and the engine, never react/
     game/                    the game store: the engine's `World` and nothing else
+    app/                     the app store: choices about the game around the match (today `muted`)
+  sound/                     what the fight sounds like: plain logic and the browser's audio; used by react/, never imports react/ or a store
+  assets/sounds/             the sound files (`files/<key>.wav`), their keys and addresses
   game/                      bottom layer: plain data and logic (the arenas and which match to open), no React, no store
 ```
 
@@ -108,6 +111,8 @@ edge (a fixed 0.12 tile wide, the palette's `--color-gs-ring` repeated as a vect
 `AimReticleCursor.ts`, `image-set(url(32 px) 1x, url(64 px) 2x) 16 16, crosshair`; `AimReticleSharp.png` is `art`'s `reticle@2x.png`, and the hotspot is in CSS pixels, so 16 is the middle of both), set as a style on the arena div in `ArenaCanvas.tsx` **and nowhere else**: the HUDs are `pointer-events-none`
 (keep them so, or they become an aim dead zone) and the round banner is a sibling overlay, so it keeps the ordinary pointer; a cursor on `body` would leak onto it.
 `AimingWithAReticle` reads the cursor under a point. A native cursor is not in any screenshot, so how it looks on a real display (the 2x picture on Retina, and that the browser scales the hotspot as the spec says) is judged by eye.
+
+**Sounds** (`src/sound/`, `src/assets/sounds/`): the loop calls `CombatSounds.afterTick({events, firing, round})` after **every** step with that step's `World.events` (the store keeps only the last world of a frame, so a diff of stored worlds would miss events). `CombatSounds` is plain logic over a `SoundOutput` (`play(key)`, `stopAll()`), so it is unit-tested with a recorder; `web-audio/WebAudioOutput` is the browser's output (an `AudioContext`, each WAV fetched and decoded once, one voice per key, **a sound is dropped, not queued, while the context is suspended**, so a stale cue can never play late; it wakes the context on the first `pointerdown` or `keydown`). `empty-click/ClickLatch` turns the engine's refusal on every step a held trigger meets an empty magazine into **one click per hold**: only letting go rearms it, so a reload or a weapon switch while held does not, and a round that is not being played (a death, the pause before the next round) disarms it. Cues are cosmetic, never read by the engine and never in the game store. `useCombatSounds` (beneath `use-game-loop/hooks/`) makes both, starts the audio with the page, flips the mute with **M** (and `?mute=1` starts silent, `game/sound/MutedOfPage`; the state is `store/app`'s `muted`, passed to the output as a function) and cancels what is playing when the window loses focus. Files are plain WAV, not the compressed copies, which still fail the WebKit checks (`TODO.md`); `sfx-empty-click` is `art`'s `empty-tight`. ESLint keeps `sound/` free of React and stores. **Not covered by a spec, plainly:** that the context is woken by a first press in a browser that holds audio back (the test Chromium starts audio running whatever flag it is given, so removing the wake-up survives), how the click sounds over a real shot, and that it is audible on a speaker.
 
 ## Folders inside `react/`
 

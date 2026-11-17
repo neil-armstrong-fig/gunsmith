@@ -1,5 +1,6 @@
 import {advanceBullets} from "@gunsmith/engine/bullet/AdvanceBullets";
 import type {Bullet} from "@gunsmith/engine/bullet/types/Bullet";
+import {eventsOfStep} from "@gunsmith/engine/combat-events/EventsOfStep";
 import {prepareFighter} from "@gunsmith/engine/game-loop/fighter/PrepareFighter";
 import {shootFighter} from "@gunsmith/engine/game-loop/fighter/ShootFighter";
 import type {Input} from "@gunsmith/engine/game-loop/types/Input";
@@ -29,11 +30,12 @@ import {decideRound} from "@gunsmith/engine/round/DecideRound";
  * in each step that is fought, so it stops with the round, unlike `elapsedSeconds`, and a fighter outside the ring, as it
  * stands at the end of the step, loses health to it with any bullet damage, before the round is decided; the practice
  * dummies and the bullets in the air are not hurt by it. Last, a fighter with health left who stands within reach of the
- * pickup lying in the arena takes it (`takePickup`), and a frozen world takes nothing.
+ * pickup lying in the arena takes it (`takePickup`), and a frozen world takes nothing. The world also carries what happened to the
+ * player in this step alone (`eventsOfStep`), so a frozen world and the step after it carry none.
  */
 export function step(world: World, input: Input, seconds: number): World {
   if (world.round !== "playing") {
-    return {...world, elapsedSeconds: world.elapsedSeconds + seconds};
+    return {...world, elapsedSeconds: world.elapsedSeconds + seconds, events: undefined};
   }
 
   const playerTurn = prepareFighter({arena: world.arena, fighter: world.player, input, seconds});
@@ -80,6 +82,7 @@ export function step(world: World, input: Input, seconds: number): World {
     round,
     match: world.match && scoreRound(world.match, round),
     ring,
+    events: eventsOfStep({playerTurn}),
   };
 }
 

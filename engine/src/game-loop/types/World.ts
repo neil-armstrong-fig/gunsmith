@@ -1,4 +1,5 @@
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
+import type {CombatEvent} from "@gunsmith/engine/combat-events/types/CombatEvent";
 import type {Bullet} from "@gunsmith/engine/bullet/types/Bullet";
 import type {Dummy} from "@gunsmith/engine/dummy/types/Dummy";
 import type {Match} from "@gunsmith/engine/match/types/Match";
@@ -30,4 +31,6 @@ export interface World {
   ring?: Ring | undefined;
   /** The weapon lying in the arena for either fighter to walk onto; absent once it is taken, and in a world that has none, such as the practice range. */
   pickup?: Pickup | undefined;
+  /** What happened to the local player in the step that made this world, and only that step; absent when nothing did, and in a frozen world. */
+  events?: readonly CombatEvent[] | undefined;
 }

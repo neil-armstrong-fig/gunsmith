@@ -75,3 +75,27 @@ it("keeps cooling down while the weapon is being reloaded", () => {
 it("does not start the cool-down when it cannot fire", () => {
   expect(pull({rounds: 0}).cooldownSeconds).toBe(0);
 });
+
+it("refuses as empty when the trigger is held on an empty magazine that is ready", () => {
+  expect(pull({rounds: 0}).refusal).toBe("empty");
+});
+
+it("refuses as empty on the step that finishes the cool-down of the last shot", () => {
+  expect(pull({rounds: 0, cooldownSeconds: 0.01}).refusal).toBe("empty");
+});
+
+it("does not refuse while the empty weapon is still cooling down", () => {
+  expect(pull({rounds: 0, cooldownSeconds: INTERVAL}).refusal).toBeUndefined();
+});
+
+it("does not refuse while the empty weapon is being reloaded", () => {
+  expect(pull({rounds: 0, reloading: true}).refusal).toBeUndefined();
+});
+
+it("does not refuse when the trigger is not held", () => {
+  expect(pull({rounds: 0, firing: false}).refusal).toBeUndefined();
+});
+
+it("does not refuse when it fires", () => {
+  expect(pull().refusal).toBeUndefined();
+});

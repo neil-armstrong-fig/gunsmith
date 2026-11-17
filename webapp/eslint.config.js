@@ -5,6 +5,7 @@ import globals from "globals";
 
 // The webapp may import the shared vocabulary and the engine. Inside `src/` the layers run react/ → store/ → game/, and
 // an import may only point down: `game/` knows nothing of the store or of React, and `store/` knows nothing of React.
+// `sound/` sits beside the store: the react/ layer uses it, and it uses neither React nor a store.
 // The game store is held to more than that: see `gameStoreMayImport`.
 const allowedPackages = ["@gunsmith/shared", "@gunsmith/engine"];
 
@@ -78,6 +79,32 @@ export default [
           {
             group: ["@src/react/**"],
             message: "store/ is below react/ (react/ → store/ → game/): a store may not import React code.",
+          },
+        ],
+      }),
+    },
+  },
+  {
+    // The sounds: plain logic and the browser's audio. They may use the engine's events and the sound files, never React code
+    // or a store (the loop hands them what a step reported, and the mute is passed in as a function).
+    files: ["src/sound/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": restrictedImports({
+        allowedPackages,
+        patterns: [
+          {
+            group: [
+              "@src/react/**",
+              "@src/store/**",
+              "react",
+              "react/**",
+              "react-dom",
+              "react-dom/**",
+              "zustand",
+              "zustand/**",
+            ],
+            message:
+              "sound/ is plain logic and the browser's audio: no React, no store. The loop passes it what a step reported.",
           },
         ],
       }),

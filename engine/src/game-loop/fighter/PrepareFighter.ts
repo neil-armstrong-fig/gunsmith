@@ -30,5 +30,6 @@ export function prepareFighter({arena, fighter, input, seconds}: PrepareFighterR
   return {
     fighter: {...ready, position, aim, crouching, cooldownSeconds: trigger.cooldownSeconds},
     fires: trigger.fires,
+    refusal: trigger.refusal,
   };
 }
