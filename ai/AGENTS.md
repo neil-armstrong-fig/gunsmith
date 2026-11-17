@@ -91,7 +91,7 @@ Standing criteria apply to every request using the relevant DSL; a spec states o
   evaluators' and the DSL's, stay flat `it(...)`.
 - Schema validation is separate from model generation: parse untrusted output, preserve field types and let code enforce limits. The engine owns deterministic rating/balancing; AI parses preferences and invokes it before final rating. Do not silently change either policy while editing prompts.
 - Model output is `unknown` until zod has parsed it; the AI proposes, the engine disposes.
-- Schemas and caps here are **drafts** local to `ai/` until `build` freezes the contracts in `HANDOFF.md`; do not touch `shared/`.
+- Schemas and caps here are **drafts** local to `ai/` until the domain owner and real consumers review the contracts in `HANDOFF.md`; do not touch `shared/`.
 
 ## Commands
 

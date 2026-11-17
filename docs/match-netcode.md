@@ -2,7 +2,7 @@
 
 The design of real-time play. Modelled on janggi's `docs/online-play.md` (read it for the sign-in and room-token flow,
 which is unchanged), but the game is real-time, so the room is a ticking authority. Status: design; `build` keeps it in step
-with the code (Phase E in `TODO-build.md`).
+with the code (`TODO-server.md`).
 
 The 2026-11-15 [fair-play research and handoff](art/fair-play-research.md)
 adds sign-in for public play, recording, reports and silent restricted matchmaking.
@@ -36,7 +36,7 @@ These are design decisions; the online controls are not implemented yet.
 - Input validation: rate-limit and clamp (a move vector's length, a fire request only if the weapon can fire), reject
   out-of-order sequence numbers, ignore anything for a dead player.
 - A ticking object stays awake for the match. A Durable Object with a running loop cannot hibernate, so cost grows with match
-  length (the free-plan spike in `TODO-build.md` measures this). Between matches the object is idle and can be evicted.
+  length (the free-plan spike in `TODO-server.md` tracks this). Between matches the object is idle and can be evicted.
 
 ## Snapshots
 

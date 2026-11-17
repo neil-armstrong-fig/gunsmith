@@ -4,6 +4,19 @@ import {join} from "node:path";
 import {expect, it} from "vitest";
 import {instructionFailures} from "./InstructionFailures.ts";
 
+it.each(["play", "engine", "ai", "server", "budget", "art", "ship"])(
+  "checks references in the %s persona checklist",
+  persona => {
+    const root = mkdtempSync(join(tmpdir(), "gunsmith-persona-"));
+    try {
+      writeFileSync(join(root, `TODO-${persona}.md`), "[Missing](Missing.md)");
+      expect(instructionFailures(root).join("\n")).toContain(`TODO-${persona}.md: missing reference Missing.md`);
+    } finally {
+      rmSync(root, {recursive: true, force: true});
+    }
+  },
+);
+
 it.each([
   {name: "budget", text: "x".repeat(100), limit: 32, expected: "exceeds 32"},
   {name: "stale startup", text: "The fuzzy frontend comes first", limit: 65536, expected: "stale startup instruction"},

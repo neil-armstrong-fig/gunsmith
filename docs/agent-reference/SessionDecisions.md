@@ -1,5 +1,7 @@
 # Session decisions and proposals
 
+Current domain owners: engine for rules/tunables and balancing, ai for inference/generated renderer, play for gameplay feedback, art for authored presentation. Historical build references route through HANDOFF.md.
+
 These decisions remain task references. Proposals are not frozen runtime contracts.
 The current owners and readiness are in [HANDOFF](../../HANDOFF.md).
 

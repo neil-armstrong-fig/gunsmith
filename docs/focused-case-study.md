@@ -46,7 +46,7 @@ tested **shutdown drill**, and the honest fact that Cloudflare has no hard cap. 
 5. Evals: datasets, evaluators, the calibrated judge, the gate, and the mutation proof.
 6. Observability: traces, receipts, what a failure looked like.
 7. What it cost (fixed and variable) and what I would change.
-8. Process: the fuzzy frontend, ATDD, three personas working from one set of docs.
+8. Process: the fuzzy frontend, ATDD, seven personas working from one shared board and individual checklists.
 
 ## Evidence checklist (fill in as you go)
 

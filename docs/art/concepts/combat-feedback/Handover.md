@@ -1,6 +1,8 @@
 # Combat feedback / build handover
 
-Status: art study complete, ready for build. Owner of implementation: `build`.
+Current implementation owner: play (Claude), with engine supplying simulation events and art supplying assets/manifests. Use the root TODO-play.md and HANDOFF.md. Historical build references below mean these domain owners.
+
+Status: art study complete, ready for build. Owner of implementation: `play` (Claude).
 User decision, 2026-11-16: **punchy / crunch is preferred; keep the camera shake
 as it is and adjust it during build.** No further art approval is required to
 start integration. This does not claim production playback or gameplay QA.
@@ -110,10 +112,10 @@ These are integration tasks, not reasons to repeat the chosen art direction.
 
 ## Resume prompt for Claude
 
-> You are build. Read HANDOFF.md, TODO.md, the three persona checklists and
+> You are play. Read HANDOFF.md, TODO.md, your current checklist and
 > docs/art/concepts/combat-feedback/Handover.md. Implement the combat-feedback
-> slice test-first when it reaches build's queue. The user chose punchy/crunch;
-> preserve current shake values and tune them during build. Agree event/manifest
+> slice test-first when it reaches play's queue. The user chose punchy/crunch;
+> preserve current shake values and tune them during playtests. Agree event/manifest
 > contracts first, preserve fog privacy and the World-only store, verify aiming
 > during camera translation, and keep approved audio unchanged. Leave uncommitted.
 

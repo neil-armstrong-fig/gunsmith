@@ -2,7 +2,7 @@
 
 The most important fact: **Cloudflare has no hard billing cap.** Budget alerts are informational and email only; they do not
 pause or cap usage, and they exclude recurring plan fees. So automatic shutdown has to be built from layers, and each layer
-has a known weakness. Owners: `ai` for the AI spend, `build` for the Durable Object and Worker spend (the spike).
+has a known weakness. Owners: `budget` for production AI spend/tracing, `ai` for eval spending, `server` for runtime measurements and `ship` for infrastructure cost/release evidence.
 
 ## Targets (all in one config, tunable)
 
@@ -48,12 +48,12 @@ library and the built-in weapon and arena pool; guests are unaffected.
 
 ## Spikes and tasks that produce the numbers
 
-- `build`: the free-plan spike (`TODO-build.md`, Phase E): duration, requests and storage for a 1v1 match at 20 Hz, with
+- `server`: the free-plan spike (`TODO-server.md`): duration, requests and storage for a 1v1 match at 20 Hz, with
   spectators. Record results here.
 - `ai`: the budget arithmetic (`TODO-ai.md`, O1): cost per generation × credits per day = how many generations the $1 a day
   soft cap buys globally; if that is a handful of users, decide what changes (smaller models, caching, fewer credits).
 - `ai`: fixed vs variable spend: LangSmith Plus and Workers Paid are subscriptions on top of the $20 model ceiling.
-- `ai`: the **shutdown drill**: set a tiny budget, exceed it, confirm calls stop, the banner shows, and the game still plays.
+- `budget`: the **shutdown drill**: set a tiny budget, exceed it, confirm calls stop, the banner shows, and the game still plays.
 
 ## Results (fill in)
 

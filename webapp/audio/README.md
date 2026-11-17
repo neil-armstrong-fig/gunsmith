@@ -1,5 +1,7 @@
 # Gunsmith audio pack 02
 
+Current routing: art owns static cues/codec QA; play owns runtime combat playback; ai owns weapon-shot synthesis. See root HANDOFF.md for current ownership.
+
 Original local synthesis, regenerated with native Web Audio on 2026-11-12.
 **The user approved the expanded pack on 2026-11-12: "Sounds great".**
 Detailed fatigue, cross-device and in-game masking review remain before production.

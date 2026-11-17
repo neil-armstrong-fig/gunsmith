@@ -1,5 +1,7 @@
 # AI-generated weapon visuals: a very early look
 
+Current ownership: ai owns pipeline/generated renderer; engine owns rules/balancing; art reviews visuals. The five-call integration is merged; remaining tasks live in the root persona TODOs. Historical build references route through HANDOFF.md.
+
 Owner: `ai`. Dated 2026-11-13. Requested by the user via `art`: evaluate JSON-based weapon appearance generation before the
 design freezes (complexity, reliability, safe code-owned defaults, repair and fallback, cost). **This is findings and
 questions, not a contract.** The original local probe and later Haiku results are preserved below; scores do not transfer
@@ -345,7 +347,7 @@ prompt line about long shapes was **not** added: no eval shows the model failing
 
 9. Answered 2026-11-13: you looked at the contact sheet and none of the drawings came close (see "what to try next"). Look again after the next pass.
 10. A Haiku re-probe needs a capped key. The $1 a day ceiling stays locked until you provide one.
-11. The omitted-stat policy is separate and **still open**. Visual defaults do not decide it.
+11. The omitted-stat policy is separate: the user approved AI-chosen unspecified values/trade-offs on 2026-11-17 in the [preference brief](ai-stat-preference-probe.md). Visual defaults do not decide it; probes/calibration remain open.
 
 ## Not done (original local-probe checkpoint)
 

@@ -6,15 +6,16 @@ Packages: webapp, engine, acceptance-tests, shared and ai exist; api and infra r
 Use pnpm. Design decisions are in `docs/`; add research only when losing it would require re-deriving a decision.
 Read [operational reference](docs/agent-reference/Operations.md) for command details, worktrees, environment gotchas, planned deployment and manual setup.
 
-## The three builders
+## The seven personas
 
-Work is split across three personas so a session can be cleared and resumed with one line
-("You are build, continue the TODO."). **`build`** builds the game and project, **`ai`** builds the AI, **`art`** (Codex)
-makes art, text and audio. Stay inside your own folders; a contract another persona plugs into changes only in
-`HANDOFF.md` first.
+Work is split into **play, engine, ai, server, budget, art and ship**. Each has a TODO-<persona>.md feeding the shared TODO.md board; restart with "You are engine, continue the TODO." Claude defaults: play, engine, ai, server, budget. Codex defaults: art, ship. Ownership follows the persona, not the product/model, and HANDOFF.md defines concrete boundaries. The old build role is retired. Keep consumed contract changes in HANDOFF.md first and coordinate shared-file writers.
 
 **Every fresh session follows the startup protocol in `TODO.md`:** read current shared status and handoff, then your own current checklist and task references. The other checklists and historical archives are read only for dependencies. Before coding, explicitly read every applicable package and nested instruction file; they are not guaranteed to be preloaded. Recover truncated reads before continuing.
 At the end, update your checklist, status and a concise handoff delivery.
+
+## Checkout workflow
+
+**Main is integration-only; develop in persona worktrees.** This includes code, tests, assets, tooling and development docs. Check your checkout at startup, merge committed main into your clean persona branch before new work/delivery, and carry TODO/status/handoff updates with that work. Integrate reviewed commits into a clean main checkout, validate, then have each persona merge main back before continuing. Worktrees persist across slices; never remove/rebase/repurpose another session's work. Main permits merge conflict resolution, combined validation and integration records, not feature/fix development. Follow [the worktree flow](docs/agent-reference/Operations.md#development-worktrees-and-the-integration-checkout) and existing git-write authorization rules.
 
 ## Before changing code
 
@@ -204,7 +205,7 @@ the boundary is silently dropped for those files.
 
 ## More than one session may be running
 
-Several agent sessions can be open on this working tree at once (`build`, `ai` and `art` may share it), and nothing
+Several agent sessions can be open on this working tree at once (the seven personas may share it), and nothing
 tells you when another one starts. The working tree, the index, the stash and the editor's language servers are all shared.
 
 - **Re-read a file immediately before you change it** — a targeted edit beats rewriting a whole file,

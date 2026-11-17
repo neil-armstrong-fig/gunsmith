@@ -13,14 +13,14 @@ can end up in your opponent's hands.
 - **Method:** acceptance-test driven, modelled on [janggi](../janggi). It is also a case study in cost-controlled,
   eval-driven AI engineering (`docs/focused-case-study.md`).
 
-**Status: foundation only. No code yet.** Start with `HANDOFF.md` (who does what) and `TODO.md` (the shared north-star path); each persona also has its own checklist.
+**Status: M1, a playable local game; online play and production integration remain in progress.** Start with `HANDOFF.md` (who does what) and `TODO.md` (the shared north-star path); each persona also has its own checklist.
 
 | File | What it is |
 | --- | --- |
 | `AGENTS.md` | Standards, commands and rules, adapted from janggi |
 | `TODO.md` | The shared north-star path, status board and blockers |
-| `TODO-build.md`, `TODO-ai.md`, `TODO-art.md` | One checklist per persona (all three are read at every session start) |
-| `HANDOFF.md` | Personas, ownership, contracts between sessions |
+| `TODO-<persona>.md` | Seven owner checklists: play, engine, ai, server, budget, art, ship; read your own current tasks |
+| `HANDOFF.md` | Personas, ownership, contracts and integration handoffs |
 | `MANUAL-SETUP-STEPS.md` | Everything done outside the repo |
 | `docs/game-design.md` | The rules of the game, the glossary and the tunables |
 | `docs/architecture.md` | Packages, hosting, and where this differs from janggi |
@@ -32,3 +32,5 @@ can end up in your opponent's hands.
 | `docs/privacy-and-data.md` | What is stored, traced and deleted |
 | `docs/focused-case-study.md` | Research on Focused and the case-study outline |
 | `docs/art/` | The art, copy and audio briefs for `art` |
+
+Development happens in persistent persona worktrees. The main checkout integrates reviewed commits and validates the combined result; worktrees merge updated main before continuing. See [the workflow](docs/agent-reference/Operations.md#development-worktrees-and-the-integration-checkout).

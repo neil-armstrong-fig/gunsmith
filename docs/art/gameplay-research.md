@@ -1,7 +1,7 @@
 # Research for the game session: readable surprises
 
 Researched 2026-11-12 by `art`, at the user's request. This feeds the **game-first, test-first** direction in
-`TODO-build.md`: no menus, schema freeze or real model calls are prerequisites for these experiments.
+`TODO-play.md` and `TODO-engine.md`: no menus, schema freeze or real model calls are prerequisites for these experiments.
 
 This is documentary research from developer/publisher material and original technical work, not hands-on evaluation.
 Source facts are labelled **Evidence**; **Application** and the experiments below are Gunsmith-specific inferences.

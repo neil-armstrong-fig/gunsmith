@@ -16,44 +16,32 @@ pnpm start:preview       # compile, then serve the build on http://localhost:300
 pnpm acceptance-tests    # needs one of the two running in another terminal; preview for the whole suite
 pnpm install-browsers    # one-time Playwright chromium download
 pnpm api:dev             # planned, not implemented: the API Worker locally (`wrangler dev`, port 8787); see `api/AGENTS.md`
-pnpm test:properties     # planned, not implemented: the property tests, which `pnpm checks` leaves out
+pnpm test:properties     # engine property tests, which `pnpm checks` leaves out
 pnpm evals               # root command planned; use package evals:fake/local/paid today. The AI evals (`ai`); costs money, so `pnpm checks` leaves them out
 ```
 
 `pnpm checks` is the gate (`--max-warnings=0`). It deliberately leaves out the property tests — a
 fresh seed every run means a failure isn't reproducible from the same commit, so it can't gate a
-deploy — and the evals, which call a model, cost money, and are non-deterministic. The property-test command is not implemented yet: report that limitation rather than claiming a property run. For prompt/graph changes, use the implemented AI package eval commands and preserve paid authorization/spend controls.
+deploy — and the evals, which call a model, cost money, and are non-deterministic. The property-test command is implemented; run it when engine changes require it. For prompt/graph changes, use the implemented AI package eval commands and preserve paid authorization/spend controls.
 
 
-## Working on a feature in a worktree
+## Development worktrees and the integration checkout
 
-**Work in the main checkout, however big the change. Use a worktree only when asked.** The rest of
-this section is for then. `EnterWorktree` makes one under `.claude/worktrees/<name>` on branch
-`worktree-<name>` (`git worktree add` does the same by hand).
+**The main checkout (`main`) is integration-only. All development happens in persona worktrees**, including fixes, tests, tooling, assets and development documentation. Main is for reviewing incoming commits, merging branches, resolving merge conflicts and validating the combined result. If validation reveals a behavior defect, fix it in the owning worktree and integrate that fix; do not develop the fix on main.
 
-1. **Install its own dependencies** — a worktree has no `node_modules`:
-   `pnpm install --frozen-lockfile --offline`.
-2. **The files are yours; the repository isn't.** Branches, remotes and the stash are shared with
-   every other checkout, so the concurrency rules above still hold — above all, never `git stash` in
-   a worktree. Set work aside with a WIP commit on your own branch instead.
-3. **Run the app on a port of your own** and point specs at it (`pnpm start:preview --port 3100`, or
-   `pnpm start --port 3100 --strictPort` while writing a spec, then
-   `WEBAPP_URL=http://localhost:3100` for Playwright), or you'll test somebody else's code.
-4. **Verify before handing over**: `pnpm checks` and the acceptance suite against your own port.
-5. **Stop, and leave the work uncommitted.** Say what changed and what you ran — the branch is
-   reviewed and committed by hand.
-6. **Integrate from the main checkout only, once that commit exists.** Default to a real merge
-   (`git -C /path/to/main-checkout merge worktree-<name>`), not a fast-forward — it's the safer choice
-   where main may have moved on. For a linear history instead, rebase the worktree branch onto main
-   first and fast-forward main onto the result (`git merge --ff-only worktree-<name>`); ask before
-   rewriting a worktree branch that another worktree or session might still be building on. **A clean text
-   merge proves nothing**: re-run `pnpm checks` (and the acceptance suite where both sides touched the same
-   area) from the main checkout after either route, then tear down: `git worktree remove
-   .claude/worktrees/<name>` and `git branch -d worktree-<name>`.
-7. **Kill any dev server you started by process, not wrapper** — `pkill -f "vite.*--port <port>"`, or
-   the next `--strictPort` start fails with "Port is already in use".
+The flow is **persona worktree → main → persona worktrees**. A merge into main does not update another worktree's files: each worktree explicitly merges the updated local main. Model assignment does not change this workflow.
 
-Pushing is the human's, always.
+1. **Select the right checkout.** At every session start, inspect `git status`, `git branch --show-current` and `git worktree list`. Continue in the persona's assigned development worktree, never the main checkout. Existing legacy worktrees may keep their names until their remaining work is handed over; record the actual path/branch in that persona's resume. Create/reuse a dedicated persona worktree when authorized; do not repurpose a worktree containing someone else's unfinished work.
+2. **Sync from main before new work.** With the worktree's tracked state clean, merge the local main branch into its development branch: `git -C <persona-worktree> merge main`. Commit or hand over unfinished work through the authorized commit flow first; never stash, discard or move another session's work to make a merge possible. If main has pending uncommitted integration changes, those are not part of the sync: wait for their integration commit before relying on them.
+3. **Install and test independently.** Each worktree has its own dependencies: `pnpm install --frozen-lockfile --offline` (if offline metadata is missing, report it before a network retry). Run the app on its own port with `--strictPort` and point Playwright's `WEBAPP_URL` there. Never reuse or kill another session's server.
+4. **Develop and keep context in the worktree.** Follow acceptance/eval-first rules and update the persona TODO, its shared status row and relevant handoff sections there. Use targeted edits to shared coordination files so merges preserve other personas' updates. Shared branches, remotes and stash still require the root concurrency precautions even though the working directories/indexes are separate.
+5. **Prepare a reviewed delivery.** Run `pnpm checks` and the relevant production-preview acceptance/property/eval checks in the development worktree. Report exact results and the commit(s) to integrate. Commits still require the existing authorization; otherwise leave changes uncommitted for the user to review/commit. No push is implied.
+6. **Integrate in main, one branch at a time.** Start from a clean main checkout and merge only reviewed, committed work: `git -C <main-checkout> merge --no-ff <persona-branch>`. Preserve unrelated changes and resolve overlapping TODO/status/handoff edits without losing either side's tasks. Do not rebase shared worktree branches or change their history as part of this flow. Existing git-write authorization rules apply.
+7. **Validate the merged result in main.** Run `pnpm checks` and relevant production-preview acceptance/property checks for the integrated change. A clean textual merge is not sufficient. Record the tested main commit and actual result in the integration handoff; any integration-record-only update is coordination, not permission for development on main.
+8. **Sync back out.** Each persona merges the resulting main commit into its clean development branch before resuming, resolves conflicts in that worktree, and reruns checks relevant to the merge. Record the last merged main commit in its resume. Main may advance again while work continues; sync again before delivery and revalidate the combined worktree result. Coordinate merge timing with active sessions; never run a merge into a worktree whose owner is editing.
+9. **Keep the worktrees.** Persona worktrees are persistent across slices and context clears. Do not automatically remove them, delete their branches, unlock them or clean unfinished files after integration. Stop only the servers you started, by their process/port.
+
+Pushing remains the user's. This policy does not authorize extra commits, branch changes or destructive git operations beyond the instructions already given for a task.
 
 
 ## Gotchas that will waste your time

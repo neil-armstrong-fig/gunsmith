@@ -1,5 +1,7 @@
 # Build asset reference
 
+Current routing: art owns asset production, manifests/loading and presentation; play owns combat/HUD behavior; ai owns generated renderer. See root HANDOFF.md. Historical build references follow those boundaries.
+
 Start here when replacing a primitive or drafting the asset manifest. These are
 editable examples, not production-approved assets. All art is original SVG geometry
 using the established industrial palette. No runtime, schema or manifest changed.

@@ -1,74 +1,87 @@
 # HANDOFF
 
-Current ownership, contracts and cross-session dependencies. Follow `TODO.md` for startup;
-use the owner checklists for tasks. Long implementation/test narratives are historical references.
+Current ownership, contracts and cross-session dependencies. Follow [TODO.md](TODO.md) for startup; each owner maintains its own resume and status row. Historical delivery entries retain the names used at delivery.
 
 ## The personas
 
-Ownership follows the user's assigned persona, not the product or model. Existing sessions
-use build, ai and art; user-directed maintenance follows its explicit scope.
+Ownership follows the assigned persona. Models below are defaults; no application/model settings are changed. The old build role is retired.
 
-| Persona | Checklist | Responsibility |
-| ------- | --------- | -------------- |
-| build | `TODO-build.md` | Game/runtime, shared contracts, project tooling and infrastructure |
-| ai | `TODO-ai.md` | AI pipeline, evals, credit/spend integration and AI research |
-| art | `TODO-art.md` | Authored assets/audio, copy and art research; build integrates runtime changes |
+| Persona | Model | Checklist | Responsibility |
+| --- | --- | --- | --- |
+| play | Claude | [TODO-play.md](TODO-play.md) | Combat feedback, HUD/inventory, camera and runtime audio; close M1 playtest. |
+| engine | Claude | [TODO-engine.md](TODO-engine.md) | Finish source-worktree cross-level bot work; extend merged routing, validators and balancing. |
+| ai | Claude | [TODO-ai.md](TODO-ai.md) | Fix eight reported canned-response fake-eval failures; renderer, calibration and arena generation. |
+| server | Claude | [TODO-server.md](TODO-server.md) | First authoritative two-browser slice after M1; auth, persistence and online privacy. |
+| budget | Claude | [TODO-budget.md](TODO-budget.md) | Production ledger/spend boundaries with server/AI; credits, refunds, tracing and kill switch. |
+| art | Codex | [TODO-art.md](TODO-art.md) | Production assets/presentation, Safari timing and combat masking; current sprites/MP3 are integrated. |
+| ship | Codex | [TODO-ship.md](TODO-ship.md) | Repository tooling/CI now; infra/release when bindings and authorization exist. |
 
 ### Start prompts
 
-"You are build|ai|art. Follow the startup protocol in TODO.md, then continue your
-current resume section. Read applicable instructions and references before editing."
-Check active ownership before overlapping work; old thread/worktree names are not current reservations.
+"You are play|engine|ai|server|budget|art|ship, continue the TODO. Follow the startup protocol in TODO.md; read applicable instructions before editing."
+
+Read shared status/handoff and your own current checklist, not all seven backlogs. Check dependencies and reserve concrete files before overlapping another session. Existing unfinished source-worktree changes remain with their current session until explicitly handed over; an old thread name is not an active reservation.
+
+## Folder and contract ownership
+
+| Domain / paths | Primary writer | Consumers / boundaries |
+| --- | --- | --- |
+| engine/; simulation events, rating/caps, arena validation; engine vocabulary in shared | engine | play consumes local events/data; ai proposes preferences; server runs authority |
+| Webapp combat HUD, camera/input offsets, runtime sound playback and playtests | play | engine writes rules/events; art writes assets/loading/manifests |
+| ai/; generated-appearance renderer; AI adapter result schema and eval workflow | ai | engine reviews rule constraints; server wires API; budget guards production calls |
+| api/ application, auth, match, account/library/history storage; browser networking/prediction | server | Excludes budget-owned AI operations. Server owns shared API routing and common DB migration configuration |
+| api/src/ai/ production credits/spend/Gateway/kill switch/tracing and domain storage/tests | budget | Coordinate credit schema/migration changes through server; ai retains its existing eval paid-spend guard |
+| webapp/public/assets/, webapp/audio/, asset manifests/loading, authored styling/overlays, docs/art/ | art | play owns combat/HUD behavior; ai owns generated renderer and weapon-shot synthesis |
+| infra/, general CI/property workflow, root scripts, shared/config/, manual setup and release evidence | ship | server/budget supply bindings; ai owns eval workflow semantics; no unauthorized live changes |
+| acceptance-tests/ and consumed shared contracts | Feature owner | Reserve the feature's concrete files, including common DSL/hooks; domain owner writes shared contract changes after consumer review |
+| AGENTS.md, TODO.md, HANDOFF.md and other shared docs | Owner of described change | Update only your row/section; reread immediately before editing |
+
+Every TODO-<persona>.md belongs to its named persona. Future path assignments are ownership boundaries, not permission to scaffold before a real consumer exists. Overlapping webapp components/shared files have one writer per slice, recorded below; consumers request changes through the handoff rather than overwrite them.
+
+## Integration workflow
+
+Main is an integration checkout. All seven personas develop in their own worktrees and carry their TODO/status/handoff updates with their commits. The integration session reviews and merges committed deliveries one at a time, validates main, and records its resulting commit/checks. Each worktree then merges committed main before continuing; updates are explicit, not automatic. Record the worktree path/branch and last merged main commit in the persona resume. Keep persistent worktrees and unfinished legacy work; no automatic teardown, rebase or work transfer. Follow [Operations](docs/agent-reference/Operations.md#development-worktrees-and-the-integration-checkout); existing git permissions remain in force.
+
+## Active reservations and requests
+
+No new runtime file reservations are established by this migration. engine coordinates unfinished engagement/cover work, art coordinates unfinished projectile work, and ai coordinates remaining source-worktree improvements before taking those files. Record the persona, slice, concrete files, dependencies and handoff when reserving new work.
 
 ## Contracts between sessions
 
-| Contract | Current state / owner |
-| -------- | --------------------- |
-| Canvas state hook | Build-owned, tiny and read-only; shared snapshot types have real webapp/acceptance consumers. Includes seeded pickup visibility/inventory data. Do not add write seams. |
-| Combat events | Build-owned `World.events` covers one local-player step; currently empty-fire refusal. Frozen steps clear events. It is not a network snapshot or sound-state hook. |
-| Sound keys | MP3 `sfx-empty-click` is integrated under its existing key. User authorized art/research 1 to make this runtime switch. `sfx-damage-crunch` and `sfx-hit` remain agreed but unregistered; future static cues use MP3. Safari timing is follow-up QA, not a prerequisite. |
-| AI hosting | API will import AI in-process in the Worker. Keep the graph host-agnostic/Workers-safe; only API imports AI runtime. |
-| Stats/appearance integration | Accepted design: separate stages, five calls maximum, one repair per stage, disclosed appearance fallback; committed pipeline integration is merged; renderer consumer remains open. |
-| Planned M2 contracts | Weapon/arena schemas and fixtures, adapter/fake, ledger, credit config, asset manifest, wire messages, power rating/caps and arena validity are introduced with real consumers and owner review. Do not build against withdrawn drafts. |
+| Contract | Current state / writer |
+| --- | --- |
+| Canvas state hook | play writes the read-only browser hook, with engine owning simulation meanings and all affected consumers reviewing shared snapshot changes. Existing seeded pickup/inventory data is consumed; no write seams |
+| Combat events | engine owns World.events for a local simulation step; currently empty-fire refusal. play consumes each tick; frozen steps clear events. Damage/hit additions remain open; this is not the network sound contract |
+| Asset/sound manifest | art owns keys/loading; play agrees integration needs. MP3 sfx-empty-click is integrated; sfx-damage-crunch and sfx-hit remain agreed but unregistered. Safari timing is follow-up QA |
+| AI hosting and adapter | API imports AI in-process, Workers-safe. ai owns generation outcomes; server owns API wiring; budget owns production spend/tracing guards |
+| Stats/appearance | Merged separate stages, five calls maximum, one repair per stage, disclosed appearance fallback. ai owns remaining renderer consumer; schema moves require a real second consumer |
+| Initial engine balancing | Merged rating/balancer and eight property tests are implementation evidence. engine and ai still owe calibration/probes; labels and AI-chosen omitted-stat policy are approved |
+| Planned M2 contracts | Domain writers: engine weapon/arena constraints, ai adapter, budget ledger/credit configuration, art asset manifest, server wire messages. Freeze only with real consumers and affected owner review |
 
-Before changing a contract another persona consumes, record it here and identify affected owners.
-Future proposals are not existing runtime contracts. Detailed planned responsibilities and credit/ledger
-requirements remain in [the snapshot](docs/history/2026-11-17-compaction/Handoff.md#contracts-between-sessions)
-and the linked design documents.
+Before changing a consumed contract, record the proposal and affected owners here. Existing decisions remain in [SessionDecisions](docs/agent-reference/SessionDecisions.md); future proposals are not runtime contracts.
 
 ## Ready handovers and preserved decisions
 
-- [Inventory](docs/art/concepts/inventory-display/README.md): user-approved two icons and selected name; build owns data/hook/manifest agreement and implementation.
-- [Combat feedback](docs/art/concepts/combat-feedback/Handover.md): punchy/crunch and retained shake. Empty click is committed as `8acad87`; damage, outgoing hit and shake remain open. Tune the click's abrasive/loud impression with other sounds.
-- [Fair arenas](docs/art/arena-fairness-research.md): matching spawns and unchanged random ring centres; symmetrical geometry/stairs and paired playtests remain implementation work.
-- [AI integration](docs/ai-visual-generation.md#ai-session-handoff-2026-11-15) and [stat balancing](docs/ai-stat-balancing.md): integration first; preserve actual cumulative spend and deliberate weak weapons. User selected AI-chosen unspecified values/trade-offs on 2026-11-17.
-- [Preference-probe brief](docs/ai-stat-preference-probe.md): twelve user-approved label rows (v1, 2026-11-17), three encoding arms and paired illustrations. User selected AI-chosen unspecified values/trade-offs. P06 requires overall weakness and exactly one reserve round, not every stat weak; bad arena weapons can be tactical. AI-inference/engine-balancing owner agreement, probes and calibration remain pending. This is research documentation, not a production contract or model result.
-- AI owner follow-up: reconcile the now-completed label/policy-review tasks in `TODO-ai.md` and the stale "omitted-stat policy still open" statement in `docs/ai-visual-generation.md` with the approved brief. These owner files were left unchanged.
-- [Fair play](docs/art/fair-play-research.md) and [asset reference](docs/art/asset-reference/README.md): implementation/production approval remains with the relevant owners.
-- [Earlier mechanics/appearance decisions](docs/agent-reference/SessionDecisions.md): stairs-only height transitions, no arena level labels, weapon-owned forward vision, crouch tradeoff, proposed visual grammar and shelved kit experiment.
-
-## Folder ownership
-
-| Path | Owner |
-| ---- | ----- |
-| `TODO-build.md`, `shared/`, `engine/`, `webapp/src/`, `api/` (except the AI parts), `acceptance-tests/`, `infra/`, `.github/workflows/ci.yml`, `property-tests.yml` | `build` |
-| `TODO-ai.md`, `ai/`, `.github/workflows/evals.yml`, `api/src/ai/` (credits spend, gateway client, kill switch), `docs/ai-pipeline.md`, `docs/ai-hosting.md`, `docs/cost-and-budget.md` | `ai` |
-| `TODO-art.md`, `webapp/public/assets/`, `webapp/audio/`, `docs/art/`, `docs/focused-case-study.md` (illustrations) | `art` |
-| `AGENTS.md`, `TODO.md` (shared path), `HANDOFF.md`, `MANUAL-SETUP-STEPS.md`, other `docs/` | whoever changes the thing the doc describes; say so in your summary |
+- [Inventory](docs/art/concepts/inventory-display/README.md) and [combat feedback](docs/art/concepts/combat-feedback/Handover.md) are approved: play implements behavior, engine supplies events/data, art supplies manifest assets. Preserve punchy/crunch and retained shake; tune empty-click levels with other sounds.
+- [Fair arenas](docs/art/arena-fairness-research.md): engine owns matching spawns, transformed geometry/stairs, clearance and paired playtests; random ring centres remain unchanged.
+- [AI integration](docs/ai-visual-generation.md#ai-session-handoff-2026-11-15) is merged; [stat balancing](docs/ai-stat-balancing.md) and [preference brief](docs/ai-stat-preference-probe.md) guide calibration. Preserve deliberate weakness and cumulative paid spend; no new budget/paid authorization is implied.
+- [Fair play](docs/art/fair-play-research.md) belongs to server; [asset reference](docs/art/asset-reference/README.md) belongs to art. Historical references to build route through the ownership table above.
+- Source-worktree unfinished projectile, engagement/cover and AI improvements were not included by the committed merges. Preserve them and coordinate before overlapping.
 
 ## What is ready for the others
 
-`build` updates this list. `ai` and `art` start from the first row that is true.
-
-- [ ] A fun, playable game first (full-screen canvas, built test-first; `TODO-build.md`). Menus are added around it afterwards
-- [ ] Weapon and arena schemas and fixtures in `shared/`. **Withdrawn 2026-11-12:** deleted, to return test-first when a second package needs them
-- [ ] `AiAdapter`, `CreditLedger` interfaces and their fakes. **Withdrawn 2026-11-12:** deleted with the fake world; they return when the game is fun and the AI is next
-- [ ] Asset manifest with placeholders and `docs/art/` stubs complete
-- [ ] Power rating, caps and the arena validator in `engine/`
-- [ ] Real `AiAdapter` swapped in behind the same interface (`ai`)
-- [ ] Art delivered and wired in (`art`, then `build`)
+- [ ] M1 playtest verdict: play coordinates; engine completes rule/bot dependencies. Existing duel/crouch/click have been tried by the user.
+- [ ] Consumer-reviewed M2 contracts/manifest: domain writers above coordinate; withdrawn drafts stay withdrawn.
+- [ ] Full arena validity/caps/property coverage: engine extends the merged initial rating/balancer.
+- [ ] Real adapter/API, accounting and fallbacks: ai, server and budget each deliver their side.
+- [ ] Production art/audio and live release: art/play integrate their domains; ship validates release.
 
 ## Delivery log
+
+- 2026-11-17, integration workflow: user selected integration-only main and persistent persona development worktrees, with explicit worktree → main → worktree merges. Updated startup/ownership guidance and all persona resumes. Existing staged migration and unfinished legacy worktrees preserved; no worktree, index or branch mutation performed. Validation: pnpm checks passes (lint/format/types and shared 59, acceptance helpers 9, engine 976, audio 270 with one slow render skipped, AI 507, webapp 296 tests). Repository gate, thirteen workflow/startup documents, 82 local references and diff whitespace pass. Re-read root instructions and Operations.md; standards/folder/caller review complete, with no new source files, helpers, types or folders. This is coordination guidance only; no runtime/acceptance/eval changes or paid calls.
+
+- 2026-11-17, persona migration: split build/ai/art into play, engine, ai, server, budget, art and ship (five Claude, two Codex defaults). Preserved all 74 original checkbox tasks and source text in [migration history](docs/history/2026-11-17-persona-migration.md). Updated ownership/startup and registered all seven checklists. The new checker regression first failed for exactly the five new personas, then all eleven instruction-check cases passed. Final pnpm checks exits 0: lint/format/types and shared 59, acceptance helpers 9, engine 976, audio 270 (one slow render skipped), AI 507 and webapp 296 tests pass. Sandboxed audio first failed with listen EPERM; unrestricted rerun passed. Seven checklist structures, five Claude/two Codex assignments, 74 routing rows, 81 startup/checklist links and diff whitespace pass. Standards review re-read root/shared/AI/audio instructions and completed the folder/caller audit: no new code helpers/types/folders, root TODO entrypoints are intentional and the history snapshot is referenced by every persona. No gameplay acceptance or model eval was rerun for this docs/tooling change; earlier gameplay/model evidence remains explicitly inherited. No runtime feature, paid call or git write.
+
 
 - 2026-11-17, integration: merged committed AI stats/appearance pipeline, LangGraph execution, initial engine rating/balancing, property tests and eval grouping from `worktree-ai-hosting-proof`. Preserved main’s separated type definitions and repository gate. Calibration/model evidence remains distinct from implementation; no uncommitted source-worktree changes or paid calls included. Validation: `pnpm checks` passes (shared 52, acceptance helpers 9, engine 976, audio 270 with one slow render skipped, AI 507, webapp 296); eight property tests and all 199 production-preview acceptance tests pass. Fake evals: 126 pass, eight fail because the canned moderator/generator approve non-weapon and armour requests; no model-quality claim or paid run. Standards review used root, AI, engine, webapp/React, acceptance and shared instructions; folder/caller audit completed and graph state types placed in `types/`. Initial offline install lacked registry metadata; frozen installation succeeded with 417 reused packages and no version changes.
 

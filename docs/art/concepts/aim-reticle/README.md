@@ -1,5 +1,7 @@
 # Precision aim reticle
 
+Current runtime owner: play (Claude); art supplies authored reticle assets. See root HANDOFF.md for current ownership.
+
 Art delivery: 2026-11-16. User chose a precision crosshair and an aim marker
 only. Artwork is ready for visual review; build owns runtime integration and
 production manifest registration. No game code or approved audio changed.
