@@ -21,7 +21,7 @@ export default [
         "error",
         {
           selector:
-            'CallExpression[callee.name="then"] CallExpression[callee.property.name=/^(resizeWindowTo|startWalking|stopWalking|walkFor|aimAtTile|fire|startFiring|stopFiring|reload|switchTo|startDuel|startLongDuel|startSparring|startSparringWithSeed|startSparringWithPickupDrawing|startSparringWithHeldPictures|releasePictures|startSparringWithMissingPictures|startHeights|startPickupRace|startFairDuel|toggleMute|startClosingRing|startClosingDuel|nextRound|playAgain|holdTheGame|runGameFor|runUntilTheOpponentFires|createPrivateRoom|joinWithASecondBrowser)$/]',
+            'CallExpression[callee.name="then"] CallExpression[callee.property.name=/^(resizeWindowTo|startWalking|stopWalking|walkFor|aimAtTile|fire|startFiring|stopFiring|reload|switchTo|startDuel|startLongDuel|startSparring|startSparringWithSeed|startSparringWithPickupDrawing|startSparringWithHeldPictures|releasePictures|startSparringWithMissingPictures|startHeights|startPickupRace|startFairDuel|startOverwatch|toggleMute|startClosingRing|startClosingDuel|nextRound|playAgain|holdTheGame|runGameFor|runUntilTheOpponentFires|createPrivateRoom|joinWithASecondBrowser)$/]',
           message:
             "Arrange in a beforeEach on the given or when, not inside a then. A criterion asserts; it does not set up.",
         },

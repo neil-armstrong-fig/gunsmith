@@ -18,7 +18,7 @@ Start a session with: **"You are engine, continue the TODO."** Substitute any pe
 | Persona | Model | Checklist | Current focus | Updated |
 | --- | --- | --- | --- | --- |
 | play | Claude | [TODO-play.md](TODO-play.md) | Damage feedback 2b integrated; hit confirmation, HUD/inventory, camera and M1 playtest next. | 2026-11-17 |
-| engine | Claude | [TODO-engine.md](TODO-engine.md) | Hit events and structural arena validator integrated; spawn/symmetry work remains in its worktree, limits and built-in pool next. | 2026-11-17 |
+| engine | Claude | [TODO-engine.md](TODO-engine.md) | Main merged (`40b3dfb`); the bot now searches for a shooter it cannot see (uncommitted, for review). Next: `ShootingAcrossLevels` flake, high-ground dominance question, built-in pool and limits for ai, inventory data, reflection. | 2026-11-18 |
 | ai | Claude | [TODO-ai.md](TODO-ai.md) | Generated pickup renderer and fake-tier arena pipeline A3 integrated; readability review, judge A4, engine-validator adoption and calibration next. | 2026-11-17 |
 | server | Claude | [TODO-server.md](TODO-server.md) | First online match green (`TwoBrowsersHidingFromEachOther`); minimal `api/`, per-seat fog, webapp client. Next: round/match flow in a room, reconnect, then sign-in/storage for budget. | 2026-11-17 |
 | budget | Claude | [TODO-budget.md](TODO-budget.md) | API package is integrated; credits/spend work still awaits storage, account identity and the AI route. | 2026-11-17 |

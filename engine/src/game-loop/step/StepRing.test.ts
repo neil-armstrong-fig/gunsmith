@@ -4,6 +4,7 @@ import {DUMMY_HEALTH} from "@gunsmith/engine/dummy/DummyHealth";
 import {PLAYER_HEALTH} from "@gunsmith/engine/health/PlayerHealth";
 import {OPPONENT_HEALTH} from "@gunsmith/engine/health/OpponentHealth";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
+import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import {step} from "@gunsmith/engine/game-loop/Step";
 import type {World} from "@gunsmith/engine/game-loop/types/World";
@@ -82,6 +83,14 @@ describe("with a closing ring", () => {
 
     expect(opponentOf(after).health).toBeCloseTo(OPPONENT_HEALTH - MAXIMUM_RING_DAMAGE_PER_SECOND * TICK, 9);
     expect(after.player.health).toBe(PLAYER_HEALTH);
+  });
+
+  it("does not tell an opponent hurt only by the ring where the player stands", () => {
+    const hurtByTheRing = withRing(giveOpponentBrain(sparring(), 1), ringOn(PLAYER_AT, CLOSED));
+    const after = step(hurtByTheRing, IDLE, TICK);
+
+    expect(opponentOf(after).health).toBeLessThan(OPPONENT_HEALTH);
+    expect(after.opponentBrain?.shotFrom).toBeUndefined();
   });
 
   it("takes nothing off an opponent inside it", () => {

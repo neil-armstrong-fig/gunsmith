@@ -231,6 +231,28 @@ it("plays a searching brain by the search state: it waits at the place it reache
   expect(decision.brain?.idleSeconds).toBeCloseTo(TICK, 9);
 });
 
+it("searches the place a shot that hurt it came from, when a wall hides the shooter, and then forgets the shot", () => {
+  const shotFrom = {x: 3.5, y: 2.5};
+  const world = duel(1, wallInTheMiddle, {x: 16.5, y: 3.5});
+  const hurt = {
+    ...world,
+    player: {...world.player, position: shotFrom},
+    opponentBrain: world.opponentBrain && {...world.opponentBrain, shotFrom},
+  };
+  const brain = brainOf(hurt);
+
+  expect(brain.state).toBe("search");
+  expect(brain.goal).toEqual(shotFrom);
+  expect(brain.shotFrom).toBeUndefined();
+});
+
+it("keeps wandering when nothing has hurt it and a wall hides the player", () => {
+  const world = duel(1, wallInTheMiddle, {x: 16.5, y: 3.5});
+  const hidden = {...world, player: {...world.player, position: {x: 3.5, y: 2.5}}};
+
+  expect(brainOf(hidden).state).toBe("wander");
+});
+
 // The player stands at the middle of the arena's centre tile; the opponent four tiles east of that, or where it is told.
 function duel(seed = 1, arena = room, opponentAt = {x: 16.5, y: 3.5}): World {
   return giveOpponentBrain(startingWorld(arena, [], opponentAt), seed);
