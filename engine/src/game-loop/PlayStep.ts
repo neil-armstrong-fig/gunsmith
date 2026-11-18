@@ -8,6 +8,7 @@ import type {World} from "@gunsmith/engine/game-loop/types/World";
 import {visibleHitsOf} from "@gunsmith/engine/game-loop/visible-hits/VisibleHitsOf";
 import {takeDamage} from "@gunsmith/engine/health/TakeDamage";
 import {scoreRound} from "@gunsmith/engine/match/ScoreRound";
+import {rememberShot} from "@gunsmith/engine/opponent/RememberShot";
 import {takePickup} from "@gunsmith/engine/pickup/TakePickup";
 import type {Player} from "@gunsmith/engine/player/types/Player";
 import {advanceRing} from "@gunsmith/engine/ring/AdvanceRing";
@@ -31,7 +32,8 @@ import {decideRound} from "@gunsmith/engine/round/DecideRound";
  * `elapsedSeconds`, and a fighter outside the ring, as it stands at the end of the step, loses health to it with any
  * bullet damage, before the round is decided; the practice dummies and the bullets in the air are not hurt by it. Last, a
  * fighter with health left who stands within reach of the pickup lying in the arena takes it (`takePickup`), and a frozen
- * world takes nothing. The world also carries what happened to the player in this step alone, including what a bullet and the
+ * world takes nothing. A bullet of the player's that hurt the opponent leaves its brain the place the player stood
+ * (`rememberShot`), so a shooter it cannot see is searched for next step; the ring never does. The world also carries what happened to the player in this step alone, including what a bullet and the
  * ring each took from their health and visible hits (`eventsOfStep`, `visibleHitsOf`), so a frozen world and the step after it carry none; the opponent's turn never
  * enters it.
  */
@@ -83,7 +85,10 @@ export function playStep(world: World, play: Play, seconds: number): World {
     player: taking.player,
     opponent: taking.opponent,
     pickup: taking.pickup,
-    opponentBrain: opponentDecision.brain,
+    opponentBrain: rememberShot(opponentDecision.brain, {
+      bulletDamage: bulletFlight.opponentDamage,
+      from: playerTurn.fighter.position,
+    }),
     bullets,
     dummies: bulletFlight.dummies,
     elapsedSeconds: world.elapsedSeconds + seconds,

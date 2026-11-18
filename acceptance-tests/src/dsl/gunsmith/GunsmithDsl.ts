@@ -207,6 +207,19 @@ export class GunsmithDsl {
   }
 
   /**
+   * Opens the overwatch: a corridor one tile wide, the opponent wandering on its low ground and the player standing on the platform at
+   * its end, ten tiles away along the same row, farther than the opponent sees and inside the rifle's reach. One round, no score,
+   * no ring; the opponent's choices are drawn from `seed`.
+   */
+  async startOverwatch(seed: number): Promise<void> {
+    try {
+      await this.gunsmith.openOverwatch(seed);
+    } catch (error) {
+      throw new DslError(`Failed to open the overwatch with seed ${seed}`, error);
+    }
+  }
+
+  /**
    * Opens the pickup race: the duel's arena with the player standing still and the opponent six tiles east, and a weapon lying
    * four tiles from the opponent and eight from the player. One round, no score, no ring; the opponent's choices are drawn from `seed`.
    */

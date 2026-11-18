@@ -71,6 +71,10 @@ the player must stand still. **A check must look for what only the drawing has**
 
 `StartingOnFairGround` opens `?scenario=fair-duel` (`gunsmith.startFairDuel(seed)`; seeds 2, 17, 28). The idle player's place is exact; the opponent has a brain and walks before the first read, so a criterion about its place allows at most 6 tiles a second times `gunsmith.round.getElapsedSeconds()` (a flat tolerance flaked 4 in 80).
 
+## Being shot from out of sight
+
+`TheOpponentShotFromOutOfSight` (in `duel/`) opens `?scenario=overwatch` (`gunsmith.startOverwatch(seed)`; seeds 2, 5, 7): a corridor one tile wide, the opponent wandering on the low ground ten tiles from the player, who stands on the platform at the end, farther than it sees. The player fires west along the row (`aimAtTile`, `startFiring`) until `opponent.waitForHealthBelow(100)`, and the criterion is that `behaviour` is no longer `wander`. It fails with the opponent's reaction to a shot switched off (`rememberShot` made a no-op: all three seeds time out). It cannot also assert that the opponent comes up the stair: the trigger is still down while the browser notices the first hit, so four rounds land and the bot dies; the engine's step tests cover the climb. The seeds are those where the old opponent never left `wander` in fifteen seconds (19 of 40).
+
 ## Pickups
 
 Use seeded sparring to isolate player pickup behavior. Assert visibility and inventory consequences as well as pickup disappearance. Keep duel round-reset coverage separate from a bot taking a weapon. `TheOpponentFetchingTheWeapon` opens `?scenario=pickup-race` (`gunsmith.startPickupRace(seed)`; seeds 2, 17, 28): the weapon lies nearer the opponent, who leaves the idle player in its sight to take it; `gunsmith.pickup.waitUntilTaken(seconds)` waits, and the opponent's magazine (over the rifle's twelve) says it holds it. It fails with the bot's seeking switched off (the weapon is never taken).

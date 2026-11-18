@@ -10,4 +10,13 @@
  * player in it until the server's snapshots take over, since the server plays the match.
  */
 export type Scenario =
-  "practice" | "duel" | "sparring" | "heights" | "terraced" | "overlook" | "pickup-race" | "fair-duel" | "room";
+  | "practice"
+  | "duel"
+  | "sparring"
+  | "heights"
+  | "terraced"
+  | "overlook"
+  | "pickup-race"
+  | "fair-duel"
+  | "overwatch"
+  | "room";

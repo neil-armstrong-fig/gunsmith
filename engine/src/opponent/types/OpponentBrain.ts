@@ -17,6 +17,11 @@ export interface OpponentBrain {
   goal?: Point | undefined;
   /** Where it last saw the player; absent until it has. */
   lastSeen?: Point | undefined;
+  /**
+   * Where the player stood when a bullet of theirs last hurt it: set by `rememberShot` in the step the bullet lands, read by the
+   * next step's `thinkOpponent` and cleared there. Absent otherwise. The ring never sets it.
+   */
+  shotFrom?: Point | undefined;
   /** How long it has had the player in sight without a break; zero when it cannot see them. */
   seenSeconds: number;
   /** How long it still waits, after sighting the player, before opening fire. */

@@ -18,7 +18,7 @@ Start a session with: **"You are engine, continue the TODO."** Substitute any pe
 | Persona | Model | Checklist | Current focus | Updated |
 | --- | --- | --- | --- | --- |
 | play | Claude | [TODO-play.md](TODO-play.md) | Hit confirmation (slice 3) integrated; camera shake/recoil/reduced motion, HUD/inventory and M1 playtest next. | 2026-11-17 |
-| engine | Claude | [TODO-engine.md](TODO-engine.md) | Fair-duel seeded symmetric starts integrated; bot follow-up remains in its worktree; limits and built-in pool next. | 2026-11-17 |
+| engine | Claude | [TODO-engine.md](TODO-engine.md) | Fair-duel starts and bot reaction to unseen shots integrated. High-ground playtest, arena pool and limits, inventory data and reflection remain open. | 2026-11-18 |
 | ai | Claude | [TODO-ai.md](TODO-ai.md) | Generated pickup renderer and fake-tier arena pipeline A3 integrated; readability review, judge A4, engine-validator adoption and calibration next. | 2026-11-17 |
 | server | Claude | [TODO-server.md](TODO-server.md) | Prediction/reconciliation/interpolation and 30 Hz snapshots integrated; round/match flow, reconnect, account/storage and generation route next. | 2026-11-17 |
 | budget | Claude | [TODO-budget.md](TODO-budget.md) | Credit and spend Durable Objects integrated; account identity and the generation route remain blockers. | 2026-11-17 |

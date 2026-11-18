@@ -12,6 +12,7 @@ import {SUBMACHINE_GUN} from "@gunsmith/engine/weapon/weapons/SubmachineGun";
 const room = arenaFrom(["##########", "#........#", "#........#", "#........#", "##########"]);
 const HERE = {x: 2.5, y: 2.5};
 const SEEN_AT = {x: 7.5, y: 2.5};
+const SHOT_FROM = {x: 8.5, y: 1.5};
 const WEAPON_NEAR_HERE = {x: 5.5, y: 2.5};
 const OPPONENT_TO_WEAPON = 3;
 const field = arenaFrom([
@@ -169,6 +170,42 @@ it("turns back from the weapon when the player is nearer to it by more than the 
   const ahead = {x: WEAPON_NEAR_HERE.x + OPPONENT_TO_WEAPON - DIFFICULTY.seekGrace - 0.5, y: 2.5};
 
   expect(chooseState(brainIn("seek"), racing({sees: true, player: ahead})).state).toBe("engage");
+});
+
+it("goes to search the place a shot came from when it is hurt while it wanders and cannot see the shooter", () => {
+  const brain = chooseState(brainIn("wander", {shotFrom: SHOT_FROM, lastSeen: SHOT_FROM}), context(false));
+
+  expect(brain.state).toBe("search");
+  expect(brain.goal).toEqual(SHOT_FROM);
+});
+
+it("searches the new place, from the start, when it is hurt again while it searches elsewhere", () => {
+  const searching = brainIn("search", {goal: SEEN_AT, idleSeconds: 3, shotFrom: SHOT_FROM, lastSeen: SHOT_FROM});
+  const brain = chooseState(searching, context(false));
+
+  expect(brain.state).toBe("search");
+  expect(brain.goal).toEqual(SHOT_FROM);
+  expect(brain.idleSeconds).toBe(0);
+});
+
+it("engages the shooter it can see, rather than searching, when it is hurt", () => {
+  expect(chooseState(brainIn("wander", {shotFrom: SHOT_FROM}), context(true)).state).toBe("engage");
+});
+
+it("goes on reloading, hurt or not, when its magazine is empty", () => {
+  const brain = chooseState(brainIn("wander", {shotFrom: SHOT_FROM}), context(false, 0));
+
+  expect(brain.state).toBe("reload");
+});
+
+it("goes on to the weapon it is winning the walk to, hurt or not", () => {
+  const brain = chooseState(brainIn("seek", {shotFrom: SHOT_FROM}), racing({sees: false}));
+
+  expect(brain.state).toBe("seek");
+});
+
+it("does not search when it was not hurt", () => {
+  expect(chooseState(brainIn("wander"), context(false)).state).toBe("wander");
 });
 
 function context(sees: boolean, magazine = 12): OpponentContext {
