@@ -59,7 +59,7 @@ the local model. That is a second model call's worth of work, not a free add-on 
 
 **Not measured:** whether the drawings are *recognisable* as the prompt. That is the user's and `art`'s judgement.
 The local drawings were judged by the user from a contact sheet (none came close). The tooling that made it is deleted; the raw 72 trials and
-their summary stay in `ai/evals/results/appearance-probe/` (git-ignored). The Haiku drawings come with any run: `EVAL_KEEP_DRAWINGS=1`.
+their summary stay in `ai/src/evals/results/appearance-probe/` (git-ignored). The Haiku drawings come with any run: `EVAL_KEEP_DRAWINGS=1`.
 The badges and counts on a page are proxies, never identity.
 
 ## The eval, on the local model
@@ -154,7 +154,7 @@ for the other 8 percent: read the faults before tuning, and the biggest one may 
 fallbacks are the **jellyfish lantern**: its tentacles hang to y 89 to 106 on a 64 unit canvas, 25 to 40 units out, and the
 repair brought them back only to y 92 to 97. That is the model not holding the canvas for a long thin shape, not a tolerance
 problem, so accepting 2 units of overshoot would not help it. One trial in twelve requests is the real figure to carry forward;
-the drawings are on `ai/evals/results/drawings-paid-latest.html`. Latency per call was not logged; 125 s for 36 drawings is
+the drawings are on `ai/src/evals/results/drawings-paid-latest.html`. Latency per call was not logged; 125 s for 36 drawings is
 about 3.5 s each.
 
 **So.** Haiku draws. The tolerance and foreign-field changes are no longer needed to get drawings on this model (they were the

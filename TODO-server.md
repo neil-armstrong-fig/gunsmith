@@ -53,6 +53,8 @@ Wait for M1 and engine consumers. Independently review [netcode](docs/match-netc
 - [x] Two browsers finish a round and agree on the score; both ask for the next round; a decided match offers a new one. Done 2026-11-18: `TwoBrowsersPlayingARound`, `TwoBrowsersPlayingABestOfThree`.
 - [x] Reconnect: a dropped connection or a returning tab gets its own seat back, a stranger does not, the leaver stands frozen, the page says "Reconnecting…". Done 2026-11-18: `TwoBrowsersReconnecting`.
 - [x] The 30 s reconnect window and the 60 s idle forfeit. Done 2026-11-18: `TwoBrowsersGoingQuiet`.
+- [ ] Adopt engine's pool: `MATCH_ARENA_ROWS` becomes `DUEL_BUILT_IN_ARENA.rows` (`@gunsmith/engine/built-in-arenas/DuelBuiltInArena`); see the HANDOFF `engine → ai` paragraph (2026-11-18).
+- [ ] Online combat feedback is wider than damage and hits: the local game now also has the ring loop, pickup cue (`pickupTaken`) and inventory HUD. Agree with play who feeds `afterTick` on the online branch, and with engine that no seat is sent the other's events. Before engine's cover slice B, agree what `viewOfSeat` sends for `Bullet.origin` (a hidden shooter's position must not leak).
 - [ ] Next criteria: an "opponent is away" notice for the player who stays (ask play); the ring and pickup in a room's rounds (seeded by the server); sound direction only (needs engine).
 
 ## Later tasks

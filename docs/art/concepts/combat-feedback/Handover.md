@@ -90,7 +90,7 @@ The user superseded the one-crunch-per-exposure mapping: ring damage needs a
 continuous bed, with no impact/onset cue. Art delivered the separate
 [ring damage study](../../../../webapp/audio/studies/ring-damage/README.md)
 (`sfx-ring-damage-loop`, two seconds, mono 48 kHz, quiet electrical texture,
-no baked-in fades). The user approved the sound after listening in Visual Studio Code. Play owns registration,
+no baked-in fades). The user approved the sound after listening in Visual Studio Code. Ship registered it and wired the playback (integrated `c372d86`); play owns it from here:
 one looping voice per exposure, roughly 100 ms fades and mute/reset cancellation.
 
 WAV loops exactly in Chromium/WebKit. MP3 passes the unchanged seam checks,
