@@ -13,7 +13,7 @@ Ownership follows the assigned persona. Models below are defaults; no applicatio
 | ai | Claude | [TODO-ai.md](TODO-ai.md) | Arena screening, player selection and engine validation integrated. Owns model quality, fallback contrast and adapter coordination. |
 | server | Claude | [TODO-server.md](TODO-server.md) | Initial private-room networking integrated; Prediction/interpolation integrated; match flow/auth/persistence next. |
 | budget | Claude | [TODO-budget.md](TODO-budget.md) | Production ledger/spend boundaries with server/AI; credits, refunds, tracing and kill switch. |
-| art | Codex | [TODO-art.md](TODO-art.md) | Approved terrain and C2 pickup marker integrated. S4 fallback contrast and ring-loop integration remain open. |
+| art | Codex | [TODO-art.md](TODO-art.md) | Terrain, C2 pickup marker and playable stair preview integrated. Stair visual review, S4-1 fallback contrast and ring-loop integration remain open. |
 | ship | Codex | [TODO-ship.md](TODO-ship.md) | Repository tooling/CI now; infra/release when bindings and authorization exist. |
 
 ### Start prompts
@@ -129,6 +129,8 @@ Before changing a consumed contract, record the proposal and affected owners her
 
 **Art → play, approved terrain wired (2026-11-18):** [review sheet and integration notes](docs/art/terrain/README.md). The three floor levels and solid wall draw through the picture loader, with flat fallbacks. The playable `?scenario=terrain` preview exercises all three levels. The level numbering and asset placement are recorded in the manifest. All 24 terrain and pickup drawing criteria and `pnpm checks` passed. Full preview had 310 passes and one shot-timing failure that passed on the managed-preview retry and did not recur in 20 focused checks on either build. Terrain is integrated from `f16c414`.
 
+**Art → play, playable stair preview (2026-11-18):** `?scenario=terrain` draws stair treads, rails onto both landings, and the revised drop lip and shadow under fog. The preview is integrated from `89e3851` and ready for visual review. All 30 targeted production criteria passed. The wider run hit the known cross-level shooting timeout and all four focused shooting criteria passed on rerun. [Preview and review sizes](docs/art/terrain/README.md#playable-stair-preview).
+
 ## Latest ship delivery
 
 2026-11-18, local ring-damage audio in `worktree-ship` (based on `0cf1a12`, pending review): the production WAV matches the approved master. Browser coverage observed the missing loop first, then passed all three new criteria. A temporary build without loop cancellation failed the mute criterion. `pnpm checks` passed lint, formatting, strict types and 3,038 tests with one existing audio-render skip. Managed production preview passed 348/348 on the first attempt. A HUD bracket mismatch from the earlier focused run passed in the full run and in three baseline repetitions.
@@ -150,7 +152,7 @@ Documentation cleanup is integrated. Current decisions and unfinished tasks rema
 
 - Ship: managed Worker startup and generated-report lint exclusions are integrated at `c61bc32`. CI forces local mode; `pnpm acceptance-tests:preview:local` manages both servers, while `API_URL=<origin> pnpm acceptance-tests:preview:api` manages Vite only. Four local CI-shaped shards pass 256/256 without retries and their combined report builds. Hosted CI still awaits publication.
 - Play repaired the `ShootingAcrossLevels` timing with the held game clock in `46ee023`. The focused production preview passed all four cross-level criteria.
-- Standards review (separate from the passing gate): 119 source folders listed with `ls`, root-file import callers counted with `grep`. Owner corrections remain: server’s `api/src/match/room/MatchRoom.ts` has a loose `withoutOneShots` helper beside the class; play’s `places-of-damage/TilesPerStudyPixel.ts` has one caller and should live in that caller; `BracketPlaces` has an unnamed `left | right` parameter type. These predate integration conflict resolution; fix through owner worktrees, preserving their unfinished changes. No standards-complete claim is made.
+- Existing standards follow-ups belong to the owners. Server’s `MatchRoom.ts` still has a loose `withoutOneShots` helper beside the class. Play’s `BracketPlaces` still has an unnamed `left | right` parameter type. `TilesPerStudyPixel` now has two callers, `BracketPlaces` and `ReachPlaces`.
 - Budget: `api/`, its instructions, tests and AI import allowance are now integrated. Credit/spend Durable Objects are integrated at `4fa67d7`; account identity and the generation route still block end-to-end accounting.
 
 ## Earlier integration — 2026-11-17
@@ -175,7 +177,7 @@ Standards review used root, engine, AI, API, shared, webapp, React, audio and ac
 Final source-tip check: every source tip is an ancestor of main and no committed delivery remains unmerged. AI/art/budget/play/ship statuses and index fingerprints match the initial inventory. Engine and server were already dirty; their existing changes were staged during the run, changing their fingerprints while their tips stayed fixed. Integration issued no write command in any source checkout and did not sync them. Their symmetry/spawn and networking work remains outside main. Temporary inventories, index hashes and detailed logs are under `/private/tmp/gunsmith-integration-20261117/` on the integration machine. Only the integration Worker and managed preview were stopped; ports 3478, 3479 and 9478 are closed. Owners merge final main when clean before resuming.
 
 
-## Latest integration — free eval gate, 2026-11-17
+## Free eval gate integration — 2026-11-17
 
 Ship tip `e8ff2700991dffeb26a723a208ea776ed09403c3` is merged at `f6039c82ac99b2cbb4bebe5caf0ffffe6ddaff4a`, the tested combined revision. The merge was conflict-free. Delivery adds the root free fake-eval command, independent CI workflow and paid-policy handoff; paid selector, ledger and evidence implementation remain pending. Stale delivery/resume claims were reconciled separately in this coordination update.
 
@@ -196,3 +198,24 @@ Final source inventory (absolute prefix `/Users/neilarmstrong/Development/Person
 | server | `a543dd1ddc105a8f3046773571bbc5ad12cb4269` | Already integrated; staged work preserved |
 
 Every listed tip is an ancestor of main; no committed delivery remains unmerged. Six sources retain their exact initial tips, status and index fingerprints, including engine/server staging. Art advanced from `9c4e8e8` to existing main `f744267` and acquired an unstaged HANDOFF.md edit concurrently; this integration issued no writes in that checkout or any other source. Art's movement introduced no unique commit. No worktree was synced, unlocked, removed or cleaned by integration. Evidence is under `/private/tmp/gunsmith-integration-20261117-194602/`. No server was started. Git commit emitted stale rerere warnings for the absent WhenBlock.ts; the merge committed successfully, with no tracked conflict or pending merge. Owners merge final main when clean before resuming.
+
+## Worktree integration — 2026-11-18
+
+Started from `4b39f84`. Reviewed committed persona deliveries in the order below. The art follow-up arrived during validation.
+
+| Source | Reviewed tip | Merge on main | Delivery |
+| --- | --- | --- | --- |
+| Engine | `2c05f575637b43685b3279074bf63e9742086866` | `b92a517` | Bot searches for an unseen shooter after taking a hit. |
+| AI | `907a5a47acf9ab8ee56038d7abdf53660e7445cc` | `7df7231` | Arena screening, player picks and engine validation. |
+| Play | `46ee02327d811c6211367871e6457bba1365040d` | `eb9695d` | Camera shake, reduced motion and cross-level spec timing. |
+| Art | `f16c41447fbf321d2f7e2d2d941bf420cea47207` | `09d2e60` | C2 pickup marker and terrain textures. |
+| Server | `be219356dfd40d5cdc500174e55fdc2d6527cd17` | `38e83ff` | Online rounds, match restarts and seat reconnect. |
+| Ship | `689ba552a808f0823d706df781626a75a147365b` | `0cf1a12` | Function-order and named-helper lint. |
+| Art follow-up | `89e38516dc5e35be9c67a0de142cfb6178ef4d6d` | `6d43440` | Stair treads, rails onto both landings and revised drop edges in the terrain preview. |
+| Budget | `bfb86f0685f0754529770efcbfb1851d23302d1b` | Already integrated | No unique commits. |
+
+`pnpm checks` passed lint, formatting, strict types and 3,040 tests at `6d43440`, with the slow audio render skipped by the default gate. The separate full render passed in 648 seconds and reproduced the committed WAV masters byte for byte. The combined suite at `0cf1a12` passed 35 properties and all 210 fake eval criteria. Production-preview acceptance there had 344 passes and one setup timeout in `HittingATarget` while waiting for damage, before the hidden-hit sound assertion. The focused production preview at `6d43440` passed all 39 terrain, traversal, cross-level and hit-sound criteria, including the timed-out case. Vite reported its existing bundle-size warning. All ten integration preview ports closed.
+
+Conflicts preserved both scenario entry points, both sets of DSL verbs, motion preferences and online readiness in the app store, and the reconnect fixture's sequence reset. The combined DSL lint required wrapping the stranger query. Four additional test helpers moved below their callers. Compared 142 test bodies across eight overlapping files with the current main side and retained them exactly. Re-read root, AI, API, engine, shared, webapp, React, audio and acceptance instructions. The folder/caller audit listed 195 folders and counted imports for 330 root files. Existing owner follow-ups are above.
+
+Every reviewed tip is an ancestor of `main`. Art committed its preview follow-up during integration. Ship synced to `0cf1a12` and began ring-loop work. Server's 11 unfinished status entries and index fingerprint matched the starting inventory. Integration issued no writes in any source worktree. The stair appearance still awaits visual review. Results are local.

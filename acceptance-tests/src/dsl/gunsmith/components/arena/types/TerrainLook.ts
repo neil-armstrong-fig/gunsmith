@@ -5,5 +5,8 @@ export interface TerrainLook {
   floorMarks: number[][];
   joinAndWall: number[];
   stairBands: number[];
+  stairTreads: number[];
+  landingRails: number[];
+  stairEntrances: number[];
   dropEdge: number[];
 }

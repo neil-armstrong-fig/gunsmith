@@ -5,6 +5,7 @@ const WINDOWS = [
   {width: 512, height: 400, pixelsPerTile: 32},
 ];
 const FLOOR_GREEN = [43, 64, 90];
+const STAIR_MARK_GREEN = 162;
 const FLOOR_TICKS = [
   [true, false, false, false, false, false],
   [true, false, true, false, false, false],
@@ -47,6 +48,29 @@ given.each(
       expect(lip).toBeGreaterThan(highFloor ?? 0);
     });
 
+    then("both stair flights show three distinct treads", async ({gunsmith}) => {
+      const {stairTreads} = await gunsmith.arena.getTerrainLook(pixelsPerTile);
+
+      expect(stairTreads).toEqual(Array(6).fill(STAIR_MARK_GREEN));
+    });
+
+    then("both landings of each flight have rails framing an open entrance", async ({gunsmith}) => {
+      const {landingRails, stairEntrances} = await gunsmith.arena.getTerrainLook(pixelsPerTile);
+
+      expect(landingRails).toEqual(Array(8).fill(STAIR_MARK_GREEN));
+      expect(Math.max(...stairEntrances)).toBeLessThan(STAIR_MARK_GREEN);
+    });
+
+    then("the drop has a narrow slate lip and a short shadow", async ({gunsmith}) => {
+      const {dropEdge} = await gunsmith.arena.getTerrainLook(pixelsPerTile);
+      const [shadow, lip, highFloor, beyondShadow, beyondLip] = dropEdge;
+
+      expect(lip).toBe(STAIR_MARK_GREEN);
+      expect(beyondLip).toBe(highFloor);
+      expect(beyondShadow).toBe(FLOOR_GREEN[1]);
+      expect(shadow).toBeLessThan(beyondShadow ?? 0);
+    });
+
     when("the player turns away from the stairs", () => {
       beforeEach(async ({gunsmith}) => {
         await gunsmith.player.aimAtTile({x: 13.5, y: 3.5});
@@ -62,9 +86,49 @@ given.each(
           })
           .toBe(true);
       });
+
+      then("the fog dims the treads, landing rails and drop lip", async ({gunsmith}) => {
+        await expect
+          .poll(async () => {
+            const {stairTreads, landingRails, dropEdge} = await gunsmith.arena.getTerrainLook(pixelsPerTile);
+            const markings = [...stairTreads, ...landingRails, dropEdge[1] ?? 0];
+
+            return markings.every(green => green > 75 && green < 130);
+          })
+          .toBe(true);
+      });
     });
   },
 );
+
+given("a player on the highest terrace in the terrain preview", () => {
+  beforeEach(async ({gunsmith}) => {
+    await gunsmith.startTerrain();
+  });
+
+  when("the player walks down both stairs", () => {
+    beforeEach(async ({gunsmith}) => {
+      await gunsmith.player.startWalking("west");
+      await expect.poll(async () => (await gunsmith.player.getPosition()).x).toBeLessThan(3);
+      await gunsmith.player.stopWalking("west");
+    });
+
+    then("the player reaches the lowest floor", async ({gunsmith}) => {
+      expect(await gunsmith.player.getLevel()).toBe(0);
+    });
+
+    when("the player walks back up both stairs", () => {
+      beforeEach(async ({gunsmith}) => {
+        await gunsmith.player.startWalking("east");
+      });
+
+      then("the player can return to the highest terrace", async ({gunsmith}) => {
+        await expect.poll(async () => (await gunsmith.player.getPosition()).x).toBeGreaterThan(8);
+        expect(await gunsmith.player.getLevel()).toBe(2);
+      });
+    });
+  });
+});
 
 given("the highest terrain picture is held back", () => {
   beforeEach(async ({gunsmith}) => {
