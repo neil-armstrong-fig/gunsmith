@@ -4,9 +4,9 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 ## Resume here
 
-Checkout: `.claude/worktrees/art`, branch `worktree-art`; last merged main `6186476` by fast-forward on 2026-11-18. Preserve this worktree and sync committed main before new work/delivery.
+Checkout: `.claude/worktrees/art`, branch `worktree-art`; last merged main `963a09d` in `75a2b89` on 2026-11-18. Preserve this worktree and sync committed main before new work/delivery.
 
-Current slice: the [playable stair preview](docs/art/terrain/README.md#playable-stair-preview) is integrated from `89e3851` and ready for visual review at 64 and 32 px per tile. Art owns `ArenaHeights`, its stair marking geometry and the terrain screenshot criteria for this slice. Next visual check: review the stairs in motion at both scales and review S4-1 when AI delivers its fallback contrast change. Ring-loop integration remains with play.
+Current slice: the [playable stair preview](docs/art/terrain/README.md#playable-stair-preview) passed motion and fog review at 64 and 32 px per tile. Art recommends adopting the treatment in other arenas. The first rollout criterion should show the rotated treads and open landings in `fair-duel` and clear rails beside the wall in `terraced`. Art owns `ArenaHeights` and its terrain drawing criteria. S4-1 re-review awaits AI's fallback contrast change. Ship owns the ring-loop integration slice.
 
 Current milestone: M1/M6; the project remains on M1. Next audio task: combat masking, fatigue and levels once AI/play integrate runtime weapon-shot synthesis (not yet wired into the game sound output). Safari acceptance does not claim new headphone/speaker measurements. Preserve approved master hashes. Next failing check for any playback change: the relevant browser sound acceptance criterion before implementation.
 
@@ -44,7 +44,8 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [ ] Complete remaining held-weapon/default-rifle variants and production polish. Standing/crouched player, opponent and dummy integration already exists.
 - [ ] Pickup glow, projectiles/muzzle flashes by supported behavior, hit/death effects.
 - [x] Draw paired stair landings and height edges in `?scenario=terrain` for playable review.
-- [ ] Review the stair treatment for adoption in other arenas. Penetrable cover, spawn markers, ring edge and fog texture remain open.
+- [x] Review the stair treatment for adoption in other arenas at both play scales.
+- [ ] Adopt the stair treatment in other arenas after browser coverage for the opposite-facing stairs and a wall-side landing. Penetrable cover, spawn markers, ring edge and fog texture remain open.
 - [ ] Runtime HUD/slot assets, health/ammo/credit UI, panels/buttons, prompt styling, power gauge, pipeline progress and reveal frame. Use the approved inventory study rather than treating its standalone artwork as integration.
 - [ ] Landing/practice/onboarding/prompt copy and example prompts for datasets, including weak, broken and harmless adversarial-looking requests; rejection/errors, AI-off and credit explanations.
 - [ ] Privacy/terms copy consistent with `docs/privacy-and-data.md`.
@@ -52,6 +53,15 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [ ] Case-study diagrams: pipeline, cost safeguards and eval loop.
 
 ## Verification/latest delivery
+
+2026-11-18, stair motion review on merged main `963a09d`. At both 64 and
+32 px per tile, the player crossed both flights in both directions. The
+treads and rails framed the open route, and the drop lip and shadow stayed
+distinct from it under fog. All 34 focused Chromium criteria passed without
+retries. `pnpm checks` passed lint, formatting, strict types and 3,040 tests,
+with one existing slow audio test skipped. The review changed coordination
+docs only. The folder and caller audit found no new files, helpers or types.
+Captures and traversal recordings are in `/private/tmp/gunsmith-art-stairs-963a09d/`.
 
 2026-11-18, playable stair preview in `worktree-art` at `f16c414`: eight
 visual criteria failed against the original renderer. The final production

@@ -22,7 +22,7 @@ Start a session with: **"You are engine, continue the TODO."** Substitute any pe
 | ai | Claude | [TODO-ai.md](TODO-ai.md) | Player arena selection and engine validation integrated. S4-1 contrast, model quality, and the production adapter remain open. | 2026-11-18 |
 | server | Claude | [TODO-server.md](TODO-server.md) | Online best-of-three rounds and seat reconnect integrated. Forfeit, account/storage and the generation route remain open. | 2026-11-18 |
 | budget | Claude | [TODO-budget.md](TODO-budget.md) | Credit and spend Durable Objects integrated; account identity and the generation route remain blockers. | 2026-11-17 |
-| art | Codex | [TODO-art.md](TODO-art.md) | Terrain, C2 pickup marker and playable stair preview integrated. Stair visual review, S4-1 fallback contrast and audio dependencies remain open. | 2026-11-18 |
+| art | Codex | [TODO-art.md](TODO-art.md) | Stair preview passed motion and fog review at 64 and 32 px per tile. Other-arena adoption, S4-1 fallback re-review and audio listening remain open. | 2026-11-18 |
 | ship | Codex | [TODO-ship.md](TODO-ship.md) | Function-order and named-helper lint integrated, including tests. Hosted CI profiling and deployment remain open. | 2026-11-18 |
 
 These are persistent workstreams, not permission for simultaneous edits to the same files. Select one current slice; record concrete reservations and contracts in HANDOFF.md. Model assignments are defaults, not application configuration. `build` is retired; current tasks remain in the seven owner checklists.
@@ -52,7 +52,7 @@ M0 is complete; M1 is current. Later milestones proceed when their consumers and
 - **art → ai:** S4 pickup review is complete: lantern passes; fallback body/outline contrast needs a failing acceptance criterion and fix before art re-review. See the S4-1 finding in [HANDOFF.md](HANDOFF.md) and the [approved C2 marker proof](docs/art/concepts/top-down-oddities/pickup-markers/README.md). Redundant review artifacts were removed by user request. Kit generation remains shelved. Fake evals prove the harness only. Reconcile paid spend before any model call; a missing ledger creates no allowance.
 - **engine → server:** [arena fairness](docs/art/arena-fairness-research.md), visibility and deterministic contracts support online play. Preserve random ring centres and validate built-ins too. Public-play [fair-play/privacy](docs/art/fair-play-research.md) belongs to server, not the M1 gate.
 - **server ↔ budget ↔ ship:** server supplies account/storage/call boundaries; budget owns atomic credit/spend enforcement and tracing; ship provisions approved bindings and deployment automation. No speculative shared contracts or live changes.
-- **art → play:** ring-damage WAV/MP3 study delivered; runtime loop playback remains open and the ring stays silent until integrated.
+- **art → ship:** Ship is publishing and registering the approved ring-damage WAV, wiring local playback with fades and cancellation, and covering it in browser acceptance.
 - **art/play:** MP3 is approved and empty click integrated. Safari audio is accepted as good enough by user decision (2026-11-17); its listening follow-up is closed. Combat masking/fatigue and levels await runtime shot synthesis, with existing thresholds and masters preserved.
 - Current milestone remains M1. Add menus, shared contracts and future packages only with real consumers. Later workstreams can refine relevant acceptance scenarios while waiting.
 
