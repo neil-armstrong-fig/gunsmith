@@ -8,6 +8,20 @@ const allowedPackages = ["@gunsmith/shared"];
 
 const notUpwards = "Imports run tests -> acceptance-criteria-mapping -> dsl, never back up.";
 
+// What no part of the DSL may do with the page, shared by the two blocks that govern it.
+const dslSyntax = [
+  {
+    selector: 'MemberExpression[object.type="ThisExpression"][property.name="page"]',
+    message:
+      "A *Dsl may not reach the page from a method. Take it in the constructor, build the *Playwright beside this file with it, and go through that.",
+  },
+  {
+    selector: 'PropertyDefinition[key.name="page"], TSParameterProperty > Identifier[name="page"]',
+    message:
+      "A *Dsl may not keep the page. Take it as a plain constructor parameter, build the *Playwright beside this file with it, and let it go out of scope.",
+  },
+];
+
 export default [
   ...baseConfig({tsconfigRootDir: import.meta.dirname, allowedPackages}),
   {
@@ -21,7 +35,7 @@ export default [
         "error",
         {
           selector:
-            'CallExpression[callee.name="then"] CallExpression[callee.property.name=/^(resizeWindowTo|startWalking|stopWalking|walkFor|aimAtTile|fire|startFiring|stopFiring|reload|switchTo|startDuel|startLongDuel|startSparring|startSparringWithSeed|startSparringWithPickupDrawing|startSparringWithHeldPictures|releasePictures|startSparringWithMissingPictures|startHeights|startPickupRace|startFairDuel|toggleMute|startClosingRing|startClosingDuel|nextRound|playAgain|holdTheGame|runGameFor|runUntilTheOpponentFires|createPrivateRoom|joinWithASecondBrowser|slowTheConnectionBy|receiveOnlyEveryNthSnapshot|startRecordingTheShownFighters)$/]',
+            'CallExpression[callee.name="then"] CallExpression[callee.property.name=/^(resizeWindowTo|startWalking|stopWalking|walkFor|walkUntilPast|aimAtTile|fire|startFiring|stopFiring|reload|switchTo|startDuel|startLongDuel|startSparring|startSparringWithSeed|startSparringWithPickupDrawing|startSparringWithHeldPictures|releasePictures|startSparringWithMissingPictures|startHeights|startPickupRace|startFairDuel|toggleMute|startClosingRing|startClosingDuel|nextRound|playAgain|holdTheGame|keepTheCameraStill|askForReducedMotion|preferReducedMotion|runGameFor|runUntilTheOpponentFires|createPrivateRoom|joinWithASecondBrowser|slowTheConnectionBy|receiveOnlyEveryNthSnapshot|startRecordingTheShownFighters)$/]',
           message:
             "Arrange in a beforeEach on the given or when, not inside a then. A criterion asserts; it does not set up.",
         },
@@ -62,19 +76,7 @@ export default [
     files: ["src/dsl/**"],
     ignores: ["src/dsl/**/playwright/**"],
     rules: {
-      "no-restricted-syntax": [
-        "error",
-        {
-          selector: 'MemberExpression[object.type="ThisExpression"][property.name="page"]',
-          message:
-            "A *Dsl may not reach the page from a method. Take it in the constructor, build the *Playwright beside this file with it, and go through that.",
-        },
-        {
-          selector: 'PropertyDefinition[key.name="page"], TSParameterProperty > Identifier[name="page"]',
-          message:
-            "A *Dsl may not keep the page. Take it as a plain constructor parameter, build the *Playwright beside this file with it, and let it go out of scope.",
-        },
-      ],
+      "no-restricted-syntax": ["error", ...dslSyntax],
       "no-restricted-imports": restrictedImports({
         allowedPackages,
         paths: playwrightPackages.map(name => ({
@@ -85,6 +87,23 @@ export default [
         })),
         patterns: [{group: ["@src/tests/**", "@src/acceptance-criteria-mapping/**"], message: notUpwards}],
       }),
+    },
+  },
+  {
+    // Every method of a `*Dsl`, sync or async, is one `try` that rethrows a `DslError` naming the intention, so a failing spec says what it was doing.
+    // Flat config replaces a rule rather than merging it, so the two selectors above are repeated here.
+    files: ["src/dsl/**/*Dsl.ts"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        ...dslSyntax,
+        {
+          selector:
+            'MethodDefinition[kind=/^(method|get)$/] > FunctionExpression > BlockStatement:not([body.length=1][body.0.type="TryStatement"])',
+          message:
+            "A *Dsl method is one try/catch that rethrows a DslError naming what it was trying to do, even when it is not async, so a failing spec reads as an intention.",
+        },
+      ],
     },
   },
 ];

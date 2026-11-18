@@ -1,5 +1,5 @@
-import type {Flash} from "@src/react/components/three/arena-canvas/components/arena-scene/components/damage-brackets/flash/types/Flash";
-import type {FlashRequest} from "@src/react/components/three/arena-canvas/components/arena-scene/components/damage-brackets/flash/types/FlashRequest";
+import type {Flash} from "@src/react/components/three/arena-canvas/components/arena-scene/flash/types/Flash";
+import type {FlashRequest} from "@src/react/components/three/arena-canvas/components/arena-scene/flash/types/FlashRequest";
 import {BURST_SECONDS} from "@src/sound/burst-window/BurstSeconds";
 
 /**

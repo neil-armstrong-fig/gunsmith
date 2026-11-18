@@ -66,7 +66,7 @@ library and the built-in weapon and arena pool; guests are unaffected.
 | Cost per edit | Sonnet 5.5 $0.0128 (cached $0.0094); Haiku 5.5 $0.0007 (cached $0.0006). Estimate | 2026-11-12 |
 | Cost per arena judgement | Haiku 5.5 $0.00014. Estimate | 2026-11-12 |
 | Generations per day the soft cap buys | See "Budget arithmetic" below. The $20 month, not the $1 day, is the binding limit | 2026-11-12 |
-| Fixed monthly costs (Plus, Paid) | None added by the chosen option 3. Plus ($39 per seat, option 1) declined for now; Workers Paid ($5) only if the real graph's CPU or `build`'s spike needs it. See `docs/ai-hosting.md` | 2026-11-12 |
+| Fixed monthly costs (Plus, Paid) | None added by the chosen option 3. Plus ($39 per seat per month with 10,000 base traces included, option 1; price re-checked on langchain.com/pricing 2026-11-18) declined for now, and the user wants the Plus-only features costed and reconsidered once the game works end to end; Workers Paid ($5) only if the real graph's CPU or `build`'s spike needs it. See `docs/ai-hosting.md` | 2026-11-12 |
 
 ## Budget arithmetic (2026-11-12, estimates until the evals measure real tokens)
 

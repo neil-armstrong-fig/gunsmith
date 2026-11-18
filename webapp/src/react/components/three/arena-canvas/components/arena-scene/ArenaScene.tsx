@@ -12,6 +12,7 @@ import {VisionOverlay} from "@src/react/components/three/arena-canvas/components
 import {RingEdge} from "@src/react/components/three/arena-canvas/components/arena-scene/components/ring-edge/RingEdge";
 import {Opponent} from "@src/react/components/three/arena-canvas/components/arena-scene/components/opponent/Opponent";
 import {Player} from "@src/react/components/three/arena-canvas/components/arena-scene/components/player/Player";
+import {useCameraShake} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-camera-shake/UseCameraShake";
 import {useGameLoop} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/UseGameLoop";
 import {gameState} from "@src/store/game/selectors/game-state/GameState";
 import {useGameStore} from "@src/store/game/UseGameStore";
@@ -36,6 +37,9 @@ export function ArenaScene(): JSX.Element {
     camera.position.set(current.width / 2, current.height / 2, 10);
     camera.updateProjectionMatrix();
   });
+
+  // After the fit above, so the shake has the last word on where the camera is in a frame.
+  useCameraShake();
 
   return (
     <>
