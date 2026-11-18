@@ -93,6 +93,11 @@ export function useGameLoop(): void {
       if (appStore.waitingForOtherPlayer !== waiting) {
         appStore.setWaitingForOtherPlayer(waiting);
       }
+
+      const reconnecting = onlineMatch?.isReconnecting() ?? false;
+      if (appStore.reconnecting !== reconnecting) {
+        appStore.setReconnecting(reconnecting);
+      }
       trigger.afterTicks(owed.ticks);
 
       return;

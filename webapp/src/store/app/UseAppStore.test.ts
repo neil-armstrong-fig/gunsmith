@@ -9,6 +9,8 @@ it("holds the choices about the game and nothing else, so adding state is a deli
     "askForNextRound",
     "muted",
     "nextRoundAsked",
+    "reconnecting",
+    "setReconnecting",
     "setWaitingForOtherPlayer",
     "takeNextRoundAsk",
     "toggleMuted",
@@ -38,6 +40,18 @@ it("remembers whether the other player is being waited for", () => {
   useAppStore.getState().setWaitingForOtherPlayer(false);
 
   expect(useAppStore.getState().waitingForOtherPlayer).toBe(false);
+});
+
+it("remembers whether the connection is being made again, and starts with it not", () => {
+  expect(useAppStore.getState().reconnecting).toBe(false);
+
+  useAppStore.getState().setReconnecting(true);
+
+  expect(useAppStore.getState().reconnecting).toBe(true);
+
+  useAppStore.getState().setReconnecting(false);
+
+  expect(useAppStore.getState().reconnecting).toBe(false);
 });
 
 it("starts with the sound on, as no page asks for it off", () => {

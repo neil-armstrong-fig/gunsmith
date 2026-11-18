@@ -15,12 +15,15 @@ import {fadedOffset} from "@src/online/prediction/correction/FadedOffset";
 import {InputHistory} from "@src/online/prediction/history/InputHistory";
 import {replayInputs} from "@src/online/prediction/replay/ReplayInputs";
 import type {InputAck} from "@gunsmith/shared/online/types/InputAck";
+import type {SeatTokenKeeper} from "@src/online/seat-token/SeatTokenKeeper";
+import type {JoinedFrame} from "@src/online/types/JoinedFrame";
 import type {MatchSocket} from "@src/online/types/MatchSocket";
 import type {Readiness} from "@src/online/types/Readiness";
 import type {SnapshotFrame} from "@src/online/types/SnapshotFrame";
 import {TICK_SECONDS} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/clock/TickSeconds";
 
-/** `WebSocket.OPEN`: the only state a frame can be sent in. */
+/** `WebSocket.CONNECTING` and `WebSocket.OPEN`: the only state a frame can be sent in. */
+const SOCKET_CONNECTING = 0;
 const SOCKET_OPEN = 1;
 
 /** The same ask is sent again after this many steps (ten times a second), so the server's count of steps played with it is lined up with ours again. A tunable. */
@@ -52,14 +55,20 @@ export class OnlineMatch {
   private ready: Readiness | undefined;
   private readonly snapshots = new SnapshotBuffer(SNAPSHOTS_KEPT);
   private readonly renderClock = new RenderClock(INTERPOLATION_DELAY_SECONDS);
-  private readonly history = new InputHistory(HISTORY_STEPS);
+  private history = new InputHistory(HISTORY_STEPS);
   private predicted: Player | undefined;
   private offset: Point = NO_OFFSET;
   private lastSent: Input | undefined;
   private lastSentStep = 0;
   private clockSeconds = 0;
+  private seated = false;
+  private seatedOnThisConnection = false;
 
-  constructor(private readonly socket: MatchSocket) {
+  /** `seatTokens` keeps the token the server gives this browser's seat, when there is somewhere to keep it, so a reload gets the seat back. */
+  constructor(
+    private readonly socket: MatchSocket,
+    private readonly seatTokens?: SeatTokenKeeper,
+  ) {
     socket.addEventListener("message", event => {
       this.receive(event.data);
     });
@@ -67,6 +76,10 @@ export class OnlineMatch {
 
   /** Plays one fixed step of this browser's clock: `input` is what the player asks for during it. */
   step(input: Input): void {
+    if (this.socket.readyState !== SOCKET_OPEN) {
+      this.seatedOnThisConnection = false;
+    }
+
     const step = this.history.nextStep;
     this.history.record(step, input);
     this.send(step, input);
@@ -107,17 +120,27 @@ export class OnlineMatch {
     return this.ready?.player === true;
   }
 
+  /** Whether the connection to the server is lost and being made again, after the match had begun: the player is told, and nothing is sent meanwhile. */
+  isReconnecting(): boolean {
+    return this.seated && this.socket.readyState === SOCKET_CONNECTING;
+  }
+
   close(): void {
     this.socket.close();
   }
 
-  /** Sends `input` as `step` when it is the first, has changed, or is due again. Dropped while the socket is not open: the next change carries the ask. */
+  /**
+   * Sends `input` as `step` when it is the first, has changed, or is due again. Dropped while the socket is not open, and while the server
+   * has not yet seated this browser on this connection (its `joined` frame): a connection made again after a loss is open before that, and
+   * an input sent in the gap would carry a number from the count the server is about to be told has started again, which it would then
+   * hold every later input to. The next step carries the ask.
+   */
   private send(step: number, input: Input): void {
     const last = this.lastSent;
     if (last && !inputChanged(last, input) && step - this.lastSentStep < HEARTBEAT_STEPS) {
       return;
     }
-    if (this.socket.readyState !== SOCKET_OPEN) {
+    if (this.socket.readyState !== SOCKET_OPEN || !this.seatedOnThisConnection) {
       return;
     }
 
@@ -156,10 +179,28 @@ export class OnlineMatch {
 
     const message = parseServerMessage(data);
     if (message?.kind === "joined") {
-      this.arena = arenaFrom(message.arena);
+      this.takeSeat(message);
     }
     if (message?.kind === "snapshot" && this.arena) {
       this.takeSnapshot(this.arena, message);
+    }
+  }
+
+  /**
+   * The server has seated this browser, as it does on every connection, the first and each one after the connection was lost or the page
+   * reloaded. It knows nothing of what this connection has asked for, and counts the inputs it plays from nothing again: so the count
+   * begins again here, and the ask in force is sent again at the next step instead of waiting for it to change. The token it gives is
+   * kept to get the seat back with.
+   */
+  private takeSeat(message: JoinedFrame): void {
+    this.arena = arenaFrom(message.arena);
+    this.seated = true;
+    this.seatedOnThisConnection = true;
+    this.history = new InputHistory(HISTORY_STEPS);
+    this.lastSent = undefined;
+    this.lastSentStep = 0;
+    if (message.token) {
+      this.seatTokens?.save(message.token);
     }
   }
 

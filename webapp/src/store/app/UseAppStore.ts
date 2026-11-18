@@ -24,4 +24,8 @@ export const useAppStore = create<AppStore>()((set, get) => ({
   setWaitingForOtherPlayer: waiting => {
     set({waitingForOtherPlayer: waiting});
   },
+  reconnecting: false,
+  setReconnecting: reconnecting => {
+    set({reconnecting});
+  },
 }));

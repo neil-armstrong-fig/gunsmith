@@ -57,6 +57,86 @@ it("keeps a seat once the match has begun: a person who leaves cannot be replace
   expect(room.join()).toBeUndefined();
 });
 
+it("tells each seat a token of its own as it sits down, which only that seat is given", () => {
+  const room = startedRoom();
+  const first = room.joinedMessage("first").token;
+  const second = room.joinedMessage("second").token;
+
+  expect(first).not.toBe("");
+  expect(second).not.toBe("");
+  expect(first).not.toBe(second);
+});
+
+it("gives a seat back to the person holding its token, but never to a stranger", () => {
+  const room = startedRoom();
+  const token = room.joinedMessage("first").token;
+  room.leave("first");
+
+  expect(room.reconnect("not-the-token")).toBeUndefined();
+  expect(room.reconnect("")).toBeUndefined();
+  expect(room.join()).toBeUndefined();
+  expect(room.reconnect(token)).toBe("first");
+});
+
+it("lets the token of a seat that is still held take it over, as a page that reloads before the old connection is noticed gone", () => {
+  const room = startedRoom();
+
+  expect(room.reconnect(room.joinedMessage("second").token)).toBe("second");
+});
+
+it("has no token for a seat that was given back before the match began", () => {
+  const room = new MatchRoom();
+  room.join();
+  const token = room.joinedMessage("first").token;
+  room.leave("first");
+  room.join();
+  room.join();
+
+  expect(room.reconnect(token)).toBeUndefined();
+});
+
+it("freezes a fighter whose person has left, where it stood", () => {
+  const room = startedRoom();
+  const start = room.snapshotFor("first")?.player.position;
+  room.setInput("first", {...IDLE, direction: {x: 1, y: 0}}, 1);
+  room.tick(10);
+  const leftAt = room.snapshotFor("first")?.player.position;
+  room.leave("first");
+  room.tick(60);
+
+  expect(leftAt?.x).toBeGreaterThan(start?.x ?? Infinity);
+  expect(room.snapshotFor("first")?.player.position).toEqual(leftAt);
+});
+
+it("plays what a returning person asks for even though their count of inputs starts again from nothing", () => {
+  const room = startedRoom();
+  const token = room.joinedMessage("first").token;
+  room.setInput("first", IDLE, 500);
+  room.tick();
+  room.leave("first");
+  room.reconnect(token);
+
+  expect(room.snapshotFor("first")?.ack).toBeUndefined();
+
+  const before = room.snapshotFor("first")?.player.position;
+  room.setInput("first", {...IDLE, direction: {x: 1, y: 0}}, 0);
+  room.tick(10);
+
+  expect(room.snapshotFor("first")?.ack).toEqual({seq: 0, held: 10});
+  expect(room.snapshotFor("first")?.player.position.x).toBeGreaterThan(before?.x ?? Infinity);
+});
+
+it("keeps a seat's ask to go on across its person leaving and returning", () => {
+  const room = startedRoom();
+  const token = room.joinedMessage("first").token;
+  winRound(room, "second");
+  room.ready("first");
+  room.leave("first");
+  room.reconnect(token);
+
+  expect(room.snapshotFor("second")?.ready).toEqual({player: false, opponent: true});
+});
+
 it("sends a seat nothing until both seats are taken", () => {
   const room = new MatchRoom();
   room.join();

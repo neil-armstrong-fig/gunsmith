@@ -30,8 +30,14 @@ export function parseServerMessage(text: string): ServerMessage | undefined {
 function isJoined(frame: object): boolean {
   const seat = Reflect.get(frame, "seat");
   const arena = Reflect.get(frame, "arena");
+  const token: unknown = Reflect.get(frame, "token");
 
-  return (seat === "first" || seat === "second") && Array.isArray(arena) && arena.every(row => typeof row === "string");
+  return (
+    (seat === "first" || seat === "second") &&
+    Array.isArray(arena) &&
+    arena.every(row => typeof row === "string") &&
+    (token === undefined || typeof token === "string")
+  );
 }
 
 function isSnapshot(frame: object): boolean {

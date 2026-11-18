@@ -15,4 +15,7 @@ export interface AppStore {
   /** Online only: the server has this player's ask and is waiting for the other player to ask too. Written by the loop from what the server says. */
   waitingForOtherPlayer: boolean;
   setWaitingForOtherPlayer: (waiting: boolean) => void;
+  /** Online only: the connection to the server was lost and is being made again; the seat is kept for this player meanwhile. Written by the loop. */
+  reconnecting: boolean;
+  setReconnecting: (reconnecting: boolean) => void;
 }

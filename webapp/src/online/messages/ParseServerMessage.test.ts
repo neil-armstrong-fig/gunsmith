@@ -6,6 +6,20 @@ it("reads the frame that seats a browser", () => {
   expect(parseServerMessage(text)).toEqual({kind: "joined", seat: "second", arena: ["###", "#.#", "###"]});
 });
 
+it("reads the token that gets the seat back", () => {
+  const text = JSON.stringify({kind: "joined", seat: "first", arena: ["###"], token: "the-token"});
+  const message = parseServerMessage(text);
+
+  expect(message?.kind === "joined" && message.token).toBe("the-token");
+});
+
+it("refuses a seating whose token is not text", () => {
+  const frame = {kind: "joined", seat: "first", arena: ["###"]};
+
+  expect(parseServerMessage(JSON.stringify({...frame, token: 7}))).toBeUndefined();
+  expect(parseServerMessage(JSON.stringify({...frame, token: null}))).toBeUndefined();
+});
+
 it("reads a snapshot", () => {
   const text = JSON.stringify({
     kind: "snapshot",

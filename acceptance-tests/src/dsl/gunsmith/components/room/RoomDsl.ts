@@ -11,6 +11,7 @@ type MakeGunsmith = (page: Page) => GunsmithDsl;
 export class RoomDsl {
   private readonly room: RoomPlaywright;
   private second: GunsmithDsl | undefined;
+  private stranger: GunsmithDsl | undefined;
 
   constructor(
     page: Page,
@@ -43,6 +44,99 @@ export class RoomDsl {
       await this.secondBrowser().room.waitForTheMatch();
     } catch (error) {
       throw new DslError(`Failed to join room ${code} with a second browser`, error);
+    }
+  }
+
+  /** Opens a third browser, with no seat of its own, in the room `code` names: a stranger who has the friend code. It is reached as `strangersBrowser()`. */
+  async joinAsAStranger(code: string): Promise<void> {
+    try {
+      await this.room.openStrangersBrowser(code, strangerPage => {
+        this.stranger = this.makeGunsmith(strangerPage);
+        this.stranger.room.startWatching();
+      });
+    } catch (error) {
+      throw new DslError(`Failed to join room ${code} as a stranger`, error);
+    }
+  }
+
+  /** The game as the stranger's browser sees it. */
+  strangersBrowser(): GunsmithDsl {
+    if (!this.stranger) {
+      throw new DslError("No stranger has opened the room", undefined);
+    }
+
+    return this.stranger;
+  }
+
+  /** Makes this browser's connection one that `cutTheConnection` can cut. Say it before `createPrivateRoom`. */
+  async prepareToLoseTheConnection(): Promise<void> {
+    try {
+      await this.room.prepareToLoseTheConnection();
+    } catch (error) {
+      throw new DslError("Failed to prepare to lose the connection", error);
+    }
+  }
+
+  /** Cuts this browser's connection to the match, as a dropped network would; the page stays open and has to reconnect by itself. */
+  cutTheConnection(): void {
+    try {
+      this.room.cutTheConnection();
+    } catch (error) {
+      throw new DslError("Failed to cut the connection", error);
+    }
+  }
+
+  /** Cuts this browser's connection and turns away every try to make it again, as a network that stays down would, until `letTheConnectionBack`. */
+  keepTheConnectionDown(): void {
+    try {
+      this.room.keepTheConnectionDown();
+    } catch (error) {
+      throw new DslError("Failed to keep the connection down", error);
+    }
+  }
+
+  /** Lets this browser's next try to connect through again. */
+  letTheConnectionBack(): void {
+    try {
+      this.room.letTheConnectionBack();
+    } catch (error) {
+      throw new DslError("Failed to let the connection back", error);
+    }
+  }
+
+  /** Whether the page is telling the player that the connection is being made again. */
+  async isToldItIsReconnecting(): Promise<boolean> {
+    try {
+      return await this.room.isToldItIsReconnecting();
+    } catch (error) {
+      throw new DslError("Failed to read whether the page says it is reconnecting", error);
+    }
+  }
+
+  /** Leaves the room as a closed tab does. */
+  async leaveTheRoom(): Promise<void> {
+    try {
+      await this.room.leaveTheRoom();
+    } catch (error) {
+      throw new DslError("Failed to leave the room", error);
+    }
+  }
+
+  /** Comes back to the room this browser left, in the same tab. */
+  async returnToTheRoom(): Promise<void> {
+    try {
+      await this.room.returnToTheRoom();
+    } catch (error) {
+      throw new DslError("Failed to return to the room", error);
+    }
+  }
+
+  /** Waits until the server has sent this browser a snapshot since it lost its connection or left. */
+  async waitForTheMatchAgain(): Promise<void> {
+    try {
+      await this.room.waitForTheMatchAgain();
+    } catch (error) {
+      throw new DslError("Failed to wait for the match again", error);
     }
   }
 

@@ -70,8 +70,11 @@ a delay alone can still help a player through a second account.
 
 - A disconnected player has 30 s to return; their character is frozen in place and still vulnerable. After that the round is
   forfeited; two forfeits lose the match. No input for about 60 s counts as idle and is treated the same.
-- The client re-sends `introduce` on every connection and the server replies with a full snapshot.
-- Close code for "match is gone, stop retrying", a documented application close code.
+- **Built (2026-11-18, no time limit yet):** each seat gets a secret `token` in `joined`, sent on every connection; a returning
+  browser shows it (`?token=` on the socket URL, kept in session storage) and gets the same seat, and the server's next
+  snapshot is the full state. The returning page counts its inputs from zero, so the server forgets the seat's `ack` on rebinding.
+  Close codes (application codes, both mean "do not come back"): `4409` the room is full, `4410` the seat's person connected
+  again elsewhere (the old connection is closed). The 30 s window and the 60 s idle rule are the next slice.
 
 ## Rooms
 

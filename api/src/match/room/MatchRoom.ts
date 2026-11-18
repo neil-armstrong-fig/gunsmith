@@ -34,11 +34,15 @@ const OTHER_SEAT: Record<Seat, Seat> = {first: "second", second: "first"};
 export class MatchRoom {
   private readonly arena: Arena = arenaFrom(MATCH_ARENA_ROWS);
   private readonly seated: Seat[] = [];
+  private readonly tokens: Record<Seat, string> = {first: "", second: ""};
   private readonly asked: Record<Seat, Input> = {first: NOTHING_ASKED, second: NOTHING_ASKED};
   private readonly acked: Partial<Record<Seat, InputAck>> = {};
   private readonly pulled: Record<Seat, boolean> = {first: false, second: false};
   private readonly readied: Record<Seat, boolean> = {first: false, second: false};
   private world: World | undefined;
+
+  /** `makeToken` makes the secret each seat is given as it sits down: whoever shows it later is that seat's person. */
+  constructor(private readonly makeToken: () => string = () => crypto.randomUUID()) {}
 
   /** The next free seat, or `undefined` when both are taken. The second to sit starts the match. */
   join(): Seat | undefined {
@@ -48,6 +52,7 @@ export class MatchRoom {
     }
 
     this.seated.push(seat);
+    this.tokens[seat] = this.makeToken();
     if (seat === "second") {
       this.world = this.worldOfRound(startMatch());
     }
@@ -56,23 +61,48 @@ export class MatchRoom {
   }
 
   /**
-   * Gives `seat` back, but only before the match begins: a browser that connects and goes (a page reloading) must not keep the
-   * room full. Once it has begun a seat is kept for its person, who may not be replaced by a stranger (reconnecting comes later).
+   * Notes that `seat`'s person is gone. Before the match begins the seat is given back: a browser that connects and goes (a page
+   * reloading) must not keep the room full, and its token is void. Once it has begun the seat is kept for its person, who may come back
+   * with its token (`reconnect`) and is not replaced by a stranger. Meanwhile the fighter stands still where it is, in the match and still
+   * hittable, as `docs/match-netcode.md` says.
    */
   leave(seat: Seat): void {
     if (this.world) {
+      this.asked[seat] = NOTHING_ASKED;
+      this.pulled[seat] = false;
+
       return;
     }
 
     const index = this.seated.indexOf(seat);
     if (index >= 0) {
       this.seated.splice(index, 1);
+      this.tokens[seat] = "";
     }
   }
 
-  /** The word a browser is sent as it sits down. */
+  /**
+   * The seat whose person shows `token`, taken back as they left it, or `undefined` for a token that is not a seat's (or before the match
+   * begins, when a seat that left is simply free). A returning page counts its inputs from nothing again, so what the seat had reached
+   * is forgotten and its next input is played whatever its number; its ask to go on is kept. It works while the seat is still held too,
+   * for a page that comes back before the old connection is known to be gone.
+   */
+  reconnect(token: string): Seat | undefined {
+    const seat = this.seatOfToken(token);
+    if (!seat || !this.world) {
+      return undefined;
+    }
+
+    delete this.acked[seat];
+    this.asked[seat] = NOTHING_ASKED;
+    this.pulled[seat] = false;
+
+    return seat;
+  }
+
+  /** The word a browser is sent as it sits down, with the secret that gets the seat back for it. */
   joinedMessage(seat: Seat): JoinedMessage {
-    return {kind: "joined", seat, arena: MATCH_ARENA_ROWS};
+    return {kind: "joined", seat, arena: MATCH_ARENA_ROWS, token: this.tokens[seat]};
   }
 
   /**
@@ -168,6 +198,20 @@ export class MatchRoom {
         this.acked[seat] = {...reached, held: reached.held + steps};
       }
     }
+  }
+
+  private seatOfToken(token: string): Seat | undefined {
+    if (token === "") {
+      return undefined;
+    }
+    if (token === this.tokens.first) {
+      return "first";
+    }
+    if (token === this.tokens.second) {
+      return "second";
+    }
+
+    return undefined;
   }
 
   private nextFreeSeat(): Seat | undefined {
