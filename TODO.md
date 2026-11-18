@@ -18,7 +18,7 @@ Start a session with: **"You are engine, continue the TODO."** Substitute any pe
 | Persona | Model | Checklist | Current focus | Updated |
 | --- | --- | --- | --- | --- |
 | play | Claude | [TODO-play.md](TODO-play.md) | Hit confirmation, camera shake and reduced motion integrated. Inventory HUD and M1 playtest next. Recoil and muzzle flash depend on held weapons. | 2026-11-18 |
-| engine | Claude | [TODO-engine.md](TODO-engine.md) | Fair-duel starts and bot reaction to unseen shots integrated. High-ground playtest, arena pool and limits, inventory data and reflection remain open. | 2026-11-18 |
+| engine | Claude | [TODO-engine.md](TODO-engine.md) | Fair-duel starts and bot reaction to unseen shots integrated. Built-in arena pool (Duel, Fair duel) and arena size limits built for ai and server to adopt (awaiting integration). High-ground playtest, inventory data, wall density/corridor limits and reflection remain open. | 2026-11-18 |
 | ai | Claude | [TODO-ai.md](TODO-ai.md) | Player arena selection and engine validation integrated. S4-1 contrast, model quality, and the production adapter remain open. | 2026-11-18 |
 | server | Claude | [TODO-server.md](TODO-server.md) | Online best-of-three rounds and seat reconnect integrated. Forfeit, account/storage and the generation route remain open. | 2026-11-18 |
 | budget | Claude | [TODO-budget.md](TODO-budget.md) | Credit and spend Durable Objects integrated; account identity and the generation route remain blockers. | 2026-11-17 |

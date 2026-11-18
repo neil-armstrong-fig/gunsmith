@@ -113,7 +113,7 @@ export function worldOfScenario(scenario: Scenario, seed: number, ringTiming?: R
 
 /**
  * The fair duel: the fighters on a matching pair of places drawn from `seed`, the opponent's brain, a ring and a weapon lying in
- * the arena, in one round. The arena is drawn to have such places (`BuiltInArenas.test.ts`), so none is a mistake in the drawing.
+ * the arena, in one round. The arena is drawn to have such places (`engine/src/built-in-arenas/BuiltInArenas.test.ts`), so none is a mistake in the drawing.
  */
 function fairDuelOf(seed: number, ringTiming: RingTiming): World {
   const places = chooseStartingPlaces(FAIR_DUEL_ARENA, seed);

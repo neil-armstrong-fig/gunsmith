@@ -1,23 +1,5 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
+import {FAIR_DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/FairDuelBuiltInArena";
 
-/**
- * Fixture A of art's fairness study (`docs/art/arena-fairness-research.md`): 21 by 13 tiles, a platform one level up in the
- * middle with a stair on each of its west and east ends climbing towards it, and two walls in opposite corners of the room. The
- * picture is the same turned half way round, so whichever matching pair of places the fighters start on, each has the ground the
- * other has, the platform equally near. It has not been played: the proportions are for play to judge.
- */
-export const FAIR_DUEL_ARENA = arenaFrom([
-  "#####################",
-  "#...................#",
-  "#...................#",
-  "#...............#...#",
-  "#.......11111...#...#",
-  "#.......11111.......#",
-  "#......>11111<......#",
-  "#.......11111.......#",
-  "#...#...11111.......#",
-  "#...#...............#",
-  "#...................#",
-  "#...................#",
-  "#####################",
-]);
+/** The arena for the fair duel: the engine's built-in "Fair duel", art's fixture A (its drawing is described there). */
+export const FAIR_DUEL_ARENA = arenaFrom(FAIR_DUEL_BUILT_IN_ARENA.rows);
