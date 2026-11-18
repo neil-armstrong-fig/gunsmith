@@ -8,34 +8,6 @@ import type {RenderedCue} from "@gunsmith/audio-studies/common/types/RenderedCue
 const RATE = 48000;
 const SECONDS = 80;
 
-function silentTrack(): RenderedCue {
-  return {
-    key: "music-loop-match",
-    channels: [new Float32Array(SECONDS * RATE), new Float32Array(SECONDS * RATE)],
-    loop: true,
-  };
-}
-
-function pulse(key: string, level: number): RenderedCue {
-  return {key, channels: [Float32Array.of(level, level, level, level)]};
-}
-
-// Every effect the mix uses, each a four-sample pulse at its own level, so a place in the mix says which effect is there.
-function effects(): Map<string, RenderedCue> {
-  const keys = ["sfx-pickup", "sfx-reload", "sfx-ring-warning", "sfx-hit"];
-  for (const stance of ["stand", "crouch"] as const) {
-    for (let variant = 0; variant < STEP_VARIANTS; variant += 1) {
-      keys.push(stepKey(stance, variant));
-    }
-  }
-
-  return new Map(keys.map((key, index) => [key, pulse(key, 0.01 * (index + 1))]));
-}
-
-function levelAt(mix: RenderedCue, seconds: number, channel = 0): number {
-  return mix.channels[channel]?.[Math.round(seconds * RATE) + 1] ?? Number.NaN;
-}
-
 it("is the audition mix, and not a loop", () => {
   const mix = makeMix(silentTrack(), effects());
 
@@ -161,3 +133,31 @@ it("refuses a table that lacks an effect the mix needs", () => {
 
   expect(() => makeMix(silentTrack(), table)).toThrow();
 });
+
+function levelAt(mix: RenderedCue, seconds: number, channel = 0): number {
+  return mix.channels[channel]?.[Math.round(seconds * RATE) + 1] ?? Number.NaN;
+}
+
+// Every effect the mix uses, each a four-sample pulse at its own level, so a place in the mix says which effect is there.
+function effects(): Map<string, RenderedCue> {
+  const keys = ["sfx-pickup", "sfx-reload", "sfx-ring-warning", "sfx-hit"];
+  for (const stance of ["stand", "crouch"] as const) {
+    for (let variant = 0; variant < STEP_VARIANTS; variant += 1) {
+      keys.push(stepKey(stance, variant));
+    }
+  }
+
+  return new Map(keys.map((key, index) => [key, pulse(key, 0.01 * (index + 1))]));
+}
+
+function pulse(key: string, level: number): RenderedCue {
+  return {key, channels: [Float32Array.of(level, level, level, level)]};
+}
+
+function silentTrack(): RenderedCue {
+  return {
+    key: "music-loop-match",
+    channels: [new Float32Array(SECONDS * RATE), new Float32Array(SECONDS * RATE)],
+    loop: true,
+  };
+}

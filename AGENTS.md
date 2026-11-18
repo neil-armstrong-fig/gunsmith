@@ -87,8 +87,9 @@ This governs unit tests only — acceptance specs are the opposite case, their `
 
 Prettier owns formatting (`pnpm format`). What it won't tell you:
 
-- **Declare functions below their callers**, so a file reads top to bottom. Helpers must be
+- **Declare functions below their callers**, so a file reads top to bottom. Module-level helpers must be
   `function` declarations — an arrow `const` is in the temporal dead zone above its line.
+  A `const` function nested inside another function may stay in place.
 - **A file with a class holds that class and nothing else but the interfaces it needs** (and its constants, above
   it). No loose `function` above or below it: a helper that uses the class's state or is used by one method is a
   `private` method, below its caller; a helper that is pure and worth testing alone is its own file in a subfolder
@@ -262,7 +263,7 @@ mixes up which package a file belongs to.
 
 ## Enforced standards and limits
 
-The shared ESLint config enforces return-ternary prohibition, three parameters maximum, named object types at boundaries, and one public subject per source file. Runtime values may keep their directly derived types; a class may keep interfaces it needs. Component-local `Props` and the two acceptance/eval mapping interfaces retain their documented exceptions.
+The shared ESLint config enforces return-ternary prohibition, three parameters maximum, named object types at boundaries, function ordering and module-level helper declarations (including tests), and one public subject per source file. Runtime values may keep their directly derived types; a class may keep interfaces it needs. Component-local `Props` and the two acceptance/eval mapping interfaces retain their documented exceptions.
 Folder ownership, helper placement and design quality still require the explicit review above. Do not describe a passing gate as proof of those properties.
 `pnpm checks` also checks instruction chains against a 65536-byte budget and validates executable art scripts. Frozen HTML receives syntax checks, not a claim of usability or complete standards compliance. New standalone art scripts receive JavaScript lint checks.
 Codex's global `project_doc_max_bytes` should be 65536; start a fresh session after changing configuration or startup guidance. Model and reasoning settings are unchanged.

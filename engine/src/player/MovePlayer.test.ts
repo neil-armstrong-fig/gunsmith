@@ -53,16 +53,6 @@ const hills = arenaFrom([
 ]);
 const TICK_SECONDS = 1 / 60;
 
-function walkFor(from: Point, direction: Point, seconds: number): Point {
-  let position = from;
-
-  for (let elapsed = 0; elapsed < seconds; elapsed += TICK_SECONDS) {
-    position = movePlayer(hills, {position, direction, seconds: TICK_SECONDS, crouching: false});
-  }
-
-  return position;
-}
-
 it("stops a walker on the low ground at a platform's edge, as a wall does", () => {
   const walked = walkFor({x: 2.5, y: 6.5}, {x: 1, y: 0}, 1);
 
@@ -111,3 +101,13 @@ it("judges a walker from where they stood, so one long step cannot jump the drop
 
   expect(walked.x).toBeCloseTo(4 - PLAYER_RADIUS, 6);
 });
+
+function walkFor(from: Point, direction: Point, seconds: number): Point {
+  let position = from;
+
+  for (let elapsed = 0; elapsed < seconds; elapsed += TICK_SECONDS) {
+    position = movePlayer(hills, {position, direction, seconds: TICK_SECONDS, crouching: false});
+  }
+
+  return position;
+}

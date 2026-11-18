@@ -6,16 +6,6 @@ import {ToolCallingFakeModel} from "@gunsmith/ai/pipeline/appearance/testing/Too
 const USAGE = {inputTokens: 100, outputTokens: 200};
 const PROMPT = {prompt: "a rubber duck cannon"};
 
-/** What a model really wrote on the local tier: nested text, and no opacity, rotation or origin on any part. */
-function sloppyAnswer(): Record<string, unknown> {
-  return {body: JSON.stringify([{kind: "rect", x: 12, y: 26, width: 40, height: 12}])};
-}
-
-/** A drawing the strict check refuses: a part reaching outside the canvas. */
-function refusedAnswer(): Record<string, unknown> {
-  return {...passingAppearance(), body: [{kind: "rect", x: 60, y: 10, width: 20, height: 5}]};
-}
-
 it("shows the first drawing as written when it passes, after one model call", async () => {
   const model = new ToolCallingFakeModel({answers: [passingAppearance()], usage: USAGE});
 
@@ -138,3 +128,13 @@ it("what the repair changed is reported as the code's work on the repair, not th
   expect(outcome.status).toBe("repaired");
   expect(outcome.changes).toContain("body.opacity");
 });
+
+/** A drawing the strict check refuses: a part reaching outside the canvas. */
+function refusedAnswer(): Record<string, unknown> {
+  return {...passingAppearance(), body: [{kind: "rect", x: 60, y: 10, width: 20, height: 5}]};
+}
+
+/** What a model really wrote on the local tier: nested text, and no opacity, rotation or origin on any part. */
+function sloppyAnswer(): Record<string, unknown> {
+  return {body: JSON.stringify([{kind: "rect", x: 12, y: 26, width: 40, height: 12}])};
+}

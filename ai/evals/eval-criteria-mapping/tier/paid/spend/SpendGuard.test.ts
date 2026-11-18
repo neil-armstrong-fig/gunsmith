@@ -5,10 +5,6 @@ import {SpendGuard} from "@evals/eval-criteria-mapping/tier/paid/spend/SpendGuar
 import {SpendLedger} from "@evals/eval-criteria-mapping/tier/paid/spend/SpendLedger";
 import {finishedCall} from "@evals/eval-criteria-mapping/tier/paid/spend/testing/FinishedCall";
 
-function ledger(ceilingDollars: number): SpendLedger {
-  return new SpendLedger({file: join(mkdtempSync(join(tmpdir(), "guard-")), "ledger.json"), ceilingDollars});
-}
-
 it("adds what a finished call cost, from the tokens the model reported", () => {
   const spent = ledger(1);
   new SpendGuard(spent).handleLLMEnd(finishedCall(1_000_000, 1_000_000));
@@ -100,3 +96,7 @@ it("keeps the stop as a failure too, so a request cut short by the ceiling is no
   expect(() => guard.handleChatModelStart()).toThrow("ceiling");
   expect(guard.takeFailure()).toContain("ceiling");
 });
+
+function ledger(ceilingDollars: number): SpendLedger {
+  return new SpendLedger({file: join(mkdtempSync(join(tmpdir(), "guard-")), "ledger.json"), ceilingDollars});
+}

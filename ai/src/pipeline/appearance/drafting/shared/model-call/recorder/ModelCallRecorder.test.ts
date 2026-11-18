@@ -3,12 +3,6 @@ import type {BaseMessage} from "@langchain/core/messages";
 import type {ChatGeneration, LLMResult} from "@langchain/core/outputs";
 import {ModelCallRecorder} from "@gunsmith/ai/pipeline/appearance/drafting/shared/model-call/recorder/ModelCallRecorder";
 
-function finished(message: BaseMessage): LLMResult {
-  const generation: ChatGeneration = {text: "", message};
-
-  return {generations: [[generation]]};
-}
-
 it("records the tokens the model reported and the arguments of its tool call", () => {
   const recorder = new ModelCallRecorder();
 
@@ -52,3 +46,9 @@ it("starts with nothing recorded", () => {
 
   expect([recorder.inputTokens, recorder.outputTokens, recorder.toolCallArguments]).toEqual([0, 0, undefined]);
 });
+
+function finished(message: BaseMessage): LLMResult {
+  const generation: ChatGeneration = {text: "", message};
+
+  return {generations: [[generation]]};
+}

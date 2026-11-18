@@ -18,12 +18,6 @@ afterEach(() => {
   }
 });
 
-function carriesTheSharedGuard(model: ChatAnthropic): boolean {
-  const callbacks = model.callbacks;
-
-  return Array.isArray(callbacks) && callbacks.includes(paidSpendGuard());
-}
-
 it("writes with Haiku 5.5 and judges with Haiku 5.5", () => {
   const {generator, moderator} = createPaidWeaponModels();
 
@@ -49,3 +43,9 @@ it("sets no temperature, which Haiku 5.5 refuses", () => {
 
   expect([generator.temperature, moderator.temperature]).toEqual([undefined, undefined]);
 });
+
+function carriesTheSharedGuard(model: ChatAnthropic): boolean {
+  const callbacks = model.callbacks;
+
+  return Array.isArray(callbacks) && callbacks.includes(paidSpendGuard());
+}

@@ -136,10 +136,6 @@ describe("with two carried weapons", () => {
     expect(after.player.reloadRemainingSeconds).toBe(MARKSMAN_RIFLE.reloadSeconds);
   });
 
-  function withPlayer(world: World, changes: Partial<Player>): World {
-    return {...world, player: {...world.player, ...changes}};
-  }
-
   /** The world with `rounds` in the magazine of the weapon at `index`. */
   function withRounds(world: World, index: number, rounds: number): World {
     const loadout = world.player.loadout.map((carried, at) => {
@@ -151,5 +147,9 @@ describe("with two carried weapons", () => {
     });
 
     return withPlayer(world, {loadout});
+  }
+
+  function withPlayer(world: World, changes: Partial<Player>): World {
+    return {...world, player: {...world.player, ...changes}};
   }
 });

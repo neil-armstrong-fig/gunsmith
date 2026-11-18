@@ -8,14 +8,6 @@ const BAD = {name: "Cut In Two", rows: ["##########", "#...#....#", "#...#....#"
 const BUILT_IN = {name: "Open Room", rows: ["##########", "#........#", "#........#", "#........#", "##########"]};
 const ARENA_REQUEST = {isArenaRequest: true, reason: "pillars"};
 
-function dependenciesWith(generatorReplies: unknown[], verdict: unknown = ARENA_REQUEST): ArenaPipelineDependencies {
-  return {
-    generator: new FakeListChatModel({responses: generatorReplies.map(reply => JSON.stringify(reply))}),
-    moderator: new FakeListChatModel({responses: [JSON.stringify(verdict)]}),
-    builtInArenas: [BUILT_IN],
-  };
-}
-
 it("makes the arena the model drew when it passes every check, with two model calls and nothing refunded", async () => {
   const outcome = await generateArena({prompt: "a plain room"}, dependenciesWith([GOOD]));
 
@@ -85,3 +77,11 @@ it("turns away a request that is too long before any model is called", async () 
   expect(outcome).toMatchObject({status: "rejected", nodes: ["precheck"], modelCalls: 0});
   expect(moderate).not.toHaveBeenCalled();
 });
+
+function dependenciesWith(generatorReplies: unknown[], verdict: unknown = ARENA_REQUEST): ArenaPipelineDependencies {
+  return {
+    generator: new FakeListChatModel({responses: generatorReplies.map(reply => JSON.stringify(reply))}),
+    moderator: new FakeListChatModel({responses: [JSON.stringify(verdict)]}),
+    builtInArenas: [BUILT_IN],
+  };
+}

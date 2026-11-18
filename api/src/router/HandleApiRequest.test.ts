@@ -2,28 +2,6 @@ import type {ApiEnvironment} from "@src/env/types/ApiEnvironment";
 import {handleApiRequest} from "@src/router/HandleApiRequest";
 import {isFriendCode} from "@src/rooms/IsFriendCode";
 
-/** A `MATCHES` namespace whose every object answers 101 and remembers which name asked. */
-function matchesThatAnswer(names: string[]): DurableObjectNamespace {
-  const namespace = {
-    idFromName: (name: string): string => name,
-    get: (id: string): DurableObjectStub => {
-      names.push(id);
-
-      return {fetch: async () => new Response("the match", {status: 200})} as unknown as DurableObjectStub;
-    },
-  };
-
-  return namespace as unknown as DurableObjectNamespace;
-}
-
-function environment(names: string[] = []): ApiEnvironment {
-  return {MATCHES: matchesThatAnswer(names)};
-}
-
-function upgrade(path: string): Request {
-  return new Request(`https://gunsmith.test${path}`, {headers: {Upgrade: "websocket"}});
-}
-
 it("opens a private room and answers its friend code", async () => {
   const response = await handleApiRequest(
     new Request("https://gunsmith.test/api/rooms", {method: "POST"}),
@@ -82,3 +60,25 @@ it("answers 404 to any other path", async () => {
 
   expect(response.status).toBe(404);
 });
+
+function upgrade(path: string): Request {
+  return new Request(`https://gunsmith.test${path}`, {headers: {Upgrade: "websocket"}});
+}
+
+function environment(names: string[] = []): ApiEnvironment {
+  return {MATCHES: matchesThatAnswer(names)};
+}
+
+/** A `MATCHES` namespace whose every object answers 101 and remembers which name asked. */
+function matchesThatAnswer(names: string[]): DurableObjectNamespace {
+  const namespace = {
+    idFromName: (name: string): string => name,
+    get: (id: string): DurableObjectStub => {
+      names.push(id);
+
+      return {fetch: async () => new Response("the match", {status: 200})} as unknown as DurableObjectStub;
+    },
+  };
+
+  return namespace as unknown as DurableObjectNamespace;
+}

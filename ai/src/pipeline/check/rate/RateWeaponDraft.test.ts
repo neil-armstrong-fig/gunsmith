@@ -11,10 +11,6 @@ const RIFLE: WeaponDraft = {
   startingReserve: 36,
 };
 
-function dealing(bulletDamage: number, fireIntervalSeconds: number): WeaponDraft {
-  return {...RIFLE, bulletDamage, fireIntervalSeconds};
-}
-
 it("rates a weapon by the damage it deals in a second", () => {
   expect(rateWeaponDraft(RIFLE)).toEqual({ok: true, damagePerSecond: 125});
 });
@@ -82,3 +78,7 @@ it("names the damage cap first when a weapon is over both limits", () => {
   expect(rating.ok ? [] : rating.errors).toHaveLength(2);
   expect(rating.ok ? "" : rating.errors[0]).toContain("damage per second");
 });
+
+function dealing(bulletDamage: number, fireIntervalSeconds: number): WeaponDraft {
+  return {...RIFLE, bulletDamage, fireIntervalSeconds};
+}

@@ -6,11 +6,6 @@ import {SPRITE_KEYS} from "@src/assets/sprites/SpriteKeys";
 import {SPRITE_MANIFEST} from "@src/assets/sprites/SpriteManifest";
 import {spriteUrl} from "@src/assets/sprites/SpriteUrl";
 
-/** The file `spriteUrl` points at, read from `public/`, which the dev server and the build serve from the site's root. */
-function fileOf(url: string): string {
-  return readFileSync(new URL(`../../../public${url}`, import.meta.url), "utf8");
-}
-
 it("knows every key", () => {
   expect(Object.keys(SPRITE_MANIFEST).sort()).toEqual([...SPRITE_KEYS].sort());
 });
@@ -67,3 +62,8 @@ it("draws the two sides' shots in their team colours: art's blue, and orange for
   expect(fileOf(spriteUrl("fx-projectile-rifle-blue"))).toContain("#62B5FF");
   expect(fileOf(spriteUrl("fx-projectile-rifle-orange"))).toContain("#FF9B54");
 });
+
+/** The file `spriteUrl` points at, read from `public/`, which the dev server and the build serve from the site's root. */
+function fileOf(url: string): string {
+  return readFileSync(new URL(`../../../public${url}`, import.meta.url), "utf8");
+}

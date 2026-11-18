@@ -16,10 +16,6 @@ const LANTERN = appearanceSchema.parse(
   ),
 );
 
-function count(text: string, piece: string): number {
-  return text.split(piece).length - 1;
-}
-
 it("is a transparent picture over the 64 by 64 design space: no background, no frame", () => {
   const svg = appearanceSvg(fallbackAppearance(), ["structural", "fine"]);
 
@@ -51,3 +47,7 @@ it("writes nothing but colours and numbers into the markup, whatever the drawing
 
   expect(svg).not.toMatch(/weapon-|accent|edge|outline/);
 });
+
+function count(text: string, piece: string): number {
+  return text.split(piece).length - 1;
+}

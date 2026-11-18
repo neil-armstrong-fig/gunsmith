@@ -33,12 +33,6 @@ class FakeSocket implements MatchSocket {
   }
 }
 
-function snapshotText(): string {
-  const world = startingWorld(arenaFrom(ROWS), [], {x: 5.5, y: 2.5});
-
-  return JSON.stringify({kind: "snapshot", ...viewOfSeat(world, "first")});
-}
-
 const JOINED = JSON.stringify({kind: "joined", seat: "first", arena: ROWS});
 
 it("has no world until it has been seated and sent a snapshot", () => {
@@ -109,3 +103,9 @@ it("closes the socket", () => {
 
   expect(socket.closed).toBe(true);
 });
+
+function snapshotText(): string {
+  const world = startingWorld(arenaFrom(ROWS), [], {x: 5.5, y: 2.5});
+
+  return JSON.stringify({kind: "snapshot", ...viewOfSeat(world, "first")});
+}

@@ -7,15 +7,6 @@ import {centred} from "@gunsmith/engine/game-loop/step/testing/Centred";
 
 const UNHURT: DamageToPlayer = {health: 100, bullet: 0, ring: 0};
 
-function turn(changes: Partial<FighterTurn> = {}): FighterTurn {
-  return {fighter: centred().player, fires: false, ...changes};
-}
-
-/** What `eventsOfStep` says about a quiet step, with `changes` made to what happened in it. */
-function eventsOf(changes: Partial<EventsRequest>): readonly CombatEvent[] | undefined {
-  return eventsOfStep({playerTurn: turn(), damage: UNHURT, visibleHits: [], ...changes});
-}
-
 it("reports nothing when nothing happened to the player", () => {
   expect(eventsOf({})).toBeUndefined();
 });
@@ -56,3 +47,12 @@ it("reports a refusal, a loss and a hit together, the loss before the hit", () =
     {kind: "hitLanded", on: "opponent"},
   ]);
 });
+
+/** What `eventsOfStep` says about a quiet step, with `changes` made to what happened in it. */
+function eventsOf(changes: Partial<EventsRequest>): readonly CombatEvent[] | undefined {
+  return eventsOfStep({playerTurn: turn(), damage: UNHURT, visibleHits: [], ...changes});
+}
+
+function turn(changes: Partial<FighterTurn> = {}): FighterTurn {
+  return {fighter: centred().player, fires: false, ...changes};
+}

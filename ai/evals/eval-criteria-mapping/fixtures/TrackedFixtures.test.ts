@@ -3,20 +3,6 @@ import {ArenaDsl} from "@evals/dsl/arena/ArenaDsl";
 import {WeaponSmithDsl} from "@evals/dsl/WeaponSmithDsl";
 import {TrackedFixtures} from "@evals/eval-criteria-mapping/fixtures/TrackedFixtures";
 
-function trackedFixtures(): TrackedFixtures {
-  const notAsked = (): Promise<never> => Promise.reject(new Error("not asked"));
-
-  return new TrackedFixtures({
-    weaponSmith: new WeaponSmithDsl({trials: 1, run: notAsked}),
-    appearance: new AppearanceDsl({trials: 1, run: notAsked}),
-    arena: new ArenaDsl({trials: 1, run: notAsked}),
-  });
-}
-
-function descriptions(tracked: TrackedFixtures): string[] {
-  return tracked.standingCriteria().map(criterion => criterion.description);
-}
-
 it("has taken nothing until a when asks for a DSL", () => {
   expect(trackedFixtures().taken()).toEqual([]);
 });
@@ -95,3 +81,17 @@ it("carries both sets when it took both, the weapon smith's first", () => {
 it("refuses a when that took no DSL, so it cannot go without standing criteria unnoticed", () => {
   expect(() => trackedFixtures().standingCriteria()).toThrow("Say which DSL this `when` uses");
 });
+
+function trackedFixtures(): TrackedFixtures {
+  const notAsked = (): Promise<never> => Promise.reject(new Error("not asked"));
+
+  return new TrackedFixtures({
+    weaponSmith: new WeaponSmithDsl({trials: 1, run: notAsked}),
+    appearance: new AppearanceDsl({trials: 1, run: notAsked}),
+    arena: new ArenaDsl({trials: 1, run: notAsked}),
+  });
+}
+
+function descriptions(tracked: TrackedFixtures): string[] {
+  return tracked.standingCriteria().map(criterion => criterion.description);
+}

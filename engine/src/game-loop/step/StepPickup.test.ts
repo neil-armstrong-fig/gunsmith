@@ -13,10 +13,6 @@ import {centred} from "@gunsmith/engine/game-loop/step/testing/Centred";
 describe("with a pickup lying in the arena", () => {
   const lying = {position: {x: 6.5, y: 4.5}, weapon: SUBMACHINE_GUN};
 
-  function withPickup(): World {
-    return {...centred(), pickup: lying};
-  }
-
   it("is taken by the player who walks onto it, who then holds its weapon in the second slot", () => {
     let world: World = {...withPickup(), player: {...withPickup().player, position: {x: 5.0, y: 4.5}}};
     for (let tick = 0; tick < 60; tick++) {
@@ -65,6 +61,10 @@ describe("with a pickup lying in the arena", () => {
   it("is the same from the same world and input, so a replay agrees", () => {
     expect(step(withPickup(), walking(1, 0), TICK)).toEqual(step(withPickup(), walking(1, 0), TICK));
   });
+
+  function withPickup(): World {
+    return {...centred(), pickup: lying};
+  }
 });
 
 /** A ring long since closed, far from the middle, that takes more health a tick than anyone has. */

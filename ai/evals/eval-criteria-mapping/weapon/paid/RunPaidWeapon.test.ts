@@ -17,36 +17,6 @@ interface Setup {
   pipelineRuns: () => number;
 }
 
-/** A run whose pipeline "makes" the calls it is given by finishing them on the guard, as the real models would. */
-async function setup(makeCalls: (guard: SpendGuard) => void, ceilingDollars = 1): Promise<Setup> {
-  const folder = mkdtempSync(join(tmpdir(), "paid-weapon-"));
-  const ledger = new SpendLedger({file: join(folder, "ledger.json"), ceilingDollars});
-  const guard = new SpendGuard(ledger);
-  const outcome = await createWeaponPipelineDriver("fake", undefined).run("a mild rifle");
-  let runs = 0;
-
-  const options: PaidWeaponRunOptions = {
-    ledger,
-    guard,
-    logFile: join(folder, "calls.jsonl"),
-    pipeline: (): Promise<WeaponOutcome> => {
-      runs += 1;
-      makeCalls(guard);
-
-      return Promise.resolve(outcome);
-    },
-  };
-
-  return {options, ledger, guard, logFile: options.logFile, pipelineRuns: () => runs};
-}
-
-function loggedLines(file: string): unknown[] {
-  return readFileSync(file, "utf8")
-    .trim()
-    .split("\n")
-    .map((line): unknown => JSON.parse(line));
-}
-
 it("returns what the pipeline returned, and logs the request with every call it made", async () => {
   const {options, logFile} = await setup(guard => {
     guard.handleLLMEnd(finishedCall(300, 5, "tool_use"));
@@ -130,3 +100,33 @@ it("does not carry one request's calls into the next", async () => {
     expect.objectContaining({prompt: "second", calls: [expect.objectContaining({inputTokens: 10})]}),
   ]);
 });
+
+function loggedLines(file: string): unknown[] {
+  return readFileSync(file, "utf8")
+    .trim()
+    .split("\n")
+    .map((line): unknown => JSON.parse(line));
+}
+
+/** A run whose pipeline "makes" the calls it is given by finishing them on the guard, as the real models would. */
+async function setup(makeCalls: (guard: SpendGuard) => void, ceilingDollars = 1): Promise<Setup> {
+  const folder = mkdtempSync(join(tmpdir(), "paid-weapon-"));
+  const ledger = new SpendLedger({file: join(folder, "ledger.json"), ceilingDollars});
+  const guard = new SpendGuard(ledger);
+  const outcome = await createWeaponPipelineDriver("fake", undefined).run("a mild rifle");
+  let runs = 0;
+
+  const options: PaidWeaponRunOptions = {
+    ledger,
+    guard,
+    logFile: join(folder, "calls.jsonl"),
+    pipeline: (): Promise<WeaponOutcome> => {
+      runs += 1;
+      makeCalls(guard);
+
+      return Promise.resolve(outcome);
+    },
+  };
+
+  return {options, ledger, guard, logFile: options.logFile, pipelineRuns: () => runs};
+}

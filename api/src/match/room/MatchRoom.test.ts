@@ -3,14 +3,6 @@ import {MatchRoom} from "@src/match/room/MatchRoom";
 
 const IDLE: Input = {direction: {x: 0, y: 0}, firing: false, reload: false};
 
-function startedRoom(): MatchRoom {
-  const room = new MatchRoom();
-  room.join();
-  room.join();
-
-  return room;
-}
-
 it("seats the first person first and the second second, and nobody after", () => {
   const room = new MatchRoom();
 
@@ -141,3 +133,11 @@ it("does not step a match that has not begun", () => {
 it("tells a seat the arena it plays in", () => {
   expect(new MatchRoom().joinedMessage("second")).toEqual(expect.objectContaining({kind: "joined", seat: "second"}));
 });
+
+function startedRoom(): MatchRoom {
+  const room = new MatchRoom();
+  room.join();
+  room.join();
+
+  return room;
+}

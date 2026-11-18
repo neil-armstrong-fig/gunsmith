@@ -20,13 +20,6 @@ afterEach(() => {
   }
 });
 
-function fileWith(text: string): string {
-  const file = join(mkdtempSync(join(tmpdir(), "key-")), ".env.local");
-  writeFileSync(file, text);
-
-  return file;
-}
-
 it("leaves a key that is already in the environment alone, and needs no file", () => {
   process.env.ANTHROPIC_API_KEY = DUMMY_KEY;
 
@@ -60,3 +53,10 @@ it("never puts what the file held in an error message", () => {
     expect.objectContaining({message: expect.not.stringContaining(DUMMY_KEY)}),
   );
 });
+
+function fileWith(text: string): string {
+  const file = join(mkdtempSync(join(tmpdir(), "key-")), ".env.local");
+  writeFileSync(file, text);
+
+  return file;
+}

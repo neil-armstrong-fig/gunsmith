@@ -171,22 +171,6 @@ it("turns back from the weapon when the player is nearer to it by more than the 
   expect(chooseState(brainIn("seek"), racing({sees: true, player: ahead})).state).toBe("engage");
 });
 
-function context(sees: boolean, magazine = 12): OpponentContext {
-  const world = startingWorld(room, [], HERE);
-  if (!world.opponent) {
-    throw new Error("The world has no opponent.");
-  }
-  const loadout = world.opponent.loadout.map((carried, index) => {
-    if (index === 0) {
-      return {...carried, rounds: magazine};
-    }
-
-    return carried;
-  });
-
-  return {arena: room, opponent: {...world.opponent, loadout}, target: world.player, sees, seconds: 1 / 60};
-}
-
 function brainIn(state: OpponentState, overrides: Partial<OpponentBrain> = {}): OpponentBrain {
   return {...startingBrain({seed: 1, position: HERE}), state, lastSeen: SEEN_AT, ...overrides};
 }
@@ -208,4 +192,20 @@ function racing(race: Race): OpponentContext {
     target: {...base.target, position: player},
     pickup: {position: WEAPON_NEAR_HERE, weapon: SUBMACHINE_GUN},
   };
+}
+
+function context(sees: boolean, magazine = 12): OpponentContext {
+  const world = startingWorld(room, [], HERE);
+  if (!world.opponent) {
+    throw new Error("The world has no opponent.");
+  }
+  const loadout = world.opponent.loadout.map((carried, index) => {
+    if (index === 0) {
+      return {...carried, rounds: magazine};
+    }
+
+    return carried;
+  });
+
+  return {arena: room, opponent: {...world.opponent, loadout}, target: world.player, sees, seconds: 1 / 60};
 }

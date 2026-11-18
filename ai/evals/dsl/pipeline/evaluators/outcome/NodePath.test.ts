@@ -5,10 +5,6 @@ import type {WeaponOutcomeStatus} from "@gunsmith/ai/pipeline/types/WeaponOutcom
 const STATS = ["precheck", "moderation", "generate", "validate", "balance", "rate"];
 const DRAWING = ["appearance.generate", "appearance.fix", "appearance.validate"];
 
-function ran(nodes: string[], status: WeaponOutcomeStatus = "invalid"): ReturnType<typeof passingEvalInput> {
-  return passingEvalInput({outcome: {nodes, status}});
-}
-
 it("passes a created weapon that was generated, validated, balanced and rated, then drawn", () => {
   expect(nodePath(ran([...STATS, ...DRAWING], "created")).score).toBe(1);
 });
@@ -151,3 +147,7 @@ it("fails when the pre-check was not first", () => {
 it("fails when no node ran at all", () => {
   expect(nodePath(ran([])).score).toBe(0);
 });
+
+function ran(nodes: string[], status: WeaponOutcomeStatus = "invalid"): ReturnType<typeof passingEvalInput> {
+  return passingEvalInput({outcome: {nodes, status}});
+}

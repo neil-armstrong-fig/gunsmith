@@ -2,19 +2,6 @@ import {validateArenaDraft} from "@gunsmith/ai/pipeline/arena/check/validate/Val
 
 const ROWS = ["##########", "#........#", "#........#", "#........#", "##########"];
 
-function draftWith(overrides: Record<string, unknown>): unknown {
-  return {name: "Plain Room", rows: ROWS, ...overrides};
-}
-
-function errorsOf(candidate: unknown): string[] {
-  const validation = validateArenaDraft(candidate);
-  if (validation.ok) {
-    throw new Error("expected the draft to be refused");
-  }
-
-  return validation.errors;
-}
-
 it("accepts a walled room and hands back the arena as written", () => {
   expect(validateArenaDraft(draftWith({}))).toEqual({ok: true, arena: {name: "Plain Room", rows: ROWS}});
 });
@@ -98,3 +85,16 @@ it("shortens every sentence, because the model will be shown them", () => {
     expect(error.length).toBeLessThanOrEqual(160);
   }
 });
+
+function errorsOf(candidate: unknown): string[] {
+  const validation = validateArenaDraft(candidate);
+  if (validation.ok) {
+    throw new Error("expected the draft to be refused");
+  }
+
+  return validation.errors;
+}
+
+function draftWith(overrides: Record<string, unknown>): unknown {
+  return {name: "Plain Room", rows: ROWS, ...overrides};
+}

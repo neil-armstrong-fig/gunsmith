@@ -20,6 +20,12 @@ import {probeExport} from "@gunsmith/audio-studies/encoding/verification/probe/P
 import type {PcmMeasurement} from "@gunsmith/audio-studies/encoding/pcm/types/PcmMeasurement";
 import type {VerificationReport} from "@gunsmith/audio-studies/encoding/verification/types/VerificationReport";
 
+// Node's native TypeScript support runs this entry point without a transpiler.
+const entry = process.argv[1];
+if (entry && pathToFileURL(resolve(entry)).href === import.meta.url) {
+  await verifyEncoded(resolve(import.meta.dirname, "../../encoded-audio"));
+}
+
 /**
  * Decodes every export in `output` with the same build that encoded it and writes what it found to `verification.json`. An
  * export that is not the one reported (a bad name, hash or codec) stops the check, with no report written. A finding (a length,
@@ -64,10 +70,4 @@ export async function verifyEncoded(output: string, encoder = encoderBinary()): 
   if (failures.length > 0) {
     throw new Error(failures.join("\n"));
   }
-}
-
-// Node's native TypeScript support runs this entry point without a transpiler.
-const entry = process.argv[1];
-if (entry && pathToFileURL(resolve(entry)).href === import.meta.url) {
-  await verifyEncoded(resolve(import.meta.dirname, "../../encoded-audio"));
 }
