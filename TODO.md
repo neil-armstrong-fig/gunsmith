@@ -22,7 +22,7 @@ Start a session with: **"You are engine, continue the TODO."** Substitute any pe
 | ai | Claude | [TODO-ai.md](TODO-ai.md) | Generated pickup renderer and fake-tier arena pipeline A3 integrated; readability review, judge A4, engine-validator adoption and calibration next. | 2026-11-17 |
 | server | Claude | [TODO-server.md](TODO-server.md) | First online match green and now smooth: client prediction, reconciliation and interpolation, server at 30 Hz, property tests; awaiting the user's review. Next: round/match flow in a room, reconnect, then sign-in/storage and the generation route for budget. | 2026-11-17 |
 | budget | Claude | [TODO-budget.md](TODO-budget.md) | Credit ledger and spend meter built on Durable Objects (committed `cb18fdb`, tested); waits on server's generation route and account id. | 2026-11-17 |
-| art | Codex | [TODO-art.md](TODO-art.md) | Approved terrain wired in the art worktree, alongside the C2 pickup marker. S4-1 fallback contrast and audio dependencies remain open. | 2026-11-18 |
+| art | Codex | [TODO-art.md](TODO-art.md) | Stair flights, paired landings and drop edges ready for playable terrain review. S4-1 fallback contrast and audio dependencies remain open. | 2026-11-18 |
 | ship | Codex | [TODO-ship.md](TODO-ship.md) | Preview scripts/report exclusions delivered; config standards and @src refactor verified in ship worktree. Hosted CI/deployment remain open. | 2026-11-17 |
 
 These are persistent workstreams, not permission for simultaneous edits to the same files. Select one current slice; record concrete reservations and contracts in HANDOFF.md. Model assignments are defaults, not application configuration. `build` is retired; current tasks remain in the seven owner checklists.

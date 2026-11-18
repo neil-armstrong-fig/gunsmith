@@ -46,6 +46,18 @@ to settle. Flat materials are used while an image is loading and when it
 fails. The renderer applies the floor palette to the stair bands and draws
 drop edges and fog in their existing layers.
 
+## Playable stair preview
+
+Open `?scenario=terrain` and use A or D to cross both flights. The player
+starts on the highest floor, facing the stairs. Aim away to see the same
+treads, landing rails and drop edges dim under fog.
+
+Each flight uses four slate bands and three 2 px treads. Two rails extend
+16 design pixels onto each open landing, clear of the floor ticks in the
+preview. The drop edge has a 4 px lip and a 12 px shadow on the lower floor.
+The preview derives the placement from the arena's stair directions and
+drop edges. Review at 1024 × 560 for 64 px per tile or 512 × 400 for 32 px.
+
 ## Verification — 2026-11-17
 
 Source: `worktree-art` at `6f7c38a` plus these uncommitted terrain files;
