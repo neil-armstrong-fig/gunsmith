@@ -58,7 +58,7 @@ it.each(["ai", "acceptance-tests"])("keeps standards enabled beneath %s syntax o
   const eslint = new ESLint({cwd: resolve(import.meta.dirname, "../../..", packageName)});
   let filePath = "src/dsl/probe/ProbeDsl.ts";
   if (packageName === "ai") {
-    filePath = "evals/dsl/probe/ProbeDsl.ts";
+    filePath = "src/evals/dsl/probe/ProbeDsl.ts";
   }
   const results = await eslint.lintText("export function probe(flag: boolean): number { return flag ? 1 : 2; }", {
     filePath,

@@ -3,8 +3,8 @@
   "compilerOptions": {
     "types": ["node", "vitest/globals"],
     "paths": {
-      "@evals/*": ["./evals/*"]
+      "@evals/*": ["./src/evals/*"]
     }
   },
-  "include": ["src", "evals", "vitest.config.ts", "vitest.evals.config.ts", "eslint.config.js", "prettier.config.js"]
+  "include": ["src", "vitest.config.ts", "vitest.evals.config.ts", "eslint.config.js", "prettier.config.js"]
 }

@@ -8,7 +8,7 @@ export default defineConfig({
   resolve: {tsconfigPaths: true},
   test: {
     ...vitestBaseConfig.test,
-    include: ["evals/**/*.eval.ts"],
+    include: ["src/evals/**/*.eval.ts"],
     // The report is the point: every `then` on its own line under its `given` and `when`, pass or fail.
     reporters: ["tree"],
     environment: "node",

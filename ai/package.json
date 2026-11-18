@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./*": "./src/*.ts"
+    "./*": "./src/*.ts",
+    "./evals/*": null
   },
   "scripts": {
     "build": "pnpm checks",
@@ -16,9 +17,9 @@
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "dev": "langgraphjs dev --no-browser",
-    "evals:fake": "EVAL_TIER=fake vitest run --config vitest.evals.config.ts",
-    "evals:local": "EVAL_TIER=local vitest run --config vitest.evals.config.ts",
-    "evals:paid": "EVAL_TIER=paid vitest run --config vitest.evals.config.ts"
+    "evals:fake": "EVAL_TIER=fake EVAL_RUN_ID=$(date -u +%Y%m%d-%H%M%S) vitest run --config vitest.evals.config.ts",
+    "evals:local": "EVAL_TIER=local EVAL_RUN_ID=$(date -u +%Y%m%d-%H%M%S) vitest run --config vitest.evals.config.ts",
+    "evals:paid": "EVAL_TIER=paid EVAL_RUN_ID=$(date -u +%Y%m%d-%H%M%S) vitest run --config vitest.evals.config.ts"
   },
   "dependencies": {
     "@gunsmith/engine": "workspace:*",

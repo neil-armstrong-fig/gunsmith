@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - "ai/**"
-      - "!ai/evals/results/**"
+      - "!ai/src/evals/results/**"
       - "!ai/**/*.md"
       - "engine/src/**"
       - "shared/**"
@@ -16,7 +16,7 @@ on:
   pull_request:
     paths:
       - "ai/**"
-      - "!ai/evals/results/**"
+      - "!ai/src/evals/results/**"
       - "!ai/**/*.md"
       - "engine/src/**"
       - "shared/**"
@@ -53,6 +53,6 @@ jobs:
         if: ${{ !cancelled() }}
         with:
           name: fake-eval-results
-          path: ai/evals/results/*-fake-latest.json
+          path: ai/src/evals/results/*-fake-latest.json
           retention-days: 14
           if-no-files-found: error

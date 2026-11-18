@@ -105,7 +105,6 @@ export function baseConfig({tsconfigRootDir, allowedPackages = [], allowedConsol
     {
       files: [
         "src/**/*.{ts,tsx}",
-        "evals/**/*.ts",
         "generator-scripts/**/*.ts",
         "config/standards/**/*.ts",
         "config/repository/**/*.ts",
@@ -129,7 +128,7 @@ export function baseConfig({tsconfigRootDir, allowedPackages = [], allowedConsol
     {
       files: [
         "src/acceptance-criteria-mapping/AcceptanceCriteriaMapping.ts",
-        "evals/eval-criteria-mapping/EvalCriteriaMapping.ts",
+        "src/evals/eval-criteria-mapping/EvalCriteriaMapping.ts",
         // The Workers runtime looks for the default handler and the Durable Object class in the one entry module.
         "src/ApiWorker.ts",
       ],
