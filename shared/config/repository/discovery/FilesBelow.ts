@@ -1,9 +1,9 @@
 import {readdirSync, existsSync} from "node:fs";
 import {join} from "node:path";
 
-const EXCLUDED_DIRECTORIES = new Set(["node_modules", "dist", "build", "coverage", "test-results"]);
+const EXCLUDED_DIRECTORIES = new Set(["node_modules", "dist", "build", "coverage", "test-results", "private-source"]);
 
-/** Every file below `directory`, however deep, leaving out hidden folders and build output. */
+/** Every file below `directory`, however deep, leaving out private archives, hidden folders and build output. */
 export function filesBelow(directory: string): string[] {
   if (!existsSync(directory)) {
     return [];

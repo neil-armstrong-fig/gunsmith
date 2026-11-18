@@ -35,3 +35,25 @@ given("a sparring match whose ring has closed in until its edge is on the screen
     });
   });
 });
+
+// A ring that has not begun to close covers the whole arena, and its starting radius reaches exactly to the corner farthest from its centre, so a drawing that
+// only skips "the ring is bigger than the arena" shows a wedge of the bright edge in that corner from the first frame. Nothing of the ring is to be drawn
+// until its timer has run out and it starts to move.
+const LATE_DELAY_SECONDS = 60;
+const SECONDS_WATCHED = 1;
+
+given("a sparring match whose ring does not start to close for a minute", () => {
+  beforeEach(async ({gunsmith}) => {
+    await gunsmith.startClosingRing({seed: SEED, delaySeconds: LATE_DELAY_SECONDS, closingSeconds: CLOSING_SECONDS});
+  });
+
+  when("a second of the round has been played and the ring has not started", () => {
+    beforeEach(async ({gunsmith}) => {
+      await gunsmith.waitForGameSeconds(SECONDS_WATCHED);
+    });
+
+    then("no red of the ring is drawn in any corner of the arena", async ({gunsmith}) => {
+      expect(await gunsmith.ring.isRedDrawnInAnyCorner()).toBe(false);
+    });
+  });
+});

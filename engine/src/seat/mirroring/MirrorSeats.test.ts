@@ -1,0 +1,69 @@
+import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
+import type {Bullet} from "@gunsmith/engine/bullet/types/Bullet";
+import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
+import type {World} from "@gunsmith/engine/game-loop/types/World";
+import {mirrorSeats} from "@gunsmith/engine/seat/mirroring/MirrorSeats";
+
+const room = arenaFrom(["########", "#......#", "#......#", "########"]);
+
+const BULLET: Bullet = {
+  position: {x: 3.5, y: 1.5},
+  direction: {x: 1, y: 0},
+  damage: 1,
+  speed: 1,
+  shooter: "player",
+  level: 0,
+};
+
+function duel(): World {
+  return {
+    ...startingWorld(room, [], {x: 5.5, y: 1.5}),
+    bullets: [BULLET],
+    round: "won",
+    match: {playerWins: 2, opponentWins: 1, roundNumber: 4},
+    events: [{kind: "fireRefused", reason: "empty"}],
+  };
+}
+
+it("swaps the two fighters", () => {
+  const world = duel();
+  const mirrored = mirrorSeats(world);
+
+  expect(mirrored.player).toEqual(world.opponent);
+  expect(mirrored.opponent).toEqual(world.player);
+});
+
+it("gives each bullet to the other side", () => {
+  expect(mirrorSeats(duel()).bullets[0]?.shooter).toBe("opponent");
+});
+
+it("turns the round's outcome and the score round", () => {
+  const mirrored = mirrorSeats(duel());
+
+  expect(mirrored.round).toBe("lost");
+  expect(mirrored.match).toEqual({playerWins: 1, opponentWins: 2, roundNumber: 4});
+});
+
+it("turns a lost round into a won one", () => {
+  expect(mirrorSeats({...duel(), round: "lost"}).round).toBe("won");
+});
+
+it("leaves a round still being fought as it is", () => {
+  expect(mirrorSeats({...duel(), round: "playing"}).round).toBe("playing");
+});
+
+it("drops what happened to the first fighter", () => {
+  expect(mirrorSeats(duel()).events).toBeUndefined();
+});
+
+it("returns a world with no opponent as it is", () => {
+  const alone = startingWorld(room);
+
+  expect(mirrorSeats(alone)).toBe(alone);
+});
+
+it("is its own inverse", () => {
+  const world = {...duel(), events: undefined, opponentBrain: undefined};
+
+  expect(mirrorSeats(mirrorSeats(world))).toEqual(world);
+});

@@ -11,6 +11,7 @@ import {OpponentDsl} from "@src/dsl/gunsmith/components/opponent/OpponentDsl";
 import {PickupDsl} from "@src/dsl/gunsmith/components/pickup/PickupDsl";
 import {PlayerDsl} from "@src/dsl/gunsmith/components/player/PlayerDsl";
 import {RingDsl} from "@src/dsl/gunsmith/components/ring/RingDsl";
+import {RoomDsl} from "@src/dsl/gunsmith/components/room/RoomDsl";
 import {RoundDsl} from "@src/dsl/gunsmith/components/round/RoundDsl";
 import {SoundDsl} from "@src/dsl/gunsmith/components/sound/SoundDsl";
 import {VisionDsl} from "@src/dsl/gunsmith/components/vision/VisionDsl";
@@ -34,6 +35,7 @@ export class GunsmithDsl {
   readonly match: MatchDsl;
   readonly pickup: PickupDsl;
   readonly ring: RingDsl;
+  readonly room: RoomDsl;
   readonly round: RoundDsl;
   readonly sound: SoundDsl;
   readonly vision: VisionDsl;
@@ -51,6 +53,7 @@ export class GunsmithDsl {
     this.match = new MatchDsl(page);
     this.pickup = new PickupDsl(page);
     this.ring = new RingDsl(page);
+    this.room = new RoomDsl(page, secondPage => new GunsmithDsl(secondPage));
     this.round = new RoundDsl(page);
     this.sound = new SoundDsl(page);
     this.vision = new VisionDsl(page);
@@ -61,10 +64,17 @@ export class GunsmithDsl {
     try {
       await this.bullets.startWatching();
       await this.sound.startWatching();
+      await this.hud.startWatching();
+      this.room.startWatching();
       await this.gunsmith.open();
     } catch (error) {
       throw new DslError("Failed to open the game", error);
     }
+  }
+
+  /** Closes whatever the spec opened beside the game, such as the second browser of a room. Runs after every spec. */
+  async end(): Promise<void> {
+    await this.room.end();
   }
 
   /**
@@ -205,6 +215,19 @@ export class GunsmithDsl {
       await this.gunsmith.openPickupRace(seed);
     } catch (error) {
       throw new DslError(`Failed to open the pickup race with seed ${seed}`, error);
+    }
+  }
+
+  /**
+   * Opens the fair duel: an arena that looks the same turned half way round (a shared platform in the middle), the fighters at a
+   * matching pair of places, each the other's half-turn and both on the low ground, one round, no score, a ring and a weapon lying between them. The pair, who
+   * takes which end, and the opponent's choices are drawn from `seed`.
+   */
+  async startFairDuel(seed: number): Promise<void> {
+    try {
+      await this.gunsmith.openFairDuel(seed);
+    } catch (error) {
+      throw new DslError(`Failed to open the fair duel with seed ${seed}`, error);
     }
   }
 

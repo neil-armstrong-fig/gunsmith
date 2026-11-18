@@ -12,6 +12,7 @@ const SHADER_ERROR = /WebGLProgram|shader error|GLSL/i;
 const EDGE_SEARCH_TILES = 1;
 const EDGE_SEARCH_SAMPLES = 60;
 const OUTSIDE_THE_EDGE_TILES = 1.5;
+const CORNER_INSET_TILES = 0.04;
 
 export class RingPlaywright extends BasePage {
   private readonly shaderErrors: string[] = [];
@@ -43,6 +44,22 @@ export class RingPlaywright extends BasePage {
       to: {x: centre.x - radius + EDGE_SEARCH_TILES, y: centre.y},
       samples: EDGE_SEARCH_SAMPLES,
     });
+
+    return colours.some(colour => colour.red > 200 && colour.green < 140);
+  }
+
+  /**
+   * Whether the bright red of the ring's edge is drawn in any corner of the arena. A ring that has not begun to close covers the arena, reaching exactly to the
+   * corner farthest from its centre, so a drawing of its edge shows there first. Each corner is looked at a hair inside it.
+   */
+  async isRedDrawnInAnyCorner(): Promise<boolean> {
+    const {arena} = await this.readGameState();
+    const colours = await coloursAtTiles(this.page, [
+      {x: CORNER_INSET_TILES, y: CORNER_INSET_TILES},
+      {x: arena.width - CORNER_INSET_TILES, y: CORNER_INSET_TILES},
+      {x: CORNER_INSET_TILES, y: arena.height - CORNER_INSET_TILES},
+      {x: arena.width - CORNER_INSET_TILES, y: arena.height - CORNER_INSET_TILES},
+    ]);
 
     return colours.some(colour => colour.red > 200 && colour.green < 140);
   }

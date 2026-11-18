@@ -3,11 +3,17 @@ import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
 import {screenPositionOfTile} from "@src/dsl/gunsmith/components/player/playwright/screen/ScreenPositionOfTile";
 import type {Heading} from "@src/dsl/gunsmith/components/player/types/Heading";
 import {colourIsNear} from "@src/dsl/gunsmith/playwright/look/ColourIsNear";
+import {runHeldUntil} from "@src/dsl/gunsmith/playwright/hold/RunHeldUntil";
+import {lookOfDamage} from "@src/dsl/gunsmith/playwright/look/look-of-damage/LookOfDamage";
+import {lookOfHit} from "@src/dsl/gunsmith/playwright/look/look-of-hit/LookOfHit";
 import {lookOfFighter} from "@src/dsl/gunsmith/playwright/look/look-of-fighter/LookOfFighter";
 import {TEAM_BLUE} from "@src/dsl/gunsmith/playwright/look/TeamBlue";
 import {coloursAtTiles} from "@src/dsl/gunsmith/playwright/screen/ColoursAtTiles";
 import type {Colour} from "@src/dsl/gunsmith/types/Colour";
 import type {FighterLook} from "@src/dsl/gunsmith/types/FighterLook";
+import type {DamageLook} from "@src/dsl/gunsmith/types/DamageLook";
+import type {HitLook} from "@src/dsl/gunsmith/types/HitLook";
+import type {HurtWatch} from "@src/dsl/gunsmith/types/HurtWatch";
 import type {Point} from "@src/dsl/gunsmith/types/Point";
 
 const KEY_FOR: Record<Heading, string> = {
@@ -83,8 +89,8 @@ export class PlayerPlaywright extends BasePage {
   }
 
   /** Waits until the player has less health than `health`. */
-  async waitForHealthBelow(health: number): Promise<void> {
-    await this.waitForGameState(({player}) => player.health < health);
+  async waitForHealthBelow(health: number, timeoutSeconds?: number): Promise<void> {
+    await this.waitForGameState(({player}) => player.health < health, timeoutSeconds);
   }
 
   async getLevel(): Promise<number> {
@@ -104,6 +110,38 @@ export class PlayerPlaywright extends BasePage {
     const {player} = await this.readGameState();
 
     return await lookOfFighter(this.page, {x: player.x, y: player.y}, TEAM_BLUE);
+  }
+
+  /** What the screen shows of damage round the player right now: the brackets of a hit either side, and the ring's slashes under. The player must be standing still. */
+  async getDamageOnScreen(): Promise<DamageLook> {
+    const {player} = await this.readGameState();
+
+    return await lookOfDamage(this.page, {x: player.x, y: player.y});
+  }
+
+  /** What the screen shows of a hit landed round the player right now: the mint ticks of a confirmation, which belong to a target. The player must be standing still. */
+  async getHitOnScreen(): Promise<HitLook> {
+    const {player} = await this.readGameState();
+
+    return await lookOfHit(this.page, {x: player.x, y: player.y});
+  }
+
+  /**
+   * Runs a held game (`holdTheGame`) in steps of `stepSeconds` until the player has less health than they had, and stops there, so a spec can look at the
+   * moment of damage. Throws if nothing has hurt them after `maxSeconds` of the game's time.
+   */
+  async runUntilHurt(request: HurtWatch): Promise<void> {
+    const {player: before} = await this.readGameState();
+
+    await runHeldUntil(this.page, {
+      watch: request,
+      what: "Something hurting the player",
+      isDone: async () => {
+        const {player} = await this.readGameState();
+
+        return player.health < before.health;
+      },
+    });
   }
 
   /**

@@ -4,11 +4,11 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 ## Resume here
 
-Checkout: `.claude/worktrees/ship`, branch `worktree-ship`, synced from committed main `6f6b028`. Persistent worktree; main stays integration-only. Merge newer committed main before new work/delivery when clean; never stash another session's changes.
+Checkout: `.claude/worktrees/ship`, branch `worktree-ship`, synced from committed main `9484ad0`. Persistent worktree; main stays integration-only. Merge newer committed main before new work/delivery when clean; never stash another session's changes.
 
-Current slice: four-shard production-preview CI with combined reporting and an all-shards gate. Owned files: CI workflow and ship coordination/operational docs. Project remains M1; ship supports M3/M7–M8.
+Current slice: standards refactor of preview/runner configuration after user review, including @src imports. Owned files: root scripts, CI mode selection, acceptance configuration/tests/instructions, Vite proxy configuration, shared ESLint config/tests and ship coordination docs. Project remains M1.
 
-Integration delivery is committed to main; sync the final integration record into the clean ship worktree before continuing. Next action: verify the first hosted Actions run and profile setup/build/test/report overhead. Next failing check: hosted all-shards/combined-report acceptance, including artifact transfer. Provisioning and live acceptance await server/budget bindings and user authorization.
+Next action: review/commit this uncommitted delivery when authorized; then hosted verification after publication. Hosted profiling/publication still await setup; AI owns paid selector/guard/evidence and reconciled opening spend.
 
 ## Ownership
 
@@ -22,37 +22,36 @@ server supplies Worker/DO/storage bindings; budget supplies operational limits; 
 
 ## Current milestone tasks
 
+- [x] Prepare self-contained documentation and preserve original sources privately before a future open-source release.
+
 - [x] Add repository checks, production-preview acceptance and independent property-test CI.
 - [x] Implement four acceptance shards, two workers per shard, unique blob artifacts, combined HTML reporting and an all-shards gate.
+- [x] Manage local Worker startup and external API preview scripts; exclude generated Playwright reports from lint.
 - [ ] Profile the first hosted sharded run: separate setup/build/test/merge time, total runner minutes and elapsed time; compare with the recorded 6.3-minute local baseline with budget.
-- [ ] Coordinate the budget/AI eval-strategy research request in HANDOFF.md; implement agreed CI mechanics after AI defines regression gates and paid authorization/spend controls are settled.
+- [x] Settle eval policy with the user and deliver free fake CI/root mechanics; see [policy](docs/agent-reference/EvalPolicy.md).
+- [ ] Receive AI-owned paid selector/guard/evidence implementation and reconciled opening spend before local paid activation.
 - [ ] Verify the first hosted Actions run after authorized publication; API/infra provisioning awaits bindings and authorization.
+
+- [ ] **From budget, 2026-11-17: lint rule for "declare functions below their callers" (root `AGENTS.md`, Code style), including test files.** Nothing enforces it and it has drifted: a sweep (a `function` declared above the first top-level `it`/`describe`) finds 75 test files (ai 35, webapp 26, engine 9, api 5; the two budget test files and `HandleApiRequest.test.ts` are now fixed). Decide how to introduce it without failing the gate on the other 72 (for example warn in changed files only, or the owners fix their packages first); model it on `shared/config/standards/single-export/`, small, with its own tests, proved by mutation. Arrow `const` helpers above their caller are the real risk (temporal dead zone) and are worth checking separately. Budget wrote no rule, `shared/config/` is yours.
+- [ ] **From budget, 2026-11-17: credits and spend are Durable Objects, not D1, so `infra/` must declare them.** `api/wrangler.jsonc` now has bindings `CREDITS` (`CreditLedger`, one per account) and `SPEND` (`SpendLedger`, one global) and migration `v2` (`new_sqlite_classes`); keep the same names in the Alchemy declaration when `infra/` is scaffolded. D1 stays for accounts, sessions, library, ratings and history only. No new dependency or account setup is needed for the ledgers. Reasons: [cost-and-budget.md](docs/cost-and-budget.md).
 
 ## Later tasks
 
 - [ ] Add deployment and live acceptance after manual setup, real bindings and authorization. Property checks remain non-blocking; AI owns its eval workflow.
 - [ ] Alchemy infrastructure: Worker/assets, D1, Durable Objects and rate limits. Follow `MANUAL-SETUP-STEPS.md` on a throwaway account before production; keep local Wrangler config aligned.
 - [ ] Before publication, scrub secrets/history, local settings, personal paths and addresses. No deploy, commit or push without the required authorization.
-- [ ] Final tuning and case-study evidence, including the shutdown drill and real measurements (`docs/focused-case-study.md`).
+- [ ] Final tuning and case-study evidence, including the shutdown drill and real measurements.
 - [ ] Scaffold infra/ and its package instructions when server bindings exist; keep local Wrangler configuration aligned.
 - [ ] Measure infrastructure costs with server/AI runtime measurements before proposing free versus Workers Paid.
 
 ## Verification/latest delivery
 
-- [x] 2026-11-17 integration: committed work from all six delivering personas is merged, including CI sharding and the subsequent terrain delivery; server has no unique commit. Code/assets `d28b13e`: full checks pass (2,249 tests, one skipped), properties 8/8, fake evals 134/134 and production-preview acceptance 234/234. Source indexes preserved; owners retain ongoing uncommitted work. Separate full audio render passes byte for byte (511.22 s); the initial timed-out run and all merge details are recorded in HANDOFF.md. Sync final main before resuming; hosted CI remains unverified.
+Configuration review follow-up: prior standards claim missed mixed concerns, implicit environment dependencies and ternaries in the runner config. Entry point reduced to composition; pure preview/mode/port/server/runner modules use PascalCase filenames, @src imports and named types under types/. Numeric ports stay numeric; lifecycle options are shared within the server builder. New CI runner assertions and inherited preview assertions kill the retry mutant (one criterion) and Worker-port mutant (three relevant criteria). Targeted checks pass (28 tests, including 16 config checks); real online criteria 3/3 and occupied-port/external/interruption lifecycle checks pass after @src migration. Filesystem-directory regression observed red and fixed; module aliases are not used for filesystem paths. Final `pnpm checks` passes (lint/format/strict types, 2,586 tests, one existing slow audio render skipped). No index changes or commit.
 
-- [x] 2026-11-17: four-shard CI/combined HTML delivered; all 221 preview criteria complete (220 first-pass, one viewport-size flake recovered). Full pnpm checks passes (one existing slow render skipped). Red/green workflow contract, failed/partial report probes, five gate scenarios, two gate mutants and build-failure handling verified. Standards/folder/reference review complete; local builds total 5.07 s, tests 327.55 s sequentially. Hosted setup/artifact/report overhead remains next; details in Operations.md and HANDOFF.md.
+2026-11-17 preview lifecycle: 256/256 criteria across four CI-shaped shards, no retries; combined HTML report built. Managed and external online scripts each pass all three privacy criteria. Occupied ports, partial startup failure, interrupted/normal teardown and external ownership verified. New config/report checks observed red; port mutation kills exactly one regression check. Standards/folder/caller audit complete against root, acceptance, shared and webapp instructions; no helpers/types extracted. Final `pnpm checks` passes: lint, formatting, strict types and 2,584 tests; one existing slow audio render skipped. Generated HTML/blob reports remain present. Evidence: `/private/tmp/gunsmith-ship-*.log`; no commit/push/deployment.
 
-- [x] 2026-11-17 follow-up: recorded acceptance-sharding evaluation and budget/AI eval-strategy research in HANDOFF.md. Documentation-only; full `pnpm checks` passes (one existing slow audio render skipped), diff whitespace and root standards/folder review pass. No new files or workflow/spend changes; gameplay acceptance was not rerun.
+2026-11-17 free eval gate: `pnpm evals` passes 170/170, including arena fixtures; full `pnpm checks` passes (lint/format/types, 2,567 tests, one skipped) outside sandbox after sandbox audio stalled. Missing-command red observed; five unsafe command mutants rejected with a stub process; YAML/permissions, fourteen trigger-path probes, targeted formatting, diff whitespace and root/AI/shared standards/folder/caller review pass. No new helpers/types. Free workflow is committed in `e8ff270` and integrated at `f6039c8`; hosted Actions remains unverified. Integration independently repeated full checks and 170 fake criteria with conflicting inherited settings, plus 28 push/PR path probes. Paid selector/guard/dated samples remain AI-owned and pending; no paid execution or ledger initialization.
 
-- [x] 2026-11-17: CI/managed preview/property automation delivered in `worktree-ship` from `6f6b028`. Final `pnpm checks` passes (one slow audio render skipped); production-preview acceptance 221/221 passes with CI settings, no retries; properties 8/8 pass at 1,000 cases each. Startup red/green and grep-confirmed mutation, failure/cleanup/port probes, YAML and workflow graph checks pass. Root/acceptance/shared standards and folder/caller review complete. Hosted Actions remains unverified; no commit, push or deploy. Full concise evidence in HANDOFF.md.
+Cleanup verified: `pnpm checks` passes (2,250 tests, one slow audio render skipped); production compile passes with a chunk-size warning. Links/anchors, archive hashes and ignore behavior pass. Archive exclusion failed first and its removal kills exactly the new criterion. Root/shared/AI/engine/webapp/React/audio/acceptance standards and folder/caller audit complete. Cleanup is committed and integrated; no gameplay acceptance, paid eval, push or publication.
 
-- [x] 2026-11-17: recorded integration-only main and persistent persona worktrees, with main merged back before resuming/delivery. Startup sync revisions and no automatic teardown are documented. Full pnpm checks passes (one slow audio render skipped); repository/link and standards/folder/caller review pass. No git/worktree mutation.
-
-- [x] 2026-11-17: seven-persona migration delivered. All 74 source checkboxes preserved/routed; play is Claude, art/ship Codex. Startup registry red/green proven. Full pnpm checks passes (one slow audio render skipped); sandbox local-server failure resolved by unrestricted rerun. Standards and folder/caller audit complete; current milestone remains M1.
-
-- [x] 2026-11-17: compact instructions, checklists and handoff; preserve full dated snapshots in `docs/history/`.
-
-2026-11-17 migration: tasks redistributed from the former build/ai/art checklists; no gameplay change. Latest merged validation in HANDOFF.md: root checks, eight property tests and 199 preview acceptance tests passed; fake evals reported 126 passing and eight failing canned-response criteria. This is inherited evidence, not a new run.
-
-At session end, record actual checks, mutation/red evidence where applicable, standards and folder/caller review; update this resume, your TODO.md status row and a concise HANDOFF.md delivery. [Pre-migration snapshot](docs/history/2026-11-17-persona-migration.md).
+Integration delivery: code/assets `9d33c98`; full checks pass (2,567 tests, one existing slow render skipped), properties 14/14, fake evals 170/170, production-preview browser exit 0 (255 first-pass, one known `ShootingAcrossLevels` flake recovered). Source tips and merge hashes, conflict decisions, separate standards audit and preserved concurrent staging are in HANDOFF.md. No source checkout was written or synced. CI Worker startup and owner standards corrections remain open; hosted execution, model quality and audio re-render were not claimed.

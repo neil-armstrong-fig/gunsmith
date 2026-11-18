@@ -1,6 +1,6 @@
 # Game design
 
-The rules of gunsmith as decided in planning (2026-11-12). Numbers marked *tunable* live in one config and are expected to
+The intended rules of Gunsmith; online and generation features are planned unless identified as current local behavior. Numbers marked *tunable* live in one config and are expected to
 change in play. Anything marked *stretch* is not part of the first pass.
 
 ## The idea
@@ -34,8 +34,7 @@ Code, not the AI, enforces every rule.
 
 ## Controls
 
-WASD move, mouse aim (360°), Ctrl or C crouch, **1** default rifle, **2** the carried custom weapon. Reload, pick up and
-drop keys are decided in the fuzzy frontend and kept in one key-binding config. Desktop only.
+WASD move, mouse aim (360°), Ctrl or C crouch, **1** default rifle, **2** the carried custom weapon. Current local pickups are collected by walking onto them; future drop/reload controls must follow the runtime input bindings and acceptance specs. Desktop only.
 
 ## A match
 
@@ -73,10 +72,9 @@ drop keys are decided in the fuzzy frontend and kept in one key-binding config. 
   replaces the weapon in the second slot and is in hand, with a full magazine and its reserve. Either fighter can take it by
   the same rule; if both are in reach the nearer wins, an exact tie is the opponent's, and a fighter who falls that step
   takes nothing. Only the player sees it, inside their cone, like any other item. Slice 1 uses a fixed placeholder weapon
-  and the bot does not seek it; the open question is whether it should replace the weapon in hand instead.
-- **Power is capped, not balanced.** Each stat has a wide hard cap set by what physics, the 20 Hz tick and performance can
-  carry. Inside the caps the weapon is used as written. The reveal screen shows a code-computed **power rating**, so the
-  gamble is visible. Nothing is silently nerfed.
+  and the bot seeks it when it can win the race; the open question is whether it should replace the weapon in hand instead.
+- **Power is bounded and balanced in code.** The engine applies stat ranges, a damage cap and a deterministic power ceiling. Generated preferences guide downward adjustments; unused budget and deliberate weakness remain. Calibration through gameplay is still required.
+
 - The AI-authored names and descriptions pass deterministic length, charset and blocklist checks.
 
 ## Arenas

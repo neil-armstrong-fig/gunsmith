@@ -20,6 +20,15 @@ it("asks for the practice range when it is named", () => {
   expect(scenarioFromSearch("?scenario=practice")).toBe("practice");
 });
 
+it("asks for an online room when the query names one, whatever scenario it also names", () => {
+  expect(scenarioFromSearch("?room=ABC234")).toBe("room");
+  expect(scenarioFromSearch("?scenario=duel&room=ABC234")).toBe("room");
+});
+
+it("does not ask for a room when the room is empty", () => {
+  expect(scenarioFromSearch("?room=")).toBe("practice");
+});
+
 it("asks for the sparring match when the query says so", () => {
   expect(scenarioFromSearch("?scenario=sparring")).toBe("sparring");
 });
@@ -38,4 +47,8 @@ it("asks for the overlook duel when the query says so", () => {
 
 it("asks for the pickup race when the query says so", () => {
   expect(scenarioFromSearch("?scenario=pickup-race")).toBe("pickup-race");
+});
+
+it("asks for the fair duel when the query says so", () => {
+  expect(scenarioFromSearch("?scenario=fair-duel")).toBe("fair-duel");
 });

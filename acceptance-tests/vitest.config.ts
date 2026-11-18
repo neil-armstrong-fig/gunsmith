@@ -7,6 +7,7 @@ export default defineConfig({
   resolve: {tsconfigPaths: true},
   test: {
     ...vitestBaseConfig.test,
+    include: ["src/**/*.test.{ts,tsx}", "playwright.config.test.ts"],
     exclude: ["**/node_modules/**", "src/tests/**"],
   },
 });

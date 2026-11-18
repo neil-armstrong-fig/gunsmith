@@ -1,3 +1,5 @@
+import {chooseStartingPlaces} from "@gunsmith/engine/arena-symmetry/ChooseStartingPlaces";
+import {startAtPlaces} from "@gunsmith/engine/arena-symmetry/StartAtPlaces";
 import {disarmOpponent} from "@gunsmith/engine/opponent/DisarmOpponent";
 import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
 import {engine} from "@gunsmith/engine/Engine";
@@ -12,6 +14,7 @@ import type {RingTiming} from "@gunsmith/engine/ring/types/RingTiming";
 import {SUBMACHINE_GUN} from "@gunsmith/engine/weapon/weapons/SubmachineGun";
 import {DUEL_ARENA} from "@src/game/duel/DuelArena";
 import {DUEL_OPPONENT} from "@src/game/duel/DuelOpponent";
+import {FAIR_DUEL_ARENA} from "@src/game/fair-duel/FairDuelArena";
 import {HEIGHTS_ARENA} from "@src/game/heights/HeightsArena";
 import {HEIGHTS_DUMMIES} from "@src/game/heights/HeightsDummies";
 import {OVERLOOK_OPPONENT} from "@src/game/overlook/OverlookOpponent";
@@ -40,6 +43,10 @@ import type {Scenario} from "@src/game/scenario/types/Scenario";
  * the ring alone hurt a fighter who stands still; the practice range and the heights arena never have one.
  */
 export function worldOfScenario(scenario: Scenario, seed: number, ringTiming?: RingTiming): World {
+  if (scenario === "room") {
+    return engine.startingWorld(DUEL_ARENA);
+  }
+
   if (scenario === "duel") {
     const world = giveOpponentBrain(engine.startingWorld(DUEL_ARENA, [], DUEL_OPPONENT), seed);
 
@@ -79,11 +86,33 @@ export function worldOfScenario(scenario: Scenario, seed: number, ringTiming?: R
     return {...world, pickup: {position: PICKUP_RACE_PICKUP, weapon: SUBMACHINE_GUN}};
   }
 
+  if (scenario === "fair-duel") {
+    return fairDuelOf(seed, ringTiming ?? DEFAULT_RING_TIMING);
+  }
+
   if (scenario === "heights") {
     return engine.startingWorld(HEIGHTS_ARENA, HEIGHTS_DUMMIES);
   }
 
   return engine.startingWorld(PRACTICE_ARENA, PRACTICE_DUMMIES);
+}
+
+/**
+ * The fair duel: the fighters on a matching pair of places drawn from `seed`, the opponent's brain, a ring and a weapon lying in
+ * the arena, in one round. The arena is drawn to have such places (`BuiltInArenas.test.ts`), so none is a mistake in the drawing.
+ */
+function fairDuelOf(seed: number, ringTiming: RingTiming): World {
+  const places = chooseStartingPlaces(FAIR_DUEL_ARENA, seed);
+  if (!places) {
+    throw new Error("The fair duel's arena has no matching pair of starting places.");
+  }
+
+  const world = giveOpponentBrain(
+    startAtPlaces(engine.startingWorld(FAIR_DUEL_ARENA, [], places.opponent), places),
+    seed,
+  );
+
+  return {...world, ring: ringOf(world, seed, ringTiming), pickup: pickupOf(world, seed)};
 }
 
 /** The ring for a world that has an opponent: it closes on ground both fighters can walk to from where they start. */

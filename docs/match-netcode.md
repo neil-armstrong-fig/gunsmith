@@ -1,7 +1,6 @@
 # Match netcode, fog and rooms
 
-The design of real-time play. Modelled on janggi's `docs/online-play.md` (read it for the sign-in and room-token flow,
-which is unchanged), but the game is real-time, so the room is a ticking authority. Status: design; `build` keeps it in step
+The design of real-time play. The planned room is a ticking authority. Sign-in uses OAuth code + PKCE and opaque session tokens. Status: initial private-room slice implemented; server keeps it in step
 with the code (`TODO-server.md`).
 
 The 2026-11-15 [fair-play research and handoff](art/fair-play-research.md)
@@ -23,15 +22,15 @@ These are design decisions; the online controls are not implemented yet.
 
 | Piece | Responsibility |
 | ----- | -------------- |
-| API Worker | Authenticates the session, routes HTTP and WebSocket upgrades, hands the account id to the right Durable Object in a trusted internal header (as janggi does) |
-| `Match` Durable Object | One per match. Fixed 20 Hz tick, input validation, authoritative state, fog-filtered snapshots, round and match logic, reconnect window, spectator fan-out, alarm cleanup |
+| API Worker | Authenticates the session, routes HTTP and WebSocket upgrades, hands the account id to the right Durable Object in a trusted internal header |
+| `Match` Durable Object | One per match. Fixed 30 Hz snapshots (the engine steps at 60 Hz), input validation, authoritative state, fog-filtered snapshots, round and match logic, reconnect window, spectator fan-out, alarm cleanup |
 | `Matchmaker` Durable Object | Singleton. Holds the public queue in memory/SQLite and serialises pairing (D1 has no transactions, so two matchers could pair one player twice). Creates a `Match` and hands both players its code |
-| D1 | Accounts, sessions, credits, library, ratings, match history. Not the queue |
+| D1 | Accounts, sessions, library, ratings, match history. Not the queue, and not credits or spend: those are Durable Objects (a `CreditLedger` per account, one `SpendLedger`; budget, `docs/cost-and-budget.md`) |
 | Client | Sends inputs with a sequence number, predicts its own player with the shared engine, reconciles to the server, interpolates the others |
 
 ## The tick
 
-- 20 Hz (*tunable*; 30 Hz is possible if the free-plan spike allows). Each tick: apply validated inputs, step the engine,
+- 30 Hz snapshots (*tunable*; the free-plan spike decides whether to go lower). A browser that only drew what it was sent looked choppy at 20 Hz next to the local game (user, 2026-11-17), so the client now predicts its own fighter and blends the other (see Snapshots and the client row above); the server does not need to run faster for it. The clock plays the 1/60 s engine steps real time owes, so a late timer does not slow the match. Each tick: apply validated inputs, step the engine,
   resolve hits, update the closing ring, compute per-player visibility, send each player their snapshot.
 - Input validation: rate-limit and clamp (a move vector's length, a fire request only if the weapon can fire), reject
   out-of-order sequence numbers, ignore anything for a dead player.
@@ -71,8 +70,8 @@ a delay alone can still help a player through a second account.
 
 - A disconnected player has 30 s to return; their character is frozen in place and still vulnerable. After that the round is
   forfeited; two forfeits lose the match. No input for about 60 s counts as idle and is treated the same.
-- The client re-sends `introduce` on every connection and the server replies with a full snapshot (janggi's pattern).
-- Close code for "match is gone, stop retrying", as janggi's 4404.
+- The client re-sends `introduce` on every connection and the server replies with a full snapshot.
+- Close code for "match is gone, stop retrying", a documented application close code.
 
 ## Rooms
 
@@ -84,7 +83,7 @@ a delay alone can still help a player through a second account.
 - **Guests** may play practice and private rooms with the built-in pool, not the
   public queue; their ratings are not kept.
 
-## Wire messages (draft; `build` owns the final in `shared/`)
+## Wire messages (draft; server owns the final in `shared/`, once a second package imports it)
 
 Discriminated unions on `kind`, JSON text frames to begin with.
 
@@ -123,6 +122,26 @@ corroboration with human review/override. Recovery requires completed clean
 matches resistant to farming, never inactivity; an empty restricted pool may
 prevent recovery. Keep manual correction and never match into the normal pool
 as a timeout fallback. Behavioral detectors start in observation mode.
+
+## Review against the engine (server, 2026-11-17)
+
+What the code gives today, and what the design still needs:
+
+- **Visibility is real but one-sided.** `engine/src/vision/VisibleToPlayer.ts` decides what the *player* sees from
+  `ConeOf` and `CanSeePoint`, covering the opponent, pickup, dummies and bullets, as the "single source" principle says.
+  It takes a `World` with one `player` and a scripted `opponent`.
+- **Gap: two human fighters.** `step(world, input, seconds)` takes one input and thinks for the opponent itself
+  (`thinkOpponent`). An authoritative match needs both seats' inputs per step and a view per seat. Engine owns the shape;
+  requested in `HANDOFF.md`.
+- **Gap: a sound domain.** `engine/src/` has none, and `World.events` holds only what happened to the local player, so
+  "direction only" sound cannot be tested yet.
+- **Gap: effects.** Bullets are filtered by the same rule, but hit and hurt effects are not modelled in `World`; hidden
+  effects must be absent from the snapshot once they are.
+- **The first acceptance scenario** is `TwoBrowsersHidingFromEachOther`: it reads the frames each browser *received*, not
+  the state hook, because a client sent a hidden opponent and told to hide it would pass a hook check. It pins one wire
+  proposal, `{kind: "snapshot", opponent?}` with `opponent` absent when unseen. Nothing moves to `shared/` until a second
+  package imports it.
+- Wire messages are written by server with consumer review (this doc's earlier "build owns" is retired).
 
 ## Open questions
 

@@ -1,3 +1,4 @@
+import type {HitTarget} from "@gunsmith/engine/bullet/types/HitTarget";
 import type {DamageToPlayer} from "@gunsmith/engine/combat-events/types/DamageToPlayer";
 import type {FighterTurn} from "@gunsmith/engine/game-loop/fighter/types/FighterTurn";
 
@@ -7,4 +8,6 @@ export interface EventsRequest {
   playerTurn: FighterTurn;
   /** What the step meant to take off the player, by cause. */
   damage: DamageToPlayer;
+  /** What the player's bullets landed on in this step, only where the player could see it: a hidden target is not here. */
+  visibleHits: readonly HitTarget[];
 }

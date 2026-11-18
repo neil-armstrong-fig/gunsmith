@@ -7,9 +7,12 @@ import {configDefaults, defineConfig} from "vitest/config";
  * They draw hundreds of random inputs against a fresh seed each run, so unlike every other test here a failure is not
  * reproducible from the same commit: it means "these particular random inputs found something", which is worth
  * investigating but is not a reason to block a deploy. They run through `vitest.properties.config.ts`
- * (`pnpm test:properties`). Listed by path because there is one of them; add the next here.
+ * (`pnpm test:properties`). Listed by path, so each new one is added here.
  */
-export const PROPERTY_TESTS = ["src/weapon-balance/property-tests/BalanceWeaponInvariants.test.ts"];
+export const PROPERTY_TESTS = [
+  "src/weapon-balance/property-tests/BalanceWeaponInvariants.test.ts",
+  "src/arena-validation/property-tests/ValidateArenaInvariants.test.ts",
+];
 
 export default defineConfig({
   ...vitestBaseConfig,

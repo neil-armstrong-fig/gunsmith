@@ -10,4 +10,4 @@ The build persona was split into seven workstreams. Use [TODO.md](TODO.md) to se
 - [art](TODO-art.md) — Codex
 - [ship](TODO-ship.md) — Codex
 
-[Complete pre-migration checklists and task routing](docs/history/2026-11-17-persona-migration.md). Historical references to build now route through HANDOFF.md.
+[Current decisions](docs/agent-reference/SessionDecisions.md). Historical references to build now route through HANDOFF.md.

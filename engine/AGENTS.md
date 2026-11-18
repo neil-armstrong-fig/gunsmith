@@ -1,10 +1,10 @@
 # AGENTS.md: engine
 
 `engine/` is the rules of gunsmith: a deterministic simulation, a package of its own so the webapp now, and the API's
-Worker later, run the same code. Modelled on janggi's `engine/`. Pure TypeScript: no React, no DOM, no clock, no
+Worker later, run the same code. Pure TypeScript: no React, no DOM, no clock, no
 `Math.random`, no I/O. A world and an input go in; the next world comes out, and the same two always give the same answer.
 
-Inside the package a file imports another by the package's own name, `@gunsmith/engine/arena/Arena`, as janggi's does
+Inside the package a file imports another by the package's own name, `@gunsmith/engine/arena/Arena`
 (an `@src` alias would resolve into whichever package imports it). `webapp`, `ai` and the future `api` may import it; acceptance specs may not.
 It is not in `shared/` because `acceptance-tests/` may import anything there, and a spec that recomputed its expectation
 from the engine would agree with it whatever the engine did.
@@ -17,10 +17,8 @@ a file that does not share it is a different domain with a folder of its own, an
 caller (`opponent/state/acting/engage/aim/` serves `Engage`). `src/` follows the same rule: its one file is `Engine.ts`, and
 everything else is a domain folder. Tiles are the unit; `x` grows to the east and `y` to the north.
 
-The package front door is `Engine.ts` (`startingWorld` and `step`), not a barrel.
+The package front door is `Engine.ts` (`startingWorld` and `step`), not a barrel. A match between two people is `game-loop/StepFighters.ts` (`step` and it share the core `PlayStep.ts`), and what each seat may be told is `seat/` (`ViewOfSeat` is the server's fog filter, built on `visibleToPlayer` over `MirrorSeats`; `WorldOfSeatView` is its inverse for the browser). A mutual knockout in one step still scores as a loss for the first seat.
 Use the current code and adjacent tests to find a domain's implementation.
-[Historical domain catalogue](../docs/history/2026-11-17-compaction/EngineInstructions.md#what-is-here)
-retains the mechanic descriptions and earlier measurements; it is not a backlog.
 
 `Step`'s tests are split by subject in `game-loop/step/` (`StepWalking`, `StepFiring`, `StepDummies`, `StepWeapons`, `StepRound`, `StepOpponent`, `StepRing`, `StepPickup`, `StepEvents`, each a `.test.ts`), because one file of a hundred cases was too long to read; their shared fixtures (`TICK`, `IDLE`, `arena`, `walking`, `centred`, `sparring` and the rest) are one export per file in `game-loop/step/testing/`. A new case goes in the file for its subject, not in a new catch-all.
 
@@ -46,3 +44,5 @@ files a folder is a smell: split it by subject.
 - Property tests use `fast-check` and run separately through `pnpm test:properties`; `PROPERTY_TEST_RUNS` sets the cases. Preserve seed/counterexample output. `power-rating/` and `weapon-balance/` own deterministic stat costs and downward balancing, including deliberate weakness. These initial coefficients require gameplay calibration.
 
 Stair arenas use deterministic `route/` walking paths for wandering, searching and ring shelter. Flat arenas retain existing steering. Arena parsing rejects raised stair flanks that bypass landings. Engagement and cover work across levels: `EngageDirection(arena, …)` judges range by the player but closes in toward `RouteWaypoint`, so a drop is gone round by its stair; `NearestCover` hides a place by the sight rule (a platform hides from the low ground, not the reverse) and ranks it by the walk there (`WalkingDistanceTo`); `Reload` walks to cover by `RouteWaypoint`. A bot that sees the player from a stair or an edge within its normal range fights from where it is (the user's choice) and routes only to close in or reach cover. The `seek` state (`state/acting/Seek.ts`) walks to a weapon lying in the arena, by stair if need be, without firing; `ChooseState` sends the bot there from any state, in sight of the player or not, when `state/seeking/WinningTheRace` says it is nearer by walk (`state/walking/WalkingDistanceTo`) by `seekLead` tiles, and keeps it there until the player is nearer by more than `seekGrace` (`Difficulty`, both tunables for play). An empty magazine still reloads first.
+
+`arena-symmetry/` makes starts fair without changing `Arena`: `isHalfTurnSymmetric` says whether an arena is the same picture turned half way round, `spawnPairsOf` lists the tile pairs a half turn takes onto one another (open floor, one level, no stair, reachable, `SPAWN_SPACING_STEPS` apart), `chooseStartingPlaces(arena, seed)` draws one pair and who takes which end from the seed on its own `SPAWN_SEED_SALT` stream (never an unmatched pair; `undefined` when there is none), and `startAtPlaces` stands both fighters there facing the middle. The ring centre and the pickup stay random and are not filtered. Half-turn only so far; reflection needs its own aim and input checks.

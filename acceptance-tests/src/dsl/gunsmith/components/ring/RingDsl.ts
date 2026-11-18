@@ -74,6 +74,15 @@ export class RingDsl {
     }
   }
 
+  /** Whether the bright red of the ring's edge is on the screen in any corner of the arena (a screenshot: what a player sees). */
+  async isRedDrawnInAnyCorner(): Promise<boolean> {
+    try {
+      return await this.ring.isRedDrawnInAnyCorner();
+    } catch (error) {
+      throw new DslError("Failed to see whether the ring is drawn in a corner of the arena", error);
+    }
+  }
+
   /** Whether the ground at the ring's centre is drawn without the ring's red tint. */
   async isInsideUntinted(): Promise<boolean> {
     try {

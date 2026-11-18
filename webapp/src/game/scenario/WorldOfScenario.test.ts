@@ -1,3 +1,4 @@
+import {chooseStartingPlaces} from "@gunsmith/engine/arena-symmetry/ChooseStartingPlaces";
 import {isSolid} from "@gunsmith/engine/arena/IsSolid";
 import {levelOfTile} from "@gunsmith/engine/arena/LevelOfTile";
 import {stairOfTile} from "@gunsmith/engine/arena/StairOfTile";
@@ -17,6 +18,7 @@ import type {Ring} from "@gunsmith/engine/ring/types/Ring";
 import type {RingTiming} from "@gunsmith/engine/ring/types/RingTiming";
 import {DUEL_ARENA} from "@src/game/duel/DuelArena";
 import {DUEL_OPPONENT} from "@src/game/duel/DuelOpponent";
+import {FAIR_DUEL_ARENA} from "@src/game/fair-duel/FairDuelArena";
 import {HEIGHTS_ARENA} from "@src/game/heights/HeightsArena";
 import {HEIGHTS_DUMMIES} from "@src/game/heights/HeightsDummies";
 import {OVERLOOK_OPPONENT} from "@src/game/overlook/OverlookOpponent";
@@ -34,6 +36,15 @@ it("makes the practice range with its dummies and no opponent", () => {
   expect(world).toEqual(startingWorld(PRACTICE_ARENA, PRACTICE_DUMMIES));
   expect(world.opponent).toBeUndefined();
   expect(world.dummies).not.toEqual([]);
+});
+
+it("makes a room's first world the duel's arena with the player alone: the server's snapshots replace it", () => {
+  const world = worldOfScenario("room", 1);
+
+  expect(world.arena).toEqual(DUEL_ARENA);
+  expect(world.opponent).toBeUndefined();
+  expect(world.opponentBrain).toBeUndefined();
+  expect(world.dummies).toEqual([]);
 });
 
 it("makes the duel with the opponent where it stands and no dummies", () => {
@@ -266,6 +277,45 @@ describe("the pickup race", () => {
     expect(world.match).toBeUndefined();
     expect(world.ring).toBeUndefined();
     expect(world.dummies).toEqual([]);
+  });
+});
+
+describe("the fair duel", () => {
+  it("is fixture A with the fighters at the places drawn from the seed, in one round with no score", () => {
+    const world = worldOfScenario("fair-duel", 17);
+    const places = chooseStartingPlaces(FAIR_DUEL_ARENA, 17);
+
+    expect(world.arena).toBe(FAIR_DUEL_ARENA);
+    expect(world.player.position).toEqual(places?.player);
+    expect(world.opponent?.position).toEqual(places?.opponent);
+    expect(world.match).toBeUndefined();
+    expect(world.dummies).toEqual([]);
+  });
+
+  it("starts the fighters on opposite sides of the middle, facing it from either side", () => {
+    for (const seed of [1, 2, 3, 4, 5]) {
+      const world = worldOfScenario("fair-duel", seed);
+
+      expect(world.player.position.x + (world.opponent?.position.x ?? 0)).toBe(FAIR_DUEL_ARENA.width);
+      expect(world.player.position.y + (world.opponent?.position.y ?? 0)).toBe(FAIR_DUEL_ARENA.height);
+      expect(world.player.aim.x).toBeCloseTo(-(world.opponent?.aim.x ?? 0), 10);
+      expect(world.player.aim.y).toBeCloseTo(-(world.opponent?.aim.y ?? 0), 10);
+    }
+  });
+
+  it("gives the opponent a brain drawn from the seed, and has a ring and a weapon lying in the arena", () => {
+    const world = worldOfScenario("fair-duel", 5);
+
+    expect(world.opponentBrain).toEqual(giveOpponentBrain(world, 5).opponentBrain);
+    expect(world.ring).toBeDefined();
+    expect(world.pickup).toBeDefined();
+  });
+
+  it("has a ring that follows the page's timing", () => {
+    const timing: RingTiming = {startDelaySeconds: 3, closingSeconds: 7};
+
+    expect(worldOfScenario("fair-duel", 9, timing).ring?.timing).toEqual(timing);
+    expect(worldOfScenario("fair-duel", 9).ring?.timing).toEqual(DEFAULT_RING_TIMING);
   });
 });
 

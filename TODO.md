@@ -8,7 +8,7 @@ The shared path all seven personas feed. Each persona keeps a `TODO-<persona>.md
 2. Read your own checklist's current resume section and the tasks in scope. Read other persona checklists only for dependencies; historical archives are optional task references.
 3. Before editing code, explicitly read every applicable package and nested `AGENTS.md` in full. Starting Codex at the repository root does not automatically load package instructions. Never assume a file was loaded; recover any truncated instruction read in smaller sections.
 4. Say which milestone is current, what the other personas are doing or waiting on, and what you will do. Use this board for their current status.
-5. Finish by updating your checklist resume (current slice, owned files, next failing test/check and next action), your status row and blockers, and adding a concise delivery to `HANDOFF.md`. Move detailed historical narratives to `docs/history/`; keep current decisions and unfinished tasks visible.
+5. Finish by updating your checklist resume (current slice, owned files, next failing test/check and next action), your status row and blockers, and adding a concise delivery to `HANDOFF.md`. Keep completed session narratives outside the public documentation; preserve current decisions and unfinished tasks.
 6. Report actual verification results. A standards review must name the instruction files and include the folder/caller audit; it is separate from lint and test results.
 
 Start a session with: **"You are engine, continue the TODO."** Substitute any persona from the status board.
@@ -17,17 +17,16 @@ Start a session with: **"You are engine, continue the TODO."** Substitute any pe
 
 | Persona | Model | Checklist | Current focus | Updated |
 | --- | --- | --- | --- | --- |
-| play | Claude | [TODO-play.md](TODO-play.md) | Combat feedback slice 2a (damage event, crunch) integrated into main; 2b (`store/feedback/`, brackets, health trail) next; HUD/inventory, camera, close M1 playtest. | 2026-11-17 |
-| engine | Claude | [TODO-engine.md](TODO-engine.md) | Bot pickup-seeking integrated; next arena validation and play's combat events. | 2026-11-17 |
-| ai | Claude | [TODO-ai.md](TODO-ai.md) | Generated-weapon pickup renderer S0 to S3 committed (`c11dc27`), awaiting integration; arena pipeline (A3, committed) and arena submissions (A4: screening and the players' pick rule, no AI judge; uncommitted for review) built on the fake tier, no spend; main's merge waits on a commit; a free local run next; calibration after. | 2026-11-17 |
-| server | Claude | [TODO-server.md](TODO-server.md) | First authoritative two-browser slice after M1; auth, persistence and online privacy. | 2026-11-17 |
-| budget | Claude | [TODO-budget.md](TODO-budget.md) | Production ledger/spend boundaries with server/AI; credits, refunds, tracing and kill switch. Scenarios drafted; executable specs wait for `api/`. | 2026-11-17 |
-| art | Codex | [TODO-art.md](TODO-art.md) | Terrain SVG candidates and browser review sheets delivered; approval/play integration pending. Audio masking awaits runtime synthesis. | 2026-11-17 |
-| ship | Codex | [TODO-ship.md](TODO-ship.md) | Four-shard preview CI with combined reporting; hosted timing/validation next, infra/release awaits bindings and authorization. | 2026-11-17 |
+| play | Claude | [TODO-play.md](TODO-play.md) | Hit confirmation (slice 3) built, awaiting the user's review; camera shake/recoil/reduced motion, HUD/inventory and M1 playtest next. | 2026-11-17 |
+| engine | Claude | [TODO-engine.md](TODO-engine.md) | Hit events and structural arena validator integrated; spawn/symmetry work remains in its worktree, limits and built-in pool next. | 2026-11-17 |
+| ai | Claude | [TODO-ai.md](TODO-ai.md) | Generated pickup renderer and fake-tier arena pipeline A3 integrated; arena submissions (A4: players pick, no AI judge) committed `cb64a58`, awaiting integration. Engine-validator adoption, S4-1 stand-in contrast fix and a free local arena run next. | 2026-11-18 |
+| server | Claude | [TODO-server.md](TODO-server.md) | First online match green and now smooth: client prediction, reconciliation and interpolation, server at 30 Hz, property tests; awaiting the user's review. Next: round/match flow in a room, reconnect, then sign-in/storage and the generation route for budget. | 2026-11-17 |
+| budget | Claude | [TODO-budget.md](TODO-budget.md) | Credit ledger and spend meter built on Durable Objects (committed `cb18fdb`, tested); waits on server's generation route and account id. | 2026-11-17 |
+| art | Codex | [TODO-art.md](TODO-art.md) | C2 soft octagon marker approved; source/proof retained and rejected studies cleaned. Runtime integration, S4-1 fallback contrast, terrain and audio dependencies remain open. | 2026-11-17 |
+| ship | Codex | [TODO-ship.md](TODO-ship.md) | Preview scripts/report exclusions delivered; config standards and @src refactor verified in ship worktree. Hosted CI/deployment remain open. | 2026-11-17 |
 
-These are persistent workstreams, not permission for simultaneous edits to the same files. Select one current slice; record concrete reservations and contracts in HANDOFF.md. Model assignments are defaults, not application configuration. `build` is retired; [migration history](docs/history/2026-11-17-persona-migration.md) preserves its tasks.
+These are persistent workstreams, not permission for simultaneous edits to the same files. Select one current slice; record concrete reservations and contracts in HANDOFF.md. Model assignments are defaults, not application configuration. `build` is retired; current tasks remain in the seven owner checklists.
 
-Earlier status, requests and measurements: [snapshot](docs/history/2026-11-17-compaction/SharedTodo.md).
 
 ## The path
 
@@ -43,14 +42,14 @@ M0 is complete; M1 is current. Later milestones proceed when their consumers and
 | M5 | **Real AI behind the adapter** | A player can type a weapon and an arena and play with the result; the shutdown drill passes; rejection and timeout paths work. |
 | M6 | **Art and audio wired in** | The game looks and sounds like itself; no manifest key is missing. |
 | M7 | **Ship** | Live at `gunsmith.neilarmstrong.dev`; acceptance passes against live; alerts and kill switch armed. |
-| M8 | **Case study and polish** | The case study can be written from `docs/focused-case-study.md` and real numbers. |
+| M8 | **Case study and polish** | Measured outcomes and lessons are ready for a case study. |
 
 ## Blockers and requests
 
-- **engine → play:** agree local damage/hit events and inventory data; engine writes simulation changes, play consumes them. Cross-level bot engagement and cover are merged; extend them rather than restart.
+- **engine → play:** local damage/hit events are integrated; play now consumes both. Inventory data remains open. Extend merged bot routing and cross-level engagement/cover.
 - **art → play:** approved [inventory](docs/art/concepts/inventory-display/README.md) and [combat feedback](docs/art/concepts/combat-feedback/Handover.md) are ready. Art owns assets/manifests; play implements feedback and HUD behavior.
 - **engine ↔ ai:** initial rating/balancing and five-call pipeline are merged. Extend/calibrate rather than restart. Labels v1 and AI-chosen unspecified values are approved; inference probes still need authorization and cumulative spend reconciliation. Preserve deliberate weak weapons.
-- **ai → art:** generated-appearance renderer and readability evidence precede further visual review; kit generation remains shelved. The fake-eval failures are fixed (`b99745a`); fake scores are not evidence of live-model quality. The paid-spend ledger file is gone and the user accepts that; ai tells them before any paid call.
+- **art → ai:** S4 pickup review is complete: lantern passes; fallback body/outline contrast needs a failing acceptance criterion and fix before art re-review. See the S4-1 finding in [HANDOFF.md](HANDOFF.md) and the [approved C2 marker proof](docs/art/concepts/top-down-oddities/pickup-markers/README.md). Redundant review artifacts were removed by user request. Kit generation remains shelved. Fake evals prove the harness only. Reconcile paid spend before any model call; a missing ledger creates no allowance.
 - **engine → server:** [arena fairness](docs/art/arena-fairness-research.md), visibility and deterministic contracts support online play. Preserve random ring centres and validate built-ins too. Public-play [fair-play/privacy](docs/art/fair-play-research.md) belongs to server, not the M1 gate.
 - **server ↔ budget ↔ ship:** server supplies account/storage/call boundaries; budget owns atomic credit/spend enforcement and tracing; ship provisions approved bindings and deployment automation. No speculative shared contracts or live changes.
 - **art → play:** ring-damage WAV/MP3 study delivered; runtime loop playback remains open and the ring stays silent until integrated.
@@ -63,4 +62,4 @@ M0 is complete; M1 is current. Later milestones proceed when their consumers and
 - [ ] Choose free versus Workers Paid after real Durable Object and AI CPU measurements.
 - [ ] Final name/domain check and case-study publication home.
 
-API imports AI in the Worker; that hosting decision is settled. Completed work and superseded requests belong in linked history, not this queue.
+API imports AI in the Worker; that hosting decision is settled. Keep this queue focused on unfinished work and durable decisions.

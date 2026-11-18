@@ -49,8 +49,7 @@ imports any other folder; no consumer imports a generator. If a second layer nee
 it to `common/` rather than reaching across.
 
 `RenderAudio.ts` is the entry point; `pack/` assembles the approved pack. Separate studies live under `studies/` and must not enter the approved pack implicitly.
-See the [historical module catalogue](../../docs/history/2026-11-17-compaction/AudioInstructions.md#layout-generator-scripts)
-for the earlier file tour. Inspect the current caller and tests when editing.
+Inspect the current caller and adjacent tests when editing.
 
 ## Conventions specific to this package
 

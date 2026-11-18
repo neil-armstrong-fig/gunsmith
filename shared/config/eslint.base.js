@@ -12,6 +12,9 @@ export const ignores = [
   "**/dev-dist/**",
   "**/coverage/**",
   "**/screenshots/**",
+  "**/playwright-report/**",
+  "**/blob-report/**",
+  "**/all-blob-reports/**",
 ];
 
 const workspaceScope = "@gunsmith";
@@ -118,6 +121,8 @@ export function baseConfig({tsconfigRootDir, allowedPackages = [], allowedConsol
       files: [
         "src/acceptance-criteria-mapping/AcceptanceCriteriaMapping.ts",
         "evals/eval-criteria-mapping/EvalCriteriaMapping.ts",
+        // The Workers runtime looks for the default handler and the Durable Object class in the one entry module.
+        "src/ApiWorker.ts",
       ],
       rules: {"gunsmith/single-export": "off"},
     },

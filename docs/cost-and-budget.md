@@ -21,7 +21,7 @@ library and the built-in weapon and arena pool; guests are unaffected.
 
 ## The layers
 
-1. **Provider hard cap.** A spend limit on the provider key itself (as the learning repo does with its OpenRouter key), set a
+1. **Provider hard cap.** A spend limit on the provider key itself, set a
    little above the global ceiling. The only layer that truly cannot be exceeded by our bugs.
 2. **AI Gateway spend limits.** Dollar budgets on the gateway: up to 20 rules, rolling or fixed window, scoped by provider,
    model or custom metadata, **split by `user_id`** for a per-user budget. Exceeding returns HTTP 429. *Weakness:* limits are
@@ -37,7 +37,7 @@ library and the built-in weapon and arena pool; guests are unaffected.
 
 ## Cloudflare costs to understand
 
-- **Free plan:** an over-limit operation fails until 00:00 UTC rather than billing (janggi's reason to stay on it). A Durable
+- **Free plan:** an over-limit operation fails until 00:00 UTC rather than billing. A Durable
   Object with a running tick loop does not hibernate, so duration (billed in GB-seconds) accrues for the whole match.
   *Estimate, unverified:* at 128 MB, one match-hour is about 450 GB-seconds against the free daily allowance; the spike measures
   the real numbers.
@@ -275,9 +275,25 @@ against the fake AI adapter, never a paid one.
   - **when a generation runs** then it neither fails nor waits on the trace, and play is not delayed (tracing, `TODO-budget.md`).
 - **given the month's spend rises past 50, 80 and 100 percent** then each threshold raises its alert once (layer 5).
 
-**Open, not decided here:** whether the counters live in D1 or a Durable Object (depends on `server`'s storage boundary); where the cost
-estimator lives and who owns its prices; who writes the first executable spec once `api/` exists. `ai`'s eval `paidSpendGuard` and its
-$1 total ledger are separate and untouched.
+**Decided (the user, 2026-11-17): the credit ledger and the spend counters live in Durable Objects, not D1.** A `CreditLedger` object per
+account (named by the internal account id) holds the balance and reservations; one `SpendLedger` singleton holds the daily and monthly
+counters, the kill-switch flag and the alert thresholds. D1 stays for accounts, sessions, library, ratings and history.
+- **Why:** an object runs one request at a time, so a synchronous reserve with no `await` between its read and its write cannot interleave
+  (D1 has no `BEGIN`/`COMMIT`, so each rule would have to be one conditional statement); the 00:00 UTC and first-of-month resets happen when
+  the next call arrives, so no cron Worker is needed (an `alarm()` is only needed later, to push the alerts out); and it needs no new
+  dependency or provisioning (same pattern as `MATCHES`). The free-plan SQL
+  quotas are the same for both (100,000 rows written and 5,000,000 read a day), so they do not decide it.
+- **The cost:** the ledger is split from the account tables, so account deletion and export must also call the account's object, and a
+  report across all users needs a fan-out or a summary kept elsewhere.
+- **Not proved by the unit tests:** the ledger classes (`api/src/ai/credits/account/CreditAccount.ts`, `api/src/ai/spend/meter/SpendMeter.ts`) are plain
+  and synchronous and run in node; atomicity is the Durable Object's own serial guarantee. It was checked once, on 2026-11-17, by running
+  the real `CreditLedger` and `SpendLedger` under `wrangler dev` behind a throwaway probe Worker (not in the repo, so not repeatable from
+  it) and firing concurrent requests: 50 parallel reserves on a fresh account gave exactly 10 reserved; two requests for the last credit
+  gave one; 30 parallel retries of one key charged once; 30 parallel refunds of one request refunded once; 30 parallel $0.10 spend
+  reserves gave 10 reserved and then AI off until 00:00 UTC. A repeatable version needs the generation route (`server`).
+
+**Still open:** where the cost estimator lives and who owns its prices; the generation route that the reserve and refund wrap (`server`).
+`ai`'s eval `paidSpendGuard` and its $1 total ledger are separate and untouched.
 
 ## Sources
 
@@ -285,4 +301,3 @@ $1 total ledger are separate and untouched.
 - [AI Gateway spend limits](https://developers.cloudflare.com/ai-gateway/features/spend-limits/index.md)
 - [Workers AI pricing](https://developers.cloudflare.com/workers-ai/platform/pricing/)
 - [Durable Objects WebSocket best practices](https://developers.cloudflare.com/durable-objects/best-practices/websockets)
-- janggi `api/AGENTS.md` ("Never enable Workers Paid") and `docs/online-play.md` (free-plan figures, re-checked 2026-10-02)

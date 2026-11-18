@@ -1,6 +1,9 @@
 import type {Page} from "@playwright/test";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
 import {PlayerPlaywright} from "@src/dsl/gunsmith/components/player/playwright/PlayerPlaywright";
+import type {HitLook} from "@src/dsl/gunsmith/types/HitLook";
+import type {HurtWatch} from "@src/dsl/gunsmith/types/HurtWatch";
+import type {DamageLook} from "@src/dsl/gunsmith/types/DamageLook";
 import type {Heading} from "@src/dsl/gunsmith/components/player/types/Heading";
 import type {FighterLook} from "@src/dsl/gunsmith/types/FighterLook";
 import type {Point} from "@src/dsl/gunsmith/types/Point";
@@ -87,10 +90,10 @@ export class PlayerDsl {
     }
   }
 
-  /** Waits until the player has less health than `health`. */
-  async waitForHealthBelow(health: number): Promise<void> {
+  /** Waits until the player has less health than `health`, for as long as `timeoutSeconds` when it is known to take longer than the default. */
+  async waitForHealthBelow(health: number, timeoutSeconds?: number): Promise<void> {
     try {
-      await this.player.waitForHealthBelow(health);
+      await this.player.waitForHealthBelow(health, timeoutSeconds);
     } catch (error) {
       throw new DslError(`Failed to see the player drop below ${health} health`, error);
     }
@@ -120,6 +123,33 @@ export class PlayerDsl {
       return await this.player.getLookOnScreen();
     } catch (error) {
       throw new DslError("Failed to read how the player looks on the screen", error);
+    }
+  }
+
+  /** What the screen shows of damage round the player right now: the brackets of a hit either side of them, and the ring's slashes under them. The player must be standing still. */
+  async getDamageOnScreen(): Promise<DamageLook> {
+    try {
+      return await this.player.getDamageOnScreen();
+    } catch (error) {
+      throw new DslError("Failed to read the damage the screen shows round the player", error);
+    }
+  }
+
+  /** What the screen shows of a hit landed round the player right now (mint ticks, which belong to a target the player hit, never to the player). The player must be standing still. */
+  async getHitOnScreen(): Promise<HitLook> {
+    try {
+      return await this.player.getHitOnScreen();
+    } catch (error) {
+      throw new DslError("Failed to read the hit confirmation the screen shows round the player", error);
+    }
+  }
+
+  /** Runs a held game, in steps of `stepSeconds`, until the player is hurt, and holds it there. Fails if nothing hurts them in `maxSeconds`. */
+  async runUntilHurt(request: HurtWatch): Promise<void> {
+    try {
+      await this.player.runUntilHurt(request);
+    } catch (error) {
+      throw new DslError("Failed to run the game until the player was hurt", error);
     }
   }
 

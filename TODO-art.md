@@ -4,9 +4,9 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 ## Resume here
 
-Checkout: `.claude/worktrees/art`, branch `worktree-art`; last merged main `2347f21` via merge `6f7c38a` on 2026-11-17. Preserve this worktree and sync committed main before new work/delivery.
+Checkout: `.claude/worktrees/art`, branch `worktree-art`; last merged main `9484ad0` by fast-forward on 2026-11-17. Preserve this worktree and sync committed main before new work/delivery.
 
-Current slice: delivered [arena terrain candidates](docs/art/terrain/README.md): three floors and a solid wall, editable SVGs and native/context PNG proofs. User approval and play integration remain pending. Ring damage loop remains delivered; renderer review waits for AI evidence.
+Current slice: [C2 soft octagon approved](docs/art/concepts/top-down-oddities/pickup-markers/README.md) by the user on 2026-11-17. Selected SVG, self-contained native/context proof and integration notes retained; rejected comparisons, scratch scripts and redundant S4 screenshot/metadata bundle removed at user request. Next: coordinate acceptance-first marker integration with play/AI, preserving complete fog/collection suppression and fixed appearance-independent shape. No runtime edits. S4-1 fallback contrast is retained in HANDOFF.md; terrain approval and ring-loop integration remain open.
 
 Current milestone: M1/M6; the project remains on M1. Next audio task: combat masking, fatigue and levels once AI/play integrate runtime weapon-shot synthesis (not yet wired into the game sound output). Safari acceptance does not claim new headphone/speaker measurements. Preserve approved master hashes. Next failing check for any playback change: the relevant browser sound acceptance criterion before implementation.
 
@@ -21,6 +21,10 @@ Reserve concrete files in [HANDOFF.md](HANDOFF.md) before overlapping another se
 Agree manifest keys/anchors with play and supported visual grammar with AI before production assets. The rifle shot is integrated (blue is your unmodified `effects/projectile-rifle`; see HANDOFF.md). No menus ahead of real consumers.
 
 ## Current milestone tasks
+
+- [x] User chose C2 soft octagon after two marker comparisons. Lock artwork and clean rejected studies; acceptance-first runtime integration remains open.
+
+- [x] Complete S4 generated-pickup review at native 64/32 px with hide/restore checks. Lantern passes; S4-1 fallback readability fix is handed to AI. After C2 approval, redundant review artifacts were removed by user request; the approved proof embeds its source images. Broader schema/oddity review stays open.
 
 - [x] Deliver three floor levels and solid-wall SVG candidates with native 64/32 px, repetition, grayscale, dim-terrain and terraced-context proof. Approval and runtime adoption remain open.
 
@@ -48,23 +52,8 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 
 ## Verification/latest delivery
 
-- [x] Terrain candidates (2026-11-17): four missing-file reds before artwork; static SVG checks pass. Chromium/WebKit pass 16 native renders and reject a rendered middle-floor recolour. Both sheets visually inspected. `pnpm checks` passes outside sandbox (2,175 tests, one skipped); sandbox audio server setup timed out. Root/webapp standards and folder/caller audit complete; reference/sprite/master hashes preserved. Artwork remains uncommitted; no runtime/manifest change.
+Cleanup validation: `pnpm checks` exits 0 (lint, formatting, strict types and 2,567 tests; one existing audio-render skip). Approved C2 source/proof retained, with all five proof images embedded. Root instructions re-read; folder/caller, link, SVG geometry and whitespace audit complete. Redundant review artifacts removed from disk and staging; S4-1 finding retained in HANDOFF.md. No gameplay change or acceptance rerun. Delivery remains uncommitted.
 
-- [x] Ring damage loop delivered and approved after listening in Visual Studio Code (2026-11-17); `Listen.html` removed. Five new audio tests pass with red/mutation evidence; eight browser checks pass seam/repeat limits, with WebKit’s 40 ms MP3 padding recorded (use WAV). `pnpm checks` passes: 2,175 tests, one slow render skipped; separate approved-pack re-render passes byte for byte in 308.73 s. All 62 preserved asset/evidence hashes unchanged. Requested root/audio code review and folder/caller audit complete; format duplication and measurement naming fixed. No runtime integration or combat-masking claim.
+Record actual checks, red/mutation evidence and the standards/folder review for the current delivery. Update this resume, the shared status row and a concise handoff at session end.
 
-- [x] Generated-pickup review preparation (2026-11-17): documented the exact lantern/refused review and requested S3 evidence through the connected AI session. Renderer/readability review remains open: S3 is absent. No runtime/assets changed and no new browser, listening or mutation result claimed. `pnpm checks` exits 0 outside the sandbox (2,170 tests, one slow audio render skipped); initial audio run stalled and was stopped. Links/new anchor, diff whitespace and root standards/folder/reference review pass. No new files, folders, helpers or types.
-
-- [x] Crunch MP3/cue mapping review (2026-11-17): play’s pending export matches canonical encoding; native duration/probe/PCM pass, three negative controls rejected. No audio/runtime changes. `pnpm checks` exits 0 (2,170 tests, one slow audio render skipped); standalone handover formatting warning predates this slice, new section formatted. Root/webapp/audio standards and folder/reference audit complete; no new files/helpers/types/folders. Next audio QA still needs runtime shot synthesis; renderer review waits for AI’s drawing.
-
-- [x] Safari audio accepted as good enough by user decision (2026-11-17); closed native listening follow-up and updated active status/guidance. No new listening or device measurements. `pnpm checks` exits 0: lint/format/types and 2,170 unit tests pass, one slow audio render skipped. All 56 local documentation links, the new acceptance anchor, diff whitespace and approved master/runtime MP3 hashes pass. Re-read root/webapp/audio instructions; standards and folder/reference audit complete, with no new files, folders, helpers or types. Next audio QA awaits AI/play runtime weapon-shot synthesis.
-
-- [x] Runtime timing follow-up: twelve production-preview empty-click acceptance cases pass (six each in Chromium/WebKit); six real-play probe runs and six synthetic diagnostic controls completed. All 69 inventoried audio/evidence files retain their hashes. `pnpm checks` exits 0: lint/format/types and 2,170 unit tests pass, with one slow audio render skipped. Re-read root/webapp/audio/acceptance instructions; standards and folder/reference audit complete (no new tracked files, folders, helpers or types).
-
-- [x] Orange-shot review: all 16 `DrawingTheShots` criteria pass on a production build. A temporary blue recolour fails the opponent-orange criterion (0 of 6 orange samples) and exactly one of 13 manifest tests. Native 64/32 px plus in-game screenshots reviewed, including fog and missing-asset fallback. Evidence: `/private/tmp/gunsmith-art-shot-review/` (local, temporary). `pnpm checks` passes: lint/format/types and 2,170 unit tests, with one slow audio render skipped. Standards review re-read root, webapp and acceptance instructions; folder/reference audit complete, with no new tracked files, folders, helpers or types.
-
-- [x] Session 1: [browser listening and live-playback handoff](webapp/audio/qa/runtime-playback/README.md) delivered; MP3 confirmed. Removed the completed listening page, seven one-off JSON files and temporary probes at the user's request. Preserve the decision, original audio and existing codec QA; Safari onset/cadence and production mapping remain open.
-- [x] Session 1: lock in MP3 and switch the integrated empty click at the user’s request. Approved WAV masters and codec evidence remain unchanged. Production-preview sound acceptance passes in Chromium/WebKit; project checks and full master re-render pass.
-
-2026-11-17 migration: tasks redistributed from the former build/ai/art checklists; no gameplay change. Latest merged validation in HANDOFF.md: root checks, eight property tests and 199 preview acceptance tests passed; fake evals reported 126 passing and eight failing canned-response criteria. This is inherited evidence, not a new run.
-
-At session end, record actual checks, mutation/red evidence where applicable, standards and folder/caller review; update this resume, your TODO.md status row and a concise HANDOFF.md delivery. [Pre-migration snapshot](docs/history/2026-11-17-persona-migration.md).
+S4 validation before cleanup: production build and 6/6 pickup criteria passed without retries. S1/S3 red/mutation evidence is inherited from `c11dc27`, not repeated. No runtime helpers/types/scripts added; the retained handoff records the unresolved AI defect.
