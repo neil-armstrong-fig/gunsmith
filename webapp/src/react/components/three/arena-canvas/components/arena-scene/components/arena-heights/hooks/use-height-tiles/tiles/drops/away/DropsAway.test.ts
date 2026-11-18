@@ -14,6 +14,10 @@ it("does not drop against a wall", () => {
   expect(dropsAway(arena, FLOOR, "south")).toBe(false);
 });
 
+it("drops towards a low cover block, which is low ground with a block on it and no wall", () => {
+  expect(dropsAway(arenaFrom(["#####", "#c1.#", "#####"]), {x: 2, y: 1, level: 1}, "west")).toBe(true);
+});
+
 it("does not drop on the side a stair arrives, since that is the way up", () => {
   expect(dropsAway(arena, FLOOR, "east")).toBe(false);
 });

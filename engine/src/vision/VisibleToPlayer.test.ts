@@ -123,6 +123,57 @@ it("shows an opponent on the low ground to a player who has climbed up to the pl
   expect(visibleToPlayer(onThePlatform).opponent).toBe(true);
 });
 
+// The player starts at (12.5, 3.5) facing east, with a cover block at (16, 3): a fighter at (17.5, 3.5) is right behind it.
+const coverRow = "#" + ".".repeat(15) + "c" + ".".repeat(6) + "#";
+const openRow = "#" + ".".repeat(22) + "#";
+const withCover = arenaFrom([
+  "########################",
+  openRow,
+  openRow,
+  coverRow,
+  openRow,
+  openRow,
+  "########################",
+]);
+const BEHIND_THE_COVER = {x: 17.5, y: 3.5};
+
+it("shows a standing opponent behind a cover block, which a standing player sees over", () => {
+  expect(visibleToPlayer(startingWorld(withCover, [], BEHIND_THE_COVER)).opponent).toBe(true);
+});
+
+it("hides a crouching opponent behind a cover block", () => {
+  const world = startingWorld(withCover, [], BEHIND_THE_COVER);
+  const opponent = world.opponent;
+  if (!opponent) {
+    throw new Error("The world has no opponent.");
+  }
+
+  expect(visibleToPlayer({...world, opponent: {...opponent, crouching: true}}).opponent).toBe(false);
+});
+
+it("shows a crouching opponent in the open", () => {
+  const world = startingWorld(withCover, [], {x: 20.5, y: 3.5});
+  const opponent = world.opponent;
+  if (!opponent) {
+    throw new Error("The world has no opponent.");
+  }
+
+  expect(visibleToPlayer({...world, opponent: {...opponent, crouching: true}}).opponent).toBe(true);
+});
+
+it("hides a standing opponent behind a cover block from a crouching player", () => {
+  const world = startingWorld(withCover, [], BEHIND_THE_COVER);
+
+  expect(visibleToPlayer({...world, player: {...world.player, crouching: true}}).opponent).toBe(false);
+});
+
+it("hides a crouching dummy behind a cover block, and shows a standing one and a crouching one in the open", () => {
+  const world = startingWorld(withCover, [BEHIND_THE_COVER, BEHIND_THE_COVER, {x: 20.5, y: 3.5}]);
+  const crouched = world.dummies.map((dummy, index) => ({...dummy, crouching: index !== 1}));
+
+  expect(visibleToPlayer({...world, dummies: crouched}).dummies).toEqual([false, true, true]);
+});
+
 it("shows a pickup in front of the player and hides one behind them", () => {
   const world = startingWorld(room, [], {x: 20.5, y: 3.5});
 

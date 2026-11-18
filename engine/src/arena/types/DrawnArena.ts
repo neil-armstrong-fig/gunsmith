@@ -5,6 +5,7 @@ export interface DrawnArena {
   width: number;
   height: number;
   solid: boolean[];
+  cover: boolean[];
   levels: number[];
   stairs: TileStair[];
 }

@@ -12,7 +12,8 @@ import {hasClearLine} from "@gunsmith/engine/vision/sight/HasClearLine";
  * a place across a drop is as far as the stair. The first of two equally near places wins. Absent when no candidate qualifies.
  */
 export function nearestCover(arena: Arena, request: CoverCandidates): Point | undefined {
-  const hidesFromThreat = blocksSightFrom(arena, eyeLevelAt(arena, request.threat));
+  // The threat is taken to stand: a low cover block does not hide a place from a standing viewer, only a wall or higher ground does.
+  const hidesFromThreat = blocksSightFrom(arena, {eyeLevel: eyeLevelAt(arena, request.threat), crouching: false});
   let nearest: Point | undefined;
   let nearestDistance = Infinity;
   for (const candidate of request.candidates) {

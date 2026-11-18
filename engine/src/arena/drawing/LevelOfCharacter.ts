@@ -1,14 +1,15 @@
+import {COVER} from "@gunsmith/engine/arena/drawing/Cover";
 import {FLOOR} from "@gunsmith/engine/arena/drawing/level/Floor";
 import {RAISED_LEVELS} from "@gunsmith/engine/arena/drawing/level/RaisedLevels";
 import {STAIRS} from "@gunsmith/engine/arena/drawing/Stairs";
 import {WALL} from "@gunsmith/engine/arena/drawing/Wall";
 
 /**
- * The level a character of an arena's drawing stands for: 0 for a wall, floor or stair (a stair is given its real level once
+ * The level a character of an arena's drawing stands for: 0 for a wall, a cover block, floor or stair (a stair is given its real level once
  * its landings are known), 1 or 2 for raised floor. It throws for a character that is none of these.
  */
 export function levelOfCharacter(character: string): number {
-  if (character === WALL || character === FLOOR || Object.hasOwn(STAIRS, character)) {
+  if (character === WALL || character === COVER || character === FLOOR || Object.hasOwn(STAIRS, character)) {
     return 0;
   }
 

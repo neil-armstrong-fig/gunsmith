@@ -8,7 +8,14 @@ const open = room();
 // A wall across the room whose face is at x = 9, three and a half tiles east of the apex.
 const walled = room(9);
 
-const EAST: Cone = {apex: {x: 5.5, y: 15.5}, aim: {x: 1, y: 0}, halfAngleRadians: Math.PI / 4, range: 10, eyeLevel: 0};
+const EAST: Cone = {
+  apex: {x: 5.5, y: 15.5},
+  aim: {x: 1, y: 0},
+  halfAngleRadians: Math.PI / 4,
+  range: 10,
+  eyeLevel: 0,
+  crouching: false,
+};
 
 it("starts at the apex", () => {
   expect(visibleArea(open, EAST)[0]).toEqual(EAST.apex);
@@ -85,6 +92,35 @@ it("reaches across low ground from a viewer on a platform, where a drop is no wa
   expect(Math.max(...reach)).toBeCloseTo(EAST.range, 6);
 });
 
+// A row of cover blocks across the room, their face at x = 9.
+const coverAcross = roomWithCoverAt(9);
+
+it("reaches over a row of cover blocks from a standing viewer", () => {
+  const reach = visibleArea(coverAcross, EAST)
+    .slice(1)
+    .map(point => Math.hypot(point.x - EAST.apex.x, point.y - EAST.apex.y));
+
+  expect(Math.max(...reach)).toBeCloseTo(EAST.range, 6);
+});
+
+it("stops at the face of a row of cover blocks for a crouching viewer", () => {
+  const straightAhead = visibleArea(coverAcross, {...EAST, crouching: true})
+    .slice(1)
+    .filter(point => Math.abs(point.y - EAST.apex.y) < 0.5);
+
+  expect(straightAhead.length).toBeGreaterThan(0);
+  expect(straightAhead.every(point => point.x <= 9 + 1e-9)).toBe(true);
+  expect(straightAhead.every(point => point.x > 8.99)).toBe(true);
+});
+
+it("reaches over a row of cover blocks on lower ground from a crouching viewer on a platform", () => {
+  const reach = visibleArea(coverAcross, {...EAST, crouching: true, eyeLevel: 1})
+    .slice(1)
+    .map(point => Math.hypot(point.x - EAST.apex.x, point.y - EAST.apex.y));
+
+  expect(Math.max(...reach)).toBeCloseTo(EAST.range, 6);
+});
+
 // A room 31 tiles square, with the floor as wide as the cone needs; `column` is the x of a wall across it, if any.
 function room(column?: number): Arena {
   const rows = Array.from({length: 31}, (_, y) => {
@@ -93,6 +129,29 @@ function room(column?: number): Arena {
     }
 
     return Array.from({length: 31}, (_, x) => (x === 0 || x === 30 || x === column ? "#" : ".")).join("");
+  });
+
+  return arenaFrom(rows);
+}
+
+// The same room with a cover block in every row at `column`.
+function roomWithCoverAt(column: number): Arena {
+  const rows = Array.from({length: 31}, (_, y) => {
+    if (y === 0 || y === 30) {
+      return "#".repeat(31);
+    }
+
+    return Array.from({length: 31}, (_, x) => {
+      if (x === 0 || x === 30) {
+        return "#";
+      }
+
+      if (x === column) {
+        return "c";
+      }
+
+      return ".";
+    }).join("");
   });
 
   return arenaFrom(rows);

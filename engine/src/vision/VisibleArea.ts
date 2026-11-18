@@ -9,7 +9,7 @@ const RAYS_ACROSS_THE_CONE = 48;
 
 /**
  * The outline of what the cone shows in detail: the apex, then the point each ray across the cone's width reaches
- * before it meets a wall, ground higher than the viewer's eye level or the end of its range, from one edge of the cone round to the other. It is the cone with the
+ * before it meets a wall, ground higher than the viewer's eye level, a cover block (to a crouching viewer) or the end of its range, from one edge of the cone round to the other. It is the cone with the
  * walls and the higher ground cut out of it, always the same number of points, so a drawing can reuse its buffers. Sight never
  * reaches farther than a bullet does (a bullet stops at walls only), so a bullet can reach whatever the outline shows.
  */
@@ -27,7 +27,7 @@ export function visibleArea(arena: Arena, cone: Cone): readonly Point[] {
 
 function reach(arena: Arena, cone: Cone, angle: number): Point {
   const direction = {x: Math.cos(angle), y: Math.sin(angle)};
-  const length = reachAlong(blocksSightFrom(arena, cone.eyeLevel), {position: cone.apex, direction}, cone.range);
+  const length = reachAlong(blocksSightFrom(arena, cone), {position: cone.apex, direction}, cone.range);
 
   return {x: cone.apex.x + direction.x * length, y: cone.apex.y + direction.y * length};
 }

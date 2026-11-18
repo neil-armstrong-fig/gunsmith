@@ -14,7 +14,7 @@ Appearance is a separate bounded primitive description, with code validation and
 
 ## Current arena and snapshot data
 
-Inspect `engine/src/arena/` and its validator/tests for the current arena types. Stairs are the only legal transitions between levels; raised stair flanks cannot bypass landings. Arena finalisation and fairness require engine-owned acceptance coverage.
+Inspect `engine/src/arena/` and its validator/tests for the current arena types. Stairs are the only legal transitions between levels; raised stair flanks cannot bypass landings. `Arena.cover` (2026-11-18) marks low cover blocks, always a subset of `solid` and on the low ground; a drawing's `c` is one, so a generated drawing that contains a `c` now parses as cover (ai's legend does not offer it). Arena finalisation and fairness require engine-owned acceptance coverage.
 
 `shared/src/state-hook/` is the browser acceptance snapshot contract, not the future network protocol. It is deliberately read-only. Runtime visibility is calculated by the engine; the planned server must filter outgoing snapshots as well.
 

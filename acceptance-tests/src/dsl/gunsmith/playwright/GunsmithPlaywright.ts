@@ -135,6 +135,10 @@ export class GunsmithPlaywright extends BasePage {
     await this.openScenario("heights");
   }
 
+  async openCover(): Promise<void> {
+    await this.openScenario("cover");
+  }
+
   async openTerrain(pictures?: TerrainPictures): Promise<void> {
     const highestFloor = "**/assets/tiles/tile-floor-l3.svg";
 

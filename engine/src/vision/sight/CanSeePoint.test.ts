@@ -6,7 +6,14 @@ import type {Cone} from "@gunsmith/engine/vision/types/Cone";
 const hall = arenaFrom(["###########", "#.........#", "#....#....#", "#.........#", "###########"]);
 const open = arenaFrom(["###########", "#.........#", "#.........#", "#.........#", "###########"]);
 
-const EAST: Cone = {apex: {x: 1.5, y: 2.5}, aim: {x: 1, y: 0}, halfAngleRadians: Math.PI / 4, range: 6, eyeLevel: 0};
+const EAST: Cone = {
+  apex: {x: 1.5, y: 2.5},
+  aim: {x: 1, y: 0},
+  halfAngleRadians: Math.PI / 4,
+  range: 6,
+  eyeLevel: 0,
+  crouching: false,
+};
 
 it("sees a point inside the cone with nothing in the way", () => {
   expect(canSeePoint(open, EAST, {x: 5.5, y: 2.5})).toBe(true);

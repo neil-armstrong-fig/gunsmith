@@ -16,6 +16,7 @@ import {startRing} from "@gunsmith/engine/ring/StartRing";
 import {DEFAULT_RING_TIMING} from "@gunsmith/engine/ring/DefaultRingTiming";
 import type {Ring} from "@gunsmith/engine/ring/types/Ring";
 import type {RingTiming} from "@gunsmith/engine/ring/types/RingTiming";
+import {coverWorld} from "@src/game/cover/CoverWorld";
 import {DUEL_ARENA} from "@src/game/duel/DuelArena";
 import {DUEL_OPPONENT} from "@src/game/duel/DuelOpponent";
 import {FAIR_DUEL_ARENA} from "@src/game/fair-duel/FairDuelArena";
@@ -152,6 +153,14 @@ it("leaves sparring's opponent without a brain and its match unscored when it ha
 
   expect(world.opponentBrain).toBeUndefined();
   expect(world.match).toBeUndefined();
+});
+
+it("opens the cover arena, with no ring even when asked for ring timing, and no weapon lying about", () => {
+  const timing = {startDelaySeconds: 1, closingSeconds: 6};
+
+  expect(worldOfScenario("cover", 7, timing)).toEqual(coverWorld());
+  expect(worldOfScenario("cover", 7, timing).ring).toBeUndefined();
+  expect(worldOfScenario("cover", 7).pickup).toBeUndefined();
 });
 
 describe("the heights arena", () => {

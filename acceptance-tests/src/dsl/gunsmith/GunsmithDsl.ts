@@ -288,6 +288,15 @@ export class GunsmithDsl {
     }
   }
 
+  /** Opens the cover arena: open low ground with two low cover blocks, three dummies east of them (one standing behind a block, one crouched behind a block, one crouched in the open) and no opponent. */
+  async startCover(): Promise<void> {
+    try {
+      await this.gunsmith.openCover();
+    } catch (error) {
+      throw new DslError("Failed to open the cover arena", error);
+    }
+  }
+
   async startTerrain(pictures?: TerrainPictures): Promise<void> {
     try {
       await this.gunsmith.openTerrain(pictures);

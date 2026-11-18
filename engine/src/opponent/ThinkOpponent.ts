@@ -26,7 +26,7 @@ export function thinkOpponent(world: World, seconds: number): OpponentDecision {
     return {input: {direction: {x: 0, y: 0}, firing: false, reload: false}, brain: undefined};
   }
 
-  const sees = canSee(arena, opponent, player.position);
+  const sees = canSee(arena, opponent, player);
   const context: OpponentContext = {arena, opponent, target: player, sees, seconds, ring, pickup};
   const noticed = noticeShot(noticePlayer(opponentBrain, {sees, target: player.position, seconds}), {sees});
   const chosen = {...chooseState(noticed, context), shotFrom: undefined};

@@ -42,6 +42,13 @@ it("returns the dummies unchanged when nothing was hit", () => {
   expect(hurtDummies([dummyAt(1, 100)], [])).toEqual([dummyAt(1, 100)]);
 });
 
+it("keeps a dummy crouching, whether it was hit or not", () => {
+  const crouching = {...dummyAt(1, 100), crouching: true};
+
+  expect(hurtDummies([crouching], [])).toEqual([crouching]);
+  expect(hurtDummies([crouching], [strike(0, 25)])).toEqual([{...crouching, health: 75}]);
+});
+
 it("does not change the dummies it was given", () => {
   const dummies = [dummyAt(1, 100)];
   const before = structuredClone(dummies);

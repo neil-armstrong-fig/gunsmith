@@ -55,6 +55,7 @@ it("counts the edge of the arena as a wall", () => {
     width: 1,
     height: 3,
     solid: [false, false, false],
+    cover: [false, false, false],
     levels: [0, 0, 1],
     stairs: [undefined, "north", undefined],
   };
@@ -75,6 +76,7 @@ function arenaWithStair(uphill: Uphill, sides: FlankTiles): DrawnArena {
     width: 3,
     height: 3,
     solid: new Array<boolean>(9).fill(false),
+    cover: new Array<boolean>(9).fill(false),
     levels: new Array<number>(9).fill(0),
     stairs: new Array<Uphill | undefined>(9).fill(undefined),
   };

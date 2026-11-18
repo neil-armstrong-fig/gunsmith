@@ -1,4 +1,5 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
+import {isCover} from "@gunsmith/engine/arena/IsCover";
 import {isSolid} from "@gunsmith/engine/arena/IsSolid";
 import {levelOfTile} from "@gunsmith/engine/arena/LevelOfTile";
 import {stairOfTile} from "@gunsmith/engine/arena/StairOfTile";
@@ -47,4 +48,21 @@ it("reverses a north-climbing stair when mirrored north to south, and keeps it w
 
 it("is the arena itself when turned half way round twice", () => {
   expect(transformArena(transformArena(WITH_STAIR, "halfTurn"), "halfTurn")).toEqual(WITH_STAIR);
+});
+
+// The cover block is on tile (1, 2).
+const WITH_COVER = arenaFrom(["######", "#c...#", "#....#", "######"]);
+
+it("carries a cover block with its tile, as a block and not as a wall, when turned half way round", () => {
+  const turned = transformArena(WITH_COVER, "halfTurn");
+
+  expect(isCover(turned, 4, 1)).toBe(true);
+  expect(isSolid(turned, 4, 1)).toBe(true);
+  expect(isCover(turned, 1, 2)).toBe(false);
+  expect(isCover(turned, 0, 0)).toBe(false);
+});
+
+it("carries a cover block with its tile when mirrored east to west or north to south", () => {
+  expect(isCover(transformArena(WITH_COVER, "mirrorEastWest"), 4, 2)).toBe(true);
+  expect(isCover(transformArena(WITH_COVER, "mirrorNorthSouth"), 1, 1)).toBe(true);
 });

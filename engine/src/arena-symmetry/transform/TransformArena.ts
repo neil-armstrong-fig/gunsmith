@@ -7,12 +7,13 @@ import type {Uphill} from "@gunsmith/engine/arena/types/Uphill";
 const OPPOSITE: Readonly<Record<Uphill, Uphill>> = {north: "south", south: "north", east: "west", west: "east"};
 
 /**
- * The arena turned half way round, or mirrored east to west or north to south: every tile moves, with its wall, its level and
+ * The arena turned half way round, or mirrored east to west or north to south: every tile moves, with its wall, its cover, its level and
  * its stair, a stair climbing the opposite way along every axis that was flipped. What can be walked to from where stays
  * the same, so whatever a check says of an arena it must say of this one.
  */
 export function transformArena(arena: Arena, transform: ArenaTransform): Arena {
   const solid: boolean[] = [];
+  const cover: boolean[] = [];
   const levels: number[] = [];
   const stairs: TileStair[] = [];
 
@@ -24,11 +25,12 @@ export function transformArena(arena: Arena, transform: ArenaTransform): Arena {
     const moved = (flipY ? arena.height - 1 - y : y) * arena.width + (flipX ? arena.width - 1 - x : x);
 
     solid[moved] = arena.solid[index] ?? false;
+    cover[moved] = arena.cover[index] ?? false;
     levels[moved] = arena.levels[index] ?? 0;
     stairs[moved] = flippedStair(arena.stairs[index], {flipX, flipY});
   }
 
-  return {...arena, solid, levels, stairs};
+  return {...arena, solid, cover, levels, stairs};
 }
 
 function flippedStair(stair: TileStair, {flipX, flipY}: AxisFlips): TileStair {

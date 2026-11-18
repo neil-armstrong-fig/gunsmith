@@ -19,6 +19,7 @@ it("leaves an arena with no stair as it is", () => {
     width: 2,
     height: 1,
     solid: [false, false],
+    cover: [false, false],
     levels: [0, 1],
     stairs: [undefined, undefined],
   };
@@ -33,6 +34,7 @@ it("counts the row from the top of the drawing, as it is drawn, in that message"
     width: 3,
     height: 2,
     solid: [false, false, false, false, false, false],
+    cover: [false, false, false, false, false, false],
     levels: [0, 0, 0, 0, 0, 0],
     stairs: [undefined, "east", undefined, undefined, undefined, undefined],
   };
@@ -46,6 +48,7 @@ function row(levels: number[]): DrawnArena {
     width: 3,
     height: 1,
     solid: [false, false, false],
+    cover: [false, false, false],
     levels,
     stairs: [undefined, "east", undefined],
   };

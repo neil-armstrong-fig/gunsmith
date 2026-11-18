@@ -15,7 +15,7 @@ export function hurtDummies(dummies: readonly Dummy[], strikes: readonly Strike[
       .reduce((total, strike) => total + strike.damage, 0);
     const health = dummy.health - damage;
     if (health > 0) {
-      hurt.push({position: dummy.position, health});
+      hurt.push({...dummy, health});
     }
   });
 

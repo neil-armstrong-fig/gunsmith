@@ -14,6 +14,7 @@ export function flatArena(): fc.Arbitrary<Arena> {
         width: fc.constant(width),
         height: fc.constant(height),
         solid: fc.array(fc.boolean(), {minLength: tiles, maxLength: tiles}),
+        cover: fc.constant(new Array<boolean>(tiles).fill(false)),
         levels: fc.constant(new Array<number>(tiles).fill(0)),
         stairs: fc.constant(new Array<undefined>(tiles).fill(undefined)),
       });
