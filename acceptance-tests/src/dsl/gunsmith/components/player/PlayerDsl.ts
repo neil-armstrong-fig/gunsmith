@@ -1,4 +1,5 @@
 import type {Page} from "@playwright/test";
+import type {HeldWeaponAccent} from "@src/dsl/gunsmith/components/player/types/HeldWeaponAccent";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
 import {PlayerPlaywright} from "@src/dsl/gunsmith/components/player/playwright/PlayerPlaywright";
 import type {HitLook} from "@src/dsl/gunsmith/types/HitLook";
@@ -127,6 +128,22 @@ export class PlayerDsl {
       return await this.player.getPosition();
     } catch (error) {
       throw new DslError("Failed to read where the player is", error);
+    }
+  }
+
+  async hasHeldWeaponAccent(accent: HeldWeaponAccent): Promise<boolean> {
+    try {
+      return await this.player.hasHeldWeaponAccent(accent);
+    } catch (error) {
+      throw new DslError(`Failed to see the held weapon's ${accent} accent`, error);
+    }
+  }
+
+  async hasRifleOnScreen(): Promise<boolean> {
+    try {
+      return await this.player.hasRifleOnScreen();
+    } catch (error) {
+      throw new DslError("Failed to see the player's held rifle", error);
     }
   }
 

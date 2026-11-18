@@ -13,6 +13,7 @@ import type {Point} from "@src/dsl/gunsmith/types/Point";
 // These are flat fills, so a drawing drawn with `toneMapped={false}` reads them exactly, give or take edges.
 const WEAPON_BLUE: Colour = {red: 0x62, green: 0xb5, blue: 0xff};
 const PALE_TEXT: Colour = {red: 0xe5, green: 0xea, blue: 0xf0};
+const WEAPON_MINT: Colour = {red: 0x8a, green: 0xd4, blue: 0xb0};
 const PLACEHOLDER_MINT: Colour = {red: 168, green: 216, blue: 202};
 const TOLERANCE = 6;
 
@@ -32,6 +33,10 @@ export async function lookOfPickup(page: Page, centre: Point): Promise<PickupLoo
         Math.abs(place.y - centre.y) < 0.25 &&
         colourIsNear(colour, PALE_TEXT, TOLERANCE)
       );
+    }).length,
+    // The SMG's thin stripe blends with the receiver. Its green stays further above blue than the placeholder's.
+    mintPixels: colours.filter(colour => {
+      return colour.green - colour.blue >= 20 && colourIsNear(colour, WEAPON_MINT, 36);
     }).length,
     discPixels: colours.filter(colour => colourIsNear(colour, PLACEHOLDER_MINT, TOLERANCE)).length,
   };

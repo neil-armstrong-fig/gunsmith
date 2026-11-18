@@ -28,7 +28,7 @@ The broader manifest and planned keys below remain unfrozen.
 
 Current M1 pickup sprite: [`sprite-pickup-marker`](concepts/top-down-oddities/pickup-markers/README.md)
 is the approved C2 SVG. Its 88 × 88 canvas centres on (44, 44) and spans
-88 / 90 tiles at pickup scale.
+88 / 90 tiles at pickup scale. The local built-in SMG uses `sprite-submachine-gun`, Ship’s 64 × 64 silhouette. The pickup plane centres the same texture used in hand at (32, 32).
 
 Current M1 terrain keys are `tile-floor-l1`, `tile-floor-l2`,
 `tile-floor-l3`, and `tile-wall`. Each [approved terrain tile](terrain/README.md)
@@ -40,13 +40,18 @@ are `ui-weapon-rifle`, `ui-weapon-marksman-rifle` and `ui-weapon-submachine-gun`
 They are right-facing 64 × 64 SVGs in `webapp/public/assets/ui/`, intended to
 display at 34 × 34 px in the HUD. `inventoryIconUrl` resolves the built-in icon keys.
 
+The scene uses `sprite-rifle-default`, `sprite-marksman-rifle` and
+`sprite-submachine-gun`, one image per built-in weapon. In hand the plane
+positions the grip under the fighter’s sprite at 65% scale. On the ground it
+centres the same image at half scale. The generated lantern fixture reuses
+its cached drawing in both placements.
+
 ## Planned keys (build finalises; art may propose additions)
 
 | Key | Notes | Size | Format |
 | --- | ----- | ---- | ------ |
 | `sprite-player-stand`, `sprite-player-crouch` | Neutral body; team colour applied by tint or a second layer | 64 | SVG |
 | `sprite-player-hold-<class>` | Held weapon by behavior class (rifle, hitscan, projectile, shotgun, beam, other) | 64 | SVG |
-| `sprite-rifle-default` | The default rifle (pickup-style icon and held) | 64 | SVG |
 | `sprite-dummy` | Practice dummy | 64 | SVG |
 | `sprite-pickup-glow` | Behind a weapon pickup; tinted by the weapon's `colour` | 96 | SVG |
 | `fx-projectile-<behavior>`, `fx-muzzle-<behavior>`, `fx-impact`, `fx-explosion`, `fx-beam` | One per behavior in the enum | varies | SVG or PNG strip |

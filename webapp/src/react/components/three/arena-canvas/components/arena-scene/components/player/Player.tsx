@@ -1,5 +1,6 @@
 import {useFrame} from "@react-three/fiber";
 import {FighterPlaceholder} from "@src/react/components/three/arena-canvas/components/arena-scene/components/fighter-placeholder/FighterPlaceholder";
+import {HeldWeapon} from "@src/react/components/three/arena-canvas/components/arena-scene/components/held-weapon/HeldWeapon";
 import {SpritePlane} from "@src/react/components/three/arena-canvas/components/arena-scene/components/sprite-plane/SpritePlane";
 import {useSprite} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-sprite/UseSprite";
 import {gameState} from "@src/store/game/selectors/game-state/GameState";
@@ -38,6 +39,12 @@ export function Player(): JSX.Element {
   return (
     <group ref={playerRef} name="player" data-testid="player">
       {!standingPicture && <FighterPlaceholder colour="#62b5ff" />}
+
+      <HeldWeapon
+        fighter="player"
+        standingSprite="sprite-player-stand-blue"
+        crouchedSprite="sprite-player-crouch-blue"
+      />
 
       <SpritePlane spriteKey="sprite-player-stand-blue" ref={standingRef} />
 

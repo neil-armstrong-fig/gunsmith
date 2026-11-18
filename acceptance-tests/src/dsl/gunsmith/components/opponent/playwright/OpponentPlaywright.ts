@@ -2,6 +2,7 @@ import type {Page} from "@playwright/test";
 import type {OpponentSnapshot} from "@gunsmith/shared/state-hook/types/OpponentSnapshot";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
 import {runHeldUntil} from "@src/dsl/gunsmith/playwright/hold/RunHeldUntil";
+import {hasRifleOnScreen} from "@src/dsl/gunsmith/playwright/look/held-rifle/HasRifleOnScreen";
 import {lookOfFighter} from "@src/dsl/gunsmith/playwright/look/look-of-fighter/LookOfFighter";
 import {lookOfHit} from "@src/dsl/gunsmith/playwright/look/look-of-hit/LookOfHit";
 import {TEAM_ORANGE} from "@src/dsl/gunsmith/playwright/look/TeamOrange";
@@ -23,6 +24,13 @@ export class OpponentPlaywright extends BasePage {
     }
 
     return opponent;
+  }
+
+  async hasRifleOnScreen(): Promise<boolean> {
+    const opponent = await this.get();
+
+    // The stationary sparring opponent starts facing west.
+    return await hasRifleOnScreen(this.page, opponent, 180);
   }
 
   /** What a player sees where the opponent stands: its drawing counted by colour, and the compass points on its outline. The opponent must be standing still (sparring's is). */

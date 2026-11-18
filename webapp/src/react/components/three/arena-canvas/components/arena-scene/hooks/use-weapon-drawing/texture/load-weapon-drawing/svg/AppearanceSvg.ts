@@ -1,7 +1,7 @@
 import type {Appearance} from "@gunsmith/shared/appearance/schema/Appearance";
 import {APPEARANCE_LIMITS} from "@gunsmith/shared/appearance/schema/AppearanceLimits";
 import type {DetailTier} from "@gunsmith/shared/appearance/vocabulary/detail/DetailTier";
-import {partSvg} from "@src/react/components/three/arena-canvas/components/arena-scene/components/pickup/hooks/use-weapon-drawing/texture/load-weapon-drawing/svg/part/PartSvg";
+import {partSvg} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-weapon-drawing/texture/load-weapon-drawing/svg/part/PartSvg";
 
 /**
  * An appearance's body as a transparent SVG over the 64-unit design space, back to front in array order, for the game to draw as a picture. `tiers` says which

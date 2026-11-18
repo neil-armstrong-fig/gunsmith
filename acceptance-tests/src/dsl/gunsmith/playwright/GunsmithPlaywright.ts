@@ -86,6 +86,14 @@ export class GunsmithPlaywright extends BasePage {
     await this.openSparring();
   }
 
+  async openSparringWithMissingRifle(): Promise<void> {
+    await this.page.route("**/assets/sprites/sprite-rifle-default.svg", async route => {
+      await route.fulfill({status: 404});
+    });
+
+    await this.openSparring();
+  }
+
   /** Opens sparring with everything the game draws (a ring's centre, a pickup's place) drawn from `seed`, so the same seed plays the same match. */
   async openSparringWithSeed(seed: number): Promise<void> {
     await this.openScenario(`sparring&seed=${seed}`);

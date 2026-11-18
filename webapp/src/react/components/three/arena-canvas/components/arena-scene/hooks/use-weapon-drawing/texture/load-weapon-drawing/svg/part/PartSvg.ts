@@ -1,6 +1,6 @@
 import type {AppearancePart} from "@gunsmith/shared/appearance/schema/part/AppearancePart";
-import {roleColour} from "@src/react/components/three/arena-canvas/components/arena-scene/components/pickup/hooks/use-weapon-drawing/texture/load-weapon-drawing/svg/colour/RoleColour";
-import type {AppearancePalette} from "@src/react/components/three/arena-canvas/components/arena-scene/components/pickup/hooks/use-weapon-drawing/texture/load-weapon-drawing/svg/types/AppearancePalette";
+import {roleColour} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-weapon-drawing/texture/load-weapon-drawing/svg/colour/RoleColour";
+import type {AppearancePalette} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-weapon-drawing/texture/load-weapon-drawing/svg/types/AppearancePalette";
 
 /**
  * One part as an SVG element, in the 64-unit design space: placed at its `x`, `y` and turned about it. Round joins and caps, as `art` specifies. Everything written
