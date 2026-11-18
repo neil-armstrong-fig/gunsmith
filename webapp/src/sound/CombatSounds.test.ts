@@ -98,6 +98,16 @@ it("requests the ring loop for damage in a playing round and stops it when damag
   expect(output.played).toEqual([]);
 });
 
+it("requests no ring loop for a bullet, nor for a step with nothing in it", () => {
+  const output = new RecordingOutput();
+  const sounds = new CombatSounds(output);
+
+  sounds.afterTick({...EMPTY_CLICK, events: [{kind: "damageTaken", cause: "bullet", amount: 20}], firing: false});
+  sounds.afterTick({...EMPTY_CLICK, events: undefined, firing: false});
+
+  expect(output.loopStarts).toEqual([]);
+});
+
 it("plays the click and the crunch when a step has both", () => {
   const output = new RecordingOutput();
 
