@@ -16,6 +16,7 @@ import {InputHistory} from "@src/online/prediction/history/InputHistory";
 import {replayInputs} from "@src/online/prediction/replay/ReplayInputs";
 import type {InputAck} from "@gunsmith/shared/online/types/InputAck";
 import type {MatchSocket} from "@src/online/types/MatchSocket";
+import type {Readiness} from "@src/online/types/Readiness";
 import type {SnapshotFrame} from "@src/online/types/SnapshotFrame";
 import {TICK_SECONDS} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/clock/TickSeconds";
 
@@ -48,6 +49,7 @@ const NO_OFFSET: Point = {x: 0, y: 0};
 export class OnlineMatch {
   private arena: Arena | undefined;
   private latest: World | undefined;
+  private ready: Readiness | undefined;
   private readonly snapshots = new SnapshotBuffer(SNAPSHOTS_KEPT);
   private readonly renderClock = new RenderClock(INTERPOLATION_DELAY_SECONDS);
   private readonly history = new InputHistory(HISTORY_STEPS);
@@ -89,6 +91,20 @@ export class OnlineMatch {
     });
 
     return {...latest, player: this.shownPlayer(latest.player), opponent: opponentAt(this.snapshots.all, shownAt)};
+  }
+
+  /** Asks the server to go on, to the next round or, once the match is decided, to a fresh one. It begins when both players have asked. */
+  readyForNextRound(): void {
+    if (this.socket.readyState !== SOCKET_OPEN) {
+      return;
+    }
+
+    this.socket.send(JSON.stringify({kind: "ready"}));
+  }
+
+  /** Whether this player has asked to go on and the server is waiting for the other player to ask too. */
+  isWaitingForTheOtherPlayer(): boolean {
+    return this.ready?.player === true;
   }
 
   close(): void {
@@ -149,6 +165,7 @@ export class OnlineMatch {
 
   private takeSnapshot(arena: Arena, message: SnapshotFrame): void {
     this.latest = worldOfSeatView(arena, message);
+    this.ready = message.ready;
     this.snapshots.add({
       elapsedSeconds: message.elapsedSeconds,
       opponent: message.opponent,

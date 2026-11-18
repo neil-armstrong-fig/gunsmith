@@ -8,6 +8,7 @@ import {OnlineMatch} from "@src/online/OnlineMatch";
 import type {FrameEvent} from "@src/online/types/FrameEvent";
 import type {InputAck} from "@gunsmith/shared/online/types/InputAck";
 import type {MatchSocket} from "@src/online/types/MatchSocket";
+import type {Readiness} from "@src/online/types/Readiness";
 
 const ROWS = ["############", "#..........#", "#..........#", "#..........#", "#..........#", "############"];
 
@@ -47,6 +48,7 @@ interface SnapshotRequest {
   world?: World;
   ack?: InputAck;
   elapsedSeconds?: number;
+  ready?: Readiness;
 }
 
 function snapshotText(request: SnapshotRequest = {}): string {
@@ -57,6 +59,7 @@ function snapshotText(request: SnapshotRequest = {}): string {
     ...viewOfSeat(world, "first"),
     elapsedSeconds: request.elapsedSeconds ?? world.elapsedSeconds,
     ack: request.ack,
+    ready: request.ready,
   });
 }
 
@@ -316,6 +319,37 @@ it("draws nobody for a fighter the server did not send", () => {
   socket.receive(snapshotText({world: hidden}));
 
   expect(match.worldToShow(0)?.opponent).toBeUndefined();
+});
+
+it("asks the server to go on to the next round with a ready message", () => {
+  const {socket, match} = seatedMatch();
+
+  match.readyForNextRound();
+
+  expect(socket.frames()).toEqual([{kind: "ready"}]);
+});
+
+it("does not send a ready message while the socket is not open", () => {
+  const {socket, match} = seatedMatch();
+  socket.readyState = 0;
+
+  match.readyForNextRound();
+
+  expect(socket.frames()).toEqual([]);
+});
+
+it("is waiting for the other player once the server says this seat has asked to go on, and not before", () => {
+  const {socket, match} = seatedMatch();
+  expect(match.isWaitingForTheOtherPlayer()).toBe(false);
+
+  socket.receive(snapshotText());
+  expect(match.isWaitingForTheOtherPlayer()).toBe(false);
+
+  socket.receive(snapshotText({ready: {player: true, opponent: false}}));
+  expect(match.isWaitingForTheOtherPlayer()).toBe(true);
+
+  socket.receive(snapshotText({ready: {player: false, opponent: false}}));
+  expect(match.isWaitingForTheOtherPlayer()).toBe(false);
 });
 
 it("closes the socket", () => {

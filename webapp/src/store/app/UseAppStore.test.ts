@@ -5,7 +5,39 @@ beforeEach(() => {
 });
 
 it("holds the choices about the game and nothing else, so adding state is a deliberate edit", () => {
-  expect(Object.keys(useAppStore.getState()).sort()).toEqual(["muted", "toggleMuted"]);
+  expect(Object.keys(useAppStore.getState()).sort()).toEqual([
+    "askForNextRound",
+    "muted",
+    "nextRoundAsked",
+    "setWaitingForOtherPlayer",
+    "takeNextRoundAsk",
+    "toggleMuted",
+    "waitingForOtherPlayer",
+  ]);
+});
+
+it("starts with nothing asked and nobody waited for", () => {
+  expect(useAppStore.getState().nextRoundAsked).toBe(false);
+  expect(useAppStore.getState().waitingForOtherPlayer).toBe(false);
+});
+
+it("keeps the player's ask for the next round until the loop takes it, and gives it only once", () => {
+  useAppStore.getState().askForNextRound();
+
+  expect(useAppStore.getState().nextRoundAsked).toBe(true);
+  expect(useAppStore.getState().takeNextRoundAsk()).toBe(true);
+  expect(useAppStore.getState().nextRoundAsked).toBe(false);
+  expect(useAppStore.getState().takeNextRoundAsk()).toBe(false);
+});
+
+it("remembers whether the other player is being waited for", () => {
+  useAppStore.getState().setWaitingForOtherPlayer(true);
+
+  expect(useAppStore.getState().waitingForOtherPlayer).toBe(true);
+
+  useAppStore.getState().setWaitingForOtherPlayer(false);
+
+  expect(useAppStore.getState().waitingForOtherPlayer).toBe(false);
 });
 
 it("starts with the sound on, as no page asks for it off", () => {

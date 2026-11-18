@@ -142,6 +142,11 @@ What the code gives today, and what the design still needs:
   proposal, `{kind: "snapshot", opponent?}` with `opponent` absent when unseen. Nothing moves to `shared/` until a second
   package imports it.
 - Wire messages are written by server with consumer review (this doc's earlier "build owns" is retired).
+- **Rounds in a room (2026-11-18).** Built as the draft says, with one `ready` instead of `round-start`/`round-end`: the snapshot already
+  carries `round` and `match` (scored from each seat's side), so a decided round needs no separate message. A client sends `{kind: "ready"}`;
+  it counts only once the round is decided. When both seats have sent it the server begins the next round (score kept) or, after a decided
+  match, a fresh match. A snapshot carries `ready {player, opponent}` so a seat can say it is waiting. Specs: `TwoBrowsersPlayingARound`,
+  `TwoBrowsersPlayingABestOfThree`. Not built: the pre-round phase, deadlines, the ring and pickup in a room.
 
 ## Open questions
 

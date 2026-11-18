@@ -1,5 +1,6 @@
 import type {Seat} from "@gunsmith/engine/seat/types/Seat";
 import {parseInputMessage} from "@src/match/messages/ParseInputMessage";
+import {parseReadyMessage} from "@src/match/messages/ParseReadyMessage";
 import {MatchRoom} from "@src/match/room/MatchRoom";
 import {MATCH_TICK} from "@src/match/tick/MatchTick";
 import {stepsOwed} from "@src/match/tick/StepsOwed";
@@ -64,6 +65,12 @@ export class Match {
     const message = parseInputMessage(data);
     if (message) {
       this.room.setInput(seat, message.input, message.seq);
+
+      return;
+    }
+
+    if (parseReadyMessage(data)) {
+      this.room.ready(seat);
     }
   }
 

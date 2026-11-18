@@ -34,6 +34,22 @@ it("refuses a snapshot whose ack is not two counts", () => {
   expect(parseServerMessage(JSON.stringify({...frame, ack: null}))).toBeUndefined();
 });
 
+it("reads who has asked to go on", () => {
+  const text = JSON.stringify({kind: "snapshot", player: {}, round: "won", ready: {player: true, opponent: false}});
+  const message = parseServerMessage(text);
+
+  expect(message?.kind === "snapshot" && message.ready).toEqual({player: true, opponent: false});
+});
+
+it("refuses a snapshot whose ready is not two flags", () => {
+  const frame = {kind: "snapshot", player: {}, round: "won"};
+
+  expect(parseServerMessage(JSON.stringify({...frame, ready: {player: "yes", opponent: false}}))).toBeUndefined();
+  expect(parseServerMessage(JSON.stringify({...frame, ready: {player: true}}))).toBeUndefined();
+  expect(parseServerMessage(JSON.stringify({...frame, ready: true}))).toBeUndefined();
+  expect(parseServerMessage(JSON.stringify({...frame, ready: null}))).toBeUndefined();
+});
+
 it("refuses text that is not a frame, and frames missing what the page acts on", () => {
   expect(parseServerMessage("nope")).toBeUndefined();
   expect(parseServerMessage("7")).toBeUndefined();

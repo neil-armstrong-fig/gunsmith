@@ -1,4 +1,5 @@
 import type {Input} from "@gunsmith/engine/game-loop/types/Input";
+import type {Seat} from "@gunsmith/engine/seat/types/Seat";
 import {MatchRoom} from "@src/match/room/MatchRoom";
 
 const IDLE: Input = {direction: {x: 0, y: 0}, firing: false, reload: false};
@@ -9,6 +10,23 @@ function startedRoom(): MatchRoom {
   room.join();
 
   return room;
+}
+
+/** The longest a seat shooting a standing fighter is given to decide a round: far more than the rifle needs. */
+const MOST_STEPS_TO_DECIDE_A_ROUND = 1200;
+
+/** Has `winner` shoot the other seat, who stands still, until the round is decided. */
+function winRound(room: MatchRoom, winner: Seat): void {
+  const loser: Seat = winner === "first" ? "second" : "first";
+  const aimAt = room.snapshotFor(loser)?.player.position;
+  const seq = (room.snapshotFor(winner)?.ack?.seq ?? 0) + 1;
+  room.setInput(winner, {...IDLE, aimAt, firing: true}, seq);
+
+  for (let step = 0; step < MOST_STEPS_TO_DECIDE_A_ROUND && room.snapshotFor(winner)?.round === "playing"; step += 1) {
+    room.tick();
+  }
+
+  room.setInput(winner, IDLE, seq + 1);
 }
 
 it("seats the first person first and the second second, and nobody after", () => {
@@ -206,4 +224,93 @@ it("does not play a click again on the ticks after it", () => {
   room.tick(3);
 
   expect(room.snapshotFor("first")?.player.loadout[0]?.rounds).toBe(rounds - 1);
+});
+
+it("begins a match at nothing to nothing, in its first round", () => {
+  const room = startedRoom();
+
+  expect(room.snapshotFor("first")?.match).toEqual({playerWins: 0, opponentWins: 0, roundNumber: 1});
+  expect(room.snapshotFor("second")?.match).toEqual({playerWins: 0, opponentWins: 0, roundNumber: 1});
+});
+
+it("scores a decided round for each seat from its own side", () => {
+  const room = startedRoom();
+
+  winRound(room, "first");
+
+  expect(room.snapshotFor("first")?.round).toBe("won");
+  expect(room.snapshotFor("first")?.match).toEqual({playerWins: 1, opponentWins: 0, roundNumber: 1});
+  expect(room.snapshotFor("second")?.round).toBe("lost");
+  expect(room.snapshotFor("second")?.match).toEqual({playerWins: 0, opponentWins: 1, roundNumber: 1});
+});
+
+it("does not begin the next round while only one seat has asked for it", () => {
+  const room = startedRoom();
+  winRound(room, "first");
+
+  room.ready("first");
+  room.tick();
+
+  expect(room.snapshotFor("first")?.round).toBe("won");
+  expect(room.snapshotFor("second")?.round).toBe("lost");
+  expect(room.snapshotFor("first")?.ready).toEqual({player: true, opponent: false});
+  expect(room.snapshotFor("second")?.ready).toEqual({player: false, opponent: true});
+});
+
+it("begins the next round when both seats have asked for it: the score kept, both fighters restored", () => {
+  const room = startedRoom();
+  winRound(room, "first");
+
+  room.ready("first");
+  room.ready("second");
+
+  expect(room.snapshotFor("first")?.round).toBe("playing");
+  expect(room.snapshotFor("second")?.round).toBe("playing");
+  expect(room.snapshotFor("first")?.match).toEqual({playerWins: 1, opponentWins: 0, roundNumber: 2});
+  expect(room.snapshotFor("second")?.match).toEqual({playerWins: 0, opponentWins: 1, roundNumber: 2});
+  expect(room.snapshotFor("second")?.player.health).toBe(room.snapshotFor("first")?.player.health);
+  expect(room.snapshotFor("first")?.player.position).toEqual({x: 10.5, y: 6.5});
+  expect(room.snapshotFor("first")?.ready).toEqual({player: false, opponent: false});
+});
+
+it("ignores a seat asking to go on while the round is being fought, so it cannot ask ahead", () => {
+  const room = startedRoom();
+
+  room.ready("first");
+  room.ready("second");
+
+  expect(room.snapshotFor("first")?.match?.roundNumber).toBe(1);
+
+  winRound(room, "first");
+
+  expect(room.snapshotFor("first")?.ready).toEqual({player: false, opponent: false});
+});
+
+it("begins a fresh match when both seats ask to go on after the match is decided", () => {
+  const room = startedRoom();
+  winRound(room, "first");
+  room.ready("first");
+  room.ready("second");
+  winRound(room, "first");
+
+  expect(room.snapshotFor("first")?.match).toEqual({playerWins: 2, opponentWins: 0, roundNumber: 2});
+
+  room.ready("first");
+  room.ready("second");
+
+  expect(room.snapshotFor("first")?.round).toBe("playing");
+  expect(room.snapshotFor("first")?.match).toEqual({playerWins: 0, opponentWins: 0, roundNumber: 1});
+  expect(room.snapshotFor("second")?.match).toEqual({playerWins: 0, opponentWins: 0, roundNumber: 1});
+});
+
+it("keeps what a seat asked for once the round is decided from being played in the next round", () => {
+  const room = startedRoom();
+  winRound(room, "first");
+  room.setInput("first", {...IDLE, reload: true, switchTo: 2}, 5);
+
+  room.ready("first");
+  room.ready("second");
+  room.tick();
+
+  expect(room.snapshotFor("first")?.player.equippedIndex).toBe(0);
 });

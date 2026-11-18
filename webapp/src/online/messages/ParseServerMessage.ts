@@ -38,10 +38,24 @@ function isSnapshot(frame: object): boolean {
   const player: unknown = Reflect.get(frame, "player");
   const round = Reflect.get(frame, "round");
   const ack: unknown = Reflect.get(frame, "ack");
+  const ready: unknown = Reflect.get(frame, "ready");
 
   return (
-    typeof player === "object" && player !== null && typeof round === "string" && (ack === undefined || isAck(ack))
+    typeof player === "object" &&
+    player !== null &&
+    typeof round === "string" &&
+    (ack === undefined || isAck(ack)) &&
+    (ready === undefined || isReadiness(ready))
   );
+}
+
+/** Who has asked to go on: two flags. A frame whose flags are not two is refused, not guessed at. */
+function isReadiness(ready: unknown): boolean {
+  if (typeof ready !== "object" || ready === null) {
+    return false;
+  }
+
+  return typeof Reflect.get(ready, "player") === "boolean" && typeof Reflect.get(ready, "opponent") === "boolean";
 }
 
 /** How far the server has played this browser's inputs: two counts. A frame whose count is not one is refused, not guessed at. */

@@ -5,11 +5,16 @@ import {stepFighters} from "@gunsmith/engine/game-loop/StepFighters";
 import type {FighterInputs} from "@gunsmith/engine/game-loop/types/FighterInputs";
 import type {Input} from "@gunsmith/engine/game-loop/types/Input";
 import type {World} from "@gunsmith/engine/game-loop/types/World";
+import {decideMatch} from "@gunsmith/engine/match/DecideMatch";
+import {nextRound} from "@gunsmith/engine/match/NextRound";
+import {startMatch} from "@gunsmith/engine/match/StartMatch";
+import type {Match} from "@gunsmith/engine/match/types/Match";
 import type {Seat} from "@gunsmith/engine/seat/types/Seat";
 import {viewOfSeat} from "@gunsmith/engine/seat/ViewOfSeat";
 import {MATCH_ARENA_ROWS} from "@src/match/room/arena/MatchArenaRows";
 import type {InputAck} from "@gunsmith/shared/online/types/InputAck";
 import type {JoinedMessage} from "@src/match/room/types/JoinedMessage";
+import type {Readiness} from "@src/match/room/types/Readiness";
 import type {SnapshotMessage} from "@src/match/room/types/SnapshotMessage";
 import {MATCH_TICK} from "@src/match/tick/MatchTick";
 
@@ -17,10 +22,14 @@ const SECOND_FIGHTER_STARTS_AT = {x: 16.5, y: 6.5};
 
 const NOTHING_ASKED: Input = {direction: {x: 0, y: 0}, firing: false, reload: false};
 
+const OTHER_SEAT: Record<Seat, Seat> = {first: "second", second: "first"};
+
 /**
  * One private room's match, as plain state with no network in it: who has taken which seat, what each seat last asked for, and
  * the engine's world, which only this class steps. The Durable Object (`match/Match.ts`) feeds it frames and a clock and sends
- * what it answers. The match begins when the second seat is taken; before that no world exists and nothing is sent.
+ * what it answers. The match (a best of three) begins when the second seat is taken; before that no world exists and nothing is sent.
+ * A decided round waits, frozen, until both seats have asked to go on (`ready`), then the next round begins; once the match itself is
+ * decided, both asking begins a fresh match.
  */
 export class MatchRoom {
   private readonly arena: Arena = arenaFrom(MATCH_ARENA_ROWS);
@@ -28,6 +37,7 @@ export class MatchRoom {
   private readonly asked: Record<Seat, Input> = {first: NOTHING_ASKED, second: NOTHING_ASKED};
   private readonly acked: Partial<Record<Seat, InputAck>> = {};
   private readonly pulled: Record<Seat, boolean> = {first: false, second: false};
+  private readonly readied: Record<Seat, boolean> = {first: false, second: false};
   private world: World | undefined;
 
   /** The next free seat, or `undefined` when both are taken. The second to sit starts the match. */
@@ -39,7 +49,7 @@ export class MatchRoom {
 
     this.seated.push(seat);
     if (seat === "second") {
-      this.world = startingWorld(this.arena, [], SECOND_FIGHTER_STARTS_AT);
+      this.world = this.worldOfRound(startMatch());
     }
 
     return seat;
@@ -84,6 +94,23 @@ export class MatchRoom {
   }
 
   /**
+   * Notes that `seat` asks to go on, to the next round or, once the match is decided, to a fresh match. It counts only once the round is
+   * decided, so a seat cannot ask ahead; when both have asked the next round begins at once, with the score kept and both fighters
+   * restored, and what either seat had asked for during the pause is forgotten.
+   */
+  ready(seat: Seat): void {
+    const world = this.world;
+    if (!world || world.round === "playing") {
+      return;
+    }
+
+    this.readied[seat] = true;
+    if (this.readied.first && this.readied.second) {
+      this.begin(world.match ?? startMatch());
+    }
+  }
+
+  /**
    * Plays `steps` engine steps (one by default) from what each seat asked for: the clock says how many it owes, since a timer
    * fires late and unevenly. Nothing happens before the match begins or when no step is owed (so a one-shot ask waits for a step that
    * plays it). A reload, weapon switch or trigger pull is played in the first step only.
@@ -111,7 +138,27 @@ export class MatchRoom {
       return undefined;
     }
 
-    return {kind: "snapshot", ...viewOfSeat(this.world, seat), ack: this.acked[seat]};
+    return {kind: "snapshot", ...viewOfSeat(this.world, seat), ack: this.acked[seat], ready: this.readinessOf(seat)};
+  }
+
+  /** The round after the one `match` has just ended, or a fresh match when `match` is decided. */
+  private begin(match: Match): void {
+    this.world = this.worldOfRound(decideMatch(match) === "playing" ? nextRound(match) : startMatch());
+    this.readied.first = false;
+    this.readied.second = false;
+    this.asked.first = NOTHING_ASKED;
+    this.asked.second = NOTHING_ASKED;
+    this.pulled.first = false;
+    this.pulled.second = false;
+  }
+
+  /** A round about to be fought: both fighters at their starting places with full health and magazines, in `match`. */
+  private worldOfRound(match: Match): World {
+    return {...startingWorld(this.arena, [], SECOND_FIGHTER_STARTS_AT), match};
+  }
+
+  private readinessOf(seat: Seat): Readiness {
+    return {player: this.readied[seat], opponent: this.readied[OTHER_SEAT[seat]]};
   }
 
   private countSteps(steps: number): void {

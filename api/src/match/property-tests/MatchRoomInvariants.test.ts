@@ -29,6 +29,7 @@ const ALLOWED_SNAPSHOT_FIELDS = [
   "round",
   "elapsedSeconds",
   "ack",
+  "ready",
 ];
 
 it("tells a seat the newest input it has sent and how many steps were played with it, never going back", () => {
