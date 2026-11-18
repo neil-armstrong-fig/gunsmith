@@ -1,5 +1,5 @@
 import type {Page} from "@playwright/test";
-import type {HeldWeaponAccent} from "@src/dsl/gunsmith/components/player/types/HeldWeaponAccent";
+import type {HeldWeaponAccent} from "@src/dsl/gunsmith/types/HeldWeaponAccent";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
 import {PlayerPlaywright} from "@src/dsl/gunsmith/components/player/playwright/PlayerPlaywright";
 import type {HitLook} from "@src/dsl/gunsmith/types/HitLook";

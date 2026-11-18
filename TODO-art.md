@@ -4,15 +4,15 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 ## Resume here
 
-Checkout: `.claude/worktrees/art`, branch `worktree-art`. The latest validated code merge on main is `08dd9f3` on 2026-11-18. Preserve this worktree and sync committed main before new work/delivery.
+Art is in `.claude/worktrees/art` on `worktree-art`, synced to committed main `afc2092`. Preserve this worktree and sync committed main before resuming.
 
-Current slice: the same weapon texture draws in hand and on the ground in local play. Default rifle, marksman rifle and SMG use authored sprites. The generated lantern follows the sparring pickup into the loadout. Ship’s inventory identity (`6795b56`) is on main. The next failing criterion is seeing the correct room weapon before and after switching in a two-browser test, with separate fog coverage. AI and Engine still own the production appearance association. For S4-1, recheck the refused pickup's body and outline separately from its muzzle at 64 and 32 px per tile once AI delivers the contrast change.
+Room weapon art uses the inventory identity for both fighters. The drawing hook, held weapon and pickup components and the two-browser drawing spec are ready for review in this worktree. The next slice replaces the low-cover placeholder in `?scenario=cover`. Start with a failing browser criterion for the cover silhouette at 64 and 32 px per tile. AI and Engine own the production appearance association. For S4-1, recheck the refused pickup's body and outline separately from its muzzle at both scales once AI delivers the contrast change.
 
 The [approved stair treatment](docs/art/terrain/README.md#playable-stair-preview) draws in every arena. Art reviewed the opposing stairs in `fair-duel` and the wall-side landing in `terraced` at 64 and 32 px per tile.
 
 Current milestone: M1/M6; the project remains on M1. Next audio task: combat masking, fatigue and levels once AI/play integrate runtime weapon-shot synthesis (not yet wired into the game sound output). Safari acceptance does not claim new headphone/speaker measurements. Preserve approved master hashes. Next failing check for any playback change: the relevant browser sound acceptance criterion before implementation.
 
-Ship's inventory HUD, local pickup cue and ring loop are integrated (`c372d86`). The two slots show the approved icons, with the selected name and ammunition. Switching and the seed 8 pickup update the readout. The engine reports an actual local collection and the game plays the existing MP3 once alongside the HUD change. The live preview is ready for user review. Status badges and generated thumbnails remain future work.
+Ship's inventory HUD, local pickup cue and ring loop are integrated (`c372d86`). The two slots show the approved icons, with the selected name and ammunition. Switching and the seed 8 pickup update the readout. The engine reports an actual local collection and the game plays the existing MP3 once alongside the HUD change. Ship owns the independent review of the integrated HUD and cues. Status badges and generated thumbnails remain future work.
 
 ## Ownership
 
@@ -50,11 +50,12 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [x] Draw the authored default rifle in local play with stance, aim, equip, fallback and fog coverage.
 - [x] Draw Ship’s SMG artwork for the local ground pickup through AI’s existing pickup plane.
 - [x] Use the same weapon texture for both placements. Verify the marksman optic, the SMG stripe and generated lantern after collection.
-- [ ] Use inventory identity for weapon rendering in rooms and cover it in two browsers.
+- [x] Use inventory identity for weapon rendering in rooms and cover it in two browsers.
 - [ ] Pickup glow, projectiles/muzzle flashes by supported behavior, hit/death effects.
 - [x] Draw paired stair landings and height edges in `?scenario=terrain` for playable review.
 - [x] Review the stair treatment for adoption in other arenas at both play scales.
 - [x] Adopt the stair treatment in other arenas with browser coverage for opposing stairs and the wall-side landing.
+- [ ] Replace the low-cover block placeholder with terrain artwork in `?scenario=cover`.
 - [ ] Penetrable cover, spawn markers and fog texture.
 - [ ] Revisit closing-ring visuals after MVP, per the user.
 - [x] Publish the three [approved inventory icons](docs/art/concepts/inventory-display/README.md#weapon-artwork-and-prompt-built-identities) and their lookup for Play.
@@ -66,6 +67,15 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [ ] Case-study diagrams: pipeline, cost safeguards and eval loop.
 
 ## Verification/latest delivery
+
+2026-11-18, room weapon artwork in `worktree-art`. All five new browser
+criteria failed on the original renderer and passed with the identity-key
+lookup. An isolated client build that retained the hidden opponent made
+the canvas assertion fail while the WebSocket privacy criterion passed.
+All 94 focused production-preview criteria passed without retries.
+`pnpm checks` passed lint, formatting, strict types and 3,253 tests with
+one existing slow audio test skipped. Re-read the root, webapp, React and
+acceptance instructions and audited changed folders and callers.
 
 2026-11-18, shared weapon drawing in `worktree-art`. All four new
 appearance criteria went red on the prior build. Removing the marksman

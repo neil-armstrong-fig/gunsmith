@@ -5,6 +5,8 @@ import {DslError} from "@src/dsl/gunsmith/errors/DslError";
 import type {FighterLook} from "@src/dsl/gunsmith/types/FighterLook";
 import type {HitLook} from "@src/dsl/gunsmith/types/HitLook";
 import type {HurtWatch} from "@src/dsl/gunsmith/types/HurtWatch";
+import type {AimedPoint} from "@src/dsl/gunsmith/types/AimedPoint";
+import type {HeldWeaponAccent} from "@src/dsl/gunsmith/types/HeldWeaponAccent";
 import type {Point} from "@src/dsl/gunsmith/types/Point";
 
 /** The opponent in a duel, reached as `gunsmith.opponent`. */
@@ -24,11 +26,19 @@ export class OpponentDsl {
     }
   }
 
-  async hasRifleOnScreen(): Promise<boolean> {
+  async hasRifleOnScreen(aimedPoint?: AimedPoint): Promise<boolean> {
     try {
-      return await this.opponent.hasRifleOnScreen();
+      return await this.opponent.hasRifleOnScreen(aimedPoint);
     } catch (error) {
       throw new DslError("Failed to see the opponent's held rifle", error);
+    }
+  }
+
+  async hasHeldWeaponAccent(accent: HeldWeaponAccent, aimedPoint: AimedPoint): Promise<boolean> {
+    try {
+      return await this.opponent.hasHeldWeaponAccent(accent, aimedPoint);
+    } catch (error) {
+      throw new DslError(`Failed to see the ${accent} accent on the opponent's held weapon`, error);
     }
   }
 
