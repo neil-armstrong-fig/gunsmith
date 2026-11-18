@@ -37,14 +37,6 @@ function createFakeModels(): WeaponPipelineDependencies {
   };
 }
 
-// Interim policy (2026-11-15), until a cheaper hosted model has been benchmarked as the test tier: the weapon specs on the fake and
-// local tiers draw with a canned valid drawing. A real local drawing takes about 30 seconds, which would take the whole local weapon
-// run from about 85 seconds to well over half an hour, and its drawings were judged poor. The wiring, the call budget and the path
-// are still proved; `DrawingAWeapon` tests the real local model's drawings by itself, and the paid tier draws for real.
-function cannedDrawer(): BaseChatModel {
-  return createAppearanceModels("fake").generator;
-}
-
 // Temperature 0 and thinking off: repeatable output for a loop that has to be fast. This model build (qwen3.5:9b, NVFP4) has no
 // constrained decoding: `format` fails with "structured output is unavailable" (checked 2026-11-12, Ollama 0.40.16). So the
 // pipeline must ask for structure with `withStructuredOutput(schema, {method: "functionCalling"})`, which works, and which
@@ -58,4 +50,12 @@ function createLocalModels(): WeaponPipelineDependencies {
     moderator: new ChatOllama({...options, numPredict: 100}),
     appearanceGenerator: cannedDrawer(),
   };
+}
+
+// Interim policy (2026-11-15), until a cheaper hosted model has been benchmarked as the test tier: the weapon specs on the fake and
+// local tiers draw with a canned valid drawing. A real local drawing takes about 30 seconds, which would take the whole local weapon
+// run from about 85 seconds to well over half an hour, and its drawings were judged poor. The wiring, the call budget and the path
+// are still proved; `DrawingAWeapon` tests the real local model's drawings by itself, and the paid tier draws for real.
+function cannedDrawer(): BaseChatModel {
+  return createAppearanceModels("fake").generator;
 }

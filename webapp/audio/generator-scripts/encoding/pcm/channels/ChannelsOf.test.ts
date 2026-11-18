@@ -1,13 +1,6 @@
 import {expect, it} from "vitest";
 import {channelsOf} from "@gunsmith/audio-studies/encoding/pcm/channels/ChannelsOf";
 
-function floats(values: number[]): Buffer {
-  const pcm = Buffer.alloc(values.length * 4);
-  values.forEach((value, index) => pcm.writeFloatLE(value, index * 4));
-
-  return pcm;
-}
-
 it("splits interleaved little-endian floats into one array per channel", () => {
   const channels = channelsOf(floats([0.25, -0.5, 0.125, 0.75]), 2);
 
@@ -27,3 +20,10 @@ it("rejects a sample that is not a finite number", () => {
   expect(() => channelsOf(floats([0.1, NaN]), 1)).toThrow(/Invalid PCM sample/);
   expect(() => channelsOf(floats([Infinity, 0.1]), 1)).toThrow(/Invalid PCM sample/);
 });
+
+function floats(values: number[]): Buffer {
+  const pcm = Buffer.alloc(values.length * 4);
+  values.forEach((value, index) => pcm.writeFloatLE(value, index * 4));
+
+  return pcm;
+}

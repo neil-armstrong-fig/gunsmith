@@ -22,6 +22,9 @@ import {FAIR_DUEL_ARENA} from "@src/game/fair-duel/FairDuelArena";
 import {HEIGHTS_ARENA} from "@src/game/heights/HeightsArena";
 import {HEIGHTS_DUMMIES} from "@src/game/heights/HeightsDummies";
 import {OVERLOOK_OPPONENT} from "@src/game/overlook/OverlookOpponent";
+import {OVERWATCH_ARENA} from "@src/game/overwatch/OverwatchArena";
+import {OVERWATCH_OPPONENT} from "@src/game/overwatch/OverwatchOpponent";
+import {OVERWATCH_PLAYER} from "@src/game/overwatch/OverwatchPlayer";
 import {OVERLOOK_PLAYER} from "@src/game/overlook/OverlookPlayer";
 import {PICKUP_RACE_PICKUP} from "@src/game/pickup-race/PickupRacePickup";
 import {PRACTICE_ARENA} from "@src/game/practice/PracticeArena";
@@ -245,6 +248,36 @@ describe("the overlook duel", () => {
   it("gives the opponent a brain drawn from the seed, and is one round with no score, no ring and no dummies", () => {
     const world = worldOfScenario("overlook", 5);
     const seeded = giveOpponentBrain(startingWorld(TERRACED_ARENA, [], OVERLOOK_OPPONENT), 5);
+
+    expect(world.opponentBrain).toEqual(seeded.opponentBrain);
+    expect(world.match).toBeUndefined();
+    expect(world.ring).toBeUndefined();
+    expect(world.dummies).toEqual([]);
+  });
+});
+
+describe("the overwatch", () => {
+  it("is a one-tile corridor of low ground, with the player on the platform at its end and the opponent on the low ground", () => {
+    const world = worldOfScenario("overwatch", 1);
+
+    expect(world.arena).toBe(OVERWATCH_ARENA);
+    expect(world.opponent?.position).toEqual(OVERWATCH_OPPONENT);
+    expect(world.player.position).toEqual(OVERWATCH_PLAYER);
+    expect(levelAt(world.arena, OVERWATCH_OPPONENT)).toBe(0);
+    expect(levelAt(world.arena, OVERWATCH_PLAYER)).toBe(1);
+    expect(OVERWATCH_OPPONENT.y).toBe(OVERWATCH_PLAYER.y);
+  });
+
+  it("puts the player beyond the opponent's far range, so it cannot see them, but inside the rifle's reach, so they can hit it", () => {
+    const apart = Math.abs(OVERWATCH_PLAYER.x - OVERWATCH_OPPONENT.x);
+
+    expect(apart).toBeGreaterThan(DIFFICULTY.farRange);
+    expect(apart).toBeLessThan(RIFLE.visionRange);
+  });
+
+  it("gives the opponent a brain drawn from the seed, and is one round with no score, no ring and no dummies", () => {
+    const world = worldOfScenario("overwatch", 5);
+    const seeded = giveOpponentBrain(startingWorld(OVERWATCH_ARENA, [], OVERWATCH_OPPONENT), 5);
 
     expect(world.opponentBrain).toEqual(seeded.opponentBrain);
     expect(world.match).toBeUndefined();

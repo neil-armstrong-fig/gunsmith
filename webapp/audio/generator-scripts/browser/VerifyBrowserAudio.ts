@@ -11,6 +11,15 @@ import type {BrowserResult} from "@gunsmith/audio-studies/browser/run/types/Brow
 /** The page, and the exports it fetches. Nothing else in the package is served. */
 const SERVED_FOLDERS = ["/generator-scripts/browser/page/", "/encoded-audio/"];
 
+// Node's native TypeScript support runs this entry point without a transpiler.
+const entry = process.argv[1];
+if (entry && pathToFileURL(resolve(entry)).href === import.meta.url) {
+  const clean = await verifyBrowserAudio(resolve(import.meta.dirname, "../.."));
+  if (!clean) {
+    process.exitCode = 1;
+  }
+}
+
 /**
  * Decodes every export in Chromium and WebKit, which is the check that a real browser plays what the encoder made, and writes
  * `browser-verification.json`. The page is served from this machine on a port the system picks, and stopped afterwards.
@@ -45,13 +54,4 @@ function reportResult(result: BrowserResult): boolean {
   );
 
   return failures.length === 0 && result.error === undefined;
-}
-
-// Node's native TypeScript support runs this entry point without a transpiler.
-const entry = process.argv[1];
-if (entry && pathToFileURL(resolve(entry)).href === import.meta.url) {
-  const clean = await verifyBrowserAudio(resolve(import.meta.dirname, "../.."));
-  if (!clean) {
-    process.exitCode = 1;
-  }
 }

@@ -7,10 +7,6 @@ const BULLET = [{kind: "damageTaken", cause: "bullet", amount: 20}] as const;
 const RING = [{kind: "damageTaken", cause: "ring", amount: 0.2}] as const;
 const REFUSED = [{kind: "fireRefused", reason: "empty"}] as const;
 
-function after(request: Partial<CuesRequest>): ReturnType<typeof cuesAfterTick> {
-  return cuesAfterTick({previous: NONE, events: undefined, round: "playing", hitPlaces: [], ...request});
-}
-
 it("counts a step in which a bullet hurt the player", () => {
   expect(after({events: BULLET}).bulletHits).toBe(1);
   expect(after({previous: {...NONE, bulletHits: 4}, events: BULLET}).bulletHits).toBe(5);
@@ -92,3 +88,7 @@ it("returns the very same object when no place was hit and nothing else changed"
 
   expect(after({previous, hitPlaces: []})).toBe(previous);
 });
+
+function after(request: Partial<CuesRequest>): ReturnType<typeof cuesAfterTick> {
+  return cuesAfterTick({previous: NONE, events: undefined, round: "playing", hitPlaces: [], ...request});
+}

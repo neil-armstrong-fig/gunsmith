@@ -35,7 +35,7 @@ mutation evidence from `c11dc27`. AI owns the follow-up acceptance test and fix;
 art re-reviews its result. No runtime, schema, asset or anchor changed. Held
 weapons and broader grammar validation remain open. The user approved the
 [C2 soft octagon pickup marker](pickup-markers/README.md); it supersedes the
-diamond in the original studies. Runtime marker integration remains open.
+diamond in the original studies and now draws above ground weapons.
 The redundant review screenshots and capture metadata were removed at the
 user's request; the approved marker proof embeds its source images. The
 fallback-contrast finding remains in `HANDOFF.md`.

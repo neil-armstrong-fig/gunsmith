@@ -30,6 +30,21 @@ Paid models share one spend guard and cumulative ledger. The existing $1 eval ce
 
 Server supplies the API adapter; budget supplies atomic credit reservations/refunds, kill switch and production tracing. Account/library commits are not part of the current pipeline. Credit prices and limits remain defined in [cost and budget](cost-and-budget.md).
 
-Arena comparison will randomize prompt order and parse a structured verdict. Geometry, stairs, spawn/pickup access and ring escape remain engine-owned validity constraints. Built-ins require the same quality checks. Do not pre-create shared contracts before a real consumer exists.
+Geometry, stairs, spawn/pickup access and ring escape remain engine-owned validity constraints. Built-ins require the same quality checks. Do not pre-create shared contracts before a real consumer exists.
+
+### Choosing the arena: the players pick, there is no AI judge
+
+**Decided by the user, 2026-11-18:** no model chooses the arena. Each player puts one forward, **a prompt or a built-in arena by name**. Screening checks each (`ai/src/pipeline/arena-submission/`) and every survivor is generated. Both players then see both arenas and each picks an arena, picks nothing, or chooses random. `resolveArenaPicks` (`ai/src/pipeline/arena-picking/`, pure, no model) settles two choices; chance is drawn from the engine's `nextRandom` on a salted stream of its own.
+
+| Player 1 | Player 2 | Played | `how` |
+| --- | --- | --- | --- |
+| arena X | arena X | X, no draw | `agreed` |
+| arena X | arena Y | one draw, a coin between X and Y | `coin` |
+| arena X | nothing | X, no draw | `only-pick` |
+| arena X | random | a first draw decides between the pick and random; under a half, X is played | `pick-kept` |
+| | | a half or more: random wins and a second draw plays one of the two submitted arenas | `random` |
+| random, nothing | random, nothing | one draw over the two submitted arenas | `random` |
+
+Seat order does not matter. A lone survivor goes forward by default; none gives a built-in arena. **Confirmed by the user (2026-11-18):** random is set against the other player's pick in a first draw, and if random wins a second draw chooses the arena. **Inferred, not stated:** random against *nothing* has no pick to keep, so it goes straight to the one draw over the two arenas, and the second draw can land on the picked arena again. Fake tier only; never run on a real model.
 
 [Hosting](ai-hosting.md) records the in-process Worker decision. Preserve a host-agnostic graph and validate real CPU and callback flushing during integration.

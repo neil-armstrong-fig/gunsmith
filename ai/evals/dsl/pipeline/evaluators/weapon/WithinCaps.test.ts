@@ -2,10 +2,6 @@ import {passingEvalInput} from "@evals/dsl/pipeline/evaluators/testing/input/Pas
 import {PASSING_WEAPON} from "@evals/dsl/pipeline/evaluators/testing/weapon/PassingWeapon";
 import {withinCaps} from "@evals/dsl/pipeline/evaluators/weapon/WithinCaps";
 
-function dealing(bulletDamage: number, fireIntervalSeconds: number): ReturnType<typeof passingEvalInput> {
-  return passingEvalInput({outcome: {weapon: {...PASSING_WEAPON, bulletDamage, fireIntervalSeconds}}});
-}
-
 it("passes a weapon at 120 damage per second", () => {
   expect(withinCaps(passingEvalInput()).score).toBe(1);
 });
@@ -33,3 +29,7 @@ it("passes a rejection", () => {
 it("passes an invalid outcome, which has no weapon to rate", () => {
   expect(withinCaps(passingEvalInput({outcome: {status: "invalid", weapon: undefined}})).score).toBe(1);
 });
+
+function dealing(bulletDamage: number, fireIntervalSeconds: number): ReturnType<typeof passingEvalInput> {
+  return passingEvalInput({outcome: {weapon: {...PASSING_WEAPON, bulletDamage, fireIntervalSeconds}}});
+}

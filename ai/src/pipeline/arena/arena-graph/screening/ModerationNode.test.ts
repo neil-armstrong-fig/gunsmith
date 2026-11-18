@@ -2,10 +2,6 @@ import {FakeListChatModel} from "@langchain/core/utils/testing";
 import {moderationNode} from "@gunsmith/ai/pipeline/arena/arena-graph/screening/ModerationNode";
 import {arenaGraphStateOf} from "@gunsmith/ai/pipeline/arena/arena-graph/testing/ArenaGraphStateOf";
 
-function moderatorSaying(isArenaRequest: boolean, reason: string): FakeListChatModel {
-  return new FakeListChatModel({responses: [JSON.stringify({isArenaRequest, reason})]});
-}
-
 it("lets an arena request through, noting the one model call it cost", async () => {
   const update = await moderationNode(arenaGraphStateOf(), moderatorSaying(true, "pillars"));
 
@@ -27,3 +23,7 @@ it("turns away a request when the judge cannot be read, as the closed verdict sa
   expect(update.rejectionReason).toBe("We could not check that request just now. Try again.");
   expect(update.modelCalls).toBe(1);
 });
+
+function moderatorSaying(isArenaRequest: boolean, reason: string): FakeListChatModel {
+  return new FakeListChatModel({responses: [JSON.stringify({isArenaRequest, reason})]});
+}

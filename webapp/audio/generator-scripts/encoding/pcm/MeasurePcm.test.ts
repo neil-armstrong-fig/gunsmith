@@ -1,13 +1,6 @@
 import {expect, it} from "vitest";
 import {measurePcm} from "@gunsmith/audio-studies/encoding/pcm/MeasurePcm";
 
-function floats(values: number[]): Buffer {
-  const pcm = Buffer.alloc(values.length * 4);
-  values.forEach((value, index) => pcm.writeFloatLE(value, index * 4));
-
-  return pcm;
-}
-
 it("rejects silent audio", () => {
   expect(() => measurePcm(floats([0, 0]), 1)).toThrow(/Silent or clipped PCM/);
 });
@@ -39,3 +32,10 @@ it("measures the RMS over every sample of every channel", () => {
 it("measures the worst join over the channels", () => {
   expect(measurePcm(floats([0.25, -0.5, 0.125, 0.25]), 2).loopJump).toBe(0.75);
 });
+
+function floats(values: number[]): Buffer {
+  const pcm = Buffer.alloc(values.length * 4);
+  values.forEach((value, index) => pcm.writeFloatLE(value, index * 4));
+
+  return pcm;
+}

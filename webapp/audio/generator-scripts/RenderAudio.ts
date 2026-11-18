@@ -10,6 +10,14 @@ import type {AudioPack} from "@gunsmith/audio-studies/pack/types/AudioPack";
 import type {Measurement} from "@gunsmith/audio-studies/output/measurements/types/Measurement";
 import type {RenderedCue} from "@gunsmith/audio-studies/common/types/RenderedCue";
 
+// Node's native TypeScript support runs this entry point without a transpiler.
+const entry = process.argv[1];
+if (entry && pathToFileURL(resolve(entry)).href === import.meta.url) {
+  const output = resolve(import.meta.dirname, "..", "generated-audio");
+  const count = await renderAudio(output);
+  console.log(`Rendered ${count} WAV files with node-web-audio-api in ${output}`);
+}
+
 /**
  * Renders the pack into `output` and returns how many WAVs it wrote: every effect, the match and menu loops, and the
  * audition mix of effects over the match loop, with `measurements.json` beside them. An explicit folder keeps verification
@@ -32,12 +40,4 @@ export async function renderAudio(output: string, pack: AudioPack = makeAudioPac
   await writeMeasurements(output, files);
 
   return Object.keys(files).length;
-}
-
-// Node's native TypeScript support runs this entry point without a transpiler.
-const entry = process.argv[1];
-if (entry && pathToFileURL(resolve(entry)).href === import.meta.url) {
-  const output = resolve(import.meta.dirname, "..", "generated-audio");
-  const count = await renderAudio(output);
-  console.log(`Rendered ${count} WAV files with node-web-audio-api in ${output}`);
 }

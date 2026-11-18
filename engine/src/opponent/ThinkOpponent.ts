@@ -1,6 +1,7 @@
 import type {World} from "@gunsmith/engine/game-loop/types/World";
 import {canSee} from "@gunsmith/engine/opponent/sight/CanSee";
 import {noticePlayer} from "@gunsmith/engine/opponent/sight/NoticePlayer";
+import {noticeShot} from "@gunsmith/engine/opponent/sight/NoticeShot";
 import {shelterFromRing} from "@gunsmith/engine/opponent/shelter/ShelterFromRing";
 import {actOnState} from "@gunsmith/engine/opponent/state/ActOnState";
 import {chooseState} from "@gunsmith/engine/opponent/state/ChooseState";
@@ -13,8 +14,8 @@ import {unstickBrain} from "@gunsmith/engine/opponent/unstick/UnstickBrain";
 
 /**
  * What the opponent asks for this step, in the same shape as a player's input so it is played by the same rules, and the
- * brain it carries into the next step. It looks (`canSee`, `noticePlayer`), checks its state's transitions
- * (`chooseState`), lets the state it is in decide the input (`actOnState`), walks it in from the closing ring's edge
+ * brain it carries into the next step. It looks (`canSee`, `noticePlayer`), takes in a shot that hurt it last step
+ * (`noticeShot`, then forgotten once its state is chosen), checks its state's transitions (`chooseState`), lets the state it is in decide the input (`actOnState`), walks it in from the closing ring's edge
  * if the ring has come near (`shelterFromRing`), and finally notices if it has been walking
  * without getting anywhere (`watchForStuck`). It reads only the world and the brain's own memory and seed, so the same
  * world always gives the same answer. An opponent with no brain, or no opponent at all, asks for nothing: a still target.
@@ -27,8 +28,8 @@ export function thinkOpponent(world: World, seconds: number): OpponentDecision {
 
   const sees = canSee(arena, opponent, player.position);
   const context: OpponentContext = {arena, opponent, target: player, sees, seconds, ring, pickup};
-  const noticed = noticePlayer(opponentBrain, {sees, target: player.position, seconds});
-  const chosen = chooseState(noticed, context);
+  const noticed = noticeShot(noticePlayer(opponentBrain, {sees, target: player.position, seconds}), {sees});
+  const chosen = {...chooseState(noticed, context), shotFrom: undefined};
   const acted = actOnState({...chosen, secondsInState: chosen.secondsInState + seconds}, context);
   const act = shelterFromRing(acted, context);
 

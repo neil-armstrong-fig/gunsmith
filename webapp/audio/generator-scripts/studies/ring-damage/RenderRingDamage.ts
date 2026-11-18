@@ -12,6 +12,11 @@ import {runEncoder} from "@gunsmith/audio-studies/encoding/process/RunEncoder";
 import {decodePcm} from "@gunsmith/audio-studies/encoding/verification/decode/DecodePcm";
 import {measurePcm} from "@gunsmith/audio-studies/encoding/pcm/MeasurePcm";
 
+const entry = process.argv[1];
+if (entry && pathToFileURL(resolve(entry)).href === import.meta.url) {
+  await renderRingDamage(resolve(import.meta.dirname, "../../../studies/ring-damage"));
+}
+
 /** Writes only this separate study's master, MP3 and measurements; never rebuilds the approved pack. */
 export async function renderRingDamage(output: string): Promise<void> {
   await mkdir(output, {recursive: true});
@@ -38,9 +43,4 @@ export async function renderRingDamage(output: string): Promise<void> {
     listeningReview: "user approved in Visual Studio Code, 2026-11-17; runtime combat masking/fatigue not measured",
   };
   await writeFile(join(output, "measurements.json"), JSON.stringify(report, undefined, 2) + "\n");
-}
-
-const entry = process.argv[1];
-if (entry && pathToFileURL(resolve(entry)).href === import.meta.url) {
-  await renderRingDamage(resolve(import.meta.dirname, "../../../studies/ring-damage"));
 }

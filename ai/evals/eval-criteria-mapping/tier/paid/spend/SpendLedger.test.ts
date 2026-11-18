@@ -3,10 +3,6 @@ import {tmpdir} from "node:os";
 import {join} from "node:path";
 import {SpendLedger} from "@evals/eval-criteria-mapping/tier/paid/spend/SpendLedger";
 
-function ledgerFile(): string {
-  return join(mkdtempSync(join(tmpdir(), "ledger-")), "ledger.json");
-}
-
 it("starts at nothing spent when there is no file yet", () => {
   expect(new SpendLedger({file: ledgerFile(), ceilingDollars: 1}).total()).toBe(0);
 });
@@ -39,3 +35,7 @@ it("refuses to guess when the file is not a ledger, rather than start again from
 
   expect(() => new SpendLedger({file, ceilingDollars: 1}).total()).toThrow("ledger");
 });
+
+function ledgerFile(): string {
+  return join(mkdtempSync(join(tmpdir(), "ledger-")), "ledger.json");
+}

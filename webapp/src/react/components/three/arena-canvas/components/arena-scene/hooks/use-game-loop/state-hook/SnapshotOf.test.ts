@@ -203,12 +203,6 @@ it("reports no ring when the world has none", () => {
 });
 
 const RING_START_DELAY_SECONDS = 10;
-const ringAt = (roundSeconds: number): Ring => ({
-  roundSeconds,
-  centre: {x: 2.5, y: 1.5},
-  startRadius: 8,
-  timing: {startDelaySeconds: RING_START_DELAY_SECONDS, closingSeconds: 20},
-});
 
 it("reports the seconds still to play before the ring starts", () => {
   expect(snapshotOf({...world, ring: ringAt(0)}).ring?.secondsUntilStart).toBe(RING_START_DELAY_SECONDS);
@@ -295,3 +289,12 @@ it("reports a pickup behind the player as not visible, though the game still lis
 
   expect(snapshotOf(behind).pickup).toMatchObject({x: 1.5, y: 2.5, visible: false});
 });
+
+function ringAt(roundSeconds: number): Ring {
+  return {
+    roundSeconds,
+    centre: {x: 2.5, y: 1.5},
+    startRadius: 8,
+    timing: {startDelaySeconds: RING_START_DELAY_SECONDS, closingSeconds: 20},
+  };
+}

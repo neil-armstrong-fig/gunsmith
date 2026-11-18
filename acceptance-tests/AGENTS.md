@@ -20,7 +20,7 @@ the one-line wrapper on the `*Dsl` beside it.
 
 - **`<Thing>Dsl.ts`** is what a spec may say. It holds no locators, takes a `Page` only to build its own `*Playwright`
   in the constructor (never keeps it), and wraps each call in `try`/`catch` that rethrows a `DslError` naming the
-  intention.
+  intention. **Every method, sync ones too**, is one `try`/`catch` and nothing else; lint enforces it (`src/dsl/**/*Dsl.ts` in `eslint.config.js`).
 - **`playwright/<Thing>Playwright.ts`** holds the locators, clicks and waits. It catches nothing. It extends `BasePage`
   and reads the game with `this.readGameState()` and waits on it with `this.waitForGameState(check)` (polled from the
   test, so the check may use anything in scope). Only something that must run inside the page, such as the bullet recorder,
@@ -49,7 +49,7 @@ Read visibility from the hook. Compare the fields a criterion means, not whole s
 
 ## Heights
 
-Use the heights scenario for stair and level criteria. Cover blocked drops, legal stairs, low-to-high occlusion and high-to-low sight/shots. Rendering needs screenshot checks where geometry tests alone cannot establish what is drawn.
+Use the heights scenario for stair and level criteria. **Stop a walk by the game's clock, not by polling**: `player.walkUntilPast({heading, limit, watch})` in a held game (`holdTheGame`) stops within one step of the limit; a walk stopped by a test that looks every so often ran on while the machine was busy and left the player a tile or two past the dummy on the platform, which then took a shot meant for the one behind them (the `ShootingAcrossLevels` flake, fixed 2026-11-18, together with a shot that lives 75 ms and is now looked for at every held frame, not waited for; `SeeingAcrossLevels` and the climbs in `ClimbingAStair` still poll). Cover blocked drops, legal stairs, low-to-high occlusion and high-to-low sight/shots. Rendering needs screenshot checks where geometry tests alone cannot establish what is drawn.
 
 ## The ring
 
@@ -71,15 +71,27 @@ the player must stand still. **A check must look for what only the drawing has**
 
 `StartingOnFairGround` opens `?scenario=fair-duel` (`gunsmith.startFairDuel(seed)`; seeds 2, 17, 28). The idle player's place is exact; the opponent has a brain and walks before the first read, so a criterion about its place allows at most 6 tiles a second times `gunsmith.round.getElapsedSeconds()` (a flat tolerance flaked 4 in 80).
 
+## Being shot from out of sight
+
+`TheOpponentShotFromOutOfSight` (in `duel/`) opens `?scenario=overwatch` (`gunsmith.startOverwatch(seed)`; seeds 2, 5, 7): a corridor one tile wide, the opponent wandering on the low ground ten tiles from the player, who stands on the platform at the end, farther than it sees. The player fires west along the row (`aimAtTile`, `startFiring`) until `opponent.waitForHealthBelow(100)`, and the criterion is that `behaviour` is no longer `wander`. It fails with the opponent's reaction to a shot switched off (`rememberShot` made a no-op: all three seeds time out). It cannot also assert that the opponent comes up the stair: the trigger is still down while the browser notices the first hit, so four rounds land and the bot dies; the engine's step tests cover the climb. The seeds are those where the old opponent never left `wander` in fifteen seconds (19 of 40).
+
 ## Pickups
 
 Use seeded sparring to isolate player pickup behavior. Assert visibility and inventory consequences as well as pickup disappearance. Keep duel round-reset coverage separate from a bot taking a weapon. `TheOpponentFetchingTheWeapon` opens `?scenario=pickup-race` (`gunsmith.startPickupRace(seed)`; seeds 2, 17, 28): the weapon lies nearer the opponent, who leaves the idle player in its sight to take it; `gunsmith.pickup.waitUntilTaken(seconds)` waits, and the opponent's magazine (over the rifle's twelve) says it holds it. It fails with the bot's seeking switched off (the weapon is never taken).
 
-`DrawingAGeneratedWeapon` (`tests/pickup/`) opens `gunsmith.startSparringWithPickupDrawing({seed, drawing: "lantern" | "refused"})` (seed 8) and reads `gunsmith.pickup.getLookOnScreen()` (`playwright/look/look-of-pickup/`) over the place the hook says the weapon lies. Count only colours the drawing alone has (weapon blue, the core's pale `#E5EAF0`; the body grey is the wall's and the outline the background's). The old disc reads as `(168, 216, 202)`, **not** its source `#7ee0c3`, because its material is tone-mapped (matching the source colour let "the disc is gone" pass with the disc on screen). **The fog dims a drawing, it does not hide it**, so exact colours are never found there: the fog criterion counts `markedPixels`, places that are not the floor's colour (0 with the fog check, 244 for the lantern and 460 for the disc without it; an exact-colour count survived that mutant). Measured: lantern 38 blue and 24 pale, stand-in 6 blue and 0 pale; thresholds sit well off them.
+`DrawingAGeneratedWeapon` (`tests/pickup/`) opens `gunsmith.startSparringWithPickupDrawing({seed, drawing: "lantern" | "refused"})` (seed 8) and reads `gunsmith.pickup.getLookOnScreen()` (`components/pickup/playwright/look-of-pickup/`) over the place the hook says the weapon lies. Count only colours the drawing alone has (weapon blue, the core's pale `#E5EAF0`; the body grey is the wall's and the outline the background's). The old disc reads as `(168, 216, 202)`, **not** its source `#7ee0c3`, because its material is tone-mapped (matching the source colour let "the disc is gone" pass with the disc on screen). Even a drawing accidentally left under the fog must be detected. The fog criterion uses the marker sampler's `markedPixels` over the whole pickup footprint. Measured: lantern 38 blue and 24 pale, stand-in 6 blue and 0 pale; thresholds sit well off them.
+
+`DrawingThePickupMarker` checks the four C2 corners and cardinal gaps and samples the full 88-unit marker canvas for fog and collection. Its marker query accepts a saved pickup position and a nearby clear tile under the same light. It compares matching tile-local pixels from the same screenshot, so the floor seams and ticks do not count as pickup marks. The lantern core sampler stays inside the outline because both use the same pale colour.
+
+`DrawingTheTerrain` uses `?scenario=terrain` to check the three floor levels, wall braces, joins, stairs, drop edges and fog at 64 and 32 pixels per tile. It also holds or returns 404 for the highest floor SVG to test readiness and the flat fallback.
 
 ## Hit confirmation
 
 `HittingATargetOnTheScreen` / `HittingATarget` hold the game and fire, turn away before the bullet lands (a hidden hit), and read the four mint corners from a screenshot (`player|opponent|dummies.getHitOnScreen`, `runUntilHurt` runs the held game until that target loses health, seen or not; `playwright/hold/RunHeldUntil`). Hidden-hit criteria need the unit guard _and_ the draw-time sight gate both broken to fail: mutate both.
+
+## Camera shake and reduced motion
+
+`ShakingTheCameraOnAHit` and `ReducingMotion` hold the game on a hit and read where the camera put the picture from `gunsmith.camera.getShake()` (the canvas's `data-camera-shake`, worked out from the camera's real position, so a shake computed but never applied fails). A shake lasts 100 ms: watch in 0.02 s steps and sample 0.03 s later, or it is over (a ring watched in 0.25 s steps let a mutant that made the ring shake survive). Before a spec that photographs the moment of a bullet hit, call `gunsmith.keepTheCameraStill()` (`?shake=0`); do not use reduced motion for that, it removes the brackets' opening and the trail those specs assert. `askForReducedMotion()` is `?reducedMotion=1`, `preferReducedMotion()` is the browser's `prefers-reduced-motion`; both go before `startDuel`. `getDamageOnScreen().leftBracketReachPixels` says whether the brackets opened.
 
 ## Sound
 

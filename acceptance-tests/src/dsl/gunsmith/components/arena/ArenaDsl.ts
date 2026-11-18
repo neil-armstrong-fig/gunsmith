@@ -3,6 +3,7 @@ import {DslError} from "@src/dsl/gunsmith/errors/DslError";
 import {ArenaPlaywright} from "@src/dsl/gunsmith/components/arena/playwright/ArenaPlaywright";
 import type {Cursor} from "@src/dsl/gunsmith/components/arena/types/Cursor";
 import type {CursorPlace} from "@src/dsl/gunsmith/components/arena/types/CursorPlace";
+import type {TerrainLook} from "@src/dsl/gunsmith/components/arena/types/TerrainLook";
 import type {Size} from "@src/dsl/gunsmith/types/Size";
 
 /** The arena the match is played in, reached as `gunsmith.arena`. */
@@ -37,6 +38,15 @@ export class ArenaDsl {
       return await this.arena.getCursorOver(place);
     } catch (error) {
       throw new DslError(`Failed to read the mouse cursor over ${place}`, error);
+    }
+  }
+
+  /** Reads the floor, wall, stairs and drop in the terrain preview. */
+  async getTerrainLook(pixelsPerTile: number): Promise<TerrainLook> {
+    try {
+      return await this.arena.getTerrainLook(pixelsPerTile);
+    } catch (error) {
+      throw new DslError("Failed to read what the terrain looks like on the screen", error);
     }
   }
 

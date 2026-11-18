@@ -115,6 +115,15 @@ export function baseConfig({tsconfigRootDir, allowedPackages = [], allowedConsol
         "gunsmith/no-return-ternary": "error",
         "gunsmith/named-object-types": "error",
         "gunsmith/single-export": "error",
+        "gunsmith/function-order": "error",
+        "gunsmith/helper-function-declaration": "error",
+      },
+    },
+    {
+      files: ["**/*.test.{ts,tsx}"],
+      rules: {
+        "gunsmith/function-order": "error",
+        "gunsmith/helper-function-declaration": "error",
       },
     },
     {

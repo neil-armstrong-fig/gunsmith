@@ -68,11 +68,12 @@ The user accepted the review. Frozen inputs distinguish available artwork from
 newer eval summaries and AI-reported results; concrete AI/build follow-up is
 recorded there. No kit-selection comparison or production approval is implied.
 
-## Terrain candidates (2026-11-17)
+## Arena terrain
 
-[Three floor levels and solid wall](terrain/README.md) now have production-candidate
-SVGs, native-size browser exports and a static terraced-arena context. User approval
-and runtime integration remain pending; the earlier references stay intact.
+The user approved the [three floor levels and solid wall](terrain/README.md)
+on 2026-11-18. The four SVGs are wired into the arena renderer. The review
+includes native-size browser exports and a static terraced-arena composition.
+Open `?scenario=terrain` to see all three floors and the wall in play.
 
 ## Build asset reference (2026-11-14)
 
@@ -114,7 +115,7 @@ this delivery changes no schema, enum or runtime manifest. Proposed arena theme:
 | `weapon-mint` | `#8AD4B0` | Weapon accent |
 
 The four `weapon-*` names are proposed values for the weapon's `colour` token. Weapon accent denotes the weapon,
-not ownership: teams also have shoulder stripes; pickups have a diamond surround. Ring danger uses chevrons.
+not ownership: teams also have shoulder stripes; ground pickups use the neutral C2 soft octagon. Ring danger uses chevrons.
 
 ## Shape, strokes and light
 

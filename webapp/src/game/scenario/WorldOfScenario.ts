@@ -19,11 +19,15 @@ import {HEIGHTS_ARENA} from "@src/game/heights/HeightsArena";
 import {HEIGHTS_DUMMIES} from "@src/game/heights/HeightsDummies";
 import {OVERLOOK_OPPONENT} from "@src/game/overlook/OverlookOpponent";
 import {OVERLOOK_PLAYER} from "@src/game/overlook/OverlookPlayer";
+import {OVERWATCH_ARENA} from "@src/game/overwatch/OverwatchArena";
+import {OVERWATCH_OPPONENT} from "@src/game/overwatch/OverwatchOpponent";
+import {OVERWATCH_PLAYER} from "@src/game/overwatch/OverwatchPlayer";
 import {PICKUP_RACE_PICKUP} from "@src/game/pickup-race/PickupRacePickup";
 import {PRACTICE_ARENA} from "@src/game/practice/PracticeArena";
 import {PRACTICE_DUMMIES} from "@src/game/practice/PracticeDummies";
 import {TERRACED_ARENA} from "@src/game/terraced/TerracedArena";
 import {TERRACED_OPPONENT} from "@src/game/terraced/TerracedOpponent";
+import {terrainPreview} from "@src/game/terrain-preview/TerrainPreview";
 import type {Scenario} from "@src/game/scenario/types/Scenario";
 
 /**
@@ -80,6 +84,12 @@ export function worldOfScenario(scenario: Scenario, seed: number, ringTiming?: R
     return {...world, player: {...world.player, position: OVERLOOK_PLAYER}};
   }
 
+  if (scenario === "overwatch") {
+    const world = giveOpponentBrain(engine.startingWorld(OVERWATCH_ARENA, [], OVERWATCH_OPPONENT), seed);
+
+    return {...world, player: {...world.player, position: OVERWATCH_PLAYER}};
+  }
+
   if (scenario === "pickup-race") {
     const world = giveOpponentBrain(engine.startingWorld(DUEL_ARENA, [], DUEL_OPPONENT), seed);
 
@@ -92,6 +102,10 @@ export function worldOfScenario(scenario: Scenario, seed: number, ringTiming?: R
 
   if (scenario === "heights") {
     return engine.startingWorld(HEIGHTS_ARENA, HEIGHTS_DUMMIES);
+  }
+
+  if (scenario === "terrain") {
+    return terrainPreview();
   }
 
   return engine.startingWorld(PRACTICE_ARENA, PRACTICE_DUMMIES);

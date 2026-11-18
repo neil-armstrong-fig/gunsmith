@@ -4,30 +4,10 @@ import {MatchRoom} from "@src/match/room/MatchRoom";
 
 const IDLE: Input = {direction: {x: 0, y: 0}, firing: false, reload: false};
 
-function startedRoom(): MatchRoom {
-  const room = new MatchRoom();
-  room.join();
-  room.join();
-
-  return room;
-}
-
 /** The longest a seat shooting a standing fighter is given to decide a round: far more than the rifle needs. */
 const MOST_STEPS_TO_DECIDE_A_ROUND = 1200;
 
-/** Has `winner` shoot the other seat, who stands still, until the round is decided. */
-function winRound(room: MatchRoom, winner: Seat): void {
-  const loser: Seat = winner === "first" ? "second" : "first";
-  const aimAt = room.snapshotFor(loser)?.player.position;
-  const seq = (room.snapshotFor(winner)?.ack?.seq ?? 0) + 1;
-  room.setInput(winner, {...IDLE, aimAt, firing: true}, seq);
-
-  for (let step = 0; step < MOST_STEPS_TO_DECIDE_A_ROUND && room.snapshotFor(winner)?.round === "playing"; step += 1) {
-    room.tick();
-  }
-
-  room.setInput(winner, IDLE, seq + 1);
-}
+const STEPS_PER_SECOND = 60;
 
 it("seats the first person first and the second second, and nobody after", () => {
   const room = new MatchRoom();
@@ -395,33 +375,6 @@ it("keeps what a seat asked for once the round is decided from being played in t
   expect(room.snapshotFor("first")?.player.equippedIndex).toBe(0);
 });
 
-const STEPS_PER_SECOND = 60;
-
-/** Plays `seconds` of game time, in one go. */
-function playSeconds(room: MatchRoom, seconds: number): void {
-  room.tick(Math.round(seconds * STEPS_PER_SECOND));
-}
-
-/** Has `seat` ask for something new, as a browser does when its player changes what they hold down: it walks east, then west, then east again. */
-function askSomethingNew(room: MatchRoom, seat: Seat, count: number): void {
-  const seq = (room.snapshotFor(seat)?.ack?.seq ?? 0) + 1;
-  room.setInput(seat, {...IDLE, direction: {x: count % 2 === 0 ? 1 : -1, y: 0}}, seq);
-}
-
-/** Plays `seconds` of game time, a second at a time, with `seat` asking for something new in each, so that it is plainly there. */
-function playSecondsAsking(room: MatchRoom, seat: Seat, seconds: number): void {
-  for (let second = 0; second < seconds; second += 1) {
-    askSomethingNew(room, seat, second);
-    playSeconds(room, 1);
-  }
-}
-
-/** Has `seat` send what it last asked for again, as a browser's heartbeat does. */
-function repeatTheAsk(room: MatchRoom, seat: Seat): void {
-  const seq = (room.snapshotFor(seat)?.ack?.seq ?? 0) + 1;
-  room.setInput(seat, IDLE, seq);
-}
-
 it("forfeits the round to the other seat when a seat's person has been away for the reconnect window", () => {
   const room = startedRoom();
   room.leave("first");
@@ -623,3 +576,50 @@ it("forfeits no round once the match is decided, whoever stays quiet", () => {
   expect(room.snapshotFor("first")?.match).toEqual({playerWins: 2, opponentWins: 0, roundNumber: 2});
   expect(room.snapshotFor("first")?.round).toBe("won");
 });
+
+function startedRoom(): MatchRoom {
+  const room = new MatchRoom();
+  room.join();
+  room.join();
+
+  return room;
+}
+
+/** Has `winner` shoot the other seat, who stands still, until the round is decided. */
+function winRound(room: MatchRoom, winner: Seat): void {
+  const loser: Seat = winner === "first" ? "second" : "first";
+  const aimAt = room.snapshotFor(loser)?.player.position;
+  const seq = (room.snapshotFor(winner)?.ack?.seq ?? 0) + 1;
+  room.setInput(winner, {...IDLE, aimAt, firing: true}, seq);
+
+  for (let step = 0; step < MOST_STEPS_TO_DECIDE_A_ROUND && room.snapshotFor(winner)?.round === "playing"; step += 1) {
+    room.tick();
+  }
+
+  room.setInput(winner, IDLE, seq + 1);
+}
+
+/** Plays `seconds` of game time, a second at a time, with `seat` asking for something new in each, so that it is plainly there. */
+function playSecondsAsking(room: MatchRoom, seat: Seat, seconds: number): void {
+  for (let second = 0; second < seconds; second += 1) {
+    askSomethingNew(room, seat, second);
+    playSeconds(room, 1);
+  }
+}
+
+/** Has `seat` ask for something new, as a browser does when its player changes what they hold down: it walks east, then west, then east again. */
+function askSomethingNew(room: MatchRoom, seat: Seat, count: number): void {
+  const seq = (room.snapshotFor(seat)?.ack?.seq ?? 0) + 1;
+  room.setInput(seat, {...IDLE, direction: {x: count % 2 === 0 ? 1 : -1, y: 0}}, seq);
+}
+
+/** Plays `seconds` of game time, in one go. */
+function playSeconds(room: MatchRoom, seconds: number): void {
+  room.tick(Math.round(seconds * STEPS_PER_SECOND));
+}
+
+/** Has `seat` send what it last asked for again, as a browser's heartbeat does. */
+function repeatTheAsk(room: MatchRoom, seat: Seat): void {
+  const seq = (room.snapshotFor(seat)?.ack?.seq ?? 0) + 1;
+  room.setInput(seat, IDLE, seq);
+}

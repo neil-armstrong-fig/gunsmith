@@ -2,6 +2,7 @@ import type {Page} from "@playwright/test";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
 import {ArenaDsl} from "@src/dsl/gunsmith/components/arena/ArenaDsl";
 import {BulletsDsl} from "@src/dsl/gunsmith/components/bullets/BulletsDsl";
+import {CameraDsl} from "@src/dsl/gunsmith/components/camera/CameraDsl";
 import {DummiesDsl} from "@src/dsl/gunsmith/components/dummies/DummiesDsl";
 import {HudDsl} from "@src/dsl/gunsmith/components/hud/HudDsl";
 import {MatchDsl} from "@src/dsl/gunsmith/components/match/MatchDsl";
@@ -19,6 +20,7 @@ import {WeaponDsl} from "@src/dsl/gunsmith/components/weapon/WeaponDsl";
 import {GunsmithPlaywright} from "@src/dsl/gunsmith/playwright/GunsmithPlaywright";
 import type {ClosingRingRequest} from "@src/dsl/gunsmith/types/ClosingRingRequest";
 import type {PickupDrawingRequest} from "@src/dsl/gunsmith/types/PickupDrawingRequest";
+import type {TerrainPictures} from "@src/dsl/gunsmith/types/TerrainPictures";
 import type {Size} from "@src/dsl/gunsmith/types/Size";
 
 /** The whole game as a spec sees it. Every area is a member of this rather than a fixture of its own. */
@@ -28,6 +30,7 @@ export class GunsmithDsl {
   readonly arena: ArenaDsl;
   readonly player: PlayerDsl;
   readonly bullets: BulletsDsl;
+  readonly camera: CameraDsl;
   readonly dummies: DummiesDsl;
   readonly weapon: WeaponDsl;
   readonly hud: HudDsl;
@@ -46,6 +49,7 @@ export class GunsmithDsl {
     this.arena = new ArenaDsl(page);
     this.player = new PlayerDsl(page);
     this.bullets = new BulletsDsl(page);
+    this.camera = new CameraDsl(page);
     this.dummies = new DummiesDsl(page);
     this.weapon = new WeaponDsl(page);
     this.hud = new HudDsl(page);
@@ -57,6 +61,33 @@ export class GunsmithDsl {
     this.round = new RoundDsl(page);
     this.sound = new SoundDsl(page);
     this.vision = new VisionDsl(page);
+  }
+
+  /** Asks for a camera that never shakes (`?shake=0`) in whatever the spec opens next, so a screenshot taken at the moment of a hit is of the picture as it stands. */
+  keepTheCameraStill(): void {
+    try {
+      this.gunsmith.keepTheCameraStill();
+    } catch (error) {
+      throw new DslError("Failed to ask for a camera that does not shake", error);
+    }
+  }
+
+  /** Asks for reduced motion through the page (`?reducedMotion=1`) in whatever the spec opens next. */
+  askForReducedMotion(): void {
+    try {
+      this.gunsmith.askForReducedMotion();
+    } catch (error) {
+      throw new DslError("Failed to ask for reduced motion", error);
+    }
+  }
+
+  /** Has the browser say the person prefers reduced motion (`prefers-reduced-motion: reduce`), as their system setting would, before the spec opens the game. */
+  async preferReducedMotion(): Promise<void> {
+    try {
+      await this.gunsmith.preferReducedMotion();
+    } catch (error) {
+      throw new DslError("Failed to have the browser prefer reduced motion", error);
+    }
   }
 
   /** Opens the game and waits until the arena is on screen. */
@@ -74,7 +105,11 @@ export class GunsmithDsl {
 
   /** Closes whatever the spec opened beside the game, such as the second browser of a room. Runs after every spec. */
   async end(): Promise<void> {
-    await this.room.end();
+    try {
+      await this.room.end();
+    } catch (error) {
+      throw new DslError("Failed to close what the spec opened beside the game", error);
+    }
   }
 
   /**
@@ -129,9 +164,9 @@ export class GunsmithDsl {
   }
 
   /** Opens a sparring match whose pictures are not on the server at all. */
-  async startSparringWithMissingPictures(): Promise<void> {
+  async startSparringWithMissingPictures(seed?: number): Promise<void> {
     try {
-      await this.gunsmith.openSparringWithMissingPictures();
+      await this.gunsmith.openSparringWithMissingPictures(seed);
     } catch (error) {
       throw new DslError("Failed to open the sparring match with the pictures missing", error);
     }
@@ -207,6 +242,19 @@ export class GunsmithDsl {
   }
 
   /**
+   * Opens the overwatch: a corridor one tile wide, the opponent wandering on its low ground and the player standing on the platform at
+   * its end, ten tiles away along the same row, farther than the opponent sees and inside the rifle's reach. One round, no score,
+   * no ring; the opponent's choices are drawn from `seed`.
+   */
+  async startOverwatch(seed: number): Promise<void> {
+    try {
+      await this.gunsmith.openOverwatch(seed);
+    } catch (error) {
+      throw new DslError(`Failed to open the overwatch with seed ${seed}`, error);
+    }
+  }
+
+  /**
    * Opens the pickup race: the duel's arena with the player standing still and the opponent six tiles east, and a weapon lying
    * four tiles from the opponent and eight from the player. One round, no score, no ring; the opponent's choices are drawn from `seed`.
    */
@@ -237,6 +285,14 @@ export class GunsmithDsl {
       await this.gunsmith.openHeights();
     } catch (error) {
       throw new DslError("Failed to open the heights arena", error);
+    }
+  }
+
+  async startTerrain(pictures?: TerrainPictures): Promise<void> {
+    try {
+      await this.gunsmith.openTerrain(pictures);
+    } catch (error) {
+      throw new DslError("Failed to open the terrain preview", error);
     }
   }
 

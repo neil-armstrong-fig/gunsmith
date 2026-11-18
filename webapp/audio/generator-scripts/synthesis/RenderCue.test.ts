@@ -12,10 +12,6 @@ const beep: Cue = {
   voices: [{kind: "tone", at: 0.01, duration: 0.1, frequency: 440, gain: 0.9}],
 };
 
-function energy(samples: Float32Array): number {
-  return samples.reduce((sum, sample) => sum + sample * sample, 0);
-}
-
 it("renders the cue's length in frames, and keeps its key", async () => {
   const rendered = await renderCue(beep);
 
@@ -72,3 +68,7 @@ it("lets a note that rings past the end of a loop wrap onto its start, but not a
 it("renders the same samples every time", async () => {
   expect(await renderCue(beep)).toStrictEqual(await renderCue(beep));
 });
+
+function energy(samples: Float32Array): number {
+  return samples.reduce((sum, sample) => sum + sample * sample, 0);
+}

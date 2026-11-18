@@ -5,10 +5,6 @@ import {startMatch} from "@gunsmith/engine/match/StartMatch";
 import {MATCH_ARENA_ROWS} from "@src/match/room/arena/MatchArenaRows";
 import {forfeitRound} from "@src/match/room/forfeit/ForfeitRound";
 
-function roundBeingFought(): World {
-  return {...startingWorld(arenaFrom(MATCH_ARENA_ROWS), [], {x: 16.5, y: 6.5}), match: startMatch()};
-}
-
 it("gives the round to the second seat when the first forfeits, and scores it for them", () => {
   const world = forfeitRound(roundBeingFought(), "first");
 
@@ -43,3 +39,7 @@ it("decides a round that belongs to no match without inventing a score", () => {
   expect(world.round).toBe("lost");
   expect(world.match).toBeUndefined();
 });
+
+function roundBeingFought(): World {
+  return {...startingWorld(arenaFrom(MATCH_ARENA_ROWS), [], {x: 16.5, y: 6.5}), match: startMatch()};
+}

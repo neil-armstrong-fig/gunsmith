@@ -3,17 +3,6 @@ import {makeMelody} from "@gunsmith/audio-studies/generators/music/bar/melody/Ma
 import {noteFrequency} from "@gunsmith/audio-studies/generators/music/bar/note/NoteFrequency";
 import type {BarPosition} from "@gunsmith/audio-studies/generators/music/bar/types/BarPosition";
 
-function position(sparse: boolean, sectionIndex = 0): BarPosition {
-  return {
-    bar: 0,
-    sectionIndex,
-    section: {sparse, kickBeats: [], bassSteps: [], melody: [62, 65, 69, 65]},
-    root: 38,
-    start: 8,
-    beat: 0.5,
-  };
-}
-
 it("plays each note of a full section on the off-beat, with a quieter echo three-eighths of a beat after it", () => {
   const voices = makeMelody(position(false));
 
@@ -51,3 +40,14 @@ it("closes its filter a little more in each section", () => {
   expect(makeMelody(position(false, 0))[0]?.cutoff).toBe(2200);
   expect(makeMelody(position(false, 4))[0]?.cutoff).toBe(2200 - 4 * 100);
 });
+
+function position(sparse: boolean, sectionIndex = 0): BarPosition {
+  return {
+    bar: 0,
+    sectionIndex,
+    section: {sparse, kickBeats: [], bassSteps: [], melody: [62, 65, 69, 65]},
+    root: 38,
+    start: 8,
+    beat: 0.5,
+  };
+}

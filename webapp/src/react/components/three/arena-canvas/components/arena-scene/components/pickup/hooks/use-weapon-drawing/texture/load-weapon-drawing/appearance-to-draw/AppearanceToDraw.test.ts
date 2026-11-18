@@ -1,31 +1,6 @@
 import {fallbackAppearance} from "@gunsmith/shared/appearance/fallback/FallbackAppearance";
 import {appearanceToDraw} from "@src/react/components/three/arena-canvas/components/arena-scene/components/pickup/hooks/use-weapon-drawing/texture/load-weapon-drawing/appearance-to-draw/AppearanceToDraw";
 
-function lantern(): Record<string, unknown> {
-  return {
-    version: 1,
-    palette: {accent: "weapon-blue", "accent-secondary": "weapon-violet"},
-    body: [
-      {
-        kind: "rect",
-        x: 6,
-        y: 28,
-        width: 18,
-        height: 8,
-        fill: "body",
-        stroke: "edge",
-        strokeWidth: 2,
-        opacity: 1,
-        rotation: 0,
-        detail: "structural",
-      },
-    ],
-    projectile: [],
-    impact: {preset: "spark", colour: "accent"},
-    animation: {preset: "none"},
-  };
-}
-
 it("is the appearance itself when the schema accepts it", () => {
   expect(appearanceToDraw(lantern())).toEqual(lantern());
 });
@@ -50,3 +25,28 @@ it("is the stand-in for anything that is not an object at all", () => {
     expect(appearanceToDraw(answer)).toEqual(fallbackAppearance());
   });
 });
+
+function lantern(): Record<string, unknown> {
+  return {
+    version: 1,
+    palette: {accent: "weapon-blue", "accent-secondary": "weapon-violet"},
+    body: [
+      {
+        kind: "rect",
+        x: 6,
+        y: 28,
+        width: 18,
+        height: 8,
+        fill: "body",
+        stroke: "edge",
+        strokeWidth: 2,
+        opacity: 1,
+        rotation: 0,
+        detail: "structural",
+      },
+    ],
+    projectile: [],
+    impact: {preset: "spark", colour: "accent"},
+    animation: {preset: "none"},
+  };
+}

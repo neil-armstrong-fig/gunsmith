@@ -12,14 +12,6 @@ const room = arenaFrom([
   "########################",
 ]);
 
-function duel(): World {
-  return startingWorld(room, [], {x: 12.5 + 4, y: 3.5});
-}
-
-function shot(shooter: Bullet["shooter"], x: number): Bullet {
-  return {position: {x, y: 3.5}, direction: {x: 1, y: 0}, damage: 1, speed: 1, shooter, level: 0};
-}
-
 it("tells a seat its own fighter in full", () => {
   const world = duel();
 
@@ -79,3 +71,27 @@ it("never tells a seat the brain, the events or the dummies: sent as JSON, only 
 
   expect(Object.keys(sent).sort()).toEqual(["bullets", "elapsedSeconds", "opponent", "player", "round"]);
 });
+
+it("never tells either seat where a shot that hurt the opponent came from, which its brain remembers", () => {
+  const brained = giveOpponentBrain(duel(), 7);
+  const remembering = {
+    ...brained,
+    opponentBrain: brained.opponentBrain && {...brained.opponentBrain, shotFrom: {x: 88.125, y: 77.375}},
+  };
+
+  for (const seat of ["first", "second"] as const) {
+    const sent = JSON.stringify(viewOfSeat(remembering, seat));
+
+    expect(sent).not.toContain("shotFrom");
+    expect(sent).not.toContain("88.125");
+    expect(sent).not.toContain("77.375");
+  }
+});
+
+function shot(shooter: Bullet["shooter"], x: number): Bullet {
+  return {position: {x, y: 3.5}, direction: {x: 1, y: 0}, damage: 1, speed: 1, shooter, level: 0};
+}
+
+function duel(): World {
+  return startingWorld(room, [], {x: 12.5 + 4, y: 3.5});
+}

@@ -1,21 +1,8 @@
 import {AppearanceDsl} from "@evals/dsl/appearance/AppearanceDsl";
 import {ArenaDsl} from "@evals/dsl/arena/ArenaDsl";
+import {ArenaSubmissionDsl} from "@evals/dsl/arena-submission/ArenaSubmissionDsl";
 import {WeaponSmithDsl} from "@evals/dsl/WeaponSmithDsl";
 import {TrackedFixtures} from "@evals/eval-criteria-mapping/fixtures/TrackedFixtures";
-
-function trackedFixtures(): TrackedFixtures {
-  const notAsked = (): Promise<never> => Promise.reject(new Error("not asked"));
-
-  return new TrackedFixtures({
-    weaponSmith: new WeaponSmithDsl({trials: 1, run: notAsked}),
-    appearance: new AppearanceDsl({trials: 1, run: notAsked}),
-    arena: new ArenaDsl({trials: 1, run: notAsked}),
-  });
-}
-
-function descriptions(tracked: TrackedFixtures): string[] {
-  return tracked.standingCriteria().map(criterion => criterion.description);
-}
 
 it("has taken nothing until a when asks for a DSL", () => {
   expect(trackedFixtures().taken()).toEqual([]);
@@ -82,6 +69,19 @@ it("carries the arena's standing criteria when it took the arena", () => {
   ]);
 });
 
+it("carries the arena submissions' standing criteria when it took the arena submissions", () => {
+  const tracked = trackedFixtures();
+  const {arenaSubmission} = tracked.fixtures;
+
+  expect(arenaSubmission).toBeInstanceOf(ArenaSubmissionDsl);
+  expect(tracked.taken()).toEqual(["arenaSubmission"]);
+  expect(descriptions(tracked)).toEqual([
+    "whatever is asked, what goes forward is a submission that was made, and what is left follows how many survived",
+    "whatever is asked, screening costs at most one model call for each prompt, none for a built-in arena",
+    "whatever is asked, what the players are shown repeats no prompt and leaks nothing",
+  ]);
+});
+
 it("carries both sets when it took both, the weapon smith's first", () => {
   const tracked = trackedFixtures();
   const {appearance, weaponSmith} = tracked.fixtures;
@@ -95,3 +95,18 @@ it("carries both sets when it took both, the weapon smith's first", () => {
 it("refuses a when that took no DSL, so it cannot go without standing criteria unnoticed", () => {
   expect(() => trackedFixtures().standingCriteria()).toThrow("Say which DSL this `when` uses");
 });
+
+function trackedFixtures(): TrackedFixtures {
+  const notAsked = (): Promise<never> => Promise.reject(new Error("not asked"));
+
+  return new TrackedFixtures({
+    weaponSmith: new WeaponSmithDsl({trials: 1, run: notAsked}),
+    appearance: new AppearanceDsl({trials: 1, run: notAsked}),
+    arena: new ArenaDsl({trials: 1, run: notAsked}),
+    arenaSubmission: new ArenaSubmissionDsl({trials: 1, run: notAsked}),
+  });
+}
+
+function descriptions(tracked: TrackedFixtures): string[] {
+  return tracked.standingCriteria().map(criterion => criterion.description);
+}

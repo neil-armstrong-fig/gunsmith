@@ -1,12 +1,6 @@
 import {pushOnce} from "@gunsmith/engine/movement/pushing/PushOnce";
 
 const RADIUS = 0.4;
-// Blocked tiles: the column x = 3, and the row y = 3.
-const column = (tileX: number): boolean => tileX === 3;
-const tileTwo = (tileX: number): boolean => tileX === 2;
-const row = (_tileX: number, tileY: number): boolean => tileY === 3;
-const rowTwo = (_tileX: number, tileY: number): boolean => tileY === 2;
-const columnAndRow = (tileX: number, tileY: number): boolean => tileX === 3 || tileY === 3;
 
 it("returns the very same point when nothing is in reach, so a caller can tell nothing moved", () => {
   const centre = {x: 1.5, y: 1.5};
@@ -55,3 +49,24 @@ it("judges each blocked tile from where the earlier ones have already pushed the
   expect(pushed.x).toBeCloseTo(3 - RADIUS, 9);
   expect(pushed.y).toBeCloseTo(3 - RADIUS, 9);
 });
+
+function columnAndRow(tileX: number, tileY: number): boolean {
+  return tileX === 3 || tileY === 3;
+}
+
+function rowTwo(_tileX: number, tileY: number): boolean {
+  return tileY === 2;
+}
+
+function row(_tileX: number, tileY: number): boolean {
+  return tileY === 3;
+}
+
+function tileTwo(tileX: number): boolean {
+  return tileX === 2;
+}
+
+// Blocked tiles: the column x = 3, and the row y = 3.
+function column(tileX: number): boolean {
+  return tileX === 3;
+}

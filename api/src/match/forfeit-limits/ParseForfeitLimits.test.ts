@@ -2,10 +2,6 @@ import {parseForfeitLimits} from "@src/match/forfeit-limits/ParseForfeitLimits";
 import {DEFAULT_FORFEIT_LIMITS} from "@src/match/room/DefaultForfeitLimits";
 import type {ForfeitLimits} from "@src/match/room/types/ForfeitLimits";
 
-function limitsOf(query: string): ForfeitLimits {
-  return parseForfeitLimits(new URLSearchParams(query));
-}
-
 it("gives the real limits when the page asks for none", () => {
   expect(limitsOf("")).toEqual(DEFAULT_FORFEIT_LIMITS);
   expect(limitsOf("room=ABCD")).toEqual(DEFAULT_FORFEIT_LIMITS);
@@ -41,3 +37,7 @@ it("ignores what is not a number", () => {
   expect(limitsOf("reconnectSeconds=NaN&idleSeconds=Infinity")).toEqual(DEFAULT_FORFEIT_LIMITS);
   expect(limitsOf("reconnectSeconds=2abc")).toEqual(DEFAULT_FORFEIT_LIMITS);
 });
+
+function limitsOf(query: string): ForfeitLimits {
+  return parseForfeitLimits(new URLSearchParams(query));
+}

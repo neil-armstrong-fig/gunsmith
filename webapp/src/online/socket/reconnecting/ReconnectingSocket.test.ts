@@ -49,13 +49,6 @@ class FakeSocket implements RawSocket {
 
 let opened: FakeSocket[] = [];
 
-function openSocket(): FakeSocket {
-  const socket = new FakeSocket();
-  opened.push(socket);
-
-  return socket;
-}
-
 beforeEach(() => {
   opened = [];
   vi.useFakeTimers();
@@ -183,3 +176,10 @@ it("closes the connection it has when it is closed on purpose", () => {
 
   expect(opened[0]?.closed).toBe(true);
 });
+
+function openSocket(): FakeSocket {
+  const socket = new FakeSocket();
+  opened.push(socket);
+
+  return socket;
+}

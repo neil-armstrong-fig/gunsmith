@@ -5,26 +5,6 @@ import type {Voice} from "@gunsmith/audio-studies/common/types/Voice";
 
 const BEAT = 0.5;
 
-function position(overrides: Partial<BarPosition> = {}, section: Partial<BarPosition["section"]> = {}): BarPosition {
-  return {
-    bar: 2,
-    sectionIndex: 0,
-    section: {sparse: false, kickBeats: [0, 1, 2, 3], bassSteps: [], melody: [], ...section},
-    root: 38,
-    start: 4,
-    beat: BEAT,
-    ...overrides,
-  };
-}
-
-function kicks(voices: readonly Voice[]): Voice[] {
-  return voices.filter(voice => voice.kind === "tone");
-}
-
-function snares(voices: readonly Voice[]): Voice[] {
-  return voices.filter(voice => voice.kind === "noise");
-}
-
 it("plays a kick, a falling thud, on each beat the section names", () => {
   const voices = makeDrums(position({}, {kickBeats: [0, 2]}));
 
@@ -81,3 +61,23 @@ it("puts each beat's kick before its snare, beat by beat", () => {
 it("plays no kick at all when the section names no beats", () => {
   expect(kicks(makeDrums(position({}, {kickBeats: []}))).length).toBe(0);
 });
+
+function snares(voices: readonly Voice[]): Voice[] {
+  return voices.filter(voice => voice.kind === "noise");
+}
+
+function kicks(voices: readonly Voice[]): Voice[] {
+  return voices.filter(voice => voice.kind === "tone");
+}
+
+function position(overrides: Partial<BarPosition> = {}, section: Partial<BarPosition["section"]> = {}): BarPosition {
+  return {
+    bar: 2,
+    sectionIndex: 0,
+    section: {sparse: false, kickBeats: [0, 1, 2, 3], bassSteps: [], melody: [], ...section},
+    root: 38,
+    start: 4,
+    beat: BEAT,
+    ...overrides,
+  };
+}

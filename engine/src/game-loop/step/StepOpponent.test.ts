@@ -1,6 +1,8 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
+import {OPPONENT_HEALTH} from "@gunsmith/engine/health/OpponentHealth";
 import {PLAYER_HEALTH} from "@gunsmith/engine/health/PlayerHealth";
+import {levelAt} from "@gunsmith/engine/height/LevelAt";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import {step} from "@gunsmith/engine/game-loop/Step";
 import type {World} from "@gunsmith/engine/game-loop/types/World";
@@ -12,6 +14,8 @@ import {IDLE} from "@gunsmith/engine/game-loop/step/testing/Idle";
 import {upstairs} from "@gunsmith/engine/game-loop/step/testing/Upstairs";
 import {playTicks} from "@gunsmith/engine/game-loop/step/testing/PlayTicks";
 import {opponentOf} from "@gunsmith/engine/game-loop/step/testing/OpponentOf";
+import {firingAt} from "@gunsmith/engine/game-loop/step/testing/FiringAt";
+import {lowGroundBelowAPlatform} from "@gunsmith/engine/game-loop/step/testing/LowGroundBelowAPlatform";
 
 describe("with a seeded opponent", () => {
   const wallInTheMiddle = ["###############", ...Array.from({length: 7}, () => "#.....#.......#"), "###############"];
@@ -152,8 +156,45 @@ describe("with a seeded opponent", () => {
     expect(after.opponentBrain?.state).toBe("engage");
   });
 
+  it("sends an opponent hit by a shooter it cannot see to search the place the shot came from", () => {
+    const hit = untilHitFromThePlatform();
+    const after = step(hit, IDLE, TICK);
+
+    expect(after.opponentBrain?.state).toBe("search");
+    expect(after.opponentBrain?.goal).toEqual(hit.player.position);
+  });
+
+  it("turns an opponent hit from behind, walking away from a shooter it cannot see, back toward the shooter", () => {
+    const hit = untilHitFromThePlatform();
+    const after = playTicks(hit, IDLE, 60);
+
+    expect(opponentOf(after).position.x).toBeGreaterThan(opponentOf(hit).position.x);
+  });
+
+  it("has an opponent hit from the platform come up its stair to the shooter, who now stands still", () => {
+    const after = playTicks(untilHitFromThePlatform(), IDLE, 100);
+
+    expect(levelAt(after.arena, opponentOf(after).position)).toBeGreaterThan(0);
+  });
+
   function duel(seed = 1): World {
     return giveOpponentBrain(startingWorld(arena, [], {x: 11.5, y: 4.5}), seed);
+  }
+
+  // The player stands on the platform and fires down at an opponent on the low ground that is walking west, away from them, with its
+  // back to them and too far to see them; the world is returned on the step a bullet first hurts it.
+  function untilHitFromThePlatform(seed = 1): World {
+    const start = giveOpponentBrain(startingWorld(lowGroundBelowAPlatform, [], {x: 6.5, y: 3.5}), seed);
+    const walkingWest = start.opponentBrain && {...start.opponentBrain, goal: {x: 1.5, y: 3.5}};
+    let world: World = {...start, opponentBrain: walkingWest, player: {...start.player, position: {x: 12.5, y: 3.5}}};
+    for (let tick = 0; tick < 600; tick++) {
+      world = step(world, firingAt({x: 1.5, y: 3.5}), TICK);
+      if (opponentOf(world).health < OPPONENT_HEALTH) {
+        return world;
+      }
+    }
+
+    throw new Error("No bullet reached the opponent.");
   }
 
   // Plays ticks, standing still, until `found` returns something or `limit` ticks pass.

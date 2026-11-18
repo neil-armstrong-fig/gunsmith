@@ -2,7 +2,9 @@ import type {Page} from "@playwright/test";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
 import {screenPositionOfTile} from "@src/dsl/gunsmith/components/player/playwright/screen/ScreenPositionOfTile";
 import type {Heading} from "@src/dsl/gunsmith/components/player/types/Heading";
+import type {HeldWalk} from "@src/dsl/gunsmith/components/player/types/HeldWalk";
 import {colourIsNear} from "@src/dsl/gunsmith/playwright/look/ColourIsNear";
+import {isPast} from "@src/dsl/gunsmith/components/player/playwright/walking/IsPast";
 import {runHeldUntil} from "@src/dsl/gunsmith/playwright/hold/RunHeldUntil";
 import {lookOfDamage} from "@src/dsl/gunsmith/playwright/look/look-of-damage/LookOfDamage";
 import {lookOfHit} from "@src/dsl/gunsmith/playwright/look/look-of-hit/LookOfHit";
@@ -64,6 +66,27 @@ export class PlayerPlaywright extends BasePage {
 
     const before = await this.readGameState();
     await this.waitForGameState(({elapsedSeconds}) => elapsedSeconds >= before.elapsedSeconds + seconds);
+
+    await this.stopWalking(heading);
+  }
+
+  /**
+   * Walks in a held game (`holdTheGame`), in steps of `watch.stepSeconds`, until the player has gone past `limit` along the heading, and stops there. The walk is
+   * stopped by the game's own time, not by a test that looks every so often: a busy machine looked late and left the player a tile or two beyond where the spec meant.
+   * The player ends no more than one step beyond the limit. Throws if they have not got past it after `watch.maxSeconds`.
+   */
+  async walkUntilPast({heading, limit, watch}: HeldWalk): Promise<void> {
+    await this.startWalking(heading);
+
+    await runHeldUntil(this.page, {
+      watch,
+      what: `The player walking ${heading} past ${limit}`,
+      isDone: async () => {
+        const position = await this.getPosition();
+
+        return isPast(position, heading, limit);
+      },
+    });
 
     await this.stopWalking(heading);
   }

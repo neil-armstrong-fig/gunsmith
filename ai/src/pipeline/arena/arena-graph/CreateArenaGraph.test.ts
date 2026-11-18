@@ -3,18 +3,6 @@ import {createArenaGraph} from "@gunsmith/ai/pipeline/arena/arena-graph/CreateAr
 import type {ArenaGraph} from "@gunsmith/ai/pipeline/arena/arena-graph/types/ArenaGraph";
 import type {ArenaPipelineDependencies} from "@gunsmith/ai/pipeline/arena/types/ArenaPipelineDependencies";
 
-function fakeArenaPipelineDependencies(): ArenaPipelineDependencies {
-  return {
-    generator: new FakeListChatModel({responses: ["{}"]}),
-    moderator: new FakeListChatModel({responses: ["{}"]}),
-    builtInArenas: [{name: "Open Room", rows: ["#####", "#...#", "#####"]}],
-  };
-}
-
-function drawableGraph(): ReturnType<ArenaGraph["getGraph"]> {
-  return createArenaGraph(fakeArenaPipelineDependencies()).getGraph();
-}
-
 it("has one node for each step of the pipeline, and no other", () => {
   const stepIds = Object.keys(drawableGraph().nodes).filter(id => !id.startsWith("__"));
 
@@ -38,3 +26,15 @@ it("runs the steps in a fixed order, with a way out at every refusal, one road b
     "validate -> repair",
   ]);
 });
+
+function drawableGraph(): ReturnType<ArenaGraph["getGraph"]> {
+  return createArenaGraph(fakeArenaPipelineDependencies()).getGraph();
+}
+
+function fakeArenaPipelineDependencies(): ArenaPipelineDependencies {
+  return {
+    generator: new FakeListChatModel({responses: ["{}"]}),
+    moderator: new FakeListChatModel({responses: ["{}"]}),
+    builtInArenas: [{name: "Open Room", rows: ["#####", "#...#", "#####"]}],
+  };
+}

@@ -2,27 +2,6 @@ import {drawingVisible} from "@evals/dsl/appearance/pipeline/evaluators/drawing/
 import {passingAppearanceOutcome} from "@evals/dsl/appearance/pipeline/evaluators/testing/PassingAppearanceOutcome";
 import {passingAppearance} from "@gunsmith/ai/pipeline/appearance/testing/PassingAppearance";
 
-function part(overrides: Record<string, unknown>): Record<string, unknown> {
-  return {
-    kind: "rect",
-    x: 10,
-    y: 20,
-    width: 30,
-    height: 8,
-    fill: "body",
-    stroke: "outline",
-    strokeWidth: 2,
-    opacity: 1,
-    rotation: 0,
-    detail: "structural",
-    ...overrides,
-  };
-}
-
-function outcomeOf(body: Record<string, unknown>[]): ReturnType<typeof passingAppearanceOutcome> {
-  return passingAppearanceOutcome({appearance: {...passingAppearance(), body}});
-}
-
 it("passes a drawing wide enough to read along the aim", () => {
   expect(drawingVisible({outcome: passingAppearanceOutcome()})).toEqual({key: "drawingVisible", score: 1});
 });
@@ -71,3 +50,24 @@ it("passes, with nothing to look at, a drawing that is not valid: drawingValid i
     comment: "not valid, nothing to measure",
   });
 });
+
+function outcomeOf(body: Record<string, unknown>[]): ReturnType<typeof passingAppearanceOutcome> {
+  return passingAppearanceOutcome({appearance: {...passingAppearance(), body}});
+}
+
+function part(overrides: Record<string, unknown>): Record<string, unknown> {
+  return {
+    kind: "rect",
+    x: 10,
+    y: 20,
+    width: 30,
+    height: 8,
+    fill: "body",
+    stroke: "outline",
+    strokeWidth: 2,
+    opacity: 1,
+    rotation: 0,
+    detail: "structural",
+    ...overrides,
+  };
+}

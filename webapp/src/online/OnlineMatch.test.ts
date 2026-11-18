@@ -53,38 +53,12 @@ interface SnapshotRequest {
   ready?: Readiness;
 }
 
-function snapshotText(request: SnapshotRequest = {}): string {
-  const world = request.world ?? startingWorld(arenaFrom(ROWS), [], {x: 8.5, y: 2.5});
-
-  return JSON.stringify({
-    kind: "snapshot",
-    ...viewOfSeat(world, "first"),
-    elapsedSeconds: request.elapsedSeconds ?? world.elapsedSeconds,
-    ack: request.ack,
-    ready: request.ready,
-  });
-}
-
 const JOINED = JSON.stringify({kind: "joined", seat: "first", arena: ROWS});
 const START = startingWorld(arenaFrom(ROWS), [], {x: 8.5, y: 2.5}).player.position;
 
 interface SeatedMatch {
   socket: FakeSocket;
   match: OnlineMatch;
-}
-
-function seatedMatch(): SeatedMatch {
-  const socket = new FakeSocket();
-  const match = new OnlineMatch(socket);
-  socket.receive(JOINED);
-
-  return {socket, match};
-}
-
-function steps(match: OnlineMatch, count: number, input: Input): void {
-  for (let step = 0; step < count; step += 1) {
-    match.step(input);
-  }
 }
 
 it("has no world until it has been seated and sent a snapshot", () => {
@@ -444,3 +418,29 @@ it("closes the socket", () => {
 
   expect(socket.closed).toBe(true);
 });
+
+function snapshotText(request: SnapshotRequest = {}): string {
+  const world = request.world ?? startingWorld(arenaFrom(ROWS), [], {x: 8.5, y: 2.5});
+
+  return JSON.stringify({
+    kind: "snapshot",
+    ...viewOfSeat(world, "first"),
+    elapsedSeconds: request.elapsedSeconds ?? world.elapsedSeconds,
+    ack: request.ack,
+    ready: request.ready,
+  });
+}
+
+function seatedMatch(): SeatedMatch {
+  const socket = new FakeSocket();
+  const match = new OnlineMatch(socket);
+  socket.receive(JOINED);
+
+  return {socket, match};
+}
+
+function steps(match: OnlineMatch, count: number, input: Input): void {
+  for (let step = 0; step < count; step += 1) {
+    match.step(input);
+  }
+}

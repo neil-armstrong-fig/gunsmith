@@ -3,6 +3,7 @@ import {expect} from "@playwright/test";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
 import type {ClosingRingRequest} from "@src/dsl/gunsmith/types/ClosingRingRequest";
 import type {PickupDrawingRequest} from "@src/dsl/gunsmith/types/PickupDrawingRequest";
+import type {TerrainPictures} from "@src/dsl/gunsmith/types/TerrainPictures";
 import type {Size} from "@src/dsl/gunsmith/types/Size";
 
 /** Art's pictures, served from `public/assets/sprites`. Only the `.svg` files: the dev server also serves the app's own code from a `src/assets/sprites` folder. */
@@ -15,11 +16,28 @@ const PICTURES = "**/assets/sprites/*.svg";
 const HOLD_AFTER_MILLISECONDS = 3000;
 
 export class GunsmithPlaywright extends BasePage {
-  /** Lets through the pictures `openSparringWithHeldPictures` is holding back. */
+  /** Lets through pictures a scenario is holding back. */
   private releaseHeldPictures: (() => void) | undefined;
+
+  /** What the spec has asked of the page beyond the scenario (`shake=0`, `reducedMotion=1`), added to the address of whatever it opens next. */
+  private readonly askedFor: string[] = [];
 
   constructor(page: Page) {
     super(page);
+  }
+
+  /** Has the next scenario opened with a camera that does not shake. */
+  keepTheCameraStill(): void {
+    this.askedFor.push("shake=0");
+  }
+
+  /** Has the next scenario opened asking for reduced motion. */
+  askForReducedMotion(): void {
+    this.askedFor.push("reducedMotion=1");
+  }
+
+  async preferReducedMotion(): Promise<void> {
+    await this.page.emulateMedia({reducedMotion: "reduce"});
   }
 
   async open(): Promise<void> {
@@ -41,16 +59,7 @@ export class GunsmithPlaywright extends BasePage {
    * the pictures arrive when the spec says, so it can look at the page while they have not. Returns once the canvas is up, which is before the pictures are.
    */
   async openSparringWithHeldPictures(): Promise<void> {
-    const released = new Promise<void>(resolve => {
-      this.releaseHeldPictures = resolve;
-    });
-    await this.page.route(PICTURES, async route => {
-      await released;
-      await route.continue();
-    });
-
-    await this.page.goto("/?scenario=sparring");
-    await expect(this.page.getByTestId("arena")).toHaveAttribute("data-ready", "true");
+    await this.openWithHeldPictures("sparring", PICTURES);
   }
 
   /** Lets the pictures held back by `openSparringWithHeldPictures` through, and waits until the page has them. */
@@ -64,10 +73,15 @@ export class GunsmithPlaywright extends BasePage {
   }
 
   /** Opens sparring with art's pictures missing from the server, as a bad deploy would leave them. */
-  async openSparringWithMissingPictures(): Promise<void> {
+  async openSparringWithMissingPictures(seed?: number): Promise<void> {
     await this.page.route(PICTURES, async route => {
       await route.fulfill({status: 404});
     });
+
+    if (seed !== undefined) {
+      await this.openSparringWithSeed(seed);
+      return;
+    }
 
     await this.openSparring();
   }
@@ -102,6 +116,11 @@ export class GunsmithPlaywright extends BasePage {
     await this.openScenario(`overlook&seed=${seed}`);
   }
 
+  /** Opens the overwatch (a corridor one tile wide, the opponent on its low ground and the player on the platform at its end, farther than the opponent sees, one round, no ring), its choices drawn from `seed`. */
+  async openOverwatch(seed: number): Promise<void> {
+    await this.openScenario(`overwatch&seed=${seed}`);
+  }
+
   /** Opens the pickup race (the duel's arena and fighters, one round, no ring, a weapon lying much nearer the opponent than the player), its choices drawn from `seed`. */
   async openPickupRace(seed: number): Promise<void> {
     await this.openScenario(`pickup-race&seed=${seed}`);
@@ -114,6 +133,23 @@ export class GunsmithPlaywright extends BasePage {
 
   async openHeights(): Promise<void> {
     await this.openScenario("heights");
+  }
+
+  async openTerrain(pictures?: TerrainPictures): Promise<void> {
+    const highestFloor = "**/assets/tiles/tile-floor-l3.svg";
+
+    if (pictures === "held") {
+      await this.openWithHeldPictures("terrain", highestFloor);
+      return;
+    }
+
+    if (pictures === "missing") {
+      await this.page.route(highestFloor, async route => {
+        await route.fulfill({status: 404});
+      });
+    }
+
+    await this.openScenario("terrain");
   }
 
   /**
@@ -151,8 +187,23 @@ export class GunsmithPlaywright extends BasePage {
     await this.waitForGameState(state => state.elapsedSeconds >= elapsedSeconds + seconds);
   }
 
-  private async openScenario(scenario: string): Promise<void> {
+  private async openWithHeldPictures(scenario: string, pictures: string): Promise<void> {
+    const released = new Promise<void>(resolve => {
+      this.releaseHeldPictures = resolve;
+    });
+    await this.page.route(pictures, async route => {
+      await released;
+      await route.continue();
+    });
+
     await this.page.goto(`/?scenario=${scenario}`);
+    await expect(this.page.getByTestId("arena")).toHaveAttribute("data-ready", "true");
+  }
+
+  private async openScenario(scenario: string): Promise<void> {
+    const asked = this.askedFor.map(request => `&${request}`).join("");
+
+    await this.page.goto(`/?scenario=${scenario}${asked}`);
     await this.waitForArena();
   }
 

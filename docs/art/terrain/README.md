@@ -1,11 +1,12 @@
-# Arena terrain candidates
+# Arena terrain
 
 [Review sheet](Terrain.png) · [Editable SVG](Terrain.svg) ·
 [WebKit rendering](Terrain-webkit.png)
 
-Four production candidates refine the existing flat industrial references.
-User approval and runtime integration remain pending. Open the PNG at 100%
-for native 64/32 px samples; the context composition uses 48 px per tile.
+The user approved these four terrain SVGs on 2026-11-18. They now draw in
+the game, and `?scenario=terrain` opens a playable preview of all three
+levels. Open the PNG at 100% for native 64/32 px samples. The static context
+composition uses 48 px per tile.
 
 ## Files and placement
 
@@ -40,11 +41,22 @@ SVG compositing approximates the WebGL presentation: this is neither an
 engine visibility test nor evidence of live shader colour equivalence. The
 dim region contains no concealed actors or exact-position effects.
 
-Play should register/load these files only in an acceptance-first integration
-slice, retain loading/failure fallback, verify texture colour handling in the
-actual renderer, and preserve height, stairs, collision and fog rules. No
-manifest key, public type or renderer has changed in this delivery. Cover,
-stairs, height edges, fog textures and ring artwork remain separate tasks.
+The existing picture loader registers the four SVGs and waits for each load
+to settle. Flat materials are used while an image is loading and when it
+fails. The renderer applies the floor palette to the stair bands and draws
+drop edges and fog in their existing layers.
+
+## Playable stair preview
+
+Open `?scenario=terrain` and use A or D to cross both flights. The player
+starts on the highest floor, facing the stairs. Aim away to see the same
+treads, landing rails and drop edges dim under fog.
+
+Each flight uses four slate bands and three 2 px treads. Two rails extend
+16 design pixels onto each open landing, clear of the floor ticks in the
+preview. The drop edge has a 4 px lip and a 12 px shadow on the lower floor.
+The preview derives the placement from the arena's stair directions and
+drop edges. Review at 1024 × 560 for 64 px per tile or 512 × 400 for 32 px.
 
 ## Verification — 2026-11-17
 

@@ -3,18 +3,6 @@ import {createWeaponGraph} from "@gunsmith/ai/pipeline/weapon-graph/CreateWeapon
 import type {WeaponPipelineDependencies} from "@gunsmith/ai/pipeline/types/WeaponPipelineDependencies";
 import type {WeaponGraph} from "@gunsmith/ai/pipeline/weapon-graph/types/WeaponGraph";
 
-function fakeWeaponPipelineDependencies(): WeaponPipelineDependencies {
-  return {
-    generator: new FakeListChatModel({responses: ["{}"]}),
-    moderator: new FakeListChatModel({responses: ["{}"]}),
-    appearanceGenerator: new FakeListChatModel({responses: ["{}"]}),
-  };
-}
-
-function drawableGraph(): ReturnType<WeaponGraph["getGraph"]> {
-  return createWeaponGraph(fakeWeaponPipelineDependencies()).getGraph();
-}
-
 it("has one node for each step of the pipeline, and no other", () => {
   const stepIds = Object.keys(drawableGraph().nodes).filter(id => !id.startsWith("__"));
 
@@ -51,3 +39,15 @@ it("runs the steps in a fixed order, with a way out at every refusal and one roa
     "validate -> repair",
   ]);
 });
+
+function drawableGraph(): ReturnType<WeaponGraph["getGraph"]> {
+  return createWeaponGraph(fakeWeaponPipelineDependencies()).getGraph();
+}
+
+function fakeWeaponPipelineDependencies(): WeaponPipelineDependencies {
+  return {
+    generator: new FakeListChatModel({responses: ["{}"]}),
+    moderator: new FakeListChatModel({responses: ["{}"]}),
+    appearanceGenerator: new FakeListChatModel({responses: ["{}"]}),
+  };
+}

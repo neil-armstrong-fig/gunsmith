@@ -9,16 +9,6 @@ import type {Voice} from "@gunsmith/audio-studies/common/types/Voice";
 const BAR_SECONDS = 4 * (60 / 128);
 const SECTION_SECONDS = 8 * BAR_SECONDS;
 
-function withoutSeed(voice: Voice): Omit<Voice, "seed"> {
-  if (voice.kind === "noise") {
-    const {seed: _seed, ...rest} = voice;
-
-    return rest;
-  }
-
-  return voice;
-}
-
 it("composes full-length tracks: 90 seconds of match and 60 of menu, in stereo, as loops", () => {
   const match = makeMusic(MATCH_ARRANGEMENT);
   const menu = makeMusic(MENU_ARRANGEMENT);
@@ -103,3 +93,13 @@ it("builds each bar on the bass round's root for that bar", () => {
     [38, 38, 34, 36].map(noteFrequency),
   );
 });
+
+function withoutSeed(voice: Voice): Omit<Voice, "seed"> {
+  if (voice.kind === "noise") {
+    const {seed: _seed, ...rest} = voice;
+
+    return rest;
+  }
+
+  return voice;
+}
