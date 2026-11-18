@@ -1,0 +1,4 @@
+interface:
+  display_name: "Integrate Worktrees"
+  short_description: "Review and merge committed worktrees into main"
+  default_prompt: "Use $integrate-worktrees to review all worktrees and merge their committed changes into main, preserving uncommitted work and asking me about difficult conflicts."
