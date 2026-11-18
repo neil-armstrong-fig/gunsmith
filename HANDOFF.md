@@ -235,3 +235,23 @@ Started from `4b39f84`. Reviewed committed persona deliveries in the order below
 Conflicts preserved both scenario entry points, both sets of DSL verbs, motion preferences and online readiness in the app store, and the reconnect fixture's sequence reset. The combined DSL lint required wrapping the stranger query. Four additional test helpers moved below their callers. Compared 142 test bodies across eight overlapping files with the current main side and retained them exactly. Re-read root, AI, API, engine, shared, webapp, React, audio and acceptance instructions. The folder/caller audit listed 195 folders and counted imports for 330 root files. Existing owner follow-ups are above.
 
 Every reviewed tip is an ancestor of `main`. Art committed its preview follow-up during integration. Ship synced to `0cf1a12` and began ring-loop work. Server's 11 unfinished status entries and index fingerprint matched the starting inventory. Integration issued no writes in any source worktree. The stair appearance still awaits visual review. Results are local.
+
+## Worktree integration — 2026-11-18 (second)
+
+Started from `855e39b`. Merged committed tips one at a time; each source worktree was left untouched.
+
+| Source | Reviewed tip | Merge on main | Delivery |
+| --- | --- | --- | --- |
+| AI | `aac0258` | `5299141` | Eval code cleanup and new fake-tier eval criteria. |
+| Server | `dcf0bce` | `24e22e4` | Forfeit when a player is left idle. |
+| Engine | `9bd8bfb`, then tip `2b31e8d` | `c650259`, `a7ee9d6` | Built-in arenas and engine limits, then low cover (sight half). |
+| Art | `4c8eeef` | `41727fc` | Stairs in every arena. |
+| Ship | `fb461ef` | `c372d86` | Ring-damage loop, weapon pickup cue and live inventory HUD. |
+| Play | `084eb25` | `0cf1817` | Ring-damage sound tests. Its other commits arrived via ship. |
+| Budget | `bfb86f0` | n/a | No unique commits. |
+
+Conflicts were wording and status only, in `HANDOFF.md`, `TODO.md`, `TODO-art.md` and `acceptance-tests/eslint.config.js`. Both sides were kept (art's stair status with ship's HUD, ring and pickup delivery; engine's cover row; `startCover` and `keepMovingFor` in the DSL lint list). No code conflicts. The first engine merge took `9bd8bfb`, not the branch tip, so the tip `2b31e8d` followed in a second merge.
+
+At `a7ee9d6`: `pnpm checks` exit 0 (webapp 599, engine 1247, api 138, ai 839 and acceptance-tests 54 unit tests), `pnpm evals` exit 0 and `pnpm test:properties` 36/36. Production-preview acceptance with the managed local Worker (ports 3407/8887) failed 5 of 387 in the first run and 4 of 387 in a rerun, with different sets each time except two online criteria (`TheOtherPlayerMovingSmoothly`, `TwoBrowsersGoingQuiet`). The machine load average was about 70. The same files, plus the damage-bracket and shot-drawing specs, passed 34/34 on one worker at a load of about 17. Treat these as timing-sensitive under load; rerun if they fail again on a quiet machine. The slow audio render was not rerun.
+
+Every reviewed tip is an ancestor of `main`. All source worktrees' status and index fingerprints matched the starting inventory (art's staged files preserved). An untracked `ai/evals/` (old generated eval results, no longer ignored after AI's `.gitignore` change) remains in the main checkout and was left alone. Results are local; nothing was pushed.
