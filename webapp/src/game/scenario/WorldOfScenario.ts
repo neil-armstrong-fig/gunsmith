@@ -27,6 +27,7 @@ import {PRACTICE_ARENA} from "@src/game/practice/PracticeArena";
 import {PRACTICE_DUMMIES} from "@src/game/practice/PracticeDummies";
 import {TERRACED_ARENA} from "@src/game/terraced/TerracedArena";
 import {TERRACED_OPPONENT} from "@src/game/terraced/TerracedOpponent";
+import {terrainPreview} from "@src/game/terrain-preview/TerrainPreview";
 import type {Scenario} from "@src/game/scenario/types/Scenario";
 
 /**
@@ -101,6 +102,10 @@ export function worldOfScenario(scenario: Scenario, seed: number, ringTiming?: R
 
   if (scenario === "heights") {
     return engine.startingWorld(HEIGHTS_ARENA, HEIGHTS_DUMMIES);
+  }
+
+  if (scenario === "terrain") {
+    return terrainPreview();
   }
 
   return engine.startingWorld(PRACTICE_ARENA, PRACTICE_DUMMIES);

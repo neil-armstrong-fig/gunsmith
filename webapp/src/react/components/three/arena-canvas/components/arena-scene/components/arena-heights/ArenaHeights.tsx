@@ -4,7 +4,9 @@ import {dropStripsOf} from "@src/react/components/three/arena-canvas/components/
 import {DROP_LIP_COLOUR} from "@src/react/components/three/arena-canvas/components/arena-scene/components/arena-heights/drops/DropLipColour";
 import {useHeightTiles} from "@src/react/components/three/arena-canvas/components/arena-scene/components/arena-heights/hooks/use-height-tiles/UseHeightTiles";
 import {stairStripsOf} from "@src/react/components/three/arena-canvas/components/arena-scene/components/arena-heights/stairs/StairStripsOf";
+import {useSprite} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-sprite/UseSprite";
 import type {JSX} from "react";
+import type {CanvasTexture} from "three";
 import {Color} from "three";
 
 interface Props {
@@ -17,16 +19,24 @@ interface Props {
  */
 export function ArenaHeights({arena}: Props): JSX.Element {
   const {floors, stairs, drops} = useHeightTiles(arena);
+  const middleFloor = useSprite("tile-floor-l2");
+  const highestFloor = useSprite("tile-floor-l3");
 
   return (
     <group>
-      {floors.map(floor => (
-        <mesh key={`${floor.x},${floor.y}`} position={[floor.x + 0.5, floor.y + 0.5, 0.05]}>
-          <planeGeometry args={[1, 1]} />
+      {floors.map(floor => {
+        const texture = textureForRaisedFloor(floor.level, middleFloor, highestFloor);
 
-          <meshBasicMaterial color={levelColour(floor.level)} />
-        </mesh>
-      ))}
+        return (
+          <mesh key={`${floor.x},${floor.y}`} position={[floor.x + 0.5, floor.y + 0.5, 0.05]}>
+            <planeGeometry args={[1, 1]} />
+
+            {texture && <meshBasicMaterial map={texture} toneMapped={false} />}
+
+            {!texture && <meshBasicMaterial color={levelColour(floor.level)} toneMapped={false} />}
+          </mesh>
+        );
+      })}
 
       {drops.map(drop => {
         const {lip, shadow} = dropStripsOf(drop.facing);
@@ -57,6 +67,7 @@ export function ArenaHeights({arena}: Props): JSX.Element {
             <planeGeometry args={[strip.width, strip.height]} />
 
             <meshBasicMaterial
+              toneMapped={false}
               color={new Color(levelColour(stair.level)).lerp(new Color(levelColour(stair.level + 1)), strip.fraction)}
             />
           </mesh>
@@ -64,4 +75,16 @@ export function ArenaHeights({arena}: Props): JSX.Element {
       )}
     </group>
   );
+}
+
+function textureForRaisedFloor(
+  level: number,
+  middleFloor: CanvasTexture | undefined,
+  highestFloor: CanvasTexture | undefined,
+): CanvasTexture | undefined {
+  if (level >= 2) {
+    return highestFloor;
+  }
+
+  return middleFloor;
 }

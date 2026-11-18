@@ -4,6 +4,8 @@ import type {Cursor} from "@src/dsl/gunsmith/components/arena/types/Cursor";
 import type {CursorPicture} from "@src/dsl/gunsmith/components/arena/types/CursorPicture";
 import type {CursorPlace} from "@src/dsl/gunsmith/components/arena/types/CursorPlace";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
+import {lookOfTerrain} from "@src/dsl/gunsmith/components/arena/playwright/terrain/LookOfTerrain";
+import type {TerrainLook} from "@src/dsl/gunsmith/components/arena/types/TerrainLook";
 import type {Point} from "@src/dsl/gunsmith/types/Point";
 import type {Size} from "@src/dsl/gunsmith/types/Size";
 
@@ -63,6 +65,10 @@ export class ArenaPlaywright extends BasePage {
     await expect(this.page.getByTestId("arena")).toHaveAttribute("data-sprites-ready", "false");
 
     return true;
+  }
+
+  async getTerrainLook(pixelsPerTile: number): Promise<TerrainLook> {
+    return await lookOfTerrain(this.page, pixelsPerTile);
   }
 
   async getSizeInTiles(): Promise<Size> {

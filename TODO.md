@@ -22,7 +22,7 @@ Start a session with: **"You are engine, continue the TODO."** Substitute any pe
 | ai | Claude | [TODO-ai.md](TODO-ai.md) | Player arena selection and engine validation integrated. S4-1 contrast, model quality, and the production adapter remain open. | 2026-11-18 |
 | server | Claude | [TODO-server.md](TODO-server.md) | Prediction/reconciliation/interpolation and 30 Hz snapshots integrated; round/match flow, reconnect, account/storage and generation route next. | 2026-11-17 |
 | budget | Claude | [TODO-budget.md](TODO-budget.md) | Credit and spend Durable Objects integrated; account identity and the generation route remain blockers. | 2026-11-17 |
-| art | Codex | [TODO-art.md](TODO-art.md) | C2 soft octagon marker approved; source/proof retained and rejected studies cleaned. Runtime integration, S4-1 fallback contrast, terrain and audio dependencies remain open. | 2026-11-17 |
+| art | Codex | [TODO-art.md](TODO-art.md) | Approved terrain and C2 pickup marker integrated. S4-1 fallback contrast, remaining terrain art and ring audio remain open. | 2026-11-18 |
 | ship | Codex | [TODO-ship.md](TODO-ship.md) | Managed Worker preview and report exclusions integrated; function-order standards work remains in its worktree; hosted CI/deployment open. | 2026-11-17 |
 
 These are persistent workstreams, not permission for simultaneous edits to the same files. Select one current slice; record concrete reservations and contracts in HANDOFF.md. Model assignments are defaults, not application configuration. `build` is retired; current tasks remain in the seven owner checklists.

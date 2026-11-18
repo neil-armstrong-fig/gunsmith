@@ -8,10 +8,4 @@ export interface PickupLook {
 
   /** How many show the mint of the placeholder disc the drawing replaces, as tone mapping makes it look on the screen; no drawing here uses that colour. */
   discPixels: number;
-
-  /**
-   * How many places are not the colour most of the square is (the floor, or the fog over it), by more than a drawing's dimming would hide. In the fog a drawing is
-   * dimmed, not hidden, so its exact colours are never found there; any mark at all says something is drawn over the floor.
-   */
-  markedPixels: number;
 }

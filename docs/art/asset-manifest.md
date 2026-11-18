@@ -24,6 +24,15 @@ static cues. The broader manifest and planned keys below remain unfrozen.
 - Sizes are the design size; supply 2x for raster images. Sprites face **right** (positive x) at rest; the game rotates them.
 - Weapon sounds are **not** in the manifest: they are synthesised from the weapon's `sound` block.
 
+Current M1 pickup sprite: [`sprite-pickup-marker`](concepts/top-down-oddities/pickup-markers/README.md)
+is the approved C2 SVG. Its 88 × 88 canvas centres on (44, 44) and spans
+88 / 90 tiles at pickup scale.
+
+Current M1 terrain keys are `tile-floor-l1`, `tile-floor-l2`,
+`tile-floor-l3`, and `tile-wall`. Each [approved terrain tile](terrain/README.md)
+is an SVG with a 64 × 64 canvas centred at (32, 32), drawn at one cell per
+image. The flat materials serve as fallbacks.
+
 ## Planned keys (build finalises; art may propose additions)
 
 | Key | Notes | Size | Format |
@@ -35,8 +44,7 @@ static cues. The broader manifest and planned keys below remain unfrozen.
 | `sprite-pickup-glow` | Behind a weapon pickup; tinted by the weapon's `colour` | 96 | SVG |
 | `fx-projectile-<behavior>`, `fx-muzzle-<behavior>`, `fx-impact`, `fx-explosion`, `fx-beam` | One per behavior in the enum | varies | SVG or PNG strip |
 | `fx-hit`, `fx-death` | Player hit and death | 96 | PNG strip |
-| `tile-floor-l1`, `tile-floor-l2`, `tile-floor-l3` | Three height levels | 64 | SVG or atlas |
-| `tile-wall`, `tile-cover` | Indestructible wall vs penetrable cover | 64 | SVG or atlas |
+| `tile-cover` | Penetrable cover | 64 | SVG or atlas |
 | `tile-edge-<n>`; stair keys pending build | Height edges and paired stair landings; provisional `tile-ramp` withdrawn | 64 | SVG or atlas |
 | `tile-spawn`, `tile-pickup-spot` | Markers (shown in the practice arena and the reveal) | 64 | SVG |
 | `fx-ring-edge`, `fx-fog` | The closing ring's edge and the fog texture | tiling | PNG |
