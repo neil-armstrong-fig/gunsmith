@@ -55,8 +55,11 @@ treads, landing rails and drop edges dim under fog.
 Each flight uses four slate bands and three 2 px treads. Two rails extend
 16 design pixels onto each open landing, clear of the floor ticks in the
 preview. The drop edge has a 4 px lip and a 12 px shadow on the lower floor.
-The preview derives the placement from the arena's stair directions and
-drop edges. Review at 1024 × 560 for 64 px per tile or 512 × 400 for 32 px.
+The shared renderer derives the placement from each arena's stair directions
+and drop edges. The browser checks cover the opposing stairs in
+`?scenario=fair-duel&seed=17` and the wall-side landing in
+`?scenario=terraced&seed=9`. Review the terrain preview at 1024 × 560 for
+64 px per tile or 512 × 400 for 32 px.
 
 ## Verification — 2026-11-17
 

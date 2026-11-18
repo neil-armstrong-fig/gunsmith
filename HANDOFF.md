@@ -13,7 +13,7 @@ Ownership follows the assigned persona. Models below are defaults; no applicatio
 | ai | Claude | [TODO-ai.md](TODO-ai.md) | Arena screening, player selection and engine validation integrated. Owns model quality, fallback contrast and adapter coordination. |
 | server | Claude | [TODO-server.md](TODO-server.md) | Initial private-room networking integrated; Prediction/interpolation integrated; match flow/auth/persistence next. |
 | budget | Claude | [TODO-budget.md](TODO-budget.md) | Production ledger/spend boundaries with server/AI; credits, refunds, tracing and kill switch. |
-| art | Codex | [TODO-art.md](TODO-art.md) | Terrain and C2 pickup marker integrated. Stair preview passed motion and fog review. Adoption in other arenas and S4-1 fallback re-review remain open. |
+| art | Codex | [TODO-art.md](TODO-art.md) | Terrain and C2 pickup marker integrated. Stair artwork rolled out in `worktree-art`. S4-1 fallback re-review awaits AI. |
 | ship | Codex | [TODO-ship.md](TODO-ship.md) | Repository tooling/CI now; infra/release when bindings and authorization exist. |
 
 ### Start prompts
@@ -128,6 +128,8 @@ Before changing a consumed contract, record the proposal and affected owners her
 **Art → play, approved terrain wired (2026-11-18):** [review sheet and integration notes](docs/art/terrain/README.md). The three floor levels and solid wall draw through the picture loader, with flat fallbacks. The playable `?scenario=terrain` preview exercises all three levels. The level numbering and asset placement are recorded in the manifest. All 24 terrain and pickup drawing criteria and `pnpm checks` passed. Full preview had 310 passes and one shot-timing failure that passed on the managed-preview retry and did not recur in 20 focused checks on either build. Terrain is integrated from `f16c414`.
 
 **Art → play, playable stair review (2026-11-18):** `?scenario=terrain` passed review in motion and under fog at 64 and 32 px per tile on main `963a09d`. Both flights frame an open route, and each drop reads separately. All 34 focused production criteria passed without retries. Art recommends adopting the preview treatment with browser coverage for opposite-facing stairs in `fair-duel` and the wall-side landing in `terraced`. [Preview and review sizes](docs/art/terrain/README.md#playable-stair-preview).
+
+**Art → play, stair rollout (2026-11-18)** applies treads, landing rails and the narrower drop edge in every arena through the shared height renderer. Chromium review at 64 and 32 px per tile covered both opposing stairs in `fair-duel` and the wall-side entrance in `terraced`. Eight criteria went red first. Four isolated bundle mutations caught missing markings, west-facing tread rotation, short rails and wide drops. All 73 focused production criteria passed without retries. `pnpm checks` passed with 3,040 tests and the existing slow audio skip. The work is in `worktree-art`. [Terrain artwork](docs/art/terrain/README.md#playable-stair-preview).
 
 ## Latest ship delivery
 

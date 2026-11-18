@@ -6,7 +6,7 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 Checkout: `.claude/worktrees/art`, branch `worktree-art`; last merged main `963a09d` in `75a2b89` on 2026-11-18. Preserve this worktree and sync committed main before new work/delivery.
 
-Current slice: the [playable stair preview](docs/art/terrain/README.md#playable-stair-preview) passed motion and fog review at 64 and 32 px per tile. Art recommends adopting the treatment in other arenas. The first rollout criterion should show the rotated treads and open landings in `fair-duel` and clear rails beside the wall in `terraced`. Art owns `ArenaHeights` and its terrain drawing criteria. S4-1 re-review awaits AI's fallback contrast change. Ship owns the ring-loop integration slice.
+Current slice: the [approved stair treatment](docs/art/terrain/README.md#playable-stair-preview) now draws in every arena through `ArenaHeights` in `worktree-art`. Art reviewed the opposing stairs in `fair-duel` and the wall-side landing in `terraced` at 64 and 32 px per tile. Next art review is S4-1 when AI delivers the fallback contrast change. Recheck the refused pickup's body and outline separately from its muzzle at both scales. Ship owns ring-loop integration and is coordinating the authored inventory icons with play and engine.
 
 Current milestone: M1/M6; the project remains on M1. Next audio task: combat masking, fatigue and levels once AI/play integrate runtime weapon-shot synthesis (not yet wired into the game sound output). Safari acceptance does not claim new headphone/speaker measurements. Preserve approved master hashes. Next failing check for any playback change: the relevant browser sound acceptance criterion before implementation.
 
@@ -45,7 +45,8 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [ ] Pickup glow, projectiles/muzzle flashes by supported behavior, hit/death effects.
 - [x] Draw paired stair landings and height edges in `?scenario=terrain` for playable review.
 - [x] Review the stair treatment for adoption in other arenas at both play scales.
-- [ ] Adopt the stair treatment in other arenas after browser coverage for the opposite-facing stairs and a wall-side landing. Penetrable cover, spawn markers, ring edge and fog texture remain open.
+- [x] Adopt the stair treatment in other arenas with browser coverage for opposing stairs and the wall-side landing.
+- [ ] Penetrable cover, spawn markers, ring edge and fog texture.
 - [ ] Runtime HUD/slot assets, health/ammo/credit UI, panels/buttons, prompt styling, power gauge, pipeline progress and reveal frame. Use the approved inventory study rather than treating its standalone artwork as integration.
 - [ ] Landing/practice/onboarding/prompt copy and example prompts for datasets, including weak, broken and harmless adversarial-looking requests; rejection/errors, AI-off and credit explanations.
 - [ ] Privacy/terms copy consistent with `docs/privacy-and-data.md`.
@@ -53,6 +54,19 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [ ] Case-study diagrams: pipeline, cost safeguards and eval loop.
 
 ## Verification/latest delivery
+
+2026-11-18, stair rollout in `worktree-art` on main `963a09d`. All eight
+new production criteria failed first on the old renderer. Four isolated
+bundles triggered their expected failures at both scales. The preview gate
+failed six criteria, the west-tread direction failed two, short rails failed
+four, and wide drops failed two. The first regression run caught a one-level
+rasterisation difference on a 32 px rail sample. With a two-level tolerance
+in that assertion, the production rerun passed all 73 criteria without retries.
+`pnpm checks` passed lint, formatting, strict types and 3,040 tests, with one
+existing slow audio test skipped. Re-read the root, webapp, React and
+acceptance instructions and completed the folder and caller audit. Four
+Chromium captures and validation logs are in
+`/private/tmp/gunsmith-stair-rollout.7HNGmD/`.
 
 2026-11-18, stair motion review on merged main `963a09d`. At both 64 and
 32 px per tile, the player crossed both flights in both directions. The

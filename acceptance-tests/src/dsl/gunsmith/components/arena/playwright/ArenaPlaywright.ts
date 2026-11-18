@@ -6,6 +6,8 @@ import type {CursorPlace} from "@src/dsl/gunsmith/components/arena/types/CursorP
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
 import {lookOfTerrain} from "@src/dsl/gunsmith/components/arena/playwright/terrain/LookOfTerrain";
 import type {TerrainLook} from "@src/dsl/gunsmith/components/arena/types/TerrainLook";
+import {coloursAtTiles} from "@src/dsl/gunsmith/playwright/screen/ColoursAtTiles";
+import type {Colour} from "@src/dsl/gunsmith/types/Colour";
 import type {Point} from "@src/dsl/gunsmith/types/Point";
 import type {Size} from "@src/dsl/gunsmith/types/Size";
 
@@ -69,6 +71,10 @@ export class ArenaPlaywright extends BasePage {
 
   async getTerrainLook(pixelsPerTile: number): Promise<TerrainLook> {
     return await lookOfTerrain(this.page, pixelsPerTile);
+  }
+
+  async getTerrainColoursAt(landmarks: Point[]): Promise<Colour[]> {
+    return await coloursAtTiles(this.page, landmarks);
   }
 
   async getSizeInTiles(): Promise<Size> {
