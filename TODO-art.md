@@ -6,7 +6,7 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 Checkout: `.claude/worktrees/art`, branch `worktree-art`; last merged main `6186476` by fast-forward on 2026-11-18. Preserve this worktree and sync committed main before new work/delivery.
 
-Current slice: [C2 soft octagon](docs/art/concepts/top-down-oddities/pickup-markers/README.md) draws above ground weapons and shares their fog and collection suppression. The sprite loader, pickup group and browser coverage are delivered together. Next visual slice: review S4-1 when AI delivers its fallback contrast change, using the 64/32 px pickup checks. Terrain approval and ring-loop integration remain open.
+Current slice: the [approved arena terrain](docs/art/terrain/README.md) is wired into the sprite loader, arena renderer and visual acceptance DSL. The terrain delivery is in `worktree-art` for review. Next visual slice: review S4-1 when AI delivers its fallback contrast change, using the 64/32 px pickup checks. Ring-loop integration remains with play.
 
 Current milestone: M1/M6; the project remains on M1. Next audio task: combat masking, fatigue and levels once AI/play integrate runtime weapon-shot synthesis (not yet wired into the game sound output). Safari acceptance does not claim new headphone/speaker measurements. Preserve approved master hashes. Next failing check for any playback change: the relevant browser sound acceptance criterion before implementation.
 
@@ -26,7 +26,7 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 
 - [x] Complete S4 generated-pickup review at native 64/32 px with hide/restore checks. Lantern passes; S4-1 fallback readability fix is handed to AI. After C2 approval, redundant review artifacts were removed by user request; the approved proof embeds its source images. Broader schema/oddity review stays open.
 
-- [x] Deliver three floor levels and solid-wall SVG candidates with native 64/32 px, repetition, grayscale, dim-terrain and terraced-context proof. Approval and runtime adoption remain open.
+- [x] Deliver three floor levels and solid-wall SVG candidates with native 64/32 px, repetition, grayscale, dim-terrain and terraced-context proof. User approved all four on 2026-11-18. All four now draw in the game.
 
 - [x] Generate `sfx-ring-damage-loop` for play: separate continuous electrical bed with no impacts or baked-in fades. WAV/MP3 and codec caveat delivered; sound approved in Visual Studio Code; runtime integration remains open.
 
@@ -43,7 +43,7 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 
 - [ ] Complete remaining held-weapon/default-rifle variants and production polish. Standing/crouched player, opponent and dummy integration already exists.
 - [ ] Pickup glow, projectiles/muzzle flashes by supported behavior, hit/death effects.
-- [ ] Floor, indestructible wall, penetrable cover, three height levels and paired stairs, spawn/pickup markers, ring edge and fog texture.
+- [ ] Penetrable cover, paired stair and height-edge art, spawn markers, ring edge and fog texture.
 - [ ] Runtime HUD/slot assets, health/ammo/credit UI, panels/buttons, prompt styling, power gauge, pipeline progress and reveal frame. Use the approved inventory study rather than treating its standalone artwork as integration.
 - [ ] Landing/practice/onboarding/prompt copy and example prompts for datasets, including weak, broken and harmless adversarial-looking requests; rejection/errors, AI-off and credit explanations.
 - [ ] Privacy/terms copy consistent with `docs/privacy-and-data.md`.
@@ -51,6 +51,21 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [ ] Case-study diagrams: pipeline, cost safeguards and eval loop.
 
 ## Verification/latest delivery
+
+2026-11-18, runtime terrain: four production-preview criteria failed against
+the flat renderer at 64 and 32 px per tile. All 11 terrain and 13 pickup
+drawing criteria passed after integration. The fog mutation revealed 1,930
+changed samples in each of two criteria, and the collection mutation revealed
+2,166 in its criterion. The production bundle was restored. Full production preview had 310 passes
+and one failure in `DrawingTheShots`: the shot had expired before the state
+assertion. The two shot criteria passed 20/20 focused repetitions on both the
+terrain build and the original `e8c8668` build. The full-run timing failure did
+not recur in those comparisons or the managed preview rerun of the failed criterion. `pnpm checks`
+passed lint, formatting, strict types and 2,810 unit tests, with one existing
+slow audio test skipped. Standards review re-read root, webapp, React and
+acceptance instructions and audited folder contents and callers. The ground
+texture hook sits beneath `ArenaWalls`, the terrain preview has its own domain,
+and the acceptance request type sits in `types/`.
 
 2026-11-18, runtime marker: production build and 78/78 pickup and sprite
 criteria passed without retries. All 13 marker and generated-drawing criteria
@@ -65,7 +80,7 @@ corner-filling drawing.
 with one existing slow audio test skipped. Standards review used root, webapp,
 React and acceptance instructions. Folder and caller audit placed pickup-only
 sampling under its Playwright caller and the result type in `types/`.
-The runtime delivery is uncommitted in `worktree-art`.
+The pickup marker is committed as `e8c8668` in `worktree-art`.
 
 Cleanup validation: `pnpm checks` exits 0 (lint, formatting, strict types and 2,567 tests; one existing audio-render skip). Approved C2 source/proof retained, with all five proof images embedded. Root instructions re-read; folder/caller, link, SVG geometry and whitespace audit complete. Redundant review artifacts removed from disk and staging; S4-1 finding retained in HANDOFF.md. No gameplay change or acceptance rerun. The artwork is on main in `6186476`.
 

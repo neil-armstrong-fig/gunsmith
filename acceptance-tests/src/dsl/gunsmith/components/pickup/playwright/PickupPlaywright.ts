@@ -29,9 +29,9 @@ export class PickupPlaywright extends BasePage {
     return await lookOfPickup(this.page, {x: pickup.x, y: pickup.y});
   }
 
-  /** Reads the marker at this place, even after the weapon has been collected. */
-  async getMarkerOnScreen(centre: Point): Promise<PickupMarkerLook> {
-    return await lookOfPickupMarker(this.page, centre);
+  /** Reads the marker against a clear tile in the same light, even after collection. */
+  async getMarkerOnScreen(centre: Point, clearFloor: Point): Promise<PickupMarkerLook> {
+    return await lookOfPickupMarker(this.page, centre, clearFloor);
   }
 
   /** Waits until no weapon lies in the arena, for as long as the expect timeout or `timeoutSeconds` allows. A game that never had one counts as taken, so read `get` first. */

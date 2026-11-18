@@ -6,8 +6,17 @@
  * on the low ground in its sight, in one round with no ring, or the pickup race: the duel's arena and fighters in one round with no ring,
  * and a weapon lying much nearer the opponent than the player, or the fair duel: an arena that is the same picture turned half way round
  * (a platform in the middle), the fighters at a matching pair of places drawn from the seed, in one round with a ring (no score),
- * or an online room (`?room=<code>`): the duel's arena with only the
+ * the three-level terrain preview, or an online room (`?room=<code>`): the duel's arena with only the
  * player in it until the server's snapshots take over, since the server plays the match.
  */
 export type Scenario =
-  "practice" | "duel" | "sparring" | "heights" | "terraced" | "overlook" | "pickup-race" | "fair-duel" | "room";
+  | "practice"
+  | "duel"
+  | "sparring"
+  | "heights"
+  | "terraced"
+  | "overlook"
+  | "pickup-race"
+  | "fair-duel"
+  | "terrain"
+  | "room";

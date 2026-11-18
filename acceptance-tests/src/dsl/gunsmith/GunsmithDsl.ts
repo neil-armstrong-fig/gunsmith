@@ -19,6 +19,7 @@ import {WeaponDsl} from "@src/dsl/gunsmith/components/weapon/WeaponDsl";
 import {GunsmithPlaywright} from "@src/dsl/gunsmith/playwright/GunsmithPlaywright";
 import type {ClosingRingRequest} from "@src/dsl/gunsmith/types/ClosingRingRequest";
 import type {PickupDrawingRequest} from "@src/dsl/gunsmith/types/PickupDrawingRequest";
+import type {TerrainPictures} from "@src/dsl/gunsmith/types/TerrainPictures";
 import type {Size} from "@src/dsl/gunsmith/types/Size";
 
 /** The whole game as a spec sees it. Every area is a member of this rather than a fixture of its own. */
@@ -237,6 +238,14 @@ export class GunsmithDsl {
       await this.gunsmith.openHeights();
     } catch (error) {
       throw new DslError("Failed to open the heights arena", error);
+    }
+  }
+
+  async startTerrain(pictures?: TerrainPictures): Promise<void> {
+    try {
+      await this.gunsmith.openTerrain(pictures);
+    } catch (error) {
+      throw new DslError("Failed to open the terrain preview", error);
     }
   }
 

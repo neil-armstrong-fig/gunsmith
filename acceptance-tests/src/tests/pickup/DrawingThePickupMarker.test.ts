@@ -2,6 +2,8 @@ import type {PickupSnapshot} from "@gunsmith/shared/state-hook/types/PickupSnaps
 import {beforeEach, expect, given, then, when} from "@src/acceptance-criteria-mapping/AcceptanceCriteriaMapping";
 
 const SEED = 8;
+// One tile west of the seeded pickup, with the same floor art and lighting.
+const CLEAR_FLOOR = {x: 12.5, y: 6.5};
 const BEHIND_THE_PLAYER = {x: 2.5, y: 6.5};
 const WALK_PAST_PICKUP_SECONDS = 0.7;
 const OUTLINE = {corners: 4, gaps: 4};
@@ -32,7 +34,7 @@ given.each(
 
     when("the player sees the pickup", () => {
       then("the same four clipped corners frame it at the approved size, with open sides", async ({gunsmith}) => {
-        await expect.poll(() => gunsmith.pickup.getMarkerOnScreen(pickup)).toMatchObject(OUTLINE);
+        await expect.poll(() => gunsmith.pickup.getMarkerOnScreen(pickup, CLEAR_FLOOR)).toMatchObject(OUTLINE);
       });
     });
 
@@ -40,31 +42,35 @@ given.each(
 
     when("the player turns away after seeing the marker", () => {
       beforeEach(async ({gunsmith}) => {
-        await expect.poll(() => gunsmith.pickup.getMarkerOnScreen(pickup)).toMatchObject(OUTLINE);
+        await expect.poll(() => gunsmith.pickup.getMarkerOnScreen(pickup, CLEAR_FLOOR)).toMatchObject(OUTLINE);
         await gunsmith.player.aimAtTile(BEHIND_THE_PLAYER);
         await expect.poll(async () => (await gunsmith.pickup.get())?.visible).toBe(false);
       });
 
       then("the entire marker disappears into the fog", async ({gunsmith}) => {
-        await expect.poll(async () => (await gunsmith.pickup.getMarkerOnScreen(pickup)).markedPixels).toBe(0);
+        await expect
+          .poll(async () => (await gunsmith.pickup.getMarkerOnScreen(pickup, CLEAR_FLOOR)).markedPixels)
+          .toBe(0);
       });
 
       when("the player faces the pickup again", () => {
         beforeEach(async ({gunsmith}) => {
-          await expect.poll(async () => (await gunsmith.pickup.getMarkerOnScreen(pickup)).markedPixels).toBe(0);
+          await expect
+            .poll(async () => (await gunsmith.pickup.getMarkerOnScreen(pickup, CLEAR_FLOOR)).markedPixels)
+            .toBe(0);
           await gunsmith.player.aimAtTile(pickup);
           await expect.poll(async () => (await gunsmith.pickup.get())?.visible).toBe(true);
         });
 
         then("the same outline returns", async ({gunsmith}) => {
-          await expect.poll(() => gunsmith.pickup.getMarkerOnScreen(pickup)).toMatchObject(OUTLINE);
+          await expect.poll(() => gunsmith.pickup.getMarkerOnScreen(pickup, CLEAR_FLOOR)).toMatchObject(OUTLINE);
         });
       });
     });
 
     when("the player walks over the pickup and looks back at its old location", () => {
       beforeEach(async ({gunsmith}) => {
-        await expect.poll(() => gunsmith.pickup.getMarkerOnScreen(pickup)).toMatchObject(OUTLINE);
+        await expect.poll(() => gunsmith.pickup.getMarkerOnScreen(pickup, CLEAR_FLOOR)).toMatchObject(OUTLINE);
         await gunsmith.player.walkFor("east", WALK_PAST_PICKUP_SECONDS);
         await gunsmith.pickup.waitUntilTaken();
         await gunsmith.player.aimAtTile(pickup);
@@ -73,7 +79,9 @@ given.each(
       then("the weapon goes into the second slot and leaves no marker on the floor", async ({gunsmith}) => {
         expect(await gunsmith.pickup.get()).toBeUndefined();
         expect(await gunsmith.weapon.get()).toMatchObject({slot: 2, rounds: pickup.magazineSize});
-        await expect.poll(async () => (await gunsmith.pickup.getMarkerOnScreen(pickup)).markedPixels).toBe(0);
+        await expect
+          .poll(async () => (await gunsmith.pickup.getMarkerOnScreen(pickup, CLEAR_FLOOR)).markedPixels)
+          .toBe(0);
       });
     });
   },
@@ -90,7 +98,7 @@ given("a sparring match whose sprite files are missing", () => {
       throw new Error("No weapon lies in the arena.");
     }
 
-    expect((await gunsmith.pickup.getMarkerOnScreen(pickup)).corners).toBe(0);
+    expect((await gunsmith.pickup.getMarkerOnScreen(pickup, CLEAR_FLOOR)).corners).toBe(0);
     expect((await gunsmith.pickup.getLookOnScreen()).discPixels).toBeGreaterThan(0);
   });
 });

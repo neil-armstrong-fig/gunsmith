@@ -31,6 +31,13 @@ const SHOT_SPRITE: SpriteEntry = {
   pixelsPerTile: PLAYER_SPRITE.pixelsPerTile,
 };
 
+/** Terrain art fills exactly one cell and is centred on it. */
+const TERRAIN_TILE: SpriteEntry = {
+  sizePixels: 64,
+  anchor: {x: 32, y: 32},
+  pixelsPerTile: 64,
+};
+
 /** What the game knows of each picture, by key. */
 export const SPRITE_MANIFEST: Record<SpriteKey, SpriteEntry> = {
   "sprite-player-stand-blue": PLAYER_SPRITE,
@@ -45,4 +52,8 @@ export const SPRITE_MANIFEST: Record<SpriteKey, SpriteEntry> = {
   },
   "fx-projectile-rifle-blue": SHOT_SPRITE,
   "fx-projectile-rifle-orange": SHOT_SPRITE,
+  "tile-floor-l1": TERRAIN_TILE,
+  "tile-floor-l2": TERRAIN_TILE,
+  "tile-floor-l3": TERRAIN_TILE,
+  "tile-wall": TERRAIN_TILE,
 };

@@ -1,6 +1,5 @@
 import type {Page} from "@playwright/test";
 import {colourIsNear} from "@src/dsl/gunsmith/playwright/look/ColourIsNear";
-import {floorColour} from "@src/dsl/gunsmith/components/pickup/playwright/look-of-pickup/floor/FloorColour";
 import type {PickupMarkerLook} from "@src/dsl/gunsmith/components/pickup/types/PickupMarkerLook";
 import {coloursAtTiles} from "@src/dsl/gunsmith/playwright/screen/ColoursAtTiles";
 import type {Colour} from "@src/dsl/gunsmith/types/Colour";
@@ -26,21 +25,27 @@ const CARDINAL_GAPS = [
   [-37, 0],
 ] as const;
 
-export async function lookOfPickupMarker(page: Page, centre: Point): Promise<PickupMarkerLook> {
+export async function lookOfPickupMarker(page: Page, centre: Point, clearFloor: Point): Promise<PickupMarkerLook> {
   const offsets = Array.from({length: 2 * HALF_SIDE + 1}, (_, index) => index - HALF_SIDE);
   const places = offsets.flatMap(y => offsets.map(x => ({x, y})));
   const colours = await coloursAtTiles(
     page,
-    places.map(({x, y}) => ({x: centre.x + x / DESIGN_PIXELS_PER_TILE, y: centre.y + y / DESIGN_PIXELS_PER_TILE})),
+    [centre, clearFloor].flatMap(origin =>
+      places.map(({x, y}) => ({x: origin.x + x / DESIGN_PIXELS_PER_TILE, y: origin.y + y / DESIGN_PIXELS_PER_TILE})),
+    ),
   );
-  const floor = floorColour(colours);
   const pale = places.filter((_, index) => {
     const colour = colours[index];
     return colour !== undefined && colourIsNear(colour, PALE_LINE, STROKE_TOLERANCE);
   });
   const marked = places.filter((_, index) => {
     const colour = colours[index];
-    return colour !== undefined && !colourIsNear(colour, floor, FLOOR_TOLERANCE);
+    const floor = colours[index + places.length];
+    if (!colour || !floor) {
+      throw new Error("The screenshot did not include the pickup and its floor reference.");
+    }
+
+    return !colourIsNear(colour, floor, FLOOR_TOLERANCE);
   });
 
   return {

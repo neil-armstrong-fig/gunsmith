@@ -3,6 +3,7 @@ import {expect} from "@playwright/test";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
 import type {ClosingRingRequest} from "@src/dsl/gunsmith/types/ClosingRingRequest";
 import type {PickupDrawingRequest} from "@src/dsl/gunsmith/types/PickupDrawingRequest";
+import type {TerrainPictures} from "@src/dsl/gunsmith/types/TerrainPictures";
 import type {Size} from "@src/dsl/gunsmith/types/Size";
 
 /** Art's pictures, served from `public/assets/sprites`. Only the `.svg` files: the dev server also serves the app's own code from a `src/assets/sprites` folder. */
@@ -15,7 +16,7 @@ const PICTURES = "**/assets/sprites/*.svg";
 const HOLD_AFTER_MILLISECONDS = 3000;
 
 export class GunsmithPlaywright extends BasePage {
-  /** Lets through the pictures `openSparringWithHeldPictures` is holding back. */
+  /** Lets through pictures a scenario is holding back. */
   private releaseHeldPictures: (() => void) | undefined;
 
   constructor(page: Page) {
@@ -41,16 +42,7 @@ export class GunsmithPlaywright extends BasePage {
    * the pictures arrive when the spec says, so it can look at the page while they have not. Returns once the canvas is up, which is before the pictures are.
    */
   async openSparringWithHeldPictures(): Promise<void> {
-    const released = new Promise<void>(resolve => {
-      this.releaseHeldPictures = resolve;
-    });
-    await this.page.route(PICTURES, async route => {
-      await released;
-      await route.continue();
-    });
-
-    await this.page.goto("/?scenario=sparring");
-    await expect(this.page.getByTestId("arena")).toHaveAttribute("data-ready", "true");
+    await this.openWithHeldPictures("sparring", PICTURES);
   }
 
   /** Lets the pictures held back by `openSparringWithHeldPictures` through, and waits until the page has them. */
@@ -121,6 +113,23 @@ export class GunsmithPlaywright extends BasePage {
     await this.openScenario("heights");
   }
 
+  async openTerrain(pictures?: TerrainPictures): Promise<void> {
+    const highestFloor = "**/assets/tiles/tile-floor-l3.svg";
+
+    if (pictures === "held") {
+      await this.openWithHeldPictures("terrain", highestFloor);
+      return;
+    }
+
+    if (pictures === "missing") {
+      await this.page.route(highestFloor, async route => {
+        await route.fulfill({status: 404});
+      });
+    }
+
+    await this.openScenario("terrain");
+  }
+
   /**
    * Holds the game still: nothing in the page moves, however much real time passes, until `runGameFor` lets it. A shot is in the air for a fraction of a second,
    * so a spec that wants to look at one holds the game on it. Call it once the game is open.
@@ -154,6 +163,19 @@ export class GunsmithPlaywright extends BasePage {
     const {elapsedSeconds} = await this.readGameState();
 
     await this.waitForGameState(state => state.elapsedSeconds >= elapsedSeconds + seconds);
+  }
+
+  private async openWithHeldPictures(scenario: string, pictures: string): Promise<void> {
+    const released = new Promise<void>(resolve => {
+      this.releaseHeldPictures = resolve;
+    });
+    await this.page.route(pictures, async route => {
+      await released;
+      await route.continue();
+    });
+
+    await this.page.goto(`/?scenario=${scenario}`);
+    await expect(this.page.getByTestId("arena")).toHaveAttribute("data-ready", "true");
   }
 
   private async openScenario(scenario: string): Promise<void> {

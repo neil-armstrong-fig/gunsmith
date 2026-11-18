@@ -32,10 +32,10 @@ export class PickupDsl {
     }
   }
 
-  /** Reads the marker at this place, even after the weapon has been collected. */
-  async getMarkerOnScreen(centre: Point): Promise<PickupMarkerLook> {
+  /** Reads the marker against a clear tile in the same light, even after collection. */
+  async getMarkerOnScreen(centre: Point, clearFloor: Point): Promise<PickupMarkerLook> {
     try {
-      return await this.pickup.getMarkerOnScreen(centre);
+      return await this.pickup.getMarkerOnScreen(centre, clearFloor);
     } catch (error) {
       throw new DslError("Failed to read the pickup marker on the screen", error);
     }
