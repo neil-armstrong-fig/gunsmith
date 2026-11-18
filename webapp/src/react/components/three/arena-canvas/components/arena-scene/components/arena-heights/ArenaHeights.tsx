@@ -1,5 +1,7 @@
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
+import {scenarioOfPage} from "@src/game/scenario/ScenarioOfPage";
 import {levelColour} from "@src/react/components/three/arena-canvas/components/arena-scene/components/arena-heights/colours/LevelColour";
+import {StairMarkings} from "@src/react/components/three/arena-canvas/components/arena-scene/components/arena-heights/components/stair-markings/StairMarkings";
 import {dropStripsOf} from "@src/react/components/three/arena-canvas/components/arena-scene/components/arena-heights/drops/DropStripsOf";
 import {DROP_LIP_COLOUR} from "@src/react/components/three/arena-canvas/components/arena-scene/components/arena-heights/drops/DropLipColour";
 import {useHeightTiles} from "@src/react/components/three/arena-canvas/components/arena-scene/components/arena-heights/hooks/use-height-tiles/UseHeightTiles";
@@ -8,6 +10,9 @@ import {useSprite} from "@src/react/components/three/arena-canvas/components/are
 import type {JSX} from "react";
 import type {CanvasTexture} from "three";
 import {Color} from "three";
+
+const TERRAIN_EDGE_COLOUR = "#91a2b2";
+const PREVIEW_DROP_WIDTHS = {lip: 4 / 64, shadow: 12 / 64};
 
 interface Props {
   arena: Arena;
@@ -21,6 +26,8 @@ export function ArenaHeights({arena}: Props): JSX.Element {
   const {floors, stairs, drops} = useHeightTiles(arena);
   const middleFloor = useSprite("tile-floor-l2");
   const highestFloor = useSprite("tile-floor-l3");
+  const terrainPreview = scenarioOfPage() === "terrain";
+  const dropWidths = terrainPreview && PREVIEW_DROP_WIDTHS;
 
   return (
     <group>
@@ -39,7 +46,7 @@ export function ArenaHeights({arena}: Props): JSX.Element {
       })}
 
       {drops.map(drop => {
-        const {lip, shadow} = dropStripsOf(drop.facing);
+        const {lip, shadow} = dropStripsOf(drop.facing, dropWidths || undefined);
 
         return (
           <group key={`${drop.x},${drop.y},${drop.facing}`}>
@@ -52,7 +59,9 @@ export function ArenaHeights({arena}: Props): JSX.Element {
             <mesh position={[drop.x + lip.x + lip.width / 2, drop.y + lip.y + lip.height / 2, 0.07]}>
               <planeGeometry args={[lip.width, lip.height]} />
 
-              <meshBasicMaterial color={DROP_LIP_COLOUR} />
+              {terrainPreview && <meshBasicMaterial color={TERRAIN_EDGE_COLOUR} toneMapped={false} />}
+
+              {!terrainPreview && <meshBasicMaterial color={DROP_LIP_COLOUR} />}
             </mesh>
           </group>
         );
@@ -73,6 +82,9 @@ export function ArenaHeights({arena}: Props): JSX.Element {
           </mesh>
         )),
       )}
+
+      {terrainPreview &&
+        stairs.map(stair => <StairMarkings key={`${stair.x},${stair.y}`} stair={stair} colour={TERRAIN_EDGE_COLOUR} />)}
     </group>
   );
 }

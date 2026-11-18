@@ -18,16 +18,26 @@ export async function lookOfTerrain(page: Page, pixelsPerTile: number): Promise<
     terrainPoint(0, 8, 13),
   ];
   const stairBands = [8, 24, 40, 56].map(x => terrainPoint(7, x, 32));
+  const stairTreads = [3, 7].flatMap(column => [16, 32, 48].map(x => terrainPoint(column, x, 32)));
+  const landingRails = [3, 7].flatMap(column =>
+    [4, 58].flatMap(y => [terrainPoint(column - 1, 54, y), terrainPoint(column + 1, 10, y)]),
+  );
+  const stairEntrances = [3, 7].flatMap(column => [terrainPoint(column, 0, 32), terrainPoint(column + 1, 2, 32)]);
   const dropEdge = [
     {x: 7.85, y: 4.3},
-    {x: 8.05, y: 4.3},
+    {x: 8.03125, y: 4.3},
     {x: 8.45, y: 4.3},
+    {x: 7.75, y: 4.3},
+    {x: 8.0625, y: 4.3},
   ];
   const colours = await coloursAtTiles(page, [
     ...floorFills,
     ...floorMarks,
     ...joinAndWall,
     ...stairBands,
+    ...stairTreads,
+    ...landingRails,
+    ...stairEntrances,
     ...dropEdge,
   ]);
   const greens = colours.map(colour => colour.green);
@@ -37,6 +47,9 @@ export async function lookOfTerrain(page: Page, pixelsPerTile: number): Promise<
     floorMarks: FLOOR_COLUMNS.map(() => greens.splice(0, MARK_AND_GAP_X.length)),
     joinAndWall: greens.splice(0, joinAndWall.length),
     stairBands: greens.splice(0, stairBands.length),
+    stairTreads: greens.splice(0, stairTreads.length),
+    landingRails: greens.splice(0, landingRails.length),
+    stairEntrances: greens.splice(0, stairEntrances.length),
     dropEdge: greens,
   };
 }

@@ -13,7 +13,7 @@ Ownership follows the assigned persona. Models below are defaults; no applicatio
 | ai | Claude | [TODO-ai.md](TODO-ai.md) | Arena screening, player selection and engine validation integrated. Owns model quality, fallback contrast and adapter coordination. |
 | server | Claude | [TODO-server.md](TODO-server.md) | Initial private-room networking integrated; Prediction/interpolation integrated; match flow/auth/persistence next. |
 | budget | Claude | [TODO-budget.md](TODO-budget.md) | Production ledger/spend boundaries with server/AI; credits, refunds, tracing and kill switch. |
-| art | Codex | [TODO-art.md](TODO-art.md) | Approved terrain and C2 pickup marker integrated. S4 fallback contrast and ring-loop integration remain open. |
+| art | Codex | [TODO-art.md](TODO-art.md) | Terrain, C2 pickup marker and playable stair preview integrated. Stair visual review, S4-1 fallback contrast and ring-loop integration remain open. |
 | ship | Codex | [TODO-ship.md](TODO-ship.md) | Repository tooling/CI now; infra/release when bindings and authorization exist. |
 
 ### Start prompts
@@ -126,6 +126,8 @@ Before changing a consumed contract, record the proposal and affected owners her
 **Server → play, reconnect in an online room (2026-11-18, integrated from `be21935`).** Additions only in play's tree: `webapp/src/react/components/dom/connection-notice/ConnectionNotice.tsx` (new; "Connection lost. Reconnecting…", `data-testid="connection-notice"`) mounted by one line in `App.tsx`; the app store gained `reconnecting`/`setReconnecting`, written by the online branch of `UseGameLoop` (server's). Wire: `joined` now carries `token` (every connection); the socket URL takes `?token=`; close codes `4409` room full and `4410` seat replaced mean "do not retry". Local play is unaffected. The old rule "nothing before `joined`" is new: `OnlineMatch` sends no input until the connection's `joined` has arrived. `AGENTS.md` also gained the every-session merge-main sentence (standalone docs change). No time limit on the seat yet.
 
 **Art → play, approved terrain wired (2026-11-18):** [review sheet and integration notes](docs/art/terrain/README.md). The three floor levels and solid wall draw through the picture loader, with flat fallbacks. The playable `?scenario=terrain` preview exercises all three levels. The level numbering and asset placement are recorded in the manifest. All 24 terrain and pickup drawing criteria and `pnpm checks` passed. Full preview had 310 passes and one shot-timing failure that passed on the managed-preview retry and did not recur in 20 focused checks on either build. Terrain is integrated from `f16c414`.
+
+**Art → play, playable stair preview (2026-11-18):** `?scenario=terrain` draws stair treads, rails onto both landings, and the revised drop lip and shadow under fog. The preview is integrated from `89e3851` and ready for visual review. All 30 targeted production criteria passed. The wider run hit the known cross-level shooting timeout and all four focused shooting criteria passed on rerun. [Preview and review sizes](docs/art/terrain/README.md#playable-stair-preview).
 
 ## Latest ship delivery
 
