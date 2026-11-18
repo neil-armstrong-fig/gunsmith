@@ -6,9 +6,9 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 Checkout: `.claude/worktrees/ship`, branch `worktree-ship`, synced from committed main `9484ad0`. Persistent worktree; main stays integration-only. Merge newer committed main before new work/delivery when clean; never stash another session's changes.
 
-Current slice: standards refactor of preview/runner configuration after user review, including @src imports. Owned files: root scripts, CI mode selection, acceptance configuration/tests/instructions, Vite proxy configuration, shared ESLint config/tests and ship coordination docs. Project remains M1.
+Current slice: preview/runner configuration integrated from `249fc3c` via `c61bc32`; unfinished function-order/helper-declaration standards work stays in the ship worktree. Owned files: root scripts, CI mode selection, acceptance configuration/tests/instructions, Vite proxy configuration, shared ESLint config/tests and ship coordination docs. Project remains M1.
 
-Next action: review/commit this uncommitted delivery when authorized; then hosted verification after publication. Hosted profiling/publication still await setup; AI owns paid selector/guard/evidence and reconciled opening spend.
+Next action: preserve/finish the standards slice in its worktree, syncing main when clean; hosted verification follows authorized publication. Hosted profiling/publication still await setup; AI owns paid selector/guard/evidence and reconciled opening spend.
 
 ## Ownership
 
