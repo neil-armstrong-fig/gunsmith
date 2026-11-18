@@ -146,16 +146,55 @@ weapon as before, one call cheaper, and still only a stand-in for the shield beh
 `docs/schemas.md`, which says the power rating "is displayed, not used to scale anything". The balancer trims by design; those two
 lines are `build`'s and the user's to update.
 
-### The arena judge
+### Choosing the arena: the players pick, there is no AI judge
 
-A separate small graph: given two arena prompts, choose the more interesting one. Both are validated first. They are placed in a
-**randomised order**, the verdict is a schema, and a deterministic tie-break applies. If only one prompt exists, it wins
-(still validated); if none, the built-in pool is used. Measure position bias in the evals and fix it with the shuffle and,
-if needed, a swapped-order second judgement.
+**Decided by the user, 2026-11-18:** no model chooses the arena. Each player puts an arena forward, **a prompt or a built-in arena by
+name**. Screening checks each one and both survivors are generated. Both players see both arenas, and each has three choices: **pick an
+arena, pick nothing, or choose random**. The rule (`resolveArenaPicks`):
+
+| Player 1 | Player 2 | Played | `how` |
+| --- | --- | --- | --- |
+| arena X | arena X | X, no draw | `agreed` |
+| arena X | arena Y | one draw, a coin between X and Y | `coin` |
+| arena X | nothing | X, no draw | `only-pick` |
+| arena X | random | a first draw decides between the pick and random. Under a half, X is played | `pick-kept` |
+| | | a half or more, random wins and a second draw plays one of the two submitted arenas | `random` |
+| random | random | one draw over the two submitted arenas | `random` |
+| random | nothing | one draw over the two submitted arenas (no pick to keep) | `random` |
+| nothing | nothing | one draw over the two submitted arenas | `random` |
+
+The seat order does not matter: "arena X, random" and "random, arena X" are the same case. "Random" is itself chosen by chance
+against the pick: **one draw to choose between the pick and random, and only if random wins a second draw to choose the arena.**
+
+A lone survivor goes forward by default; none gives a built-in arena.
+
+**Confirmed by the user (2026-11-18):** a random choice is set against the other player's pick in a first draw, and if random wins a
+second draw chooses the arena; when nobody picks, an arena is drawn at random. **Inferred, not stated:** random against *nothing* has no
+pick to keep, so it goes straight to the one draw over the two arenas; and the second draw can land on the picked arena again.
+
+**As built (fake tier only, never run on a real model):**
+- `ai/src/pipeline/arena-submission/`, entry `screenArenaSubmissions`: each submission goes through the arena pipeline's own token
+  pre-check and moderation (`precheckArenaPrompt`, `arenaModerationJudge`), so a prompt that could not be generated is never put to the
+  players; a built-in submission passes if the injected pool has an arena of that name, with no model call. The result is
+  `{status, survivors, rejected, modelCalls}`: `none`, `only-submission` or `players-pick`. A rejection's reason is the screen's own words,
+  never the player's text. At most two submissions, one for each player; two moderation calls at most. A plain function, not a graph:
+  there is no branching worth drawing.
+- `ai/src/pipeline/arena-picking/`, entry `resolveArenaPicks`: pure, no model. Two picks in (`{playerId, choice}`, the choice an
+  `arena` naming whose submission, `random`, or `nothing`), the arena played out, `how` as in the table. Chance is drawn one run at a time, as needed,
+  from the engine's `nextRandom` on a salted stream of its own (`seed ^ ARENA_PICK_SEED_SALT`, so it never shares a draw with the pickup,
+  ring or spawn streams: engine's request). A draw over two arenas: under a half takes the first player listed (the first pick in a coin, the first player's arena in a
+  random draw), a half or more the second. Same seed and picks, same arena. It has no caller yet; `server`'s match flow will call it
+  once both players have chosen. It is a game rule, not an AI task: **`engine` is the intended owner** and takes it into
+  `engine/src/arena-picking/` when `api/` needs it (the second consumer); until then it stays here, free of any `ai`-only import so it
+  moves unchanged. `server` declined to own it (the room has no pre-round flow yet) and will design the wire messages with `play`.
+- The caller composes them: screen, `generateArena` for each survivor, show both, collect the picks, `resolveArenaPicks`.
+- Evals (`evals/dsl/arena-submission/`, `evals/tests/arena-submission/`): `TwoArenaSubmissions`, `OnlyOneArenaPrompt`,
+  `NoArenaSubmission`, all `given.inProgress`; only the moderation model is exercised, so they prove the harness and the screening
+  rules, and nothing about how a real model moderates. The pick rule is unit-tested, not eval-tested, because it calls no model.
 
 ## Contracts (see `HANDOFF.md`)
 
-`AiAdapter` (owned by `build`, implemented here): generate a weapon, generate an arena, judge two arena prompts; emit
+`AiAdapter` (owned by `build`, implemented here): generate a weapon, generate an arena, screen two arena submissions (prompts or built-ins) and resolve the players' picks; emit
 pipeline-progress events (token check, judging, generating, validating, rating); return the credit cost; fail with a typed
 result (`rejected`, `timed-out`, `ai-off`, `over-limit`, `invalid`). The fake adapter returns fixtures. No acceptance test
 calls the real one.
@@ -186,7 +225,7 @@ Credits (one config in `shared/`): 10 a day, reset 00:00 UTC; weapon 1, arena 1,
 ## Models and portability
 
 The model is chosen in code, never in the environment (a rule from the learning repo). Primary provider: Anthropic through
-Cloudflare AI Gateway. A cheap model for `moderationJudge` and the arena judge; a stronger one for `generate`;
+Cloudflare AI Gateway. A cheap model for `moderationJudge`; a stronger one for `generate`;
 `modelFallbackMiddleware` for a second provider. Workers AI is a bake-off candidate (its JSON mode takes a JSON schema but
 does not guarantee conformance and does not stream). Model-agnostic design is also Focused's talking point: switch with a
 config change and an eval run, not a rewrite.
@@ -231,7 +270,7 @@ module 02.
   tasks drawn from real failures is a great start; Focused: a 7-example demo, 50 to 100 for production; Hamel Husain: about 100
   traces to discover failure modes. So start near 20 to 30 and grow to 50 to 100 once there is traffic, adding a case only
   when a real or probed failure needs one, never to pad): weapons (positive, negative, adversarial, deliberately
-  overpowered, boundary), arenas (including unplayable layouts), judge pairs (each in both orders). Seeded from `build`'s
+  overpowered, boundary), arenas (including unplayable layouts), arena submissions (prompts and built-in names). Seeded from `build`'s
   fixtures and `art`'s example prompts. Failures from real traces become new cases.
 - **Evaluators, deterministic first** and binary: schema validity, stats inside caps, arena reachable, token budget respected,
   no system-prompt leak, names clean. Then an LLM judge for "matches the prompt" and "interesting", temperature 0, majority
@@ -247,7 +286,7 @@ module 02.
   | Consistency over trials (pass^k) | built (3 trials on the local tier) |
   | Cost and latency per case | latency built; tokens and cost once nodes call models |
   | LLM judge ("matches the prompt", "interesting") | **deferred** (user, 2026-11-12); then temperature 0, majority of three, about 50 labels |
-  | Arena suite (reachability from the engine, swapped-order judge pairs) | later |
+  | Arena suite (reachability from the engine, submissions that survive screening) | later |
   | Online evaluators on sampled production traces | likely needs LangSmith Plus; failing traces are promoted into the dataset by hand |
   | Dataset hygiene (timestamp, monthly review, quarterly rotation, 10% from production monthly) | later |
 

@@ -19,7 +19,7 @@ Start a session with: **"You are engine, continue the TODO."** Substitute any pe
 | --- | --- | --- | --- | --- |
 | play | Claude | [TODO-play.md](TODO-play.md) | Combat feedback slice 2a (damage event, crunch) integrated into main; 2b (`store/feedback/`, brackets, health trail) next; HUD/inventory, camera, close M1 playtest. | 2026-11-17 |
 | engine | Claude | [TODO-engine.md](TODO-engine.md) | Bot pickup-seeking integrated; next arena validation and play's combat events. | 2026-11-17 |
-| ai | Claude | [TODO-ai.md](TODO-ai.md) | Generated-weapon pickup renderer S0 to S3 committed (`c11dc27`), awaiting integration; arena pipeline built on the fake tier (A3, uncommitted; no spend), judge next, with requests to engine for the arena validator and built-in pool; calibration after. | 2026-11-17 |
+| ai | Claude | [TODO-ai.md](TODO-ai.md) | Generated-weapon pickup renderer S0 to S3 committed (`c11dc27`), awaiting integration; arena pipeline (A3, committed) and arena submissions (A4: screening and the players' pick rule, no AI judge; uncommitted for review) built on the fake tier, no spend; main's merge waits on a commit; a free local run next; calibration after. | 2026-11-17 |
 | server | Claude | [TODO-server.md](TODO-server.md) | First authoritative two-browser slice after M1; auth, persistence and online privacy. | 2026-11-17 |
 | budget | Claude | [TODO-budget.md](TODO-budget.md) | Production ledger/spend boundaries with server/AI; credits, refunds, tracing and kill switch. Scenarios drafted; executable specs wait for `api/`. | 2026-11-17 |
 | art | Codex | [TODO-art.md](TODO-art.md) | Terrain SVG candidates and browser review sheets delivered; approval/play integration pending. Audio masking awaits runtime synthesis. | 2026-11-17 |

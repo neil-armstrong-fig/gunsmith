@@ -64,7 +64,9 @@ one repair attempt, then the built-in pool is used and the credit is refunded.
 ## Judge verdicts (the `ai` package)
 
 - **Input judge:** `{valid: boolean, reason: enum, category: enum}`; never prose passed on to players.
-- **Arena judge:** `{winner: "A" | "B", reason: short string}` over two prompts in a randomised order; ties resolved by rule.
+- **No arena judge (decided 2026-11-18):** the players pick the arena. Each submission is screened by the input judge above (a built-in
+  arena is named, not screened). A pick is `{playerId, choice: {kind: "arena", chosenPlayerId} | {kind: "random"} | {kind: "nothing"}}`;
+  the rule that settles two picks is `ai/src/pipeline/arena-picking/` (see `docs/ai-pipeline.md`). Draft, local to `ai/`.
 
 ## Fixtures `build` provides in `shared/`
 

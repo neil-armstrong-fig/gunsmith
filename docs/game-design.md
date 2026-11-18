@@ -7,7 +7,7 @@ change in play. Anything marked *stretch* is not part of the first pass.
 
 A 1v1 top-down 2D shooter with fog of war. Before a match, each player writes, in plain language, the weapons that will
 lie around the arena and the arena itself. The twist: weapons are a **shared pool** at random spots, so a wildly
-overpowered weapon you ask for may end up in your opponent's hands. An AI judge chooses the more interesting arena prompt.
+overpowered weapon you ask for may end up in your opponent's hands. Each player may put an arena forward, and the players, not an AI, pick which one is played.
 Code, not the AI, enforces every rule.
 
 ## Glossary (use these words in code and copy)
@@ -43,9 +43,15 @@ drop keys are decided in the fuzzy frontend and kept in one key-binding config. 
    - Weapons are submitted one at a time (two each). **The opponent's first weapon prompt is visible once you have
      submitted yours**, so you see it before writing your second. If the opponent has not yet submitted their first, you may
      still submit your second, and you see theirs only if it exists by then.
-   - Arena prompts are **blind until you have submitted yours**; then you see the opponent's.
-   - Generation then runs. A lone arena prompt wins by default; no prompts means a built-in arena. Generation that times out
+   - Arena prompts are **blind until you have submitted yours**; then you see the opponent's. A player may submit a prompt or name a
+     built-in arena.
+   - Generation then runs. A lone arena wins by default; no arena means a built-in one. Generation that times out
      falls back to the built-in pool for that item and the credit is refunded.
+   - **The players pick the arena (decided 2026-11-18; no AI judge).** With two arenas, both are generated and both players see both.
+     Each player picks one arena, picks nothing, or chooses **random**. The same pick is played. Two different picks: a seeded coin
+     chooses between them. Only one player picks and the other picks nothing: that pick is played. One picks and the other chooses
+     random: a draw chooses between the pick and random, and if random wins, a second draw chooses one of the two arenas. Both
+     choose random, or nobody picks: one of the two arenas is drawn at random. The screen and its timing are for `play` and `server` to design.
 2. **Reveal** (about 30 s): the arena preview and the four weapons with their stats and power rating.
 3. **Rounds.** Best of three, one life each, 100 HP, no healing. Pickups and spawns are random every round but **evenly
    spaced**, so neither player can know them ahead of time. The arena and weapons stay the same for all rounds.

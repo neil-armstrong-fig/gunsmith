@@ -50,9 +50,9 @@ tested **shutdown drill**, and the honest fact that Cloudflare has no hard cap. 
 
 ## Evidence checklist (fill in as you go)
 
-- [ ] Cost per weapon, arena and judgement; generations per day under the $1 soft cap
+- [ ] Cost per weapon and arena; generations per day under the $1 soft cap
 - [ ] Pass rates per evaluator, before and after a deliberate regression (the gate failing)
-- [ ] Judge calibration: agreement with ~50 human labels; position bias before and after the shuffle
+- [ ] Judge calibration (only if an eval judge is built): agreement with ~50 human labels
 - [ ] A trace screenshot set (a success, a rejection, a repair, a timeout)
 - [ ] The shutdown drill: time to stop, what the player saw
 - [ ] A failure that became a dataset example
