@@ -4,7 +4,7 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 ## Resume here
 
-Checkout: `.claude/worktrees/art`, branch `worktree-art`; last merged main `963a09d` in `75a2b89` on 2026-11-18. Preserve this worktree and sync committed main before new work/delivery.
+Checkout: `.claude/worktrees/art`, branch `worktree-art`. The latest validated code merge on main is `08dd9f3` on 2026-11-18. Preserve this worktree and sync committed main before new work/delivery.
 
 Current slice: the same weapon texture draws in hand and on the ground in local play. Default rifle, marksman rifle and SMG use authored sprites. The generated lantern follows the sparring pickup into the loadout. Ship’s inventory identity (`6795b56`) is on main. The next failing criterion is seeing the correct room weapon before and after switching in a two-browser test, with separate fog coverage. AI and Engine still own the production appearance association. For S4-1, recheck the refused pickup's body and outline separately from its muzzle at 64 and 32 px per tile once AI delivers the contrast change.
 
