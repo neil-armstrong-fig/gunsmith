@@ -13,16 +13,36 @@ it("uses wss on a secure page", () => {
 });
 
 it("carries the seat's token when it has one", () => {
-  expect(roomSocketUrl({protocol: "http:", host: "h"}, "ABC234", "a b&c")).toBe(
+  expect(roomSocketUrl({protocol: "http:", host: "h"}, "ABC234", {token: "a b&c"})).toBe(
     "ws://h/api/rooms/ABC234/socket?token=a%20b%26c",
   );
 });
 
 it("carries no token when it has none", () => {
-  expect(roomSocketUrl({protocol: "http:", host: "h"}, "ABC234", undefined)).toBe("ws://h/api/rooms/ABC234/socket");
-  expect(roomSocketUrl({protocol: "http:", host: "h"}, "ABC234", "")).toBe("ws://h/api/rooms/ABC234/socket");
+  expect(roomSocketUrl({protocol: "http:", host: "h"}, "ABC234", {token: undefined})).toBe(
+    "ws://h/api/rooms/ABC234/socket",
+  );
+  expect(roomSocketUrl({protocol: "http:", host: "h"}, "ABC234", {token: ""})).toBe("ws://h/api/rooms/ABC234/socket");
 });
 
 it("escapes a code that is not plain", () => {
   expect(roomSocketUrl({protocol: "http:", host: "h"}, "a/b")).toBe("ws://h/api/rooms/a%2Fb/socket");
+});
+
+it("passes on how long the page asks the room to wait, which the room's first connection sets", () => {
+  expect(
+    roomSocketUrl({protocol: "http:", host: "h"}, "ABC234", {search: "?room=ABC234&reconnectSeconds=2&idleSeconds=3"}),
+  ).toBe("ws://h/api/rooms/ABC234/socket?reconnectSeconds=2&idleSeconds=3");
+});
+
+it("passes on only those limits, and never what else the page's address says", () => {
+  expect(roomSocketUrl({protocol: "http:", host: "h"}, "ABC234", {search: "?room=ABC234&lag=300&scenario=x"})).toBe(
+    "ws://h/api/rooms/ABC234/socket",
+  );
+});
+
+it("carries the token and the limits together", () => {
+  expect(roomSocketUrl({protocol: "http:", host: "h"}, "ABC234", {token: "t", search: "?idleSeconds=3"})).toBe(
+    "ws://h/api/rooms/ABC234/socket?token=t&idleSeconds=3",
+  );
 });

@@ -32,7 +32,7 @@ export function useOnlineMatch(): RefObject<OnlineMatch | undefined> {
       // shows what the server gave on the first.
       const seatTokens = new SeatTokenKeeper(() => sessionStorage, code);
       let socket: MatchSocket = new ReconnectingSocket(
-        () => new WebSocket(roomSocketUrl(location, code, seatTokens.read())),
+        () => new WebSocket(roomSocketUrl(location, code, {token: seatTokens.read(), search: location.search})),
       );
       const lag = lagOfSearch(location.search);
       if (lag > 0) {

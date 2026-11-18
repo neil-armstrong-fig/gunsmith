@@ -1,7 +1,7 @@
 import fc from "fast-check";
 import type {Seat} from "@gunsmith/engine/seat/types/Seat";
 import {goodInputs} from "@src/match/property-tests/arbitraries/GoodInputs";
-import type {Step} from "@src/match/property-tests/arbitraries/types/Step";
+import type {Step} from "@src/match/property-tests/match-room/arbitraries/types/Step";
 
 /** What can happen to a room in a stretch of play: inputs from either seat, in any order and under any sequence number, and ticks owing none to several steps. */
 export function steps(): fc.Arbitrary<Step[]> {

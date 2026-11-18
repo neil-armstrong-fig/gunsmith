@@ -70,11 +70,18 @@ a delay alone can still help a player through a second account.
 
 - A disconnected player has 30 s to return; their character is frozen in place and still vulnerable. After that the round is
   forfeited; two forfeits lose the match. No input for about 60 s counts as idle and is treated the same.
-- **Built (2026-11-18, no time limit yet):** each seat gets a secret `token` in `joined`, sent on every connection; a returning
+- **Built (2026-11-18): reconnect.** Each seat gets a secret `token` in `joined`, sent on every connection; a returning
   browser shows it (`?token=` on the socket URL, kept in session storage) and gets the same seat, and the server's next
   snapshot is the full state. The returning page counts its inputs from zero, so the server forgets the seat's `ack` on rebinding.
   Close codes (application codes, both mean "do not come back"): `4409` the room is full, `4410` the seat's person connected
-  again elsewhere (the old connection is closed). The 30 s window and the 60 s idle rule are the next slice.
+  again elsewhere (the old connection is closed).
+- **Built (2026-11-18): the 30 s window and the 60 s idle rule.** Each seat has a clock of how long it has been silent, in game time. It
+  restarts when the person leaves or returns, asks for something **new** (the heartbeat repeating the same ask is not new), clicks "Next
+  round", and for both seats when a round is decided or begins. Away: 30 s; there but silent: 60 s. Then the seat forfeits: a round being fought
+  goes to the other seat and is scored as a lost round (so two forfeits lose the match); a decided round still waiting for that seat to click has
+  the next round forfeited as it begins. A decided match forfeits nothing, and two seats running out together forfeit nothing. Specs shorten
+  both with `?reconnectSeconds=` and `?idleSeconds=` on the page (passed on the socket URL; only the room's first connection sets them, never
+  longer than the real limits or under a second). No on-screen notice of the other player being away yet.
 
 ## Rooms
 

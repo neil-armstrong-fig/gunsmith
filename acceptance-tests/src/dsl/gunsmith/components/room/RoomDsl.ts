@@ -1,6 +1,7 @@
 import type {Page} from "@playwright/test";
 import {RoomPlaywright} from "@src/dsl/gunsmith/components/room/playwright/RoomPlaywright";
 import type {ConnectionDelay} from "@src/dsl/gunsmith/components/room/playwright/wire/delayed-line/types/ConnectionDelay";
+import type {RoomLimits} from "@src/dsl/gunsmith/components/room/types/RoomLimits";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
 import type {GunsmithDsl} from "@src/dsl/gunsmith/GunsmithDsl";
 
@@ -29,12 +30,24 @@ export class RoomDsl {
     }
   }
 
-  /** Asks the server for a private room and opens it here. Returns the friend code. */
-  async createPrivateRoom(): Promise<string> {
+  /**
+   * Asks the server for a private room and opens it here. Returns the friend code. `limits` make the room wait less than the real 30 and
+   * 60 seconds for a player who has left or has asked for nothing new.
+   */
+  async createPrivateRoom(limits: RoomLimits = {}): Promise<string> {
     try {
-      return await this.room.createPrivateRoom();
+      return await this.room.createPrivateRoom(limits);
     } catch (error) {
       throw new DslError("Failed to create a private room", error);
+    }
+  }
+
+  /** Keeps this browser's player asking for something new, walking to and fro, for `seconds`: they are plainly there. */
+  async keepMovingFor(seconds: number): Promise<void> {
+    try {
+      await this.room.keepMovingFor(seconds);
+    } catch (error) {
+      throw new DslError(`Failed to keep moving for ${seconds} seconds`, error);
     }
   }
 
