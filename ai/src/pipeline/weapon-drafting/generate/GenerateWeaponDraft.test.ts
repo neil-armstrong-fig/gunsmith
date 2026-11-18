@@ -2,19 +2,6 @@ import {FakeListChatModel} from "@langchain/core/utils/testing";
 import {generateWeaponDraft} from "@gunsmith/ai/pipeline/weapon-drafting/generate/GenerateWeaponDraft";
 import {SYSTEM_PROMPT_CANARY} from "@gunsmith/ai/pipeline/canary/SystemPromptCanary";
 
-function generatorSaying(reply: unknown): FakeListChatModel {
-  return new FakeListChatModel({responses: [JSON.stringify(reply)]});
-}
-
-/** The text of every message handed to the model, in order. The model's input is `unknown` to this test on purpose. */
-function messageTexts(input: unknown): string[] {
-  if (!Array.isArray(input)) {
-    return [];
-  }
-
-  return input.map(message => String((message as {content: unknown}).content));
-}
-
 it("returns what the model said, unchecked", async () => {
   const generator = generatorSaying({name: "Rifle", bulletDamage: 25});
 
@@ -67,3 +54,16 @@ it("does not let a closing tag in the player's words end the data block early", 
   expect(request?.match(/<\s*\/\s*request\s*>/gi)).toHaveLength(1);
   expect(request?.endsWith("</request>")).toBe(true);
 });
+
+/** The text of every message handed to the model, in order. The model's input is `unknown` to this test on purpose. */
+function messageTexts(input: unknown): string[] {
+  if (!Array.isArray(input)) {
+    return [];
+  }
+
+  return input.map(message => String((message as {content: unknown}).content));
+}
+
+function generatorSaying(reply: unknown): FakeListChatModel {
+  return new FakeListChatModel({responses: [JSON.stringify(reply)]});
+}

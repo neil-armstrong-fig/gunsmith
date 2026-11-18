@@ -11,10 +11,6 @@ const player = {...world.player, position: {x: 1.5, y: 1.5}};
 const opponent = world.opponent ?? player;
 const lying: Pickup = {position: {x: 5.5, y: 1.5}, weapon: SUBMACHINE_GUN};
 
-function at(x: number): Point {
-  return {x, y: 1.5};
-}
-
 it("is taken by the player who stands on it, who holds it and leaves nothing lying", () => {
   const taking = takePickup(lying, {player: {...player, position: at(5.5)}, opponent});
 
@@ -71,3 +67,7 @@ it("changes nothing when nothing lies there, or there is no opponent", () => {
   expect(takePickup(undefined, {player, opponent})).toEqual({pickup: undefined, player, opponent});
   expect(takePickup(lying, {player: {...player, position: at(5.5)}}).opponent).toBeUndefined();
 });
+
+function at(x: number): Point {
+  return {x, y: 1.5};
+}

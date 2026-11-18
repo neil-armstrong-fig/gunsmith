@@ -1,10 +1,6 @@
 import {SnapshotBuffer} from "@src/online/interpolation/SnapshotBuffer";
 import type {SnapshotOfOpponent} from "@src/online/interpolation/types/SnapshotOfOpponent";
 
-function at(elapsedSeconds: number): SnapshotOfOpponent {
-  return {elapsedSeconds, opponent: undefined};
-}
-
 it("keeps the snapshots it is given, oldest first, and says which is newest", () => {
   const buffer = new SnapshotBuffer(5);
   buffer.add(at(1));
@@ -35,3 +31,7 @@ it("starts again when the server's game time goes back, as it does with each rou
 it("has no newest snapshot before it is given one", () => {
   expect(new SnapshotBuffer(5).newest).toBeUndefined();
 });
+
+function at(elapsedSeconds: number): SnapshotOfOpponent {
+  return {elapsedSeconds, opponent: undefined};
+}

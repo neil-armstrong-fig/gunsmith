@@ -3,17 +3,6 @@ import {tmpdir} from "node:os";
 import {join} from "node:path";
 import {logPaidCalls} from "@evals/eval-criteria-mapping/weapon/paid/log/LogPaidCalls";
 
-function logFile(): string {
-  return join(mkdtempSync(join(tmpdir(), "calls-")), "nested", "calls.jsonl");
-}
-
-function linesOf(file: string): unknown[] {
-  return readFileSync(file, "utf8")
-    .trim()
-    .split("\n")
-    .map((line): unknown => JSON.parse(line));
-}
-
 it("writes one line holding the request, how long it took and what each call used", () => {
   const file = logFile();
 
@@ -53,3 +42,14 @@ it("keeps a request whose prompt holds a newline on one line", () => {
 
   expect(linesOf(file)).toEqual([expect.objectContaining({prompt: "line one\nline two"})]);
 });
+
+function linesOf(file: string): unknown[] {
+  return readFileSync(file, "utf8")
+    .trim()
+    .split("\n")
+    .map((line): unknown => JSON.parse(line));
+}
+
+function logFile(): string {
+  return join(mkdtempSync(join(tmpdir(), "calls-")), "nested", "calls.jsonl");
+}

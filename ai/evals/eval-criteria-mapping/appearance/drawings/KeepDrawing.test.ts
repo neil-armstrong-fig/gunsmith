@@ -5,10 +5,6 @@ import {passingAppearance} from "@gunsmith/ai/pipeline/appearance/testing/Passin
 import type {AppearanceOutcome} from "@gunsmith/ai/pipeline/appearance/types/AppearanceOutcome";
 import {keepDrawing} from "@evals/eval-criteria-mapping/appearance/drawings/KeepDrawing";
 
-function folder(): string {
-  return mkdtempSync(join(tmpdir(), "drawings-"));
-}
-
 it("keeps nothing unless asked to, so an ordinary run writes no extra files", () => {
   const where = folder();
   keepDrawing({
@@ -54,4 +50,8 @@ function passingAppearanceOutcome(): AppearanceOutcome {
     modelCalls: 1,
     usage: {inputTokens: 3000, outputTokens: 1000},
   };
+}
+
+function folder(): string {
+  return mkdtempSync(join(tmpdir(), "drawings-"));
 }

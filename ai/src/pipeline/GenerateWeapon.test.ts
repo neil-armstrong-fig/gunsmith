@@ -6,19 +6,6 @@ import {passingAppearance} from "@gunsmith/ai/pipeline/appearance/testing/Passin
 import {ToolCallingFakeModel} from "@gunsmith/ai/pipeline/appearance/testing/ToolCallingFakeModel";
 import type {WeaponPipelineDependencies} from "@gunsmith/ai/pipeline/types/WeaponPipelineDependencies";
 
-/** What a model that draws would write: the answers, one per call, the last repeated. */
-function appearanceModelSaying(...answers: unknown[]): ToolCallingFakeModel {
-  return new ToolCallingFakeModel({answers});
-}
-
-function fakeWeaponPipelineDependencies(): WeaponPipelineDependencies {
-  return {
-    generator: new FakeListChatModel({responses: ["{}"]}),
-    moderator: new FakeListChatModel({responses: ["{}"]}),
-    appearanceGenerator: appearanceModelSaying(passingAppearance()),
-  };
-}
-
 it("rejects an over-long prompt without calling a model", async () => {
   const weaponPipelineDependencies = fakeWeaponPipelineDependencies();
   const generatorCall = vi.spyOn(weaponPipelineDependencies.generator, "invoke");
@@ -95,21 +82,6 @@ const DRAWING_REPAIRED_NODES = [
   "appearance.validate",
 ];
 const DRAWING_STAND_IN_NODES = [...DRAWING_REPAIRED_NODES, "appearance.fallback"];
-
-function weaponPipelineDependenciesWhereGeneratorSays(...replies: unknown[]): WeaponPipelineDependencies {
-  return {
-    generator: new FakeListChatModel({responses: replies.map(reply => JSON.stringify(reply))}),
-    moderator: new FakeListChatModel({responses: [JSON.stringify({isWeaponRequest: true, reason: "a gun"})]}),
-    appearanceGenerator: appearanceModelSaying(passingAppearance()),
-  };
-}
-
-function weaponPipelineDependenciesWhereDrawerSays(...drawings: unknown[]): WeaponPipelineDependencies {
-  return {
-    ...weaponPipelineDependenciesWhereGeneratorSays(RIFLE),
-    appearanceGenerator: appearanceModelSaying(...drawings),
-  };
-}
 
 it("creates the weapon the generator wrote when it is valid and within the cap, and draws it", async () => {
   const outcome = await generateWeapon({prompt: "a mild rifle"}, weaponPipelineDependenciesWhereGeneratorSays(RIFLE));
@@ -394,3 +366,31 @@ it("rejects an empty prompt with a reason the player can read", async () => {
     modelCalls: 0,
   });
 });
+
+function weaponPipelineDependenciesWhereDrawerSays(...drawings: unknown[]): WeaponPipelineDependencies {
+  return {
+    ...weaponPipelineDependenciesWhereGeneratorSays(RIFLE),
+    appearanceGenerator: appearanceModelSaying(...drawings),
+  };
+}
+
+function weaponPipelineDependenciesWhereGeneratorSays(...replies: unknown[]): WeaponPipelineDependencies {
+  return {
+    generator: new FakeListChatModel({responses: replies.map(reply => JSON.stringify(reply))}),
+    moderator: new FakeListChatModel({responses: [JSON.stringify({isWeaponRequest: true, reason: "a gun"})]}),
+    appearanceGenerator: appearanceModelSaying(passingAppearance()),
+  };
+}
+
+function fakeWeaponPipelineDependencies(): WeaponPipelineDependencies {
+  return {
+    generator: new FakeListChatModel({responses: ["{}"]}),
+    moderator: new FakeListChatModel({responses: ["{}"]}),
+    appearanceGenerator: appearanceModelSaying(passingAppearance()),
+  };
+}
+
+/** What a model that draws would write: the answers, one per call, the last repeated. */
+function appearanceModelSaying(...answers: unknown[]): ToolCallingFakeModel {
+  return new ToolCallingFakeModel({answers});
+}

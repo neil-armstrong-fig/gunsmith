@@ -110,3 +110,27 @@ it("does not treat a comment as a class interface dependency", async () => {
   );
   expect(results.flatMap(result => result.messages.map(message => message.ruleId))).toContain("gunsmith/single-export");
 });
+
+it.each(["shared", "engine", "ai", "api", "webapp", "acceptance-tests"])(
+  "enforces function standards in %s tests",
+  async packageName => {
+    const eslint = new ESLint({cwd: resolve(import.meta.dirname, "../../..", packageName)});
+    const results = await eslint.lintText(
+      "function helper(): number { return 1; } const arrow = (): number => 2; it('case', () => { helper(); arrow(); });",
+      {filePath: "src/Probe.test.ts"},
+    );
+    const rules = results.flatMap(result => result.messages.map(message => message.ruleId));
+    expect(rules).toContain("gunsmith/function-order");
+    expect(rules).toContain("gunsmith/helper-function-declaration");
+  },
+);
+
+it("enforces function standards in root configuration tests", async () => {
+  const eslint = new ESLint({cwd: resolve(import.meta.dirname, "../..")});
+  const results = await eslint.lintText("function helper() {} it('case', () => helper());", {
+    filePath: "probe.config.test.ts",
+  });
+  expect(results.flatMap(result => result.messages.map(message => message.ruleId))).toContain(
+    "gunsmith/function-order",
+  );
+});

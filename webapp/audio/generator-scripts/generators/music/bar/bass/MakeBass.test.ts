@@ -3,17 +3,6 @@ import {makeBass} from "@gunsmith/audio-studies/generators/music/bar/bass/MakeBa
 import {noteFrequency} from "@gunsmith/audio-studies/generators/music/bar/note/NoteFrequency";
 import type {BarPosition} from "@gunsmith/audio-studies/generators/music/bar/types/BarPosition";
 
-function position(sparse: boolean, sectionIndex = 0): BarPosition {
-  return {
-    bar: 8,
-    sectionIndex,
-    section: {sparse, kickBeats: [], bassSteps: [0, 3, 8], melody: []},
-    root: 38,
-    start: 4,
-    beat: 0.5,
-  };
-}
-
 it("plays a sawtooth on each sixteenth-note step the section names", () => {
   expect(makeBass(position(false)).map(voice => voice.at)).toStrictEqual([4, 4.375, 5]);
 });
@@ -41,3 +30,14 @@ it("plays nothing when the section names no steps", () => {
 
   expect(makeBass(silent)).toStrictEqual([]);
 });
+
+function position(sparse: boolean, sectionIndex = 0): BarPosition {
+  return {
+    bar: 8,
+    sectionIndex,
+    section: {sparse, kickBeats: [], bassSteps: [0, 3, 8], melody: []},
+    root: 38,
+    start: 4,
+    beat: 0.5,
+  };
+}

@@ -5,17 +5,6 @@ import type {ArenaSubmissionDependencies} from "@gunsmith/ai/pipeline/arena-subm
 const PROMPT = {kind: "prompt" as const, playerId: "first", prompt: "an open arena with a ring of stone pillars"};
 const BUILT_IN = {kind: "built-in" as const, playerId: "second", builtInName: "Open Room"};
 
-function dependencies(...isArenaRequests: boolean[]): ArenaSubmissionDependencies {
-  const responses = isArenaRequests.map(isArenaRequest =>
-    JSON.stringify({isArenaRequest, reason: isArenaRequest ? "An arena." : "Not an arena."}),
-  );
-
-  return {
-    moderator: new FakeListChatModel({responses}),
-    builtInArenas: [{name: "Open Room", rows: ["#####", "#...#", "#####"]}],
-  };
-}
-
 it("lets an arena prompt through at the cost of one moderation call", async () => {
   expect(await screenOneSubmission(PROMPT, dependencies(true))).toEqual({passed: PROMPT, modelCalls: 1});
 });
@@ -67,3 +56,14 @@ it("never repeats the player's prompt in the reason it gives", async () => {
 
   expect(JSON.stringify(screened.rejected)).not.toContain("lasagna");
 });
+
+function dependencies(...isArenaRequests: boolean[]): ArenaSubmissionDependencies {
+  const responses = isArenaRequests.map(isArenaRequest =>
+    JSON.stringify({isArenaRequest, reason: isArenaRequest ? "An arena." : "Not an arena."}),
+  );
+
+  return {
+    moderator: new FakeListChatModel({responses}),
+    builtInArenas: [{name: "Open Room", rows: ["#####", "#...#", "#####"]}],
+  };
+}

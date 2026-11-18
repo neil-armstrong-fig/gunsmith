@@ -3,54 +3,6 @@ import {validateAppearance} from "@gunsmith/ai/pipeline/appearance/check/validat
 import {readArtAppearanceFixtures} from "@gunsmith/ai/pipeline/appearance/testing/ArtAppearanceFixtures";
 import {passingAppearance} from "@gunsmith/ai/pipeline/appearance/testing/PassingAppearance";
 
-/** The passing appearance with one body part changed. */
-function withBodyPart(index: number, change: Record<string, unknown>): unknown {
-  const appearance = passingAppearance();
-  const body = appearance.body as Record<string, unknown>[];
-  body[index] = {...body[index], ...change};
-
-  return appearance;
-}
-
-/** A closed shape of `count` points on a small ring, so it stays inside the space whatever the count. */
-function ring({count, centreX, centreY, decimals}: RingRequest): number[][] {
-  return Array.from({length: count}, (_, index) => {
-    const angle = (index / count) * 2 * Math.PI;
-    const x = centreX + 3 * Math.cos(angle);
-    const y = centreY + 3 * Math.sin(angle);
-
-    if (decimals === undefined) {
-      return [x, y];
-    }
-
-    return [Number(x.toFixed(decimals)), Number(y.toFixed(decimals))];
-  });
-}
-
-function polygonOf(points: number[][]): Record<string, unknown> {
-  return {
-    kind: "polygon",
-    x: 0,
-    y: 0,
-    points,
-    fill: "accent",
-    stroke: "outline",
-    strokeWidth: 2,
-    opacity: 1,
-    rotation: 0,
-    detail: "structural",
-  };
-}
-
-function errorsOf(candidate: unknown): string[] {
-  const result = validateAppearance(candidate);
-
-  if (result.ok) {
-    return [];
-  }
-  return result.errors;
-}
-
 it("accepts every appearance art has drawn", () => {
   const fixtures = readArtAppearanceFixtures();
   const refused = fixtures.flatMap(fixture => errorsOf(fixture.appearance).map(error => `${fixture.name}: ${error}`));
@@ -370,3 +322,51 @@ it("shortens a long message, so words the model or player chose cannot fill the 
   expect(errors.length).toBeGreaterThan(0);
   expect(errors.every(error => error.length <= 120)).toBe(true);
 });
+
+function errorsOf(candidate: unknown): string[] {
+  const result = validateAppearance(candidate);
+
+  if (result.ok) {
+    return [];
+  }
+  return result.errors;
+}
+
+function polygonOf(points: number[][]): Record<string, unknown> {
+  return {
+    kind: "polygon",
+    x: 0,
+    y: 0,
+    points,
+    fill: "accent",
+    stroke: "outline",
+    strokeWidth: 2,
+    opacity: 1,
+    rotation: 0,
+    detail: "structural",
+  };
+}
+
+/** A closed shape of `count` points on a small ring, so it stays inside the space whatever the count. */
+function ring({count, centreX, centreY, decimals}: RingRequest): number[][] {
+  return Array.from({length: count}, (_, index) => {
+    const angle = (index / count) * 2 * Math.PI;
+    const x = centreX + 3 * Math.cos(angle);
+    const y = centreY + 3 * Math.sin(angle);
+
+    if (decimals === undefined) {
+      return [x, y];
+    }
+
+    return [Number(x.toFixed(decimals)), Number(y.toFixed(decimals))];
+  });
+}
+
+/** The passing appearance with one body part changed. */
+function withBodyPart(index: number, change: Record<string, unknown>): unknown {
+  const appearance = passingAppearance();
+  const body = appearance.body as Record<string, unknown>[];
+  body[index] = {...body[index], ...change};
+
+  return appearance;
+}

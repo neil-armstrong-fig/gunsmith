@@ -23,27 +23,6 @@ const EFFECT_KEYS = [
   ),
 ];
 
-function tinyEffect(key: string): Cue {
-  return {
-    key,
-    duration: 0.05,
-    channels: 1,
-    peak: 0.3,
-    voices: [{kind: "tone", at: 0, duration: 0.04, frequency: 500, gain: 1}],
-  };
-}
-
-function tinyLoop(key: string): Cue {
-  return {
-    key,
-    duration: 0.5,
-    channels: 2,
-    peak: 0.25,
-    loop: true,
-    voices: [{kind: "tone", at: 0.1, duration: 0.2, frequency: 300, gain: 1, pan: -0.5}],
-  };
-}
-
 const pack: AudioPack = {
   effects: EFFECT_KEYS.map(tinyEffect),
   match: tinyLoop("music-loop-match"),
@@ -59,14 +38,6 @@ beforeAll(async () => {
 afterAll(async () => {
   await rm(folder, {recursive: true, force: true});
 });
-
-function channelsOf(key: string): number {
-  if (key.startsWith("sfx-")) {
-    return 1;
-  }
-
-  return 2;
-}
 
 it("renders every effect, both loops and the audition mix, and says how many files that is", async () => {
   const output = join(folder, "first");
@@ -155,3 +126,32 @@ it("renders the same bytes every time", async () => {
     expect(await readFile(join(first, file)), file).toStrictEqual(await readFile(join(second, file)));
   }
 });
+
+function channelsOf(key: string): number {
+  if (key.startsWith("sfx-")) {
+    return 1;
+  }
+
+  return 2;
+}
+
+function tinyLoop(key: string): Cue {
+  return {
+    key,
+    duration: 0.5,
+    channels: 2,
+    peak: 0.25,
+    loop: true,
+    voices: [{kind: "tone", at: 0.1, duration: 0.2, frequency: 300, gain: 1, pan: -0.5}],
+  };
+}
+
+function tinyEffect(key: string): Cue {
+  return {
+    key,
+    duration: 0.05,
+    channels: 1,
+    peak: 0.3,
+    voices: [{kind: "tone", at: 0, duration: 0.04, frequency: 500, gain: 1}],
+  };
+}

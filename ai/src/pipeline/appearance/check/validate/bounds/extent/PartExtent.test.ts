@@ -4,13 +4,6 @@ import type {AppearancePart} from "@gunsmith/shared/appearance/schema/part/Appea
 
 const COMMON = {fill: "body", stroke: "edge", strokeWidth: 2, opacity: 1, rotation: 0, detail: "structural"} as const;
 
-function expectExtent(actual: Extent, expected: Extent): void {
-  expect(actual.minX).toBeCloseTo(expected.minX, 6);
-  expect(actual.minY).toBeCloseTo(expected.minY, 6);
-  expect(actual.maxX).toBeCloseTo(expected.maxX, 6);
-  expect(actual.maxY).toBeCloseTo(expected.maxY, 6);
-}
-
 it("grows a circle by half its stroke on every side", () => {
   const part: AppearancePart = {...COMMON, kind: "circle", x: 32, y: 32, radius: 6};
 
@@ -123,3 +116,10 @@ it("leaves a circle where it is however it is turned", () => {
 
   expectExtent(partExtent(part), {minX: 26, minY: 26, maxX: 38, maxY: 38});
 });
+
+function expectExtent(actual: Extent, expected: Extent): void {
+  expect(actual.minX).toBeCloseTo(expected.minX, 6);
+  expect(actual.minY).toBeCloseTo(expected.minY, 6);
+  expect(actual.maxX).toBeCloseTo(expected.maxX, 6);
+  expect(actual.maxY).toBeCloseTo(expected.maxY, 6);
+}

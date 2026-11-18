@@ -11,6 +11,13 @@ import {ENCODER_SETTINGS} from "@gunsmith/audio-studies/encoding/settings/Encode
 import {readMeasurements} from "@gunsmith/audio-studies/output/measurements/read/ReadMeasurements";
 import type {EncodingOptions} from "@gunsmith/audio-studies/encoding/types/EncodingOptions";
 
+// Node's native TypeScript support runs this entry point without a transpiler.
+const entry = process.argv[1];
+if (entry && pathToFileURL(resolve(entry)).href === import.meta.url) {
+  const root = resolve(import.meta.dirname, "../..");
+  await encodeAudio({source: join(root, "generated-audio"), output: join(root, "encoded-audio")});
+}
+
 /**
  * Encodes the measured masters into `output`, as Ogg Vorbis and MP3. Old reports are removed first, the exports are made in a
  * staging folder, and nothing is published unless every one succeeded, with the report last (`publishEncoded`).
@@ -29,11 +36,4 @@ export async function encodeAudio(options: EncodingOptions): Promise<void> {
   } finally {
     await rm(staging, {recursive: true, force: true});
   }
-}
-
-// Node's native TypeScript support runs this entry point without a transpiler.
-const entry = process.argv[1];
-if (entry && pathToFileURL(resolve(entry)).href === import.meta.url) {
-  const root = resolve(import.meta.dirname, "../..");
-  await encodeAudio({source: join(root, "generated-audio"), output: join(root, "encoded-audio")});
 }

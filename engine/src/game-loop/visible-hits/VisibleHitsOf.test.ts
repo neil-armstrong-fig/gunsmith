@@ -10,16 +10,6 @@ const OPPONENT_HIT: LandedHit = {on: "opponent", dummyIndex: undefined};
 const IN_FRONT = {x: 10.5, y: 4.5};
 const BEHIND = {x: 3.5, y: 4.5};
 
-function lookingEast(): World {
-  return startingWorld(arena, [IN_FRONT, BEHIND], {x: 11.5, y: 4.5});
-}
-
-function lookingWest(): World {
-  const world = lookingEast();
-
-  return {...world, player: {...world.player, aim: {x: -1, y: 0}}};
-}
-
 it("has no visible hits when nothing landed", () => {
   expect(visibleHitsOf(lookingEast(), [])).toEqual([]);
 });
@@ -58,3 +48,13 @@ it("keeps each visible hit in order and drops the hidden ones between them", () 
 it("drops a hit on an opponent that is not in the world", () => {
   expect(visibleHitsOf({...lookingEast(), opponent: undefined}, [OPPONENT_HIT])).toEqual([]);
 });
+
+function lookingWest(): World {
+  const world = lookingEast();
+
+  return {...world, player: {...world.player, aim: {x: -1, y: 0}}};
+}
+
+function lookingEast(): World {
+  return startingWorld(arena, [IN_FRONT, BEHIND], {x: 11.5, y: 4.5});
+}

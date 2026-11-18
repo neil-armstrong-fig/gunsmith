@@ -10,17 +10,6 @@ const SECOND = {
 };
 const BUILT_IN = {kind: "built-in" as const, playerId: "second", builtInName: "Open Room"};
 
-function dependencies(...isArenaRequests: boolean[]): ArenaSubmissionDependencies {
-  const responses = isArenaRequests.map(isArenaRequest =>
-    JSON.stringify({isArenaRequest, reason: isArenaRequest ? "An arena." : "Not an arena."}),
-  );
-
-  return {
-    moderator: new FakeListChatModel({responses}),
-    builtInArenas: [{name: "Open Room", rows: ["#####", "#...#", "#####"]}],
-  };
-}
-
 it("sends both prompts forward for the players to pick between when both are arenas", async () => {
   const screening = await screenArenaSubmissions({submissions: [FIRST, SECOND]}, dependencies(true, true));
 
@@ -95,3 +84,14 @@ it("refuses two submissions from one player, which would make whose arena is pic
     "one submission for each player",
   );
 });
+
+function dependencies(...isArenaRequests: boolean[]): ArenaSubmissionDependencies {
+  const responses = isArenaRequests.map(isArenaRequest =>
+    JSON.stringify({isArenaRequest, reason: isArenaRequest ? "An arena." : "Not an arena."}),
+  );
+
+  return {
+    moderator: new FakeListChatModel({responses}),
+    builtInArenas: [{name: "Open Room", rows: ["#####", "#...#", "#####"]}],
+  };
+}

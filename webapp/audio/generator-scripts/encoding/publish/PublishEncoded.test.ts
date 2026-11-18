@@ -22,10 +22,6 @@ afterEach(async () => {
   await rm(folder, {recursive: true, force: true});
 });
 
-function fileOf(format: EncodedFile["format"]): EncodedFile {
-  return {key: "sfx-hit", format, sourceSha256: "s", sha256: "h", bytes: 1, channels: 1, seconds: 1, arguments: []};
-}
-
 const REPORT: EncodingReport = {encoder: "ffmpeg test", sampleRate: 48000, files: [fileOf("ogg"), fileOf("mp3")]};
 
 it("copies every staged export and then writes the report", async () => {
@@ -44,3 +40,7 @@ it("writes no report when an export is missing, so a report never vouches for wh
   await expect(publishEncoded({staging, output, report: REPORT})).rejects.toThrow();
   expect((await readdir(output)).includes("report.json")).toBe(false);
 });
+
+function fileOf(format: EncodedFile["format"]): EncodedFile {
+  return {key: "sfx-hit", format, sourceSha256: "s", sha256: "h", bytes: 1, channels: 1, seconds: 1, arguments: []};
+}

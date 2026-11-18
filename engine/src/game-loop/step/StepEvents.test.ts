@@ -30,14 +30,6 @@ const RING_AWAY_FROM_PLAYER: Ring = {
 
 const EAST = firingAt({x: 20, y: 4.5});
 
-/** The player with an empty magazine in every weapon and `reserve` rounds behind each. */
-function dry(world: World, reserve: number): World {
-  return {
-    ...world,
-    player: {...world.player, loadout: world.player.loadout.map(carried => ({...carried, rounds: 0, reserve}))},
-  };
-}
-
 it("reports nothing in a step where nothing happened", () => {
   expect(step(centred(), IDLE, TICK).events).toBeUndefined();
 });
@@ -316,4 +308,12 @@ function eventsWhilePlaying(world: World, ticks: number): CombatEvent[] {
 
 function damageTakenIn(events: readonly CombatEvent[] | undefined): DamageTakenEvent[] {
   return (events ?? []).filter(event => event.kind === "damageTaken");
+}
+
+/** The player with an empty magazine in every weapon and `reserve` rounds behind each. */
+function dry(world: World, reserve: number): World {
+  return {
+    ...world,
+    player: {...world.player, loadout: world.player.loadout.map(carried => ({...carried, rounds: 0, reserve}))},
+  };
 }

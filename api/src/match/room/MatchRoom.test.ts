@@ -4,31 +4,8 @@ import {MatchRoom} from "@src/match/room/MatchRoom";
 
 const IDLE: Input = {direction: {x: 0, y: 0}, firing: false, reload: false};
 
-function startedRoom(): MatchRoom {
-  const room = new MatchRoom();
-  room.join();
-  room.join();
-
-  return room;
-}
-
 /** The longest a seat shooting a standing fighter is given to decide a round: far more than the rifle needs. */
 const MOST_STEPS_TO_DECIDE_A_ROUND = 1200;
-
-/** Has `winner` shoot the other seat, who stands still, until the round is decided. */
-function winRound(room: MatchRoom, winner: Seat): void {
-  const loser: Seat = winner === "first" ? "second" : "first";
-  const aimAt = room.snapshotFor(loser)?.player.position;
-  const seq = (room.snapshotFor(winner)?.ack?.seq ?? 0) + 1;
-  room.setInput(winner, {...IDLE, aimAt, firing: true}, seq);
-
-  for (let step = 0; step < MOST_STEPS_TO_DECIDE_A_ROUND && room.snapshotFor(winner)?.round === "playing"; step += 1) {
-    room.tick();
-  }
-
-  room.setInput(winner, IDLE, seq + 1);
-}
-
 it("seats the first person first and the second second, and nobody after", () => {
   const room = new MatchRoom();
 
@@ -394,3 +371,25 @@ it("keeps what a seat asked for once the round is decided from being played in t
 
   expect(room.snapshotFor("first")?.player.equippedIndex).toBe(0);
 });
+
+function startedRoom(): MatchRoom {
+  const room = new MatchRoom();
+  room.join();
+  room.join();
+
+  return room;
+}
+
+/** Has `winner` shoot the other seat, who stands still, until the round is decided. */
+function winRound(room: MatchRoom, winner: Seat): void {
+  const loser: Seat = winner === "first" ? "second" : "first";
+  const aimAt = room.snapshotFor(loser)?.player.position;
+  const seq = (room.snapshotFor(winner)?.ack?.seq ?? 0) + 1;
+  room.setInput(winner, {...IDLE, aimAt, firing: true}, seq);
+
+  for (let step = 0; step < MOST_STEPS_TO_DECIDE_A_ROUND && room.snapshotFor(winner)?.round === "playing"; step += 1) {
+    room.tick();
+  }
+
+  room.setInput(winner, IDLE, seq + 1);
+}

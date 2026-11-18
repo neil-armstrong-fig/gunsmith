@@ -16,16 +16,6 @@ const SECOND_OWN: ArenaChoice = {kind: "arena", chosenPlayerId: "second"};
 const RANDOM: ArenaChoice = {kind: "random"};
 const NOTHING: ArenaChoice = {kind: "nothing"};
 
-function resolved(first: ArenaChoice, second: ArenaChoice, seed: number): ReturnType<typeof resolveArenaPicks> {
-  return resolveArenaPicks({
-    picks: [
-      {playerId: "first", choice: first},
-      {playerId: "second", choice: second},
-    ],
-    seed,
-  });
-}
-
 it("plays the arena both players picked, whichever it is, without any draw", () => {
   expect(resolved(SECOND_OWN, SECOND_OWN, FIRST_DRAW_UNDER_A_HALF)).toEqual({chosenPlayerId: "second", how: "agreed"});
   expect(resolved(FIRST_OWN, FIRST_OWN, FIRST_DRAW_A_HALF_OR_MORE)).toEqual({chosenPlayerId: "first", how: "agreed"});
@@ -142,3 +132,13 @@ it("has a salt of its own, none of the engine's other streams' (pickup, ring and
 
   expect([PICKUP_SEED_SALT, RING_SEED_SALT, SPAWN_SEED_SALT]).not.toContain(ARENA_PICK_SEED_SALT);
 });
+
+function resolved(first: ArenaChoice, second: ArenaChoice, seed: number): ReturnType<typeof resolveArenaPicks> {
+  return resolveArenaPicks({
+    picks: [
+      {playerId: "first", choice: first},
+      {playerId: "second", choice: second},
+    ],
+    seed,
+  });
+}

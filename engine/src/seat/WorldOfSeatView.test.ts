@@ -10,10 +10,6 @@ const room = arenaFrom([
   "########################",
 ]);
 
-function duel(): World {
-  return startingWorld(room, [], {x: 12.5 + 4, y: 3.5});
-}
-
 it("builds the world a seat was told about, with the fighters it sees", () => {
   const world = duel();
   const rebuilt = worldOfSeatView(room, viewOfSeat(world, "first"));
@@ -35,3 +31,7 @@ it("survives being sent as JSON", () => {
 
   expect(worldOfSeatView(room, sent).player).toEqual(duel().opponent);
 });
+
+function duel(): World {
+  return startingWorld(room, [], {x: 12.5 + 4, y: 3.5});
+}

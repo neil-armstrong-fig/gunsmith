@@ -8,15 +8,6 @@ const PALETTE = {accent: "weapon-blue", "accent-secondary": "weapon-violet"} as 
 
 const CSS = readFileSync(resolve(import.meta.dirname, "../../../../../../../../../../../../../../index.css"), "utf8");
 
-function cssToken(name: string): string {
-  const found = new RegExp(`--color-gs-${name}:\\s*(#[0-9a-fA-F]{6})`).exec(CSS);
-  if (!found?.[1]) {
-    throw new Error(`index.css has no --color-gs-${name}`);
-  }
-
-  return found[1].toUpperCase();
-}
-
 it("draws nothing for the role none", () => {
   expect(roleColour("none", PALETTE)).toBe("none");
 });
@@ -54,3 +45,12 @@ it("is the colours of the game's own tokens, so a drawing sits in the palette of
     cssToken("weapon-mint"),
   );
 });
+
+function cssToken(name: string): string {
+  const found = new RegExp(`--color-gs-${name}:\\s*(#[0-9a-fA-F]{6})`).exec(CSS);
+  if (!found?.[1]) {
+    throw new Error(`index.css has no --color-gs-${name}`);
+  }
+
+  return found[1].toUpperCase();
+}
