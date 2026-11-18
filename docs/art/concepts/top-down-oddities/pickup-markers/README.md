@@ -28,20 +28,19 @@ Source weapon/arena images are from the S4 runtime review at revision
 bundle and capture metadata were removed at the user's request after approval.
 The marker SVG contains no raster image.
 
-## Integration handoff
+## Runtime placement
 
-Artwork is approved; runtime adoption remains open. Art owns source/loading;
-play coordinates pickup integration with AI's generated-appearance renderer.
-No new manifest key, schema or game behavior is introduced by this delivery.
+The [runtime sprite](../../../../../webapp/public/assets/sprites/sprite-pickup-marker.svg)
+uses the manifest key `sprite-pickup-marker`. It translates the approved source
+onto a zero-origin canvas. The marker sits above the weapon, so the same outline
+stays visible around a corner-filling design. The pickup's existing visibility
+and collection check applies to both layers. If the marker file is unavailable,
+the weapon drawing or placeholder still appears once sprite loading settles.
 
-Use the same code-owned marker for every ground weapon, including fallbacks.
-Acceptance first: assert the marker around both fixtures, unchanged dimensions
-across appearances, disappearance of the entire marker under fog, return when
-visible, and removal on collection. Sample its whole canvas (about 0.489 tile
-from the centre), beyond the existing pickup sampler's 0.4 tile radius. Mutation
-must remove the marker or its visibility check and fail the relevant criterion.
-Review edge-filling weapon shapes before integration. The fallback body's S4-1
-contrast problem remains separate from the approved marker.
+The browser spec checks both drawings and the placeholder. Fog and collection
+checks read the full marker canvas (about 0.489 tile from centre). The lantern
+core check reads only the centre because the marker uses the same pale colour.
+Fallback body contrast remains the separate S4-1 follow-up.
 
 ## Cleanup and verification
 

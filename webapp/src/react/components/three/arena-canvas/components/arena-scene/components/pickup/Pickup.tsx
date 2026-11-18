@@ -4,9 +4,13 @@ import {gameState} from "@src/store/game/selectors/game-state/GameState";
 import {PickupDisc} from "@src/react/components/three/arena-canvas/components/arena-scene/components/pickup/components/pickup-disc/PickupDisc";
 import {WeaponDrawingPlane} from "@src/react/components/three/arena-canvas/components/arena-scene/components/pickup/components/weapon-drawing-plane/WeaponDrawingPlane";
 import {useWeaponDrawing} from "@src/react/components/three/arena-canvas/components/arena-scene/components/pickup/hooks/use-weapon-drawing/UseWeaponDrawing";
+import {SpritePlane} from "@src/react/components/three/arena-canvas/components/arena-scene/components/sprite-plane/SpritePlane";
 import type {JSX} from "react";
 import {useRef} from "react";
 import type {Group} from "three";
+
+// Lift the marker above the weapon plane so even drawings that fill their corners leave the outline visible.
+const MARKER_HEIGHT_ABOVE_PICKUP = 0.01;
 
 /** The weapon lying in the arena, where the simulation says it is, drawn as its drawing (the placeholder disc when it has none) and only while the player sees it. */
 export function Pickup(): JSX.Element {
@@ -31,6 +35,10 @@ export function Pickup(): JSX.Element {
       {!drawing && <PickupDisc />}
 
       {drawing && <WeaponDrawingPlane texture={drawing} />}
+
+      <group position={[0, 0, MARKER_HEIGHT_ABOVE_PICKUP]}>
+        <SpritePlane spriteKey="sprite-pickup-marker" />
+      </group>
     </group>
   );
 }

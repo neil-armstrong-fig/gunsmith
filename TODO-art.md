@@ -4,9 +4,9 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 ## Resume here
 
-Checkout: `.claude/worktrees/art`, branch `worktree-art`; last merged main `9484ad0` by fast-forward on 2026-11-17. Preserve this worktree and sync committed main before new work/delivery.
+Checkout: `.claude/worktrees/art`, branch `worktree-art`; last merged main `6186476` by fast-forward on 2026-11-18. Preserve this worktree and sync committed main before new work/delivery.
 
-Current slice: [C2 soft octagon approved](docs/art/concepts/top-down-oddities/pickup-markers/README.md) by the user on 2026-11-17. Selected SVG, self-contained native/context proof and integration notes retained; rejected comparisons, scratch scripts and redundant S4 screenshot/metadata bundle removed at user request. Next: coordinate acceptance-first marker integration with play/AI, preserving complete fog/collection suppression and fixed appearance-independent shape. No runtime edits. S4-1 fallback contrast is retained in HANDOFF.md; terrain approval and ring-loop integration remain open.
+Current slice: [C2 soft octagon](docs/art/concepts/top-down-oddities/pickup-markers/README.md) draws above ground weapons and shares their fog and collection suppression. The sprite loader, pickup group and browser coverage are delivered together. Next visual slice: review S4-1 when AI delivers its fallback contrast change, using the 64/32 px pickup checks. Terrain approval and ring-loop integration remain open.
 
 Current milestone: M1/M6; the project remains on M1. Next audio task: combat masking, fatigue and levels once AI/play integrate runtime weapon-shot synthesis (not yet wired into the game sound output). Safari acceptance does not claim new headphone/speaker measurements. Preserve approved master hashes. Next failing check for any playback change: the relevant browser sound acceptance criterion before implementation.
 
@@ -22,7 +22,7 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 
 ## Current milestone tasks
 
-- [x] User chose C2 soft octagon after two marker comparisons. Lock artwork and clean rejected studies; acceptance-first runtime integration remains open.
+- [x] User chose C2 soft octagon after two marker comparisons. Lock artwork, clean rejected studies and integrate the marker with pickup rendering and browser coverage.
 
 - [x] Complete S4 generated-pickup review at native 64/32 px with hide/restore checks. Lantern passes; S4-1 fallback readability fix is handed to AI. After C2 approval, redundant review artifacts were removed by user request; the approved proof embeds its source images. Broader schema/oddity review stays open.
 
@@ -52,7 +52,22 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 
 ## Verification/latest delivery
 
-Cleanup validation: `pnpm checks` exits 0 (lint, formatting, strict types and 2,567 tests; one existing audio-render skip). Approved C2 source/proof retained, with all five proof images embedded. Root instructions re-read; folder/caller, link, SVG geometry and whitespace audit complete. Redundant review artifacts removed from disk and staging; S4-1 finding retained in HANDOFF.md. No gameplay change or acceptance rerun. Delivery remains uncommitted.
+2026-11-18, runtime marker: production build and 78/78 pickup and sprite
+criteria passed without retries. All 13 marker and generated-drawing criteria
+passed again after moving the screenshot helpers. Before implementation, all
+three placement checks reported zero corners. Temporary production bundle
+mutations repeated those failures, exposed 792 fog and 909 post-collection
+sample points, and removed the lantern's pale core with its marker intact.
+Chromium 64/32 px captures confirmed the outline stays above a valid
+corner-filling drawing.
+
+`pnpm checks` passed lint, formatting, strict types and 2,805 unit tests,
+with one existing slow audio test skipped. Standards review used root, webapp,
+React and acceptance instructions. Folder and caller audit placed pickup-only
+sampling under its Playwright caller and the result type in `types/`.
+The runtime delivery is uncommitted in `worktree-art`.
+
+Cleanup validation: `pnpm checks` exits 0 (lint, formatting, strict types and 2,567 tests; one existing audio-render skip). Approved C2 source/proof retained, with all five proof images embedded. Root instructions re-read; folder/caller, link, SVG geometry and whitespace audit complete. Redundant review artifacts removed from disk and staging; S4-1 finding retained in HANDOFF.md. No gameplay change or acceptance rerun. The artwork is on main in `6186476`.
 
 Record actual checks, red/mutation evidence and the standards/folder review for the current delivery. Update this resume, the shared status row and a concise handoff at session end.
 

@@ -7,9 +7,9 @@ import {beforeEach, expect, given, then, when} from "@src/acceptance-criteria-ma
 // art's `top-down-oddities/appearances/jellyfish-cage.json`, drawn at half scale (art's README: a pickup is the body at scale 1 or 0.5; half is 0.71 tile
 // across, near today's 0.6-tile disc). `refused` is the same drawing at a version the schema does not know (version 2), so the stand-in is drawn:
 // **it ships in the production bundle behind the query**, a test seam like `?ringDelay=`. Nothing links a real weapon to a drawing yet (the engine's
-// `Weapon` has no appearance), so a fixture is the only way to ask. Art's neutral diamond round a pickup is out of this slice.
+// `Weapon` has no appearance), so a fixture is the only way to ask. The C2 marker has separate coverage in DrawingThePickupMarker.
 //
-// Colours only the drawing has: the cage's weapon blue and the core's pale text grey (`#E5EAF0`). The body grey is the wall's colour and the outline the
+// The cage uses weapon blue and the core uses pale text grey (`#E5EAF0`), sampled centrally to exclude the same colour in the marker. The body grey is the wall's colour and the outline the
 // background's, so neither says anything. The drawing is drawn with `toneMapped={false}`, so a flat fill reads exactly.
 //
 // Measured on a production build, the same every run, over a 33 by 33 grid with a gap of 0.025 tile: the lantern 38 blue and 24 pale grey, the stand-in 6 blue and

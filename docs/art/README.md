@@ -114,7 +114,7 @@ this delivery changes no schema, enum or runtime manifest. Proposed arena theme:
 | `weapon-mint` | `#8AD4B0` | Weapon accent |
 
 The four `weapon-*` names are proposed values for the weapon's `colour` token. Weapon accent denotes the weapon,
-not ownership: teams also have shoulder stripes; pickups have a diamond surround. Ring danger uses chevrons.
+not ownership: teams also have shoulder stripes; ground pickups use the neutral C2 soft octagon. Ring danger uses chevrons.
 
 ## Shape, strokes and light
 

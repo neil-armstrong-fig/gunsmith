@@ -67,3 +67,11 @@ it("draws the two sides' shots in their team colours: art's blue, and orange for
   expect(fileOf(spriteUrl("fx-projectile-rifle-blue"))).toContain("#62B5FF");
   expect(fileOf(spriteUrl("fx-projectile-rifle-orange"))).toContain("#FF9B54");
 });
+
+it("centres the pickup marker and draws its canvas at half the fighters' scale", () => {
+  const {anchor, pixelsPerTile, sizePixels} = SPRITE_MANIFEST["sprite-pickup-marker"];
+
+  expect(sizePixels).toBe(88);
+  expect(anchor).toEqual({x: 44, y: 44});
+  expect(pixelsPerTile).toBe(2 * SPRITE_MANIFEST["sprite-player-stand-blue"].pixelsPerTile);
+});

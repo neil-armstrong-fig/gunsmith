@@ -64,10 +64,15 @@ export class GunsmithPlaywright extends BasePage {
   }
 
   /** Opens sparring with art's pictures missing from the server, as a bad deploy would leave them. */
-  async openSparringWithMissingPictures(): Promise<void> {
+  async openSparringWithMissingPictures(seed?: number): Promise<void> {
     await this.page.route(PICTURES, async route => {
       await route.fulfill({status: 404});
     });
+
+    if (seed !== undefined) {
+      await this.openSparringWithSeed(seed);
+      return;
+    }
 
     await this.openSparring();
   }

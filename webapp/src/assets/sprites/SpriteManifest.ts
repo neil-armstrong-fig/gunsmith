@@ -37,6 +37,12 @@ export const SPRITE_MANIFEST: Record<SpriteKey, SpriteEntry> = {
   "sprite-player-crouch-blue": PLAYER_SPRITE,
   "sprite-player-stand-orange": PLAYER_SPRITE,
   "sprite-dummy": DUMMY_SPRITE,
+  "sprite-pickup-marker": {
+    sizePixels: 88,
+    anchor: {x: 44, y: 44},
+    // Same design units as the ground weapon, drawn at half scale.
+    pixelsPerTile: PLAYER_SPRITE.pixelsPerTile / 0.5,
+  },
   "fx-projectile-rifle-blue": SHOT_SPRITE,
   "fx-projectile-rifle-orange": SHOT_SPRITE,
 };

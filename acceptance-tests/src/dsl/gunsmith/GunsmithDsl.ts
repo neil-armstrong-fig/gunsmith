@@ -129,9 +129,9 @@ export class GunsmithDsl {
   }
 
   /** Opens a sparring match whose pictures are not on the server at all. */
-  async startSparringWithMissingPictures(): Promise<void> {
+  async startSparringWithMissingPictures(seed?: number): Promise<void> {
     try {
-      await this.gunsmith.openSparringWithMissingPictures();
+      await this.gunsmith.openSparringWithMissingPictures(seed);
     } catch (error) {
       throw new DslError("Failed to open the sparring match with the pictures missing", error);
     }

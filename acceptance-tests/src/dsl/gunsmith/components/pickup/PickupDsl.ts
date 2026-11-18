@@ -2,6 +2,8 @@ import type {Page} from "@playwright/test";
 import type {PickupSnapshot} from "@gunsmith/shared/state-hook/types/PickupSnapshot";
 import {PickupPlaywright} from "@src/dsl/gunsmith/components/pickup/playwright/PickupPlaywright";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
+import type {PickupMarkerLook} from "@src/dsl/gunsmith/components/pickup/types/PickupMarkerLook";
+import type {Point} from "@src/dsl/gunsmith/types/Point";
 import type {PickupLook} from "@src/dsl/gunsmith/types/PickupLook";
 
 /** The weapon lying in the arena for a fighter to take, reached as `gunsmith.pickup`. */
@@ -27,6 +29,15 @@ export class PickupDsl {
       return await this.pickup.getLookOnScreen();
     } catch (error) {
       throw new DslError("Failed to read what the pickup looks like on the screen", error);
+    }
+  }
+
+  /** Reads the marker at this place, even after the weapon has been collected. */
+  async getMarkerOnScreen(centre: Point): Promise<PickupMarkerLook> {
+    try {
+      return await this.pickup.getMarkerOnScreen(centre);
+    } catch (error) {
+      throw new DslError("Failed to read the pickup marker on the screen", error);
     }
   }
 
