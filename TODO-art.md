@@ -12,7 +12,7 @@ The [approved stair treatment](docs/art/terrain/README.md#playable-stair-preview
 
 Current milestone: M1/M6; the project remains on M1. Next audio task: combat masking, fatigue and levels once AI/play integrate runtime weapon-shot synthesis (not yet wired into the game sound output). Safari acceptance does not claim new headphone/speaker measurements. Preserve approved master hashes. Next failing check for any playback change: the relevant browser sound acceptance criterion before implementation.
 
-Ship's inventory HUD, local pickup cue and ring loop are integrated (`c372d86`). The two slots show the approved icons, with the selected name and ammunition. Switching and the seed 8 pickup update the readout. The engine reports an actual local collection and the game plays the existing MP3 once alongside the HUD change. The live preview is ready for user review. Status badges and generated thumbnails remain future work.
+Ship's inventory HUD, local pickup cue and ring loop are integrated (`c372d86`). The integrated review is complete in `worktree-ship`, coordinated with Art. The submachine gun's magazine is still faint at 34 px. Status badges and generated thumbnails remain future work.
 
 ## Ownership
 
@@ -35,6 +35,8 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [x] Deliver the approved `sfx-ring-damage-loop` and wire its WAV into local play. The runtime delivery is integrated from `worktree-ship` (`c372d86`).
 
 - [x] Wire the audio pack's `sfx-pickup` MP3 into local play and cover the actual collection, opponent collection, mute and ordinary slot switching.
+
+- [x] Review the integrated inventory HUD, ring loop and pickup cue in the production build.
 
 - [x] Approve the existing matching orange rifle shot (`fx-projectile-rifle-orange.svg`) as selected by the user on 2026-11-17. Native 64/32 px and in-game review pass; keep the 64×64 canvas, current shape/scale, `#FF9B54` and tip (49, 32). The colour mutation was caught by both manifest and browser assertions; the original asset hash was restored. Later weapon classes still need both team variants; muzzle flash remains descoped until feature complete.
 - [x] Measure the shipped empty click’s onset/content and event cadence in Chromium/WebKit at default, 44.1 and 48 kHz: 13 starts per 13 holds in all six runs, including repeats shorter than the buffer. WebKit’s main transient is about 12 ms later; no global correction or threshold change. See the audio handoff.
@@ -66,6 +68,29 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [ ] Case-study diagrams: pipeline, cost safeguards and eval loop.
 
 ## Verification/latest delivery
+
+2026-11-18, integrated HUD and local cues reviewed in `worktree-ship` at
+`afc2092`. Chromium and WebKit kept the 320 × 104 px panel 16 px from the
+bottom and left at 1280 × 720 and 1920 × 1080. Rifle, marksman rifle and
+submachine gun showed 12/36, 5/15 and 30/60 respectively. The selection
+underline was visible in grayscale. The submachine gun's magazine remained
+faint, while the silhouette was distinguishable from the rifle.
+
+The pickup started and ended once per collection in both engines. The ring
+held one WAV loop across a repeat, ended on mute, restarted on unmute and
+ended at round loss, with 100 ms gain ramps. Both built audio files matched
+their approved sources byte for byte. At 44.1 kHz, the ring decoded one sample
+short of two seconds in Chromium and exactly two seconds in WebKit. Pickup
+buffers were 380 ms and 408 ms respectively. Device listening remains open
+until runtime shot synthesis is integrated.
+
+The production build and all 55 focused Chromium criteria passed. The
+repository gate passed lint, formatting, strict types and 3,253 tests, with
+one existing slow audio render skipped. The sandboxed first runs hit loopback
+EPERM and passed with loopback access. The standards review covered root,
+webapp, React, audio and acceptance instructions. The folder and caller audit
+found no new files, helpers or types. Captures and playback measurements are
+in `/private/tmp/gunsmith-ship-art-review.vgXMRq/`.
 
 2026-11-18, shared weapon drawing in `worktree-art`. All four new
 appearance criteria went red on the prior build. Removing the marksman
