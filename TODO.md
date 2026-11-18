@@ -17,7 +17,7 @@ Start a session with: **"You are engine, continue the TODO."** Substitute any pe
 
 | Persona | Model | Checklist | Current focus | Updated |
 | --- | --- | --- | --- | --- |
-| play | Claude | [TODO-play.md](TODO-play.md) | Hit confirmation (slice 3) integrated; camera shake/recoil/reduced motion, HUD/inventory and M1 playtest next. | 2026-11-17 |
+| play | Claude | [TODO-play.md](TODO-play.md) | Hit confirmation, camera shake and reduced motion integrated. Inventory HUD and M1 playtest next. Recoil and muzzle flash depend on held weapons. | 2026-11-18 |
 | engine | Claude | [TODO-engine.md](TODO-engine.md) | Fair-duel starts and bot reaction to unseen shots integrated. High-ground playtest, arena pool and limits, inventory data and reflection remain open. | 2026-11-18 |
 | ai | Claude | [TODO-ai.md](TODO-ai.md) | Player arena selection and engine validation integrated. S4-1 contrast, model quality, and the production adapter remain open. | 2026-11-18 |
 | server | Claude | [TODO-server.md](TODO-server.md) | Prediction/reconciliation/interpolation and 30 Hz snapshots integrated; round/match flow, reconnect, account/storage and generation route next. | 2026-11-17 |
@@ -35,7 +35,7 @@ M0 is complete; M1 is current. Later milestones proceed when their consumers and
 | # | Milestone | Done when |
 | - | --------- | --------- |
 | M0 | **Foundation** (this repo's docs) | A fresh session can start from the docs alone. *Done 2026-11-12.* |
-| M1 | **A fun, playable game** (was: fuzzy frontend, dropped 2026-11-12) | Someone who has never seen it can play a best-of-three against the scripted opponent in a full-screen arena with fog, heights, crouch and the ring, and it is fun. First look by the user. |
+| M1 | **A fun, playable game** (replaced the first fuzzy frontend, 2026-11-12; same rough-parts-first intent, applied to the game: [approach](docs/build-approach.md)) | Someone who has never seen it can play a best-of-three against the scripted opponent in a full-screen arena with fog, heights, crouch and the ring, and it is fun. First look by the user. |
 | M2 | **Contracts frozen** (un-frozen 2026-11-12: nothing is drafted until the game needs it) | Real consumers have reviewed the required schemas, adapter, ledger and asset manifest; domain owners and affected consumers sign off in HANDOFF.md. |
 | M3 | **Focus: ATDD and the real engine** | `pnpm checks` green; acceptance suite green on a production build; engine property tests green; first art files delivered. |
 | M4 | **Multiplayer for real** | Two browsers play a match through the real Worker; a hidden opponent is absent from the network snapshot; spike result recorded. |

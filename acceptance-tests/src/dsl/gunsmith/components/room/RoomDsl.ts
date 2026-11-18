@@ -21,7 +21,11 @@ export class RoomDsl {
 
   /** Begins noting every frame the server sends this browser, from page load, so a snapshot cannot be missed. */
   startWatching(): void {
-    this.room.startWatching();
+    try {
+      this.room.startWatching();
+    } catch (error) {
+      throw new DslError("Failed to start watching the frames the server sends", error);
+    }
   }
 
   /** Asks the server for a private room and opens it here. Returns the friend code. */
@@ -57,11 +61,15 @@ export class RoomDsl {
 
   /** The game as the second browser sees it. */
   secondBrowser(): GunsmithDsl {
-    if (!this.second) {
-      throw new DslError("No second browser has joined the room", undefined);
-    }
+    try {
+      if (!this.second) {
+        throw new Error("No second browser has joined the room");
+      }
 
-    return this.second;
+      return this.second;
+    } catch (error) {
+      throw new DslError("Failed to get the game as the second browser sees it", error);
+    }
   }
 
   /** Holds every frame to and from this browser up by `delay`, in order. Say it before `createPrivateRoom`: it applies to the page that opens next. */
@@ -171,6 +179,10 @@ export class RoomDsl {
 
   /** Closes the second browser, if one joined. */
   async end(): Promise<void> {
-    await this.room.closeSecondBrowser();
+    try {
+      await this.room.closeSecondBrowser();
+    } catch (error) {
+      throw new DslError("Failed to close the second browser", error);
+    }
   }
 }

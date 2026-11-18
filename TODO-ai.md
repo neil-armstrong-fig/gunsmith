@@ -49,7 +49,7 @@ engine owns balancing/rating; server owns production adapter routing; budget sup
 - [ ] Deterministic evaluators first; a model judge stays deferred until a real need, then calibrate with human labels and check position bias. Preserve regression/capability separation and mutation proof.
 - [ ] Add the root eval command with ship and own the AI regression workflow for AI changes. Fake tier proves the harness, never live-model quality; scores do not transfer.
 - [ ] Review real renderer feedback (duck/cactus silhouettes, lantern evidence, pose/muzzle alignment and contrast) before further visual probes. Kit references remain authored art, not an active generation experiment.
-- [ ] Clearly label deferred Plus-only features; optional interrupt review queues, OpenTelemetry and provider bake-offs need a concrete brief/authorization. Gather case-study evidence and shutdown measurements as work lands.
+- [ ] Clearly label deferred Plus-only features; optional interrupt review queues, OpenTelemetry and provider bake-offs need a concrete brief/authorization. The user wants their **cost estimated** (LangSmith Plus is $39 per seat per month with 10,000 base traces, checked 2026-11-18) and will decide to integrate them once the game works end to end. Gather case-study evidence and shutdown measurements as work lands.
 
 ## Verification/latest delivery
 

@@ -139,9 +139,15 @@ WASD move, mouse aim (360°), Ctrl or C crouch, **1** default rifle, **2** the c
 
 ## Out of scope for the first pass
 
-Mobile and touch play, accessibility features, other languages (English only, hard-coded), health or ammo pickups, a
-public gallery, paid credits, server-rendered replay video, bots as opponents (a small scripted bot exists, in `engine/src/opponent/`, as a target to test weapons and arenas
-against while the game is built, not as a feature; and practice dummies).
+Accessibility features beyond reduced motion, other languages (English only, hard-coded), health or ammo pickups, server-rendered replay video.
+
+Out of the first pass but **wanted soon after** (the user, 2026-11-18), not abandoned:
+
+- **Mobile and touch play:** a fast follow-up to the first pass.
+- **A public gallery** of arenas and weapons.
+- **Paid credits**, and possibly spending credits to "pay" another player for access to their arenas or weapons. An idea only: no design, pricing or privacy review yet.
+
+**Bots already work:** the scripted opponent (`engine/src/opponent/`) plays the duel and sparring today, and practice dummies exist. Whether a bot becomes a player-facing mode (a solo match) is open.
 
 ## Tunables checklist
 

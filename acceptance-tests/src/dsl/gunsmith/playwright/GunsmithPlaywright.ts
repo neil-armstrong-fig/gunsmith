@@ -18,8 +18,25 @@ export class GunsmithPlaywright extends BasePage {
   /** Lets through the pictures `openSparringWithHeldPictures` is holding back. */
   private releaseHeldPictures: (() => void) | undefined;
 
+  /** What the spec has asked of the page beyond the scenario (`shake=0`, `reducedMotion=1`), added to the address of whatever it opens next. */
+  private readonly askedFor: string[] = [];
+
   constructor(page: Page) {
     super(page);
+  }
+
+  /** Has the next scenario opened with a camera that does not shake. */
+  keepTheCameraStill(): void {
+    this.askedFor.push("shake=0");
+  }
+
+  /** Has the next scenario opened asking for reduced motion. */
+  askForReducedMotion(): void {
+    this.askedFor.push("reducedMotion=1");
+  }
+
+  async preferReducedMotion(): Promise<void> {
+    await this.page.emulateMedia({reducedMotion: "reduce"});
   }
 
   async open(): Promise<void> {
@@ -157,7 +174,9 @@ export class GunsmithPlaywright extends BasePage {
   }
 
   private async openScenario(scenario: string): Promise<void> {
-    await this.page.goto(`/?scenario=${scenario}`);
+    const asked = this.askedFor.map(request => `&${request}`).join("");
+
+    await this.page.goto(`/?scenario=${scenario}${asked}`);
     await this.waitForArena();
   }
 

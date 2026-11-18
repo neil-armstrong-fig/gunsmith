@@ -2,6 +2,7 @@ import type {Page} from "@playwright/test";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
 import {ArenaDsl} from "@src/dsl/gunsmith/components/arena/ArenaDsl";
 import {BulletsDsl} from "@src/dsl/gunsmith/components/bullets/BulletsDsl";
+import {CameraDsl} from "@src/dsl/gunsmith/components/camera/CameraDsl";
 import {DummiesDsl} from "@src/dsl/gunsmith/components/dummies/DummiesDsl";
 import {HudDsl} from "@src/dsl/gunsmith/components/hud/HudDsl";
 import {MatchDsl} from "@src/dsl/gunsmith/components/match/MatchDsl";
@@ -28,6 +29,7 @@ export class GunsmithDsl {
   readonly arena: ArenaDsl;
   readonly player: PlayerDsl;
   readonly bullets: BulletsDsl;
+  readonly camera: CameraDsl;
   readonly dummies: DummiesDsl;
   readonly weapon: WeaponDsl;
   readonly hud: HudDsl;
@@ -46,6 +48,7 @@ export class GunsmithDsl {
     this.arena = new ArenaDsl(page);
     this.player = new PlayerDsl(page);
     this.bullets = new BulletsDsl(page);
+    this.camera = new CameraDsl(page);
     this.dummies = new DummiesDsl(page);
     this.weapon = new WeaponDsl(page);
     this.hud = new HudDsl(page);
@@ -57,6 +60,33 @@ export class GunsmithDsl {
     this.round = new RoundDsl(page);
     this.sound = new SoundDsl(page);
     this.vision = new VisionDsl(page);
+  }
+
+  /** Asks for a camera that never shakes (`?shake=0`) in whatever the spec opens next, so a screenshot taken at the moment of a hit is of the picture as it stands. */
+  keepTheCameraStill(): void {
+    try {
+      this.gunsmith.keepTheCameraStill();
+    } catch (error) {
+      throw new DslError("Failed to ask for a camera that does not shake", error);
+    }
+  }
+
+  /** Asks for reduced motion through the page (`?reducedMotion=1`) in whatever the spec opens next. */
+  askForReducedMotion(): void {
+    try {
+      this.gunsmith.askForReducedMotion();
+    } catch (error) {
+      throw new DslError("Failed to ask for reduced motion", error);
+    }
+  }
+
+  /** Has the browser say the person prefers reduced motion (`prefers-reduced-motion: reduce`), as their system setting would, before the spec opens the game. */
+  async preferReducedMotion(): Promise<void> {
+    try {
+      await this.gunsmith.preferReducedMotion();
+    } catch (error) {
+      throw new DslError("Failed to have the browser prefer reduced motion", error);
+    }
   }
 
   /** Opens the game and waits until the arena is on screen. */
@@ -74,7 +104,11 @@ export class GunsmithDsl {
 
   /** Closes whatever the spec opened beside the game, such as the second browser of a room. Runs after every spec. */
   async end(): Promise<void> {
-    await this.room.end();
+    try {
+      await this.room.end();
+    } catch (error) {
+      throw new DslError("Failed to close what the spec opened beside the game", error);
+    }
   }
 
   /**

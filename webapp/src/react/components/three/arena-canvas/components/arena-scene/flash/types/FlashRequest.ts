@@ -1,4 +1,4 @@
-import type {Flash} from "@src/react/components/three/arena-canvas/components/arena-scene/components/damage-brackets/flash/types/Flash";
+import type {Flash} from "@src/react/components/three/arena-canvas/components/arena-scene/flash/types/Flash";
 
 /** What `nextFlash` is told about one frame. */
 export interface FlashRequest {

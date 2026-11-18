@@ -114,11 +114,12 @@ The tables above say "local brackets" and "sustained unsafe-state treatment" wit
 - **Health panel position:** bottom right, as in the game. (The [inventory concept](../inventory-display/README.md) puts health bottom left; see its placement note.)
 
 - **Outgoing hit (built 2026-11-17):** four 2-pixel mint (`#8AD4B0`) diagonal ticks, each 7 pixels long between 17 and 24 pixels out from the target's centre along both axes, tips toward the body, for 180 ms, no expansion (`Study.html`). `sfx-hit` plays once per burst (hits inside 100 ms merge: play's decision, the study is silent). Both only for a target the player sees, and the ticks go the moment its place leaves sight.
+- **Camera shake and reduced motion (built 2026-11-18):** the camera moves the *picture* by the study's curve for 100 ms after a bullet hurts the player (not the ring), 12 screen pixels by default (the user tried 8, 12 and 16 on 2026-11-18 and chose 12; the study's 2 was too subtle to see; `?shake=<pixels>` tunes it, `0` is off, and a settings control can come later). **The aim is worked out on the still camera** (the user's decision, 2026-11-17: fixed view, so a hit never nudges the aim; the picture is up to 12 px off the cursor for 100 ms). Reduced motion (`?reducedMotion=1` or `prefers-reduced-motion`, read at load) removes the shake, the brackets' opening and the health trail; health, the brackets and the ticks still show.
 
 Two lines above are stale and are corrected here: the acceptance bullet "Sustained ring damage has one onset" predates the user's decision (table, 2026-11-17)
 that there is **no onset cue**; the criterion now is: the ring's marks are steady while it hurts, never pulse per tick, and clear when exposure or the round ends.
-The study also plays `sfx-death` at a local death, which no slice here covers yet; it needs an owner (play, with art's file, which already exists as
-`webapp/audio/generated-audio/sfx-death.wav`). The cosmetic recoil and muzzle flash need the held weapon's drawing, which the user has shelved until the game is feature complete.
+The study also plays `sfx-death` at a local death, which no slice here covers yet. The user wants it but **deferred it until more important things** (2026-11-18); it is not shelved. Play owns it, with art's file, which already exists as
+`webapp/audio/generated-audio/sfx-death.wav`. The cosmetic recoil and muzzle flash need the held weapon's drawing, which is not built yet. The user wants to work on it (2026-11-18); it is not shelved.
 
 ## Integration order and event behaviour
 
