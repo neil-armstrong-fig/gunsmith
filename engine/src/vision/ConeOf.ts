@@ -17,6 +17,7 @@ export function coneOf(arena: Arena, fighter: Player): Cone {
     halfAngleRadians: (weapon.visionDegrees / 2) * RADIANS_PER_DEGREE,
     range: rangeOf(fighter, weapon.visionRange),
     eyeLevel: eyeLevelAt(arena, fighter.position),
+    crouching: fighter.crouching,
   };
 }
 

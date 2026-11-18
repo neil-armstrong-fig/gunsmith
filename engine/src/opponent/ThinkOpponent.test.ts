@@ -16,6 +16,16 @@ const room = arenaFrom([
   "#......................#",
   "########################",
 ]);
+// The player starts at (12.5, 3.5): a cover block at (13, 3) stands right beside them, between them and the opponent at (16.5, 3.5).
+const coverBesidePlayer = arenaFrom([
+  "########################",
+  "#......................#",
+  "#......................#",
+  "#............c.........#",
+  "#......................#",
+  "#......................#",
+  "########################",
+]);
 const wallInTheMiddle = arenaFrom([
   "########################",
   "#..........#...........#",
@@ -50,6 +60,18 @@ it("remembers where the player is, and for how long it has seen them", () => {
 
   expect(brain.lastSeen).toEqual(world.player.position);
   expect(brain.seenSeconds).toBeCloseTo(TICK, 9);
+});
+
+it("starts to engage a player standing behind a low cover block, which it sees over", () => {
+  expect(brainOf(duel(1, coverBesidePlayer)).state).toBe("engage");
+});
+
+it("keeps wandering when the player crouches behind a low cover block, which hides them", () => {
+  const world = duel(1, coverBesidePlayer);
+  const decision = thinkOpponent({...world, player: {...world.player, crouching: true}}, TICK);
+
+  expect(decision.brain?.state).toBe("wander");
+  expect(decision.input.firing).toBe(false);
 });
 
 it("keeps wandering when a wall is between it and the player", () => {

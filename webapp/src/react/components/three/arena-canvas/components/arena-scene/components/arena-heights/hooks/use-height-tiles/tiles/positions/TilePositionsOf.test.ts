@@ -13,5 +13,5 @@ it("lists every tile once, south to north and west to east, walls included", () 
 });
 
 it("lists nothing for an arena with no tiles", () => {
-  expect(tilePositionsOf({width: 0, height: 0, solid: [], levels: [], stairs: []})).toEqual([]);
+  expect(tilePositionsOf({width: 0, height: 0, solid: [], cover: [], levels: [], stairs: []})).toEqual([]);
 });

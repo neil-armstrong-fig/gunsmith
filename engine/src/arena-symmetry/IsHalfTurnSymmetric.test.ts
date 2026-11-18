@@ -32,3 +32,15 @@ it("is false when the platform is higher at one end than at its half-turn place"
 it("is false for a stair on the centre tile, which a half turn makes climb the other way", () => {
   expect(isHalfTurnSymmetric(arenaFrom(["###", "#1#", "#^#", "#.#", "###"]))).toBe(false);
 });
+
+it("is true when cover blocks stand at opposite places", () => {
+  expect(isHalfTurnSymmetric(arenaFrom(["######", "#c...#", "#...c#", "######"]))).toBe(true);
+});
+
+it("is false when a cover block has a wall, not a block, at its half-turn place", () => {
+  expect(isHalfTurnSymmetric(arenaFrom(["######", "#c...#", "#...##", "######"]))).toBe(false);
+});
+
+it("is false when a cover block has plain floor at its half-turn place", () => {
+  expect(isHalfTurnSymmetric(arenaFrom(["######", "#c...#", "#....#", "######"]))).toBe(false);
+});

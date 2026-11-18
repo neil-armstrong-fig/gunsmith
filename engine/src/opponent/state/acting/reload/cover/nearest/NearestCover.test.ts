@@ -25,6 +25,24 @@ it("takes a place the threat cannot see", () => {
   expect(cover).toEqual({x: 4.5, y: 4.5});
 });
 
+it("does not take a place behind a low cover block, which the threat sees over", () => {
+  const lowBlock = arenaFrom([
+    "##############",
+    "#............#",
+    "#.....cc.....#",
+    "#.....cc.....#",
+    "#.....cc.....#",
+    "#.....cc.....#",
+    "#.....cc.....#",
+    "#............#",
+    "##############",
+  ]);
+  const behindIt = {x: 4.5, y: 4.5};
+
+  expect(nearestCover(room, {from: FROM, threat: THREAT, candidates: [behindIt]})).toEqual(behindIt);
+  expect(nearestCover(lowBlock, {from: FROM, threat: THREAT, candidates: [behindIt]})).toBeUndefined();
+});
+
 it("passes over places the threat can see", () => {
   const candidates = [
     {x: 9.5, y: 4.5},

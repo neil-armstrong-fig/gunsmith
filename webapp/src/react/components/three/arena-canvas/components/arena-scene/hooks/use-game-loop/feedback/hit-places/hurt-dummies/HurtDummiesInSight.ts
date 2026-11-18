@@ -1,6 +1,6 @@
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
 import {coneOf} from "@gunsmith/engine/vision/ConeOf";
-import {canSeePoint} from "@gunsmith/engine/vision/sight/CanSeePoint";
+import {canSeeFighter} from "@gunsmith/engine/vision/sight/CanSeeFighter";
 import type {StepReport} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/feedback/types/StepReport";
 
 /**
@@ -19,6 +19,6 @@ export function hurtDummiesInSight({before, after}: StepReport): Point[] {
 
       return left === undefined || left.health < dummy.health;
     })
-    .map(dummy => dummy.position)
-    .filter(place => canSeePoint(after.arena, cone, place));
+    .filter(dummy => canSeeFighter(after.arena, cone, {position: dummy.position, crouching: dummy.crouching === true}))
+    .map(dummy => dummy.position);
 }

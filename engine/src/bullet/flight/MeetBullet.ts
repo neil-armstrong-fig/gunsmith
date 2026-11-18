@@ -20,7 +20,8 @@ export function meetBullet(arena: Arena, flightRequest: FlightRequest, bullet: B
   const distance = bullet.speed * flightRequest.seconds;
   const dummyHit = hittableDummyHit(flightRequest, bullet, distance);
   const contact = firstContact({
-    wallDistance: distanceToWall(blocksSightFrom(arena, bullet.level), bullet, distance) ?? Infinity,
+    wallDistance:
+      distanceToWall(blocksSightFrom(arena, {eyeLevel: bullet.level, crouching: false}), bullet, distance) ?? Infinity,
     dummyHit,
     fighterDistance: distanceToFighter(fighterHurtBy(flightRequest, bullet), bullet, distance),
   });

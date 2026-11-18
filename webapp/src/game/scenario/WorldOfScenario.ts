@@ -12,6 +12,7 @@ import {DEFAULT_RING_TIMING} from "@gunsmith/engine/ring/DefaultRingTiming";
 import type {Ring} from "@gunsmith/engine/ring/types/Ring";
 import type {RingTiming} from "@gunsmith/engine/ring/types/RingTiming";
 import {SUBMACHINE_GUN} from "@gunsmith/engine/weapon/weapons/SubmachineGun";
+import {coverWorld} from "@src/game/cover/CoverWorld";
 import {DUEL_ARENA} from "@src/game/duel/DuelArena";
 import {DUEL_OPPONENT} from "@src/game/duel/DuelOpponent";
 import {FAIR_DUEL_ARENA} from "@src/game/fair-duel/FairDuelArena";
@@ -44,7 +45,7 @@ import type {Scenario} from "@src/game/scenario/types/Scenario";
  *
  * The ring closes on a point drawn from `seed`, and keeps `ringTiming` when the page asked for one (`?ringDelay=`,
  * `?ringClosing=`), otherwise the game's own. Sparring has a ring only when the page asks for ring timing, so a spec can watch
- * the ring alone hurt a fighter who stands still; the practice range and the heights arena never have one.
+ * the ring alone hurt a fighter who stands still; the practice range, the heights arena and the cover arena never have one.
  */
 export function worldOfScenario(scenario: Scenario, seed: number, ringTiming?: RingTiming): World {
   if (scenario === "room") {
@@ -102,6 +103,10 @@ export function worldOfScenario(scenario: Scenario, seed: number, ringTiming?: R
 
   if (scenario === "heights") {
     return engine.startingWorld(HEIGHTS_ARENA, HEIGHTS_DUMMIES);
+  }
+
+  if (scenario === "cover") {
+    return coverWorld();
   }
 
   if (scenario === "terrain") {

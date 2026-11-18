@@ -1,4 +1,5 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
+import {isCover} from "@gunsmith/engine/arena/IsCover";
 import {isSolid} from "@gunsmith/engine/arena/IsSolid";
 import {levelOfTile} from "@gunsmith/engine/arena/LevelOfTile";
 import {stairOfTile} from "@gunsmith/engine/arena/StairOfTile";
@@ -114,4 +115,24 @@ it("refuses raised floor beside a stair's middle, which would let a walker skip 
 it("accepts a stair between walls, and a stair beside low ground", () => {
   expect(() => arenaFrom(["#####", "#.>1#", "#####"])).not.toThrow();
   expect(() => arenaFrom(["#####", "#...#", "#.>1#", "#...#", "#####"])).not.toThrow();
+});
+
+it("reads a c as a cover block: solid, on the low ground and not a stair", () => {
+  const arena = arenaFrom(["###", "#c#", "###"]);
+
+  expect(isSolid(arena, 1, 1)).toBe(true);
+  expect(isCover(arena, 1, 1)).toBe(true);
+  expect(levelOfTile(arena, 1, 1)).toBe(0);
+  expect(stairOfTile(arena, 1, 1)).toBeUndefined();
+});
+
+it("does not read a wall or floor as cover", () => {
+  const arena = arenaFrom(["###", "#.#", "###"]);
+
+  expect(isCover(arena, 0, 0)).toBe(false);
+  expect(isCover(arena, 1, 1)).toBe(false);
+});
+
+it("lets a cover block stand beside a stair's middle, where raised floor may not", () => {
+  expect(() => arenaFrom(["#####", "#.c.#", "#.>1#", "#####"])).not.toThrow();
 });

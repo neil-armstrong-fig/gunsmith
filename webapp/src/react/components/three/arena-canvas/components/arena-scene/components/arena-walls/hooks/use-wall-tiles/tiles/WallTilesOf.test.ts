@@ -5,6 +5,13 @@ it("lists every wall tile", () => {
   expect(wallTilesOf(arenaFrom(["###", "#.#", "###"]))).toHaveLength(8);
 });
 
+it("does not list a low cover block, which is drawn lower than a wall", () => {
+  expect(wallTilesOf(arenaFrom(["#c#"]))).toEqual([
+    {x: 0, y: 0},
+    {x: 2, y: 0},
+  ]);
+});
+
 it("lists none for an arena of open floor", () => {
   expect(wallTilesOf(arenaFrom(["...", "..."]))).toEqual([]);
 });

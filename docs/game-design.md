@@ -83,7 +83,10 @@ WASD move, mouse aim (360°), Ctrl or C crouch, **1** default rifle, **2** the c
   height levels (stories)** on the first pass.
 - **Stairs** are the only way to change height. Each connection has a visible stair flight and landing on both levels;
   players cannot walk across other height boundaries. No L1/L2/L3 labels appear on the arena during play.
-- **Indestructible walls** block every weapon, always. Cover blocks some weapons and is penetrated by others.
+- **Indestructible walls** block every weapon, always. Cover blocks some weapons and is penetrated by others (the penetrable class is
+  not built). **Low cover blocks** are built (2026-11-18, `c` in a drawing, low ground only): impassable like a wall, but low. A
+  standing fighter sees over one; a crouched fighter does not, and one crouched with a block right beside them is hidden: see
+  [Crouch](#vision-height-crouch-and-sound).
 - After the player/AI definitions are resolved, code finalises and validates the arena and places spawns/pickups.
   Fairness uses traversable routes through stairs, not straight-line distance alone, including access to pickups and
   escape from the closing ring. The prompt may suggest placement; code enforces the constraints.
@@ -104,6 +107,14 @@ WASD move, mouse aim (360°), Ctrl or C crouch, **1** default rifle, **2** the c
   walls and height still block vision. Crouching **substantially slows movement**, leaving you easier to hit; this
   is its intended tradeoff. The range bonus and slowdown are tunable. Protection depends on whether the incoming weapon
   penetrates that cover.
+  **Low cover, sight (built 2026-11-18, the user's rule; the bullet half is next):** a cover block is low, so a *standing* viewer
+  sees over it; a *crouched* viewer cannot see past it, unless they are on a higher level than the block (higher ground sees over
+  lower cover). A *crouched* fighter with a cover block on the line to them, no farther from them than `COVER_REACH_TILES`
+  (1 tile, a tunable for play), is hidden from every viewer, high ground included: a block near the viewer hides nobody far
+  behind it. A standing fighter behind cover is seen. Bullets are still unaffected by cover; the decided rule is that a
+  crouched shooter's bullet stops at cover, a standing one's flies over, and a bullet that crossed cover cannot hurt a crouched
+  fighter, by the same line test as sight ("what you cannot see you cannot shoot"). The bot never crouches yet, so it only
+  cannot see a crouched player behind cover.
 - **Sound:** a hidden opponent can be heard within a hearing range. The server sends only a **direction quantised to about
   8 sectors**, never a position. Crouching is quieter. Weapon sounds are synthesised in the browser from the weapon's
   `sound` block; other sounds are pre-rendered files.

@@ -3,6 +3,7 @@ import type {CombatEvent} from "@gunsmith/engine/combat-events/types/CombatEvent
 import type {World} from "@gunsmith/engine/game-loop/types/World";
 import {hitPlacesOfStep} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/feedback/hit-places/HitPlacesOfStep";
 import type {PracticeRange} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/feedback/hit-places/types/PracticeRange";
+import {coverWorld} from "@src/game/cover/CoverWorld";
 import {worldOfScenario} from "@src/game/scenario/WorldOfScenario";
 
 const OPPONENT_HIT: CombatEvent = {kind: "hitLanded", on: "opponent"};
@@ -95,6 +96,27 @@ it("leaves out a dummy that lost health out of sight, though another was hit in 
   const after = {...withDummyHurt(withDummyHurt(world, seen, 10), unseen, 10), events: [DUMMY_HIT]};
 
   expect(hitPlacesOfStep({before: world, after})).toEqual([seen]);
+});
+
+it("puts a hit on a standing dummy behind cover where it stands, and none on a crouched one the cover hides", () => {
+  const world = coverWorld();
+  const [standing, hidden] = world.dummies.map(dummy => dummy.position);
+  if (!standing || !hidden) {
+    throw new Error("The cover arena has fewer than two dummies.");
+  }
+
+  const towardStanding = facing(world, standing);
+  const towardHidden = facing(world, hidden);
+
+  expect(
+    hitPlacesOfStep({
+      before: towardStanding,
+      after: {...withDummyHurt(towardStanding, standing, 10), events: [DUMMY_HIT]},
+    }),
+  ).toEqual([standing]);
+  expect(
+    hitPlacesOfStep({before: towardHidden, after: {...withDummyHurt(towardHidden, hidden, 10), events: [DUMMY_HIT]}}),
+  ).toEqual([]);
 });
 
 it("has no place for a dummy hurt in a step that reports no hit on one", () => {

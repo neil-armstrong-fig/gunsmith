@@ -16,6 +16,11 @@ it("starts at the player and points where the player aims", () => {
   expect(cone.aim).toEqual({x: 0, y: 1});
 });
 
+it("says whether the fighter crouches, which decides what a low block hides from them", () => {
+  expect(coneOf(room, {...player, crouching: false}).crouching).toBe(false);
+  expect(coneOf(room, {...player, crouching: true}).crouching).toBe(true);
+});
+
 it("takes its width and range from the weapon in hand", () => {
   const cone = coneOf(room, player);
 

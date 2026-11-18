@@ -6,6 +6,7 @@ const arena: DrawnArena = {
   width: 3,
   height: 2,
   solid: [false, false, true, false, false, false],
+  cover: [false, false, false, false, false, false],
   levels: [0, 0, 0, 0, 0, 0],
   stairs: [undefined, "east", undefined, undefined, undefined, undefined],
 };
