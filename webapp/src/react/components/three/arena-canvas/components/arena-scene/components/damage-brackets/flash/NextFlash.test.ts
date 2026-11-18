@@ -1,6 +1,6 @@
 import {nextFlash} from "@src/react/components/three/arena-canvas/components/arena-scene/components/damage-brackets/flash/NextFlash";
 import type {Flash} from "@src/react/components/three/arena-canvas/components/arena-scene/components/damage-brackets/flash/types/Flash";
-import {BURST_SECONDS} from "@src/sound/damage-crunch/BurstSeconds";
+import {BURST_SECONDS} from "@src/sound/burst-window/BurstSeconds";
 
 const NONE: Flash = {hitsSeen: 0, age: Number.POSITIVE_INFINITY};
 const FRAME = 1 / 60;

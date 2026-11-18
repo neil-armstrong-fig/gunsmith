@@ -61,12 +61,8 @@ it("answers 404 to any other path", async () => {
   expect(response.status).toBe(404);
 });
 
-function upgrade(path: string): Request {
-  return new Request(`https://gunsmith.test${path}`, {headers: {Upgrade: "websocket"}});
-}
-
 function environment(names: string[] = []): ApiEnvironment {
-  return {MATCHES: matchesThatAnswer(names)};
+  return {MATCHES: matchesThatAnswer(names), CREDITS: unusedNamespace(), SPEND: unusedNamespace()};
 }
 
 /** A `MATCHES` namespace whose every object answers 101 and remembers which name asked. */
@@ -81,4 +77,13 @@ function matchesThatAnswer(names: string[]): DurableObjectNamespace {
   };
 
   return namespace as unknown as DurableObjectNamespace;
+}
+
+/** The two ledgers no route reads yet: a namespace that is never asked. */
+function unusedNamespace<Ledger extends Rpc.DurableObjectBranded>(): DurableObjectNamespace<Ledger> {
+  return {} as unknown as DurableObjectNamespace<Ledger>;
+}
+
+function upgrade(path: string): Request {
+  return new Request(`https://gunsmith.test${path}`, {headers: {Upgrade: "websocket"}});
 }

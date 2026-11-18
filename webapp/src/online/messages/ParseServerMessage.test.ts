@@ -18,6 +18,22 @@ it("reads a snapshot", () => {
   expect(parseServerMessage(text)?.kind).toBe("snapshot");
 });
 
+it("reads how far the server has played this browser's inputs", () => {
+  const text = JSON.stringify({kind: "snapshot", player: {}, round: "playing", ack: {seq: 7, held: 3}});
+  const message = parseServerMessage(text);
+
+  expect(message?.kind === "snapshot" && message.ack).toEqual({seq: 7, held: 3});
+});
+
+it("refuses a snapshot whose ack is not two counts", () => {
+  const frame = {kind: "snapshot", player: {}, round: "playing"};
+
+  expect(parseServerMessage(JSON.stringify({...frame, ack: {seq: "7", held: 3}}))).toBeUndefined();
+  expect(parseServerMessage(JSON.stringify({...frame, ack: {seq: 7}}))).toBeUndefined();
+  expect(parseServerMessage(JSON.stringify({...frame, ack: 7}))).toBeUndefined();
+  expect(parseServerMessage(JSON.stringify({...frame, ack: null}))).toBeUndefined();
+});
+
 it("refuses text that is not a frame, and frames missing what the page acts on", () => {
   expect(parseServerMessage("nope")).toBeUndefined();
   expect(parseServerMessage("7")).toBeUndefined();

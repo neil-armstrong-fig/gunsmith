@@ -4,11 +4,11 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 ## Resume here
 
-Checkout: `.claude/worktrees/ship`, branch `worktree-ship`, synced from committed main `9484ad0`. Persistent worktree; main stays integration-only. Merge newer committed main before new work/delivery when clean; never stash another session's changes.
+Checkout: `.claude/worktrees/ship`, branch `worktree-ship`, synced from committed main `6186476`. Persistent worktree; main stays integration-only. Merge newer committed main before new work/delivery when clean; never stash another session's changes.
 
-Current slice: function-order and module-level named-helper lint rules with full declaration-only cleanup across packages. Owned files: shared standards/config/tests, diagnosed helpers/tests in this checkout, root standards summary and ship coordination docs. Project remains M1. Preview delivery is already committed as `249fc3c`.
+Current slice: function-order and module-level named-helper lint rules with full declaration-only cleanup across packages. Owned files: shared standards/config/tests, diagnosed helpers/tests in this checkout, root standards summary and ship coordination docs. Project remains M1. Preview delivery `249fc3c` is integrated at `c61bc32`. The standards slice is committed at `5b7a97a`.
 
-Next action: review/commit this delivery when authorized, then integrate it with owner worktrees. Hosted CI/profiling still await publication; AI owns paid selector/guard/evidence and opening spend reconciliation.
+Next action: review the validated standards slice in the next integration pass. Hosted CI/profiling still await publication; AI owns paid selector/guard/evidence and opening spend reconciliation.
 
 ## Ownership
 
@@ -45,6 +45,7 @@ server supplies Worker/DO/storage bindings; budget supplies operational limits; 
 
 ## Verification/latest delivery
 
+2026-11-18 main sync: merged `6186476` into the ship worktree and resolved six conflicts. Verified 14 affected tests against main, preserving cases, assertions and helper bodies. `pnpm checks` passed lint, format, types and 2,838 tests with one existing slow audio render skipped. Properties passed 35/35, fake evals 170/170 and managed preview acceptance 293/293 on the first attempt. The managed wrappers logged errors at shutdown and both preview ports closed. The standards slice is ready for integration review.
 2026-11-18: Restored nested `const` functions and narrowed helper declaration lint to helpers outside function scopes. All 23 original definitions match the ship baseline. `pnpm checks` passes with 2,621 tests and one existing skip. Properties 14/14 and fake evals 170/170 passed. All browser criteria passed across runs, with timing failures detailed in [HANDOFF.md](HANDOFF.md#latest-ship-delivery).
 
 2026-11-17 function standards: final `pnpm checks` passes lint/format/strict types and 2,618 tests (one existing slow render skipped); properties 14/14; fake evals 170/170; managed preview acceptance 256/256 without retries. Four final mutants fail the expected 6/5/7/1 criteria. All 1,292 inherited expect calls across 89 migrated test files are unchanged. Root/shared/engine/AI/API/webapp/React/audio/acceptance instructions reviewed; folder/caller audit lists 98 folders and counts 279 root files. No new helpers/types. Sandbox loopback EPERM required outside-sandbox checks and browser validation. Main advanced during the slice (observed `9026bcd`); sync and combined validation await an authorized commit of this delivery. No other worktree edits, commit, push, paid call or deploy.

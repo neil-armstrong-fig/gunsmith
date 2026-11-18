@@ -37,6 +37,18 @@ function isJoined(frame: object): boolean {
 function isSnapshot(frame: object): boolean {
   const player: unknown = Reflect.get(frame, "player");
   const round = Reflect.get(frame, "round");
+  const ack: unknown = Reflect.get(frame, "ack");
 
-  return typeof player === "object" && player !== null && typeof round === "string";
+  return (
+    typeof player === "object" && player !== null && typeof round === "string" && (ack === undefined || isAck(ack))
+  );
+}
+
+/** How far the server has played this browser's inputs: two counts. A frame whose count is not one is refused, not guessed at. */
+function isAck(ack: unknown): boolean {
+  if (typeof ack !== "object" || ack === null) {
+    return false;
+  }
+
+  return Number.isSafeInteger(Reflect.get(ack, "seq")) && Number.isSafeInteger(Reflect.get(ack, "held"));
 }

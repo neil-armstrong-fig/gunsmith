@@ -48,3 +48,7 @@ it("asks for the overlook duel when the query says so", () => {
 it("asks for the pickup race when the query says so", () => {
   expect(scenarioFromSearch("?scenario=pickup-race")).toBe("pickup-race");
 });
+
+it("asks for the fair duel when the query says so", () => {
+  expect(scenarioFromSearch("?scenario=fair-duel")).toBe("fair-duel");
+});
