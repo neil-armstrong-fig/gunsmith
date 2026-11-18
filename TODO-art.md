@@ -6,7 +6,7 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 Checkout: `.claude/worktrees/art`, branch `worktree-art`; last merged main `6186476` by fast-forward on 2026-11-18. Preserve this worktree and sync committed main before new work/delivery.
 
-Current slice: the [approved arena terrain](docs/art/terrain/README.md) is wired into the sprite loader, arena renderer and visual acceptance DSL. Terrain is integrated from `f16c414`. Next visual slice: review S4-1 when AI delivers its fallback contrast change, using the 64/32 px pickup checks. Ring-loop integration remains with play.
+Current slice: the [approved arena terrain](docs/art/terrain/README.md) is wired into the sprite loader, arena renderer and visual acceptance DSL. Terrain is integrated from `f16c414`. Next visual slice: review S4-1 when AI delivers its fallback contrast change, using the 64/32 px pickup checks. The ring loop is wired in `worktree-ship` and awaits review.
 
 Current milestone: M1/M6; the project remains on M1. Next audio task: combat masking, fatigue and levels once AI/play integrate runtime weapon-shot synthesis (not yet wired into the game sound output). Safari acceptance does not claim new headphone/speaker measurements. Preserve approved master hashes. Next failing check for any playback change: the relevant browser sound acceptance criterion before implementation.
 
@@ -28,7 +28,7 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 
 - [x] Deliver three floor levels and solid-wall SVG candidates with native 64/32 px, repetition, grayscale, dim-terrain and terraced-context proof. User approved all four on 2026-11-18. All four now draw in the game.
 
-- [x] Generate `sfx-ring-damage-loop` for play: separate continuous electrical bed with no impacts or baked-in fades. WAV/MP3 and codec caveat delivered; sound approved in Visual Studio Code; runtime integration remains open.
+- [x] Deliver the approved `sfx-ring-damage-loop` and wire its WAV into local play. The runtime delivery is in `worktree-ship` for review.
 
 - [x] Approve the existing matching orange rifle shot (`fx-projectile-rifle-orange.svg`) as selected by the user on 2026-11-17. Native 64/32 px and in-game review pass; keep the 64×64 canvas, current shape/scale, `#FF9B54` and tip (49, 32). The colour mutation was caught by both manifest and browser assertions; the original asset hash was restored. Later weapon classes still need both team variants; muzzle flash remains descoped until feature complete.
 - [x] Measure the shipped empty click’s onset/content and event cadence in Chromium/WebKit at default, 44.1 and 48 kHz: 13 starts per 13 holds in all six runs, including repeats shorter than the buffer. WebKit’s main transient is about 12 ms later; no global correction or threshold change. See the audio handoff.
@@ -83,6 +83,8 @@ sampling under its Playwright caller and the result type in `types/`.
 The pickup marker is integrated from `e8c8668`.
 
 Cleanup validation: `pnpm checks` exits 0 (lint, formatting, strict types and 2,567 tests; one existing audio-render skip). Approved C2 source/proof retained, with all five proof images embedded. Root instructions re-read; folder/caller, link, SVG geometry and whitespace audit complete. Redundant review artifacts removed from disk and staging; S4-1 finding retained in HANDOFF.md. No gameplay change or acceptance rerun. The artwork is on main in `6186476`.
+
+2026-11-18 ring audio: browser red showed zero loop starts. The mute criterion rejected a build with loop cancellation removed. The runtime and production WAVs match the approved master. `pnpm checks` passed lint, formatting, strict types and 3,038 tests, with one existing slow audio render skipped. Managed production preview passed all 348 criteria. One earlier focused HUD bracket mismatch passed in the full run and three baseline repetitions. The folder and caller audit placed the loop voice type under its Web Audio caller's `types/` folder. Delivery awaits review in the Ship worktree.
 
 Record actual checks, red/mutation evidence and the standards/folder review for the current delivery. Update this resume, the shared status row and a concise handoff at session end.
 

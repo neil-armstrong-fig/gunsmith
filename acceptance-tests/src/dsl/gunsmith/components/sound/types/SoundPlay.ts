@@ -4,4 +4,6 @@ export interface SoundPlay {
   url: string;
   /** Whether the browser's audio was `running` when the sound started: a `suspended` context starts sounds nobody hears. */
   contextState: string;
+  looping: boolean;
+  ended: boolean;
 }
