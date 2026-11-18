@@ -110,9 +110,23 @@ export class SoundPlaywright extends BasePage {
         "start",
         function (this: AudioBufferSourceNode, ...args: Parameters<AudioBufferSourceNode["start"]>): void {
           const url = this.buffer && urlOfBuffer.get(this.buffer);
-          plays.push({url: url ?? "", contextState: this.context.state});
+          const play: SoundPlay = {
+            url: url ?? "",
+            contextState: this.context.state,
+            looping: this.loop,
+            ended: false,
+          };
+
+          this.addEventListener(
+            "ended",
+            () => {
+              play.ended = true;
+            },
+            {once: true},
+          );
 
           originalStart.apply(this, args);
+          plays.push(play);
         },
       );
     }, RECORD_NAMES);

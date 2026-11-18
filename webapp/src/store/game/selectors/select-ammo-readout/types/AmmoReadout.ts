@@ -2,6 +2,11 @@
 export interface AmmoReadout {
   /** Which slot the weapon is in: 1 or 2, matching the keys that switch to it. */
   slot: number;
+  selectedName: string;
+  firstName: string | undefined;
+  firstIconKey: string | undefined;
+  secondName: string | undefined;
+  secondIconKey: string | undefined;
   /** Rounds in the magazine. */
   rounds: number;
   /** Rounds in the reserve. */

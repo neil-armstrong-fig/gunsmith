@@ -50,7 +50,7 @@ it("reports a refusal, a loss and a hit together, the loss before the hit", () =
 
 /** What `eventsOfStep` says about a quiet step, with `changes` made to what happened in it. */
 function eventsOf(changes: Partial<EventsRequest>): readonly CombatEvent[] | undefined {
-  return eventsOfStep({playerTurn: turn(), damage: UNHURT, visibleHits: [], ...changes});
+  return eventsOfStep({playerTurn: turn(), damage: UNHURT, visibleHits: [], playerTookPickup: false, ...changes});
 }
 
 function turn(changes: Partial<FighterTurn> = {}): FighterTurn {

@@ -64,7 +64,12 @@ it("is not taken by a fighter with no health left", () => {
 });
 
 it("changes nothing when nothing lies there, or there is no opponent", () => {
-  expect(takePickup(undefined, {player, opponent})).toEqual({pickup: undefined, player, opponent});
+  expect(takePickup(undefined, {player, opponent})).toEqual({
+    pickup: undefined,
+    player,
+    opponent,
+    playerTookPickup: false,
+  });
   expect(takePickup(lying, {player: {...player, position: at(5.5)}}).opponent).toBeUndefined();
 });
 

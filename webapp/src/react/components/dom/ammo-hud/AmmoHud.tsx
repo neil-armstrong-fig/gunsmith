@@ -1,13 +1,11 @@
+import {InventorySlot} from "@src/react/components/dom/ammo-hud/components/inventory-slot/InventorySlot";
 import {selectAmmoReadout} from "@src/store/game/selectors/select-ammo-readout/SelectAmmoReadout";
 import {useGameStore} from "@src/store/game/UseGameStore";
 import type {JSX} from "react";
 import {useShallow} from "zustand/react/shallow";
 
 /**
- * The ammunition of the weapon in hand, over the bottom left of the arena: its slot, the rounds in the magazine and the
- * reserve, and a bar with a segment for each round the magazine holds. While a reload runs, a blue fill sweeps the bar
- * over the time the reload takes (a CSS animation, so React never sees a per-frame value). It re-renders only when
- * the numbers change, which is a few times a second at most, though the world behind it is replaced every frame.
+ * Both carried weapons and the ammunition of the weapon in hand. The magazine bar uses a CSS animation during reload.
  */
 export function AmmoHud(): JSX.Element {
   const ammo = useGameStore(useShallow(selectAmmoReadout));
@@ -19,14 +17,14 @@ export function AmmoHud(): JSX.Element {
       aria-label="Ammunition"
       data-testid="ammo-hud"
       data-reloading={ammo.reloading}
-      className="pointer-events-none fixed bottom-4 left-4 flex flex-col gap-2 rounded-md bg-gs-ui-surface/80 px-4 py-3 shadow-lg"
+      className="pointer-events-none fixed bottom-4 left-4 flex w-80 max-w-[calc(100%_-_2rem)] flex-col gap-1 rounded-md bg-gs-ui-surface/80 px-4 py-2 shadow-lg"
     >
-      <div className="flex items-baseline justify-between gap-6">
-        <span className="text-xs tracking-wide text-gs-ui-muted uppercase">
-          Weapon <span data-testid="weapon-slot">{ammo.slot}</span>
+      <div className="flex items-baseline justify-between gap-4">
+        <span data-testid="inventory-weapon-name" className="min-w-0 truncate text-sm font-bold text-gs-ui-text">
+          {ammo.selectedName}
         </span>
 
-        <span className="font-mono text-2xl text-gs-ui-text tabular-nums">
+        <span className="shrink-0 font-mono text-2xl leading-7 text-gs-ui-text tabular-nums">
           <span data-testid="ammo-rounds">{ammo.rounds}</span>
 
           <span className="text-gs-ui-muted"> / </span>
@@ -35,13 +33,23 @@ export function AmmoHud(): JSX.Element {
         </span>
       </div>
 
-      <div className="relative flex gap-1">
+      <ul aria-label="Carried weapons" className="flex gap-2">
+        <InventorySlot slot={1} name={ammo.firstName} iconKey={ammo.firstIconKey} selected={ammo.slot === 1} />
+
+        <InventorySlot slot={2} name={ammo.secondName} iconKey={ammo.secondIconKey} selected={ammo.slot === 2} />
+      </ul>
+
+      <span data-testid="weapon-slot" className="sr-only">
+        {ammo.slot}
+      </span>
+
+      <div className="relative flex gap-0.5">
         {segments.map(index => (
           <div
             key={index}
             data-testid="magazine-segment"
             data-loaded={index < ammo.rounds}
-            className="h-2 w-3 rounded-sm bg-gs-ui-muted/30 data-[loaded=true]:bg-gs-warning"
+            className="h-1 flex-1 rounded-sm bg-gs-ui-muted/30 data-[loaded=true]:bg-gs-warning"
           />
         ))}
 

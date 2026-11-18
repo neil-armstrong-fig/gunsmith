@@ -1,6 +1,7 @@
 import {beforeEach, expect, given, then, when} from "@src/acceptance-criteria-mapping/AcceptanceCriteriaMapping";
 
 const DAMAGE_CRUNCH = "sfx-damage-crunch";
+const RING_LOOP = "sfx-ring-damage-loop";
 
 // The ring starts to close after three seconds and is closed in six more, on a point drawn from the seed. Seed 14 closes on a point
 // one tile from the opponent's start, so the player, who stands still in sparring where nothing else can hurt them (so no bullet crunch can be heard), leaves the ring
@@ -83,9 +84,55 @@ given("a sparring match whose ring closes on the opponent's side of the arena", 
     });
   });
 
+  when("the player mutes the sound while taking ring damage", () => {
+    let healthWhenMuted = 0;
+
+    beforeEach(async ({gunsmith}) => {
+      await gunsmith.player.waitForHealthBelow(99, LONGEST_ROUND_SECONDS);
+      await expect.poll(async () => (await gunsmith.sound.getPlays(RING_LOOP)).length).toBe(1);
+      await gunsmith.sound.toggleMute();
+      healthWhenMuted = await gunsmith.player.getHealth();
+      await gunsmith.player.waitForHealthBelow(healthWhenMuted);
+    });
+
+    then("the loop ends and stays silent while the player keeps losing health", async ({gunsmith}) => {
+      await expect.poll(async () => (await gunsmith.sound.getPlays(RING_LOOP)).map(play => play.ended)).toEqual([true]);
+      expect(await gunsmith.player.getHealth()).toBeLessThan(healthWhenMuted);
+      expect(await gunsmith.round.getState()).toBe("playing");
+    });
+
+    when("the player unmutes while the ring is still hurting them", () => {
+      beforeEach(async ({gunsmith}) => {
+        await expect
+          .poll(async () => (await gunsmith.sound.getPlays(RING_LOOP)).map(play => play.ended))
+          .toEqual([true]);
+        await gunsmith.sound.toggleMute();
+      });
+
+      then("a fresh loop starts", async ({gunsmith}) => {
+        await expect
+          .poll(async () => (await gunsmith.sound.getPlays(RING_LOOP)).map(play => play.ended))
+          .toEqual([true, false]);
+      });
+    });
+  });
+
   when("the ring has taken all the health of the player, who stood still outside it", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.round.waitForState("lost", LONGEST_ROUND_SECONDS);
+    });
+
+    then("the ring played one continuous WAV loop and stopped it when the round ended", async ({gunsmith}) => {
+      await expect
+        .poll(() => gunsmith.sound.getPlays(RING_LOOP))
+        .toEqual([
+          {
+            url: expect.stringMatching(/\/sfx-ring-damage-loop[^/]*\.wav$/),
+            contextState: "running",
+            looping: true,
+            ended: true,
+          },
+        ]);
     });
 
     then("the ring never crunched: it hurts continuously and has no impact to hear", async ({gunsmith}) => {

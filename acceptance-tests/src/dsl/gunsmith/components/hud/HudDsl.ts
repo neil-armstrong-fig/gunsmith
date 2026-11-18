@@ -3,6 +3,7 @@ import {HudPlaywright} from "@src/dsl/gunsmith/components/hud/playwright/HudPlay
 import type {HudAmmo} from "@src/dsl/gunsmith/components/hud/types/HudAmmo";
 import type {HealthBorder} from "@src/dsl/gunsmith/components/hud/types/HealthBorder";
 import type {HudMotion} from "@src/dsl/gunsmith/components/hud/types/HudMotion";
+import type {InventoryReadout} from "@src/dsl/gunsmith/components/hud/types/InventoryReadout";
 import type {MagazineBar} from "@src/dsl/gunsmith/components/hud/types/MagazineBar";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
 
@@ -20,6 +21,14 @@ export class HudDsl {
       return await this.hud.getAmmo();
     } catch (error) {
       throw new DslError("Failed to read the ammunition on the screen", error);
+    }
+  }
+
+  async getInventory(): Promise<InventoryReadout> {
+    try {
+      return await this.hud.getInventory();
+    } catch (error) {
+      throw new DslError("Failed to read the weapon inventory on the screen", error);
     }
   }
 

@@ -4,10 +4,20 @@ import type {TickCues} from "@src/sound/types/TickCues";
 
 class RecordingOutput implements SoundOutput {
   readonly played: string[] = [];
+  readonly loopStarts: string[] = [];
+  readonly loopStops: string[] = [];
   stops = 0;
 
   play(key: string): void {
     this.played.push(key);
+  }
+
+  startLoop(key: string): void {
+    this.loopStarts.push(key);
+  }
+
+  stopLoop(key: string): void {
+    this.loopStops.push(key);
   }
 
   stopAll(): void {
@@ -36,6 +46,7 @@ it("plays nothing for a step with no events", () => {
   new CombatSounds(output).afterTick({...EMPTY_CLICK, events: undefined});
 
   expect(output.played).toEqual([]);
+  expect(output.loopStarts).toEqual([]);
 });
 
 it("plays one click for a hold across many steps", () => {
@@ -72,14 +83,18 @@ it("plays the crunch for a bullet that hurt the player", () => {
   expect(output.played).toEqual(["sfx-damage-crunch"]);
 });
 
-it("plays no crunch for the ring, which has a sound of its own to come", () => {
+it("requests the ring loop for damage in a playing round and stops it when damage ceases or the round ends", () => {
   const output = new RecordingOutput();
   const sounds = new CombatSounds(output);
   const ring: TickCues = {...EMPTY_CLICK, events: [{kind: "damageTaken", cause: "ring", amount: 0.2}], firing: false};
 
   sounds.afterTick(ring);
+  sounds.afterTick({...ring, events: undefined});
   sounds.afterTick(ring);
+  sounds.afterTick({...ring, round: "lost"});
 
+  expect(output.loopStarts).toEqual(["sfx-ring-damage-loop", "sfx-ring-damage-loop"]);
+  expect(output.loopStops).toEqual(["sfx-ring-damage-loop", "sfx-ring-damage-loop"]);
   expect(output.played).toEqual([]);
 });
 

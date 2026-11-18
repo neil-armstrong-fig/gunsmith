@@ -10,4 +10,5 @@ export interface EventsRequest {
   damage: DamageToPlayer;
   /** What the player's bullets landed on in this step, only where the player could see it: a hidden target is not here. */
   visibleHits: readonly HitTarget[];
+  playerTookPickup: boolean;
 }

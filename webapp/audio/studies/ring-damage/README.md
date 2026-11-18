@@ -14,7 +14,7 @@ finished mix or perceived-loudness judgement. No approved audio was replaced.
 
 ## Playback handoff
 
-Play owns key registration and loop start/stop. Start once when actual local
+Ship wired key registration and loop playback in the Ship worktree. Start once when actual local
 ring damage begins; stop when damage ceases, the round ends, mute is enabled,
 or playback is cancelled. Use about 100 ms playback gain fades. Do not restart
 on each simulation tick, play the crunch for the ring, or reuse the countdown

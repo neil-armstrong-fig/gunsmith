@@ -2,6 +2,9 @@ import {SOUND_KEYS} from "@src/assets/sounds/SoundKeys";
 import {SOUND_URLS} from "@src/assets/sounds/SoundUrls";
 import type {SoundKey} from "@src/assets/sounds/types/SoundKey";
 import type {SoundOutput} from "@src/sound/types/SoundOutput";
+import type {LoopVoice} from "@src/sound/web-audio/types/LoopVoice";
+
+const LOOP_FADE_SECONDS = 0.1;
 
 /**
  * Plays the game's sounds through the browser's Web Audio. `start` makes the audio context, loads every sound and listens for
@@ -14,6 +17,7 @@ export class WebAudioOutput implements SoundOutput {
   private context: AudioContext | undefined;
   private readonly buffers = new Map<SoundKey, AudioBuffer>();
   private readonly voices = new Map<SoundKey, AudioBufferSourceNode>();
+  private readonly loops = new Map<SoundKey, LoopVoice>();
 
   constructor(private readonly isMuted: () => boolean) {}
 
@@ -32,6 +36,7 @@ export class WebAudioOutput implements SoundOutput {
     window.removeEventListener("pointerdown", this.wake);
     window.removeEventListener("keydown", this.wake);
     this.stopAll();
+    this.loops.clear();
     this.buffers.clear();
     void this.context?.close();
     this.context = undefined;
@@ -53,12 +58,57 @@ export class WebAudioOutput implements SoundOutput {
     this.voices.set(key, voice);
   }
 
+  startLoop(key: SoundKey): void {
+    if (this.loops.has(key)) return;
+
+    const {context} = this;
+    const buffer = this.buffers.get(key);
+    if (!context || !buffer || this.isMuted() || context.state !== "running" || !document.hasFocus()) return;
+
+    const source = context.createBufferSource();
+    const gain = context.createGain();
+    const startedAt = context.currentTime;
+    const loopVoice: LoopVoice = {source, gain, startedAt, stopping: false};
+    source.buffer = buffer;
+    source.loop = true;
+    source.connect(gain);
+    gain.connect(context.destination);
+    gain.gain.setValueAtTime(0, startedAt);
+    gain.gain.linearRampToValueAtTime(1, startedAt + LOOP_FADE_SECONDS);
+    source.onended = () => {
+      source.disconnect();
+      gain.disconnect();
+      if (this.loops.get(key) === loopVoice) this.loops.delete(key);
+    };
+    source.start(startedAt);
+    this.loops.set(key, loopVoice);
+  }
+
+  stopLoop(key: SoundKey): void {
+    const loopVoice = this.loops.get(key);
+    if (!loopVoice || loopVoice.stopping) return;
+
+    const {source, gain, startedAt} = loopVoice;
+    const now = source.context.currentTime;
+    const fadeEndsAt = now + LOOP_FADE_SECONDS;
+    const currentGain = Math.min(1, (now - startedAt) / LOOP_FADE_SECONDS);
+    gain.gain.cancelScheduledValues(now);
+    gain.gain.setValueAtTime(currentGain, now);
+    gain.gain.linearRampToValueAtTime(0, fadeEndsAt);
+    source.stop(fadeEndsAt);
+    loopVoice.stopping = true;
+  }
+
   stopAll(): void {
     for (const voice of this.voices.values()) {
       voice.stop();
     }
 
     this.voices.clear();
+
+    for (const key of this.loops.keys()) {
+      this.stopLoop(key);
+    }
   }
 
   private readonly wake = (): void => {

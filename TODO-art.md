@@ -6,9 +6,13 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 Checkout: `.claude/worktrees/art`, branch `worktree-art`; last merged main `963a09d` in `75a2b89` on 2026-11-18. Preserve this worktree and sync committed main before new work/delivery.
 
-Current slice: the [approved stair treatment](docs/art/terrain/README.md#playable-stair-preview) now draws in every arena through `ArenaHeights` in `worktree-art`. Art reviewed the opposing stairs in `fair-duel` and the wall-side landing in `terraced` at 64 and 32 px per tile. Next art review is S4-1 when AI delivers the fallback contrast change. Recheck the refused pickup's body and outline separately from its muzzle at both scales. Ship owns ring-loop integration and is coordinating the authored inventory icons with play and engine.
+Current slice: the [approved stair treatment](docs/art/terrain/README.md#playable-stair-preview) now draws in every arena through `ArenaHeights` in `worktree-art`. Art reviewed the opposing stairs in `fair-duel` and the wall-side landing in `terraced` at 64 and 32 px per tile. Next art review is S4-1 when AI delivers the fallback contrast change. Recheck the refused pickup's body and outline separately from its muzzle at both scales. Ship wired the ring loop, local pickup cue, inventory icons and live HUD in `worktree-ship`; they await review.
 
 Current milestone: M1/M6; the project remains on M1. Next audio task: combat masking, fatigue and levels once AI/play integrate runtime weapon-shot synthesis (not yet wired into the game sound output). Safari acceptance does not claim new headphone/speaker measurements. Preserve approved master hashes. Next failing check for any playback change: the relevant browser sound acceptance criterion before implementation.
+
+Parallel inventory HUD slice in `.claude/worktrees/ship` (`worktree-ship`, main `963a09d` merged as `68a1661`): the two slots now show the approved icons, with the selected name and ammunition. Switching and the seed 8 pickup update the readout. The live sparring preview is ready for user review. Status badges and generated thumbnails remain future work.
+
+The local pickup cue is ready for review in the Ship worktree. The engine reports an actual local collection through its combat events, and the game plays the existing MP3 once alongside the HUD change.
 
 ## Ownership
 
@@ -28,7 +32,9 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 
 - [x] Deliver three floor levels and solid-wall SVG candidates with native 64/32 px, repetition, grayscale, dim-terrain and terraced-context proof. User approved all four on 2026-11-18. All four now draw in the game.
 
-- [x] Generate `sfx-ring-damage-loop` for play: separate continuous electrical bed with no impacts or baked-in fades. WAV/MP3 and codec caveat delivered; sound approved in Visual Studio Code; runtime integration remains open.
+- [x] Deliver the approved `sfx-ring-damage-loop` and wire its WAV into local play. The runtime delivery is in `worktree-ship` for review.
+
+- [x] Wire the audio pack's `sfx-pickup` MP3 into local play and cover the actual collection, opponent collection, mute and ordinary slot switching.
 
 - [x] Approve the existing matching orange rifle shot (`fx-projectile-rifle-orange.svg`) as selected by the user on 2026-11-17. Native 64/32 px and in-game review pass; keep the 64×64 canvas, current shape/scale, `#FF9B54` and tip (49, 32). The colour mutation was caught by both manifest and browser assertions; the original asset hash was restored. Later weapon classes still need both team variants; muzzle flash remains descoped until feature complete.
 - [x] Measure the shipped empty click’s onset/content and event cadence in Chromium/WebKit at default, 44.1 and 48 kHz: 13 starts per 13 holds in all six runs, including repeats shorter than the buffer. WebKit’s main transient is about 12 ms later; no global correction or threshold change. See the audio handoff.
@@ -47,7 +53,9 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [x] Review the stair treatment for adoption in other arenas at both play scales.
 - [x] Adopt the stair treatment in other arenas with browser coverage for opposing stairs and the wall-side landing.
 - [ ] Penetrable cover, spawn markers, ring edge and fog texture.
-- [ ] Runtime HUD/slot assets, health/ammo/credit UI, panels/buttons, prompt styling, power gauge, pipeline progress and reveal frame. Use the approved inventory study rather than treating its standalone artwork as integration.
+- [x] Publish the three [approved inventory icons](docs/art/concepts/inventory-display/README.md#weapon-artwork-and-prompt-built-identities) and their lookup for Play.
+- [x] Wire the built-in icons into the live HUD and cover starting slots, switching and the pickup with browser criteria.
+- [ ] Remaining HUD and overlay art includes slot status badges, health/ammo/credit UI, panels/buttons, prompt styling, power gauge, pipeline progress and reveal frame.
 - [ ] Landing/practice/onboarding/prompt copy and example prompts for datasets, including weak, broken and harmless adversarial-looking requests; rejection/errors, AI-off and credit explanations.
 - [ ] Privacy/terms copy consistent with `docs/privacy-and-data.md`.
 - [ ] Logo, favicons, social preview and README banner.
@@ -76,6 +84,45 @@ retries. `pnpm checks` passed lint, formatting, strict types and 3,040 tests,
 with one existing slow audio test skipped. The review changed coordination
 docs only. The folder and caller audit found no new files, helpers or types.
 Captures and traversal recordings are in `/private/tmp/gunsmith-art-stairs-963a09d/`.
+
+2026-11-18, local pickup cue in `worktree-ship`. The engine event and browser
+audio start both failed before implementation. Production preview passed
+64 Chromium criteria and all four pickup sound criteria in WebKit. Duplicate
+playback and opponent-triggered playback mutations each failed one intended
+criterion. `pnpm checks` passed lint, formatting, strict types and 3,051
+tests, with one existing slow audio test skipped. Properties passed 35/35
+across engine, browser and API. The runtime MP3 matches the
+audio pack byte for byte. A 44.1 kHz in-game buffer capture measured 380 ms
+in Chromium and 408 ms in WebKit. WebKit's active portion was shifted about
+12 ms later using 1 ms RMS windows at −45 dBFS. Device listening remains
+open. The separate standards review covered root, engine, webapp, React,
+audio and acceptance instructions and included a folder and caller audit.
+
+2026-11-18, live inventory HUD in `worktree-ship`. All four new browser
+criteria failed against the old HUD, then passed after wiring. Fixing slot 2
+to the marksman icon temporarily failed both pickup criteria and passed
+both starting-loadout criteria. The correct lookup was restored. Chromium
+review confirmed the starting, switched and pickup states in a 320 × 104 px
+panel. Production preview passed 49 criteria without retries, including
+HUD, reload, pickup, reticle and room scenarios. `pnpm checks` passed lint,
+formatting, strict types and 3,046 tests with one existing skip.
+`pnpm test:properties` passed all 35. The standards review covered root,
+engine, webapp, React and acceptance instructions. The folder and caller
+audit put the slot component beneath `AmmoHud` and its data types in their
+own domains' `types/` folders.
+
+2026-11-18, inventory icons in `worktree-ship`: all three asset criteria
+failed first on unresolved URLs and then on missing SVGs. All four lookup
+and asset checks passed with the approved files. Production preview served
+all three SVGs byte for byte and passed 31 ammunition HUD and pickup
+criteria. Chromium review at 34 px in colour and grayscale found the
+submachine gun's magazine hard to see against the study slot colours.
+The approved source is preserved. `pnpm checks` passed lint, formatting,
+strict types and 3,046 tests, with one existing audio render skipped.
+The sandboxed check could not open a loopback listener and passed with
+loopback access. Root and webapp instructions were re-read and the folder
+and caller audit found one asset lookup with its test and no loose helpers
+or types. [Inventory handover](docs/art/concepts/inventory-display/README.md#weapon-artwork-and-prompt-built-identities).
 
 2026-11-18, playable stair preview in `worktree-art` at `f16c414`: eight
 visual criteria failed against the original renderer. The final production
@@ -120,6 +167,8 @@ sampling under its Playwright caller and the result type in `types/`.
 The pickup marker is integrated from `e8c8668`.
 
 Cleanup validation: `pnpm checks` exits 0 (lint, formatting, strict types and 2,567 tests; one existing audio-render skip). Approved C2 source/proof retained, with all five proof images embedded. Root instructions re-read; folder/caller, link, SVG geometry and whitespace audit complete. Redundant review artifacts removed from disk and staging; S4-1 finding retained in HANDOFF.md. No gameplay change or acceptance rerun. The artwork is on main in `6186476`.
+
+2026-11-18 ring audio: browser red showed zero loop starts. The mute criterion rejected a build with loop cancellation removed. The runtime and production WAVs match the approved master. `pnpm checks` passed lint, formatting, strict types and 3,038 tests, with one existing slow audio render skipped. Managed production preview passed all 348 criteria. One earlier focused HUD bracket mismatch passed in the full run and three baseline repetitions. The folder and caller audit placed the loop voice type under its Web Audio caller's `types/` folder. Delivery awaits review in the Ship worktree.
 
 Record actual checks, red/mutation evidence and the standards/folder review for the current delivery. Update this resume, the shared status row and a concise handoff at session end.
 

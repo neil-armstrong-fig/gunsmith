@@ -3,6 +3,7 @@ import {expect} from "@playwright/test";
 import type {HudAmmo} from "@src/dsl/gunsmith/components/hud/types/HudAmmo";
 import type {HealthBorder} from "@src/dsl/gunsmith/components/hud/types/HealthBorder";
 import type {HudMotion} from "@src/dsl/gunsmith/components/hud/types/HudMotion";
+import type {InventoryReadout} from "@src/dsl/gunsmith/components/hud/types/InventoryReadout";
 import type {MagazineBar} from "@src/dsl/gunsmith/components/hud/types/MagazineBar";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
 
@@ -110,6 +111,22 @@ export class HudPlaywright extends BasePage {
     };
   }
 
+  async getInventory(): Promise<InventoryReadout> {
+    const name = this.hud().getByTestId("inventory-weapon-name");
+    await expect(name).toBeVisible();
+
+    const first = this.hud().getByTestId("inventory-slot-1");
+    const second = this.hud().getByTestId("inventory-slot-2");
+    return {
+      selectedName: await name.innerText(),
+      firstIcon: await this.loadedInventoryIcon(first),
+      secondIcon: await this.loadedInventoryIcon(second),
+      firstSelected: (await first.getAttribute("aria-current")) === "true",
+      secondSelected: (await second.getAttribute("aria-current")) === "true",
+      widthPixels: await this.hud().evaluate(element => element.getBoundingClientRect().width),
+    };
+  }
+
   async getMagazineBar(): Promise<MagazineBar> {
     const segments = this.page.getByTestId("magazine-segment");
 
@@ -162,6 +179,17 @@ export class HudPlaywright extends BasePage {
 
   private hud(): Locator {
     return this.page.getByTestId("ammo-hud");
+  }
+
+  private async loadedInventoryIcon(slot: Locator): Promise<string | undefined> {
+    const icon = slot.getByTestId("inventory-icon");
+    await expect(icon).toBeVisible();
+    await expect
+      .poll(() => icon.evaluate(element => element instanceof HTMLImageElement && element.naturalWidth > 0))
+      .toBe(true);
+
+    const source = await icon.getAttribute("src");
+    return source ?? undefined;
   }
 
   private async numberIn(testId: string): Promise<number> {

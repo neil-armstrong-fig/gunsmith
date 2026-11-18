@@ -95,7 +95,7 @@ Use seeded sparring to isolate player pickup behavior. Assert visibility and inv
 
 ## Sound
 
-Sound is not part of the state hook. The DSL instruments fetch/decode/play calls by manifest key. A recorded buffer start does not prove device playback, first-interaction context wake-up, masking or listening quality. The 100 ms burst merge cannot be arranged reliably in a browser, so it is unit-tested in `webapp/src/sound/damage-crunch/`.
+Sound is not part of the state hook. The DSL traces fetch/decode to a manifest key and records source starts, loop flags and ended events. A recorded buffer start does not prove device playback, first-interaction context wake-up, masking or listening quality. The 100 ms burst merge cannot be arranged reliably in a browser, so it is unit-tested in `webapp/src/sound/damage-crunch/`.
 
 ## Online rooms
 
