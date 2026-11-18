@@ -1,4 +1,5 @@
 import type {Seat} from "@gunsmith/engine/seat/types/Seat";
+import {parseForfeitLimits} from "@src/match/forfeit-limits/ParseForfeitLimits";
 import {parseInputMessage} from "@src/match/messages/ParseInputMessage";
 import {parseReadyMessage} from "@src/match/messages/ParseReadyMessage";
 import {MatchRoom} from "@src/match/room/MatchRoom";
@@ -22,10 +23,12 @@ const LONGEST_TOKEN = 64;
  * (it is not unit tested, as janggi's `ApiWorker`): it accepts the two WebSockets, hands each frame to `MatchRoom`, runs the
  * clock that steps it and sends each seat its own snapshot. What is decided is in `MatchRoom`. A browser that shows its seat's token
  * (`?token=`) is given that seat back, and the connection it had before, if the server still thinks it open, is closed; a seat whose
- * person has gone stands still until they come back. A time limit on that and idle forfeit come later (`docs/match-netcode.md`).
+ * person has gone stands still until they come back, or until `MatchRoom`'s reconnect window or idle time runs out and the round is forfeited
+ * (`docs/match-netcode.md`). The clock stops with the last connection, so a room everyone has left keeps its state but does not run down.
  */
 export class Match {
-  private readonly room = new MatchRoom();
+  private room = new MatchRoom();
+  private opened = false;
   private readonly sockets = new Map<Seat, WebSocket>();
   private ticking: ReturnType<typeof setInterval> | undefined;
   private lastTickAt = 0;
@@ -40,9 +43,23 @@ export class Match {
     const [client, server] = [pair[0], pair[1]];
     server.accept();
 
+    this.openRoom(request);
     this.seat(server, this.tokenOf(request));
 
     return new Response(null, {status: 101, webSocket: client});
+  }
+
+  /**
+   * The room's first connection sets how long it waits for a person (`?reconnectSeconds=`, `?idleSeconds=`, only ever shorter than the real
+   * limits: `parseForfeitLimits`); later connections' say is ignored, so a seat's person cannot shorten the other's time.
+   */
+  private openRoom(request: Request): void {
+    if (this.opened) {
+      return;
+    }
+
+    this.opened = true;
+    this.room = new MatchRoom(parseForfeitLimits(new URL(request.url).searchParams));
   }
 
   /** The token the browser shows (`?token=`), or `undefined` when it shows none or something too long to be one. */

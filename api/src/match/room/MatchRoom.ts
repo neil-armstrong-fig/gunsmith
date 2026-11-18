@@ -13,6 +13,10 @@ import type {Seat} from "@gunsmith/engine/seat/types/Seat";
 import {viewOfSeat} from "@gunsmith/engine/seat/ViewOfSeat";
 import {MATCH_ARENA_ROWS} from "@src/match/room/arena/MatchArenaRows";
 import type {InputAck} from "@gunsmith/shared/online/types/InputAck";
+import {DEFAULT_FORFEIT_LIMITS} from "@src/match/room/DefaultForfeitLimits";
+import {askChanged} from "@src/match/room/forfeit/AskChanged";
+import {forfeitRound} from "@src/match/room/forfeit/ForfeitRound";
+import type {ForfeitLimits} from "@src/match/room/types/ForfeitLimits";
 import type {JoinedMessage} from "@src/match/room/types/JoinedMessage";
 import type {Readiness} from "@src/match/room/types/Readiness";
 import type {SnapshotMessage} from "@src/match/room/types/SnapshotMessage";
@@ -24,12 +28,21 @@ const NOTHING_ASKED: Input = {direction: {x: 0, y: 0}, firing: false, reload: fa
 
 const OTHER_SEAT: Record<Seat, Seat> = {first: "second", second: "first"};
 
+const SEATS: readonly Seat[] = ["first", "second"];
+
 /**
  * One private room's match, as plain state with no network in it: who has taken which seat, what each seat last asked for, and
  * the engine's world, which only this class steps. The Durable Object (`match/Match.ts`) feeds it frames and a clock and sends
  * what it answers. The match (a best of three) begins when the second seat is taken; before that no world exists and nothing is sent.
  * A decided round waits, frozen, until both seats have asked to go on (`ready`), then the next round begins; once the match itself is
  * decided, both asking begins a fresh match.
+ *
+ * The room does not wait for ever (`docs/match-netcode.md`, "Reconnect and forfeits"). Each seat has a clock of how long it has been
+ * silent, counted in the game time `tick` plays: it starts again when the person leaves or comes back, asks for something new
+ * (`askChanged`) or asks to go on, and when a round is decided or begins. A seat whose person is away is silent for `reconnectSeconds`
+ * at most; one whose person is there, for `idleSeconds`. Then it forfeits: the round being fought goes to the other seat, and a decided
+ * round that was waiting for it to ask to go on has the next round forfeited as it begins. If both seats run out together nobody forfeits
+ * (two people gone is a stall, not a win for either), and a decided match forfeits nothing.
  */
 export class MatchRoom {
   private readonly arena: Arena = arenaFrom(MATCH_ARENA_ROWS);
@@ -39,10 +52,18 @@ export class MatchRoom {
   private readonly acked: Partial<Record<Seat, InputAck>> = {};
   private readonly pulled: Record<Seat, boolean> = {first: false, second: false};
   private readonly readied: Record<Seat, boolean> = {first: false, second: false};
+  private readonly present: Record<Seat, boolean> = {first: true, second: true};
+  private readonly silentSeconds: Record<Seat, number> = {first: 0, second: 0};
   private world: World | undefined;
 
-  /** `makeToken` makes the secret each seat is given as it sits down: whoever shows it later is that seat's person. */
-  constructor(private readonly makeToken: () => string = () => crypto.randomUUID()) {}
+  /**
+   * `limits` is how long the room waits for a person (the real ones unless a page asked for shorter). `makeToken` makes the secret each
+   * seat is given as it sits down: whoever shows it later is that seat's person.
+   */
+  constructor(
+    private readonly limits: ForfeitLimits = DEFAULT_FORFEIT_LIMITS,
+    private readonly makeToken: () => string = () => crypto.randomUUID(),
+  ) {}
 
   /** The next free seat, or `undefined` when both are taken. The second to sit starts the match. */
   join(): Seat | undefined {
@@ -53,6 +74,8 @@ export class MatchRoom {
 
     this.seated.push(seat);
     this.tokens[seat] = this.makeToken();
+    this.present[seat] = true;
+    this.silentSeconds[seat] = 0;
     if (seat === "second") {
       this.world = this.worldOfRound(startMatch());
     }
@@ -64,12 +87,14 @@ export class MatchRoom {
    * Notes that `seat`'s person is gone. Before the match begins the seat is given back: a browser that connects and goes (a page
    * reloading) must not keep the room full, and its token is void. Once it has begun the seat is kept for its person, who may come back
    * with its token (`reconnect`) and is not replaced by a stranger. Meanwhile the fighter stands still where it is, in the match and still
-   * hittable, as `docs/match-netcode.md` says.
+   * hittable, as `docs/match-netcode.md` says, until the reconnect window runs out and the round is forfeited.
    */
   leave(seat: Seat): void {
     if (this.world) {
       this.asked[seat] = NOTHING_ASKED;
       this.pulled[seat] = false;
+      this.present[seat] = false;
+      this.silentSeconds[seat] = 0;
 
       return;
     }
@@ -96,6 +121,8 @@ export class MatchRoom {
     delete this.acked[seat];
     this.asked[seat] = NOTHING_ASKED;
     this.pulled[seat] = false;
+    this.present[seat] = true;
+    this.silentSeconds[seat] = 0;
 
     return seat;
   }
@@ -118,6 +145,9 @@ export class MatchRoom {
       return;
     }
 
+    if (askChanged(before, input)) {
+      this.silentSeconds[seat] = 0;
+    }
     this.acked[seat] = {seq, held: 0};
     this.pulled[seat] = this.pulled[seat] || input.firing;
     this.asked[seat] = {...input, reload: input.reload || before.reload, switchTo: input.switchTo ?? before.switchTo};
@@ -135,6 +165,7 @@ export class MatchRoom {
     }
 
     this.readied[seat] = true;
+    this.silentSeconds[seat] = 0;
     if (this.readied.first && this.readied.second) {
       this.begin(world.match ?? startMatch());
     }
@@ -150,6 +181,7 @@ export class MatchRoom {
       return;
     }
 
+    const wasBeingFought = this.world.round === "playing";
     let world = this.world;
     for (let step = 0; step < steps; step += 1) {
       world = stepFighters(world, this.inputsOfStep(step), MATCH_TICK.stepSeconds);
@@ -160,6 +192,17 @@ export class MatchRoom {
     this.pulled.first = false;
     this.pulled.second = false;
     this.countSteps(steps);
+
+    if (wasBeingFought && world.round !== "playing") {
+      this.restartClocks();
+
+      return;
+    }
+
+    // One step at a time, so that of two seats running out in one stretch of steps the first to do so is the one that forfeits.
+    for (let step = 0; step < steps; step += 1) {
+      this.watchClocks(MATCH_TICK.stepSeconds);
+    }
   }
 
   /** What `seat` may be told right now: only what the engine says it sees, and how far its inputs have been played. `undefined` before the match begins. */
@@ -173,13 +216,81 @@ export class MatchRoom {
 
   /** The round after the one `match` has just ended, or a fresh match when `match` is decided. */
   private begin(match: Match): void {
-    this.world = this.worldOfRound(decideMatch(match) === "playing" ? nextRound(match) : startMatch());
+    this.startRound(this.worldOfRound(decideMatch(match) === "playing" ? nextRound(match) : startMatch()));
+  }
+
+  /** Makes `world` the one being played: nobody has asked to go on, nothing is held over from the last round, and every clock begins again. */
+  private startRound(world: World): void {
+    this.world = world;
     this.readied.first = false;
     this.readied.second = false;
     this.asked.first = NOTHING_ASKED;
     this.asked.second = NOTHING_ASKED;
     this.pulled.first = false;
     this.pulled.second = false;
+    this.restartClocks();
+  }
+
+  /** Lets `seconds` of game time pass on each seat's clock, and forfeits for the one seat that has been silent too long. */
+  private watchClocks(seconds: number): void {
+    for (const seat of SEATS) {
+      this.silentSeconds[seat] += seconds;
+    }
+
+    const silentTooLong = SEATS.filter(seat => this.silentSeconds[seat] >= this.limitOf(seat));
+    const seat = silentTooLong[0];
+    if (!seat) {
+      return;
+    }
+    if (silentTooLong.length > 1) {
+      this.restartClocks();
+
+      return;
+    }
+
+    this.forfeit(seat);
+  }
+
+  /** How long `seat` may be silent: the reconnect window if its person is away, the idle time if they are there. */
+  private limitOf(seat: Seat): number {
+    if (this.present[seat]) {
+      return this.limits.idleSeconds;
+    }
+
+    return this.limits.reconnectSeconds;
+  }
+
+  /**
+   * `seat` has been silent too long. The round being fought goes to the other seat. A decided round, which was waiting for them to ask to go
+   * on, has the next round forfeited as it begins (the other seat is shown the result and asks to go on as usual). A decided match has
+   * nothing left to forfeit, so the seat's clock only starts again.
+   */
+  private forfeit(seat: Seat): void {
+    const world = this.world;
+    if (!world) {
+      return;
+    }
+
+    if (world.round === "playing") {
+      this.world = forfeitRound(world, seat);
+      this.restartClocks();
+
+      return;
+    }
+
+    const match = world.match;
+    if (!match || decideMatch(match) !== "playing") {
+      this.silentSeconds[seat] = 0;
+
+      return;
+    }
+
+    this.startRound(forfeitRound(this.worldOfRound(nextRound(match)), seat));
+  }
+
+  private restartClocks(): void {
+    this.silentSeconds.first = 0;
+    this.silentSeconds.second = 0;
   }
 
   /** A round about to be fought: both fighters at their starting places with full health and magazines, in `match`. */

@@ -11,7 +11,14 @@ import type {ShownSamples} from "@src/dsl/gunsmith/components/room/playwright/wi
 import {isJoinedFrame} from "@src/dsl/gunsmith/components/room/playwright/wire/IsJoinedFrame";
 import {isSnapshotFrame} from "@src/dsl/gunsmith/components/room/playwright/wire/IsSnapshotFrame";
 import {snapshotsOfFrames} from "@src/dsl/gunsmith/components/room/playwright/wire/SnapshotsOfFrames";
+import {addressOfRoom} from "@src/dsl/gunsmith/components/room/playwright/address/AddressOfRoom";
+import {PlayerPlaywright} from "@src/dsl/gunsmith/components/player/playwright/PlayerPlaywright";
+import type {Heading} from "@src/dsl/gunsmith/components/player/types/Heading";
+import type {RoomLimits} from "@src/dsl/gunsmith/components/room/types/RoomLimits";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
+
+/** How long each step of `keepMovingFor` walks, in game seconds. */
+const MOVE_SECONDS = 0.25;
 
 /** The page's own list of where it showed the player each frame (`startRecordingTheShownFighters`). */
 const SHOWN_SAMPLES_NAME = "gunsmithShownPlayerSamples";
@@ -84,8 +91,11 @@ export class RoomPlaywright extends BasePage {
     });
   }
 
-  /** Asks the server for a private room and opens it in this browser. Returns the room's friend code. */
-  async createPrivateRoom(): Promise<string> {
+  /**
+   * Asks the server for a private room and opens it in this browser. Returns the room's friend code. `limits` shorten how long the room
+   * waits for a player: this is the room's first connection, and the room takes its limits from that one alone, so no other page need carry them.
+   */
+  async createPrivateRoom(limits: RoomLimits = {}): Promise<string> {
     const response = await this.page.request.post("/api/rooms");
     if (!response.ok()) {
       throw new Error(`POST /api/rooms answered ${response.status()}, not a room.`);
@@ -98,7 +108,7 @@ export class RoomPlaywright extends BasePage {
     }
 
     this.code = code;
-    await this.enterRoom(this.page, code);
+    await this.enterRoom(this.page, code, limits);
     this.origin = new URL(this.page.url()).origin;
 
     return code;
@@ -215,13 +225,42 @@ export class RoomPlaywright extends BasePage {
     return {context, page: await context.newPage()};
   }
 
-  /** Opens the room's page in `page` and waits until its arena is drawn into, as the game's own pages are waited for. */
-  private async enterRoom(page: Page, code: string): Promise<void> {
-    await page.goto(`/?room=${encodeURIComponent(code)}`);
+  /** Opens the room's page in `page`, asking for `limits` if it is the room's first, and waits until its arena is drawn into, as the game's own pages are waited for. */
+  private async enterRoom(page: Page, code: string, limits: RoomLimits = {}): Promise<void> {
+    await page.goto(addressOfRoom(code, limits));
 
     const arena = page.getByTestId("arena");
     await expect(arena).toHaveAttribute("data-ready", "true");
     await expect(arena).toHaveAttribute("data-sprites-ready", "true");
+  }
+
+  /**
+   * Keeps this browser's player asking for something new, walking a little east and then west, for `seconds` of real time: a player who
+   * is plainly there, however long the room waits on the other one.
+   */
+  async keepMovingFor(seconds: number): Promise<void> {
+    const until = Date.now() + seconds * 1000;
+    while (Date.now() < until) {
+      await this.walkALittle("east");
+      await this.walkALittle("west");
+    }
+  }
+
+  /**
+   * Holds the key for `heading` for about `MOVE_SECONDS` of the page's game time. A round that ends or begins while it is held starts the
+   * game's clock again from nothing, which also ends the wait: `PlayerPlaywright.walkFor` would wait for a clock that went back.
+   */
+  private async walkALittle(heading: Heading): Promise<void> {
+    const player = new PlayerPlaywright(this.page);
+    await player.startWalking(heading);
+
+    const before = await this.readGameState();
+    await this.waitForGameState(
+      ({elapsedSeconds}) =>
+        elapsedSeconds < before.elapsedSeconds || elapsedSeconds >= before.elapsedSeconds + MOVE_SECONDS,
+    );
+
+    await player.stopWalking(heading);
   }
 
   async closeSecondBrowser(): Promise<void> {

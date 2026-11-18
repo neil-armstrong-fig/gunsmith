@@ -394,3 +394,232 @@ it("keeps what a seat asked for once the round is decided from being played in t
 
   expect(room.snapshotFor("first")?.player.equippedIndex).toBe(0);
 });
+
+const STEPS_PER_SECOND = 60;
+
+/** Plays `seconds` of game time, in one go. */
+function playSeconds(room: MatchRoom, seconds: number): void {
+  room.tick(Math.round(seconds * STEPS_PER_SECOND));
+}
+
+/** Has `seat` ask for something new, as a browser does when its player changes what they hold down: it walks east, then west, then east again. */
+function askSomethingNew(room: MatchRoom, seat: Seat, count: number): void {
+  const seq = (room.snapshotFor(seat)?.ack?.seq ?? 0) + 1;
+  room.setInput(seat, {...IDLE, direction: {x: count % 2 === 0 ? 1 : -1, y: 0}}, seq);
+}
+
+/** Plays `seconds` of game time, a second at a time, with `seat` asking for something new in each, so that it is plainly there. */
+function playSecondsAsking(room: MatchRoom, seat: Seat, seconds: number): void {
+  for (let second = 0; second < seconds; second += 1) {
+    askSomethingNew(room, seat, second);
+    playSeconds(room, 1);
+  }
+}
+
+/** Has `seat` send what it last asked for again, as a browser's heartbeat does. */
+function repeatTheAsk(room: MatchRoom, seat: Seat): void {
+  const seq = (room.snapshotFor(seat)?.ack?.seq ?? 0) + 1;
+  room.setInput(seat, IDLE, seq);
+}
+
+it("forfeits the round to the other seat when a seat's person has been away for the reconnect window", () => {
+  const room = startedRoom();
+  room.leave("first");
+
+  playSeconds(room, 29.5);
+
+  expect(room.snapshotFor("second")?.round).toBe("playing");
+
+  playSeconds(room, 1);
+
+  expect(room.snapshotFor("second")?.round).toBe("won");
+  expect(room.snapshotFor("second")?.match).toEqual({playerWins: 1, opponentWins: 0, roundNumber: 1});
+  expect(room.snapshotFor("first")?.round).toBe("lost");
+  expect(room.snapshotFor("first")?.match).toEqual({playerWins: 0, opponentWins: 1, roundNumber: 1});
+});
+
+it("forfeits to the first seat when it is the second seat's person who has been away", () => {
+  const room = startedRoom();
+  room.leave("second");
+
+  playSeconds(room, 31);
+
+  expect(room.snapshotFor("first")?.round).toBe("won");
+});
+
+it("keeps the round for a person who comes back inside the window, and starts the window afresh when they leave again", () => {
+  const room = startedRoom();
+  const token = room.joinedMessage("first").token;
+  room.leave("first");
+  playSecondsAsking(room, "second", 25);
+  room.reconnect(token);
+  playSecondsAsking(room, "second", 20);
+  room.leave("first");
+  playSecondsAsking(room, "second", 25);
+
+  expect(room.snapshotFor("second")?.round).toBe("playing");
+});
+
+it("waits as long as the room was made to wait", () => {
+  const room = new MatchRoom({reconnectSeconds: 2, idleSeconds: 3});
+  room.join();
+  room.join();
+  room.leave("first");
+
+  playSeconds(room, 1.9);
+
+  expect(room.snapshotFor("second")?.round).toBe("playing");
+
+  playSeconds(room, 0.2);
+
+  expect(room.snapshotFor("second")?.round).toBe("won");
+});
+
+it("forfeits the round of a seat that is there but has asked for nothing new for the idle time, the other seat being active", () => {
+  const room = startedRoom();
+
+  for (let second = 0; second < 59; second += 1) {
+    askSomethingNew(room, "second", second);
+    playSeconds(room, 1);
+  }
+
+  expect(room.snapshotFor("second")?.round).toBe("playing");
+
+  askSomethingNew(room, "second", 59);
+  playSeconds(room, 2);
+
+  expect(room.snapshotFor("second")?.round).toBe("won");
+  expect(room.snapshotFor("first")?.round).toBe("lost");
+  expect(room.snapshotFor("first")?.match).toEqual({playerWins: 0, opponentWins: 1, roundNumber: 1});
+});
+
+it("does not count the same ask sent again as a sign the person is there", () => {
+  const room = startedRoom();
+
+  for (let second = 0; second < 70; second += 1) {
+    askSomethingNew(room, "second", second);
+    if (second % 5 === 0) {
+      repeatTheAsk(room, "first");
+    }
+    playSeconds(room, 1);
+  }
+
+  expect(room.snapshotFor("second")?.round).toBe("won");
+});
+
+it("counts a changed ask as a sign the person is there, however seldom", () => {
+  const room = startedRoom();
+  let firstAsks = 0;
+
+  for (let second = 0; second < 70; second += 1) {
+    askSomethingNew(room, "second", second);
+    if (second % 50 === 0) {
+      askSomethingNew(room, "first", firstAsks);
+      firstAsks += 1;
+    }
+    playSeconds(room, 1);
+  }
+
+  // The first seat last changed its ask at 50 s and the second every second, so the first would be the quiet one, but not before 110 s.
+  expect(room.snapshotFor("second")?.round).toBe("playing");
+});
+
+it("forfeits nothing when both seats are quiet together", () => {
+  const room = startedRoom();
+
+  playSeconds(room, 200);
+
+  expect(room.snapshotFor("first")?.round).toBe("playing");
+  expect(room.snapshotFor("first")?.match).toEqual({playerWins: 0, opponentWins: 0, roundNumber: 1});
+});
+
+it("forfeits nothing when both seats are away together", () => {
+  const room = startedRoom();
+  room.leave("first");
+  room.leave("second");
+
+  playSeconds(room, 100);
+
+  expect(room.snapshotFor("first")?.round).toBe("playing");
+});
+
+it("runs no clock before the match has begun", () => {
+  const room = new MatchRoom();
+  room.join();
+
+  playSeconds(room, 100);
+
+  expect(room.snapshotFor("first")).toBeUndefined();
+
+  room.join();
+
+  expect(room.snapshotFor("second")?.round).toBe("playing");
+  expect(room.snapshotFor("second")?.match).toEqual({playerWins: 0, opponentWins: 0, roundNumber: 1});
+});
+
+it("gives a seat the whole idle time from the moment a round is decided to ask for the next one", () => {
+  const room = startedRoom();
+  winRound(room, "first");
+
+  // The second seat was silent through the whole fight; its time to ask begins only now.
+  playSeconds(room, 59.5);
+
+  expect(room.snapshotFor("first")?.match).toEqual({playerWins: 1, opponentWins: 0, roundNumber: 1});
+});
+
+it("forfeits the next round for a seat that never asks for it, once the other has", () => {
+  const room = startedRoom();
+  winRound(room, "first");
+  playSeconds(room, 1);
+  room.ready("first");
+
+  playSeconds(room, 58);
+
+  expect(room.snapshotFor("first")?.match).toEqual({playerWins: 1, opponentWins: 0, roundNumber: 1});
+
+  playSeconds(room, 3);
+
+  expect(room.snapshotFor("first")?.match).toEqual({playerWins: 2, opponentWins: 0, roundNumber: 2});
+  expect(room.snapshotFor("first")?.round).toBe("won");
+  expect(room.snapshotFor("second")?.round).toBe("lost");
+  expect(room.snapshotFor("first")?.ready).toEqual({player: false, opponent: false});
+});
+
+it("forfeits the next round for a seat whose person is away when a round is decided", () => {
+  const room = startedRoom();
+  winRound(room, "first");
+  room.leave("second");
+
+  playSeconds(room, 31);
+
+  expect(room.snapshotFor("first")?.match).toEqual({playerWins: 2, opponentWins: 0, roundNumber: 2});
+  expect(room.snapshotFor("first")?.round).toBe("won");
+});
+
+it("counts the ask to go on as a sign the person is there", () => {
+  const room = startedRoom();
+  winRound(room, "first");
+  playSeconds(room, 40);
+  room.ready("second");
+
+  playSeconds(room, 21);
+
+  // The first seat has said nothing for 61 s since the round was decided, the second only 21: the first is the one who forfeits.
+  expect(room.snapshotFor("first")?.match).toEqual({playerWins: 1, opponentWins: 1, roundNumber: 2});
+  expect(room.snapshotFor("second")?.round).toBe("won");
+});
+
+it("forfeits no round once the match is decided, whoever stays quiet", () => {
+  const room = startedRoom();
+  winRound(room, "first");
+  room.ready("first");
+  room.ready("second");
+  winRound(room, "first");
+  playSeconds(room, 1);
+  room.ready("first");
+
+  playSeconds(room, 200);
+
+  expect(room.snapshotFor("first")?.match).toEqual({playerWins: 2, opponentWins: 0, roundNumber: 2});
+  expect(room.snapshotFor("first")?.round).toBe("won");
+});
