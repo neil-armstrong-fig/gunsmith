@@ -33,6 +33,12 @@ given("a duel has just begun", () => {
         plays.map(() => expect.stringMatching(/\/sfx-damage-crunch[^/]*\.mp3$/)),
       );
     });
+
+    then("the ring's loop does not play: a bullet is not the ring", async ({gunsmith}) => {
+      await gunsmith.waitForGameSeconds(1);
+
+      expect(await gunsmith.sound.getPlays(RING_LOOP)).toHaveLength(0);
+    });
   });
 
   when("the sound is muted and the opponent has shot the player again", () => {
@@ -99,6 +105,11 @@ given("a sparring match whose ring closes on the opponent's side of the arena", 
       await expect.poll(async () => (await gunsmith.sound.getPlays(RING_LOOP)).map(play => play.ended)).toEqual([true]);
       expect(await gunsmith.player.getHealth()).toBeLessThan(healthWhenMuted);
       expect(await gunsmith.round.getState()).toBe("playing");
+
+      // A mute that the next ring step could undo would show as a second loop a moment later.
+      await gunsmith.waitForGameSeconds(1);
+
+      expect(await gunsmith.sound.getPlays(RING_LOOP)).toHaveLength(1);
     });
 
     when("the player unmutes while the ring is still hurting them", () => {
@@ -114,6 +125,17 @@ given("a sparring match whose ring closes on the opponent's side of the arena", 
           .poll(async () => (await gunsmith.sound.getPlays(RING_LOOP)).map(play => play.ended))
           .toEqual([true, false]);
       });
+    });
+  });
+
+  when("the sound was muted before the ring began to hurt, and the ring has taken all the health of the player", () => {
+    beforeEach(async ({gunsmith}) => {
+      await gunsmith.sound.toggleMute();
+      await gunsmith.round.waitForState("lost", LONGEST_ROUND_SECONDS);
+    });
+
+    then("the ring's loop never played", async ({gunsmith}) => {
+      expect(await gunsmith.sound.getPlays(RING_LOOP)).toHaveLength(0);
     });
   });
 

@@ -17,7 +17,7 @@ Start a session with: **"You are engine, continue the TODO."** Substitute any pe
 
 | Persona | Model | Checklist | Current focus | Updated |
 | --- | --- | --- | --- | --- |
-| play | Claude | [TODO-play.md](TODO-play.md) | Hit confirmation, camera shake and reduced motion integrated. Inventory HUD and M1 playtest next. Recoil and muzzle flash depend on held weapons. | 2026-11-18 |
+| play | Claude | [TODO-play.md](TODO-play.md) | Hit confirmation, camera shake and reduced motion integrated. Ring loop and inventory HUD arrived from ship's worktree and are merged here; play reviews them live. Recoil and muzzle flash depend on held weapons. | 2026-11-18 |
 | engine | Claude | [TODO-engine.md](TODO-engine.md) | Fair-duel starts and bot reaction to unseen shots integrated. High-ground playtest, arena pool and limits, inventory data and reflection remain open. | 2026-11-18 |
 | ai | Claude | [TODO-ai.md](TODO-ai.md) | Player arena selection and engine validation integrated. S4-1 contrast, model quality, and the production adapter remain open. | 2026-11-18 |
 | server | Claude | [TODO-server.md](TODO-server.md) | Online best-of-three rounds and seat reconnect integrated. Forfeit, account/storage and the generation route remain open. | 2026-11-18 |
