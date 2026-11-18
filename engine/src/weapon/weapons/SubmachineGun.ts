@@ -6,6 +6,7 @@ import type {Weapon} from "@gunsmith/engine/weapon/types/Weapon";
  * set by play.
  */
 export const SUBMACHINE_GUN: Weapon = {
+  identity: {key: "submachine-gun", name: "Submachine gun"},
   fireIntervalSeconds: 0.1,
   bulletDamage: 12,
   bulletSpeed: 18,

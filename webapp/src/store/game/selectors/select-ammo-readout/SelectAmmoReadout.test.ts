@@ -11,6 +11,11 @@ const world = startingWorld(arenaFrom(["###", "#.#", "###"]));
 it("reads the rifle's ammunition at the start of a match", () => {
   expect(selectAmmoReadout(storeHolding(world))).toEqual({
     slot: 1,
+    selectedName: "Rifle",
+    firstName: "Rifle",
+    firstIconKey: "rifle",
+    secondName: "Marksman rifle",
+    secondIconKey: "marksman-rifle",
     rounds: RIFLE.magazineSize,
     reserve: RIFLE.startingReserve,
     magazineSize: RIFLE.magazineSize,
@@ -24,6 +29,11 @@ it("reads the marksman rifle's ammunition once it is in hand, counting the slot 
 
   expect(selectAmmoReadout(storeHolding(holdingSecond))).toEqual({
     slot: 2,
+    selectedName: "Marksman rifle",
+    firstName: "Rifle",
+    firstIconKey: "rifle",
+    secondName: "Marksman rifle",
+    secondIconKey: "marksman-rifle",
     rounds: MARKSMAN_RIFLE.magazineSize,
     reserve: MARKSMAN_RIFLE.startingReserve,
     magazineSize: MARKSMAN_RIFLE.magazineSize,

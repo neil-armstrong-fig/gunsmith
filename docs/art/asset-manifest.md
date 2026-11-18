@@ -33,6 +33,11 @@ Current M1 terrain keys are `tile-floor-l1`, `tile-floor-l2`,
 is an SVG with a 64 × 64 canvas centred at (32, 32), drawn at one cell per
 image. The flat materials serve as fallbacks.
 
+The [authored inventory icons](concepts/inventory-display/README.md#weapon-artwork-and-prompt-built-identities)
+are `ui-weapon-rifle`, `ui-weapon-marksman-rifle` and `ui-weapon-submachine-gun`.
+They are right-facing 64 × 64 SVGs in `webapp/public/assets/ui/`, intended to
+display at 34 × 34 px in the HUD. `inventoryIconUrl` resolves the built-in icon keys.
+
 ## Planned keys (build finalises; art may propose additions)
 
 | Key | Notes | Size | Format |

@@ -10,6 +10,8 @@ Current slice: the [playable stair preview](docs/art/terrain/README.md#playable-
 
 Current milestone: M1/M6; the project remains on M1. Next audio task: combat masking, fatigue and levels once AI/play integrate runtime weapon-shot synthesis (not yet wired into the game sound output). Safari acceptance does not claim new headphone/speaker measurements. Preserve approved master hashes. Next failing check for any playback change: the relevant browser sound acceptance criterion before implementation.
 
+Parallel inventory HUD slice in `.claude/worktrees/ship` (`worktree-ship`, main `963a09d` merged as `68a1661`): the two slots now show the approved icons, with the selected name and ammunition. Switching and the seed 8 pickup update the readout. The live sparring preview is ready for user review. Status badges and generated thumbnails remain future work.
+
 ## Ownership
 
 webapp/public/assets/, webapp/audio/, asset manifests/loading, authored presentation/overlay components, copy and docs/art/. play owns combat/HUD behavior; AI owns generated renderer and shot synthesis.
@@ -45,13 +47,41 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [ ] Pickup glow, projectiles/muzzle flashes by supported behavior, hit/death effects.
 - [x] Draw paired stair landings and height edges in `?scenario=terrain` for playable review.
 - [ ] Review the stair treatment for adoption in other arenas. Penetrable cover, spawn markers, ring edge and fog texture remain open.
-- [ ] Runtime HUD/slot assets, health/ammo/credit UI, panels/buttons, prompt styling, power gauge, pipeline progress and reveal frame. Use the approved inventory study rather than treating its standalone artwork as integration.
+- [x] Publish the three [approved inventory icons](docs/art/concepts/inventory-display/README.md#weapon-artwork-and-prompt-built-identities) and their lookup for Play.
+- [x] Wire the built-in icons into the live HUD and cover starting slots, switching and the pickup with browser criteria.
+- [ ] Remaining HUD and overlay art includes slot status badges, health/ammo/credit UI, panels/buttons, prompt styling, power gauge, pipeline progress and reveal frame.
 - [ ] Landing/practice/onboarding/prompt copy and example prompts for datasets, including weak, broken and harmless adversarial-looking requests; rejection/errors, AI-off and credit explanations.
 - [ ] Privacy/terms copy consistent with `docs/privacy-and-data.md`.
 - [ ] Logo, favicons, social preview and README banner.
 - [ ] Case-study diagrams: pipeline, cost safeguards and eval loop.
 
 ## Verification/latest delivery
+
+2026-11-18, live inventory HUD in `worktree-ship`. All four new browser
+criteria failed against the old HUD, then passed after wiring. Fixing slot 2
+to the marksman icon temporarily failed both pickup criteria and passed
+both starting-loadout criteria. The correct lookup was restored. Chromium
+review confirmed the starting, switched and pickup states in a 320 × 104 px
+panel. Production preview passed 49 criteria without retries, including
+HUD, reload, pickup, reticle and room scenarios. `pnpm checks` passed lint,
+formatting, strict types and 3,046 tests with one existing skip.
+`pnpm test:properties` passed all 35. The standards review covered root,
+engine, webapp, React and acceptance instructions. The folder and caller
+audit put the slot component beneath `AmmoHud` and its data types in their
+own domains' `types/` folders.
+
+2026-11-18, inventory icons in `worktree-ship`: all three asset criteria
+failed first on unresolved URLs and then on missing SVGs. All four lookup
+and asset checks passed with the approved files. Production preview served
+all three SVGs byte for byte and passed 31 ammunition HUD and pickup
+criteria. Chromium review at 34 px in colour and grayscale found the
+submachine gun's magazine hard to see against the study slot colours.
+The approved source is preserved. `pnpm checks` passed lint, formatting,
+strict types and 3,046 tests, with one existing audio render skipped.
+The sandboxed check could not open a loopback listener and passed with
+loopback access. Root and webapp instructions were re-read and the folder
+and caller audit found one asset lookup with its test and no loose helpers
+or types. [Inventory handover](docs/art/concepts/inventory-display/README.md#weapon-artwork-and-prompt-built-identities).
 
 2026-11-18, playable stair preview in `worktree-art` at `f16c414`: eight
 visual criteria failed against the original renderer. The final production

@@ -1,5 +1,9 @@
+import type {WeaponIdentity} from "@gunsmith/engine/weapon/types/WeaponIdentity";
+
 /** What makes one weapon different from another. Every number is a tunable, to be set by play. */
 export interface Weapon {
+  /** Presentation metadata carried with the weapon through loadout changes. */
+  identity?: WeaponIdentity;
   /** The time between one shot and the next, in seconds. */
   fireIntervalSeconds: number;
   /** What one bullet takes off whatever it hits. */

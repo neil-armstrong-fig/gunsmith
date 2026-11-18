@@ -72,15 +72,20 @@ show reload progress continuing on a stowed weapon or transfer it to the new one
 
 ## Weapon artwork and prompt-built identities
 
-| Study source | Identity cue |
-| --- | --- |
-| [Rifle](weapons/rifle/Icon.svg) | Existing default silhouette: broad receiver and short barrel |
-| [Marksman rifle](weapons/marksman-rifle/Icon.svg) | New study: long barrel, slim body and raised optic |
-| [Submachine gun](weapons/submachine-gun/Icon.svg) | New study: short body and projecting magazine |
+| Approved source | HUD icon key | Identity cue |
+| --- | --- | --- |
+| [Rifle](weapons/rifle/Icon.svg) | `rifle` | Broad receiver and short barrel |
+| [Marksman rifle](weapons/marksman-rifle/Icon.svg) | `marksman-rifle` | Long barrel, slim body and raised optic |
+| [Submachine gun](weapons/submachine-gun/Icon.svg) | `submachine-gun` | Short body and projecting magazine |
 
-The rifle reuses the build-reference weapon layer. The other two drawings are
-art proposals, not evidence that runtime already draws those weapons. Reuse these
-identities for future held/pickup artwork when build adopts them.
+The production SVGs copy the approved sources byte for byte. Play can call
+`inventoryIconUrl(identity)` from `@src/assets/inventory-icons/InventoryIconUrl`
+with a HUD icon key. It returns the corresponding `/assets/ui/ui-weapon-*.svg`
+URL, or `undefined` for a missing or unsupported key. The HUD uses the built-in
+weapon identity key directly and draws a neutral mark for occupied slots without
+an icon. It fits the full 64 × 64 canvas into 34 × 34 px, facing right. In the 34 px
+Chromium check on the study's dark slot colours, the submachine gun's magazine
+blended into the background. Its main outline was still distinct in grayscale.
 
 For prompt-built weapons, render a thumbnail from the **same validated appearance**
 as the held weapon. Cache it by stable visual identity/revision, fit the bounded
@@ -97,29 +102,15 @@ must preserve existing fallback disclosure when adopting the real renderer.
 
 ## Build handover: minimum data and acceptance
 
-Current references inspected: AmmoHud, SelectAmmoReadout, SnapshotOf,
-WeaponSnapshot, StartingLoadout, SwitchWeapon, WithPickedUpWeapon and the weapon
-constants. Runtime shows selected-slot ammunition only. Engine weapons have stats
-but no display name or stable visual identity. Reference `ui-slot-1`/`ui-slot-2`
-artwork is not installed in the runtime HUD.
+The live HUD uses optional `Weapon.identity` metadata (`key` and `name`).
+The starting loadout and pickups carry it with the weapon. `selectAmmoReadout`
+reads the two slots and the selected weapon from the existing world. The browser
+criteria inspect the rendered DOM. The existing state hook still provides the
+selected ammunition data for its current consumers.
 
-Build needs a deliberate identity path from a weapon definition through the
-carried weapon and pickup into presentation: stable identity, display name and a
-trusted icon/appearance reference. Never identify a weapon by comparing its stats.
-For each local-player slot, presentation also needs rounds/reserve and occupancy;
-selection and reload derive from the existing world. Use a slow Zustand selector,
-keeping the game store's keys unchanged. Keep animation out of per-frame React
-state and preserve the HUD's pointer pass-through.
-
-**Proposed state-hook addition, not a frozen interface:** a small local-player
-inventory summary with slot, weapon identity/name and ammunition; absent weapon
-metadata means an unoccupied slot. Preserve the existing selected `weapon`
-snapshot for its consumers. Report selection/reload using existing values rather
-than introducing contradictory state. Icon identity can be an opaque trusted key;
-full artwork, arbitrary URLs, opponent inventory and per-frame progress do not
-belong in the hook. The DOM must expose readable full names and status for both
-slots so browser specs can assert actual output. Build agrees the exact type and
-adds it test-first when consumed; art changes no schema or manifest key.
+The first live slice retains the segmented magazine and CSS reload progress.
+The continuous track, per-slot status badges and generated thumbnails remain
+design follow-ups.
 
 Suggested acceptance scenarios for build, written before runtime changes:
 

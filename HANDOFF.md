@@ -44,7 +44,7 @@ Main is an integration checkout. All seven personas develop in their own worktre
 
 ## Active reservations and requests
 
-**Ship, ring-damage audio:** Ship owns this runtime slice in `worktree-ship`, including the WAV registration, local combat playback and the sound acceptance recorder/spec. Play continues inventory and Art continues stairs.
+**Ship, ring-damage audio:** Ship owns this runtime slice in `worktree-ship`, including the WAV registration, local combat playback and the sound acceptance recorder/spec.
 
 **Ship preview integrated:** `249fc3c` via `c61bc32`, including managed local Worker/external API modes, runner configuration modules, CI local mode and generated-report exclusions. Hosted verification and profiling await publication.
 
@@ -114,6 +114,8 @@ Before changing a consumed contract, record the proposal and affected owners her
 - [ ] Production art/audio and live release: art/play integrate their domains; ship validates release.
 
 ## Delivery log
+
+**Art → Play and Engine, live inventory HUD (2026-11-18):** Ship wired the three [approved silhouettes](docs/art/concepts/inventory-display/README.md#weapon-artwork-and-prompt-built-identities) into `AmmoHud` in `worktree-ship`. Engine's built-in `Weapon` values carry optional `identity {key, name}` metadata through the existing loadout. The HUD uses its keys to resolve the three 34 px icons and shows the selected name and ammunition. An occupied slot with unknown art has a neutral mark. `InventoryOnTheScreen` covers starting slots, selection, the slot 2 pickup and stowing it. Play owns subsequent HUD behavior.
 **Server → play, round and match flow in an online room (2026-11-18, integrated from `4f34125`).** A room is a best of three the server scores; a decided round waits until both players send `{kind: "ready"}`, then the next round (or, after a decided match, a fresh match) begins. **Play's file touched:** `webapp/src/react/components/dom/round-banner/RoundBanner.tsx` now calls `go-on/GoOn.ts` instead of setting the world itself, and shows "Waiting for the other player" (`data-testid="round-banner-waiting"`, from the app store); a local game behaves as before (`GoOn.test.ts`). Also: the app store gained `nextRoundAsked`, `takeNextRoundAsk`, `waitingForOtherPlayer` (keys test updated); the online branch of `UseGameLoop.ts` takes the ask and sends it. Wire: in `{kind: "ready"}`; out `ready {player, opponent}` on each snapshot (flags only; the property test's allowed-fields list has `ready`). DSL: `round.isWaitingForTheOtherPlayer()`. Specs `TwoBrowsersPlayingARound` (7) and `TwoBrowsersPlayingABestOfThree` (3) are green; mutation-proved on the ready rule, the match in a new round, the ask-ahead guard and the seat's side of `ready`. No engine change, no ring or pickup in a room yet.
 
 - 2026-11-18, play (`worktree-play`, integrated from `46ee023`): **DSL error wrapping.** Every `*Dsl` method (149, six were bare) is one `try`/`catch` rethrowing a `DslError`, enforced by lint in `acceptance-tests/eslint.config.js`; no spec or behaviour changed. Also: camera shake defaults to 12 px (the user's choice), `docs/build-approach.md` records the rough-parts-first approach for the case study, and `docs/game-design.md` out-of-scope list now marks mobile/touch, public gallery and paid credits as wanted soon after the first pass. Also fixed the `ShootingAcrossLevels` flake (a late-stopped walk left the player past the platform dummy): `player.walkUntilPast` in a held game, see `TODO-play.md`.
