@@ -4,6 +4,8 @@ import {ArenaPlaywright} from "@src/dsl/gunsmith/components/arena/playwright/Are
 import type {Cursor} from "@src/dsl/gunsmith/components/arena/types/Cursor";
 import type {CursorPlace} from "@src/dsl/gunsmith/components/arena/types/CursorPlace";
 import type {TerrainLook} from "@src/dsl/gunsmith/components/arena/types/TerrainLook";
+import type {Colour} from "@src/dsl/gunsmith/types/Colour";
+import type {Point} from "@src/dsl/gunsmith/types/Point";
 import type {Size} from "@src/dsl/gunsmith/types/Size";
 
 /** The arena the match is played in, reached as `gunsmith.arena`. */
@@ -47,6 +49,15 @@ export class ArenaDsl {
       return await this.arena.getTerrainLook(pixelsPerTile);
     } catch (error) {
       throw new DslError("Failed to read what the terrain looks like on the screen", error);
+    }
+  }
+
+  /** Reads the colours drawn at landmarks in the arena. */
+  async getTerrainColoursAt(landmarks: Point[]): Promise<Colour[]> {
+    try {
+      return await this.arena.getTerrainColoursAt(landmarks);
+    } catch (error) {
+      throw new DslError("Failed to read the colours at the terrain landmarks", error);
     }
   }
 
