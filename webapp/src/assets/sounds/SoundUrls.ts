@@ -1,6 +1,7 @@
 import damageCrunchUrl from "@src/assets/sounds/files/sfx-damage-crunch.mp3?url&no-inline";
 import emptyClickUrl from "@src/assets/sounds/files/sfx-empty-click.mp3?url&no-inline";
 import hitUrl from "@src/assets/sounds/files/sfx-hit.mp3?url&no-inline";
+import pickupUrl from "@src/assets/sounds/files/sfx-pickup.mp3?url&no-inline";
 import ringDamageLoopUrl from "@src/assets/sounds/files/sfx-ring-damage-loop.wav?url&no-inline";
 import type {SoundKey} from "@src/assets/sounds/types/SoundKey";
 
@@ -9,5 +10,6 @@ export const SOUND_URLS: Record<SoundKey, string> = {
   "sfx-empty-click": emptyClickUrl,
   "sfx-damage-crunch": damageCrunchUrl,
   "sfx-hit": hitUrl,
+  "sfx-pickup": pickupUrl,
   "sfx-ring-damage-loop": ringDamageLoopUrl,
 };

@@ -30,6 +30,14 @@ describe("with a pickup lying in the arena", () => {
     expect(world.pickup).toBe(lying);
   });
 
+  it("reports the player's collection on its step only", () => {
+    const base = withPickup();
+    const world = step({...base, player: {...base.player, position: lying.position}}, IDLE, TICK);
+
+    expect(world.events).toEqual([{kind: "pickupTaken"}]);
+    expect(step(world, IDLE, TICK).events).toBeUndefined();
+  });
+
   it("is taken by the opponent who stands on it", () => {
     const base = withPickup();
     const opponent = {...base.player, position: lying.position, health: OPPONENT_HEALTH};
@@ -38,6 +46,18 @@ describe("with a pickup lying in the arena", () => {
     expect(world.pickup).toBeUndefined();
     expect(world.opponent?.loadout[1]?.weapon).toBe(SUBMACHINE_GUN);
     expect(world.player.loadout[1]?.weapon).toBe(MARKSMAN_RIFLE);
+    expect(world.events).toBeUndefined();
+  });
+
+  it("reports nothing to the player when the opponent wins a tie", () => {
+    const base = withPickup();
+    const player = {...base.player, position: lying.position};
+    const opponent = {...player, health: OPPONENT_HEALTH};
+    const world = step(disarmOpponent({...base, player, opponent}), IDLE, TICK);
+
+    expect(world.opponent?.loadout[1]?.weapon).toBe(SUBMACHINE_GUN);
+    expect(world.player.loadout[1]?.weapon).toBe(MARKSMAN_RIFLE);
+    expect(world.events).toBeUndefined();
   });
 
   it("is not taken once the round is over: a frozen world takes nothing", () => {

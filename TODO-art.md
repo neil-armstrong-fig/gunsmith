@@ -12,6 +12,8 @@ Current milestone: M1/M6; the project remains on M1. Next audio task: combat mas
 
 Parallel inventory HUD slice in `.claude/worktrees/ship` (`worktree-ship`, main `963a09d` merged as `68a1661`): the two slots now show the approved icons, with the selected name and ammunition. Switching and the seed 8 pickup update the readout. The live sparring preview is ready for user review. Status badges and generated thumbnails remain future work.
 
+The local pickup cue is ready for review in the Ship worktree. The engine reports an actual local collection through its combat events, and the game plays the existing MP3 once alongside the HUD change.
+
 ## Ownership
 
 webapp/public/assets/, webapp/audio/, asset manifests/loading, authored presentation/overlay components, copy and docs/art/. play owns combat/HUD behavior; AI owns generated renderer and shot synthesis.
@@ -31,6 +33,8 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [x] Deliver three floor levels and solid-wall SVG candidates with native 64/32 px, repetition, grayscale, dim-terrain and terraced-context proof. User approved all four on 2026-11-18. All four now draw in the game.
 
 - [x] Deliver the approved `sfx-ring-damage-loop` and wire its WAV into local play. The runtime delivery is in `worktree-ship` for review.
+
+- [x] Wire the audio pack's `sfx-pickup` MP3 into local play and cover the actual collection, opponent collection, mute and ordinary slot switching.
 
 - [x] Approve the existing matching orange rifle shot (`fx-projectile-rifle-orange.svg`) as selected by the user on 2026-11-17. Native 64/32 px and in-game review pass; keep the 64×64 canvas, current shape/scale, `#FF9B54` and tip (49, 32). The colour mutation was caught by both manifest and browser assertions; the original asset hash was restored. Later weapon classes still need both team variants; muzzle flash remains descoped until feature complete.
 - [x] Measure the shipped empty click’s onset/content and event cadence in Chromium/WebKit at default, 44.1 and 48 kHz: 13 starts per 13 holds in all six runs, including repeats shorter than the buffer. WebKit’s main transient is about 12 ms later; no global correction or threshold change. See the audio handoff.
@@ -56,6 +60,19 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [ ] Case-study diagrams: pipeline, cost safeguards and eval loop.
 
 ## Verification/latest delivery
+
+2026-11-18, local pickup cue in `worktree-ship`. The engine event and browser
+audio start both failed before implementation. Production preview passed
+64 Chromium criteria and all four pickup sound criteria in WebKit. Duplicate
+playback and opponent-triggered playback mutations each failed one intended
+criterion. `pnpm checks` passed lint, formatting, strict types and 3,051
+tests, with one existing slow audio test skipped. Properties passed 35/35
+across engine, browser and API. The runtime MP3 matches the
+audio pack byte for byte. A 44.1 kHz in-game buffer capture measured 380 ms
+in Chromium and 408 ms in WebKit. WebKit's active portion was shifted about
+12 ms later using 1 ms RMS windows at −45 dBFS. Device listening remains
+open. The separate standards review covered root, engine, webapp, React,
+audio and acceptance instructions and included a folder and caller audit.
 
 2026-11-18, live inventory HUD in `worktree-ship`. All four new browser
 criteria failed against the old HUD, then passed after wiring. Fixing slot 2

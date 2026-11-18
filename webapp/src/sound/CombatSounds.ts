@@ -10,7 +10,7 @@ const RING_LOOP = "sfx-ring-damage-loop";
  * The sounds the fight makes, played from what each step of the simulation reports: the empty click (the latch turns the
  * engine's refusal on every step a held trigger meets an empty magazine into one click for the hold), the crunch of damage
  * (`DamageCrunch` makes one of a burst of bullets), the continuous ring damage loop, and the confirmation of a hit landed on a target the player sees
- * (`HitConfirmation`; the engine reports no hit on one they cannot).
+ * (`HitConfirmation`; the engine reports no hit on one they cannot), plus the latch when the player takes a pickup.
  * Cosmetic and outside the simulation: nothing here is ever read back by the engine or kept in the game store.
  */
 export class CombatSounds {
@@ -34,6 +34,10 @@ export class CombatSounds {
 
     if (this.confirmation.shouldPlay({events, round, seconds})) {
       this.output.play("sfx-hit");
+    }
+
+    if (events?.some(event => event.kind === "pickupTaken")) {
+      this.output.play("sfx-pickup");
     }
 
     if (round === "playing" && events?.some(event => event.kind === "damageTaken" && event.cause === "ring")) {

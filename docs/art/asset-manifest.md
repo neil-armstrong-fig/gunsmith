@@ -11,7 +11,9 @@ Current M1 sound mapping: `sfx-empty-click` is integrated in
 `webapp/src/assets/sounds/` as a separate MP3 asset, encoded from the approved
 `empty-tight` WAV master; `sfx-damage-crunch` is integrated beside it, encoded by play from
 `webapp/audio/studies/combat-feedback/damage-crunch.wav` with the audio workspace's recipe. MP3 is the approved production format for future
-static cues. `sfx-ring-damage-loop` uses the approved two-second WAV for gapless playback during local ring damage. The broader manifest and planned keys below remain unfrozen.
+static cues. `sfx-pickup` uses the audio pack's encoded MP3 as a one-shot for local weapon collection.
+`sfx-ring-damage-loop` uses the approved two-second WAV for gapless playback during local ring damage.
+The broader manifest and planned keys below remain unfrozen.
 
 ## Rules
 
@@ -56,7 +58,7 @@ display at 34 × 34 px in the HUD. `inventoryIconUrl` resolves the built-in icon
 | `ui-hud-frame`, `ui-slot-1`, `ui-slot-2`, `ui-health`, `ui-ammo`, `ui-credit` | HUD | varies | SVG |
 | `ui-button`, `ui-panel`, `ui-power-gauge`, `ui-progress-step` | Menus and the reveal | varies | SVG |
 | `brand-logo`, `brand-favicon-*`, `brand-social` | Logo, icons, social-preview image | varies | SVG and PNG |
-| `sfx-pickup`, `sfx-drop`, `sfx-reload`, `sfx-step-stand`, `sfx-step-crouch`, `sfx-hit`, `sfx-death`, `sfx-ring-warning`, `sfx-ui-click`, `sfx-round-start`, `sfx-round-end` | Static sounds (`docs/art/audio.md`) | n/a | `.mp3` |
+| `sfx-drop`, `sfx-reload`, `sfx-step-stand`, `sfx-step-crouch`, `sfx-hit`, `sfx-death`, `sfx-ring-warning`, `sfx-ui-click`, `sfx-round-start`, `sfx-round-end` | Static sounds (`docs/art/audio.md`) | n/a | `.mp3` |
 | `music-loop-menu`, `music-loop-match` | Looping music | n/a | `.mp3` |
 
 ## Delivery protocol

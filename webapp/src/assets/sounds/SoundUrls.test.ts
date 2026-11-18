@@ -27,3 +27,10 @@ it("ships the ring loop as a separate copy of the approved WAV", () => {
   );
   expect(runtime.equals(approved)).toBe(true);
 });
+
+it("ships the pickup MP3 byte for byte from the audio pack", () => {
+  const runtime = readFileSync(new URL("./files/sfx-pickup.mp3", import.meta.url));
+  const encoded = readFileSync(new URL("../../../audio/encoded-audio/sfx-pickup.mp3", import.meta.url));
+
+  expect(runtime.equals(encoded)).toBe(true);
+});

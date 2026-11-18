@@ -99,6 +99,7 @@ export function playStep(world: World, play: Play, seconds: number): World {
       playerTurn,
       damage: {health: playerShot.fighter.health, bullet: bulletFlight.playerDamage, ring: playerRingDamage},
       visibleHits,
+      playerTookPickup: taking.playerTookPickup,
     }),
   };
 }
