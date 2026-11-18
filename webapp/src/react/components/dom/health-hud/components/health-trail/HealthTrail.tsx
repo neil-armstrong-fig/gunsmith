@@ -1,4 +1,5 @@
 import {PLAYER_HEALTH} from "@gunsmith/engine/health/PlayerHealth";
+import {useAppStore} from "@src/store/app/UseAppStore";
 import type {JSX} from "react";
 import {useEffect, useRef} from "react";
 
@@ -11,11 +12,12 @@ interface Props {
 /**
  * The part of the health bar a burst of bullets took, shown a moment longer: an amber bar behind the real one that follows it down in 350 ms. Only bullets
  * leave a trail, as in art's study; the ring's loss, a little at a time, and a rise in health, as at the start of a round, put it with the bar at once. Told
- * apart by the hit count, which the loop writes with the same step that took the health, so the two arrive in one render.
+ * apart by the hit count, which the loop writes with the same step that took the health, so the two arrive in one render. With reduced motion the bar is simply the health: nothing trails.
  */
 export function HealthTrail({health, bulletHits}: Props): JSX.Element {
   const shownRef = useRef({health, bulletHits});
-  const trailing = health < shownRef.current.health && bulletHits !== shownRef.current.bulletHits;
+  const reducedMotion = useAppStore(state => state.reducedMotion);
+  const trailing = !reducedMotion && health < shownRef.current.health && bulletHits !== shownRef.current.bulletHits;
 
   useEffect(() => {
     shownRef.current = {health, bulletHits};

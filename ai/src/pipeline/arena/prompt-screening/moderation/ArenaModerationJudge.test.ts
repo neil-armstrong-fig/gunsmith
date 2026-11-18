@@ -4,19 +4,6 @@ import {SYSTEM_PROMPT_CANARY} from "@gunsmith/ai/pipeline/canary/SystemPromptCan
 
 const UNAVAILABLE_REASON = "We could not check that request just now. Try again.";
 
-function moderatorSaying(reply: unknown): FakeListChatModel {
-  return new FakeListChatModel({responses: [JSON.stringify(reply)]});
-}
-
-/** The text of every message handed to the model, in order. The model's input is `unknown` to this test on purpose. */
-function messageTexts(input: unknown): string[] {
-  if (!Array.isArray(input)) {
-    return [];
-  }
-
-  return input.map(message => String((message as {content: unknown}).content));
-}
-
 it("accepts an arena request", async () => {
   const moderator = moderatorSaying({isArenaRequest: true, reason: "pillars make an arena"});
 
@@ -79,3 +66,16 @@ it("does not let a closing tag in the player's words end the data block early", 
   expect(request?.match(/<\s*\/\s*request\s*>/gi)).toHaveLength(1);
   expect(request?.endsWith("</request>")).toBe(true);
 });
+
+/** The text of every message handed to the model, in order. The model's input is `unknown` to this test on purpose. */
+function messageTexts(input: unknown): string[] {
+  if (!Array.isArray(input)) {
+    return [];
+  }
+
+  return input.map(message => String((message as {content: unknown}).content));
+}
+
+function moderatorSaying(reply: unknown): FakeListChatModel {
+  return new FakeListChatModel({responses: [JSON.stringify(reply)]});
+}

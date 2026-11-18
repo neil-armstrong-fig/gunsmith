@@ -1,10 +1,6 @@
 import type {Input} from "@gunsmith/engine/game-loop/types/Input";
 import {InputHistory} from "@src/online/prediction/history/InputHistory";
 
-function asking(x: number): Input {
-  return {direction: {x, y: 0}, firing: false, reload: false};
-}
-
 it("gives back the inputs from a step on, oldest first", () => {
   const history = new InputHistory(10);
   history.record(0, asking(0));
@@ -41,3 +37,7 @@ it("counts the steps it holds so a caller can tell the next one", () => {
 
   expect(history.nextStep).toBe(2);
 });
+
+function asking(x: number): Input {
+  return {direction: {x, y: 0}, firing: false, reload: false};
+}

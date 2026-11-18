@@ -105,6 +105,8 @@ it("slides along a wall instead of sticking to it", () => {
 });
 
 it("plays the same way every time from the same inputs", () => {
+  expect(play()).toEqual(play());
+
   function play(): World {
     let world = centred();
     for (let tick = 0; tick < 200; tick += 1) {
@@ -113,8 +115,6 @@ it("plays the same way every time from the same inputs", () => {
 
     return world;
   }
-
-  expect(play()).toEqual(play());
 });
 
 it("turns the player to face the point being aimed at", () => {

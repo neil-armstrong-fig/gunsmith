@@ -4,19 +4,6 @@ import {SYSTEM_PROMPT_CANARY} from "@gunsmith/ai/pipeline/canary/SystemPromptCan
 
 const ROWS = ["##########", "#........#", "#........#", "#........#", "##########"];
 
-function generatorSaying(reply: unknown): FakeListChatModel {
-  return new FakeListChatModel({responses: [JSON.stringify(reply)]});
-}
-
-/** The text of every message handed to the model, in order. The model's input is `unknown` to this test on purpose. */
-function messageTexts(input: unknown): string[] {
-  if (!Array.isArray(input)) {
-    return [];
-  }
-
-  return input.map(message => String((message as {content: unknown}).content));
-}
-
 it("returns what the model wrote, unchecked", async () => {
   const draft = await generateArenaDraft("a box", generatorSaying({name: "Box", rows: ROWS}));
 
@@ -71,3 +58,16 @@ it("does not let a closing tag in the player's words end the data block early", 
   const [, request] = messageTexts(invoke.mock.calls[0]?.[0]);
   expect(request?.match(/<\s*\/\s*request\s*>/gi)).toHaveLength(1);
 });
+
+/** The text of every message handed to the model, in order. The model's input is `unknown` to this test on purpose. */
+function messageTexts(input: unknown): string[] {
+  if (!Array.isArray(input)) {
+    return [];
+  }
+
+  return input.map(message => String((message as {content: unknown}).content));
+}
+
+function generatorSaying(reply: unknown): FakeListChatModel {
+  return new FakeListChatModel({responses: [JSON.stringify(reply)]});
+}

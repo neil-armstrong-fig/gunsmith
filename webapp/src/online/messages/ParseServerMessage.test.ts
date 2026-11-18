@@ -6,6 +6,20 @@ it("reads the frame that seats a browser", () => {
   expect(parseServerMessage(text)).toEqual({kind: "joined", seat: "second", arena: ["###", "#.#", "###"]});
 });
 
+it("reads the token that gets the seat back", () => {
+  const text = JSON.stringify({kind: "joined", seat: "first", arena: ["###"], token: "the-token"});
+  const message = parseServerMessage(text);
+
+  expect(message?.kind === "joined" && message.token).toBe("the-token");
+});
+
+it("refuses a seating whose token is not text", () => {
+  const frame = {kind: "joined", seat: "first", arena: ["###"]};
+
+  expect(parseServerMessage(JSON.stringify({...frame, token: 7}))).toBeUndefined();
+  expect(parseServerMessage(JSON.stringify({...frame, token: null}))).toBeUndefined();
+});
+
 it("reads a snapshot", () => {
   const text = JSON.stringify({
     kind: "snapshot",
@@ -32,6 +46,22 @@ it("refuses a snapshot whose ack is not two counts", () => {
   expect(parseServerMessage(JSON.stringify({...frame, ack: {seq: 7}}))).toBeUndefined();
   expect(parseServerMessage(JSON.stringify({...frame, ack: 7}))).toBeUndefined();
   expect(parseServerMessage(JSON.stringify({...frame, ack: null}))).toBeUndefined();
+});
+
+it("reads who has asked to go on", () => {
+  const text = JSON.stringify({kind: "snapshot", player: {}, round: "won", ready: {player: true, opponent: false}});
+  const message = parseServerMessage(text);
+
+  expect(message?.kind === "snapshot" && message.ready).toEqual({player: true, opponent: false});
+});
+
+it("refuses a snapshot whose ready is not two flags", () => {
+  const frame = {kind: "snapshot", player: {}, round: "won"};
+
+  expect(parseServerMessage(JSON.stringify({...frame, ready: {player: "yes", opponent: false}}))).toBeUndefined();
+  expect(parseServerMessage(JSON.stringify({...frame, ready: {player: true}}))).toBeUndefined();
+  expect(parseServerMessage(JSON.stringify({...frame, ready: true}))).toBeUndefined();
+  expect(parseServerMessage(JSON.stringify({...frame, ready: null}))).toBeUndefined();
 });
 
 it("refuses text that is not a frame, and frames missing what the page acts on", () => {

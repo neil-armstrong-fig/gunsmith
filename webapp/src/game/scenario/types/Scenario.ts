@@ -18,5 +18,6 @@ export type Scenario =
   | "overlook"
   | "pickup-race"
   | "fair-duel"
+  | "overwatch"
   | "terrain"
   | "room";

@@ -2,6 +2,7 @@ import {useFrame} from "@react-three/fiber";
 import {engine} from "@gunsmith/engine/Engine";
 import {STATE_HOOK_NAME} from "@gunsmith/shared/state-hook/StateHookName";
 import {gameState} from "@src/store/game/selectors/game-state/GameState";
+import {useAppStore} from "@src/store/app/UseAppStore";
 import {useGameStore} from "@src/store/game/UseGameStore";
 import {arenaPointAtPixel} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/pointer/ArenaPointAtPixel";
 import {recordFeedbackCues} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/feedback/RecordFeedbackCues";
@@ -79,6 +80,23 @@ export function useGameLoop(): void {
       const shown = onlineMatch?.worldToShow(owed.leftoverSeconds);
       if (shown) {
         useGameStore.getState().setWorld(shown);
+      }
+
+      // The banner's "Next round" and "Play again" ask through the app store (the engine is not stepped here to start a round); the loop
+      // sends the ask once, and tells the store whether the server is now waiting for the other player, which the banner says.
+      const appStore = useAppStore.getState();
+      if (appStore.takeNextRoundAsk()) {
+        onlineMatch?.readyForNextRound();
+      }
+
+      const waiting = onlineMatch?.isWaitingForTheOtherPlayer() ?? false;
+      if (appStore.waitingForOtherPlayer !== waiting) {
+        appStore.setWaitingForOtherPlayer(waiting);
+      }
+
+      const reconnecting = onlineMatch?.isReconnecting() ?? false;
+      if (appStore.reconnecting !== reconnecting) {
+        appStore.setReconnecting(reconnecting);
       }
       trigger.afterTicks(owed.ticks);
 

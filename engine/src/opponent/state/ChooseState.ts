@@ -12,7 +12,8 @@ import type {OpponentState} from "@gunsmith/engine/opponent/types/OpponentState"
  * gone or the player has pulled ahead. A reload or a seek that is over sends it back to engaging if it sees the player, to
  * searching if it has seen them before, and to wandering otherwise (a finished reload may go straight to seeking). Otherwise: sighting the player
  * while wandering or searching starts engaging (and its reaction time), and losing sight of them while engaging starts a
- * search. A state it stays in keeps everything it remembers. How long a search lasts, and giving up when stuck, are the
+ * search. So does a bullet that hurt it (`shotFrom`) from a player it cannot see, from any of the three: a search that is
+ * already under way starts again, for the place of the new shot. A state it stays in keeps everything it remembers. How long a search lasts, and giving up when stuck, are the
  * state's own business, not decided here.
  */
 export function chooseState(brain: OpponentBrain, context: OpponentContext): OpponentBrain {
@@ -36,7 +37,7 @@ export function chooseState(brain: OpponentBrain, context: OpponentContext): Opp
     return stayOrEnter(brain, "engage");
   }
 
-  if (brain.state === "engage") {
+  if (brain.state === "engage" || brain.shotFrom) {
     return enterState(brain, "search");
   }
 

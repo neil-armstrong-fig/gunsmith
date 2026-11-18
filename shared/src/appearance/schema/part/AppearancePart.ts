@@ -19,10 +19,6 @@ const COMMON_FIELDS = {
 /** A radius, width or height: more than nothing. How far it may reach is the bounds check's, once it is placed and turned. */
 const SIZE = z.number().positive();
 
-function pointList(minimum: number): z.ZodArray<typeof appearancePointSchema> {
-  return z.array(appearancePointSchema).min(minimum).max(APPEARANCE_LIMITS.pointsPerPart.max);
-}
-
 /**
  * One drawing primitive, a strict union on `kind`: each kind takes only its own geometry and a stray field is refused, not
  * dropped. Five kinds, no path strings, no nesting. DRAFT, local to `ai/` (`docs/art/concepts/top-down-oddities/README.md` is the field dictionary).
@@ -37,3 +33,7 @@ export const appearancePartSchema = z.discriminatedUnion("kind", [
 
 /** A part, read off its schema so the two cannot drift apart. */
 export type AppearancePart = z.infer<typeof appearancePartSchema>;
+
+function pointList(minimum: number): z.ZodArray<typeof appearancePointSchema> {
+  return z.array(appearancePointSchema).min(minimum).max(APPEARANCE_LIMITS.pointsPerPart.max);
+}

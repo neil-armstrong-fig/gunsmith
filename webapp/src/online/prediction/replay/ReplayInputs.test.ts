@@ -9,10 +9,6 @@ const PLAYER = startingWorld(ARENA).player;
 const IDLE: Input = {direction: {x: 0, y: 0}, firing: false, reload: false};
 const STEP_SECONDS = 1 / 60;
 
-function times(count: number, input: Input): Input[] {
-  return Array.from({length: count}, () => input);
-}
-
 it("leaves the player where they are when no input is replayed", () => {
   expect(replayInputs({arena: ARENA, player: PLAYER, inputs: []})).toEqual(PLAYER);
 });
@@ -53,3 +49,7 @@ it("does not predict what the server alone decides: a shot, a reload or a weapon
   expect(asked.cooldownSeconds).toBe(PLAYER.cooldownSeconds);
   expect(asked.health).toBe(PLAYER.health);
 });
+
+function times(count: number, input: Input): Input[] {
+  return Array.from({length: count}, () => input);
+}

@@ -7,24 +7,6 @@ const TRIGGER: BurstStep = {triggered: true, round: "playing", seconds: TICK};
 const QUIET: BurstStep = {triggered: false, round: "playing", seconds: TICK};
 const STEPS_IN_BURST = Math.round(BURST_SECONDS / TICK);
 
-/** Runs one step per request and says which of them opened a burst, by position. */
-function opensOf(steps: readonly BurstStep[]): number[] {
-  const window = new BurstWindow();
-
-  return steps.flatMap((step, index) => {
-    if (window.opens(step)) {
-      return [index];
-    }
-
-    return [];
-  });
-}
-
-/** `count` quiet steps. */
-function quiet(count: number): BurstStep[] {
-  return Array.from({length: count}, () => QUIET);
-}
-
 it("opens at once for the first trigger", () => {
   expect(opensOf([TRIGGER])).toEqual([0]);
 });
@@ -59,3 +41,21 @@ it("opens for the first trigger of a new round straight away, though the last ro
 
   expect(opensOf([TRIGGER, fatal, {...QUIET, round: "lost"}, TRIGGER])).toEqual([0, 3]);
 });
+
+/** Runs one step per request and says which of them opened a burst, by position. */
+function opensOf(steps: readonly BurstStep[]): number[] {
+  const window = new BurstWindow();
+
+  return steps.flatMap((step, index) => {
+    if (window.opens(step)) {
+      return [index];
+    }
+
+    return [];
+  });
+}
+
+/** `count` quiet steps. */
+function quiet(count: number): BurstStep[] {
+  return Array.from({length: count}, () => QUIET);
+}

@@ -3,14 +3,6 @@ import {completeAppearance} from "@gunsmith/ai/pipeline/appearance/check/fix/com
 import {passingAppearance} from "@gunsmith/ai/pipeline/appearance/testing/PassingAppearance";
 import {validateAppearance} from "@gunsmith/ai/pipeline/appearance/check/validate/ValidateAppearance";
 
-function withoutKeys(record: Record<string, unknown>, keys: string[]): Record<string, unknown> {
-  return Object.fromEntries(Object.entries(record).filter(([key]) => !keys.includes(key)));
-}
-
-function bodyOf(candidate: unknown): Record<string, unknown>[] {
-  return (candidate as {body: Record<string, unknown>[]}).body;
-}
-
 it("changes nothing in an appearance that is complete", () => {
   const candidate = passingAppearance();
 
@@ -178,3 +170,11 @@ it("gives each caller its own defaults, so changing one answer cannot change the
   expect(second.palette.accent).toBe("weapon-blue");
   expect(second.projectile).toEqual([]);
 });
+
+function bodyOf(candidate: unknown): Record<string, unknown>[] {
+  return (candidate as {body: Record<string, unknown>[]}).body;
+}
+
+function withoutKeys(record: Record<string, unknown>, keys: string[]): Record<string, unknown> {
+  return Object.fromEntries(Object.entries(record).filter(([key]) => !keys.includes(key)));
+}

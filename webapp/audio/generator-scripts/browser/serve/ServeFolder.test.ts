@@ -21,12 +21,6 @@ afterAll(async () => {
   await rm(folder, {recursive: true, force: true});
 });
 
-function address(path: string): string {
-  assert(served, "the folder is being served");
-
-  return `${served.url}${path}`;
-}
-
 it("serves a file in an allowed folder, with its type, on a port of the system's choosing", async () => {
   const response = await fetch(address("/public/a.json"));
 
@@ -51,3 +45,9 @@ it("stops listening when it is closed", async () => {
 
   await expect(fetch(`${other.url}/public/a.json`)).rejects.toThrow();
 });
+
+function address(path: string): string {
+  assert(served, "the folder is being served");
+
+  return `${served.url}${path}`;
+}

@@ -2,7 +2,9 @@ import {OnlineMatch} from "@src/online/OnlineMatch";
 import {roomOfPage} from "@src/online/RoomOfPage";
 import {lagOfSearch} from "@src/online/socket/lag/LagOfSearch";
 import {LaggedSocket} from "@src/online/socket/lag/LaggedSocket";
+import {ReconnectingSocket} from "@src/online/socket/reconnecting/ReconnectingSocket";
 import {roomSocketUrl} from "@src/online/socket/RoomSocketUrl";
+import {SeatTokenKeeper} from "@src/online/seat-token/SeatTokenKeeper";
 import type {MatchSocket} from "@src/online/types/MatchSocket";
 import {useEffect, useRef} from "react";
 import type {RefObject} from "react";
@@ -26,12 +28,17 @@ export function useOnlineMatch(): RefObject<OnlineMatch | undefined> {
     // began the match and left, and the real socket was refused as a full room. Connecting a tick later lets the cleanup cancel the
     // first run before it connects.
     const connecting = setTimeout(() => {
-      let socket: MatchSocket = new WebSocket(roomSocketUrl(location, code));
+      // The seat's token is read each time a connection is made, not once: the first connection has none, and the one made after a loss
+      // shows what the server gave on the first.
+      const seatTokens = new SeatTokenKeeper(() => sessionStorage, code);
+      let socket: MatchSocket = new ReconnectingSocket(
+        () => new WebSocket(roomSocketUrl(location, code, seatTokens.read())),
+      );
       const lag = lagOfSearch(location.search);
       if (lag > 0) {
         socket = new LaggedSocket(socket, lag);
       }
-      matchRef.current = new OnlineMatch(socket);
+      matchRef.current = new OnlineMatch(socket, seatTokens);
     }, 0);
 
     return () => {

@@ -2,17 +2,6 @@ import {expect, it} from "vitest";
 import {makeHats} from "@gunsmith/audio-studies/generators/music/bar/hats/MakeHats";
 import type {BarPosition} from "@gunsmith/audio-studies/generators/music/bar/types/BarPosition";
 
-function position(sparse: boolean, bar = 1): BarPosition {
-  return {
-    bar,
-    sectionIndex: 0,
-    section: {sparse, kickBeats: [], bassSteps: [], melody: []},
-    root: 38,
-    start: 2,
-    beat: 0.5,
-  };
-}
-
 it("ticks a hi-hat on every eighth note of a full section", () => {
   expect(makeHats(position(false)).map(voice => voice.at)).toStrictEqual([2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75]);
 });
@@ -37,3 +26,14 @@ it("makes each hat a short highpassed noise tick, panned alternately and seeded 
   expect(second?.kind === "noise" && second.seed).toBe(500 + 3 * 8 + 1);
   expect(second?.pan).toBe(0.32);
 });
+
+function position(sparse: boolean, bar = 1): BarPosition {
+  return {
+    bar,
+    sectionIndex: 0,
+    section: {sparse, kickBeats: [], bassSteps: [], melody: []},
+    root: 38,
+    start: 2,
+    beat: 0.5,
+  };
+}

@@ -6,10 +6,6 @@ const room = arenaFrom(["#######", "#.....#", "#.##..#", "#.....#", "#######"]);
 const withStair = arenaFrom(["#########", "#...>111#", "#...#111#", "#########"]);
 const noStair = arenaFrom(["#########", "#...1111#", "#...1111#", "#########"]);
 
-function distanceTo(distances: ReadonlyMap<number, number>, arenaWidth: number, tile: Point): number | undefined {
-  return distances.get(tile.y * arenaWidth + tile.x);
-}
-
 it("is nothing steps from the tile the walker stands on", () => {
   expect(distanceTo(routeDistancesFrom(room, {x: 1.5, y: 1.5}), 7, {x: 1, y: 1})).toBe(0);
 });
@@ -41,3 +37,7 @@ it("reaches a platform by its stair and has no distance to one with no stair", (
 it("is the same standing anywhere on the same tile", () => {
   expect(routeDistancesFrom(room, {x: 1.1, y: 1.9})).toEqual(routeDistancesFrom(room, {x: 1.9, y: 1.1}));
 });
+
+function distanceTo(distances: ReadonlyMap<number, number>, arenaWidth: number, tile: Point): number | undefined {
+  return distances.get(tile.y * arenaWidth + tile.x);
+}

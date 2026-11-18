@@ -28,7 +28,7 @@ export class TrackedFixtures {
     if (taken.length === 0) {
       throw new Error(
         'Say which DSL this `when` uses: take it in the body\'s parameter, as `when("…", ({weaponSmith}) => {…})` or ' +
-          "`({appearance}) => {…}` or `({arena}) => {…}`. Without one it would carry no standing criteria.",
+          "`({appearance}) => {…}`, `({arena}) => {…}` or `({arenaSubmission}) => {…}`. Without one it would carry no standing criteria.",
       );
     }
 
@@ -54,6 +54,11 @@ export class TrackedFixtures {
         takenNames.add("arena");
 
         return source.arena;
+      },
+      get arenaSubmission() {
+        takenNames.add("arenaSubmission");
+
+        return source.arenaSubmission;
       },
     };
   }

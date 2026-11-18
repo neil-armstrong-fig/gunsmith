@@ -2,10 +2,6 @@ import {parseInputMessage} from "@src/match/messages/ParseInputMessage";
 
 const GOOD = {kind: "input", seq: 5, direction: {x: 1, y: 0}, firing: false, reload: false};
 
-function frame(overrides: Record<string, unknown>): string {
-  return JSON.stringify({...GOOD, ...overrides});
-}
-
 it("reads an input message", () => {
   expect(parseInputMessage(frame({aimAt: {x: 3, y: 4}, crouching: true, switchTo: 2, firing: true}))).toEqual({
     seq: 5,
@@ -62,3 +58,7 @@ it("refuses a number that is not finite", () => {
     parseInputMessage('{"kind":"input","seq":1,"direction":{"x":1e999,"y":0},"firing":false,"reload":false}'),
   ).toBeUndefined();
 });
+
+function frame(overrides: Record<string, unknown>): string {
+  return JSON.stringify({...GOOD, ...overrides});
+}

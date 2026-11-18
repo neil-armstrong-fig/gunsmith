@@ -1,11 +1,13 @@
 import * as ls from "langsmith/vitest";
 import {afterAll, beforeAll as runBeforeAll, describe, expect} from "vitest";
 import {createAppearanceDriver} from "@evals/eval-criteria-mapping/appearance/CreateAppearanceDriver";
+import {createArenaSubmissionDriver} from "@evals/eval-criteria-mapping/arena-submission/CreateArenaSubmissionDriver";
 import {createArenaPipelineDriver} from "@evals/eval-criteria-mapping/arena/CreateArenaPipelineDriver";
 import {createWeaponPipelineDriver} from "@evals/eval-criteria-mapping/weapon/CreateWeaponPipelineDriver";
 import {parseEvalTier} from "@evals/eval-criteria-mapping/tier/ParseEvalTier";
 import {AppearanceDsl} from "@evals/dsl/appearance/AppearanceDsl";
 import {ArenaDsl} from "@evals/dsl/arena/ArenaDsl";
+import {ArenaSubmissionDsl} from "@evals/dsl/arena-submission/ArenaSubmissionDsl";
 import {WeaponSmithDsl} from "@evals/dsl/WeaponSmithDsl";
 import {TrackedFixtures} from "@evals/eval-criteria-mapping/fixtures/TrackedFixtures";
 import {isGating} from "@evals/eval-criteria-mapping/gate/IsGating";
@@ -25,6 +27,7 @@ const tier = parseEvalTier(process.env.EVAL_TIER);
 const weaponDriver = createWeaponPipelineDriver(tier, process.env.EVAL_TRIALS);
 const appearanceDriver = createAppearanceDriver(tier, process.env.EVAL_TRIALS);
 const arenaDriver = createArenaPipelineDriver(tier, process.env.EVAL_TRIALS);
+const arenaSubmissionDriver = createArenaSubmissionDriver(tier, process.env.EVAL_TRIALS);
 const results: CriterionResult[] = [];
 let currentGiven = "";
 let currentSuite: EvalSuite = "regression";
@@ -49,6 +52,10 @@ function trialsOf(firstDsl: FixtureName | undefined): number {
 
   if (firstDsl === "arena") {
     return arenaDriver.trials;
+  }
+
+  if (firstDsl === "arenaSubmission") {
+    return arenaSubmissionDriver.trials;
   }
 
   return weaponDriver.trials;
@@ -81,6 +88,7 @@ export function when(description: string, define: DefineWhen): void {
       weaponSmith: new WeaponSmithDsl(weaponDriver),
       appearance: new AppearanceDsl(appearanceDriver),
       arena: new ArenaDsl(arenaDriver),
+      arenaSubmission: new ArenaSubmissionDsl(arenaSubmissionDriver),
     });
 
     currentWhen = whenContext;

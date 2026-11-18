@@ -8,19 +8,6 @@ const DUMMY_HIT: HitRequest = {events: [{kind: "hitLanded", on: "dummy"}], round
 const QUIET: HitRequest = {events: undefined, round: "playing", seconds: TICK};
 const STEPS_IN_BURST = Math.round(BURST_SECONDS / TICK);
 
-/** Runs one step per request and says which of them sounded, by position. */
-function soundsOf(requests: readonly HitRequest[]): number[] {
-  const confirmation = new HitConfirmation();
-
-  return requests.flatMap((request, index) => {
-    if (confirmation.shouldPlay(request)) {
-      return [index];
-    }
-
-    return [];
-  });
-}
-
 it("sounds at once for a hit on the opponent", () => {
   expect(soundsOf([OPPONENT_HIT])).toEqual([0]);
 });
@@ -53,3 +40,16 @@ it("merges a second hit inside the burst into the first sound, and sounds again 
 it("sounds for the hit that ends the round", () => {
   expect(soundsOf([{...OPPONENT_HIT, round: "won"}])).toEqual([0]);
 });
+
+/** Runs one step per request and says which of them sounded, by position. */
+function soundsOf(requests: readonly HitRequest[]): number[] {
+  const confirmation = new HitConfirmation();
+
+  return requests.flatMap((request, index) => {
+    if (confirmation.shouldPlay(request)) {
+      return [index];
+    }
+
+    return [];
+  });
+}

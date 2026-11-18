@@ -70,8 +70,11 @@ a delay alone can still help a player through a second account.
 
 - A disconnected player has 30 s to return; their character is frozen in place and still vulnerable. After that the round is
   forfeited; two forfeits lose the match. No input for about 60 s counts as idle and is treated the same.
-- The client re-sends `introduce` on every connection and the server replies with a full snapshot.
-- Close code for "match is gone, stop retrying", a documented application close code.
+- **Built (2026-11-18, no time limit yet):** each seat gets a secret `token` in `joined`, sent on every connection; a returning
+  browser shows it (`?token=` on the socket URL, kept in session storage) and gets the same seat, and the server's next
+  snapshot is the full state. The returning page counts its inputs from zero, so the server forgets the seat's `ack` on rebinding.
+  Close codes (application codes, both mean "do not come back"): `4409` the room is full, `4410` the seat's person connected
+  again elsewhere (the old connection is closed). The 30 s window and the 60 s idle rule are the next slice.
 
 ## Rooms
 
@@ -142,6 +145,11 @@ What the code gives today, and what the design still needs:
   proposal, `{kind: "snapshot", opponent?}` with `opponent` absent when unseen. Nothing moves to `shared/` until a second
   package imports it.
 - Wire messages are written by server with consumer review (this doc's earlier "build owns" is retired).
+- **Rounds in a room (2026-11-18).** Built as the draft says, with one `ready` instead of `round-start`/`round-end`: the snapshot already
+  carries `round` and `match` (scored from each seat's side), so a decided round needs no separate message. A client sends `{kind: "ready"}`;
+  it counts only once the round is decided. When both seats have sent it the server begins the next round (score kept) or, after a decided
+  match, a fresh match. A snapshot carries `ready {player, opponent}` so a seat can say it is waiting. Specs: `TwoBrowsersPlayingARound`,
+  `TwoBrowsersPlayingABestOfThree`. Not built: the pre-round phase, deadlines, the ring and pickup in a room.
 
 ## Open questions
 

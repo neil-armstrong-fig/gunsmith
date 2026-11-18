@@ -5,9 +5,12 @@ import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import {PLAYER_SPEED} from "@gunsmith/engine/player/walking/PlayerSpeed";
 import {viewOfSeat} from "@gunsmith/engine/seat/ViewOfSeat";
 import {OnlineMatch} from "@src/online/OnlineMatch";
+import {SeatTokenKeeper} from "@src/online/seat-token/SeatTokenKeeper";
+import type {SeatTokenStorage} from "@src/online/seat-token/types/SeatTokenStorage";
 import type {FrameEvent} from "@src/online/types/FrameEvent";
 import type {InputAck} from "@gunsmith/shared/online/types/InputAck";
 import type {MatchSocket} from "@src/online/types/MatchSocket";
+import type {Readiness} from "@src/online/types/Readiness";
 
 const ROWS = ["############", "#..........#", "#..........#", "#..........#", "#..........#", "############"];
 
@@ -47,17 +50,7 @@ interface SnapshotRequest {
   world?: World;
   ack?: InputAck;
   elapsedSeconds?: number;
-}
-
-function snapshotText(request: SnapshotRequest = {}): string {
-  const world = request.world ?? startingWorld(arenaFrom(ROWS), [], {x: 8.5, y: 2.5});
-
-  return JSON.stringify({
-    kind: "snapshot",
-    ...viewOfSeat(world, "first"),
-    elapsedSeconds: request.elapsedSeconds ?? world.elapsedSeconds,
-    ack: request.ack,
-  });
+  ready?: Readiness;
 }
 
 const JOINED = JSON.stringify({kind: "joined", seat: "first", arena: ROWS});
@@ -66,20 +59,6 @@ const START = startingWorld(arenaFrom(ROWS), [], {x: 8.5, y: 2.5}).player.positi
 interface SeatedMatch {
   socket: FakeSocket;
   match: OnlineMatch;
-}
-
-function seatedMatch(): SeatedMatch {
-  const socket = new FakeSocket();
-  const match = new OnlineMatch(socket);
-  socket.receive(JOINED);
-
-  return {socket, match};
-}
-
-function steps(match: OnlineMatch, count: number, input: Input): void {
-  for (let step = 0; step < count; step += 1) {
-    match.step(input);
-  }
 }
 
 it("has no world until it has been seated and sent a snapshot", () => {
@@ -143,14 +122,13 @@ it("asks for a reload or a weapon switch once: the steps after and the heartbeat
   expect(socket.frames()[1]).not.toHaveProperty("switchTo");
 });
 
-it("sends nothing while the socket is not open, but keeps counting its steps", () => {
+it("sends nothing while the socket is not open", () => {
   const {socket, match} = seatedMatch();
+  socket.sent = [];
   socket.readyState = 0;
   steps(match, 2, EAST);
-  socket.readyState = 1;
-  match.step({...EAST, firing: true});
 
-  expect(socket.frames().map(frame => frame["seq"])).toEqual([2]);
+  expect(socket.sent).toEqual([]);
 });
 
 it("shows the player walking at once, without waiting for the server to say so", () => {
@@ -318,9 +296,151 @@ it("draws nobody for a fighter the server did not send", () => {
   expect(match.worldToShow(0)?.opponent).toBeUndefined();
 });
 
+it("asks the server to go on to the next round with a ready message", () => {
+  const {socket, match} = seatedMatch();
+
+  match.readyForNextRound();
+
+  expect(socket.frames()).toEqual([{kind: "ready"}]);
+});
+
+it("does not send a ready message while the socket is not open", () => {
+  const {socket, match} = seatedMatch();
+  socket.readyState = 0;
+
+  match.readyForNextRound();
+
+  expect(socket.frames()).toEqual([]);
+});
+
+it("is waiting for the other player once the server says this seat has asked to go on, and not before", () => {
+  const {socket, match} = seatedMatch();
+  expect(match.isWaitingForTheOtherPlayer()).toBe(false);
+
+  socket.receive(snapshotText());
+  expect(match.isWaitingForTheOtherPlayer()).toBe(false);
+
+  socket.receive(snapshotText({ready: {player: true, opponent: false}}));
+  expect(match.isWaitingForTheOtherPlayer()).toBe(true);
+
+  socket.receive(snapshotText({ready: {player: false, opponent: false}}));
+  expect(match.isWaitingForTheOtherPlayer()).toBe(false);
+});
+
+class MemoryStorage implements SeatTokenStorage {
+  readonly items = new Map<string, string>();
+
+  getItem(key: string): string | null {
+    return this.items.get(key) ?? null;
+  }
+
+  setItem(key: string, value: string): void {
+    this.items.set(key, value);
+  }
+}
+
+it("keeps the token the server gives its seat, to get the seat back with after a reload", () => {
+  const storage = new MemoryStorage();
+  const socket = new FakeSocket();
+  new OnlineMatch(socket, new SeatTokenKeeper(() => storage, "ABC234"));
+
+  socket.receive(JSON.stringify({kind: "joined", seat: "first", arena: ROWS, token: "the-token"}));
+
+  expect(new SeatTokenKeeper(() => storage, "ABC234").read()).toBe("the-token");
+});
+
+it("counts its inputs from nothing and sends the ask in force again when the server seats it again", () => {
+  const {socket, match} = seatedMatch();
+  steps(match, 5, EAST);
+  socket.sent = [];
+
+  socket.receive(JOINED);
+  steps(match, 2, EAST);
+
+  expect(socket.frames()).toEqual([{kind: "input", seq: 0, direction: {x: 1, y: 0}, firing: false, reload: false}]);
+});
+
+it("sends nothing on a connection made again until the server has seated it, so no input carries a number from the old count", () => {
+  const {socket, match} = seatedMatch();
+  steps(match, 8, EAST);
+  socket.readyState = 0;
+  steps(match, 2, EAST);
+  socket.readyState = 1;
+  socket.sent = [];
+
+  steps(match, 10, EAST);
+  expect(socket.sent).toEqual([]);
+
+  socket.receive(JOINED);
+  steps(match, 1, EAST);
+  expect(socket.frames()).toEqual([{kind: "input", seq: 0, direction: {x: 1, y: 0}, firing: false, reload: false}]);
+});
+
+it("takes the server's word as it is on the snapshot that follows being seated again, with no inputs of the lost connection played over it", () => {
+  const {socket, match} = seatedMatch();
+  socket.receive(snapshotText());
+  steps(match, 30, EAST);
+
+  socket.receive(JOINED);
+  socket.receive(snapshotText());
+
+  expect(match.worldToShow(0)?.player.position.x).toBeCloseTo(START.x, 5);
+});
+
+it("is reconnecting when the connection is lost after the match began, and not before it began", () => {
+  const socket = new FakeSocket();
+  const match = new OnlineMatch(socket);
+  socket.readyState = 0;
+  expect(match.isReconnecting()).toBe(false);
+
+  socket.readyState = 1;
+  socket.receive(JOINED);
+  expect(match.isReconnecting()).toBe(false);
+
+  socket.readyState = 0;
+  expect(match.isReconnecting()).toBe(true);
+
+  socket.readyState = 1;
+  expect(match.isReconnecting()).toBe(false);
+});
+
+it("is not reconnecting once the socket has closed for good", () => {
+  const {socket, match} = seatedMatch();
+
+  socket.readyState = 3;
+
+  expect(match.isReconnecting()).toBe(false);
+});
+
 it("closes the socket", () => {
   const socket = new FakeSocket();
   new OnlineMatch(socket).close();
 
   expect(socket.closed).toBe(true);
 });
+
+function snapshotText(request: SnapshotRequest = {}): string {
+  const world = request.world ?? startingWorld(arenaFrom(ROWS), [], {x: 8.5, y: 2.5});
+
+  return JSON.stringify({
+    kind: "snapshot",
+    ...viewOfSeat(world, "first"),
+    elapsedSeconds: request.elapsedSeconds ?? world.elapsedSeconds,
+    ack: request.ack,
+    ready: request.ready,
+  });
+}
+
+function seatedMatch(): SeatedMatch {
+  const socket = new FakeSocket();
+  const match = new OnlineMatch(socket);
+  socket.receive(JOINED);
+
+  return {socket, match};
+}
+
+function steps(match: OnlineMatch, count: number, input: Input): void {
+  for (let step = 0; step < count; step += 1) {
+    match.step(input);
+  }
+}

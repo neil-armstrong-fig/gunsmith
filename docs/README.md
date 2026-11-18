@@ -4,6 +4,7 @@
 
 - [Game design and glossary](game-design.md): intended rules and current local behavior.
 - [Architecture](architecture.md): existing packages and planned online system.
+- [How the game is being built](build-approach.md): rough parts first, validated by playing; the case study's story.
 - [Decisions](agent-reference/SessionDecisions.md): durable constraints and open proposals.
 - [State management](state-management.md) and [shaders](shaders.md): implementation rationale and verification.
 

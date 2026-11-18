@@ -18,8 +18,17 @@ it("fails an arena split in two by a wall", () => {
   expect(score).toEqual({
     key: "playableArena",
     score: 0,
-    comment: "only 1 of the arena's 2 open tiles can be walked to from one another",
+    comment: expect.stringMatching(
+      /^the engine's validator: 1 tiles of floor, .* cannot be walked to from the rest of the arena\.$/,
+    ),
   });
+});
+
+it("says how many more problems the engine found, not all of them", () => {
+  const rows = ["#######", "#.#.#.#", "#######"];
+  const score = playableArena(passingArenaInput({arena: {name: "Speckled", rows}}));
+
+  expect(score.comment).toMatch(/cannot be walked to from the rest of the arena\. \(and 1 more\)$/);
 });
 
 it("fails an arena whose second level has no stair up to it", () => {
@@ -38,7 +47,9 @@ it("fails an arena the engine refuses to read, with the engine's words", () => {
 it("fails an arena of walls only", () => {
   const rows = ["###", "###"];
 
-  expect(playableArena(passingArenaInput({arena: {name: "Solid", rows}})).comment).toBe("the arena has no open floor");
+  expect(playableArena(passingArenaInput({arena: {name: "Solid", rows}})).comment).toBe(
+    "the engine's validator: The arena has no floor to stand on.",
+  );
 });
 
 it("fails a created arena that carries no drawing", () => {

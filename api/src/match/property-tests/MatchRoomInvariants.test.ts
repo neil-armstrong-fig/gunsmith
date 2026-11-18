@@ -29,6 +29,7 @@ const ALLOWED_SNAPSHOT_FIELDS = [
   "round",
   "elapsedSeconds",
   "ack",
+  "ready",
 ];
 
 it("tells a seat the newest input it has sent and how many steps were played with it, never going back", () => {
@@ -54,35 +55,6 @@ function expectAckToFollowTheInputs(plan: Step[]): void {
       expect(room.snapshotFor(seat)?.ack).toEqual(reached[seat]);
     }
   }
-}
-
-/** Plays one step on the room, and says where each seat's input count should stand after it, worked out here from the step alone. */
-function play(
-  room: MatchRoom,
-  step: Step,
-  reached: Record<Seat, InputAck | undefined>,
-): Record<Seat, InputAck | undefined> {
-  if (step.kind === "tick") {
-    room.tick(step.steps);
-
-    return {first: heldFor(reached.first, step.steps), second: heldFor(reached.second, step.steps)};
-  }
-
-  room.setInput(step.seat, step.input, step.seq);
-  const before = reached[step.seat];
-  if (before && step.seq < before.seq) {
-    return reached;
-  }
-
-  return {...reached, [step.seat]: {seq: step.seq, held: 0}};
-}
-
-function heldFor(reached: InputAck | undefined, steps: number): InputAck | undefined {
-  if (!reached || steps <= 0) {
-    return reached;
-  }
-
-  return {seq: reached.seq, held: reached.held + steps};
 }
 
 function expectTheSameWhenCutUp(plan: Step[], cutInto: number[]): void {
@@ -132,4 +104,33 @@ function startedRoom(): MatchRoom {
 /** Ways to cut a stretch of owed steps into ticks. */
 function cuts(): fc.Arbitrary<number[]> {
   return fc.array(fc.integer({min: 1, max: 6}), {minLength: 1, maxLength: 6});
+}
+
+/** Plays one step on the room, and says where each seat's input count should stand after it, worked out here from the step alone. */
+function play(
+  room: MatchRoom,
+  step: Step,
+  reached: Record<Seat, InputAck | undefined>,
+): Record<Seat, InputAck | undefined> {
+  if (step.kind === "tick") {
+    room.tick(step.steps);
+
+    return {first: heldFor(reached.first, step.steps), second: heldFor(reached.second, step.steps)};
+  }
+
+  room.setInput(step.seat, step.input, step.seq);
+  const before = reached[step.seat];
+  if (before && step.seq < before.seq) {
+    return reached;
+  }
+
+  return {...reached, [step.seat]: {seq: step.seq, held: 0}};
+}
+
+function heldFor(reached: InputAck | undefined, steps: number): InputAck | undefined {
+  if (!reached || steps <= 0) {
+    return reached;
+  }
+
+  return {seq: reached.seq, held: reached.held + steps};
 }

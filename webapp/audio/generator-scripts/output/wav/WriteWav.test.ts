@@ -16,13 +16,6 @@ afterAll(async () => {
   await rm(folder, {recursive: true, force: true});
 });
 
-function sine(frames: number, amplitude: number, cycles: number): Float32Array {
-  return Float32Array.from(
-    {length: frames},
-    (_, index) => amplitude * Math.sin((2 * Math.PI * cycles * index) / frames),
-  );
-}
-
 it("writes <key>.wav, a canonical 16-bit 48 kHz file of the right size", async () => {
   const cue: RenderedCue = {key: "sfx-test", channels: [sine(480, 0.4, 5)]};
 
@@ -121,3 +114,10 @@ it("writes the same bytes every time", async () => {
 
   expect(first).toStrictEqual(second);
 });
+
+function sine(frames: number, amplitude: number, cycles: number): Float32Array {
+  return Float32Array.from(
+    {length: frames},
+    (_, index) => amplitude * Math.sin((2 * Math.PI * cycles * index) / frames),
+  );
+}

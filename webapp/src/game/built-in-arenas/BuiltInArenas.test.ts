@@ -4,6 +4,7 @@ import {DUEL_ARENA} from "@src/game/duel/DuelArena";
 import {FAIR_DUEL_ARENA} from "@src/game/fair-duel/FairDuelArena";
 import {HEIGHTS_ARENA} from "@src/game/heights/HeightsArena";
 import {PRACTICE_ARENA} from "@src/game/practice/PracticeArena";
+import {OVERWATCH_ARENA} from "@src/game/overwatch/OverwatchArena";
 import {terrainPreview} from "@src/game/terrain-preview/TerrainPreview";
 import {TERRACED_ARENA} from "@src/game/terraced/TerracedArena";
 
@@ -22,6 +23,10 @@ it("finds nothing wrong with the practice arena", () => {
 
 it("finds nothing wrong with the terraced arena", () => {
   expect(validateArena(TERRACED_ARENA)).toEqual([]);
+});
+
+it("finds nothing wrong with the overwatch arena", () => {
+  expect(validateArena(OVERWATCH_ARENA)).toEqual([]);
 });
 
 it("finds nothing wrong with the fair duel's arena, which is the same picture turned half way round", () => {

@@ -73,6 +73,8 @@ given("a duel has just begun", () => {
 
 given("a duel, held still, with the player standing in the open", () => {
   beforeEach(async ({gunsmith}) => {
+    // The camera shakes for 100 ms after this hit and would move the picture a pixel or two against sampling gaps of about one; `ShakingTheCameraOnAHit` covers the shake.
+    gunsmith.keepTheCameraStill();
     await gunsmith.startDuel();
     await gunsmith.holdTheGame();
   });

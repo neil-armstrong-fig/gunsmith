@@ -1,22 +1,6 @@
 import {checkAppearance} from "@gunsmith/ai/pipeline/appearance/check/CheckAppearance";
 import {passingAppearance} from "@gunsmith/ai/pipeline/appearance/testing/PassingAppearance";
 
-/** What a model really wrote on the local tier: nested text, and no opacity, rotation or origin on any part. */
-function sloppyAnswer(): Record<string, unknown> {
-  const source = passingAppearance();
-  const bare = (source.body as Record<string, unknown>[]).map(part => {
-    const {opacity: _opacity, rotation: _rotation, detail: _detail, ...rest} = part;
-
-    if (part.kind === "polygon") {
-      return {...rest, x: undefined, y: undefined};
-    }
-
-    return rest;
-  });
-
-  return {body: JSON.stringify(bare)};
-}
-
 it("accepts an answer that is already complete, and changes nothing", () => {
   const result = checkAppearance(passingAppearance());
 
@@ -68,3 +52,19 @@ it("holds a completed answer to the same limits: a part out of the space is refu
     "body.0 (rect): reaches outside the 64 by 64 space (right edge 81); pull it in by 17 so its right edge, stroke included, is at most 64",
   ]);
 });
+
+/** What a model really wrote on the local tier: nested text, and no opacity, rotation or origin on any part. */
+function sloppyAnswer(): Record<string, unknown> {
+  const source = passingAppearance();
+  const bare = (source.body as Record<string, unknown>[]).map(part => {
+    const {opacity: _opacity, rotation: _rotation, detail: _detail, ...rest} = part;
+
+    if (part.kind === "polygon") {
+      return {...rest, x: undefined, y: undefined};
+    }
+
+    return rest;
+  });
+
+  return {body: JSON.stringify(bare)};
+}

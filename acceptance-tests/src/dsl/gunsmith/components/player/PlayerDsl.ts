@@ -5,6 +5,7 @@ import type {HitLook} from "@src/dsl/gunsmith/types/HitLook";
 import type {HurtWatch} from "@src/dsl/gunsmith/types/HurtWatch";
 import type {DamageLook} from "@src/dsl/gunsmith/types/DamageLook";
 import type {Heading} from "@src/dsl/gunsmith/components/player/types/Heading";
+import type {HeldWalk} from "@src/dsl/gunsmith/components/player/types/HeldWalk";
 import type {FighterLook} from "@src/dsl/gunsmith/types/FighterLook";
 import type {Point} from "@src/dsl/gunsmith/types/Point";
 
@@ -57,6 +58,18 @@ export class PlayerDsl {
       await this.player.loseFocus();
     } catch (error) {
       throw new DslError("Failed to take the focus away from the window", error);
+    }
+  }
+
+  /**
+   * Walks in a held game (`holdTheGame`) until the player has gone past `limit` along the heading (`x` for east and west, `y` for north and south), and stops no more
+   * than one step beyond it. Unlike `startWalking` then `stopWalking` after a wait, a busy machine cannot make it late.
+   */
+  async walkUntilPast(request: HeldWalk): Promise<void> {
+    try {
+      await this.player.walkUntilPast(request);
+    } catch (error) {
+      throw new DslError(`Failed to walk ${request.heading} past ${request.limit} in the held game`, error);
     }
   }
 

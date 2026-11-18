@@ -6,29 +6,6 @@ import type {Voice} from "@gunsmith/audio-studies/common/types/Voice";
 
 const RATE = 48000;
 
-async function render(voice: Voice, channelCount = 2, seconds = 0.5): Promise<Float32Array[]> {
-  const context = new OfflineAudioContext(channelCount, RATE * seconds, RATE);
-  scheduleVoice(context, voice, 0);
-  const buffer = await context.startRendering();
-
-  return Array.from({length: channelCount}, (_, index) => buffer.getChannelData(index).slice());
-}
-
-function energy(samples: Float32Array): number {
-  return samples.reduce((sum, sample) => sum + sample * sample, 0);
-}
-
-function crossings(samples: Float32Array): number {
-  let count = 0;
-  for (let index = 1; index < samples.length; index += 1) {
-    if ((samples[index - 1] ?? 0) < 0 !== (samples[index] ?? 0) < 0) {
-      count += 1;
-    }
-  }
-
-  return count;
-}
-
 it("plays a tone at its pitch: a 1 kHz sine for a quarter second crosses zero about 500 times", async () => {
   const [left] = await render({kind: "tone", at: 0, duration: 0.25, frequency: 1000, gain: 1});
 
@@ -172,3 +149,26 @@ it("finishes a pitch sweep in the first 80 milliseconds, then holds the end pitc
 
   expect(Math.abs(crossings(window) - 30), `${crossings(window)} crossings`).toBeLessThanOrEqual(4);
 });
+
+function crossings(samples: Float32Array): number {
+  let count = 0;
+  for (let index = 1; index < samples.length; index += 1) {
+    if ((samples[index - 1] ?? 0) < 0 !== (samples[index] ?? 0) < 0) {
+      count += 1;
+    }
+  }
+
+  return count;
+}
+
+function energy(samples: Float32Array): number {
+  return samples.reduce((sum, sample) => sum + sample * sample, 0);
+}
+
+async function render(voice: Voice, channelCount = 2, seconds = 0.5): Promise<Float32Array[]> {
+  const context = new OfflineAudioContext(channelCount, RATE * seconds, RATE);
+  scheduleVoice(context, voice, 0);
+  const buffer = await context.startRendering();
+
+  return Array.from({length: channelCount}, (_, index) => buffer.getChannelData(index).slice());
+}

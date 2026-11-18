@@ -8,45 +8,6 @@ import {worldOfScenario} from "@src/game/scenario/WorldOfScenario";
 const OPPONENT_HIT: CombatEvent = {kind: "hitLanded", on: "opponent"};
 const DUMMY_HIT: CombatEvent = {kind: "hitLanded", on: "dummy"};
 
-/** The world with the player facing `toward`, so that is where they see. */
-function facing(world: World, toward: Point): World {
-  const {position} = world.player;
-  const length = Math.hypot(toward.x - position.x, toward.y - position.y);
-
-  return {
-    ...world,
-    player: {...world.player, aim: {x: (toward.x - position.x) / length, y: (toward.y - position.y) / length}},
-  };
-}
-
-/** The practice range, the player facing its first dummy; the second stands behind them, out of sight. */
-function practice(): PracticeRange {
-  const world = worldOfScenario("practice", 1);
-  const [seen, unseen] = world.dummies.map(dummy => dummy.position);
-  if (!seen || !unseen) {
-    throw new Error("The practice range has fewer than two dummies.");
-  }
-
-  return {world: facing(world, seen), seen, unseen};
-}
-
-/** `world` with the health of the dummy at `place` lowered by `by`, or the dummy gone when `by` is all it had. */
-function withDummyHurt(world: World, place: Point, by: number): World {
-  const dummies = world.dummies.flatMap(dummy => {
-    if (dummy.position.x !== place.x || dummy.position.y !== place.y) {
-      return [dummy];
-    }
-
-    if (dummy.health <= by) {
-      return [];
-    }
-
-    return [{...dummy, health: dummy.health - by}];
-  });
-
-  return {...world, dummies};
-}
-
 it("has no place for a step in which nothing happened, or only other things", () => {
   const {world} = practice();
 
@@ -141,3 +102,42 @@ it("has no place for a dummy hurt in a step that reports no hit on one", () => {
 
   expect(hitPlacesOfStep({before: world, after: withDummyHurt(world, seen, 10)})).toEqual([]);
 });
+
+/** The practice range, the player facing its first dummy; the second stands behind them, out of sight. */
+function practice(): PracticeRange {
+  const world = worldOfScenario("practice", 1);
+  const [seen, unseen] = world.dummies.map(dummy => dummy.position);
+  if (!seen || !unseen) {
+    throw new Error("The practice range has fewer than two dummies.");
+  }
+
+  return {world: facing(world, seen), seen, unseen};
+}
+
+/** `world` with the health of the dummy at `place` lowered by `by`, or the dummy gone when `by` is all it had. */
+function withDummyHurt(world: World, place: Point, by: number): World {
+  const dummies = world.dummies.flatMap(dummy => {
+    if (dummy.position.x !== place.x || dummy.position.y !== place.y) {
+      return [dummy];
+    }
+
+    if (dummy.health <= by) {
+      return [];
+    }
+
+    return [{...dummy, health: dummy.health - by}];
+  });
+
+  return {...world, dummies};
+}
+
+/** The world with the player facing `toward`, so that is where they see. */
+function facing(world: World, toward: Point): World {
+  const {position} = world.player;
+  const length = Math.hypot(toward.x - position.x, toward.y - position.y);
+
+  return {
+    ...world,
+    player: {...world.player, aim: {x: (toward.x - position.x) / length, y: (toward.y - position.y) / length}},
+  };
+}

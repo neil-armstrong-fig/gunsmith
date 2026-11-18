@@ -2,19 +2,6 @@ import {FakeListChatModel} from "@langchain/core/utils/testing";
 import {SYSTEM_PROMPT_CANARY} from "@gunsmith/ai/pipeline/canary/SystemPromptCanary";
 import {repairWeaponDraft} from "@gunsmith/ai/pipeline/weapon-drafting/repair/RepairWeaponDraft";
 
-function generatorSaying(reply: unknown): FakeListChatModel {
-  return new FakeListChatModel({responses: [JSON.stringify(reply)]});
-}
-
-/** The text of every message handed to the model, in order. The model's input is `unknown` to this test on purpose. */
-function messageTexts(input: unknown): string[] {
-  if (!Array.isArray(input)) {
-    return [];
-  }
-
-  return input.map(message => String((message as {content: unknown}).content));
-}
-
 it("returns what the model said the second time, unchecked", async () => {
   const generator = generatorSaying({name: "Rifle", bulletDamage: 25});
 
@@ -119,3 +106,16 @@ it("returns nothing when the model call throws", async () => {
 
   expect(await repairWeaponDraft({prompt: "a rifle", previous: {}, errors: ["x: y"]}, generator)).toBeUndefined();
 });
+
+/** The text of every message handed to the model, in order. The model's input is `unknown` to this test on purpose. */
+function messageTexts(input: unknown): string[] {
+  if (!Array.isArray(input)) {
+    return [];
+  }
+
+  return input.map(message => String((message as {content: unknown}).content));
+}
+
+function generatorSaying(reply: unknown): FakeListChatModel {
+  return new FakeListChatModel({responses: [JSON.stringify(reply)]});
+}

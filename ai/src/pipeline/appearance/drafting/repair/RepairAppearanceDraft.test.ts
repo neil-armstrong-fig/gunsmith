@@ -2,10 +2,6 @@ import {repairAppearanceDraft} from "@gunsmith/ai/pipeline/appearance/drafting/r
 import {REPAIR_PROMPT} from "@gunsmith/ai/pipeline/appearance/drafting/repair/prompts/RepairPrompt";
 import {ToolCallingFakeModel} from "@gunsmith/ai/pipeline/appearance/testing/ToolCallingFakeModel";
 
-function texts(model: ToolCallingFakeModel): string[] {
-  return (model.seen[0] ?? []).map(message => String(message.content));
-}
-
 it("sends the repair instructions, the player's words, the first answer and what was wrong, each apart", async () => {
   const model = new ToolCallingFakeModel({answers: [{body: []}]});
 
@@ -67,3 +63,7 @@ it("returns the reply the model call gave", async () => {
 
   expect(reply).toEqual({answer: {body: []}, usage});
 });
+
+function texts(model: ToolCallingFakeModel): string[] {
+  return (model.seen[0] ?? []).map(message => String(message.content));
+}

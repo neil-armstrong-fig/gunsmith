@@ -16,6 +16,7 @@ At the end, update your checklist, status and a concise handoff delivery.
 ## Checkout workflow
 
 **Main is integration-only; develop in persona worktrees.** This includes code, tests, assets, tooling and development docs. Check your checkout at startup, merge committed main into your clean persona branch before new work/delivery, and carry TODO/status/handoff updates with that work. Integrate reviewed commits into a clean main checkout, validate, then have each persona merge main back before continuing. Worktrees persist across slices; never remove/rebase/repurpose another session's work. Main permits merge conflict resolution, combined validation and integration records, not feature/fix development. Follow [the worktree flow](docs/agent-reference/Operations.md#development-worktrees-and-the-integration-checkout) and existing git-write authorization rules.
+**Every fresh turn in a persona worktree (any model) starts with `git log --oneline HEAD..main`.** If main moved, merge it before any work, resolve the conflicts yourself (shared docs keep both sides, code is merged by meaning), re-run the affected checks and commit the merge unasked as `chore: merge main into <branch>`; that merge is the one commit made without being asked. Stop and ask only when the two sides disagree on behaviour, not on wording; never stash or discard to make it possible.
 
 ## Before changing code
 
@@ -87,8 +88,9 @@ This governs unit tests only — acceptance specs are the opposite case, their `
 
 Prettier owns formatting (`pnpm format`). What it won't tell you:
 
-- **Declare functions below their callers**, so a file reads top to bottom. Helpers must be
+- **Declare functions below their callers**, so a file reads top to bottom. Module-level helpers must be
   `function` declarations — an arrow `const` is in the temporal dead zone above its line.
+  A `const` function nested inside another function may stay in place.
 - **A file with a class holds that class and nothing else but the interfaces it needs** (and its constants, above
   it). No loose `function` above or below it: a helper that uses the class's state or is used by one method is a
   `private` method, below its caller; a helper that is pure and worth testing alone is its own file in a subfolder
@@ -262,7 +264,7 @@ mixes up which package a file belongs to.
 
 ## Enforced standards and limits
 
-The shared ESLint config enforces return-ternary prohibition, three parameters maximum, named object types at boundaries, and one public subject per source file. Runtime values may keep their directly derived types; a class may keep interfaces it needs. Component-local `Props` and the two acceptance/eval mapping interfaces retain their documented exceptions.
+The shared ESLint config enforces return-ternary prohibition, three parameters maximum, named object types at boundaries, function ordering and module-level helper declarations (including tests), and one public subject per source file. Runtime values may keep their directly derived types; a class may keep interfaces it needs. Component-local `Props` and the two acceptance/eval mapping interfaces retain their documented exceptions.
 Folder ownership, helper placement and design quality still require the explicit review above. Do not describe a passing gate as proof of those properties.
 `pnpm checks` also checks instruction chains against a 65536-byte budget and validates executable art scripts. Frozen HTML receives syntax checks, not a claim of usability or complete standards compliance. New standalone art scripts receive JavaScript lint checks.
 Codex's global `project_doc_max_bytes` should be 65536; start a fresh session after changing configuration or startup guidance. Model and reasoning settings are unchanged.

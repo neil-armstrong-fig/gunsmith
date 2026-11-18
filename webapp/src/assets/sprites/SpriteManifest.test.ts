@@ -6,11 +6,6 @@ import {SPRITE_KEYS} from "@src/assets/sprites/SpriteKeys";
 import {SPRITE_MANIFEST} from "@src/assets/sprites/SpriteManifest";
 import {spriteUrl} from "@src/assets/sprites/SpriteUrl";
 
-/** The file `spriteUrl` points at, read from `public/`, which the dev server and the build serve from the site's root. */
-function fileOf(url: string): string {
-  return readFileSync(new URL(`../../../public${url}`, import.meta.url), "utf8");
-}
-
 it("knows every key", () => {
   expect(Object.keys(SPRITE_MANIFEST).sort()).toEqual([...SPRITE_KEYS].sort());
 });
@@ -75,3 +70,8 @@ it("centres the pickup marker and draws its canvas at half the fighters' scale",
   expect(anchor).toEqual({x: 44, y: 44});
   expect(pixelsPerTile).toBe(2 * SPRITE_MANIFEST["sprite-player-stand-blue"].pixelsPerTile);
 });
+
+/** The file `spriteUrl` points at, read from `public/`, which the dev server and the build serve from the site's root. */
+function fileOf(url: string): string {
+  return readFileSync(new URL(`../../../public${url}`, import.meta.url), "utf8");
+}

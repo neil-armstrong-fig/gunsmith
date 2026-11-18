@@ -26,10 +26,6 @@ const PLAYER: Point = {x: 10.5, y: 6.5};
 const OPPONENT: Point = {x: 16.5, y: 6.5};
 const SEEDS = Array.from({length: 60}, (_, seed) => seed);
 
-function requestIn(arena: Arena, seed: number, starts: readonly Point[] = [PLAYER, OPPONENT]): PickupRequest {
-  return {arena, starts, seed, weapon: SUBMACHINE_GUN};
-}
-
 it("lies on the middle of a floor tile, holding the weapon it was asked for", () => {
   const pickup = startPickup(requestIn(duel, 3));
 
@@ -124,3 +120,7 @@ it("refuses an arena where the fighters cannot walk to each other", () => {
 it("refuses a request with no fighter to be as far from", () => {
   expect(() => startPickup(requestIn(duel, 1, []))).toThrow(/at least one fighter/);
 });
+
+function requestIn(arena: Arena, seed: number, starts: readonly Point[] = [PLAYER, OPPONENT]): PickupRequest {
+  return {arena, starts, seed, weapon: SUBMACHINE_GUN};
+}

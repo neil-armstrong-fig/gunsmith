@@ -15,16 +15,6 @@ const BULLET: Bullet = {
   level: 0,
 };
 
-function duel(): World {
-  return {
-    ...startingWorld(room, [], {x: 5.5, y: 1.5}),
-    bullets: [BULLET],
-    round: "won",
-    match: {playerWins: 2, opponentWins: 1, roundNumber: 4},
-    events: [{kind: "fireRefused", reason: "empty"}],
-  };
-}
-
 it("swaps the two fighters", () => {
   const world = duel();
   const mirrored = mirrorSeats(world);
@@ -67,3 +57,13 @@ it("is its own inverse", () => {
 
   expect(mirrorSeats(mirrorSeats(world))).toEqual(world);
 });
+
+function duel(): World {
+  return {
+    ...startingWorld(room, [], {x: 5.5, y: 1.5}),
+    bullets: [BULLET],
+    round: "won",
+    match: {playerWins: 2, opponentWins: 1, roundNumber: 4},
+    events: [{kind: "fireRefused", reason: "empty"}],
+  };
+}

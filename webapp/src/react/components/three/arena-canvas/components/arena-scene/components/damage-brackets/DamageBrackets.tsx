@@ -1,7 +1,8 @@
 import {useFrame} from "@react-three/fiber";
-import {nextFlash} from "@src/react/components/three/arena-canvas/components/arena-scene/components/damage-brackets/flash/NextFlash";
-import type {Flash} from "@src/react/components/three/arena-canvas/components/arena-scene/components/damage-brackets/flash/types/Flash";
+import {nextFlash} from "@src/react/components/three/arena-canvas/components/arena-scene/flash/NextFlash";
+import type {Flash} from "@src/react/components/three/arena-canvas/components/arena-scene/flash/types/Flash";
 import {Stroke} from "@src/react/components/three/arena-canvas/components/arena-scene/components/stroke/Stroke";
+import {useAppStore} from "@src/store/app/UseAppStore";
 import {useFeedbackStore} from "@src/store/feedback/UseFeedbackStore";
 import {gameState} from "@src/store/game/selectors/game-state/GameState";
 import type {JSX} from "react";
@@ -23,7 +24,7 @@ const THICKNESS = 0.075;
  * The brackets that flash either side of the player for 180 ms when a bullet hurts them, opening outward as they go: art's "local brackets", with no attacker
  * direction in them. The loop writes `bulletHits` to the feedback store and this reads it each frame inside `useFrame` (no React state): `nextFlash` starts a
  * flash on a new hit and merges the hits of a burst into one. The ring never makes them. They follow the player, who is always drawn, so nothing about the
- * opponent shows. Cosmetic: nothing the engine reads.
+ * opponent shows. Cosmetic: nothing the engine reads. With reduced motion they stand where they start and do not open.
  */
 export function DamageBrackets(): JSX.Element {
   const groupRef = useRef<Group>(null);
@@ -44,7 +45,7 @@ export function DamageBrackets(): JSX.Element {
     }
 
     const {position} = gameState().player;
-    const expansion = (EXPANSION_TILES * age) / FLASH_SECONDS;
+    const expansion = expansionAt(age, useAppStore.getState().reducedMotion);
     groupRef.current.position.set(position.x, position.y, 1.2);
     leftRef.current.position.x = -expansion;
     rightRef.current.position.x = expansion;
@@ -75,4 +76,12 @@ export function DamageBrackets(): JSX.Element {
       </group>
     </group>
   );
+}
+
+function expansionAt(age: number, reducedMotion: boolean): number {
+  if (reducedMotion) {
+    return 0;
+  }
+
+  return (EXPANSION_TILES * age) / FLASH_SECONDS;
 }

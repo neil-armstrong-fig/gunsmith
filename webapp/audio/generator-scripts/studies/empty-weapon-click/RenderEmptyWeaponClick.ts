@@ -7,6 +7,13 @@ import {writeWav} from "@gunsmith/audio-studies/output/wav/WriteWav";
 import {writeMeasurements} from "@gunsmith/audio-studies/output/measurements/WriteMeasurements";
 import type {Measurement} from "@gunsmith/audio-studies/output/measurements/types/Measurement";
 
+const entry = process.argv[1];
+if (entry && pathToFileURL(resolve(entry)).href === import.meta.url) {
+  const output = resolve(import.meta.dirname, "../../../studies/empty-weapon-click");
+  await renderEmptyWeaponClick(output);
+  console.log(`Selected click rendered to ${output}`);
+}
+
 /** Render the selected empty-magazine click and measurements into the supplied study folder. */
 export async function renderEmptyWeaponClick(output: string): Promise<void> {
   await mkdir(output, {recursive: true});
@@ -14,11 +21,4 @@ export async function renderEmptyWeaponClick(output: string): Promise<void> {
   const cue = makeEmptyClick();
   measurements[cue.key] = await writeWav(output, await renderCue(cue));
   await writeMeasurements(output, measurements);
-}
-
-const entry = process.argv[1];
-if (entry && pathToFileURL(resolve(entry)).href === import.meta.url) {
-  const output = resolve(import.meta.dirname, "../../../studies/empty-weapon-click");
-  await renderEmptyWeaponClick(output);
-  console.log(`Selected click rendered to ${output}`);
 }

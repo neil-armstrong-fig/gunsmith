@@ -58,6 +58,11 @@ export class RoundPlaywright extends BasePage {
     return await this.page.getByRole("button", {name: "Play again"}).isVisible();
   }
 
+  /** Whether the banner says this player has asked to go on and is waiting for the other to ask too. */
+  async isWaitingForTheOtherPlayer(): Promise<boolean> {
+    return await this.page.getByTestId("round-banner-waiting").isVisible();
+  }
+
   async nextRound(): Promise<void> {
     await this.page.getByRole("button", {name: "Next round"}).click();
   }

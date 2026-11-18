@@ -5,11 +5,6 @@ import aimReticleSharpUrl from "@src/react/components/three/arena-canvas/reticle
 import {aimReticleCursor} from "@src/react/components/three/arena-canvas/reticle/AimReticleCursor";
 import {expect, it} from "vitest";
 
-/** A PNG file starts with an eight-byte signature, then the header chunk: its width and height are the next big-endian numbers. */
-function pngSizeOf(file: Buffer): PngSize {
-  return {width: file.readUInt32BE(16), height: file.readUInt32BE(20)};
-}
-
 it("puts the mouse position at the middle of the ordinary picture, in CSS pixels", () => {
   const {width, height} = pngSizeOf(readFileSync(new URL("AimReticle.png", import.meta.url)));
 
@@ -32,3 +27,8 @@ it("offers the ordinary picture at 1x and the sharp one at 2x", () => {
 it("ends with the browser's crosshair, the fallback CSS requires", () => {
   expect(aimReticleCursor.endsWith(", crosshair")).toBe(true);
 });
+
+/** A PNG file starts with an eight-byte signature, then the header chunk: its width and height are the next big-endian numbers. */
+function pngSizeOf(file: Buffer): PngSize {
+  return {width: file.readUInt32BE(16), height: file.readUInt32BE(20)};
+}

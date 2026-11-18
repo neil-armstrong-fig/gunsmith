@@ -3,19 +3,6 @@ import {repairArenaDraft} from "@gunsmith/ai/pipeline/arena/arena-drafting/repai
 
 const ROWS = ["##########", "#........#", "#........#", "#........#", "##########"];
 
-function generatorSaying(reply: unknown): FakeListChatModel {
-  return new FakeListChatModel({responses: [JSON.stringify(reply)]});
-}
-
-/** The text of every message handed to the model, in order. The model's input is `unknown` to this test on purpose. */
-function messageTexts(input: unknown): string[] {
-  if (!Array.isArray(input)) {
-    return [];
-  }
-
-  return input.map(message => String((message as {content: unknown}).content));
-}
-
 it("returns what the model wrote the second time, unchecked", async () => {
   const draft = await repairArenaDraft(
     {prompt: "a box", previous: {name: "B"}, errors: ["name: too short"]},
@@ -84,3 +71,16 @@ it("returns nothing when the model call throws", async () => {
 
   expect(await repairArenaDraft({prompt: "a box", previous: undefined, errors: ["e"]}, generator)).toBeUndefined();
 });
+
+/** The text of every message handed to the model, in order. The model's input is `unknown` to this test on purpose. */
+function messageTexts(input: unknown): string[] {
+  if (!Array.isArray(input)) {
+    return [];
+  }
+
+  return input.map(message => String((message as {content: unknown}).content));
+}
+
+function generatorSaying(reply: unknown): FakeListChatModel {
+  return new FakeListChatModel({responses: [JSON.stringify(reply)]});
+}

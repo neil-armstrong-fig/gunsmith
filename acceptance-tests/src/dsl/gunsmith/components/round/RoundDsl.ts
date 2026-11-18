@@ -92,6 +92,15 @@ export class RoundDsl {
     }
   }
 
+  /** Whether the banner says this player is waiting for the other player to ask for the next round too (online rooms). */
+  async isWaitingForTheOtherPlayer(): Promise<boolean> {
+    try {
+      return await this.round.isWaitingForTheOtherPlayer();
+    } catch (error) {
+      throw new DslError("Failed to see whether the banner is waiting for the other player", error);
+    }
+  }
+
   /** Presses the banner's "Next round" button. */
   async nextRound(): Promise<void> {
     try {

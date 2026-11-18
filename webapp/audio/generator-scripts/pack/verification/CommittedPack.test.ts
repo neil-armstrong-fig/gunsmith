@@ -7,10 +7,6 @@ import type {Measurement} from "@gunsmith/audio-studies/output/measurements/type
 
 const PACK = join(import.meta.dirname, "..", "..", "..", "generated-audio");
 
-async function recorded(): Promise<Readonly<Record<string, Measurement>>> {
-  return (await readMeasurements(PACK)).files;
-}
-
 it("has a WAV for every file measurements.json lists, and no other", async () => {
   const wavs = (await readdir(PACK)).filter(file => file.endsWith(".wav")).sort();
 
@@ -40,3 +36,7 @@ it("has every WAV the size its measurements say: 16-bit, 48 kHz, the seconds and
     expect(wav.readUInt16LE(22), key).toBe(measurement.channels);
   }
 });
+
+async function recorded(): Promise<Readonly<Record<string, Measurement>>> {
+  return (await readMeasurements(PACK)).files;
+}

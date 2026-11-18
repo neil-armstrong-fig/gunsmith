@@ -15,24 +15,6 @@ const RING: CrunchRequest = {
 };
 const QUIET: CrunchRequest = {events: undefined, round: "playing", seconds: TICK};
 
-/** Runs one step per request and says which of them crunched, by position. */
-function crunchesOf(requests: readonly CrunchRequest[]): number[] {
-  const crunch = new DamageCrunch();
-
-  return requests.flatMap((request, index) => {
-    if (crunch.shouldPlay(request)) {
-      return [index];
-    }
-
-    return [];
-  });
-}
-
-/** `count` quiet steps. */
-function quiet(count: number): CrunchRequest[] {
-  return Array.from({length: count}, () => QUIET);
-}
-
 const STEPS_IN_BURST = Math.round(BURST_SECONDS / TICK);
 
 it("crunches at once for a bullet that hits", () => {
@@ -63,3 +45,21 @@ it("crunches for a hit that ends the round, and for nothing after it", () => {
 
   expect(crunchesOf([fatal, after, after])).toEqual([0]);
 });
+
+/** Runs one step per request and says which of them crunched, by position. */
+function crunchesOf(requests: readonly CrunchRequest[]): number[] {
+  const crunch = new DamageCrunch();
+
+  return requests.flatMap((request, index) => {
+    if (crunch.shouldPlay(request)) {
+      return [index];
+    }
+
+    return [];
+  });
+}
+
+/** `count` quiet steps. */
+function quiet(count: number): CrunchRequest[] {
+  return Array.from({length: count}, () => QUIET);
+}

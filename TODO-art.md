@@ -6,7 +6,7 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 Checkout: `.claude/worktrees/art`, branch `worktree-art`; last merged main `6186476` by fast-forward on 2026-11-18. Preserve this worktree and sync committed main before new work/delivery.
 
-Current slice: the [playable stair preview](docs/art/terrain/README.md#playable-stair-preview) is ready for visual review at 64 and 32 px per tile. Art owns `ArenaHeights`, its stair marking geometry and the terrain screenshot criteria for this slice. Next visual check: review the stairs in motion at both scales and review S4-1 when AI delivers its fallback contrast change. Ring-loop integration remains with play.
+Current slice: the [playable stair preview](docs/art/terrain/README.md#playable-stair-preview) is integrated from `89e3851` and ready for visual review at 64 and 32 px per tile. Art owns `ArenaHeights`, its stair marking geometry and the terrain screenshot criteria for this slice. Next visual check: review the stairs in motion at both scales and review S4-1 when AI delivers its fallback contrast change. Ring-loop integration remains with play.
 
 Current milestone: M1/M6; the project remains on M1. Next audio task: combat masking, fatigue and levels once AI/play integrate runtime weapon-shot synthesis (not yet wired into the game sound output). Safari acceptance does not claim new headphone/speaker measurements. Preserve approved master hashes. Next failing check for any playback change: the relevant browser sound acceptance criterion before implementation.
 
@@ -63,8 +63,7 @@ captures at 64 and 32 px per tile were visually reviewed. `pnpm checks`
 passed lint, formatting, strict types and 2,814 tests, with one existing
 slow audio test skipped. Root, webapp, React and acceptance instructions
 were re-read and the folder and caller audit was completed. Main advanced
-to `09d2e60` while this slice was in progress. The preview edits remain
-uncommitted for review in the art worktree.
+to `09d2e60` while this slice was in progress. The preview is integrated from `89e3851`.
 
 2026-11-18, runtime terrain: four production-preview criteria failed against
 the flat renderer at 64 and 32 px per tile. All 11 terrain and 13 pickup
@@ -94,7 +93,7 @@ corner-filling drawing.
 with one existing slow audio test skipped. Standards review used root, webapp,
 React and acceptance instructions. Folder and caller audit placed pickup-only
 sampling under its Playwright caller and the result type in `types/`.
-The pickup marker is committed as `e8c8668` in `worktree-art`.
+The pickup marker is integrated from `e8c8668`.
 
 Cleanup validation: `pnpm checks` exits 0 (lint, formatting, strict types and 2,567 tests; one existing audio-render skip). Approved C2 source/proof retained, with all five proof images embedded. Root instructions re-read; folder/caller, link, SVG geometry and whitespace audit complete. Redundant review artifacts removed from disk and staging; S4-1 finding retained in HANDOFF.md. No gameplay change or acceptance rerun. The artwork is on main in `6186476`.
 

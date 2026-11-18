@@ -6,14 +6,6 @@ import type {SnapshotOfOpponent} from "@src/online/interpolation/types/SnapshotO
 
 const FIGHTER: Player = startingWorld(arenaFrom(["#####", "#...#", "#####"]), [], {x: 2.5, y: 1.5}).player;
 
-function standingAt(x: number, y = 1.5): Player {
-  return {...FIGHTER, position: {x, y}};
-}
-
-function told(elapsedSeconds: number, opponent: Player | undefined): SnapshotOfOpponent {
-  return {elapsedSeconds, opponent};
-}
-
 it("has nobody to draw before any snapshot", () => {
   expect(opponentAt([], 1)).toBeUndefined();
 });
@@ -62,3 +54,11 @@ it("holds the newest snapshot's fighter when the time runs past it, and does not
 it("holds the oldest snapshot's fighter when the time is before it", () => {
   expect(opponentAt([told(2, standingAt(4)), told(3, standingAt(5))], 1)?.position.x).toBe(4);
 });
+
+function standingAt(x: number, y = 1.5): Player {
+  return {...FIGHTER, position: {x, y}};
+}
+
+function told(elapsedSeconds: number, opponent: Player | undefined): SnapshotOfOpponent {
+  return {elapsedSeconds, opponent};
+}
