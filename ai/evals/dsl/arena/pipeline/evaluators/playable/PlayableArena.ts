@@ -1,19 +1,16 @@
+import {validateArena} from "@gunsmith/engine/arena-validation/ValidateArena";
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
-import {tilesReachableFrom} from "@gunsmith/engine/route/TilesReachableFrom";
 import type {ArenaEvalInput} from "@evals/dsl/arena/pipeline/types/ArenaEvalInput";
 import type {EvalScore} from "@evals/dsl/types/EvalScore";
 
 const KEY = "playableArena";
 
-// The middle of a tile, which is where a walker stands to be counted on it.
-const TILE_MIDDLE = 0.5;
-
 /**
  * An arena the player is given can be played: a request turned away gives none, and any other gives drawing rows the engine's
- * `arenaFrom` accepts (so its stairs are legal) whose open floor is all one region a walker can cross, stairs included. Written
- * against the engine, not the pipeline's own check, so a pipeline that stops checking is caught. `engine/` is to own the full
- * validator (`HANDOFF.md`); this is the smallest form of "the fighters can reach each other" until it lands.
+ * `arenaFrom` accepts (so its stairs are legal) and its `validateArena` finds nothing wrong with. The pipeline's own check calls the
+ * same validator (the user's decision, 2026-11-18: `engine/` is a shared resource), so what this still catches is a pipeline that
+ * stops checking or hands back something other than what it checked, not a fault in the engine's rules.
  */
 export function playableArena({outcome}: ArenaEvalInput): EvalScore {
   if (outcome.status === "rejected") {
@@ -30,7 +27,7 @@ export function playableArena({outcome}: ArenaEvalInput): EvalScore {
     return {key: KEY, score: 0, comment: `the engine refused the arena: ${arena}`};
   }
 
-  return connectedScore(arena);
+  return validatedScore(arena);
 }
 
 function noArenaScore(arena: unknown): EvalScore {
@@ -68,22 +65,17 @@ function parsed(rows: string[]): Arena | string {
   }
 }
 
-function connectedScore(arena: Arena): EvalScore {
-  const open = [...arena.solid.keys()].filter(index => !arena.solid[index]);
-  const first = open[0];
-  if (first === undefined) {
-    return {key: KEY, score: 0, comment: "the arena has no open floor"};
-  }
-
-  const start = {x: (first % arena.width) + TILE_MIDDLE, y: Math.floor(first / arena.width) + TILE_MIDDLE};
-  const reachable = tilesReachableFrom(arena, start).length;
-  if (reachable === open.length) {
+function validatedScore(arena: Arena): EvalScore {
+  const problems = validateArena(arena);
+  const [first] = problems;
+  if (!first) {
     return {key: KEY, score: 1};
   }
 
-  return {
-    key: KEY,
-    score: 0,
-    comment: `only ${reachable} of the arena's ${open.length} open tiles can be walked to from one another`,
-  };
+  const unlisted = problems.length - 1;
+  if (unlisted === 0) {
+    return {key: KEY, score: 0, comment: `the engine's validator: ${first.reason}`};
+  }
+
+  return {key: KEY, score: 0, comment: `the engine's validator: ${first.reason} (and ${unlisted} more)`};
 }
