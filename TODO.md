@@ -19,7 +19,7 @@ Start a session with: **"You are engine, continue the TODO."** Substitute any pe
 | --- | --- | --- | --- | --- |
 | play | Claude | [TODO-play.md](TODO-play.md) | Hit confirmation (slice 3) integrated; camera shake/recoil/reduced motion, HUD/inventory and M1 playtest next. | 2026-11-17 |
 | engine | Claude | [TODO-engine.md](TODO-engine.md) | Fair-duel starts and bot reaction to unseen shots integrated. High-ground playtest, arena pool and limits, inventory data and reflection remain open. | 2026-11-18 |
-| ai | Claude | [TODO-ai.md](TODO-ai.md) | Generated pickup renderer and fake-tier arena pipeline A3 integrated; readability review, judge A4, engine-validator adoption and calibration next. | 2026-11-17 |
+| ai | Claude | [TODO-ai.md](TODO-ai.md) | Player arena selection and engine validation integrated. S4-1 contrast, model quality, and the production adapter remain open. | 2026-11-18 |
 | server | Claude | [TODO-server.md](TODO-server.md) | Prediction/reconciliation/interpolation and 30 Hz snapshots integrated; round/match flow, reconnect, account/storage and generation route next. | 2026-11-17 |
 | budget | Claude | [TODO-budget.md](TODO-budget.md) | Credit and spend Durable Objects integrated; account identity and the generation route remain blockers. | 2026-11-17 |
 | art | Codex | [TODO-art.md](TODO-art.md) | C2 soft octagon marker approved; source/proof retained and rejected studies cleaned. Runtime integration, S4-1 fallback contrast, terrain and audio dependencies remain open. | 2026-11-17 |

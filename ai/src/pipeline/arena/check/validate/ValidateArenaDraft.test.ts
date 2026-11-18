@@ -76,19 +76,48 @@ it("refuses a stair with no landing, with the engine's words", () => {
 it("refuses an arena of walls only", () => {
   const rows = ["##########", "##########", "##########", "##########", "##########"];
 
-  expect(errorsOf(draftWith({rows}))).toEqual(["The arena has no open floor: every tile is a wall."]);
+  expect(errorsOf(draftWith({rows}))).toEqual(["The arena has no floor to stand on."]);
 });
 
-it("refuses an arena whose floor is cut in two, saying how much of it can be reached", () => {
+it("refuses an arena whose floor is cut in two, saying how much of the smaller part is cut off", () => {
   const rows = ["##########", "#...#....#", "#...#....#", "#...#....#", "##########"];
 
-  expect(errorsOf(draftWith({rows}))[0]).toContain("only 9 of its 21 tiles");
+  expect(errorsOf(draftWith({rows}))).toEqual([expect.stringContaining("9 tiles of floor")]);
+});
+
+it("names every part of the floor that is cut off, not only the first", () => {
+  const rows = ["#############", "#..#...#....#", "#..#...#....#", "#..#...#....#", "#############"];
+
+  expect(errorsOf(draftWith({rows}))).toEqual([
+    expect.stringContaining("6 tiles of floor"),
+    expect.stringContaining("9 tiles of floor"),
+  ]);
 });
 
 it("refuses a raised platform with no stair up to it", () => {
   const rows = ["##########", "#........#", "#...#11..#", "#...#11..#", "##########"];
 
-  expect(errorsOf(draftWith({rows}))[0]).toContain("cut into separate parts");
+  expect(errorsOf(draftWith({rows}))[0]).toContain("cannot be walked to");
+});
+
+it("lists the first few problems and counts the rest, so a speckled drawing cannot flood the repair", () => {
+  const rows = [
+    "#############",
+    "#.#.#.#.#.#.#",
+    "#############",
+    "#.#.#.#.#.#.#",
+    "#############",
+    "#.#.#.#.#.#.#",
+    "#############",
+    "#.#.#.#.#.#.#",
+    "#############",
+  ];
+
+  const errors = errorsOf(draftWith({rows}));
+
+  expect(errors).toHaveLength(6);
+  expect(errors.slice(0, 5)).toEqual(Array(5).fill(expect.stringContaining("1 tiles of floor")));
+  expect(errors[5]).toBe("And 18 more of the same kind.");
 });
 
 it("shortens every sentence, because the model will be shown them", () => {
