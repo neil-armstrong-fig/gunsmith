@@ -13,6 +13,8 @@
     "api:dev": "pnpm --filter @gunsmith/api start",
     "acceptance-tests": "pnpm --filter @gunsmith/acceptance-tests acceptance-tests",
     "acceptance-tests:preview": "pnpm --filter @gunsmith/webapp compile && PREVIEW_ACCEPTANCE=1 pnpm acceptance-tests",
+    "acceptance-tests:preview:local": "PREVIEW_API_MODE=local pnpm acceptance-tests:preview",
+    "acceptance-tests:preview:api": "PREVIEW_API_MODE=external pnpm acceptance-tests:preview",
     "install-browsers": "pnpm --filter @gunsmith/acceptance-tests install-browsers",
     "build": "pnpm --recursive build",
     "checks": "pnpm checks:repository && pnpm --recursive checks",
@@ -23,7 +25,7 @@
     "type-check": "pnpm --recursive type-check",
     "test": "pnpm --recursive test",
     "checks:repository": "pnpm --filter @gunsmith/shared exec node config/repository/CheckRepository.ts",
-    "test:properties": "pnpm --filter @gunsmith/engine test:properties",
+    "test:properties": "pnpm --filter @gunsmith/engine --filter @gunsmith/webapp --filter @gunsmith/api test:properties",
     "evals": "EVAL_GATE=all EVAL_SUITE=all EVAL_TRIALS=1 EVAL_TRACK=0 pnpm --filter @gunsmith/ai evals:fake"
   }
 }

@@ -57,6 +57,7 @@ jobs:
         run: pnpm acceptance-tests --shard=${{ matrix.shard }}/${{ strategy.job-total }} --reporter=github,blob
         env:
           PREVIEW_ACCEPTANCE: "1"
+          PREVIEW_API_MODE: local
           PLAYWRIGHT_BLOB_OUTPUT_NAME: shard-${{ matrix.shard }}.zip
       # Blobs include retry traces, screenshots and videos; preserve failures too.
       - uses: actions/upload-artifact@v7

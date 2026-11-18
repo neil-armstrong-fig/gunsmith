@@ -25,36 +25,20 @@ Original player prompts and mechanics exclusions remain in [the profile-study br
 
 ## Runtime pickup review checkpoint — 2026-11-17
 
-Status: **waiting for AI renderer slice S3**. Inspection of worktree `ai` at
-`b99745a` plus its staged S0–S2 changes found the shared appearance move and
-acceptance spec, but no webapp drawing implementation. No runtime screenshots
-or readability verdict were produced. The S1 result reported by AI is five of
-six criteria failing; the hidden-pickup case passes without a drawing, so that
-pass alone does not establish fog coverage.
+Status: **S4 review completed** at `9484ad0`. The lantern passes this seeded fixture
+review at 64/32 px; the fallback needs body/outline contrast work (S4-1).
+Both disappear under fog and return when faced again. All six existing browser
+criteria pass without retries; their colour counts do not detect S4-1.
 
-AI supplies the production-preview URL, source revision/working-tree state,
-and all six `DrawingAGeneratedWeapon` results with red or mutation evidence.
-Art then reviews the seeded sparring fixtures (`seed=8`, `weaponDrawing=lantern`
-and `weaponDrawing=refused`) against `appearances/jellyfish-cage.json`:
-
-- Capture the visible lantern in the actual arena and at native 64/32 px.
-  Record browser, viewport, device scale and source revision with the images;
-  enlarged crops illustrate details but do not prove native-size readability.
-- Compare the polygon cage, pale core, forward braids, palette and proportions
-  with the authored jellyfish sheet. Structural shapes must survive reduction;
-  fine braces may disappear at 32 px. Judge recognisability separately from
-  the spec's blue/pale pixel counts.
-- Check placement and contrast against the arena floor. The agreed first proof
-  uses the body at half scale; the neutral pickup diamond is outside this slice.
-- Turn away and back: the hidden pickup must leave neither drawing nor disc,
-  and the visible drawing must return. For the refused fixture, check the
-  code-owned plain-body/blue-muzzle stand-in, with no lantern core or mint disc.
-- Report each defect with its fixture, size, expected/actual appearance and
-  screenshot. AI owns renderer fixes and test mutations; art records a verdict
-  only after reviewing their resulting evidence.
-
-This checkpoint adds no schema, asset, anchor or gameplay contract. Held
-weapons, muzzle flashes and further generation probes remain deferred.
+The review records Chromium, viewports, source state and inherited S1 red/S3
+mutation evidence from `c11dc27`. AI owns the follow-up acceptance test and fix;
+art re-reviews its result. No runtime, schema, asset or anchor changed. Held
+weapons and broader grammar validation remain open. The user approved the
+[C2 soft octagon pickup marker](pickup-markers/README.md); it supersedes the
+diamond in the original studies. Runtime marker integration remains open.
+The redundant review screenshots and capture metadata were removed at the
+user's request; the approved marker proof embeds its source images. The
+fallback-contrast finding remains in `HANDOFF.md`.
 
 ## How a generic renderer reproduces the drawings
 

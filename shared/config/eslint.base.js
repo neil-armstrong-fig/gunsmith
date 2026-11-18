@@ -12,6 +12,9 @@ export const ignores = [
   "**/dev-dist/**",
   "**/coverage/**",
   "**/screenshots/**",
+  "**/playwright-report/**",
+  "**/blob-report/**",
+  "**/all-blob-reports/**",
 ];
 
 const workspaceScope = "@gunsmith";

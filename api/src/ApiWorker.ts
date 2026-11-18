@@ -10,3 +10,5 @@ export default {
 
 // The Durable Object class the Workers runtime looks for beside the default export (`wrangler.jsonc` names it).
 export {Match} from "@src/match/Match";
+export {CreditLedger} from "@src/ai/credits/CreditLedger";
+export {SpendLedger} from "@src/ai/spend/SpendLedger";

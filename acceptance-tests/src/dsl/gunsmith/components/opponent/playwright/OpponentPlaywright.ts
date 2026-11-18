@@ -1,9 +1,13 @@
 import type {Page} from "@playwright/test";
 import type {OpponentSnapshot} from "@gunsmith/shared/state-hook/types/OpponentSnapshot";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
+import {runHeldUntil} from "@src/dsl/gunsmith/playwright/hold/RunHeldUntil";
 import {lookOfFighter} from "@src/dsl/gunsmith/playwright/look/look-of-fighter/LookOfFighter";
+import {lookOfHit} from "@src/dsl/gunsmith/playwright/look/look-of-hit/LookOfHit";
 import {TEAM_ORANGE} from "@src/dsl/gunsmith/playwright/look/TeamOrange";
 import type {FighterLook} from "@src/dsl/gunsmith/types/FighterLook";
+import type {HitLook} from "@src/dsl/gunsmith/types/HitLook";
+import type {HurtWatch} from "@src/dsl/gunsmith/types/HurtWatch";
 import type {Point} from "@src/dsl/gunsmith/types/Point";
 
 export class OpponentPlaywright extends BasePage {
@@ -26,6 +30,27 @@ export class OpponentPlaywright extends BasePage {
     const {x, y} = await this.get();
 
     return await lookOfFighter(this.page, {x, y}, TEAM_ORANGE);
+  }
+
+  /** What the screen shows of a hit landed round the opponent right now: the mint ticks at its corners. The opponent must be standing still (sparring's is). */
+  async getHitOnScreen(): Promise<HitLook> {
+    const {x, y} = await this.get();
+
+    return await lookOfHit(this.page, {x, y});
+  }
+
+  /**
+   * Runs a held game (`holdTheGame`) in steps of `stepSeconds` until the opponent has less health than it had, whether or not the player sees it, and stops there.
+   * Throws if nothing has hurt it after `maxSeconds` of the game's time.
+   */
+  async runUntilHurt(request: HurtWatch): Promise<void> {
+    const {health} = await this.get();
+
+    await runHeldUntil(this.page, {
+      watch: request,
+      what: "Something hurting the opponent",
+      isDone: async () => (await this.get()).health < health,
+    });
   }
 
   /** Waits until the opponent has less health than `health`. */

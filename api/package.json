@@ -12,6 +12,7 @@
     "format:check": "prettier --check .",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
+    "test:properties": "vitest run --config vitest.properties.config.ts",
     "start": "wrangler dev --port ${API_PORT:-8787}"
   },
   "dependencies": {
@@ -20,6 +21,7 @@
     "@gunsmith/shared": "workspace:*"
   },
   "devDependencies": {
+    "fast-check": "catalog:",
     "@cloudflare/workers-types": "catalog:",
     "@eslint/js": "catalog:",
     "@types/node": "catalog:",

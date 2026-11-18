@@ -8,6 +8,7 @@ import type {World} from "@gunsmith/engine/game-loop/types/World";
 import type {Seat} from "@gunsmith/engine/seat/types/Seat";
 import {viewOfSeat} from "@gunsmith/engine/seat/ViewOfSeat";
 import {MATCH_ARENA_ROWS} from "@src/match/room/arena/MatchArenaRows";
+import type {InputAck} from "@gunsmith/shared/online/types/InputAck";
 import type {JoinedMessage} from "@src/match/room/types/JoinedMessage";
 import type {SnapshotMessage} from "@src/match/room/types/SnapshotMessage";
 import {MATCH_TICK} from "@src/match/tick/MatchTick";
@@ -25,6 +26,8 @@ export class MatchRoom {
   private readonly arena: Arena = arenaFrom(MATCH_ARENA_ROWS);
   private readonly seated: Seat[] = [];
   private readonly asked: Record<Seat, Input> = {first: NOTHING_ASKED, second: NOTHING_ASKED};
+  private readonly acked: Partial<Record<Seat, InputAck>> = {};
+  private readonly pulled: Record<Seat, boolean> = {first: false, second: false};
   private world: World | undefined;
 
   /** The next free seat, or `undefined` when both are taken. The second to sit starts the match. */
@@ -63,21 +66,30 @@ export class MatchRoom {
   }
 
   /**
-   * Remembers what `seat` last asked for. It is played at the next snapshot. A reload or weapon switch is asked once and is not
-   * lost to a later input that arrives before the snapshot (a browser sends about three a snapshot): it stays until played.
+   * Remembers what `seat` last asked for, under the number the browser gave it (`seq`). It is played at the next tick. A reload, a weapon
+   * switch or a trigger pull is asked once and is not lost to a later input that arrives before the tick (a click pressed and released
+   * between two ticks is two inputs, and only the last would otherwise be played): it stays until played. An input older than one already
+   * received is dropped. The seat is told which input it has reached in each snapshot (`ack`).
    */
-  setInput(seat: Seat, input: Input): void {
+  setInput(seat: Seat, input: Input, seq: number): void {
     const before = this.asked[seat];
+    const reached = this.acked[seat];
+    if (reached && seq < reached.seq) {
+      return;
+    }
 
+    this.acked[seat] = {seq, held: 0};
+    this.pulled[seat] = this.pulled[seat] || input.firing;
     this.asked[seat] = {...input, reload: input.reload || before.reload, switchTo: input.switchTo ?? before.switchTo};
   }
 
   /**
    * Plays `steps` engine steps (one by default) from what each seat asked for: the clock says how many it owes, since a timer
-   * fires late and unevenly. Nothing happens before the match begins. A reload or weapon switch is played in the first step only.
+   * fires late and unevenly. Nothing happens before the match begins or when no step is owed (so a one-shot ask waits for a step that
+   * plays it). A reload, weapon switch or trigger pull is played in the first step only.
    */
   tick(steps = 1): void {
-    if (!this.world) {
+    if (!this.world || steps <= 0) {
       return;
     }
 
@@ -88,15 +100,27 @@ export class MatchRoom {
     this.world = world;
     this.asked.first = withoutOneShots(this.asked.first);
     this.asked.second = withoutOneShots(this.asked.second);
+    this.pulled.first = false;
+    this.pulled.second = false;
+    this.countSteps(steps);
   }
 
-  /** What `seat` may be told right now: only what the engine says it sees. `undefined` before the match begins. */
+  /** What `seat` may be told right now: only what the engine says it sees, and how far its inputs have been played. `undefined` before the match begins. */
   snapshotFor(seat: Seat): SnapshotMessage | undefined {
     if (!this.world) {
       return undefined;
     }
 
-    return {kind: "snapshot", ...viewOfSeat(this.world, seat)};
+    return {kind: "snapshot", ...viewOfSeat(this.world, seat), ack: this.acked[seat]};
+  }
+
+  private countSteps(steps: number): void {
+    for (const seat of this.seated) {
+      const reached = this.acked[seat];
+      if (reached) {
+        this.acked[seat] = {...reached, held: reached.held + steps};
+      }
+    }
   }
 
   private nextFreeSeat(): Seat | undefined {
@@ -110,13 +134,18 @@ export class MatchRoom {
     return undefined;
   }
 
-  /** A reload or a weapon switch is asked once: only the snapshot's first step plays it. */
+  /** A reload, a weapon switch or a trigger pull is asked once: only the tick's first step plays it. */
   private inputsOfStep(step: number): FighterInputs {
     if (step === 0) {
-      return {first: this.asked.first, second: this.asked.second};
+      return {first: this.withPulls("first"), second: this.withPulls("second")};
     }
 
     return {first: withoutOneShots(this.asked.first), second: withoutOneShots(this.asked.second)};
+  }
+
+  /** What `seat` asked for, with the trigger down if it was pulled at any time since the last tick, even if let go again. */
+  private withPulls(seat: Seat): Input {
+    return {...this.asked[seat], firing: this.asked[seat].firing || this.pulled[seat]};
   }
 }
 

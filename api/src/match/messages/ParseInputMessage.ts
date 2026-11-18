@@ -1,18 +1,22 @@
-import type {Input} from "@gunsmith/engine/game-loop/types/Input";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
+import type {InputMessage} from "@src/match/messages/types/InputMessage";
 
 /**
- * The input a player's text frame asks for, or `undefined` when the frame is not one: not JSON, not an `input` message, or
- * with a field of the wrong kind. Everything a client sends is `unknown` until here; the engine then caps what the input may
- * ask for (a walk longer than one tile a second is treated as one), so this checks the shape, never the speed.
+ * The input a player's text frame asks for, with the sequence number it carries, or `undefined` when the frame is not one: not JSON, not
+ * an `input` message, or with a field of the wrong kind. Everything a client sends is `unknown` until here; the engine then caps what the
+ * input may ask for (a walk longer than one tile a second is treated as one), so this checks the shape, never the speed.
  */
-export function parseInputMessage(text: string): Input | undefined {
+export function parseInputMessage(text: string): InputMessage | undefined {
   const message = parsedObject(text);
   if (!message || message["kind"] !== "input") {
     return undefined;
   }
 
+  const seq = message["seq"];
   const direction = pointOf(message["direction"]);
+  if (typeof seq !== "number" || !Number.isSafeInteger(seq) || seq < 0) {
+    return undefined;
+  }
   if (!direction || typeof message["firing"] !== "boolean" || typeof message["reload"] !== "boolean") {
     return undefined;
   }
@@ -31,12 +35,15 @@ export function parseInputMessage(text: string): Input | undefined {
   }
 
   return {
-    direction,
-    aimAt,
-    firing: message["firing"],
-    crouching,
-    reload: message["reload"],
-    switchTo: typeof switchTo === "number" ? switchTo : undefined,
+    seq,
+    input: {
+      direction,
+      aimAt,
+      firing: message["firing"],
+      crouching,
+      reload: message["reload"],
+      switchTo: typeof switchTo === "number" ? switchTo : undefined,
+    },
   };
 }
 

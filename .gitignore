@@ -13,6 +13,7 @@ coverage/
 screenshots/
 playwright-report/
 blob-report/
+all-blob-reports/
 playwright/.cache/
 test-results/
 

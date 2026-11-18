@@ -4,11 +4,11 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 ## Resume here
 
-Checkout: `.claude/worktrees/ship`, branch `worktree-ship`, synced from committed main `f744267`. Persistent worktree; main stays integration-only. Merge newer committed main before new work/delivery when clean; never stash another session's changes.
+Checkout: `.claude/worktrees/ship`, branch `worktree-ship`, synced from committed main `9484ad0`. Persistent worktree; main stays integration-only. Merge newer committed main before new work/delivery when clean; never stash another session's changes.
 
-Current slice: free eval root command/CI and the user-approved paid-eval policy handoff integrated at `f6039c8`; combined validation complete. Owned integration records: HANDOFF.md, TODO.md and this resume. Project remains M1.
+Current slice: standards refactor of preview/runner configuration after user review, including @src imports. Owned files: root scripts, CI mode selection, acceptance configuration/tests/instructions, Vite proxy configuration, shared ESLint config/tests and ship coordination docs. Project remains M1.
 
-Next action: AI owns the paid selector, shared local budget guard and dated samples; activation waits for reconciled November Console spend. Ship's next independent CI slices are generated Playwright-report lint exclusion and managed Worker startup for online acceptance (coordinate server); hosted profiling/publication still await setup. No paid calls or CI are enabled.
+Next action: review/commit this uncommitted delivery when authorized; then hosted verification after publication. Hosted profiling/publication still await setup; AI owns paid selector/guard/evidence and reconciled opening spend.
 
 ## Ownership
 
@@ -26,10 +26,14 @@ server supplies Worker/DO/storage bindings; budget supplies operational limits; 
 
 - [x] Add repository checks, production-preview acceptance and independent property-test CI.
 - [x] Implement four acceptance shards, two workers per shard, unique blob artifacts, combined HTML reporting and an all-shards gate.
+- [x] Manage local Worker startup and external API preview scripts; exclude generated Playwright reports from lint.
 - [ ] Profile the first hosted sharded run: separate setup/build/test/merge time, total runner minutes and elapsed time; compare with the recorded 6.3-minute local baseline with budget.
 - [x] Settle eval policy with the user and deliver free fake CI/root mechanics; see [policy](docs/agent-reference/EvalPolicy.md).
 - [ ] Receive AI-owned paid selector/guard/evidence implementation and reconciled opening spend before local paid activation.
 - [ ] Verify the first hosted Actions run after authorized publication; API/infra provisioning awaits bindings and authorization.
+
+- [ ] **From budget, 2026-11-17: lint rule for "declare functions below their callers" (root `AGENTS.md`, Code style), including test files.** Nothing enforces it and it has drifted: a sweep (a `function` declared above the first top-level `it`/`describe`) finds 75 test files (ai 35, webapp 26, engine 9, api 5; the two budget test files and `HandleApiRequest.test.ts` are now fixed). Decide how to introduce it without failing the gate on the other 72 (for example warn in changed files only, or the owners fix their packages first); model it on `shared/config/standards/single-export/`, small, with its own tests, proved by mutation. Arrow `const` helpers above their caller are the real risk (temporal dead zone) and are worth checking separately. Budget wrote no rule, `shared/config/` is yours.
+- [ ] **From budget, 2026-11-17: credits and spend are Durable Objects, not D1, so `infra/` must declare them.** `api/wrangler.jsonc` now has bindings `CREDITS` (`CreditLedger`, one per account) and `SPEND` (`SpendLedger`, one global) and migration `v2` (`new_sqlite_classes`); keep the same names in the Alchemy declaration when `infra/` is scaffolded. D1 stays for accounts, sessions, library, ratings and history only. No new dependency or account setup is needed for the ledgers. Reasons: [cost-and-budget.md](docs/cost-and-budget.md).
 
 ## Later tasks
 
@@ -41,6 +45,10 @@ server supplies Worker/DO/storage bindings; budget supplies operational limits; 
 - [ ] Measure infrastructure costs with server/AI runtime measurements before proposing free versus Workers Paid.
 
 ## Verification/latest delivery
+
+Configuration review follow-up: prior standards claim missed mixed concerns, implicit environment dependencies and ternaries in the runner config. Entry point reduced to composition; pure preview/mode/port/server/runner modules use PascalCase filenames, @src imports and named types under types/. Numeric ports stay numeric; lifecycle options are shared within the server builder. New CI runner assertions and inherited preview assertions kill the retry mutant (one criterion) and Worker-port mutant (three relevant criteria). Targeted checks pass (28 tests, including 16 config checks); real online criteria 3/3 and occupied-port/external/interruption lifecycle checks pass after @src migration. Filesystem-directory regression observed red and fixed; module aliases are not used for filesystem paths. Final `pnpm checks` passes (lint/format/strict types, 2,586 tests, one existing slow audio render skipped). No index changes or commit.
+
+2026-11-17 preview lifecycle: 256/256 criteria across four CI-shaped shards, no retries; combined HTML report built. Managed and external online scripts each pass all three privacy criteria. Occupied ports, partial startup failure, interrupted/normal teardown and external ownership verified. New config/report checks observed red; port mutation kills exactly one regression check. Standards/folder/caller audit complete against root, acceptance, shared and webapp instructions; no helpers/types extracted. Final `pnpm checks` passes: lint, formatting, strict types and 2,584 tests; one existing slow audio render skipped. Generated HTML/blob reports remain present. Evidence: `/private/tmp/gunsmith-ship-*.log`; no commit/push/deployment.
 
 2026-11-17 free eval gate: `pnpm evals` passes 170/170, including arena fixtures; full `pnpm checks` passes (lint/format/types, 2,567 tests, one skipped) outside sandbox after sandbox audio stalled. Missing-command red observed; five unsafe command mutants rejected with a stub process; YAML/permissions, fourteen trigger-path probes, targeted formatting, diff whitespace and root/AI/shared standards/folder/caller review pass. No new helpers/types. Free workflow is committed in `e8ff270` and integrated at `f6039c8`; hosted Actions remains unverified. Integration independently repeated full checks and 170 fake criteria with conflicting inherited settings, plus 28 push/PR path probes. Paid selector/guard/dated samples remain AI-owned and pending; no paid execution or ledger initialization.
 

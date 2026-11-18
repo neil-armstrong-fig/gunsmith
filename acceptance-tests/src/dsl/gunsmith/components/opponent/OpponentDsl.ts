@@ -3,6 +3,8 @@ import type {OpponentSnapshot} from "@gunsmith/shared/state-hook/types/OpponentS
 import {OpponentPlaywright} from "@src/dsl/gunsmith/components/opponent/playwright/OpponentPlaywright";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
 import type {FighterLook} from "@src/dsl/gunsmith/types/FighterLook";
+import type {HitLook} from "@src/dsl/gunsmith/types/HitLook";
+import type {HurtWatch} from "@src/dsl/gunsmith/types/HurtWatch";
 import type {Point} from "@src/dsl/gunsmith/types/Point";
 
 /** The opponent in a duel, reached as `gunsmith.opponent`. */
@@ -28,6 +30,24 @@ export class OpponentDsl {
       return await this.opponent.getLookOnScreen();
     } catch (error) {
       throw new DslError("Failed to read how the opponent looks on the screen", error);
+    }
+  }
+
+  /** What the screen shows of a hit landed round the opponent right now: the mint ticks at its corners. It must be standing still (sparring's is). */
+  async getHitOnScreen(): Promise<HitLook> {
+    try {
+      return await this.opponent.getHitOnScreen();
+    } catch (error) {
+      throw new DslError("Failed to read the hit confirmation the screen shows round the opponent", error);
+    }
+  }
+
+  /** Runs a held game, in steps of `stepSeconds`, until the opponent has been hurt (seen or not), and holds it there. Fails if nothing hurts it in `maxSeconds`. */
+  async runUntilHurt(request: HurtWatch): Promise<void> {
+    try {
+      await this.opponent.runUntilHurt(request);
+    } catch (error) {
+      throw new DslError("Failed to run the game until the opponent was hurt", error);
     }
   }
 

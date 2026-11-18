@@ -3,6 +3,8 @@ import type {DummySnapshot} from "@gunsmith/shared/state-hook/types/DummySnapsho
 import {DummiesPlaywright} from "@src/dsl/gunsmith/components/dummies/playwright/DummiesPlaywright";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
 import type {FighterLook} from "@src/dsl/gunsmith/types/FighterLook";
+import type {HitLook} from "@src/dsl/gunsmith/types/HitLook";
+import type {HurtWatch} from "@src/dsl/gunsmith/types/HurtWatch";
 import type {Point} from "@src/dsl/gunsmith/types/Point";
 
 /** The practice dummies, reached as `gunsmith.dummies`. */
@@ -46,6 +48,24 @@ export class DummiesDsl {
       return await this.dummies.getLookOnScreen(place);
     } catch (error) {
       throw new DslError(`Failed to read how the dummy at ${place.x}, ${place.y} looks on the screen`, error);
+    }
+  }
+
+  /** What the screen shows of a hit landed round `place`, where a dummy stood: the mint ticks at its corners. */
+  async getHitOnScreen(place: Point): Promise<HitLook> {
+    try {
+      return await this.dummies.getHitOnScreen(place);
+    } catch (error) {
+      throw new DslError(`Failed to read the hit confirmation the screen shows round ${place.x}, ${place.y}`, error);
+    }
+  }
+
+  /** Runs a held game, in steps of `stepSeconds`, until the dummy at `dummy` has been hurt or felled (seen or not), and holds it there. Fails if nothing does so in `maxSeconds`. */
+  async runUntilHurt(dummy: Point, request: HurtWatch): Promise<void> {
+    try {
+      await this.dummies.runUntilHurt(dummy, request);
+    } catch (error) {
+      throw new DslError(`Failed to run the game until the dummy at ${dummy.x}, ${dummy.y} was hurt`, error);
     }
   }
 

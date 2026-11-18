@@ -28,7 +28,8 @@ const GAME_LOOP_PRIORITY = -1;
  * world with `gameState` and renders nothing itself: a per-frame value never goes through React state. It also puts the
  * acceptance specs' read-only state hook on the page. After every step, not once a frame, it tells the sounds what the step
  * reported (`World.events`), and tells the feedback store the same, since a frame can run several steps and the game store keeps only the last world.
- * On an online room page (`?room=<code>`) it sends input and shows the server’s newest world (`useOnlineMatch`).
+ * On an online room page (`?room=<code>`) it hands each fixed step's input to the online match (`useOnlineMatch`), which sends it,
+ * predicts this fighter, and describes the world to show.
  */
 export function useGameLoop(): void {
   const leftoverSecondsRef = useRef(0);
@@ -59,22 +60,27 @@ export function useGameLoop(): void {
     const pixel = pointerRef.current;
     const aimAt = pixel && arenaPointAtPixel(pixel, startOfFrame.arena, size);
 
-    // An online room (`?room=<code>`): the server plays the match. This frame sends what the player asks for and shows the newest
-    // world the server described, which holds only what this player may see; nothing is stepped here.
+    // An online room (`?room=<code>`): the server plays the match and holds only what this player may see. Each fixed step the player's ask
+    // goes to `OnlineMatch`, which sends it when it changes and plays it at once on the browser's own copy of this fighter; each frame shows
+    // that fighter where the browser has them and the other where the server's snapshots blend them. The engine is not stepped here.
     if (roomPage) {
-      onlineMatchRef.current?.sendInput({
-        direction: directionRef.current,
-        crouching: crouchingRef.current,
-        aimAt,
-        firing: trigger.isFiring(),
-        reload: weaponKeys.takeReload(),
-        switchTo: weaponKeys.takeSlot(),
-      });
-      const told = onlineMatchRef.current?.takeWorld();
-      if (told) {
-        useGameStore.getState().setWorld(told);
+      const onlineMatch = onlineMatchRef.current;
+      for (let tick = 0; tick < owed.ticks; tick += 1) {
+        onlineMatch?.step({
+          direction: directionRef.current,
+          crouching: crouchingRef.current,
+          aimAt,
+          firing: trigger.isFiring(),
+          reload: weaponKeys.takeReload(),
+          switchTo: weaponKeys.takeSlot(),
+        });
       }
-      trigger.afterTicks(1);
+
+      const shown = onlineMatch?.worldToShow(owed.leftoverSeconds);
+      if (shown) {
+        useGameStore.getState().setWorld(shown);
+      }
+      trigger.afterTicks(owed.ticks);
 
       return;
     }
@@ -90,9 +96,10 @@ export function useGameLoop(): void {
         switchTo: weaponKeys.takeSlot(),
       };
 
+      const before = world;
       world = engine.step(world, input, TICK_SECONDS);
       sounds.afterTick({events: world.events, firing: input.firing, round: world.round, seconds: TICK_SECONDS});
-      recordFeedbackCues({events: world.events, round: world.round});
+      recordFeedbackCues({before, after: world});
     }
 
     if (owed.ticks > 0) {
