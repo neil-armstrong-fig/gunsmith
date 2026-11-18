@@ -5,11 +5,16 @@ import {stepFighters} from "@gunsmith/engine/game-loop/StepFighters";
 import type {FighterInputs} from "@gunsmith/engine/game-loop/types/FighterInputs";
 import type {Input} from "@gunsmith/engine/game-loop/types/Input";
 import type {World} from "@gunsmith/engine/game-loop/types/World";
+import {decideMatch} from "@gunsmith/engine/match/DecideMatch";
+import {nextRound} from "@gunsmith/engine/match/NextRound";
+import {startMatch} from "@gunsmith/engine/match/StartMatch";
+import type {Match} from "@gunsmith/engine/match/types/Match";
 import type {Seat} from "@gunsmith/engine/seat/types/Seat";
 import {viewOfSeat} from "@gunsmith/engine/seat/ViewOfSeat";
 import {MATCH_ARENA_ROWS} from "@src/match/room/arena/MatchArenaRows";
 import type {InputAck} from "@gunsmith/shared/online/types/InputAck";
 import type {JoinedMessage} from "@src/match/room/types/JoinedMessage";
+import type {Readiness} from "@src/match/room/types/Readiness";
 import type {SnapshotMessage} from "@src/match/room/types/SnapshotMessage";
 import {MATCH_TICK} from "@src/match/tick/MatchTick";
 
@@ -17,18 +22,27 @@ const SECOND_FIGHTER_STARTS_AT = {x: 16.5, y: 6.5};
 
 const NOTHING_ASKED: Input = {direction: {x: 0, y: 0}, firing: false, reload: false};
 
+const OTHER_SEAT: Record<Seat, Seat> = {first: "second", second: "first"};
+
 /**
  * One private room's match, as plain state with no network in it: who has taken which seat, what each seat last asked for, and
  * the engine's world, which only this class steps. The Durable Object (`match/Match.ts`) feeds it frames and a clock and sends
- * what it answers. The match begins when the second seat is taken; before that no world exists and nothing is sent.
+ * what it answers. The match (a best of three) begins when the second seat is taken; before that no world exists and nothing is sent.
+ * A decided round waits, frozen, until both seats have asked to go on (`ready`), then the next round begins; once the match itself is
+ * decided, both asking begins a fresh match.
  */
 export class MatchRoom {
   private readonly arena: Arena = arenaFrom(MATCH_ARENA_ROWS);
   private readonly seated: Seat[] = [];
+  private readonly tokens: Record<Seat, string> = {first: "", second: ""};
   private readonly asked: Record<Seat, Input> = {first: NOTHING_ASKED, second: NOTHING_ASKED};
   private readonly acked: Partial<Record<Seat, InputAck>> = {};
   private readonly pulled: Record<Seat, boolean> = {first: false, second: false};
+  private readonly readied: Record<Seat, boolean> = {first: false, second: false};
   private world: World | undefined;
+
+  /** `makeToken` makes the secret each seat is given as it sits down: whoever shows it later is that seat's person. */
+  constructor(private readonly makeToken: () => string = () => crypto.randomUUID()) {}
 
   /** The next free seat, or `undefined` when both are taken. The second to sit starts the match. */
   join(): Seat | undefined {
@@ -38,31 +52,57 @@ export class MatchRoom {
     }
 
     this.seated.push(seat);
+    this.tokens[seat] = this.makeToken();
     if (seat === "second") {
-      this.world = startingWorld(this.arena, [], SECOND_FIGHTER_STARTS_AT);
+      this.world = this.worldOfRound(startMatch());
     }
 
     return seat;
   }
 
   /**
-   * Gives `seat` back, but only before the match begins: a browser that connects and goes (a page reloading) must not keep the
-   * room full. Once it has begun a seat is kept for its person, who may not be replaced by a stranger (reconnecting comes later).
+   * Notes that `seat`'s person is gone. Before the match begins the seat is given back: a browser that connects and goes (a page
+   * reloading) must not keep the room full, and its token is void. Once it has begun the seat is kept for its person, who may come back
+   * with its token (`reconnect`) and is not replaced by a stranger. Meanwhile the fighter stands still where it is, in the match and still
+   * hittable, as `docs/match-netcode.md` says.
    */
   leave(seat: Seat): void {
     if (this.world) {
+      this.asked[seat] = NOTHING_ASKED;
+      this.pulled[seat] = false;
+
       return;
     }
 
     const index = this.seated.indexOf(seat);
     if (index >= 0) {
       this.seated.splice(index, 1);
+      this.tokens[seat] = "";
     }
   }
 
-  /** The word a browser is sent as it sits down. */
+  /**
+   * The seat whose person shows `token`, taken back as they left it, or `undefined` for a token that is not a seat's (or before the match
+   * begins, when a seat that left is simply free). A returning page counts its inputs from nothing again, so what the seat had reached
+   * is forgotten and its next input is played whatever its number; its ask to go on is kept. It works while the seat is still held too,
+   * for a page that comes back before the old connection is known to be gone.
+   */
+  reconnect(token: string): Seat | undefined {
+    const seat = this.seatOfToken(token);
+    if (!seat || !this.world) {
+      return undefined;
+    }
+
+    delete this.acked[seat];
+    this.asked[seat] = NOTHING_ASKED;
+    this.pulled[seat] = false;
+
+    return seat;
+  }
+
+  /** The word a browser is sent as it sits down, with the secret that gets the seat back for it. */
   joinedMessage(seat: Seat): JoinedMessage {
-    return {kind: "joined", seat, arena: MATCH_ARENA_ROWS};
+    return {kind: "joined", seat, arena: MATCH_ARENA_ROWS, token: this.tokens[seat]};
   }
 
   /**
@@ -81,6 +121,23 @@ export class MatchRoom {
     this.acked[seat] = {seq, held: 0};
     this.pulled[seat] = this.pulled[seat] || input.firing;
     this.asked[seat] = {...input, reload: input.reload || before.reload, switchTo: input.switchTo ?? before.switchTo};
+  }
+
+  /**
+   * Notes that `seat` asks to go on, to the next round or, once the match is decided, to a fresh match. It counts only once the round is
+   * decided, so a seat cannot ask ahead; when both have asked the next round begins at once, with the score kept and both fighters
+   * restored, and what either seat had asked for during the pause is forgotten.
+   */
+  ready(seat: Seat): void {
+    const world = this.world;
+    if (!world || world.round === "playing") {
+      return;
+    }
+
+    this.readied[seat] = true;
+    if (this.readied.first && this.readied.second) {
+      this.begin(world.match ?? startMatch());
+    }
   }
 
   /**
@@ -111,7 +168,27 @@ export class MatchRoom {
       return undefined;
     }
 
-    return {kind: "snapshot", ...viewOfSeat(this.world, seat), ack: this.acked[seat]};
+    return {kind: "snapshot", ...viewOfSeat(this.world, seat), ack: this.acked[seat], ready: this.readinessOf(seat)};
+  }
+
+  /** The round after the one `match` has just ended, or a fresh match when `match` is decided. */
+  private begin(match: Match): void {
+    this.world = this.worldOfRound(decideMatch(match) === "playing" ? nextRound(match) : startMatch());
+    this.readied.first = false;
+    this.readied.second = false;
+    this.asked.first = NOTHING_ASKED;
+    this.asked.second = NOTHING_ASKED;
+    this.pulled.first = false;
+    this.pulled.second = false;
+  }
+
+  /** A round about to be fought: both fighters at their starting places with full health and magazines, in `match`. */
+  private worldOfRound(match: Match): World {
+    return {...startingWorld(this.arena, [], SECOND_FIGHTER_STARTS_AT), match};
+  }
+
+  private readinessOf(seat: Seat): Readiness {
+    return {player: this.readied[seat], opponent: this.readied[OTHER_SEAT[seat]]};
   }
 
   private countSteps(steps: number): void {
@@ -121,6 +198,20 @@ export class MatchRoom {
         this.acked[seat] = {...reached, held: reached.held + steps};
       }
     }
+  }
+
+  private seatOfToken(token: string): Seat | undefined {
+    if (token === "") {
+      return undefined;
+    }
+    if (token === this.tokens.first) {
+      return "first";
+    }
+    if (token === this.tokens.second) {
+      return "second";
+    }
+
+    return undefined;
   }
 
   private nextFreeSeat(): Seat | undefined {

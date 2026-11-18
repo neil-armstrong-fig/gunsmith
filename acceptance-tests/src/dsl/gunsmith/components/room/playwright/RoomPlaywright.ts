@@ -8,6 +8,7 @@ import {fastestMovement} from "@src/dsl/gunsmith/components/room/playwright/wire
 import {largestJump} from "@src/dsl/gunsmith/components/room/playwright/wire/movement/LargestJump";
 import type {PositionSample} from "@src/dsl/gunsmith/components/room/playwright/wire/movement/types/PositionSample";
 import type {ShownSamples} from "@src/dsl/gunsmith/components/room/playwright/wire/movement/types/ShownSamples";
+import {isJoinedFrame} from "@src/dsl/gunsmith/components/room/playwright/wire/IsJoinedFrame";
 import {isSnapshotFrame} from "@src/dsl/gunsmith/components/room/playwright/wire/IsSnapshotFrame";
 import {snapshotsOfFrames} from "@src/dsl/gunsmith/components/room/playwright/wire/SnapshotsOfFrames";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
@@ -24,12 +25,36 @@ const AHEAD_BY_TILES = 2;
 /** The page and the server agree on where the player is when they are within this (tiles). */
 const AGREE_WITHIN_TILES = 0.05;
 
+/** A browser opened beside this one, with a session of its own. */
+interface NewBrowser {
+  context: BrowserContext;
+  page: Page;
+}
+
 export class RoomPlaywright extends BasePage {
   /** The text frames this browser has been sent over its WebSockets, in order. What it was told, not what it chose to draw. */
   private readonly framesReceived: string[] = [];
 
   /** The context of the second browser: its own storage and its own session, never a second page of this one. */
   private secondContext: BrowserContext | undefined;
+
+  /** The context of a stranger's browser, which has no seat of its own and tries to take one. */
+  private strangerContext: BrowserContext | undefined;
+
+  /** The room this browser was opened in, so it can come back to it after leaving. */
+  private code: string | undefined;
+
+  /** The site's address, kept from when the room was opened: after this browser leaves, its page has none to give. */
+  private origin = "";
+
+  /** How many frames this browser had been sent when it last lost its connection or left: frames after it are the ones that come from being back. */
+  private framesBeforeLosing = 0;
+
+  /** Whether every try to connect is being turned away (`keepTheConnectionDown`). */
+  private connectionsRefused = false;
+
+  /** Cuts the connection this page has to the match now, as a dropped network would: the server's end and the page's. Set by the route. */
+  private cutConnection: (() => void) | undefined;
 
   /**
    * Whether this page's connection runs through Playwright's WebSocket route (`slowTheConnectionBy`, `receiveOnlyEveryNthSnapshot`).
@@ -72,9 +97,75 @@ export class RoomPlaywright extends BasePage {
       throw new Error("The room's answer carries no friend code.");
     }
 
+    this.code = code;
     await this.enterRoom(this.page, code);
+    this.origin = new URL(this.page.url()).origin;
 
     return code;
+  }
+
+  /** Makes this browser's connection one the spec can cut, from the next page it opens. Call it before `createPrivateRoom`, like `slowTheConnectionBy`. */
+  async prepareToLoseTheConnection(): Promise<void> {
+    await this.routeTheConnection();
+  }
+
+  /** Cuts this browser's connection to the match, as a dropped network would. The page is left open and has to find its own way back. */
+  cutTheConnection(): void {
+    if (!this.cutConnection) {
+      throw new Error(
+        "This page's connection is not routed: call prepareToLoseTheConnection before createPrivateRoom.",
+      );
+    }
+
+    this.framesBeforeLosing = this.framesReceived.length;
+    this.cutConnection();
+  }
+
+  /** Cuts this browser's connection and turns every try to make it again away, as a network that stays down would, until `letTheConnectionBack`. */
+  keepTheConnectionDown(): void {
+    this.connectionsRefused = true;
+    this.cutTheConnection();
+  }
+
+  /** Lets this browser's next try to connect through again. */
+  letTheConnectionBack(): void {
+    this.connectionsRefused = false;
+  }
+
+  /** Whether the page is telling the player that the connection is being made again. */
+  async isToldItIsReconnecting(): Promise<boolean> {
+    return await this.page.getByTestId("connection-notice").isVisible();
+  }
+
+  /** Leaves the room as a closed tab does: the page goes away and its connection with it. */
+  async leaveTheRoom(): Promise<void> {
+    this.framesBeforeLosing = this.framesReceived.length;
+    await this.page.goto("about:blank");
+  }
+
+  /** Opens the room this browser left again, in the same tab, so what the page kept for the room (its seat's key) is still there. */
+  async returnToTheRoom(): Promise<void> {
+    if (!this.code) {
+      throw new Error("This browser never opened a room to return to.");
+    }
+
+    await this.enterRoom(this.page, this.code);
+  }
+
+  /**
+   * Waits until the server has seated this browser again after it lost its connection or left (the frame that seats it comes once on every
+   * connection) and has sent it a snapshot on that connection: it is in the match again. A snapshot already on its way when the connection
+   * was cut does not count.
+   */
+  async waitForTheMatchAgain(): Promise<void> {
+    await expect
+      .poll(() => {
+        const since = this.framesReceived.slice(this.framesBeforeLosing);
+        const seatedAgain = since.findIndex(isJoinedFrame);
+
+        return seatedAgain >= 0 && snapshotsOfFrames(since.slice(seatedAgain)).length > 0;
+      })
+      .toBe(true);
   }
 
   /** Waits until the server has begun sending this browser the match, which it does once both seats are taken. */
@@ -87,15 +178,41 @@ export class RoomPlaywright extends BasePage {
    * page first, so a recorder can be attached before anything is sent to it.
    */
   async openSecondBrowser(code: string, beforeOpening: (secondPage: Page) => void): Promise<void> {
-    const browser = this.page.context().browser();
-    if (!browser) {
-      throw new Error("This page has no browser to open a second one beside.");
-    }
+    this.secondContext = await this.openBrowserBeside(code, beforeOpening);
+  }
 
-    this.secondContext = await browser.newContext({baseURL: new URL(this.page.url()).origin});
-    const page = await this.secondContext.newPage();
+  /**
+   * Opens a browser with no seat in the room `code` names, as a stranger who has the friend code would, and waits until the server has
+   * turned its connection away: the room is full, so the page never has an arena to wait for.
+   */
+  async openStrangersBrowser(code: string, beforeOpening: (strangerPage: Page) => void): Promise<void> {
+    const {context, page} = await this.newBrowserBeside();
+    this.strangerContext = context;
+    beforeOpening(page);
+
+    const connecting = page.waitForEvent("websocket");
+    await page.goto(`/?room=${encodeURIComponent(code)}`);
+    const socket = await connecting;
+    await socket.waitForEvent("close");
+  }
+
+  private async openBrowserBeside(code: string, beforeOpening: (page: Page) => void): Promise<BrowserContext> {
+    const {context, page} = await this.newBrowserBeside();
     beforeOpening(page);
     await this.enterRoom(page, code);
+
+    return context;
+  }
+
+  private async newBrowserBeside(): Promise<NewBrowser> {
+    const browser = this.page.context().browser();
+    if (!browser) {
+      throw new Error("This page has no browser to open another one beside.");
+    }
+
+    const context = await browser.newContext({baseURL: this.origin});
+
+    return {context, page: await context.newPage()};
   }
 
   /** Opens the room's page in `page` and waits until its arena is drawn into, as the game's own pages are waited for. */
@@ -110,6 +227,8 @@ export class RoomPlaywright extends BasePage {
   async closeSecondBrowser(): Promise<void> {
     await this.secondContext?.close();
     this.secondContext = undefined;
+    await this.strangerContext?.close();
+    this.strangerContext = undefined;
   }
 
   /**
@@ -222,7 +341,17 @@ export class RoomPlaywright extends BasePage {
 
     this.routed = true;
     await this.page.routeWebSocket(/\/api\/rooms\/[^/]+\/socket/, pageSide => {
+      if (this.connectionsRefused) {
+        pageSide.close();
+
+        return;
+      }
+
       const serverSide = pageSide.connectToServer();
+      this.cutConnection = () => {
+        serverSide.close();
+        pageSide.close();
+      };
       const toServer = new DelayedLine(this.delay);
       const toPage = new DelayedLine(this.delay);
       let snapshots = 0;

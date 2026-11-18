@@ -20,7 +20,7 @@ Start a session with: **"You are engine, continue the TODO."** Substitute any pe
 | play | Claude | [TODO-play.md](TODO-play.md) | Hit confirmation, camera shake and reduced motion integrated. Inventory HUD and M1 playtest next. Recoil and muzzle flash depend on held weapons. | 2026-11-18 |
 | engine | Claude | [TODO-engine.md](TODO-engine.md) | Fair-duel starts and bot reaction to unseen shots integrated. High-ground playtest, arena pool and limits, inventory data and reflection remain open. | 2026-11-18 |
 | ai | Claude | [TODO-ai.md](TODO-ai.md) | Player arena selection and engine validation integrated. S4-1 contrast, model quality, and the production adapter remain open. | 2026-11-18 |
-| server | Claude | [TODO-server.md](TODO-server.md) | Prediction/reconciliation/interpolation and 30 Hz snapshots integrated; round/match flow, reconnect, account/storage and generation route next. | 2026-11-17 |
+| server | Claude | [TODO-server.md](TODO-server.md) | Online best-of-three rounds and seat reconnect integrated. Forfeit, account/storage and the generation route remain open. | 2026-11-18 |
 | budget | Claude | [TODO-budget.md](TODO-budget.md) | Credit and spend Durable Objects integrated; account identity and the generation route remain blockers. | 2026-11-17 |
 | art | Codex | [TODO-art.md](TODO-art.md) | Approved terrain and C2 pickup marker integrated. S4-1 fallback contrast, remaining terrain art and ring audio remain open. | 2026-11-18 |
 | ship | Codex | [TODO-ship.md](TODO-ship.md) | Managed Worker preview and report exclusions integrated; function-order standards work remains in its worktree; hosted CI/deployment open. | 2026-11-17 |
