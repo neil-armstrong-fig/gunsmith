@@ -1,0 +1,20 @@
+import type {ArenaPipelineDependencies} from "@gunsmith/ai/pipeline/arena/types/ArenaPipelineDependencies";
+import {ArenaGenerationFakeModel} from "@evals/eval-criteria-mapping/setups/arena/fake/models/ArenaGenerationFakeModel";
+import {ArenaModerationFakeModel} from "@evals/eval-criteria-mapping/setups/arena/fake/ArenaModerationFakeModel";
+import {ArenaPipelineEvalDriver} from "@evals/eval-criteria-mapping/setups/arena/shared/ArenaPipelineEvalDriver";
+import {BUILT_IN_ARENA_FIXTURES} from "@evals/eval-criteria-mapping/setups/arena/shared/built-ins/BuiltInArenaFixtures";
+
+/** The arena pipeline on canned models: deterministic, so one trial, and nothing worth keeping. */
+export class FakeArenaPipelineEvalDriver extends ArenaPipelineEvalDriver {
+  constructor(requestedTrials: string | undefined) {
+    super({tier: "fake", requestedTrials, defaultTrials: 1, keepsGeneratedByDefault: false});
+  }
+
+  protected createModels(): ArenaPipelineDependencies {
+    return {
+      generator: new ArenaGenerationFakeModel(),
+      moderator: new ArenaModerationFakeModel(),
+      builtInArenas: BUILT_IN_ARENA_FIXTURES,
+    };
+  }
+}

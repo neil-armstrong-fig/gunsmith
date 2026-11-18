@@ -2,7 +2,8 @@ import {baseConfig, restrictedImports} from "@gunsmith/shared/config/eslint.base
 
 // It may import itself by its own name, as `engine/` does: `api/` compiles it as raw source, so an `@src` alias would resolve
 // into `api/`'s tree. It may also import the shared vocabulary and the engine (to validate and rate its output). Only `api/`
-// imports it. (`evals/` is never imported by anyone, so it keeps its own `@evals` alias.)
+// imports it. (`src/evals/` is never imported by anyone, and `package.json`'s `exports` hides it from `api/`, so it keeps its own
+// `@evals` alias.)
 const allowedPackages = ["@gunsmith/ai", "@gunsmith/shared", "@gunsmith/engine"];
 
 const criteriaMapping = "@evals/eval-criteria-mapping/EvalCriteriaMapping";
@@ -26,18 +27,20 @@ function noModelPackages(message) {
 export default [
   ...baseConfig({tsconfigRootDir: import.meta.dirname, allowedPackages}),
   // `src/` is what the Worker bundles, so the eval-only packages must never reach it: a local model client and the LangSmith
-  // test wrapper belong in `evals/`. (Call `restrictedImports` rather than writing the rule: flat config replaces, not merges.)
+  // test wrapper belong in `src/evals/`, which the Worker never imports (its entry points reach only what they import, and
+  // `package.json` does not export `evals/`). (Call `restrictedImports` rather than writing the rule: flat config replaces, not merges.)
   {
     files: ["src/**/*.ts"],
+    ignores: ["src/evals/**"],
     rules: {
       "no-restricted-imports": restrictedImports({
         allowedPackages,
         paths: [
           {
             name: "@langchain/ollama",
-            message: "Eval-only: import it from `evals/`, never from `src/` (the Worker bundles `src/`).",
+            message: "Eval-only: import it from `src/evals/`, never from the rest of `src/` (the Worker bundles it).",
           },
-          {name: "langsmith/vitest", message: "Eval-only: import it from `evals/`, never from `src/`."},
+          {name: "langsmith/vitest", message: "Eval-only: import it from `src/evals/`, never from the rest of `src/`."},
         ],
       }),
     },
@@ -45,7 +48,7 @@ export default [
   {
     // Tests see the mapping and nothing else, which keeps them readable as the criteria they state: no pipeline, no evaluator,
     // no model, no vitest.
-    files: ["evals/tests/**"],
+    files: ["src/evals/tests/**"],
     rules: {
       // A `thenExpect` states one criterion and checks it. Asking the weapon smith is what its `when` already names, in a
       // `beforeAll`, once, for all the criteria beneath it.
@@ -75,14 +78,14 @@ export default [
     // The mapping is setup: it chooses the tier, builds the models and the driver, wires the DSL into Vitest and LangSmith, and
     // writes the results. It reaches down to the DSL itself and never past it to its evaluators or trial folding, which are the
     // DSL's `expect` methods, and never back up to the tests.
-    files: ["evals/eval-criteria-mapping/**"],
+    files: ["src/evals/eval-criteria-mapping/**"],
     rules: {
       "no-restricted-imports": restrictedImports({
         allowedPackages: ["@gunsmith/ai", "@gunsmith/shared"],
         patterns: [
           {group: ["@evals/tests/**"], message: notUpwards},
           {
-            group: ["@evals/dsl/**/pipeline/**", "@evals/dsl/errors/**"],
+            group: ["@evals/dsl/**/pipeline/**", "@evals/dsl/shared/errors/**"],
             message:
               "The mapping does not run checks. They are the DSL's `expect` methods; import the DSL (or its types), not what is behind it.",
           },
@@ -93,7 +96,7 @@ export default [
   {
     // The DSL is what a test may say, and the checks behind it. It reaches the pipeline only through the driver interface it owns,
     // so it never touches a test runner or a model, and its own tests need neither.
-    files: ["evals/dsl/**"],
+    files: ["src/evals/dsl/**"],
     rules: {
       "no-restricted-imports": restrictedImports({
         allowedPackages: ["@gunsmith/ai", "@gunsmith/shared"],
@@ -106,7 +109,7 @@ export default [
     // A `*Dsl` only wraps, as in `acceptance-tests/`: each method is a `try` / `catch` that rethrows a `DslError` naming what was
     // attempted. Asking the weapon smith, holding its answers and checking them are done beneath it, by the pipeline, in `pipeline/`. (Repeats the block above,
     // because flat config replaces a rule for a file rather than merging it.)
-    files: ["evals/dsl/**/*Dsl.ts"],
+    files: ["src/evals/dsl/**/*Dsl.ts"],
     rules: {
       "no-restricted-syntax": [
         "error",
@@ -126,9 +129,9 @@ export default [
         patterns: [
           {group: ["@evals/tests/**", "@evals/eval-criteria-mapping/**"], message: notUpwards},
           {
-            group: ["@evals/dsl/**/evaluators/**", "@evals/dsl/trials/**"],
+            group: ["@evals/dsl/**/evaluators/**", "@evals/dsl/shared/trials/**"],
             message:
-              "A *Dsl does not check anything itself. Call the pipeline class beneath it (WeaponSmithPipeline, AppearancePipeline), which uses the evaluators.",
+              "A *Dsl does not check anything itself. Call the pipeline class beneath it (WeaponPipeline, AppearancePipeline), which uses the evaluators.",
           },
         ],
       }),
@@ -138,7 +141,7 @@ export default [
     // The lower level catches nothing and wraps nothing: it throws a plain sentence, and the DSL above it says what was attempted.
     // It may read the engine, because an evaluator judges what the player is given by the engine's own rules (an arena is playable
     // as `arenaFrom` and its routes say), written apart from the pipeline's checks so a pipeline that stops checking is caught. Tech debt, to revisit when engine's `validateArena` lands: see `TODO-ai.md`.
-    files: ["evals/dsl/**/pipeline/**"],
+    files: ["src/evals/dsl/**/pipeline/**"],
     rules: {
       "no-restricted-imports": restrictedImports({
         allowedPackages: ["@gunsmith/ai", "@gunsmith/shared", "@gunsmith/engine"],
@@ -146,7 +149,7 @@ export default [
         patterns: [
           {group: ["@evals/tests/**", "@evals/eval-criteria-mapping/**"], message: notUpwards},
           {
-            group: ["@evals/dsl/errors/**", "@evals/dsl/**/*Dsl"],
+            group: ["@evals/dsl/shared/errors/**", "@evals/dsl/**/*Dsl"],
             message:
               "The lower level wraps nothing and never looks up at the DSL. It throws a plain Error; the *Dsl puts it in words.",
           },

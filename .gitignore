@@ -38,7 +38,7 @@ pnpm-debug.log*
 # Alchemy local state and generated files
 .alchemy/
 
-# LangGraph dev server state (`langgraph dev`). The eval results in `ai/evals/results/` ARE committed, so not ignored.
+# LangGraph dev server state (`langgraph dev`). The eval run summaries in `ai/src/evals/results/` are ignored too (see `ai/.gitignore`).
 .langgraph_api/
 
 # Caches

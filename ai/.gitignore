@@ -3,9 +3,9 @@
 .langgraph_api
 
 # Eval run summaries and kept drawings (copy a summary to a dated file to keep a baseline)
-evals/results/*-latest.json
-evals/results/*-latest.html
-evals/results/appearance-probe/
+src/evals/results/*-latest.json
+src/evals/results/*-latest.html
+src/evals/results/appearance-probe/
 
 # Paid weapon requests: tokens, stop reasons and latency, one JSON line each
-evals/results/*-latest.jsonl
+src/evals/results/*-latest.jsonl

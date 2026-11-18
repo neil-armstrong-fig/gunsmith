@@ -103,7 +103,7 @@ Findings:
 
 ## Measured on Haiku (2026-11-14, the weapon evals on the paid tier)
 
-The weapon specs now run on Haiku 5.5 (`ai/evals/eval-criteria-mapping/weapon/paid/`), and each request's calls are logged with
+The weapon specs now run on Haiku 5.5 (`ai/src/evals/eval-criteria-mapping/setups/weapon/paid/run/`), and each request's calls are logged with
 tokens, stop reason and latency. One baseline: the 21 `when`s at 3 trials, 63 requests, 101 calls; every call ended in
 `tool_use`, none was cut off. Cost is computed from the tokens the model reported at the prices above, so the Console's usage
 page is the bill and this is the guard's estimate.
