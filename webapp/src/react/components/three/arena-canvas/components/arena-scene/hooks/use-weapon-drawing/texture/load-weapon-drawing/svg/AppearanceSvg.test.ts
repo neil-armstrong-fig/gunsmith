@@ -2,14 +2,14 @@ import {readFileSync} from "node:fs";
 import {resolve} from "node:path";
 import {appearanceSchema} from "@gunsmith/shared/appearance/schema/Appearance";
 import {fallbackAppearance} from "@gunsmith/shared/appearance/fallback/FallbackAppearance";
-import {appearanceSvg} from "@src/react/components/three/arena-canvas/components/arena-scene/components/pickup/hooks/use-weapon-drawing/texture/load-weapon-drawing/svg/AppearanceSvg";
+import {appearanceSvg} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-weapon-drawing/texture/load-weapon-drawing/svg/AppearanceSvg";
 
 const LANTERN = appearanceSchema.parse(
   JSON.parse(
     readFileSync(
       resolve(
         import.meta.dirname,
-        "../../../../../../../../../../../../../../../docs/art/concepts/top-down-oddities/appearances/jellyfish-cage.json",
+        "../../../../../../../../../../../../../docs/art/concepts/top-down-oddities/appearances/jellyfish-cage.json",
       ),
       "utf8",
     ),

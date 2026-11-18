@@ -44,6 +44,12 @@ Main is an integration checkout. All seven personas develop in their own worktre
 
 ## Active reservations and requests
 
+**Art → AI/Play, one weapon drawing:** `useWeaponDrawing` resolves one cached texture per weapon and `WeaponDrawingPlane` draws it on the ground or under the fighter’s hand. The three built-in weapons use one SVG each. The lantern/refused scenario is associated with the built-in pickup for this preview, so its single parsed texture follows it into the loadout. Production-generated appearances still need to be carried by the weapon contract. Room rendering will use the stable inventory identity after `6795b56` lands.
+
+**Art → AI/Play, built-in ground pickup:** AI’s `c11dc27` was already in this checkout. Local sparring now draws Ship’s SMG silhouette at the existing half scale through the same pickup plane, inside the C2 marker. The lantern and refused fixtures take precedence. The disc remains the missing-art fallback. The built-in SMG reference selects the local sprite until inventory identity reaches main.
+
+**Art → Play, held rifle:** `sprite-rifle-default` draws under the hand in local play through the existing fighter groups and sprite loader. It follows aim, stance, equipped rifle and opponent visibility. The baseline uses the engine’s built-in rifle reference. Once Ship’s `6795b56` reaches main, consume its rifle identity for room snapshots and run two-browser equip and fog checks. Eight direction and scale criteria failed before implementation. Both switch-away criteria failed with the equip check removed. Production preview passed 56 criteria and the repository gate passed.
+
 **Ship preview integrated:** `249fc3c` via `c61bc32`, including managed local Worker/external API modes, runner configuration modules, CI local mode and generated-report exclusions. Hosted verification and profiling await publication.
 
 **Ship function standards integrated:** `5b7a97a` enforces declarations below callers and module-level named helpers, including tests. Nested `const` functions remain supported.

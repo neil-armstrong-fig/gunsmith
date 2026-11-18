@@ -7,7 +7,7 @@ const CLEAR_FLOOR = {x: 12.5, y: 6.5};
 const BEHIND_THE_PLAYER = {x: 2.5, y: 6.5};
 const WALK_PAST_PICKUP_SECONDS = 0.7;
 const OUTLINE = {corners: 4, gaps: 4};
-const DRAWINGS = ["lantern", "refused", "placeholder"] as const;
+const DRAWINGS = ["lantern", "refused", "built-in SMG"] as const;
 
 given.each(
   DRAWINGS,
@@ -16,7 +16,7 @@ given.each(
     let pickup: PickupSnapshot;
 
     beforeEach(async ({gunsmith}) => {
-      if (drawing === "placeholder") {
+      if (drawing === "built-in SMG") {
         await gunsmith.startSparringWithSeed(SEED);
       } else {
         await gunsmith.startSparringWithPickupDrawing({seed: SEED, drawing});
@@ -38,7 +38,16 @@ given.each(
       });
     });
 
-    if (drawing !== "lantern") return;
+    if (drawing === "built-in SMG") {
+      when("the player sees the authored weapon", () => {
+        then("the SMG is drawn with its mint stripe instead of the disc", async ({gunsmith}) => {
+          await expect.poll(async () => (await gunsmith.pickup.getLookOnScreen()).mintPixels).toBeGreaterThan(6);
+          expect((await gunsmith.pickup.getLookOnScreen()).discPixels).toBe(0);
+        });
+      });
+    }
+
+    if (drawing === "refused") return;
 
     when("the player turns away after seeing the marker", () => {
       beforeEach(async ({gunsmith}) => {
@@ -75,6 +84,18 @@ given.each(
         await gunsmith.pickup.waitUntilTaken();
         await gunsmith.player.aimAtTile(pickup);
       });
+
+      if (drawing === "lantern") {
+        then("the same lantern core is visible in hand", async ({gunsmith}) => {
+          await expect.poll(() => gunsmith.player.hasHeldWeaponAccent("pale")).toBe(true);
+        });
+      }
+
+      if (drawing === "built-in SMG") {
+        then("the same mint SMG stripe is visible in hand", async ({gunsmith}) => {
+          await expect.poll(() => gunsmith.player.hasHeldWeaponAccent("mint")).toBe(true);
+        });
+      }
 
       then("the weapon goes into the second slot and leaves no marker on the floor", async ({gunsmith}) => {
         expect(await gunsmith.pickup.get()).toBeUndefined();

@@ -24,6 +24,14 @@ export class OpponentDsl {
     }
   }
 
+  async hasRifleOnScreen(): Promise<boolean> {
+    try {
+      return await this.opponent.hasRifleOnScreen();
+    } catch (error) {
+      throw new DslError("Failed to see the opponent's held rifle", error);
+    }
+  }
+
   /** How the opponent looks on the screen right now, counted by colour over a grid on its drawing. It must be standing still (sparring's is); a hidden one shows none of it. */
   async getLookOnScreen(): Promise<FighterLook> {
     try {

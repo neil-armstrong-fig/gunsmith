@@ -7,5 +7,6 @@ export interface PickupLook {
   palePixels: number;
 
   /** How many show the mint of the placeholder disc the drawing replaces, as tone mapping makes it look on the screen; no drawing here uses that colour. */
+  mintPixels: number;
   discPixels: number;
 }

@@ -1,4 +1,5 @@
 import type {Page} from "@playwright/test";
+import type {HeldWeaponAccent} from "@src/dsl/gunsmith/components/player/types/HeldWeaponAccent";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
 import {screenPositionOfTile} from "@src/dsl/gunsmith/components/player/playwright/screen/ScreenPositionOfTile";
 import type {Heading} from "@src/dsl/gunsmith/components/player/types/Heading";
@@ -8,6 +9,8 @@ import {isPast} from "@src/dsl/gunsmith/components/player/playwright/walking/IsP
 import {runHeldUntil} from "@src/dsl/gunsmith/playwright/hold/RunHeldUntil";
 import {lookOfDamage} from "@src/dsl/gunsmith/playwright/look/look-of-damage/LookOfDamage";
 import {lookOfHit} from "@src/dsl/gunsmith/playwright/look/look-of-hit/LookOfHit";
+import {hasHeldWeaponAccent} from "@src/dsl/gunsmith/components/player/playwright/held-weapon/HasHeldWeaponAccent";
+import {hasRifleOnScreen} from "@src/dsl/gunsmith/playwright/look/held-rifle/HasRifleOnScreen";
 import {lookOfFighter} from "@src/dsl/gunsmith/playwright/look/look-of-fighter/LookOfFighter";
 import {TEAM_BLUE} from "@src/dsl/gunsmith/playwright/look/TeamBlue";
 import {coloursAtTiles} from "@src/dsl/gunsmith/playwright/screen/ColoursAtTiles";
@@ -126,6 +129,18 @@ export class PlayerPlaywright extends BasePage {
     const {player} = await this.readGameState();
 
     return {x: player.x, y: player.y};
+  }
+
+  async hasHeldWeaponAccent(accent: HeldWeaponAccent): Promise<boolean> {
+    const {player} = await this.readGameState();
+
+    return await hasHeldWeaponAccent(this.page, player, accent);
+  }
+
+  async hasRifleOnScreen(): Promise<boolean> {
+    const {player} = await this.readGameState();
+
+    return await hasRifleOnScreen(this.page, player, player.aimDegrees);
   }
 
   /** What a player sees where the player stands: their drawing counted by colour, and the compass points on their outline. The player must be standing still. */

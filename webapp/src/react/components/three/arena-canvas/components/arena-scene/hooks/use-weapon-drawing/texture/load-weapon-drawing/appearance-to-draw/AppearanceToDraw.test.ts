@@ -1,5 +1,5 @@
 import {fallbackAppearance} from "@gunsmith/shared/appearance/fallback/FallbackAppearance";
-import {appearanceToDraw} from "@src/react/components/three/arena-canvas/components/arena-scene/components/pickup/hooks/use-weapon-drawing/texture/load-weapon-drawing/appearance-to-draw/AppearanceToDraw";
+import {appearanceToDraw} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-weapon-drawing/texture/load-weapon-drawing/appearance-to-draw/AppearanceToDraw";
 
 it("is the appearance itself when the schema accepts it", () => {
   expect(appearanceToDraw(lantern())).toEqual(lantern());

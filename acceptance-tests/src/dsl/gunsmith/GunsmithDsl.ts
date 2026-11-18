@@ -172,6 +172,14 @@ export class GunsmithDsl {
     }
   }
 
+  async startSparringWithMissingRifle(): Promise<void> {
+    try {
+      await this.gunsmith.openSparringWithMissingRifle();
+    } catch (error) {
+      throw new DslError("Failed to open sparring with the rifle picture missing", error);
+    }
+  }
+
   /** Opens sparring with what the game draws from a seed (where a weapon lies, where a ring closes) drawn from `seed`. */
   async startSparringWithSeed(seed: number): Promise<void> {
     try {

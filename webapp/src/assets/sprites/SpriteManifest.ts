@@ -38,17 +38,35 @@ const TERRAIN_TILE: SpriteEntry = {
   pixelsPerTile: 64,
 };
 
+const HELD_WEAPON_PIXELS_PER_TILE = PLAYER_SPRITE.pixelsPerTile / 0.65;
+const PICKUP_PIXELS_PER_TILE = PLAYER_SPRITE.pixelsPerTile / 0.5;
+
 /** What the game knows of each picture, by key. */
 export const SPRITE_MANIFEST: Record<SpriteKey, SpriteEntry> = {
   "sprite-player-stand-blue": PLAYER_SPRITE,
   "sprite-player-crouch-blue": PLAYER_SPRITE,
   "sprite-player-stand-orange": PLAYER_SPRITE,
+  "sprite-rifle-default": {
+    sizePixels: 64,
+    anchor: {x: 12, y: 32},
+    pixelsPerTile: HELD_WEAPON_PIXELS_PER_TILE,
+  },
+  "sprite-marksman-rifle": {
+    sizePixels: 64,
+    anchor: {x: 8, y: 32},
+    pixelsPerTile: HELD_WEAPON_PIXELS_PER_TILE,
+  },
+  "sprite-submachine-gun": {
+    sizePixels: 64,
+    anchor: {x: 5, y: 32},
+    pixelsPerTile: HELD_WEAPON_PIXELS_PER_TILE,
+  },
   "sprite-dummy": DUMMY_SPRITE,
   "sprite-pickup-marker": {
     sizePixels: 88,
     anchor: {x: 44, y: 44},
     // Same design units as the ground weapon, drawn at half scale.
-    pixelsPerTile: PLAYER_SPRITE.pixelsPerTile / 0.5,
+    pixelsPerTile: PICKUP_PIXELS_PER_TILE,
   },
   "fx-projectile-rifle-blue": SHOT_SPRITE,
   "fx-projectile-rifle-orange": SHOT_SPRITE,

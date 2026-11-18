@@ -1,6 +1,7 @@
 import {useFrame} from "@react-three/fiber";
 import {visibleToPlayer} from "@gunsmith/engine/vision/VisibleToPlayer";
 import {FighterPlaceholder} from "@src/react/components/three/arena-canvas/components/arena-scene/components/fighter-placeholder/FighterPlaceholder";
+import {HeldWeapon} from "@src/react/components/three/arena-canvas/components/arena-scene/components/held-weapon/HeldWeapon";
 import {SpritePlane} from "@src/react/components/three/arena-canvas/components/arena-scene/components/sprite-plane/SpritePlane";
 import {useSprite} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-sprite/UseSprite";
 import {gameState} from "@src/store/game/selectors/game-state/GameState";
@@ -37,6 +38,8 @@ export function Opponent(): JSX.Element {
   return (
     <group ref={opponentRef} name="opponent" visible={false}>
       {!picture && <FighterPlaceholder colour="#ff9b54" />}
+
+      <HeldWeapon fighter="opponent" standingSprite="sprite-player-stand-orange" />
 
       <SpritePlane spriteKey="sprite-player-stand-orange" />
     </group>
