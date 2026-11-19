@@ -4,11 +4,11 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 ## Resume here
 
-Checkout: `.claude/worktrees/ship`, branch `worktree-ship`, synced from committed main `6fed51d`. Persistent worktree. Merge newer committed main before new work when clean.
+The persistent checkout is `.claude/worktrees/ship` on `worktree-ship`, synced to main at `44873b7` for this slice. Merge newer committed main before new work when clean.
 
-Current slice: The M1 thumbnail placement follow-up is integrated from `30f2230` via `c2522dd`. `WeaponThumbnailUrl.ts` now sits under its sole caller, `InventorySlot.tsx`. The shared appearance parser and SVG renderer still supply the drawing.
+Ship fixed the M1 pickup-marker acceptance setup. The [handoff](HANDOFF.md#latest-ship-delivery) records the original failing criterion, screenshot evidence and retained-marker check.
 
-Next action: Art is planning the workshop weapon result card and suggested that Ship reproduce the intermittent `DrawingThePickupMarker` pixel failure on a managed production preview and capture the failing screenshot for the owner. Production HUD wiring awaits AI and Engine's weapon-to-appearance association. When it lands, the first criterion should show that a generated weapon keeps its HUD drawing from creation through equip. Hosted CI and profiling await publication. AI owns paid selector/guard/evidence and opening spend reconciliation.
+Production HUD wiring awaits AI and Engine's weapon-to-appearance association. When it lands, the first criterion should show that a generated weapon keeps its HUD drawing from creation through equip. Hosted CI and profiling await publication. AI owns paid selector/guard/evidence and opening spend reconciliation.
 
 ## MVP priority
 
@@ -31,6 +31,7 @@ server supplies Worker/DO/storage bindings; budget supplies operational limits; 
 - [x] Add repository checks, production-preview acceptance and independent property-test CI.
 - [x] Implement four acceptance shards, two workers per shard, unique blob artifacts, combined HTML reporting and an all-shards gate.
 - [x] Manage local Worker startup and external API preview scripts; exclude generated Playwright reports from lint.
+- [x] Reproduce and fix the pickup-marker pixel failure on managed production preview.
 - [x] Budget request: enforce declarations below callers, including tests; reject module-level const arrow/function helpers, preserving nested const functions. Full cleanup, no baseline.
 - [ ] When infra is scaffolded, declare `CREDITS` → `CreditLedger` per account and singleton `SPEND` → `SpendLedger`, retaining migration `v2` with both `new_sqlite_classes`. D1 is for accounts/sessions/library/ratings/history; no provisioning in this slice.
 - [ ] Spend-alert email (from budget, built 2026-11-18 in `worktree-budget`, see [cost-and-budget.md](docs/cost-and-budget.md)): when infra is scaffolded, declare the `ALERT_MAIL` `send_email` binding (no `destination_address`) and the `ALERT_FROM_ADDRESS` var (`alerts@neilarmstrong.dev`, a sender on the zone with Email Routing) as `api/wrangler.jsonc` does. **`ALERT_TO_ADDRESS` is a Worker secret, never in git, config or CI logs:** the user sets it (`wrangler secret put ALERT_TO_ADDRESS`; [manual step 20](MANUAL-SETUP-STEPS.md)) and Alchemy must leave it in place on deploy. Unset, `SpendLedger` sends nothing, so the shutdown drill and live acceptance should confirm it is set. Cloudflare delivers only to an address verified in Email Routing. No provisioning or real send in this slice.
