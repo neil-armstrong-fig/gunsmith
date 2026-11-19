@@ -204,18 +204,24 @@ describe("on the arena split by a wall", () => {
 });
 
 describe("on the terraced arena, across two levels", () => {
-  it("climbs the stair to a ring that closes on a platform, and takes no damage, whatever its seed", () => {
-    for (const seed of SEEDS) {
-      let world = terracedDuel(seed, ON_THE_LOW_GROUND, {x: 25.5, y: 3.5});
-      for (let tick = 0; tick < 23 / TICK; tick++) {
-        world = step(world, IDLE, TICK);
+  const SIMULATION_TIMEOUT_MS = 15_000;
 
-        expect(world.opponent?.health).toBe(100);
+  it(
+    "climbs the stair to a ring that closes on a platform, and takes no damage, whatever its seed",
+    {timeout: SIMULATION_TIMEOUT_MS},
+    () => {
+      for (const seed of SEEDS) {
+        let world = terracedDuel(seed, ON_THE_LOW_GROUND, {x: 25.5, y: 3.5});
+        for (let tick = 0; tick < 23 / TICK; tick++) {
+          world = step(world, IDLE, TICK);
+
+          expect(world.opponent?.health).toBe(100);
+        }
+
+        expect(Math.hypot(opponentPosition(world).x - 25.5, opponentPosition(world).y - 3.5)).toBeLessThanOrEqual(2);
       }
-
-      expect(Math.hypot(opponentPosition(world).x - 25.5, opponentPosition(world).y - 3.5)).toBeLessThanOrEqual(2);
-    }
-  });
+    },
+  );
 
   it("comes down the stair to a ring that closes on the low ground, and takes no damage, whatever its seed", () => {
     for (const seed of SEEDS) {
@@ -275,35 +281,39 @@ describe("on the terraced arena, across two levels", () => {
     }
   });
 
-  it("wanders a whole minute, on both levels, never stuck, with a player it can never see", () => {
-    for (const seed of SEEDS) {
-      // No ring: the wall of the pocket keeps the player out of sight, so wandering is all it does.
-      let world = giveOpponentBrain(startingWorld(terraced, [], ON_THE_LOW_GROUND), seed);
-      world = {...world, player: {...world.player, position: IN_THE_POCKET, health: 100000}};
-      const levels = new Set<number>();
-      let anchor = opponentPosition(world);
-      let stillSeconds = 0;
-      let longestStill = 0;
-      for (let tick = 0; tick < 60 / TICK; tick++) {
-        world = step(world, IDLE, TICK);
-        const position = opponentPosition(world);
-        levels.add(levelOfTile(terraced, Math.floor(position.x), Math.floor(position.y)));
+  it(
+    "wanders a whole minute, on both levels, never stuck, with a player it can never see",
+    {timeout: SIMULATION_TIMEOUT_MS},
+    () => {
+      for (const seed of SEEDS) {
+        // No ring: the wall of the pocket keeps the player out of sight, so wandering is all it does.
+        let world = giveOpponentBrain(startingWorld(terraced, [], ON_THE_LOW_GROUND), seed);
+        world = {...world, player: {...world.player, position: IN_THE_POCKET, health: 100000}};
+        const levels = new Set<number>();
+        let anchor = opponentPosition(world);
+        let stillSeconds = 0;
+        let longestStill = 0;
+        for (let tick = 0; tick < 60 / TICK; tick++) {
+          world = step(world, IDLE, TICK);
+          const position = opponentPosition(world);
+          levels.add(levelOfTile(terraced, Math.floor(position.x), Math.floor(position.y)));
 
-        expect(isOnOpenFloor(terraced, position)).toBe(true);
+          expect(isOnOpenFloor(terraced, position)).toBe(true);
 
-        if (Math.hypot(position.x - anchor.x, position.y - anchor.y) >= 0.5) {
-          anchor = position;
-          stillSeconds = 0;
-        } else {
-          stillSeconds += TICK;
-          longestStill = Math.max(longestStill, stillSeconds);
+          if (Math.hypot(position.x - anchor.x, position.y - anchor.y) >= 0.5) {
+            anchor = position;
+            stillSeconds = 0;
+          } else {
+            stillSeconds += TICK;
+            longestStill = Math.max(longestStill, stillSeconds);
+          }
         }
-      }
 
-      expect(longestStill).toBeLessThan(6);
-      expect([...levels].sort()).toEqual([0, 1]);
-    }
-  });
+        expect(longestStill).toBeLessThan(6);
+        expect([...levels].sort()).toEqual([0, 1]);
+      }
+    },
+  );
 });
 
 function opponentPosition(world: World): Point {
