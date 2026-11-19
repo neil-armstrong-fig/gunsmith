@@ -26,10 +26,12 @@ Code, not the AI, enforces every rule.
 | **closing ring** | The battle-royale-style ring of fire that closes toward a random point after the round timer. |
 | **power rating** | A code-computed number shown on the reveal screen for each weapon. |
 | **credit** | The daily AI currency. 10 a day, reset at 00:00 UTC. |
-| **library** | A player's saved weapons and arenas. Private; limited slots per account. |
-| **pre-round** | Prompt entry, generation and the reveal before round 1. |
+| **workshop** | Where weapons and arenas are made: the practice arena plus a panel, no timer, no opponent. Making never happens in a match. |
+| **shelf** | What a player has saved (weapons and arenas, each with its own limit, set by the server), including things they did not like or use. The local stand-in for the library. |
+| **library** | A player's saved weapons and arenas, kept on the account. Private; limited spaces per account, set by the server. |
+| **pre-round** | Choosing weapons and the arena from the shelf and the built-ins, the arena pick and the reveal before round 1. Nothing is written or generated here. |
 | **reveal** | The screen (about 30 s, *tunable*) showing the arena, weapon names and stats. |
-| **practice arena** | The solo arena with practice dummies, where a player can also spend credits to make and save weapons. |
+| **practice arena** | The solo arena with practice dummies; the workshop's panel opens here, with a one-click **Try it** for a made weapon. |
 | **guest** | A player who is not signed in: built-in weapons and arenas only. |
 
 ## Controls
@@ -38,19 +40,19 @@ WASD move, mouse aim (360°), Ctrl or C crouch, **1** default rifle, **2** the c
 
 ## A match
 
-1. **Pre-round.** Both players submit within a window (about 60 s, *tunable*).
-   - Weapons are submitted one at a time (two each). **The opponent's first weapon prompt is visible once you have
-     submitted yours**, so you see it before writing your second. If the opponent has not yet submitted their first, you may
-     still submit your second, and you see theirs only if it exists by then.
-   - Arena prompts are **blind until you have submitted yours**; then you see the opponent's. A player may submit a prompt or name a
-     built-in arena.
-   - Generation then runs. A lone arena wins by default; no arena means a built-in one. Generation that times out
-     falls back to the built-in pool for that item and the credit is refunded.
-   - **The players pick the arena (decided 2026-11-18; no AI judge).** With two arenas, both are generated and both players see both.
+1. **Pre-round (decided 2026-11-18).** Both players **choose** within a window (about 60 s, *tunable*), from their shelf and the
+   built-ins; nothing is written or generated in a match, because making a weapon takes seconds and writing it takes far longer
+   (see [the selection concept](selection-concept/README.md)).
+   - Each player locks in two weapons, one at a time. **The opponent's first weapon is visible once you have locked in yours**
+     (the weapon and its stats, never anyone's prompt), so you see it before choosing your second.
+   - The arena is blind until you lock in yours, then you see the opponent's. A player may choose any arena on their shelf or a
+     built-in, and every arena choice shows a preview.
+   - A player who chooses nothing gets the built-ins, and the match starts as it does today.
+   - **The players pick the arena (decided 2026-11-18; no AI judge).** With two different arenas, both players see both.
      Each player picks one arena, picks nothing, or chooses **random**. The same pick is played. Two different picks: a seeded coin
      chooses between them. Only one player picks and the other picks nothing: that pick is played. One picks and the other chooses
      random: a draw chooses between the pick and random, and if random wins, a second draw chooses one of the two arenas. Both
-     choose random, or nobody picks: one of the two arenas is drawn at random. The screen and its timing are for `play` and `server` to design.
+     choose random, or nobody picks: one of the two arenas is drawn at random.
 2. **Reveal** (about 30 s): the arena preview and the four weapons with their stats and power rating.
 3. **Rounds.** Best of three, one life each, 100 HP, no healing. Pickups and spawns are random every round but **evenly
    spaced**, so neither player can know them ahead of time. The arena and weapons stay the same for all rounds.
@@ -142,11 +144,14 @@ WASD move, mouse aim (360°), Ctrl or C crouch, **1** default rifle, **2** the c
 ## Credits and the library
 
 - 10 credits a day, reset at 00:00 UTC. Weapon 1, arena 1, edit-from-base 1, a rejected prompt 0.5; reusing a saved item is
-  free. *Stretch:* paying for more.
-- Prompt limits: weapon 150 tokens, arena 250 (*tunable*). Over the limit is rejected before any model call at the
-  rejection price.
-- The library is private. Limits on saved weapons and arenas are **per account and never expire** (numbers to be decided; one
-  config). *Stretch:* a paid upgrade for more slots; a public gallery.
+  free, and so is saving anything. Credits are spent in the workshop, never in a match. *Stretch:* paying for more.
+- Prompt limits are in **characters**, not tokens (nobody can count tokens): weapon 600, arena 1,000 (*tunable*; the pre-check
+  estimates tokens as characters divided by four). The workshop will not make an over-long prompt, so a mistake the player could see
+  costs nothing; the server's pre-check stays as the backstop at the rejection price.
+- The library is private. A player can save any weapon, arena or prompt, whether or not they liked, used or won with it, and the
+  opponent's weapons and arenas after a match (the picture and stats or the map, never the opponent's prompt). Weapons and arenas
+  have **separate limits per account, set by the server** (never hard-coded in the page; numbers to be decided) and never expire.
+  A full space asks which item to replace and never drops one silently. *Stretch:* a paid upgrade for more spaces; a public gallery.
 
 ## Out of scope for the first pass
 
