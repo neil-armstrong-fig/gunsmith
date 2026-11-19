@@ -1,3 +1,4 @@
+import {isPlaceToStand} from "@gunsmith/engine/arena-symmetry/spawn-pairs/IsPlaceToStand";
 import type {PlacePair} from "@gunsmith/engine/arena-symmetry/spawn-pairs/types/PlacePair";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
@@ -26,10 +27,6 @@ export function spawnPairsOf(arena: Arena, minimumSteps: number): readonly Place
   }
 
   return pairs;
-}
-
-function isPlaceToStand(arena: Arena, index: number): boolean {
-  return arena.solid[index] === false && arena.stairs[index] === undefined;
 }
 
 function centreOf(arena: Arena, index: number): Point {

@@ -27,10 +27,7 @@ given("two browsers are in one private room", () => {
 
   when("the first player turns their back on the second", () => {
     beforeEach(async ({gunsmith}) => {
-      const first = await gunsmith.player.getPosition();
-      const second = await gunsmith.room.secondBrowser().player.getPosition();
-
-      await gunsmith.player.aimAtTile({x: 2 * first.x - second.x, y: 2 * first.y - second.y});
+      await gunsmith.player.aimAwayFrom(await gunsmith.room.secondBrowser().player.getPosition());
     });
 
     then("the server sends the first browser snapshots without the second player in them", async ({gunsmith}) => {

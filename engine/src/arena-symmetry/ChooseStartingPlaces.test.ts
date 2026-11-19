@@ -2,7 +2,7 @@ import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import {chooseStartingPlaces} from "@gunsmith/engine/arena-symmetry/ChooseStartingPlaces";
 import {spawnPairsOf} from "@gunsmith/engine/arena-symmetry/spawn-pairs/SpawnPairsOf";
 import {SPAWN_SEED_SALT} from "@gunsmith/engine/arena-symmetry/spawn-pairs/SpawnSeedSalt";
-import {SPAWN_SPACING_STEPS} from "@gunsmith/engine/arena-symmetry/spawn-pairs/SpawnSpacing";
+import {SPAWN_SPACING_STEPS} from "@gunsmith/engine/arena-symmetry/SpawnSpacing";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
 import {nextRandom} from "@gunsmith/engine/random/NextRandom";
 import {PICKUP_SEED_SALT} from "@gunsmith/engine/pickup/placement/PickupSeedSalt";
