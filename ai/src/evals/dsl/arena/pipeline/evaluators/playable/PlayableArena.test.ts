@@ -6,26 +6,26 @@ it("passes a walled room of open floor", () => {
 });
 
 it("passes an arena whose two levels are joined by a stair", () => {
-  const rows = ["#####", "#.>1#", "#####"];
+  const rows = ["#######", "#..>11#", "#..#11#", "#######"];
 
   expect(playableArena(passingArenaInput({arena: {name: "Step", rows}})).score).toBe(1);
 });
 
 it("fails an arena split in two by a wall", () => {
-  const rows = ["#####", "#.#.#", "#####"];
+  const rows = ["########", "#..#...#", "#..#...#", "########"];
   const score = playableArena(passingArenaInput({arena: {name: "Split", rows}}));
 
   expect(score).toEqual({
     key: "playableArena",
     score: 0,
     comment: expect.stringMatching(
-      /^the engine's validator: 1 tiles of floor, .* cannot be walked to from the rest of the arena\.$/,
+      /^the engine's validator: 4 tiles of floor, .* cannot be walked to from the rest of the arena\.$/,
     ),
   });
 });
 
 it("says how many more problems the engine found, not all of them", () => {
-  const rows = ["#######", "#.#.#.#", "#######"];
+  const rows = ["#########", "#..#.#..#", "#..#.#..#", "#########"];
   const score = playableArena(passingArenaInput({arena: {name: "Speckled", rows}}));
 
   expect(score.comment).toMatch(/cannot be walked to from the rest of the arena\. \(and 1 more\)$/);
