@@ -44,7 +44,7 @@ Current milestone: M4; the project remains on M1. **Local Google setup is done (
 
 ## MVP priority
 
-Sign-in and verified account identity are built (2026-11-19); next are account-backed library storage and production adapter wiring. Combine the in-flight deadline and Budget's reservation at the super turn. Own the shared generation route changes and cancellation wiring after that merge. Own the authoritative pre-round and browser transport, including the online feedback hookup. Start with built-ins and agree the messages with Play. See [the shared priorities](TODO.md#mvp-integration-priorities) and [handoffs](HANDOFF.md#mvp-ownership-and-handoffs).
+Sign-in and verified account identity are built (2026-11-19); next are account-backed library storage and production adapter wiring. The generation deadline and Budget's reservation are integrated. Own the shared generation route changes and cancellation wiring after that merge. Own the authoritative pre-round and browser transport, including the online feedback hookup. Start with built-ins and agree the messages with Play. See [the shared priorities](TODO.md#mvp-integration-priorities) and [handoffs](HANDOFF.md#mvp-ownership-and-handoffs).
 
 ## Ownership
 

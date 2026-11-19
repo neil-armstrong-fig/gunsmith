@@ -10,7 +10,7 @@ Room weapon art and its two-browser spec are integrated. The user's approved low
 
 The workshop weapon result card now has the authored picture beside the name, a power meter and six compact stat rows. Integrated from `457ba87` via `3912cb1`, alongside Play’s Try it action.
 
-The workshop arena preview is implemented in `worktree-art`. Open the workshop, choose Arenas, then choose Duel or Fair duel for a larger preview. The built-in pool supplies both the row and the deterministic Fair duel result. The match and preview render the same terrain through React Three Fiber. Next, hand the same component a parsed generated arena from Play's workshop flow, then reuse it for future pre-round choices.
+The workshop arena preview is integrated from `a091b3e` via `eeb19d3`. Open the workshop, choose Arenas, then choose Duel or Fair duel for a larger preview. The built-in pool supplies both the row and the deterministic Fair duel result. The match and preview render the same terrain through React Three Fiber. Next, hand the same component a parsed generated arena from Play's workshop flow, then reuse it for future pre-round choices.
 
 AI and Engine own the production appearance association. For S4-1, recheck the refused pickup's body and outline separately from its muzzle at both scales once AI delivers the contrast change.
 
