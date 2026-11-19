@@ -1,4 +1,4 @@
-import {beforeAll, eachTrial, given, thenExpect, when} from "@evals/eval-criteria-mapping/EvalCriteriaMapping";
+import {beforeAll, eachTrial, expect, given, thenExpect, when} from "@evals/eval-criteria-mapping/EvalCriteriaMapping";
 import type {ArenaSubmissionDsl} from "@evals/dsl/arena-submission/ArenaSubmissionDsl";
 
 // A lone arena goes forward by default (`docs/game-design.md`): the players have nothing to pick between, and a submission that screening
@@ -12,9 +12,12 @@ given.inProgress("exactly one submission survives screening, so it goes forward 
         arenaSubmission.askWithPrompts({player1: "a courtyard split by a low wall, with crates to hide behind"}),
       );
 
-      thenExpect("the described arena is the one survivor, word for word, and goes forward by default", () =>
-        arenaSubmission.expectOnlySubmissionForwarded("a courtyard split by a low wall, with crates to hide behind"),
-      );
+      thenExpect("the described arena is the one survivor, word for word, and goes forward by default", () => {
+        expect(arenaSubmission.getStatus()).toBe("only-submission");
+        expect(arenaSubmission.getSurvivingPrompts()).toEqual([
+          "a courtyard split by a low wall, with crates to hide behind",
+        ]);
+      });
 
       expectDefaultPipelineBehaviour(arenaSubmission);
     });
@@ -31,9 +34,12 @@ given.inProgress("exactly one submission survives screening, so it goes forward 
           }),
         );
 
-        thenExpect("the described arena is the one survivor, word for word, and goes forward by default", () =>
-          arenaSubmission.expectOnlySubmissionForwarded("a courtyard split by a low wall, with crates to hide behind"),
-        );
+        thenExpect("the described arena is the one survivor, word for word, and goes forward by default", () => {
+          expect(arenaSubmission.getStatus()).toBe("only-submission");
+          expect(arenaSubmission.getSurvivingPrompts()).toEqual([
+            "a courtyard split by a low wall, with crates to hide behind",
+          ]);
+        });
 
         expectDefaultPipelineBehaviour(arenaSubmission);
       });
@@ -49,9 +55,10 @@ given.inProgress("exactly one submission survives screening, so it goes forward 
         }),
       );
 
-      thenExpect("the described arena is the one survivor, word for word, and goes forward by default", () =>
-        arenaSubmission.expectOnlySubmissionForwarded("a ring of pillars around a raised platform"),
-      );
+      thenExpect("the described arena is the one survivor, word for word, and goes forward by default", () => {
+        expect(arenaSubmission.getStatus()).toBe("only-submission");
+        expect(arenaSubmission.getSurvivingPrompts()).toEqual(["a ring of pillars around a raised platform"]);
+      });
 
       expectDefaultPipelineBehaviour(arenaSubmission);
     });
@@ -69,9 +76,10 @@ given.inProgress("exactly one submission survives screening, so it goes forward 
           }),
         );
 
-        thenExpect("the described arena is the one survivor, word for word, and goes forward by default", () =>
-          arenaSubmission.expectOnlySubmissionForwarded("a ring of pillars around a raised platform"),
-        );
+        thenExpect("the described arena is the one survivor, word for word, and goes forward by default", () => {
+          expect(arenaSubmission.getStatus()).toBe("only-submission");
+          expect(arenaSubmission.getSurvivingPrompts()).toEqual(["a ring of pillars around a raised platform"]);
+        });
 
         expectDefaultPipelineBehaviour(arenaSubmission);
       });
@@ -82,16 +90,22 @@ given.inProgress("exactly one submission survives screening, so it goes forward 
 function expectDefaultPipelineBehaviour(arenaSubmission: ArenaSubmissionDsl): void {
   thenExpect(
     "whatever is submitted, only submissions that were made go forward, word for word and never twice, and what is left (none, one by default, or two to pick between) follows how many survived",
-    () => arenaSubmission.expectSurvivorsAreSubmissions(),
+    () => {
+      expect(arenaSubmission.getSurvivorProblems()).toEqual([]);
+    },
   );
 
   thenExpect(
     "whatever is submitted, screening spends at most one model call on each prompt and none on a built-in arena",
-    () => arenaSubmission.expectWithinModelCalls(),
+    () => {
+      expect(arenaSubmission.getCallBudgetProblems()).toEqual([]);
+    },
   );
 
   thenExpect(
     "whatever is submitted, no rejection reason shown to the players repeats a whole prompt or built-in name, and nothing shown contains the system prompt",
-    () => arenaSubmission.expectSafeToShow(),
+    () => {
+      expect(arenaSubmission.getSafeToShowProblems()).toEqual([]);
+    },
   );
 }

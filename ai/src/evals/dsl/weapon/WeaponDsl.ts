@@ -1,6 +1,5 @@
 import {DslError} from "@evals/dsl/shared/errors/DslError";
 import type {TrialDsl} from "@evals/dsl/shared/types/TrialDsl";
-import type {RepairAllowance} from "@evals/dsl/shared/types/RepairAllowance";
 import type {WeaponOutcomeStatus} from "@gunsmith/ai/pipeline/types/WeaponOutcomeStatus";
 import type {WeaponPipelineDriver} from "@evals/dsl/weapon/types/WeaponPipelineDriver";
 import {WeaponPipeline} from "@evals/dsl/weapon/pipeline/WeaponPipeline";
@@ -57,110 +56,66 @@ export class WeaponDsl implements TrialDsl<WeaponDsl> {
     }
   }
 
-  /** A weapon was created. */
-  expectCreated(): void {
+  /** How many model calls the request cost, all stages together. The budget is the spec's to state. */
+  getModelCalls(): number {
     try {
-      this.pipeline.checkCreated();
+      return this.pipeline.modelCallsOfTheAnswer();
     } catch (error) {
-      throw new DslError("Expected a weapon to be created", error);
+      throw new DslError("Expected to read how many model calls the request cost", error);
     }
   }
 
-  /** A weapon was created and drawn: its drawing is valid and a stand-in is never passed off as the model's own. */
-  expectCreatedAndDrawn(): void {
+  /** The graph nodes the request ran, in order (a created weapon's stats nodes, then its drawing's with an `appearance.` prefix). */
+  getNodes(): string[] {
     try {
-      this.pipeline.checkCreatedAndDrawn();
+      return this.pipeline.nodesOfTheAnswer();
     } catch (error) {
-      throw new DslError("Expected a weapon to be created and drawn", error);
+      throw new DslError("Expected to read the nodes the request ran", error);
     }
   }
 
-  /**
-   * A weapon was created and code brought it inside the limits (it was balanced), and the model was asked to repair its stats at most
-   * this many times. A spec says zero: the model is never asked to fix a stat that is too strong, because it can lower the wrong one.
-   */
-  expectBalancedByCode({maximumRepairs}: RepairAllowance): void {
+  /** What is wrong with the drawing shown, if anything: it must be valid and a stand-in must never be passed off as the model's own. A request turned away must have none, so a spec also states the status when it needs a weapon to have been drawn. */
+  getDrawingProblems(): string[] {
     try {
-      this.pipeline.checkBalancedByCode(maximumRepairs);
+      return this.pipeline.drawingProblems();
     } catch (error) {
-      throw new DslError(
-        `Expected the weapon to be balanced by code, with at most ${maximumRepairs} repairs by the model`,
-        error,
-      );
+      throw new DslError("Expected to read the problems with the drawing shown", error);
     }
   }
 
-  /** The request was turned away: not a weapon request, or too long. */
-  expectRejected(): void {
+  /** What is wrong with the name of any weapon created, if anything: markup, template characters, or enough length to carry an instruction. */
+  getNameProblems(): string[] {
     try {
-      this.pipeline.checkRejected();
+      return this.pipeline.nameProblems();
     } catch (error) {
-      throw new DslError("Expected the request to be rejected", error);
+      throw new DslError("Expected to read the problems with the weapon's name", error);
     }
   }
 
-  /** Any weapon that was created is within the damage cap. Creating nothing is a safe answer too. */
-  expectNoWeaponOverTheCap(): void {
+  /** Where the system prompt's canary token shows in anything the player can see, if it does. */
+  getPromptLeakProblems(): string[] {
     try {
-      this.pipeline.checkNoWeaponOverTheCap();
+      return this.pipeline.promptLeakProblems();
     } catch (error) {
-      throw new DslError("Expected no weapon over the damage cap to be created", error);
+      throw new DslError("Expected to read where the system prompt leaked", error);
     }
   }
 
-  /** Any weapon that was created has a plain name: no markup, no template characters, nothing long enough to carry an instruction. */
-  expectPlainWeaponName(): void {
+  /** What makes what the player is shown unsafe, if anything: a weapon that does not parse or is over the damage cap, an unplain name, an invalid drawing (or one for a request turned away), a leaked prompt. */
+  getSafeToShowProblems(): string[] {
     try {
-      this.pipeline.checkPlainWeaponName();
+      return this.pipeline.safeToShowProblems();
     } catch (error) {
-      throw new DslError("Expected any weapon created to have a plain name", error);
+      throw new DslError("Expected to read the problems with what the player sees", error);
     }
   }
 
-  /** Nothing the player can see carries the system prompt's canary token. */
-  expectNoPromptLeak(): void {
+  /** Where the pipeline left its fixed order, if it did: pre-check first, each stage repaired at most once, a created weapon validated, balanced and rated, then drawn. */
+  getFixedPathProblems(): string[] {
     try {
-      this.pipeline.checkNoPromptLeak();
+      return this.pipeline.fixedPathProblems();
     } catch (error) {
-      throw new DslError("Expected the system prompt not to be shown to the player", error);
-    }
-  }
-
-  /** Whatever the player is shown is safe: a valid weapon within the cap with a plain name, a valid drawing (and none for a request turned away), and no leaked prompt. */
-  expectSafeToShow(): void {
-    try {
-      this.pipeline.checkSafeToShow();
-    } catch (error) {
-      throw new DslError("Expected what the player sees to be safe to show", error);
-    }
-  }
-
-  /** The pipeline ran in its fixed order: pre-check first, each stage repaired at most once, a created weapon validated, balanced and rated, then drawn. */
-  expectFixedPath(): void {
-    try {
-      this.pipeline.checkFixedPath();
-    } catch (error) {
-      throw new DslError("Expected the pipeline to keep to its fixed path", error);
-    }
-  }
-
-  /** The request cost no more than this many model calls: none for unusable input, one for an off-topic question. */
-  expectModelCallsAtMost(maximumModelCalls: number): void {
-    try {
-      this.pipeline.checkModelCallsAtMost(maximumModelCalls);
-    } catch (error) {
-      throw new DslError(`Expected at most ${maximumModelCalls} model calls`, error);
-    }
-  }
-
-  expectFixedPathWithinModelCalls(maximumModelCalls: number): void {
-    try {
-      this.pipeline.checkFixedPathWithin(maximumModelCalls);
-    } catch (error) {
-      throw new DslError(
-        `Expected the pipeline to keep to its fixed path within ${maximumModelCalls} model calls`,
-        error,
-      );
+      throw new DslError("Expected to read the problems with the pipeline's path", error);
     }
   }
 }

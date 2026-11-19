@@ -7,11 +7,10 @@ import {screeningModelCallBudget} from "@evals/dsl/arena-submission/pipeline/eva
 import {rejectionReasonsEchoNoPrompt} from "@evals/dsl/arena-submission/pipeline/evaluators/player-visible/RejectionReasonsEchoNoPrompt";
 import {screeningNoCanaryLeak} from "@evals/dsl/arena-submission/pipeline/evaluators/player-visible/ScreeningNoCanaryLeak";
 import {statusFollowsSurvivors} from "@evals/dsl/arena-submission/pipeline/evaluators/survivors/StatusFollowsSurvivors";
-import {statusMatches} from "@evals/dsl/arena-submission/pipeline/evaluators/survivors/StatusMatches";
-import {survivorIs} from "@evals/dsl/arena-submission/pipeline/evaluators/survivors/SurvivorIs";
 import {survivorsWereSubmitted} from "@evals/dsl/arena-submission/pipeline/evaluators/survivors/SurvivorsWereSubmitted";
 import {failuresOf} from "@evals/dsl/shared/checks/FailuresOf";
 import type {ArenaSubmission} from "@gunsmith/ai/pipeline/arena-submission/types/ArenaSubmission";
+import type {ArenaSubmissionStatus} from "@gunsmith/ai/pipeline/arena-submission/types/ArenaSubmissionStatus";
 
 const FIRST_PLAYER = "first";
 const SECOND_PLAYER = "second";
@@ -57,42 +56,53 @@ export class ArenaSubmissionPipeline {
     await this.ask([{kind: "built-in", playerId: FIRST_PLAYER, builtInName}]);
   }
 
-  checkOnlySubmissionForwarded(prompt: string): void {
-    this.checkAnswer([input => statusMatches(input, "only-submission"), input => survivorIs(input, prompt)]);
+  /** What screening left for the players: nothing, one submission forward by default, or two to pick between. */
+  statusOfTheAnswer(): ArenaSubmissionStatus {
+    return this.theAnswer().screening.status;
   }
 
-  checkNoSurvivingArenas(): void {
-    this.checkAnswer([input => statusMatches(input, "none")]);
+  /** The prompts that survived, word for word and in the order they arrived; a surviving built-in arena has no prompt. */
+  survivingPromptsOfTheAnswer(): string[] {
+    const prompts: string[] = [];
+    for (const survivor of this.theAnswer().screening.survivors) {
+      if (survivor.kind === "prompt") {
+        prompts.push(survivor.prompt);
+      }
+    }
+
+    return prompts;
   }
 
-  checkPlayersPick(): void {
-    this.checkAnswer([input => statusMatches(input, "players-pick")]);
+  /** The model calls screening cost, one moderation for each prompt that passed the pre-check at most. */
+  modelCallsOfTheAnswer(): number {
+    return this.theAnswer().screening.modelCalls;
   }
 
-  checkSurvivorsAreSubmissions(): void {
-    this.checkAnswer([survivorsWereSubmitted, statusFollowsSurvivors]);
+  survivorProblems(): string[] {
+    return this.problemsOf([survivorsWereSubmitted, statusFollowsSurvivors]);
   }
 
-  checkWithinModelCalls(): void {
-    this.checkAnswer([screeningModelCallBudget]);
+  callBudgetProblems(): string[] {
+    return this.problemsOf([screeningModelCallBudget]);
   }
 
-  checkSafeToShow(): void {
-    this.checkAnswer([rejectionReasonsEchoNoPrompt, screeningNoCanaryLeak]);
+  safeToShowProblems(): string[] {
+    return this.problemsOf([rejectionReasonsEchoNoPrompt, screeningNoCanaryLeak]);
   }
 
   private async ask(submissions: readonly ArenaSubmission[]): Promise<void> {
     this.answered = {submissions, screening: await this.driver.run(submissions)};
   }
 
-  private checkAnswer(checks: ArenaSubmissionEvaluator[]): void {
+  private theAnswer(): ArenaSubmissionEvalInput {
     if (!this.answered) {
       throw new Error("Ask for arena submissions to be screened (in a beforeAll) before expecting anything");
     }
 
-    const failures = failuresOf(this.answered, checks);
-    if (failures.length > 0) {
-      throw new Error(failures.join("; "));
-    }
+    return this.answered;
+  }
+
+  private problemsOf(checks: ArenaSubmissionEvaluator[]): string[] {
+    return failuresOf(this.theAnswer(), checks);
   }
 }

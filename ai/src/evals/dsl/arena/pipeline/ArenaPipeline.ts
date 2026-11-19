@@ -2,14 +2,12 @@ import type {ArenaPipelineDriver} from "@evals/dsl/arena/types/ArenaPipelineDriv
 import type {ArenaEvaluator} from "@evals/dsl/arena/pipeline/types/ArenaEvaluator";
 import {arenaGiven} from "@evals/dsl/arena/pipeline/evaluators/outcome/ArenaGiven";
 import {arenaKeepsCover} from "@evals/dsl/arena/pipeline/evaluators/outcome/ArenaKeepsCover";
-import {arenaModelCallBudget} from "@evals/dsl/arena/pipeline/evaluators/outcome/ArenaModelCallBudget";
 import {arenaNodePath} from "@evals/dsl/arena/pipeline/evaluators/outcome/ArenaNodePath";
-import {arenaOutcomeMatches} from "@evals/dsl/arena/pipeline/evaluators/outcome/ArenaOutcomeMatches";
-import {builtInRefunded} from "@evals/dsl/arena/pipeline/evaluators/outcome/BuiltInRefunded";
 import {playableArena} from "@evals/dsl/arena/pipeline/evaluators/playable/PlayableArena";
 import {arenaNoPromptLeak} from "@evals/dsl/arena/pipeline/evaluators/player-visible/ArenaNoPromptLeak";
 import {failuresOf} from "@evals/dsl/shared/checks/FailuresOf";
 import type {ArenaOutcome} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcome";
+import type {ArenaOutcomeStatus} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcomeStatus";
 
 /**
  * The arena pipeline as seen from outside, the system under test: the one class that knows how to put a request through it and
@@ -31,50 +29,46 @@ export class ArenaPipeline {
     this.answered = await this.driver.run(prompt);
   }
 
-  checkCreated(): void {
-    this.checkAnswer([input => arenaOutcomeMatches(input, "created")]);
+  /** How the request ended: an arena created, the request rejected, or a built-in arena given. */
+  statusOfTheAnswer(): ArenaOutcomeStatus {
+    return this.theAnswer().status;
   }
 
-  checkArenaGiven(): void {
-    this.checkAnswer([arenaGiven]);
+  /** The model calls the request cost, all stages together. */
+  modelCallsOfTheAnswer(): number {
+    return this.theAnswer().modelCalls;
   }
 
-  checkKeepsCover(): void {
-    this.checkAnswer([input => arenaOutcomeMatches(input, "created"), arenaKeepsCover]);
+  /** Whether the credit went back. */
+  refundOfTheAnswer(): boolean {
+    return this.theAnswer().refunded;
   }
 
-  checkBuiltInGiven(): void {
-    this.checkAnswer([input => arenaOutcomeMatches(input, "builtIn")]);
+  arenaGivenProblems(): string[] {
+    return this.problemsOf([arenaGiven]);
   }
 
-  checkRejected(): void {
-    this.checkAnswer([input => arenaOutcomeMatches(input, "rejected")]);
+  coverProblems(): string[] {
+    return this.problemsOf([arenaKeepsCover]);
   }
 
-  checkSafeToShow(): void {
-    this.checkAnswer([playableArena, arenaNoPromptLeak]);
+  safeToShowProblems(): string[] {
+    return this.problemsOf([playableArena, arenaNoPromptLeak]);
   }
 
-  checkFixedPathWithin(maximumModelCalls: number): void {
-    this.checkAnswer([arenaNodePath, input => arenaModelCallBudget(input, maximumModelCalls)]);
+  fixedPathProblems(): string[] {
+    return this.problemsOf([arenaNodePath]);
   }
 
-  checkModelCallsAtMost(maximumModelCalls: number): void {
-    this.checkAnswer([input => arenaModelCallBudget(input, maximumModelCalls)]);
-  }
-
-  checkRefundedOnlyForBuiltIn(): void {
-    this.checkAnswer([builtInRefunded]);
-  }
-
-  private checkAnswer(checks: ArenaEvaluator[]): void {
+  private theAnswer(): ArenaOutcome {
     if (!this.answered) {
       throw new Error("Ask for an arena (in a beforeAll) before expecting anything");
     }
 
-    const failures = failuresOf({outcome: this.answered}, checks);
-    if (failures.length > 0) {
-      throw new Error(failures.join("; "));
-    }
+    return this.answered;
+  }
+
+  private problemsOf(checks: ArenaEvaluator[]): string[] {
+    return failuresOf({outcome: this.theAnswer()}, checks);
   }
 }

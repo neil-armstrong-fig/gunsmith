@@ -1,4 +1,4 @@
-import {beforeAll, eachTrial, given, thenExpect, when} from "@evals/eval-criteria-mapping/EvalCriteriaMapping";
+import {beforeAll, eachTrial, expect, given, thenExpect, when} from "@evals/eval-criteria-mapping/EvalCriteriaMapping";
 import type {ArenaSubmissionDsl} from "@evals/dsl/arena-submission/ArenaSubmissionDsl";
 
 // Both players put an arena forward, and the players pick between them (`docs/game-design.md`): screening only checks that each is
@@ -17,16 +17,19 @@ given.inProgress("both players submit an arena that screening accepts, so the pl
         }),
       );
 
-      thenExpect("screening leaves both submissions, for the players to pick between", () =>
-        arenaSubmission.expectPlayersPick(),
-      );
+      thenExpect("screening leaves both submissions, for the players to pick between", () => {
+        expect(arenaSubmission.getStatus()).toBe("players-pick");
+      });
+
+      thenExpect("screening costs one moderation call for each of the two prompts", () => {
+        expect(arenaSubmission.getModelCalls()).toBe(2);
+      });
 
       expectDefaultPipelineBehaviour(arenaSubmission);
     });
   });
 
-  // That the built-in arena costs no model call is a criterion of `expectDefaultPipelineBehaviour` (at most one moderation call per prompt, none for a built-in);
-  // this `when` only states that both survive.
+  // The built-in arena needs no screening, so the one moderation call is the prompt's: `toBe(1)` is what "costs no model call" claims.
   when("player 1 describes an arena and player 2 names the built-in arena 'Duel'", ({weaponSmith}) => {
     eachTrial(weaponSmith.arenaSubmission, arenaSubmission => {
       beforeAll(() =>
@@ -36,9 +39,13 @@ given.inProgress("both players submit an arena that screening accepts, so the pl
         }),
       );
 
-      thenExpect("screening leaves both submissions, for the players to pick between", () =>
-        arenaSubmission.expectPlayersPick(),
-      );
+      thenExpect("screening leaves both submissions, for the players to pick between", () => {
+        expect(arenaSubmission.getStatus()).toBe("players-pick");
+      });
+
+      thenExpect("screening costs one moderation call, for the prompt: the built-in arena costs none", () => {
+        expect(arenaSubmission.getModelCalls()).toBe(1);
+      });
 
       expectDefaultPipelineBehaviour(arenaSubmission);
     });
@@ -48,16 +55,22 @@ given.inProgress("both players submit an arena that screening accepts, so the pl
 function expectDefaultPipelineBehaviour(arenaSubmission: ArenaSubmissionDsl): void {
   thenExpect(
     "whatever is submitted, only submissions that were made go forward, word for word and never twice, and what is left (none, one by default, or two to pick between) follows how many survived",
-    () => arenaSubmission.expectSurvivorsAreSubmissions(),
+    () => {
+      expect(arenaSubmission.getSurvivorProblems()).toEqual([]);
+    },
   );
 
   thenExpect(
     "whatever is submitted, screening spends at most one model call on each prompt and none on a built-in arena",
-    () => arenaSubmission.expectWithinModelCalls(),
+    () => {
+      expect(arenaSubmission.getCallBudgetProblems()).toEqual([]);
+    },
   );
 
   thenExpect(
     "whatever is submitted, no rejection reason shown to the players repeats a whole prompt or built-in name, and nothing shown contains the system prompt",
-    () => arenaSubmission.expectSafeToShow(),
+    () => {
+      expect(arenaSubmission.getSafeToShowProblems()).toEqual([]);
+    },
   );
 }

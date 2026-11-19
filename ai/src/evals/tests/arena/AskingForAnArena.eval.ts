@@ -1,4 +1,4 @@
-import {beforeAll, eachTrial, given, thenExpect, when} from "@evals/eval-criteria-mapping/EvalCriteriaMapping";
+import {beforeAll, eachTrial, expect, given, thenExpect, when} from "@evals/eval-criteria-mapping/EvalCriteriaMapping";
 import type {ArenaDsl} from "@evals/dsl/arena/ArenaDsl";
 
 // A plain request becomes an arena: the happy path and its edges. Each `when` says only that an arena is created; that the player can
@@ -11,7 +11,9 @@ given.inProgress("a player asks for an arena, and the model must write one the e
     eachTrial(weaponSmith.arena, arena => {
       beforeAll(() => arena.ask("an open arena with a ring of stone pillars"));
 
-      thenExpect("the model's own arena is created, not a built-in fallback", () => arena.expectCreated());
+      thenExpect("the model's own arena is created, not a built-in fallback", () => {
+        expect(arena.getStatus()).toBe("created");
+      });
 
       expectDefaultPipelineBehaviour(arena);
     });
@@ -26,7 +28,9 @@ given.inProgress("a player asks for an arena, and the model must write one the e
           arena.ask("a duel arena with a raised platform in the middle, reached by one flight of stairs"),
         );
 
-        thenExpect("the model's own arena is created, not a built-in fallback", () => arena.expectCreated());
+        thenExpect("the model's own arena is created, not a built-in fallback", () => {
+          expect(arena.getStatus()).toBe("created");
+        });
 
         expectDefaultPipelineBehaviour(arena);
       });
@@ -39,10 +43,13 @@ given.inProgress("a player asks for an arena, and the model must write one the e
     eachTrial(weaponSmith.arena, arena => {
       beforeAll(() => arena.ask("an arena with low cover blocks to crouch behind"));
 
-      thenExpect(
-        "the model's own arena is created, not a built-in fallback, and its drawing has a cover block (c)",
-        () => arena.expectCoverKept(),
-      );
+      thenExpect("the model's own arena is created, not a built-in fallback", () => {
+        expect(arena.getStatus()).toBe("created");
+      });
+
+      thenExpect("its drawing has a cover block (c)", () => {
+        expect(arena.getCoverProblems()).toEqual([]);
+      });
 
       expectDefaultPipelineBehaviour(arena);
     });
@@ -59,7 +66,9 @@ given.inProgress("a player asks for an arena, and the model must write one the e
 
         thenExpect(
           "the player is given an arena (the model's own after a repair, or a built-in one), never nothing",
-          () => arena.expectArenaGiven(),
+          () => {
+            expect(arena.getArenaGivenProblems()).toEqual([]);
+          },
         );
 
         expectDefaultPipelineBehaviour(arena);
@@ -71,7 +80,9 @@ given.inProgress("a player asks for an arena, and the model must write one the e
     eachTrial(weaponSmith.arena, arena => {
       beforeAll(() => arena.ask("a small box"));
 
-      thenExpect("the model's own arena is created, not a built-in fallback", () => arena.expectCreated());
+      thenExpect("the model's own arena is created, not a built-in fallback", () => {
+        expect(arena.getStatus()).toBe("created");
+      });
 
       expectDefaultPipelineBehaviour(arena);
     });
@@ -81,16 +92,26 @@ given.inProgress("a player asks for an arena, and the model must write one the e
 function expectDefaultPipelineBehaviour(arena: ArenaDsl): void {
   thenExpect(
     "whatever is asked, the arena the player is given is playable by the engine's own rules (a rejection gives none), and nothing shown contains the system prompt",
-    () => arena.expectSafeToShow(),
+    () => {
+      expect(arena.getSafeToShowProblems()).toEqual([]);
+    },
   );
 
   thenExpect(
-    "whatever is asked, the pipeline runs its fixed stages in order (pre-check first, at most one repair) and spends at most three model calls",
-    () => arena.expectFixedPathWithinModelCalls(3),
+    "whatever is asked, the pipeline runs its fixed stages in order (pre-check first, at most one repair)",
+    () => {
+      expect(arena.getFixedPathProblems()).toEqual([]);
+    },
   );
+
+  thenExpect("whatever is asked, the pipeline spends at most three model calls", () => {
+    expect(arena.getModelCalls()).toBeLessThanOrEqual(3);
+  });
 
   thenExpect(
     "whatever is asked, the credit is refunded exactly when a built-in arena is given instead of the one asked for",
-    () => arena.expectRefundedOnlyForBuiltIn(),
+    () => {
+      expect(arena.wasRefunded()).toBe(arena.getStatus() === "builtIn");
+    },
   );
 }

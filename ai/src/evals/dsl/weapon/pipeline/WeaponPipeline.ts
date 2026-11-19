@@ -1,9 +1,6 @@
 import type {WeaponPipelineDriver} from "@evals/dsl/weapon/types/WeaponPipelineDriver";
-import {balancedByCode} from "@evals/dsl/weapon/pipeline/evaluators/outcome/BalancedByCode";
 import {drawnWhenCreated} from "@evals/dsl/weapon/pipeline/evaluators/drawing/DrawnWhenCreated";
-import {modelCallBudget} from "@evals/dsl/weapon/pipeline/evaluators/outcome/ModelCallBudget";
 import {nodePath} from "@evals/dsl/weapon/pipeline/evaluators/outcome/NodePath";
-import {outcomeMatches} from "@evals/dsl/weapon/pipeline/evaluators/outcome/OutcomeMatches";
 import {nameHygiene} from "@evals/dsl/weapon/pipeline/evaluators/created-weapon/NameHygiene";
 import {noPromptLeak} from "@evals/dsl/weapon/pipeline/evaluators/player-visible/NoPromptLeak";
 import {withinCaps} from "@evals/dsl/weapon/pipeline/evaluators/created-weapon/WithinCaps";
@@ -52,48 +49,34 @@ export class WeaponPipeline {
     return damagePerSecond;
   }
 
-  checkCreated(): void {
-    this.checkAnswer([input => outcomeMatches(input, "created")]);
+  /** The model calls the request cost, all stages together. */
+  modelCallsOfTheAnswer(): number {
+    return this.theAnswer().modelCalls;
   }
 
-  checkCreatedAndDrawn(): void {
-    this.checkAnswer([input => outcomeMatches(input, "created"), drawnWhenCreated]);
+  /** The graph nodes that ran, in order. */
+  nodesOfTheAnswer(): string[] {
+    return this.theAnswer().nodes;
   }
 
-  checkRejected(): void {
-    this.checkAnswer([input => outcomeMatches(input, "rejected")]);
+  drawingProblems(): string[] {
+    return this.problemsOf([drawnWhenCreated]);
   }
 
-  checkBalancedByCode(maximumRepairs: number): void {
-    this.checkAnswer([input => balancedByCode(input, maximumRepairs)]);
+  nameProblems(): string[] {
+    return this.problemsOf([nameHygiene]);
   }
 
-  checkNoWeaponOverTheCap(): void {
-    this.checkAnswer([withinCaps]);
+  promptLeakProblems(): string[] {
+    return this.problemsOf([noPromptLeak]);
   }
 
-  checkPlainWeaponName(): void {
-    this.checkAnswer([nameHygiene]);
+  safeToShowProblems(): string[] {
+    return this.problemsOf([schemaValid, withinCaps, nameHygiene, drawnWhenCreated, noPromptLeak]);
   }
 
-  checkNoPromptLeak(): void {
-    this.checkAnswer([noPromptLeak]);
-  }
-
-  checkSafeToShow(): void {
-    this.checkAnswer([schemaValid, withinCaps, nameHygiene, drawnWhenCreated, noPromptLeak]);
-  }
-
-  checkFixedPath(): void {
-    this.checkAnswer([nodePath]);
-  }
-
-  checkModelCallsAtMost(maximumModelCalls: number): void {
-    this.checkAnswer([input => modelCallBudget(input, maximumModelCalls)]);
-  }
-
-  checkFixedPathWithin(maximumModelCalls: number): void {
-    this.checkAnswer([nodePath, input => modelCallBudget(input, maximumModelCalls)]);
+  fixedPathProblems(): string[] {
+    return this.problemsOf([nodePath]);
   }
 
   private theAnswer(): WeaponOutcome {
@@ -104,10 +87,7 @@ export class WeaponPipeline {
     return this.answered;
   }
 
-  private checkAnswer(checks: WeaponEvaluator[]): void {
-    const failures = failuresOf({outcome: this.theAnswer()}, checks);
-    if (failures.length > 0) {
-      throw new Error(failures.join("; "));
-    }
+  private problemsOf(checks: WeaponEvaluator[]): string[] {
+    return failuresOf({outcome: this.theAnswer()}, checks);
   }
 }

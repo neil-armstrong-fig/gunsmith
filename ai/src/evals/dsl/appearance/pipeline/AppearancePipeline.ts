@@ -1,15 +1,12 @@
 import {appearancePath} from "@evals/dsl/appearance/pipeline/evaluators/outcome/AppearancePath";
-import {appearanceCallBudget} from "@evals/dsl/appearance/pipeline/evaluators/outcome/AppearanceCallBudget";
-import {outputTokenBudget} from "@evals/dsl/appearance/pipeline/evaluators/outcome/OutputTokenBudget";
-import {drawnByTheModel} from "@evals/dsl/appearance/pipeline/evaluators/outcome/DrawnByTheModel";
 import {drawingValid} from "@evals/dsl/appearance/pipeline/evaluators/drawing/DrawingValid";
 import {drawingVisible} from "@evals/dsl/appearance/pipeline/evaluators/drawing/DrawingVisible";
 import {noDisguisedStandIn} from "@evals/dsl/appearance/pipeline/evaluators/drawing/NoDisguisedStandIn";
-import type {AppearanceEvalInput} from "@evals/dsl/appearance/pipeline/types/AppearanceEvalInput";
 import type {AppearanceEvaluator} from "@evals/dsl/appearance/pipeline/types/AppearanceEvaluator";
 import type {AppearanceDriver} from "@evals/dsl/appearance/types/AppearanceDriver";
 import {failuresOf} from "@evals/dsl/shared/checks/FailuresOf";
 import type {AppearanceOutcome} from "@gunsmith/ai/pipeline/appearance/types/AppearanceOutcome";
+import type {AppearanceOutcomeStatus} from "@gunsmith/ai/pipeline/appearance/types/AppearanceOutcomeStatus";
 
 /**
  * The weapon's appearance pipeline as seen from outside, the system under test: the one class that knows how to put a request
@@ -31,35 +28,47 @@ export class AppearancePipeline {
     this.answered = await this.driver.run(prompt);
   }
 
-  checkDrawnByTheModel(maximumRepairs: number): void {
-    this.checkAnswer([input => drawnByTheModel(input, maximumRepairs)]);
+  /** How the drawing ended: valid, completed, repaired, or the plain stand-in. */
+  statusOfTheAnswer(): AppearanceOutcomeStatus {
+    return this.theAnswer().status;
   }
 
-  checkOutputTokensAtMost(maximumOutputTokens: number): void {
-    this.checkAnswer([input => outputTokenBudget(input, maximumOutputTokens)]);
+  /** The steps that ran, in order. */
+  nodesOfTheAnswer(): string[] {
+    return this.theAnswer().nodes;
   }
 
-  checkSafeToShow(): void {
-    this.checkAnswer([drawingValid, drawingVisible]);
+  /** The model calls the drawing cost. */
+  modelCallsOfTheAnswer(): number {
+    return this.theAnswer().modelCalls;
   }
 
-  checkNoDisguisedStandIn(): void {
-    this.checkAnswer([noDisguisedStandIn]);
+  /** The tokens the model wrote for the request, repair included, as it reported them. */
+  outputTokensOfTheAnswer(): number {
+    return this.theAnswer().usage.outputTokens;
   }
 
-  checkFixedPathWithin(maximumModelCalls: number): void {
-    this.checkAnswer([appearancePath, input => appearanceCallBudget(input, maximumModelCalls)]);
+  safeToShowProblems(): string[] {
+    return this.problemsOf([drawingValid, drawingVisible]);
   }
 
-  private checkAnswer(checks: AppearanceEvaluator[]): void {
+  standInProblems(): string[] {
+    return this.problemsOf([noDisguisedStandIn]);
+  }
+
+  fixedPathProblems(): string[] {
+    return this.problemsOf([appearancePath]);
+  }
+
+  private theAnswer(): AppearanceOutcome {
     if (!this.answered) {
       throw new Error("Ask for an appearance (in a beforeAll) before expecting anything");
     }
 
-    const input: AppearanceEvalInput = {outcome: this.answered};
-    const failures = failuresOf(input, checks);
-    if (failures.length > 0) {
-      throw new Error(failures.join("; "));
-    }
+    return this.answered;
+  }
+
+  private problemsOf(checks: AppearanceEvaluator[]): string[] {
+    return failuresOf({outcome: this.theAnswer()}, checks);
   }
 }
