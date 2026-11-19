@@ -288,6 +288,8 @@ Before changing a consumed contract, record the proposal and affected owners her
 
 ## Delivery log
 
+**Art → Play, built-in submachine gun inventory icon (2026-11-19, `worktree-art`).** The authored icon uses `#687B8C` for the magazine so it reads in selected and stowed 34 px slots. The editable SVG and production copy match. `InventoryOnTheScreen` covers both states and fails on the original fill. Reviewed the HUD in colour and grayscale in Chromium and WebKit. AI-generated thumbnails continue to use the structural renderer and its existing contour. See [Art verification](TODO-art.md#verificationlatest-delivery).
+
 **Art → Play, workshop weapon result card (2026-11-19).** The card places the existing weapon art beside its name, shows the rating out of 100 with an accessible meter, and keeps all six stats in a responsive grid. The meter criterion in `MakingAWeapon` failed on the old card and with a fixed fill. The production workshop suite passed 23/23. Both sample cards were reviewed at 1024 × 560 and 1440 × 900. Integrated from `457ba87` via `3912cb1` alongside Try it. Play owns Try it, Save and the shelf. [Art verification](TODO-art.md#verificationlatest-delivery).
 
 **Art → Engine and Play, low-cover terrain (2026-11-19).** The user chose option C, an inset square with four matching braces. `tile-low-cover` draws on existing cover cells beneath fog, with a flat square fallback. `DrawingLowCover` samples the braces, gaps, corners and exposed floor at 64 and 32 px per tile. All four updated criteria failed on the previous continuous rim. The idea of omitting braces along shared edges is on the post-MVP art checklist. The delivery is in `worktree-art`. [Terrain artwork](docs/art/terrain/README.md#playable-low-cover).

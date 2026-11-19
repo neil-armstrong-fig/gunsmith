@@ -3,6 +3,7 @@ import {beforeEach, expect, given, then, when} from "@src/acceptance-criteria-ma
 const RIFLE_ICON = "/assets/ui/ui-weapon-rifle.svg";
 const MARKSMAN_RIFLE_ICON = "/assets/ui/ui-weapon-marksman-rifle.svg";
 const SUBMACHINE_GUN_ICON = "/assets/ui/ui-weapon-submachine-gun.svg";
+const MINIMUM_MAGAZINE_PIXELS = 12;
 
 given("a sparring match whose pickup is on the fighters' row", () => {
   beforeEach(async ({gunsmith}) => {
@@ -56,6 +57,13 @@ given("a sparring match whose pickup is on the fighters' row", () => {
       });
     });
 
+    then("the selected submachine gun's magazine stands out against the slot", async ({gunsmith}) => {
+      const look = await gunsmith.hud.getSecondInventoryIconLook();
+
+      expect(look).toMatchObject({width: 34, height: 34});
+      expect(look.visibleMagazinePixels).toBeGreaterThanOrEqual(MINIMUM_MAGAZINE_PIXELS);
+    });
+
     when("the player switches back to slot 1", () => {
       beforeEach(async ({gunsmith}) => {
         await gunsmith.player.switchTo(1);
@@ -70,6 +78,13 @@ given("a sparring match whose pickup is on the fighters' row", () => {
           firstSelected: true,
           secondSelected: false,
         });
+      });
+
+      then("the stowed submachine gun's magazine stands out against the slot", async ({gunsmith}) => {
+        const look = await gunsmith.hud.getSecondInventoryIconLook();
+
+        expect(look).toMatchObject({width: 34, height: 34});
+        expect(look.visibleMagazinePixels).toBeGreaterThanOrEqual(MINIMUM_MAGAZINE_PIXELS);
       });
     });
   });

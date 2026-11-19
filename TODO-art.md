@@ -4,7 +4,7 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 ## Resume here
 
-Art is in `.claude/worktrees/art` on `worktree-art`, synced to main `44873b7` for the workshop arena preview. Preserve this worktree and sync committed main before resuming.
+Art is in `.claude/worktrees/art` on `worktree-art`, synced to main `e967cbd` for the submachine gun inventory icon. Preserve this worktree and sync committed main before resuming.
 
 Room weapon art and its two-browser spec are integrated. The user's approved low-cover artwork from `837f1d9` is integrated in `adbf7b4`.
 
@@ -18,7 +18,7 @@ The [approved stair treatment](docs/art/terrain/README.md#playable-stair-preview
 
 Current milestone: M1/M6; the project remains on M1. Next audio task: combat masking, fatigue and levels once AI/play integrate runtime weapon-shot synthesis (not yet wired into the game sound output). Safari acceptance does not claim new headphone/speaker measurements. Preserve approved master hashes. Next failing check for any playback change: the relevant browser sound acceptance criterion before implementation.
 
-Ship's inventory HUD, local pickup cue and ring loop are integrated (`c372d86`). The integrated review is complete in `worktree-ship`, coordinated with Art. The submachine gun's magazine is still faint at 34 px. Ship integrated generated thumbnails for local fixtures. Status badges and production appearance association remain open.
+Ship's inventory HUD, local pickup cue and ring loop are integrated (`c372d86`). Art followed up on Ship's review with a lighter fill on the built-in submachine gun's magazine at 34 px. The delivery covers the authored SVG pair and the HUD browser criteria. Ship integrated generated thumbnails for local fixtures. Status badges and production appearance association remain open.
 
 ## MVP priority
 
@@ -84,6 +84,19 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [ ] Case-study diagrams: pipeline, cost safeguards and eval loop.
 
 ## Verification/latest delivery
+
+2026-11-19, built-in submachine gun inventory icon in `worktree-art`.
+Both new magazine contrast criteria failed before the fill change and
+again when the original fill was restored in a disposable production
+build. The four identity and selection criteria passed in both runs.
+The contrast check uses the clear upper-right padding as its reference
+because the slot number can overlap the upper-left pixel.
+Reviewed the starting, selected and stowed slots at native size in
+Chromium and WebKit, in colour and grayscale. All 101 HUD and pickup
+criteria passed on the production preview without retries. `pnpm checks` passed with
+3,449 tests and one existing audio skip. Reviewed root, webapp and
+acceptance instructions, audited the existing folders and callers,
+and verified the editable, runtime and built SVGs match byte for byte.
 
 2026-11-19, selecting a built-in arena now reveals the full result in the
 scrollable workshop panel. At 1280 × 720 the old layout hid 43 pixels of
