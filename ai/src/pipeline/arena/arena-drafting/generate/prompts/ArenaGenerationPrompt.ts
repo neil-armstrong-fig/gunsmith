@@ -1,10 +1,11 @@
 import {SYSTEM_PROMPT_CANARY} from "@gunsmith/ai/pipeline/canary/SystemPromptCanary";
-import {ARENA_LIMITS} from "@gunsmith/ai/pipeline/arena/limits/ArenaLimits";
+import {ARENA_LIMITS} from "@gunsmith/engine/arena-limits/ArenaLimits";
+import {ARENA_NAME_LENGTH} from "@gunsmith/ai/pipeline/arena/limits/ArenaNameLength";
 import {EXAMPLE_ARENA} from "@gunsmith/ai/pipeline/arena/arena-drafting/generate/prompts/example/ExampleArena";
 
 /**
  * The arena builder's instructions. The player's words never go in here: they arrive in a separate message, inside a `<request>`
- * block. The limits are quoted from `ARENA_LIMITS`, the same table the schema is built from, and the one example is held to the
+ * block. The limits are quoted from `ARENA_LIMITS` and `ARENA_NAME_LENGTH`, the same tables the schema is built from, and the one example is held to the
  * validator by a test. The model draws and the engine disposes: code reads the drawing (`arenaFrom`) and checks the arena can be
  * played. Kept to the task itself: any sentence defending against a clever request joins only when a probe shows the model failing
  * without it.
@@ -12,8 +13,8 @@ import {EXAMPLE_ARENA} from "@gunsmith/ai/pipeline/arena/arena-drafting/generate
 export const ARENA_GENERATION_PROMPT = `You are the arena builder of a video game in which players describe an arena, the place where two fighters shoot at each other, and the game builds it. [${SYSTEM_PROMPT_CANARY}]
 
 You will receive one player's request inside a <request> block. Design the arena it describes by answering with the function:
-- name: a short plain name, ${ARENA_LIMITS.nameLength.min} to ${ARENA_LIMITS.nameLength.max} characters, only letters, digits, spaces, apostrophes, hyphens and full stops.
-- rows: the arena drawn as a list of text rows, north (the top) first. ${ARENA_LIMITS.rows.min} to ${ARENA_LIMITS.rows.max} rows, each ${ARENA_LIMITS.columns.min} to ${ARENA_LIMITS.columns.max} characters, and every row exactly as long as the others.
+- name: a short plain name, ${ARENA_NAME_LENGTH.min} to ${ARENA_NAME_LENGTH.max} characters, only letters, digits, spaces, apostrophes, hyphens and full stops.
+- rows: the arena drawn as a list of text rows, north (the top) first. ${ARENA_LIMITS.height.min} to ${ARENA_LIMITS.height.max} rows, each ${ARENA_LIMITS.width.min} to ${ARENA_LIMITS.width.max} characters, and every row exactly as long as the others.
 
 Draw with these characters only:
 - # a wall. Put a wall along every edge of the arena.

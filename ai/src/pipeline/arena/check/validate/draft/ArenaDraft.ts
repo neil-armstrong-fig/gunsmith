@@ -1,5 +1,6 @@
 import {z} from "zod";
-import {ARENA_LIMITS} from "@gunsmith/ai/pipeline/arena/limits/ArenaLimits";
+import {ARENA_LIMITS} from "@gunsmith/engine/arena-limits/ArenaLimits";
+import {ARENA_NAME_LENGTH} from "@gunsmith/ai/pipeline/arena/limits/ArenaNameLength";
 
 /** Letters (any language) and digits, with spaces, apostrophes, hyphens and full stops inside. No markup, braces or backticks. */
 const ARENA_NAME_PATTERN = /^[\p{L}\p{N}][\p{L}\p{N} '.-]*$/u;
@@ -12,10 +13,10 @@ const ARENA_NAME_PATTERN = /^[\p{L}\p{N}][\p{L}\p{N} '.-]*$/u;
  */
 export const arenaDraftSchema = z
   .object({
-    name: z.string().min(ARENA_LIMITS.nameLength.min).max(ARENA_LIMITS.nameLength.max).regex(ARENA_NAME_PATTERN),
+    name: z.string().min(ARENA_NAME_LENGTH.min).max(ARENA_NAME_LENGTH.max).regex(ARENA_NAME_PATTERN),
     rows: z
-      .array(z.string().min(ARENA_LIMITS.columns.min).max(ARENA_LIMITS.columns.max))
-      .min(ARENA_LIMITS.rows.min)
-      .max(ARENA_LIMITS.rows.max),
+      .array(z.string().min(ARENA_LIMITS.width.min).max(ARENA_LIMITS.width.max))
+      .min(ARENA_LIMITS.height.min)
+      .max(ARENA_LIMITS.height.max),
   })
   .strict();

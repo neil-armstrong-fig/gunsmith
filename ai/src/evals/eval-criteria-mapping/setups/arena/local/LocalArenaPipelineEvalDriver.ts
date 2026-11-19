@@ -1,7 +1,7 @@
 import type {ArenaPipelineDependencies} from "@gunsmith/ai/pipeline/arena/types/ArenaPipelineDependencies";
+import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
 import {createLocalChatModel} from "@evals/eval-criteria-mapping/environment/tier/local/CreateLocalChatModel";
 import {ArenaPipelineEvalDriver} from "@evals/eval-criteria-mapping/setups/arena/shared/ArenaPipelineEvalDriver";
-import {BUILT_IN_ARENA_FIXTURES} from "@evals/eval-criteria-mapping/setups/arena/shared/built-ins/BuiltInArenaFixtures";
 
 // An arena is a few hundred tokens of rows, so a local request takes far longer than a weapon's: one trial keeps the local run short.
 // `EVAL_TRIALS=3` brings back the repeated trials when it is worth the wait.
@@ -19,7 +19,7 @@ export class LocalArenaPipelineEvalDriver extends ArenaPipelineEvalDriver {
     return {
       generator: createLocalChatModel({temperature: 0, numPredict: 1500}),
       moderator: createLocalChatModel({temperature: 0, numPredict: 100}),
-      builtInArenas: BUILT_IN_ARENA_FIXTURES,
+      builtInArenas: BUILT_IN_ARENAS,
     };
   }
 }

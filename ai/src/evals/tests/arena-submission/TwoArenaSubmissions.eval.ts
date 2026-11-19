@@ -22,11 +22,11 @@ given.inProgress("both players submit an arena that screening accepts, so the pl
 
   // That the built-in arena costs no model call is the standing cost criterion (at most one moderation call per prompt, none for a built-in);
   // this `when` only states that both survive.
-  when("player 1 describes an arena and player 2 names the built-in arena 'Open Room'", ({arenaSubmission}) => {
+  when("player 1 describes an arena and player 2 names the built-in arena 'Duel'", ({arenaSubmission}) => {
     beforeAll(() =>
       arenaSubmission.askWithPromptAndBuiltIn({
         player1: "a courtyard split by a low wall, with crates to hide behind",
-        player2: "Open Room",
+        player2: "Duel",
       }),
     );
 
