@@ -144,6 +144,26 @@ deliberately hard drawing set (this run's requests are the weapon specs', not th
 weapons are one repair, of the stats or of the drawing (the log does not say which); the per-call log (`paid-weapon-calls-latest.jsonl`) tags the stage with `statsCalls`.
 Nothing was raised: the ceiling is still the $1 total, $0.623 spent.
 
+## Re-measured 2026-11-19 (Haiku 5.5, weapon and appearance specs at 3 trials, run by `budget`)
+
+The user asked for every eval prompt to be re-profiled so the spend estimates rest on current data (run from `worktree-budget` on main `44873b7`: `EVAL_TRIALS=3 pnpm --filter @gunsmith/ai evals:paid src/evals/tests/weapon src/evals/tests/appearance`). The arena and arena-submission specs have no paid tier, so **arenas are still unmeasured**. The ledger (a fresh file, so it started at $0, not at the earlier $0.623) ended at **$0.0780**; 423 criteria ran, 418 passed. The 5 reds are the `DrawingAWeapon` criteria "the model's own drawing, not the stand-in" (spec marked in progress); that is a drawing-quality finding for `ai`, not a cost one.
+
+The weapon call log has 72 requests and 162 calls, every one ended `tool_use`, none was cut off, and no request needed a repair (the 2026-11-15 run had three). Stages are read from call order (the log has no stage field; a rejection's only call matches a created weapon's first call to within 1 token, so call 1 is moderation):
+
+| Per request (weapon specs) | Requests | Mean cost | Largest | Wall clock |
+| - | - | - | - | - |
+| Created and drawn (3 calls) | 48 | $0.001022 | $0.001151 | median 5.1 s, p95 5.7 s, max 5.9 s |
+| Rejected (moderation only) | 18 | $0.000153 | $0.000156 | median 1.0 s, max 1.9 s |
+| Turned away by the pre-check (no call) | 6 | $0 | $0 | under 12 ms |
+
+| Call of a created weapon | Tokens in | Tokens out (mean, largest) | Mean cost |
+| - | - | - | - |
+| 1 moderation | 1,086 | 89, 96 | $0.000153 |
+| 2 stats | 1,440 | 246, 266 | $0.000267 |
+| 3 drawing | 2,596 | 683, 917 | $0.000601 |
+
+Across all 162 calls the mean is $0.00032 (the 2026-11-15 mean, unchanged). The weapon log adds to $0.0518; the rest of the $0.0780 (about $0.0262, derived by subtraction, not measured) is the appearance specs, whose driver keeps no call log, only per-outcome usage. **Against `WEAPON_SPEND`** (400 µ$ a call): a created weapon settles at 1,200 µ$ against 1,022 measured (17 percent over), a rejection at 400 against 153 (2.6 times over), and the five-call worst case (moderation, stats, a stats repair, the largest drawing at about 720 µ$, its repair) comes to about 2,300 µ$, inside the 3,000 µ$ reservation. Over-settling only makes the caps trip early, so nothing changed; pricing by the call's place (as arenas do) would tighten the rejection case and is the follow-up if it matters. The 30 s time limit holds for weapons: the slowest request was 5.9 s. Total run: 389 s of wall clock.
+
 ## Cheaper models for the drawing, stats and moderation: the shortlist (researched 2026-11-15, approved by the user)
 
 > **Decision (the user, 2026-11-16): the other models were not good enough, so Haiku 5.5 on the user's own Anthropic key stays the model for the drawing, the stats and moderation, for now.**
