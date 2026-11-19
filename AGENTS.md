@@ -131,7 +131,7 @@ Prettier owns formatting (`pnpm format`). What it won't tell you:
   and a subfolder named for its subject for each helper only the root file uses (`player/walking/PlayerSpeed.ts` serves
   `MovePlayer.ts`). A constant or helper two domains share stays at the root of the domain that owns it
   (`player/PlayerRadius.ts`), or rises to the nearest common ancestor of its callers and no further. Several entry points
-  may share a root only when they share the subject (`match/` has four, all the match); a file that clearly does not is a
+  may share a root only when they share the subject (`match/` has five, all the match); a file that clearly does not is a
   different domain with a folder of its own. A package's `src/` follows the same rule: one entry file (`engine/src/Engine.ts`)
   and domain folders.
 - **A union of literals is read off the list, not written twice.** Declare it `as const` and derive
