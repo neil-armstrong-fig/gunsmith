@@ -1,5 +1,6 @@
 import {ArenaWorkshop} from "@src/react/components/dom/workshop/components/arena-workshop/ArenaWorkshop";
 import {WeaponCard} from "@src/react/components/dom/workshop/components/weapon-card/WeaponCard";
+import {WeaponShelf} from "@src/react/components/dom/workshop/components/weapon-shelf/WeaponShelf";
 import {WeaponPrompt} from "@src/react/components/dom/workshop/components/weapon-prompt/WeaponPrompt";
 import {usePracticeResetKey} from "@src/react/components/dom/workshop/hooks/use-practice-reset-key/UsePracticeResetKey";
 import {useWorkshopKey} from "@src/react/components/dom/workshop/hooks/use-workshop-key/UseWorkshopKey";
@@ -75,6 +76,8 @@ export function Workshop(): JSX.Element | undefined {
             <WeaponPrompt />
 
             <WeaponCard />
+
+            <WeaponShelf />
           </>
         )}
 

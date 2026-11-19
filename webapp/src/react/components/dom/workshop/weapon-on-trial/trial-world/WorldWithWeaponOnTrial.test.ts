@@ -3,7 +3,7 @@ import type {World} from "@gunsmith/engine/game-loop/types/World";
 import {SUBMACHINE_GUN} from "@gunsmith/engine/weapon/weapons/SubmachineGun";
 import {PRACTICE_ARENA} from "@src/game/practice/PracticeArena";
 import {PRACTICE_DUMMIES} from "@src/game/practice/PracticeDummies";
-import {worldWithWeaponOnTrial} from "@src/react/components/dom/workshop/components/weapon-card/weapon-on-trial/WorldWithWeaponOnTrial";
+import {worldWithWeaponOnTrial} from "@src/react/components/dom/workshop/weapon-on-trial/trial-world/WorldWithWeaponOnTrial";
 import {expect, it} from "vitest";
 
 const MADE_WEAPON = {...SUBMACHINE_GUN, identity: {key: "submachine-gun", name: "Made by the player"}};
