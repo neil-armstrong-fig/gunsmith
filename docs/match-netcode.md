@@ -1,6 +1,6 @@
 # Match netcode, fog and rooms
 
-The design of real-time play. The planned room is a ticking authority. Sign-in uses OAuth code + PKCE and opaque session tokens. Status: initial private-room slice implemented; server keeps it in step
+The design of real-time play. The planned room is a ticking authority. Sign-in uses OAuth code + PKCE and opaque session tokens ([design](sign-in.md)). Status: initial private-room slice implemented; server keeps it in step
 with the code (`TODO-server.md`).
 
 The 2026-11-15 [fair-play research and handoff](art/fair-play-research.md)

@@ -1,6 +1,7 @@
 import type {ArenaOutcome} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcome";
 import type {CreditAccount} from "@src/durable-objects/credit-ledger/account/CreditAccount";
 import {DAILY_CREDITS} from "@src/durable-objects/credit-ledger/account/DailyCredits";
+import {PIPELINE_TIME_LIMIT_MILLISECONDS} from "@src/router/routes/shared/time-limit/PipelineTimeLimit";
 import {fakeLedgers} from "@src/router/routes/shared/fake-ledgers/FakeLedgers";
 import {generateArenaRoute} from "@src/router/routes/arenas/GenerateArenaRoute";
 import type {ArenaSmith} from "@src/router/routes/arenas/types/ArenaSmith";
@@ -49,6 +50,71 @@ it("gives the credit back, once, and answers 502 when the pipeline throws", asyn
   expect(await response.json()).toEqual({error: "generation-failed"});
   expect(ledgers.accountOf("acct-1").balance(Date.now())).toBe(DAILY_CREDITS);
   expect(ledgers.calls.filter(call => call === "refund")).toHaveLength(1);
+});
+
+it("gives up on a pipeline that never answers after the time limit, gives the credit back, once, and answers 504", async () => {
+  await withFakeTimers(async () => {
+    const ledgers = fakeLedgers();
+    const waiting = smithThatWaits();
+    const answer = generateArenaRoute(post({prompt: "a maze"}), ledgers.environment, waiting.smith);
+
+    await waiting.started;
+    await vi.advanceTimersByTimeAsync(PIPELINE_TIME_LIMIT_MILLISECONDS);
+    const response = await answer;
+
+    expect(response.status).toBe(504);
+    expect(await response.json()).toEqual({error: "generation-timed-out"});
+    expect(ledgers.accountOf("acct-1").balance(Date.now())).toBe(DAILY_CREDITS);
+    expect(ledgers.calls.filter(call => call === "refund")).toHaveLength(1);
+  });
+});
+
+it("does not answer before the time limit is up", async () => {
+  await withFakeTimers(async () => {
+    const ledgers = fakeLedgers();
+    const waiting = smithThatWaits();
+    let answered = false;
+    const answer = generateArenaRoute(post({prompt: "a maze"}), ledgers.environment, waiting.smith).then(response => {
+      answered = true;
+
+      return response;
+    });
+
+    await waiting.started;
+    await vi.advanceTimersByTimeAsync(PIPELINE_TIME_LIMIT_MILLISECONDS - 1);
+
+    expect(answered).toBe(false);
+
+    await vi.advanceTimersByTimeAsync(1);
+    await answer;
+  });
+});
+
+it("settles nothing more when the pipeline answers after the route gave up", async () => {
+  await withFakeTimers(async () => {
+    const ledgers = fakeLedgers();
+    const waiting = smithThatWaits();
+    const answer = generateArenaRoute(post({prompt: "a maze"}), ledgers.environment, waiting.smith);
+
+    await waiting.started;
+    await vi.advanceTimersByTimeAsync(PIPELINE_TIME_LIMIT_MILLISECONDS);
+    await answer;
+    waiting.answer(created);
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(ledgers.calls.filter(call => call.startsWith("settle"))).toHaveLength(0);
+    expect(ledgers.accountOf("acct-1").balance(Date.now())).toBe(DAILY_CREDITS);
+  });
+});
+
+it("leaves no timer running once the pipeline has answered", async () => {
+  await withFakeTimers(async () => {
+    const ledgers = fakeLedgers();
+
+    await generateArenaRoute(post({prompt: "a maze"}), ledgers.environment, smithThatAnswers(created));
+
+    expect(vi.getTimerCount()).toBe(0);
+  });
 });
 
 it("asks whether AI is on before it takes a credit, and settles after the pipeline has run", async () => {
@@ -178,6 +244,32 @@ function smithThatAnswers(outcome: ArenaOutcome): ArenaSmith & ReturnType<typeof
   return vi.fn(async () => outcome);
 }
 
+function smithThatWaits(): WaitingSmith {
+  let markStarted: () => void = () => undefined;
+  let answer: (outcome: ArenaOutcome) => void = () => undefined;
+  const started = new Promise<void>(resolve => {
+    markStarted = resolve;
+  });
+  const smith: ArenaSmith = () => {
+    markStarted();
+
+    return new Promise<ArenaOutcome>(resolve => {
+      answer = resolve;
+    });
+  };
+
+  return {smith, started, answer: outcome => answer(outcome)};
+}
+
+async function withFakeTimers(body: () => Promise<void>): Promise<void> {
+  vi.useFakeTimers();
+  try {
+    await body();
+  } finally {
+    vi.useRealTimers();
+  }
+}
+
 function smithThatThrows(): ArenaSmith {
   return async () => {
     throw new Error("the model timed out");
@@ -204,4 +296,10 @@ function spendEveryCredit(account: CreditAccount): void {
   for (let index = 0; index < DAILY_CREDITS; index += 1) {
     account.reserve(`earlier-${index}`, "arena", Date.now());
   }
+}
+
+interface WaitingSmith {
+  smith: ArenaSmith;
+  started: Promise<void>;
+  answer: (outcome: ArenaOutcome) => void;
 }

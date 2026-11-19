@@ -4,6 +4,9 @@ import {WEAPON_SPEND} from "@src/durable-objects/spend-ledger/estimate/WeaponSpe
 import type {ApiEnvironment} from "@src/env/types/ApiEnvironment";
 import {reserveCredit} from "@src/router/routes/shared/ReserveCredit";
 import type {CreditReservation} from "@src/router/routes/shared/types/CreditReservation";
+import {failureAnswer} from "@src/router/routes/shared/time-limit/FailureAnswer";
+import {PIPELINE_TIME_LIMIT_MILLISECONDS} from "@src/router/routes/shared/time-limit/PipelineTimeLimit";
+import {withTimeLimit} from "@src/router/routes/shared/time-limit/WithTimeLimit";
 import type {WeaponAnswer} from "@src/router/routes/weapons/types/WeaponAnswer";
 import type {WeaponSmith} from "@src/router/routes/weapons/types/WeaponSmith";
 
@@ -15,7 +18,7 @@ import type {WeaponSmith} from "@src/router/routes/weapons/types/WeaponSmith";
  * worst case before the pipeline runs, so a burst cannot cross a cap**; refused, the credit is given back and AI is off until the cap's
  * period ends). The credit is then settled at what the request was (a weapon costs one credit, a rejected prompt half) or refunded in
  * full (no valid weapon, or the pipeline threw), and the spend at the model calls it made (`durable-objects/spend-ledger/estimate/`), or in full if the
- * pipeline threw, since its calls may have been billed. Not done yet, by design: a time limit on the pipeline.
+ * pipeline threw or ran out of time (`shared/time-limit/`: 504 `generation-timed-out`), since its calls may have been billed.
  */
 export async function generateWeaponRoute(
   request: Request,
@@ -37,12 +40,12 @@ export async function generateWeaponRoute(
 async function runAndSettle({credits, spend, key, prompt, smith}: CreditReservation<WeaponSmith>): Promise<Response> {
   let outcome: WeaponOutcome;
   try {
-    outcome = await smith(prompt);
-  } catch {
+    outcome = await withTimeLimit(smith(prompt), PIPELINE_TIME_LIMIT_MILLISECONDS);
+  } catch (error) {
     await spend.settle(key, WEAPON_SPEND.reservedMicrodollars);
     await credits.refund(key);
 
-    return Response.json({error: "generation-failed"}, {status: 502});
+    return failureAnswer(error);
   }
 
   await spend.settle(key, settledWeaponSpend(outcome));

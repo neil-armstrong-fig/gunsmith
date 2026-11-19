@@ -7,6 +7,7 @@ import type {FighterInputs} from "@gunsmith/engine/game-loop/types/FighterInputs
 import type {Input} from "@gunsmith/engine/game-loop/types/Input";
 import type {World} from "@gunsmith/engine/game-loop/types/World";
 import {decideMatch} from "@gunsmith/engine/match/DecideMatch";
+import {forfeitRound} from "@gunsmith/engine/match/ForfeitRound";
 import {nextRound} from "@gunsmith/engine/match/NextRound";
 import {startMatch} from "@gunsmith/engine/match/StartMatch";
 import type {Match} from "@gunsmith/engine/match/types/Match";
@@ -15,7 +16,6 @@ import {viewOfSeat} from "@gunsmith/engine/seat/ViewOfSeat";
 import type {InputAck} from "@gunsmith/shared/online/types/InputAck";
 import {DEFAULT_FORFEIT_LIMITS} from "@src/durable-objects/match/room/DefaultForfeitLimits";
 import {askChanged} from "@src/durable-objects/match/room/forfeit/AskChanged";
-import {forfeitRound} from "@src/durable-objects/match/room/forfeit/ForfeitRound";
 import type {ForfeitLimits} from "@src/durable-objects/match/room/types/ForfeitLimits";
 import type {JoinedMessage} from "@src/durable-objects/match/room/types/JoinedMessage";
 import type {Readiness} from "@src/durable-objects/match/room/types/Readiness";
