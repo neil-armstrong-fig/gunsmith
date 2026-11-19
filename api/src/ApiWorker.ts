@@ -1,12 +1,12 @@
-import type {ApiEnvironment} from "@src/env/types/ApiEnvironment";
+import type {ApiWorkerEnvironment} from "@src/env/types/ApiWorkerEnvironment";
 import {handleApiRequest} from "@src/router/HandleApiRequest";
 
 /** The Worker's front door: wiring only, so it is not unit tested. What it answers is `router/HandleApiRequest`. */
 export default {
-  async fetch(request: Request, env: ApiEnvironment): Promise<Response> {
-    return await handleApiRequest(request, env);
+  async fetch(request: Request): Promise<Response> {
+    return await handleApiRequest(request);
   },
-} satisfies ExportedHandler<ApiEnvironment>;
+} satisfies ExportedHandler<ApiWorkerEnvironment>;
 
 // The Durable Object class the Workers runtime looks for beside the default export (`wrangler.jsonc` names it).
 export {Match} from "@src/durable-objects/match/Match";

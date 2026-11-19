@@ -15,6 +15,7 @@ import {addressOfRoom} from "@src/dsl/gunsmith/components/room/playwright/addres
 import {PlayerPlaywright} from "@src/dsl/gunsmith/components/player/playwright/PlayerPlaywright";
 import type {Heading} from "@src/dsl/gunsmith/components/player/types/Heading";
 import type {RoomLimits} from "@src/dsl/gunsmith/components/room/types/RoomLimits";
+import type {RoomAnswer} from "@src/dsl/gunsmith/components/room/playwright/types/RoomAnswer";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
 
 /** How long each step of `keepMovingFor` walks, in game seconds. */
@@ -96,20 +97,33 @@ export class RoomPlaywright extends BasePage {
    * waits for a player: this is the room's first connection, and the room takes its limits from that one alone, so no other page need carry them.
    */
   async createPrivateRoom(limits: RoomLimits = {}): Promise<string> {
-    const response = await this.page.request.post("/api/rooms");
-    if (!response.ok()) {
-      throw new Error(`POST /api/rooms answered ${response.status()}, not a room.`);
-    }
-
-    const body: unknown = await response.json();
-    const code = typeof body === "object" && body !== null ? Reflect.get(body, "code") : undefined;
-    if (typeof code !== "string") {
-      throw new Error("The room's answer carries no friend code.");
-    }
-
+    const code = await this.askForRoom();
     this.code = code;
     await this.enterRoom(this.page, code, limits);
     this.origin = new URL(this.page.url()).origin;
+
+    return code;
+  }
+
+  /**
+   * Asks for the room the way the app does: a `fetch` from a page of the site, which carries that page's `Origin`, as the Worker requires
+   * of every state-changing request. (Playwright's own request context sends none.) `/api/me` is the cheapest page of the site to stand on.
+   */
+  private async askForRoom(): Promise<string> {
+    await this.page.goto("/api/me");
+    const answer = await this.page.evaluate(async (): Promise<RoomAnswer> => {
+      const response = await fetch("/api/rooms", {method: "POST"});
+
+      return {status: response.status, body: await response.json()};
+    });
+    if (answer.status !== 201) {
+      throw new Error(`POST /api/rooms answered ${answer.status}, not a room.`);
+    }
+
+    const code = typeof answer.body === "object" && answer.body !== null ? Reflect.get(answer.body, "code") : undefined;
+    if (typeof code !== "string") {
+      throw new Error("The room's answer carries no friend code.");
+    }
 
     return code;
   }

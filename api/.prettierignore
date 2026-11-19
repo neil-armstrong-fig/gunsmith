@@ -1,1 +1,4 @@
-.wrangler
+# Written by `drizzle-kit generate` (SQL and its snapshots); Wrangler applies it. Reformatting it would be undone by the next generate.
+migrations/
+# Wrangler's local state and bundle output (`wrangler dev`, `d1 migrations apply --local`).
+.wrangler/

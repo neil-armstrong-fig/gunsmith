@@ -83,6 +83,15 @@ catalog:
   "@types/three": 0.187.0
   # Vite's React plugin.
   "@vitejs/plugin-react": 6.2.1
+  # Typed queries over Cloudflare D1 for accounts and sessions (`api/src/accounts/`, the only code that imports it). Approved
+  # 2026-11-19, the version janggi's API uses.
+  drizzle-orm: 0.45.3
+  # Writes the SQL migrations from the schema (`api/`, devDependency); Wrangler applies them, never `drizzle-kit migrate`.
+  # Approved 2026-11-19, the version janggi's API uses.
+  drizzle-kit: 0.31.11
+  # Google sign-in: PKCE, the code exchange and the ID token's claims (`api/src/sign-in/`). Approved 2026-11-19, the version
+  # janggi's API uses.
+  oauth4webapi: 3.8.8
   # The linter, in every package.
   eslint: 10.14.0
   # Switches off the ESLint rules Prettier owns.

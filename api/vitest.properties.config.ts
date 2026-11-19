@@ -1,4 +1,4 @@
-import {PROPERTY_TESTS} from "./vitest.config";
+import {API_RESOLVE, API_SETUP_FILES, PROPERTY_TESTS} from "./vitest.config";
 import {vitestBaseConfig} from "@gunsmith/shared/config/vitest.base.js";
 import {defineConfig} from "vitest/config";
 
@@ -8,6 +8,12 @@ import {defineConfig} from "vitest/config";
  */
 export default defineConfig({
   ...vitestBaseConfig,
-  resolve: {tsconfigPaths: true},
-  test: {...vitestBaseConfig.test, environment: "node", include: PROPERTY_TESTS, testTimeout: 60_000},
+  resolve: API_RESOLVE,
+  test: {
+    ...vitestBaseConfig.test,
+    environment: "node",
+    setupFiles: API_SETUP_FILES,
+    include: PROPERTY_TESTS,
+    testTimeout: 60_000,
+  },
 });

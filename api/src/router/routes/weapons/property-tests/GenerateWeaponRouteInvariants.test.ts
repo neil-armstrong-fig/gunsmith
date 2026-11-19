@@ -5,10 +5,11 @@ import {settledWeaponSpend} from "@src/durable-objects/spend-ledger/estimate/wea
 import {WEAPON_SPEND} from "@src/durable-objects/spend-ledger/estimate/weapon/WeaponSpend";
 import {SPEND_CAPS} from "@src/durable-objects/spend-ledger/meter/SpendCaps";
 import {fakeLedgers} from "@src/router/routes/shared/fake-ledgers/FakeLedgers";
-import type {FakeLedgers} from "@src/router/routes/shared/fake-ledgers/types/FakeLedgers";
 import {generateWeaponRoute} from "@src/router/routes/weapons/GenerateWeaponRoute";
 import {plannedRequests} from "@src/router/routes/weapons/property-tests/arbitraries/PlannedRequests";
 import type {PlannedRequest} from "@src/router/routes/weapons/property-tests/types/PlannedRequest";
+import {cookieOfPlayer} from "@src/router/routes/shared/fake-accounts/CookieOfPlayer";
+import {runWeaponPipeline} from "@src/router/routes/weapons/pipeline/RunWeaponPipeline";
 
 /**
  * What must hold for any crowd of players asking at once, not only the few cases `GenerateWeaponRoute.test.ts` writes down: every
@@ -24,7 +25,7 @@ it("charges each account exactly what its requests that ran came to, and holds n
   await fc.assert(
     fc.asyncProperty(plannedRequests(), async requests => {
       const ledgers = fakeLedgers();
-      const ran = await sendTogether(requests, ledgers);
+      const ran = await sendTogether(requests);
 
       for (const accountId of new Set(requests.map(request => request.accountId))) {
         const state = ledgers.accountOf(accountId).toState();
@@ -41,8 +42,8 @@ it("charges each account exactly what its requests that ran came to, and holds n
 it("never lets an account's requests that ran cost more than its day's credits", async () => {
   await fc.assert(
     fc.asyncProperty(plannedRequests(), async requests => {
-      const ledgers = fakeLedgers();
-      const ran = await sendTogether(requests, ledgers);
+      fakeLedgers();
+      const ran = await sendTogether(requests);
 
       for (const accountId of new Set(requests.map(request => request.accountId))) {
         expect(costOf(requests, ran, accountId)).toBeLessThanOrEqual(DAILY_CREDITS);
@@ -56,7 +57,7 @@ it("settles the global spend at what the requests that ran came to, holding noth
   await fc.assert(
     fc.asyncProperty(plannedRequests(), async requests => {
       const ledgers = fakeLedgers();
-      const ran = await sendTogether(requests, ledgers);
+      const ran = await sendTogether(requests);
 
       expect(ledgers.spendMeter.spentThisMonth()).toBe(spendOf(requests, ran));
       expect(Object.values(ledgers.spendMeter.toState().reservations).every(reservation => !reservation.held)).toBe(
@@ -75,7 +76,7 @@ it("never lets the global spend pass the daily cap, and charges no credit for a 
       ledgers.spendMeter.reserve("earlier", earlierSpend, Date.now());
       ledgers.spendMeter.settle("earlier", earlierSpend, Date.now());
 
-      const ran = await sendTogether(requests, ledgers);
+      const ran = await sendTogether(requests);
 
       expect(ledgers.spendMeter.spentThisMonth()).toBeLessThanOrEqual(SPEND_CAPS.dailyMicrodollars);
       expect(ledgers.spendMeter.spentThisMonth()).toBe(earlierSpend + spendOf(requests, ran));
@@ -91,7 +92,7 @@ it("never lets the global spend pass the daily cap, and charges no credit for a 
 });
 
 /** Sends every request at once; answers which of them the pipeline was asked to run (by position). */
-async function sendTogether(requests: readonly PlannedRequest[], ledgers: FakeLedgers): Promise<Set<number>> {
+async function sendTogether(requests: readonly PlannedRequest[]): Promise<Set<number>> {
   const ran = new Set<number>();
   const weaponSmith = async (prompt: string): Promise<WeaponOutcome> => {
     const position = Number(prompt);
@@ -103,17 +104,16 @@ async function sendTogether(requests: readonly PlannedRequest[], ledgers: FakeLe
 
     return outcome;
   };
+  vi.mocked(runWeaponPipeline).mockImplementation(weaponSmith);
 
   await Promise.all(
     requests.map(async (request, position) => {
       return await generateWeaponRoute(
         new Request("https://gunsmith.test/api/weapons", {
           method: "POST",
-          headers: {"X-Account-Id": request.accountId},
+          headers: {Cookie: cookieOfPlayer(request.accountId)},
           body: JSON.stringify({prompt: String(position)}),
         }),
-        ledgers.environment,
-        weaponSmith,
       );
     }),
   );

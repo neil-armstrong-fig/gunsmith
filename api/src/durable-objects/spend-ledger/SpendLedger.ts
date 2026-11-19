@@ -6,7 +6,7 @@ import {SpendMeter} from "@src/durable-objects/spend-ledger/meter/SpendMeter";
 import type {AiStatus} from "@src/durable-objects/spend-ledger/types/AiStatus";
 import type {SpendMeterState} from "@src/durable-objects/spend-ledger/types/SpendMeterState";
 import type {SpendOutcome} from "@src/durable-objects/spend-ledger/types/SpendOutcome";
-import type {ApiEnvironment} from "@src/env/types/ApiEnvironment";
+import type {ApiWorkerEnvironment} from "@src/env/types/ApiWorkerEnvironment";
 
 const METER_KEY = "meter";
 
@@ -20,7 +20,7 @@ const METER_KEY = "meter";
  * saved; the alarm sends each due alert and marks it sent only once it has gone (`sendDueAlerts`), so a failed send throws, the runtime
  * retries the alarm, and the alert stays due until it is delivered. With no `ALERT_TO_ADDRESS` set, nothing is scheduled or sent.
  */
-export class SpendLedger extends DurableObject<ApiEnvironment> {
+export class SpendLedger extends DurableObject<ApiWorkerEnvironment> {
   async reserve(key: string, microdollars: number): Promise<SpendOutcome> {
     const outcome = this.change(meter => meter.reserve(key, microdollars, Date.now()));
     await this.scheduleAlertsIfDue();

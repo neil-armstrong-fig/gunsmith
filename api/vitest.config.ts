@@ -10,6 +10,15 @@ export const PROPERTY_TESTS = [
   "src/router/routes/*/property-tests/**/*Invariants.test.ts",
 ];
 
+/** `cloudflare:workers` is the Workers runtime's own module: in a test it is a stub whose `env` the tests fill (`src/env/testing/`). */
+export const API_RESOLVE = {
+  tsconfigPaths: true,
+  alias: {"cloudflare:workers": `${import.meta.dirname}/src/env/testing/CloudflareWorkersStub.ts`},
+};
+
+/** What runs before every test file: clears the Worker's bindings, installs the mocks (`src/testing/SetupApiTests.ts`). */
+export const API_SETUP_FILES = ["./src/testing/SetupApiTests.ts"];
+
 /**
  * Plain node, as janggi's API: `@cloudflare/vitest-pool-workers` peers on vitest 4 and this workspace is on 5. What the Worker
  * decides is kept in plain functions and classes that take a `Request` or a value, so they run under node's own Web-standard
@@ -18,6 +27,11 @@ export const PROPERTY_TESTS = [
  */
 export default defineConfig({
   ...vitestBaseConfig,
-  resolve: {tsconfigPaths: true},
-  test: {...vitestBaseConfig.test, environment: "node", exclude: [...configDefaults.exclude, ...PROPERTY_TESTS]},
+  resolve: API_RESOLVE,
+  test: {
+    ...vitestBaseConfig.test,
+    environment: "node",
+    setupFiles: API_SETUP_FILES,
+    exclude: [...configDefaults.exclude, ...PROPERTY_TESTS],
+  },
 });

@@ -24,7 +24,7 @@ export function previewServers(previewServerOptions: PreviewServerOptions): WebS
     {
       ...lifecycle,
       name: "Worker",
-      command: `pnpm --filter @gunsmith/api exec wrangler dev --local --ip 127.0.0.1 --port ${apiPort} --inspector-port 0 --persist-to .wrangler/acceptance-${apiPort}`,
+      command: `pnpm --filter @gunsmith/api exec wrangler dev --local --ip 127.0.0.1 --port ${apiPort} --inspector-port 0 --persist-to .wrangler/acceptance-${apiPort} --var ALLOW_LOOPBACK_ORIGINS:true`,
       port: apiPort,
       env: {WRANGLER_SEND_METRICS: "false"},
     },

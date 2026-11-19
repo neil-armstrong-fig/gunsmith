@@ -1,4 +1,4 @@
-import type {ApiEnvironment} from "@src/env/types/ApiEnvironment";
+import {workerEnvironment} from "@src/env/WorkerEnvironment";
 import {fakeCreditLedger} from "@src/router/routes/shared/fake-ledgers/credit/FakeCreditLedger";
 import {fakeSpendLedger} from "@src/router/routes/shared/fake-ledgers/spend/FakeSpendLedger";
 import type {FakeLedgers} from "@src/router/routes/shared/fake-ledgers/types/FakeLedgers";
@@ -10,7 +10,7 @@ export function fakeLedgers(options: FakeLedgersOptions = {}): FakeLedgers {
   const credit = fakeCreditLedger(calls);
   const spend = fakeSpendLedger(calls, options);
 
-  const environment = {MATCHES: {}, CREDITS: credit.namespace, SPEND: spend.namespace} as unknown as ApiEnvironment;
+  Object.assign(workerEnvironment, {CREDITS: credit.namespace, SPEND: spend.namespace});
 
-  return {environment, calls, accountOf: credit.accountOf, spendMeter: spend.spendMeter};
+  return {calls, accountOf: credit.accountOf, spendMeter: spend.spendMeter};
 }
