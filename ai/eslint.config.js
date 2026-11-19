@@ -7,6 +7,12 @@ import {baseConfig, restrictedImports} from "@gunsmith/shared/config/eslint.base
 const allowedPackages = ["@gunsmith/ai", "@gunsmith/shared", "@gunsmith/engine"];
 
 const criteriaMapping = "@evals/eval-criteria-mapping/EvalCriteriaMapping";
+const dslTypesATestMayName = [
+  "@evals/dsl/appearance/AppearanceDsl",
+  "@evals/dsl/arena/ArenaDsl",
+  "@evals/dsl/arena-submission/ArenaSubmissionDsl",
+  "@evals/dsl/weapon/WeaponDsl",
+];
 
 // The evals have the three layers `acceptance-tests/` has, and imports only run downwards:
 //   tests -> eval-criteria-mapping -> dsl
@@ -60,12 +66,12 @@ export default [
     // no model, no vitest.
     files: ["src/evals/tests/**"],
     rules: {
-      // A `thenExpect` states one criterion and checks it. Asking the weapon smith is what its `when` already names, in a
+      // A `thenExpect` states one criterion and checks it. Asking (`ask`, `askWithPrompts`, …) is what its trial's scope already does, in a
       // `beforeAll`, once, for all the criteria beneath it.
       "no-restricted-syntax": [
         "error",
         {
-          selector: 'CallExpression[callee.name="thenExpect"] CallExpression[callee.property.name="ask"]',
+          selector: 'CallExpression[callee.name="thenExpect"] CallExpression[callee.property.name=/^ask/]',
           message:
             "Ask in the beforeAll of the when, not inside a thenExpect. A criterion checks the answers; it does not make a request.",
         },
@@ -77,8 +83,19 @@ export default [
         ),
         patterns: [
           {
-            group: ["@evals/eval-criteria-mapping/**", `!${criteriaMapping}`, "@evals/dsl/**", "@evals/tests/**"],
-            message: `A test may import only '${criteriaMapping}'. Anything else belongs on the mapping's exports, or on the DSL reached through its fixtures.`,
+            group: [
+              "@evals/eval-criteria-mapping/**",
+              `!${criteriaMapping}`,
+              // Not `@evals/dsl/**`: that would exclude each DSL's folder, and a pattern cannot re-include a file under an excluded folder.
+              "@evals/dsl/WeaponSmithDsl",
+              "@evals/dsl/types/**",
+              "@evals/dsl/shared/**",
+              "@evals/dsl/*/*",
+              ...dslTypesATestMayName.map(path => `!${path}`),
+              "@evals/dsl/*/*/**",
+              "@evals/tests/**",
+            ],
+            message: `A test may import only '${criteriaMapping}', and (as a type, to name the DSL a trial hands it) a DSL file. Anything else belongs on the mapping's exports, or on the DSL reached through its fixtures.`,
           },
         ],
       }),

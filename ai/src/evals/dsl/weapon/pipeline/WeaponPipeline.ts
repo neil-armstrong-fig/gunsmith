@@ -8,89 +8,104 @@ import {nameHygiene} from "@evals/dsl/weapon/pipeline/evaluators/created-weapon/
 import {noPromptLeak} from "@evals/dsl/weapon/pipeline/evaluators/player-visible/NoPromptLeak";
 import {withinCaps} from "@evals/dsl/weapon/pipeline/evaluators/created-weapon/WithinCaps";
 import {schemaValid} from "@evals/dsl/weapon/pipeline/evaluators/created-weapon/SchemaValid";
-import {failuresAcrossTrials} from "@evals/dsl/shared/trials/FailuresAcrossTrials";
+import {damagePerSecondOf} from "@evals/dsl/weapon/pipeline/evaluators/created-weapon/DamagePerSecond";
+import {failuresOf} from "@evals/dsl/shared/checks/FailuresOf";
 import type {WeaponEvaluator} from "@evals/dsl/weapon/pipeline/types/WeaponEvaluator";
 import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
+import type {WeaponOutcomeStatus} from "@gunsmith/ai/pipeline/types/WeaponOutcomeStatus";
 
 /**
  * The weapon smith's pipeline as seen from outside, the system under test: the one class that knows how to put a request through
  * it and how to read what came back. It is to the evals what `GunsmithPlaywright` is to the game in `acceptance-tests/`, and the
- * DSL above it is a thin wrapper, as `GunsmithDsl` is. `ask` runs the request once for every trial (a model's answer varies) and
- * holds the answers; each `check…` runs pure evaluators over them and holds only if it held in every trial (pass^k), throwing one
- * sentence per check that failed with the trials it failed in and why, as `expect.poll` conditions throw inside a `*Playwright`.
+ * DSL above it is a thin wrapper, as `GunsmithDsl` is. `ask` runs the request once and holds the answer; each
+ * `check…` runs pure evaluators over it, throwing one sentence per check that failed and why, as `expect.poll` conditions throw inside a
+ * `*Playwright` (each trial is a scope of its own, so that a criterion held in every trial, pass^k, is the mapping's).
  * It catches nothing and wraps nothing: the DSL says what was being attempted. LangChain and LangGraph are beneath it, behind
  * the driver, as the browser is beneath Playwright.
  */
 export class WeaponPipeline {
   private readonly driver: WeaponPipelineDriver;
-  private answered: WeaponOutcome[] = [];
+  private answered: WeaponOutcome | undefined;
 
   constructor(driver: WeaponPipelineDriver) {
     this.driver = driver;
   }
 
-  /** Puts a player's request through the pipeline, once for every trial, replacing any earlier answers. */
+  /** Puts a player's request through the pipeline, replacing any earlier answer. */
   async ask(prompt: string): Promise<void> {
-    const outcomes: WeaponOutcome[] = [];
+    this.answered = await this.driver.run(prompt);
+  }
 
-    for (let trial = 0; trial < this.driver.trials; trial += 1) {
-      outcomes.push(await this.driver.run(prompt));
+  /** How the request ended. */
+  statusOfTheAnswer(): WeaponOutcomeStatus {
+    return this.theAnswer().status;
+  }
+
+  /** The damage per second of the weapon that was created. */
+  damagePerSecondOfTheAnswer(): number {
+    const outcome = this.theAnswer();
+    const damagePerSecond = damagePerSecondOf(outcome.weapon);
+    if (damagePerSecond === undefined) {
+      throw new Error(`No weapon was created (the request ${outcome.status}), so there is no damage per second`);
     }
 
-    this.answered = outcomes;
+    return damagePerSecond;
   }
 
   checkCreated(): void {
-    this.checkEveryTrial([input => outcomeMatches(input, "created")]);
+    this.checkAnswer([input => outcomeMatches(input, "created")]);
   }
 
   checkCreatedAndDrawn(): void {
-    this.checkEveryTrial([input => outcomeMatches(input, "created"), drawnWhenCreated]);
+    this.checkAnswer([input => outcomeMatches(input, "created"), drawnWhenCreated]);
   }
 
   checkRejected(): void {
-    this.checkEveryTrial([input => outcomeMatches(input, "rejected")]);
+    this.checkAnswer([input => outcomeMatches(input, "rejected")]);
   }
 
   checkBalancedByCode(maximumRepairs: number): void {
-    this.checkEveryTrial([input => balancedByCode(input, maximumRepairs)]);
+    this.checkAnswer([input => balancedByCode(input, maximumRepairs)]);
   }
 
   checkNoWeaponOverTheCap(): void {
-    this.checkEveryTrial([withinCaps]);
+    this.checkAnswer([withinCaps]);
   }
 
   checkPlainWeaponName(): void {
-    this.checkEveryTrial([nameHygiene]);
+    this.checkAnswer([nameHygiene]);
   }
 
   checkNoPromptLeak(): void {
-    this.checkEveryTrial([noPromptLeak]);
+    this.checkAnswer([noPromptLeak]);
   }
 
   checkSafeToShow(): void {
-    this.checkEveryTrial([schemaValid, withinCaps, nameHygiene, drawnWhenCreated, noPromptLeak]);
+    this.checkAnswer([schemaValid, withinCaps, nameHygiene, drawnWhenCreated, noPromptLeak]);
   }
 
   checkFixedPath(): void {
-    this.checkEveryTrial([nodePath]);
+    this.checkAnswer([nodePath]);
   }
 
   checkModelCallsAtMost(maximumModelCalls: number): void {
-    this.checkEveryTrial([input => modelCallBudget(input, maximumModelCalls)]);
+    this.checkAnswer([input => modelCallBudget(input, maximumModelCalls)]);
   }
 
   checkFixedPathWithin(maximumModelCalls: number): void {
-    this.checkEveryTrial([nodePath, input => modelCallBudget(input, maximumModelCalls)]);
+    this.checkAnswer([nodePath, input => modelCallBudget(input, maximumModelCalls)]);
   }
 
-  private checkEveryTrial(checks: WeaponEvaluator[]): void {
-    if (this.answered.length === 0) {
+  private theAnswer(): WeaponOutcome {
+    if (!this.answered) {
       throw new Error("Ask for a weapon (in a beforeAll) before expecting anything");
     }
 
-    const inputs = this.answered.map(outcome => ({outcome}));
-    const failures = checks.flatMap(check => failuresAcrossTrials(inputs, check));
+    return this.answered;
+  }
+
+  private checkAnswer(checks: WeaponEvaluator[]): void {
+    const failures = failuresOf({outcome: this.theAnswer()}, checks);
     if (failures.length > 0) {
       throw new Error(failures.join("; "));
     }

@@ -1,17 +1,22 @@
-import * as ls from "langsmith/vitest";
-import {beforeAll as runBeforeAll, describe} from "vitest";
+import {beforeAll as runBeforeAll} from "vitest";
+import type {AnyTrialDsl} from "@evals/dsl/types/AnyTrialDsl";
+import type {TrialDsl} from "@evals/dsl/shared/types/TrialDsl";
 import {registerCriterion} from "@evals/eval-criteria-mapping/mapping/criterion/RegisterCriterion";
 import {evalRun} from "@evals/eval-criteria-mapping/mapping/run/CurrentEvalRun";
-import {createTrackedFixtures} from "@evals/eval-criteria-mapping/mapping/when/CreateTrackedFixtures";
-import {registerStandingCriteria} from "@evals/eval-criteria-mapping/mapping/when/RegisterStandingCriteria";
+import {defineGiven} from "@evals/eval-criteria-mapping/mapping/given/DefineGiven";
+import {defineTrials} from "@evals/eval-criteria-mapping/mapping/trial/DefineTrials";
+import {defineEachWhen} from "@evals/eval-criteria-mapping/mapping/when/DefineEachWhen";
+import {defineWhen} from "@evals/eval-criteria-mapping/mapping/when/DefineWhen";
 import type {DefineGiven} from "@evals/eval-criteria-mapping/types/DefineGiven";
-import type {DefineWhen} from "@evals/eval-criteria-mapping/types/DefineWhen";
-import type {EvalSuite} from "@evals/eval-criteria-mapping/types/EvalSuite";
 import type {GivenBlock} from "@evals/eval-criteria-mapping/types/GivenBlock";
 import type {RunCriterion} from "@evals/eval-criteria-mapping/types/RunCriterion";
+import type {WhenBlock} from "@evals/eval-criteria-mapping/types/WhenBlock";
 
-// What a spec may say, and nothing else: a spec imports only this file (lint). The four verbs are defined here; the state they share
+// What a spec may say, and nothing else: a spec imports only this file (lint). The verbs are defined here; the state they share
 // (the run of the spec file being loaded) and the criterion machinery behind them are in `mapping/`.
+
+/** `expect`, so a criterion states its own assertion in the spec, as an acceptance `then` does: a spec cannot import Vitest. */
+export {expect} from "vitest";
 
 /**
  * `given` reads back in the report as the case a spec covers, as the acceptance specs' does. It is a native `describe` underneath.
@@ -23,25 +28,24 @@ export const given: GivenBlock = Object.assign(
 );
 
 /**
- * `when` reads back in the report as the request a spec makes. It is a LangSmith `ls.describe` underneath (the wrapper cannot nest,
- * and a `when` is the right grain for a LangSmith dataset: one scenario, one example per `then`). Its body is handed the DSLs it
- * may talk to, one of each per `when`.
+ * `when` reads back in the report as the request a spec makes. It is a native `describe` underneath, handed the weapon smith, whose
+ * members are the DSLs it may talk to. Inside a trial's scope (`eachTrial`) a `when` nests a group of criteria that read the same
+ * answer, and costs no request. `when.each` is it once per item of a table, with each row carrying its reason.
  */
-export function when(description: string, define: DefineWhen): void {
-  ls.describe(`when ${description}`, () => {
-    const whenContext = evalRun.beginWhen(description);
-    const tracked = createTrackedFixtures(evalRun.drivers);
+export const when: WhenBlock = Object.assign(defineWhen, {each: defineEachWhen});
 
-    define(tracked.fixtures);
-    registerStandingCriteria(whenContext, tracked);
-    evalRun.endWhen(tracked.taken()[0]);
-  });
+/**
+ * Runs the request a `when` names once for each trial the tier runs, each in a scope of its own (`trial 1 of 3`) with a fresh DSL that
+ * holds only that trial's answer. A criterion holds only if it held in every trial (pass^k).
+ */
+export function eachTrial<Dsl extends AnyTrialDsl & TrialDsl<Dsl>>(dsl: Dsl, define: (trial: Dsl) => void): void {
+  defineTrials(evalRun, dsl, define);
 }
 
 /**
- * The request a `when` names, carried out once before its `then`s. It is `beforeAll` and not `beforeEach` (the acceptance
- * specs' word) on purpose: a model call costs time and money, so the request runs once, for all its trials, and every `then`
- * reads those same answers. A `then` must therefore not ask anything itself; lint stops it.
+ * The request a trial's scope carries out once before its `then`s. It is `beforeAll` and not `beforeEach` (the acceptance specs' word)
+ * on purpose: a model call costs time and money, so the request runs once for the trial, and every `then` of that trial reads the same
+ * answer. A `then` must therefore not ask anything itself; lint stops it.
  */
 export function beforeAll(arrange: RunCriterion): void {
   evalRun.requireWhen("beforeAll");
@@ -50,19 +54,10 @@ export function beforeAll(arrange: RunCriterion): void {
 }
 
 /**
- * One criterion: what must be true of the answers. It holds only if it held in every trial, and it reads back in the report as
- * `then <description>`. It is not called `then`, as the acceptance specs' mapping is: a module that exports `then` is a thenable,
- * so Vitest's `await import` calls it with the promise machinery's resolve and reject functions and the spec file never loads
- * (Playwright loads specs as CommonJS, which hides this there).
+ * One criterion: what must be true of the answer. It reads back in the report as `then <description>`. It is not called `then`, as the
+ * acceptance specs' mapping is: a module that exports `then` is a thenable, so Vitest's `await import` calls it with the promise
+ * machinery's resolve and reject functions and the spec file never loads (Playwright loads specs as CommonJS, which hides this there).
  */
 export function thenExpect(description: string, check: RunCriterion): void {
   registerCriterion(evalRun.requireWhen("thenExpect"), description, check);
-}
-
-/** Every `when` in a `given` takes its suite from it: a feature is in progress as a whole, never one scenario at a time. */
-function defineGiven(suite: EvalSuite, description: string, define: DefineGiven): void {
-  describe(suite === "inProgress" ? `given (in progress) ${description}` : `given ${description}`, () => {
-    evalRun.beginGiven(description, suite);
-    define();
-  });
 }

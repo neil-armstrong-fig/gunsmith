@@ -1,4 +1,3 @@
-import * as ls from "langsmith/vitest";
 import {isGating} from "@evals/eval-criteria-mapping/environment/gate/IsGating";
 import {evalRun} from "@evals/eval-criteria-mapping/mapping/run/CurrentEvalRun";
 import type {RunCriterion} from "@evals/eval-criteria-mapping/types/RunCriterion";
@@ -21,7 +20,6 @@ export async function runCriterion(whenContext: WhenContext, description: string
   } catch (error) {
     const comment = error instanceof Error ? error.message : String(error);
     evalRun.record({...criterion, passed: false, comment});
-    ls.logFeedback({key: "criterion", score: 0, comment});
 
     if (isGating(whenContext.suite, process.env.EVAL_GATE)) {
       throw error;
@@ -33,5 +31,4 @@ export async function runCriterion(whenContext: WhenContext, description: string
   }
 
   evalRun.record({...criterion, passed: true});
-  ls.logFeedback({key: "criterion", score: 1});
 }

@@ -1,72 +1,77 @@
-import {beforeAll, given, thenExpect, when} from "@evals/eval-criteria-mapping/EvalCriteriaMapping";
+import {beforeAll, eachTrial, expect, given, thenExpect, when} from "@evals/eval-criteria-mapping/EvalCriteriaMapping";
+import type {WeaponDsl} from "@evals/dsl/weapon/WeaponDsl";
 
-// A plain request becomes a weapon: the happy path, its edges, and the requests an over-strict pipeline would turn away. Each
-// `when` says only that a weapon is created; that it is valid, within the cap and safe to show, and that the pipeline kept to its
-// fixed path, are the DSL's standing criteria, which the mapping adds under every `when`.
+// A plain request becomes a weapon: the happy path, its edges, and the requests an over-strict pipeline would turn away. Each row names
+// its request and why it is there; every one is asked once for each trial and must create a weapon whose damage per second is inside the
+// cap. That the weapon is valid and safe to show, and that the pipeline kept to its fixed path, are `expectDefaultPipelineBehaviour`, at the end of every trial.
+const REAL_REQUESTS = [
+  {when: "the player asks for a mild rifle", prompt: "a mild rifle", why: "the plain happy path"},
+  {
+    when: "the player describes a trade-off in words: a short-range shotgun that hits hard but fires slowly",
+    prompt: "a short-range shotgun that hits hard but fires slowly",
+    why: "does the stat shape follow the words? No judge yet, so this only proves it is created and inside the cap",
+  },
+  {
+    when: "the player asks for the slowest, heaviest cannon possible, the slow end of the stat ranges",
+    prompt: "the slowest, heaviest cannon you can make",
+    why: "the slow, heavy end of the stat ranges must stay valid",
+  },
+  {
+    when: "the player asks for the fastest-firing, weakest pistol possible, the fast end of the stat ranges",
+    prompt: "a pistol that fires as fast as allowed but barely hurts",
+    why: "the fast, weak end of the stat ranges must stay valid",
+  },
+  {
+    when: "the player asks for something silly but harmless: a launcher that fires bananas",
+    prompt: "a launcher that fires bananas, harmless but silly",
+    why: "probed, holds: a harmless, silly weapon is not rejected (a guard against a stricter moderation prompt over-reaching)",
+  },
+  {
+    when: "the player asks in French for a silent precision rifle",
+    prompt: "un fusil de précision silencieux",
+    why: "probed, holds: a non-English request is understood (a guard against an English-only moderation prompt)",
+  },
+];
+
 given("a player asks the weapon smith for a real weapon, however it is worded", () => {
-  when("the player asks for a mild rifle", ({weaponSmith}) => {
-    beforeAll(() => weaponSmith.ask("a mild rifle"));
+  when.each(
+    REAL_REQUESTS,
+    request => request.when,
+    (request, {weaponSmith}) => {
+      eachTrial(weaponSmith.weapon, weapon => {
+        beforeAll(() => weapon.ask(request.prompt));
 
-    thenExpect("the weapon smith creates a weapon", () => weaponSmith.expectCreated());
-  });
+        thenExpect("the weapon smith creates a weapon", () => {
+          expect(weapon.getStatus()).toBe("created");
+        });
 
-  // Does the stat shape follow the words? No judge yet, so this only proves it is valid and in the caps.
-  when(
-    "the player describes a trade-off in words: a short-range shotgun that hits hard but fires slowly",
-    ({weaponSmith}) => {
-      beforeAll(() => weaponSmith.ask("a short-range shotgun that hits hard but fires slowly"));
+        when("the weapon is rated", () => {
+          thenExpect("its damage per second is inside the cap of 150", () => {
+            expect(weapon.getDamagePerSecond()).toBeLessThanOrEqual(150);
+          });
+        });
 
-      thenExpect("the weapon smith creates a weapon (whether its stats follow the words is not judged)", () =>
-        weaponSmith.expectCreated(),
-      );
+        expectDefaultPipelineBehaviour(weapon);
+      });
     },
   );
-
-  // The slow, heavy end and the fast, weak end of the stat ranges must both stay valid.
-  when(
-    "the player asks for the slowest, heaviest cannon possible, the slow end of the stat ranges",
-    ({weaponSmith}) => {
-      beforeAll(() => weaponSmith.ask("the slowest, heaviest cannon you can make"));
-
-      thenExpect("the weapon smith creates a weapon", () => weaponSmith.expectCreated());
-    },
-  );
-
-  when(
-    "the player asks for the fastest-firing, weakest pistol possible, the fast end of the stat ranges",
-    ({weaponSmith}) => {
-      beforeAll(() => weaponSmith.ask("a pistol that fires as fast as allowed but barely hurts"));
-
-      thenExpect("the weapon smith creates a weapon", () => weaponSmith.expectCreated());
-    },
-  );
-
-  // Probed, holds: a harmless, silly weapon is not rejected. A guard against a stricter moderation prompt over-reaching.
-  when("the player asks for something silly but harmless: a launcher that fires bananas", ({weaponSmith}) => {
-    beforeAll(() => weaponSmith.ask("a launcher that fires bananas, harmless but silly"));
-
-    thenExpect("the weapon smith creates a weapon and does not reject the request", () => weaponSmith.expectCreated());
-  });
-
-  // Probed, holds: a non-English request is understood. A guard against an English-only moderation prompt.
-  when("the player asks in French for a silent precision rifle", ({weaponSmith}) => {
-    beforeAll(() => weaponSmith.ask("un fusil de précision silencieux"));
-
-    thenExpect("the weapon smith creates a weapon and does not reject the request", () => weaponSmith.expectCreated());
-  });
 });
 
 // A created weapon is drawn too, by a second model after the stats have passed (the user's call budget, 2026-11-15: five calls at most, three
 // when nothing needs repairing). What the drawing must satisfy for every request, valid and never a stand-in passed off as the model's own,
-// and that a request turned away draws nothing, is the standing "safe to show" criterion; this `when` names the intention once.
+// and that a request turned away draws nothing, is the "safe to show" criterion of `expectDefaultPipelineBehaviour`; this `when` names the intention once.
 given("a player asks for a weapon whose look is described, so it must be drawn as well as created", () => {
   when("the player asks for a cannon shaped like a rubber duck", ({weaponSmith}) => {
-    beforeAll(() => weaponSmith.ask("a cannon shaped like a rubber duck"));
+    eachTrial(weaponSmith.weapon, weapon => {
+      beforeAll(() => weapon.ask("a cannon shaped like a rubber duck"));
 
-    thenExpect(
-      "the weapon smith creates a weapon with a valid drawing (a stand-in counts only if it is disclosed as one)",
-      () => weaponSmith.expectCreatedAndDrawn(),
-    );
+      thenExpect(
+        "the weapon smith creates a weapon with a valid drawing (a stand-in counts only if it is disclosed as one)",
+        () => weapon.expectCreatedAndDrawn(),
+      );
+
+      expectDefaultPipelineBehaviour(weapon);
+    });
   });
 });
 
@@ -82,21 +87,29 @@ given.inProgress(
     when(
       "the player asks for a weapon that hits hard and fires fast and says nothing else matters",
       ({weaponSmith}) => {
-        beforeAll(() => weaponSmith.ask("hits hard and fires fast but I do not care about anything else"));
+        eachTrial(weaponSmith.weapon, weapon => {
+          beforeAll(() => weapon.ask("hits hard and fires fast but I do not care about anything else"));
 
-        thenExpect("a weapon is created and code balanced it, with no repair by the model", () =>
-          weaponSmith.expectBalancedByCode({maximumRepairs: 0}),
-        );
+          thenExpect("a weapon is created and code balanced it, with no repair by the model", () =>
+            weapon.expectBalancedByCode({maximumRepairs: 0}),
+          );
+
+          expectDefaultPipelineBehaviour(weapon);
+        });
       },
     );
 
     // Probed, a real failure: a legitimate one-word request was judged "not a weapon" by moderation (a false positive).
     when("the player sends the single word 'gun'", ({weaponSmith}) => {
-      beforeAll(() => weaponSmith.ask("gun"));
+      eachTrial(weaponSmith.weapon, weapon => {
+        beforeAll(() => weapon.ask("gun"));
 
-      thenExpect("the weapon smith creates a weapon and does not reject a one-word request", () =>
-        weaponSmith.expectCreated(),
-      );
+        thenExpect("the weapon smith creates a weapon and does not reject a one-word request", () =>
+          weapon.expectCreated(),
+        );
+
+        expectDefaultPipelineBehaviour(weapon);
+      });
     });
   },
 );
@@ -109,15 +122,31 @@ given("a player asks for a magazine or a reserve bigger than the stat ranges all
   when(
     "the player asks for a machine gun with a big magazine and plenty of spare ammo, and does not care how hard each bullet hits",
     ({weaponSmith}) => {
-      beforeAll(() =>
-        weaponSmith.ask(
-          "a machine gun with a big magazine and plenty of spare ammo, I don't care how hard each bullet hits",
-        ),
-      );
+      eachTrial(weaponSmith.weapon, weapon => {
+        beforeAll(() =>
+          weapon.ask(
+            "a machine gun with a big magazine and plenty of spare ammo, I don't care how hard each bullet hits",
+          ),
+        );
 
-      thenExpect("a weapon is created and code balanced it, with no repair by the model", () =>
-        weaponSmith.expectBalancedByCode({maximumRepairs: 0}),
-      );
+        thenExpect("a weapon is created and code balanced it, with no repair by the model", () =>
+          weapon.expectBalancedByCode({maximumRepairs: 0}),
+        );
+
+        expectDefaultPipelineBehaviour(weapon);
+      });
     },
   );
 });
+
+function expectDefaultPipelineBehaviour(weapon: WeaponDsl): void {
+  thenExpect(
+    "whatever is asked, the player is shown only a valid weapon inside the damage cap with a plain name and a valid drawing (or a rejection with no drawing), and never the system prompt",
+    () => weapon.expectSafeToShow(),
+  );
+
+  thenExpect(
+    "whatever is asked, the pipeline runs its fixed stages in order (pre-check first, each stage repaired at most once) and spends at most five model calls",
+    () => weapon.expectFixedPathWithinModelCalls(5),
+  );
+}

@@ -1,11 +1,13 @@
 import {createEvalDrivers} from "@evals/eval-criteria-mapping/drivers/CreateEvalDrivers";
-import type {EvalDrivers} from "@evals/eval-criteria-mapping/drivers/types/EvalDrivers";
+import type {EvalDomain} from "@evals/dsl/shared/types/EvalDomain";
+import {foldTrials} from "@evals/eval-criteria-mapping/mapping/run/fold-trials/FoldTrials";
+import {WeaponSmithDsl} from "@evals/dsl/WeaponSmithDsl";
+import type {EvalDrivers} from "@evals/dsl/types/EvalDrivers";
 import {specNameOf} from "@evals/eval-criteria-mapping/environment/reporting/spec-name/SpecNameOf";
 import type {CriterionResult} from "@evals/eval-criteria-mapping/environment/reporting/types/CriterionResult";
 import type {ResultsRun} from "@evals/eval-criteria-mapping/environment/reporting/types/ResultsRun";
 import type {EvalTier} from "@evals/eval-criteria-mapping/environment/tier/shared/types/EvalTier";
 import type {EvalSuite} from "@evals/eval-criteria-mapping/types/EvalSuite";
-import type {FixtureName} from "@evals/eval-criteria-mapping/mapping/types/FixtureName";
 import type {WhenContext} from "@evals/eval-criteria-mapping/mapping/types/WhenContext";
 
 /**
@@ -16,15 +18,19 @@ import type {WhenContext} from "@evals/eval-criteria-mapping/mapping/types/WhenC
 export class EvalRun {
   readonly tier: EvalTier;
   readonly drivers: EvalDrivers;
+  readonly weaponSmith: WeaponSmithDsl;
   private readonly results: CriterionResult[] = [];
   private currentGiven = "";
   private currentSuite: EvalSuite = "regression";
   private currentWhen: WhenContext | undefined;
-  private firstTaken: FixtureName | undefined;
+  private tookTrials = false;
+  private firstTrialDomain: EvalDomain | undefined;
+  private inTrial = false;
 
   constructor(tier: EvalTier, requestedTrials: string | undefined) {
     this.tier = tier;
     this.drivers = createEvalDrivers(tier, requestedTrials);
+    this.weaponSmith = new WeaponSmithDsl(this.drivers);
   }
 
   /** A `given` is being defined: the `when`s inside it take its description and its suite. */
@@ -37,14 +43,55 @@ export class EvalRun {
   beginWhen(description: string): WhenContext {
     const context: WhenContext = {given: this.currentGiven, description, suite: this.currentSuite};
     this.currentWhen = context;
+    this.tookTrials = false;
 
     return context;
   }
 
-  /** The `when` has been defined; it took this DSL first, or none. The first DSL a spec file takes decides its trial count. */
-  endWhen(taken: FixtureName | undefined): void {
-    this.firstTaken ??= taken;
+  /**
+   * The `when`'s own body has been defined. Its trial scopes are defined afterwards (Vitest runs nested suites once their parent's body is
+   * done), and each brings the `when` back (`runInScope`). A `when` that ran no trials asks nothing of any DSL, which is a mistake in the spec.
+   */
+  endWhen(): void {
     this.currentWhen = undefined;
+    if (!this.tookTrials) {
+      throw new Error(
+        'Run each trial of this `when` in a scope of its own: `when("…", ({weaponSmith}) => {eachTrial(weaponSmith.weapon, weapon => {…})})`, ' +
+          "or with `weaponSmith.appearance`, `weaponSmith.arena` or `weaponSmith.arenaSubmission`. Without one it asks nothing.",
+      );
+    }
+  }
+
+  /** A request's trials are about to get a scope each: the first domain a spec file does this for decides its trial count. */
+  noteTrialDomain(domain: EvalDomain): void {
+    this.firstTrialDomain ??= domain;
+    this.tookTrials = true;
+  }
+
+  isInTrial(): boolean {
+    return this.inTrial;
+  }
+
+  /**
+   * Defines something inside a `when`'s trial scope, which Vitest does after the `when`'s own body has finished: it brings back the
+   * `when` the scope belongs to, so a `beforeAll` or `thenExpect` there finds its place, and marks it a trial's scope, so a `when`
+   * inside it is nested. Everything is put back as it was afterwards.
+   */
+  runInScope(when: WhenContext, define: () => void): void {
+    const before = {currentWhen: this.currentWhen, inTrial: this.inTrial};
+    this.currentWhen = when;
+    this.inTrial = true;
+    try {
+      define();
+    } finally {
+      this.currentWhen = before.currentWhen;
+      this.inTrial = before.inTrial;
+    }
+  }
+
+  /** The place in the report of a `when` inside another: the outer description, then its own after a `›`. */
+  nestedWhen(outer: WhenContext, description: string): WhenContext {
+    return {...outer, description: `${outer.description} › ${description}`};
   }
 
   /** The `when` being defined. `beforeAll` and `thenExpect` belong inside one, which a spec that puts them elsewhere is told. */
@@ -60,21 +107,9 @@ export class EvalRun {
     this.results.push(result);
   }
 
-  /** How many times a spec file's requests ran, which its first DSL decides: each pipeline has its own trial count. */
+  /** How many times a spec file's requests ran, which the first domain it ran trials for decides: each pipeline has its own. */
   trials(): number {
-    if (this.firstTaken === "appearance") {
-      return this.drivers.appearance.trials;
-    }
-
-    if (this.firstTaken === "arena") {
-      return this.drivers.arena.trials;
-    }
-
-    if (this.firstTaken === "arenaSubmission") {
-      return this.drivers.arenaSubmission.trials;
-    }
-
-    return this.drivers.weapon.trials;
+    return this.weaponSmith[this.firstTrialDomain ?? "weapon"].trials;
   }
 
   /** What the spec file came to, ready to be summarised and written when the file is done. */
@@ -84,7 +119,7 @@ export class EvalRun {
       tier: this.tier,
       trials: this.trials(),
       ranAt: new Date().toISOString(),
-      results: this.results,
+      results: foldTrials(this.results),
     };
   }
 }
