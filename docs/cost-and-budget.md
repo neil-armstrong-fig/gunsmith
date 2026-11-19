@@ -307,7 +307,9 @@ emails once each as spend reached exactly $1.00; the second, after the review be
 sent 50, 80 and the 100 percent email (spend $0.80) once each. The retry path and a real delivery are not checked: a real send needs the
 deploy and the secret (manual step 20).
 
-**Still open:** where the cost estimator lives and who owns its prices; the generation route that the reserve and refund wrap (`server`).
+**Global spend on the weapon route (budget, 2026-11-19).** The route reserves `WEAPON_SPEND.reservedMicrodollars` (3,000 µ$, about three times the measured $0.00105 for a drawn weapon and above five calls at the per-call price) after the credit and before the pipeline; a `paused` answer refunds the credit and returns 503 `ai-off` with the time AI returns. It settles at `modelCalls` times `perCallMicrodollars` (400 µ$: measured about $0.00034 a call on Haiku 5.5, rounded up), or the whole reservation if the pipeline threw. Both numbers are tunables in `api/src/ai/spend/estimate/WeaponSpend.ts`. **Known limit:** `WeaponOutcome` carries `modelCalls` but not the stats stage's tokens (only the drawing's `usage`), so the settled figure is an estimate and the Console is the bill; the fix is for `ai` to sum real `usage` onto `WeaponOutcome` (asked in HANDOFF), after which settle should use it. Repeatable now (node, fake ledgers around the real `CreditAccount` and `SpendMeter`): five requests arriving together with room under the daily cap for two let exactly two run and refund the other three; properties hold the spend at what the requests that ran came to, never over the cap, with no reservation held. Atomicity itself is still the Durable Object's guarantee (the one-off `wrangler dev` probe above).
+
+**Still open:** the arena route's estimate (arenas are not measured); a time limit on the pipeline (`server`); real token usage in the settle (`ai`).
 `ai`'s eval `paidSpendGuard` and its $1 total ledger are separate and untouched.
 
 ## Sources

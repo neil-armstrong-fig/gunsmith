@@ -2,8 +2,10 @@ import {CreditAccount} from "@src/ai/credits/account/CreditAccount";
 import type {CreditLedger} from "@src/ai/credits/CreditLedger";
 import type {CreditKind} from "@src/ai/credits/types/CreditKind";
 import type {ReserveOutcome} from "@src/ai/credits/types/ReserveOutcome";
+import {SpendMeter} from "@src/ai/spend/meter/SpendMeter";
 import type {SpendLedger} from "@src/ai/spend/SpendLedger";
 import type {AiStatus} from "@src/ai/spend/types/AiStatus";
+import type {SpendOutcome} from "@src/ai/spend/types/SpendOutcome";
 import type {ApiEnvironment} from "@src/env/types/ApiEnvironment";
 import type {FakeLedgers} from "@src/generation/fake-ledgers/types/FakeLedgers";
 import type {FakeLedgersOptions} from "@src/generation/fake-ledgers/types/FakeLedgersOptions";
@@ -11,6 +13,7 @@ import type {FakeLedgersOptions} from "@src/generation/fake-ledgers/types/FakeLe
 /** Builds the fake ledgers for a test of a route (`types/FakeLedgers.ts`). Used by the route's unit tests and its property test. */
 export function fakeLedgers(options: FakeLedgersOptions = {}): FakeLedgers {
   const accounts = new Map<string, CreditAccount>();
+  const spendMeter = new SpendMeter();
   const calls: string[] = [];
 
   const accountOf = (accountId: string): CreditAccount => {
@@ -44,8 +47,20 @@ export function fakeLedgers(options: FakeLedgersOptions = {}): FakeLedgers {
   const spendStub = (): unknown => ({
     status: async (): Promise<AiStatus> => {
       calls.push("status");
+      if (options.aiOn === false) {
+        return {on: false, returnsAt: options.returnsAt};
+      }
 
-      return {on: options.aiOn ?? true, returnsAt: options.returnsAt};
+      return spendMeter.status(Date.now());
+    },
+    reserve: async (key: string, microdollars: number): Promise<SpendOutcome> => {
+      calls.push("spend:reserve");
+
+      return spendMeter.reserve(key, microdollars, Date.now());
+    },
+    settle: async (key: string, microdollars: number): Promise<void> => {
+      calls.push("spend:settle");
+      spendMeter.settle(key, microdollars, Date.now());
     },
   });
 
@@ -55,5 +70,5 @@ export function fakeLedgers(options: FakeLedgersOptions = {}): FakeLedgers {
     SPEND: {getByName: spendStub} as unknown as DurableObjectNamespace<SpendLedger>,
   } as unknown as ApiEnvironment;
 
-  return {environment, calls, accountOf};
+  return {environment, calls, accountOf, spendMeter};
 }
