@@ -19,4 +19,5 @@ export const SPRITE_KEYS = [
   "tile-floor-l2",
   "tile-floor-l3",
   "tile-wall",
+  "tile-low-cover",
 ] as const;

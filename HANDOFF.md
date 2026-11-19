@@ -13,7 +13,7 @@ Ownership follows the assigned persona. Models below are defaults; no applicatio
 | ai | Claude | [TODO-ai.md](TODO-ai.md) | Arena screening, player selection and engine validation integrated. Owns model quality, fallback contrast and adapter coordination. |
 | server | Claude | [TODO-server.md](TODO-server.md) | Initial private-room networking integrated; Prediction/interpolation integrated; match flow/auth/persistence next. |
 | budget | Claude | [TODO-budget.md](TODO-budget.md) | Production ledger/spend boundaries with server/AI; credits, refunds, tracing and kill switch. |
-| art | Codex | [TODO-art.md](TODO-art.md) | Terrain and C2 marker integrated. Room weapon artwork is ready in `worktree-art`. Low-cover artwork is next. |
+| art | Codex | [TODO-art.md](TODO-art.md) | Terrain, C2 marker and room weapon artwork integrated. Low-cover artwork is ready for review in `worktree-art`. |
 | ship | Codex | [TODO-ship.md](TODO-ship.md) | Repository tooling/CI now; infra/release when bindings and authorization exist. |
 
 ### Start prompts
@@ -169,6 +169,9 @@ Before changing a consumed contract, record the proposal and affected owners her
 - [ ] Production art/audio and live release: art/play integrate their domains; ship validates release.
 
 ## Delivery log
+
+**Art → Engine and Play, low-cover terrain (2026-11-19).** The user chose option C, an inset square with four matching braces. `tile-low-cover` draws on existing cover cells beneath fog, with a flat square fallback. `DrawingLowCover` samples the braces, gaps, corners and exposed floor at 64 and 32 px per tile. All four updated criteria failed on the previous continuous rim. The idea of omitting braces along shared edges is on the post-MVP art checklist. The delivery is in `worktree-art`. [Terrain artwork](docs/art/terrain/README.md#playable-low-cover).
+
 - 2026-11-19, play (`worktree-play`, main `afc2092` already merged): **docs only, no code.** Wrote the selection concept (`docs/selection-concept/`, with a clickable mock-up), edited `docs/game-design.md` (pre-round now chooses; characters, not tokens; shelf limits; glossary) and `SessionDecisions.md`; reverted an unused draft `shotFired` engine event so the tree holds none of it. Nothing committed. Checks not run (the user: not needed for docs).
 - 2026-11-18, play (`worktree-play`, merged `worktree-ship` `6795b56` by fast-forward, main `963a09d` included; the added criteria are uncommitted): reviewed ship's ring loop and inventory HUD instead of building a second ring loop. Mutating ship's loop found three missing criteria, now added to `TakingDamage` and `CombatSounds.test.ts` (a bullet does not start the loop; muted before the ring it never plays; a mute stays muted). Root `pnpm checks` exit 0 (webapp 583); sound specs and `InventoryOnTheScreen` 22 of 22 on a production preview. **Contract change: none.** Ship still owns nothing further there; play owns later HUD behaviour.
 

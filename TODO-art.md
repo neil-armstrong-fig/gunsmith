@@ -4,9 +4,9 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 ## Resume here
 
-Art is in `.claude/worktrees/art` on `worktree-art`, synced to committed main `afc2092`. Preserve this worktree and sync committed main before resuming.
+Art is in `.claude/worktrees/art` on `worktree-art`, based on committed main `fb1a739`. Preserve this worktree and sync committed main before resuming.
 
-Room weapon art uses the inventory identity for both fighters. The drawing hook, held weapon and pickup components and the two-browser drawing spec are ready for review in this worktree. The next slice replaces the low-cover placeholder in `?scenario=cover`. Start with a failing browser criterion for the cover silhouette at 64 and 32 px per tile. AI and Engine own the production appearance association. For S4-1, recheck the refused pickup's body and outline separately from its muzzle at both scales once AI delivers the contrast change.
+Room weapon art and its two-browser spec are integrated. Low-cover artwork is ready for review in this worktree. Art owns the tile SVG, sprite registration, terrain rendering and drawing spec for this delivery. The workshop result card and arena thumbnails can use the live terrain tiles once Play has a consumer. Start that slice with a browser criterion for an arena preview that displays the correct floor and wall artwork. AI and Engine own the production appearance association. For S4-1, recheck the refused pickup's body and outline separately from its muzzle at both scales once AI delivers the contrast change.
 
 The [approved stair treatment](docs/art/terrain/README.md#playable-stair-preview) draws in every arena. Art reviewed the opposing stairs in `fair-duel` and the wall-side landing in `terraced` at 64 and 32 px per tile.
 
@@ -57,7 +57,8 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [x] Draw paired stair landings and height edges in `?scenario=terrain` for playable review.
 - [x] Review the stair treatment for adoption in other arenas at both play scales.
 - [x] Adopt the stair treatment in other arenas with browser coverage for opposing stairs and the wall-side landing.
-- [ ] Replace the low-cover block placeholder with terrain artwork in `?scenario=cover`.
+- [x] Replace the low-cover block placeholder with terrain artwork in `?scenario=cover`.
+- [ ] After MVP, try omitting braces on the shared edges of adjoining low-cover blocks so a row reads as one barrier.
 - [ ] Penetrable cover, spawn markers and fog texture.
 - [ ] Revisit closing-ring visuals after MVP, per the user.
 - [x] Publish the three [approved inventory icons](docs/art/concepts/inventory-display/README.md#weapon-artwork-and-prompt-built-identities) and their lookup for Play.
@@ -69,6 +70,36 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [ ] Case-study diagrams: pipeline, cost safeguards and eval loop.
 
 ## Verification/latest delivery
+
+2026-11-19, reinforced square in `worktree-art`. The user chose option C.
+All four updated drawing criteria failed against the continuous rim.
+The new SVG matches the study's geometry and colours. All 10 focused
+production-preview criteria passed, covering drawing and cover visibility.
+`pnpm checks` passed lint, formatting, strict types and 3,336 tests,
+with one existing audio skip. The folder and caller audit found no new
+helpers or types.
+
+2026-11-19, square low cover in `worktree-art`. The user asked for the
+same profile on all sides. At 64 and 32 px per tile, all four updated
+criteria failed on the directional artwork and on the forced 404.
+All 10 focused production-preview criteria passed with the square.
+`pnpm checks` passed lint, formatting, strict types and 3,336 tests,
+with one existing audio skip. Reviewed lit and dim captures and audited
+the existing asset and spec folders and callers. Captures are in
+`/private/tmp/gunsmith-square-cover.HhpuIW/`.
+
+2026-11-19, low-cover artwork in `worktree-art` at `fb1a739`. All four
+new criteria failed on the flat placeholder and passed with the slab.
+An isolated 404 settled sprite readiness, drew the fallback at both
+scales and failed all four criteria again. Chromium captures at 64 and
+32 px per tile were reviewed lit and dim, in colour and grayscale.
+The single-worker production run passed 48 criteria without retries.
+The first two-worker run passed 47 and failed one existing criterion
+while setting up crouch. `pnpm checks` passed lint, formatting, strict
+types and 3,336 tests, with one existing slow audio test skipped.
+Re-read root, webapp, React and acceptance
+instructions and audited the asset, spec and their callers. Captures
+and the 404 run are in `/private/tmp/gunsmith-low-cover.5uTViK/`.
 
 2026-11-18, room weapon artwork in `worktree-art`. All five new browser
 criteria failed on the original renderer and passed with the identity-key

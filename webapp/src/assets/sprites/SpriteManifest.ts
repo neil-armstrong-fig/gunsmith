@@ -31,7 +31,7 @@ const SHOT_SPRITE: SpriteEntry = {
   pixelsPerTile: PLAYER_SPRITE.pixelsPerTile,
 };
 
-/** Terrain art fills exactly one cell and is centred on it. */
+/** A terrain canvas spans one cell and is centred on it. */
 const TERRAIN_TILE: SpriteEntry = {
   sizePixels: 64,
   anchor: {x: 32, y: 32},
@@ -74,4 +74,5 @@ export const SPRITE_MANIFEST: Record<SpriteKey, SpriteEntry> = {
   "tile-floor-l2": TERRAIN_TILE,
   "tile-floor-l3": TERRAIN_TILE,
   "tile-wall": TERRAIN_TILE,
+  "tile-low-cover": TERRAIN_TILE,
 };
