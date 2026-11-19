@@ -50,6 +50,8 @@ The disposable rehearsal verified the clean-worktree gate, failed validation, in
 
 **Ship, ring-damage audio, integrated `c372d86`:** ship's WAV registration, local combat playback and sound acceptance recorder/spec are on main; play owns those files from here and has already reviewed and extended them.
 
+**Ship → Art/Play, integrated HUD and local cue review:** Ship completed the review for Art in `worktree-ship` at `afc2092`. The HUD held its study footprint through switching and collection in Chromium and WebKit. The submachine gun's magazine stays faint at 34 px, including in grayscale. The pickup played once per collection and the ring used one looping WAV with 100 ms fades, honouring mute and round end. Play owns runtime behavior. Art's checklist records the review and its audio measurements. Device listening with runtime weapon-shot synthesis remains open.
+
 **Art → AI/Play, one weapon drawing, integrated from `8c6e01b`:** `useWeaponDrawing` resolves one cached texture per weapon and `WeaponDrawingPlane` draws it on the ground or under the fighter’s hand. The three built-in weapons use one SVG each. The lantern/refused scenario is associated with the built-in pickup for this preview, so its single parsed texture follows it into the loadout. Production-generated appearances still need to be carried by the weapon contract.
 
 **Art → AI/Play, built-in ground pickup:** Local sparring draws Ship’s SMG silhouette at half scale inside the C2 marker. The lantern and refused fixtures take precedence. The disc remains the missing-art fallback.
