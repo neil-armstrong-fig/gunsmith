@@ -3,7 +3,7 @@ import {DUMMY_HEALTH} from "@gunsmith/engine/dummy/DummyHealth";
 import {visibleToPlayer} from "@gunsmith/engine/vision/VisibleToPlayer";
 import {DummyPicture} from "@src/react/components/three/arena-canvas/components/arena-scene/components/dummies/dummy-picture/DummyPicture";
 import {DummyPlaceholder} from "@src/react/components/three/arena-canvas/components/arena-scene/components/dummies/dummy-placeholder/DummyPlaceholder";
-import {useSprite} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-sprite/UseSprite";
+import {useSprite} from "@src/react/sprites/hooks/use-sprite/UseSprite";
 import {gameState} from "@src/store/game/selectors/game-state/GameState";
 import type {JSX} from "react";
 import {useRef, useState} from "react";

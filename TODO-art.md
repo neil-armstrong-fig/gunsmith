@@ -4,13 +4,13 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 ## Resume here
 
-Art is in `.claude/worktrees/art` on `worktree-art`, synced to main `6fed51d` before the workshop card slice. Preserve this worktree and sync committed main before resuming.
+Art is in `.claude/worktrees/art` on `worktree-art`, synced to main `44873b7` for the workshop arena preview. Preserve this worktree and sync committed main before resuming.
 
 Room weapon art and its two-browser spec are integrated. The user's approved low-cover artwork from `837f1d9` is integrated in `adbf7b4`.
 
 The workshop weapon result card now has the authored picture beside the name, a power meter and six compact stat rows. Integrated from `457ba87` via `3912cb1`, alongside Play’s Try it action.
 
-The next M1 art slice is the workshop arena preview. Resume when Play exposes the arena result and built-in arena row. Art owns the preview component, reuse of the terrain artwork and the browser drawing spec. The first criterion opens a deterministic Fair duel result and checks the floor ticks and wall braces in the preview. Compare Fair duel and Duel in the built-in row to catch a preview that reuses the wrong arena.
+The workshop arena preview is implemented in `worktree-art`. Open the workshop, choose Arenas, then choose Duel or Fair duel for a larger preview. The built-in pool supplies both the row and the deterministic Fair duel result. The match and preview render the same terrain through React Three Fiber. Next, hand the same component a parsed generated arena from Play's workshop flow, then reuse it for future pre-round choices.
 
 AI and Engine own the production appearance association. For S4-1, recheck the refused pickup's body and outline separately from its muzzle at both scales once AI delivers the contrast change.
 
@@ -22,7 +22,7 @@ Ship's inventory HUD, local pickup cue and ring loop are integrated (`c372d86`).
 
 ## MVP priority
 
-Own the reusable arena preview for workshop results and pre-round choices. Build against Play's parsed arena and deterministic Fair duel fixture, using the shipped tiles and stair geometry. Coordinate the integration point with Play, and review the generated fallback with AI when its contrast change is ready. See [the shared priorities](TODO.md#mvp-integration-priorities) and [handoffs](HANDOFF.md#mvp-ownership-and-handoffs).
+Maintain the shared arena preview for workshop results and pre-round choices. Play can pass a parsed arena, its name and any resolved starting places. Review the generated weapon fallback with AI when its contrast change is ready. See [the shared priorities](TODO.md#mvp-integration-priorities) and [handoffs](HANDOFF.md#mvp-ownership-and-handoffs).
 
 ## Ownership
 
@@ -37,6 +37,8 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 ## Current milestone tasks
 
 - [x] Style the existing workshop weapon result card using the selection concept. Check that the meter and printed power rating agree for successive results.
+
+- [x] Draw workshop arena previews from the engine's built-in Duel and Fair duel using the shipped tile artwork and stair geometry.
 
 - [x] User chose C2 soft octagon after two marker comparisons. Lock artwork, clean rejected studies and integrate the marker with pickup rendering and browser coverage.
 
@@ -83,6 +85,45 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 
 ## Verification/latest delivery
 
+2026-11-19, selecting a built-in arena now reveals the full result in the
+scrollable workshop panel. At 1280 × 720 the old layout hid 43 pixels of
+the preview and showed only 78% of the card. The new criterion reproduced
+that before the fix. Verified the whole result and its original aspect
+ratio at 1024 × 560, 1280 × 700, 1280 × 720 and 1440 × 900, including
+reselecting Fair duel after scrolling away. Reviewed the root, webapp,
+React and acceptance instructions and audited the existing folders and
+their callers. All 40 workshop browser criteria and `pnpm checks` passed,
+with 3,502 tests and one existing audio skip in the project gate.
+
+2026-11-19, reused the live terrain renderer for workshop previews. Both
+surfaces mount `ArenaTerrain`, which groups the existing walls and
+heights. The preview fits the arena with a demand-rendered orthographic
+camera. The new WebGL criterion failed on the old preview. Separate
+production variants with the floor or wall SVG missing failed their
+screenshot assertions. All 72 focused production browser criteria passed.
+Reviewed Chromium at 1024 × 560 and 1440 × 900
+for square tiles, visible captions, and switching to Duel. `pnpm checks`
+passed lint, formatting, strict types and 3,502 tests, with one existing
+audio skip. Re-read the root, webapp, React and acceptance instructions and audited the new
+Three Fiber component folders and their callers.
+
+2026-11-19, workshop arena previews in `worktree-art` on main baseline
+`44873b7`. Four browser criteria failed first on the weapon-only workshop.
+Both temporary production faults failed their intended assertions, one
+with missing floor and wall artwork and one with Duel drawn in both rows.
+The single-worker production preview passed all 71 workshop and terrain
+criteria. The four preview criteria passed again after the compact layout
+adjustment. Chromium review at 1024 × 560 and 1440 × 900 checked square
+tiles, the starting-place caption, and switching the result to Duel.
+`pnpm checks` passed lint, formatting, strict types and 3,502 tests,
+with one existing audio skip. An earlier engine timeout passed on rerun.
+Read the root, webapp, React and acceptance instructions and audited the
+added folders and caller counts. Pure terrain geometry and the sprite
+loader are shared by the DOM preview and the live arena. Drawing logic
+used only by the preview sits beneath that component and its type is in
+`types/`. The two files also touched by Play merged cleanly in a read-only
+three-way check.
+
 2026-11-19, workshop weapon result card in `worktree-art` at `6fed51d`.
 The meter criterion failed on the old card and caught a 50% fixed fill in
 a copy of the production bundle. All 23 workshop browser criteria passed
@@ -94,10 +135,12 @@ acceptance instructions. The folder and caller audit confirmed that the new
 meter type lives under the workshop DSL's `types/` and its callers stay in
 the workshop.
 
-Workshop preview baseline at `837f1d9`. The production build and all 33
-existing terrain drawing criteria passed. `pnpm checks` passed lint,
-formatting, strict types and 3,336 tests, with one existing audio skip.
-The workshop preview criterion awaits Play's arena view.
+Workshop preview baseline at `44873b7`. The production build and all 67
+existing workshop, terrain, stairs and low-cover Chromium criteria passed
+on a local preview without retries. `pnpm checks` passed lint, formatting,
+strict types and 3,502 tests, with one existing audio skip. Art and Play
+were at the weapon-only workshop baseline. That baseline preceded the
+arena result, built-in row and deterministic Fair duel result.
 
 2026-11-19, reinforced square in `worktree-art`. The user chose option C.
 All four updated drawing criteria failed against the continuous rim.

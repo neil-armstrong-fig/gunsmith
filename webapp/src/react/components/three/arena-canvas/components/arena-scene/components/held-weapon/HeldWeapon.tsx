@@ -6,7 +6,7 @@ import type {SpriteKey} from "@src/assets/sprites/types/SpriteKey";
 import {WeaponDrawingPlane} from "@src/react/components/three/arena-canvas/components/arena-scene/components/weapon-drawing-plane/WeaponDrawingPlane";
 import {useWeaponDrawing} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-weapon-drawing/UseWeaponDrawing";
 import {useGameStore} from "@src/store/game/UseGameStore";
-import {useSprite} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-sprite/UseSprite";
+import {useSprite} from "@src/react/sprites/hooks/use-sprite/UseSprite";
 import {gameState} from "@src/store/game/selectors/game-state/GameState";
 import type {JSX} from "react";
 import {useRef} from "react";
