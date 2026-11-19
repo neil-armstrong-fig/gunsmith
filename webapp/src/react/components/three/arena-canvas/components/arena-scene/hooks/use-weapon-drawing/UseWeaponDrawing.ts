@@ -4,19 +4,16 @@ import {SPRITE_MANIFEST} from "@src/assets/sprites/SpriteManifest";
 import type {SpriteEntry} from "@src/assets/sprites/types/SpriteEntry";
 import type {SpriteKey} from "@src/assets/sprites/types/SpriteKey";
 import {weaponDrawingOfPage} from "@src/game/scenario/weapon-drawing/WeaponDrawingOfPage";
-import {roomOfPage} from "@src/online/RoomOfPage";
 import {loadedWeaponDrawing} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-weapon-drawing/texture/LoadedWeaponDrawing";
 import {loadWeaponDrawing} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-weapon-drawing/texture/load-weapon-drawing/LoadWeaponDrawing";
 import type {WeaponDrawing} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-weapon-drawing/types/WeaponDrawing";
 import {loadedSprite} from "@src/react/components/three/arena-canvas/sprites/loaded/LoadedSprite";
 import {spritesReadiness} from "@src/react/components/three/arena-canvas/sprites/SpritesReadiness";
 
-const SUBMACHINE_GUN_KEY = "submachine-gun";
-
 const AUTHORED_SPRITES = new Map<string, SpriteKey>([
   ["rifle", "sprite-rifle-default"],
   ["marksman-rifle", "sprite-marksman-rifle"],
-  [SUBMACHINE_GUN_KEY, "sprite-submachine-gun"],
+  ["submachine-gun", "sprite-submachine-gun"],
 ]);
 
 // Generated v1 drawings face right. Use a fixed grip at the rear of that canvas for the preview.
@@ -28,7 +25,7 @@ const GENERATED_SPRITE: SpriteEntry = {
 
 /** Resolve one drawing per weapon, independent of where it will be placed. */
 export function useWeaponDrawing(weaponKey: string | undefined): WeaponDrawing | undefined {
-  const appearance = previewAppearanceOf(weaponKey);
+  const appearance = weaponDrawingOfPage(weaponKey);
   const spriteKey = weaponKey && AUTHORED_SPRITES.get(weaponKey);
 
   useEffect(() => {
@@ -57,13 +54,4 @@ export function useWeaponDrawing(weaponKey: string | undefined): WeaponDrawing |
   }
 
   return {texture, sprite: SPRITE_MANIFEST[spriteKey]};
-}
-
-/** The local preview gives its built-in pickup a fixture appearance that follows it into the loadout. */
-function previewAppearanceOf(weaponKey: string | undefined): unknown {
-  if (weaponKey === SUBMACHINE_GUN_KEY && roomOfPage() === undefined) {
-    return weaponDrawingOfPage();
-  }
-
-  return undefined;
 }

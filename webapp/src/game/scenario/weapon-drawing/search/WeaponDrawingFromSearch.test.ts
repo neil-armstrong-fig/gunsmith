@@ -1,15 +1,18 @@
 import {readFileSync} from "node:fs";
 import {resolve} from "node:path";
-import {weaponDrawingFromSearch} from "@src/game/scenario/weapon-drawing/WeaponDrawingFromSearch";
+import {weaponDrawingFromSearch} from "@src/game/scenario/weapon-drawing/search/WeaponDrawingFromSearch";
 
-const ART_LANTERN = resolve(
-  import.meta.dirname,
-  "../../../../../docs/art/concepts/top-down-oddities/appearances/jellyfish-cage.json",
-);
+it.each([
+  ["lantern", "jellyfish-cage"],
+  ["cactus", "cactus-cluster"],
+])("uses art's approved source for the %s drawing", (drawing, source) => {
+  const path = resolve(
+    import.meta.dirname,
+    `../../../../../../docs/art/concepts/top-down-oddities/appearances/${source}.json`,
+  );
 
-it("is art's jellyfish cage when the query asks for the lantern, so the copy cannot drift from art's file", () => {
-  expect(weaponDrawingFromSearch("?scenario=sparring&weaponDrawing=lantern")).toEqual(
-    JSON.parse(readFileSync(ART_LANTERN, "utf8")),
+  expect(weaponDrawingFromSearch(`?scenario=sparring&weaponDrawing=${drawing}`)).toEqual(
+    JSON.parse(readFileSync(path, "utf8")),
   );
 });
 

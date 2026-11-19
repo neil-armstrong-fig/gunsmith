@@ -1,8 +1,9 @@
-import {weaponDrawingFromSearch} from "@src/game/scenario/weapon-drawing/WeaponDrawingFromSearch";
+import {weaponDrawingFromSearch} from "@src/game/scenario/weapon-drawing/search/WeaponDrawingFromSearch";
+import {roomOfPage} from "@src/online/RoomOfPage";
 
-/** The drawing the page was opened with, still `unknown` until the renderer has parsed it. Outside a browser (a unit test) there is no query to read, so none. */
-export function weaponDrawingOfPage(): unknown {
-  if (typeof location === "undefined") {
+/** The local preview associates its pickup key with the page's untrusted fixture appearance. */
+export function weaponDrawingOfPage(weaponKey: string | undefined): unknown {
+  if (typeof location === "undefined" || weaponKey !== "submachine-gun" || roomOfPage() !== undefined) {
     return undefined;
   }
 

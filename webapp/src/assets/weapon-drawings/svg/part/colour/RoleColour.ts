@@ -1,7 +1,7 @@
 import type {ColourRole} from "@gunsmith/shared/appearance/vocabulary/colour/ColourRole";
 import type {PaletteToken} from "@gunsmith/shared/appearance/vocabulary/colour/PaletteToken";
-import type {AppearancePalette} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-weapon-drawing/texture/load-weapon-drawing/svg/types/AppearancePalette";
-import type {FixedRole} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-weapon-drawing/texture/load-weapon-drawing/svg/types/FixedRole";
+import type {AppearancePalette} from "@src/assets/weapon-drawings/svg/part/types/AppearancePalette";
+import type {FixedRole} from "@src/assets/weapon-drawings/svg/part/colour/types/FixedRole";
 
 // The game's own colours for what a generated weapon is drawn in, the same as the palette tokens in `index.css` (`RoleColour.test.ts` reads the file and checks each).
 // Body is art's README value, the wall's dark (`--color-gs-wall`): the eval review sheet's lighter grey was chosen only so the breech reads on its slate page, and

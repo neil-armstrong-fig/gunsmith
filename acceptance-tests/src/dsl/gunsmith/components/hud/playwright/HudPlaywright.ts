@@ -1,8 +1,10 @@
 import type {Locator, Page} from "@playwright/test";
 import {expect} from "@playwright/test";
+import {lookOfInventoryIcon} from "@src/dsl/gunsmith/components/hud/playwright/look-of-inventory-icon/LookOfInventoryIcon";
 import type {HudAmmo} from "@src/dsl/gunsmith/components/hud/types/HudAmmo";
 import type {HealthBorder} from "@src/dsl/gunsmith/components/hud/types/HealthBorder";
 import type {HudMotion} from "@src/dsl/gunsmith/components/hud/types/HudMotion";
+import type {InventoryIconLook} from "@src/dsl/gunsmith/components/hud/types/InventoryIconLook";
 import type {InventoryReadout} from "@src/dsl/gunsmith/components/hud/types/InventoryReadout";
 import type {MagazineBar} from "@src/dsl/gunsmith/components/hud/types/MagazineBar";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
@@ -117,14 +119,25 @@ export class HudPlaywright extends BasePage {
 
     const first = this.hud().getByTestId("inventory-slot-1");
     const second = this.hud().getByTestId("inventory-slot-2");
+    const [firstIcon, secondIcon] = await Promise.all([
+      this.loadedInventoryIcon(first),
+      this.loadedInventoryIcon(second),
+    ]);
+
     return {
       selectedName: await name.innerText(),
-      firstIcon: await this.loadedInventoryIcon(first),
-      secondIcon: await this.loadedInventoryIcon(second),
+      firstIcon: (await firstIcon.getAttribute("src")) ?? undefined,
+      secondIcon: (await secondIcon.getAttribute("src")) ?? undefined,
       firstSelected: (await first.getAttribute("aria-current")) === "true",
       secondSelected: (await second.getAttribute("aria-current")) === "true",
       widthPixels: await this.hud().evaluate(element => element.getBoundingClientRect().width),
     };
+  }
+
+  async getSecondInventoryIconLook(): Promise<InventoryIconLook> {
+    const icon = await this.loadedInventoryIcon(this.hud().getByTestId("inventory-slot-2"));
+
+    return await lookOfInventoryIcon(this.page, icon);
   }
 
   async getMagazineBar(): Promise<MagazineBar> {
@@ -181,15 +194,14 @@ export class HudPlaywright extends BasePage {
     return this.page.getByTestId("ammo-hud");
   }
 
-  private async loadedInventoryIcon(slot: Locator): Promise<string | undefined> {
+  private async loadedInventoryIcon(slot: Locator): Promise<Locator> {
     const icon = slot.getByTestId("inventory-icon");
     await expect(icon).toBeVisible();
     await expect
       .poll(() => icon.evaluate(element => element instanceof HTMLImageElement && element.naturalWidth > 0))
       .toBe(true);
 
-    const source = await icon.getAttribute("src");
-    return source ?? undefined;
+    return icon;
   }
 
   private async numberIn(testId: string): Promise<number> {

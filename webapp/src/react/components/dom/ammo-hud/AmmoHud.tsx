@@ -1,3 +1,4 @@
+import {weaponDrawingOfPage} from "@src/game/scenario/weapon-drawing/WeaponDrawingOfPage";
 import {InventorySlot} from "@src/react/components/dom/ammo-hud/components/inventory-slot/InventorySlot";
 import {selectAmmoReadout} from "@src/store/game/selectors/select-ammo-readout/SelectAmmoReadout";
 import {useGameStore} from "@src/store/game/UseGameStore";
@@ -34,9 +35,21 @@ export function AmmoHud(): JSX.Element {
       </div>
 
       <ul aria-label="Carried weapons" className="flex gap-2">
-        <InventorySlot slot={1} name={ammo.firstName} iconKey={ammo.firstIconKey} selected={ammo.slot === 1} />
+        <InventorySlot
+          slot={1}
+          name={ammo.firstName}
+          iconKey={ammo.firstIconKey}
+          appearance={weaponDrawingOfPage(ammo.firstIconKey)}
+          selected={ammo.slot === 1}
+        />
 
-        <InventorySlot slot={2} name={ammo.secondName} iconKey={ammo.secondIconKey} selected={ammo.slot === 2} />
+        <InventorySlot
+          slot={2}
+          name={ammo.secondName}
+          iconKey={ammo.secondIconKey}
+          appearance={weaponDrawingOfPage(ammo.secondIconKey)}
+          selected={ammo.slot === 2}
+        />
       </ul>
 
       <span data-testid="weapon-slot" className="sr-only">

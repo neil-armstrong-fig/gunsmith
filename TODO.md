@@ -23,7 +23,7 @@ Start a session with: **"You are engine, continue the TODO."** Substitute any pe
 | server | Claude | [TODO-server.md](TODO-server.md) | Room reconnect and forfeit are integrated. Rooms use the engine's Duel arena. The weapon generation route is integrated with an injectable adapter. Sign-in, storage, production adapter and spend reservation remain open. | 2026-11-19 |
 | budget | Claude | [TODO-budget.md](TODO-budget.md) | Credit and spend Durable Objects and 50/80/100% email alerts are integrated. Address configuration, account identity and spend reservation on the generation route remain open. | 2026-11-19 |
 | art | Codex | [TODO-art.md](TODO-art.md) | Room weapon artwork and two-browser equip and fog coverage integrated. Ship completed the HUD and audio cue review. Low-cover artwork is next. S4-1 re-review awaits AI and combat listening awaits runtime shot synthesis. | 2026-11-19 |
-| ship | Codex | [TODO-ship.md](TODO-ship.md) | Function-order and named-helper lint integrated, including tests. Hosted CI profiling and deployment remain open. | 2026-11-18 |
+| ship | Codex | [TODO-ship.md](TODO-ship.md) | Reusable generated weapon HUD thumbnails verified in the local preview. Production appearance association and hosted CI profiling remain open. | 2026-11-19 |
 
 These are persistent workstreams, not permission for simultaneous edits to the same files. Select one current slice; record concrete reservations and contracts in HANDOFF.md. Model assignments are defaults, not application configuration. `build` is retired; current tasks remain in the seven owner checklists.
 

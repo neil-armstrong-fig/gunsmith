@@ -108,9 +108,12 @@ reads the two slots and the selected weapon from the existing world. The browser
 criteria inspect the rendered DOM. The existing state hook still provides the
 selected ammunition data for its current consumers.
 
-The first live slice retains the segmented magazine and CSS reload progress.
-The continuous track, per-slot status badges and generated thumbnails remain
-design follow-ups.
+The HUD retains the segmented magazine and CSS reload progress. The local
+sparring preview now uses the generated weapon's validated structural drawing
+in its slot. A one-pixel contour keeps the silhouette readable against the slot
+background at 34 px. The same renderer can take the production appearance once
+AI and Engine associate it with a weapon. The continuous track and per-slot
+status badges remain design follow-ups.
 
 Suggested acceptance scenarios for build, written before runtime changes:
 
