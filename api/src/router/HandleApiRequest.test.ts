@@ -78,6 +78,18 @@ it("refuses any way of asking for an arena but POST", async () => {
   expect(response.headers.get("Allow")).toBe("POST");
 });
 
+it("hands the shelf and an item's path to the library route", async () => {
+  const shelf = await handleApiRequest(new Request("https://gunsmith.test/api/library"));
+  const item = await handleApiRequest(
+    new Request("https://gunsmith.test/api/library/arena-1", {method: "GET", headers: FROM_THE_SITE}),
+  );
+
+  expect(shelf.status).toBe(401);
+  expect(await shelf.json()).toEqual({error: "account-required"});
+  expect(item.status).toBe(405);
+  expect(item.headers.get("Allow")).toBe("DELETE");
+});
+
 it("hands a credits request to the credit status route", async () => {
   const withoutAccount = await handleApiRequest(new Request("https://gunsmith.test/api/credits"));
   const wrongMethod = await handleApiRequest(

@@ -56,5 +56,5 @@ export async function reserveCredit(
     }
   }
 
-  return {credits, spend, key, prompt};
+  return {credits, spend, accountId: account.id, key, prompt};
 }
