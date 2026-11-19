@@ -7,6 +7,9 @@ import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
 /** The key that opens the workshop on the practice range. */
 const WORKSHOP_KEY = "KeyB";
 
+/** The key that stands the practice range's dummies up again and refills the weapons. */
+const RESET_KEY = "KeyT";
+
 export class WorkshopPlaywright extends BasePage {
   constructor(page: Page) {
     super(page);
@@ -18,6 +21,10 @@ export class WorkshopPlaywright extends BasePage {
 
   async close(): Promise<void> {
     await this.page.keyboard.press("Escape");
+  }
+
+  async resetTheRange(): Promise<void> {
+    await this.page.keyboard.press(RESET_KEY);
   }
 
   async isOpen(): Promise<boolean> {

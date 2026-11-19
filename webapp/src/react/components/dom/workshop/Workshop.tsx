@@ -1,5 +1,6 @@
 import {WeaponCard} from "@src/react/components/dom/workshop/components/weapon-card/WeaponCard";
 import {WeaponPrompt} from "@src/react/components/dom/workshop/components/weapon-prompt/WeaponPrompt";
+import {usePracticeResetKey} from "@src/react/components/dom/workshop/hooks/use-practice-reset-key/UsePracticeResetKey";
 import {useWorkshopKey} from "@src/react/components/dom/workshop/hooks/use-workshop-key/UseWorkshopKey";
 import {useAppStore} from "@src/store/app/UseAppStore";
 import type {JSX, KeyboardEvent} from "react";
@@ -11,6 +12,7 @@ import {useEffect, useRef} from "react";
  */
 export function Workshop(): JSX.Element | undefined {
   useWorkshopKey();
+  usePracticeResetKey();
   const open = useAppStore(state => state.workshopOpen);
   const panelRef = useRef<HTMLDivElement>(null);
 

@@ -1,4 +1,4 @@
-import {useHeldKeys} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/hooks/use-held-keys/UseHeldKeys";
+import {useHeldKeys} from "@src/react/hooks/use-held-keys/UseHeldKeys";
 import {crouchHeld} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/hooks/use-crouch-key/keys/CrouchHeld";
 import type {RefObject} from "react";
 

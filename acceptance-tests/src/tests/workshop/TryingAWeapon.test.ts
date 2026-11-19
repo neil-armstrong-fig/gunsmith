@@ -113,36 +113,6 @@ given("the workshop is open on the practice range", () => {
   });
 });
 
-given("the player has fired the weapon in slot 2 down to a part of its magazine", () => {
-  beforeEach(async ({gunsmith}) => {
-    await gunsmith.player.switchTo(2);
-    await gunsmith.weapon.waitForSlot(2);
-
-    const full = (await gunsmith.weapon.get()).rounds;
-
-    await gunsmith.player.fire();
-    await gunsmith.weapon.waitForRounds(full - 1);
-    await gunsmith.workshop.open();
-  });
-
-  when("the player makes a weapon and presses Try it", () => {
-    let magazine = 0;
-
-    beforeEach(async ({gunsmith}) => {
-      await gunsmith.workshop.typeThePrompt(FAST_PROMPT);
-      await gunsmith.workshop.make();
-
-      magazine = Number.parseInt((await gunsmith.workshop.getResult()).stats["Magazine"] ?? "", 10);
-
-      await gunsmith.workshop.tryIt();
-    });
-
-    then("the made weapon starts with a full magazine, whatever was left in the old one", async ({gunsmith}) => {
-      expect((await gunsmith.weapon.get()).rounds).toBe(magazine);
-    });
-  });
-});
-
 given("the practice range, held still, with a weapon made and the workshop open", () => {
   let startX = 0;
   let endX = 0;

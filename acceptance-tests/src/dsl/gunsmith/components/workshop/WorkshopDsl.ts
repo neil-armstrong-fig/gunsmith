@@ -31,6 +31,15 @@ export class WorkshopDsl {
     }
   }
 
+  /** Presses the reset key, which stands the practice range's dummies up at full health and refills both weapons' magazines and reserves. */
+  async resetTheRange(): Promise<void> {
+    try {
+      await this.workshop.resetTheRange();
+    } catch (error) {
+      throw new DslError("Failed to reset the practice range", error);
+    }
+  }
+
   /** Whether the workshop's panel is on the screen. */
   async isOpen(): Promise<boolean> {
     try {
