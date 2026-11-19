@@ -6,7 +6,7 @@ import type {FakeCreditLedger} from "@src/router/routes/shared/fake-ledgers/cred
 
 /**
  * The `CREDITS` namespace as a route sees it: each account name gets its own real `CreditAccount` (made on first use), and every call a
- * route makes to one is pushed on `calls`, written like `reserve:weapon`, `settle:rejected`, `refund` or `balance`.
+ * route makes to one is pushed on `calls`, written like `reserve:weapon`, `settle:rejected`, `refund`, `balance` or `erase`.
  */
 export function fakeCreditLedger(calls: string[]): FakeCreditLedger {
   const accounts = new Map<string, CreditAccount>();
@@ -41,6 +41,10 @@ export function fakeCreditLedger(calls: string[]): FakeCreditLedger {
       calls.push("balance");
 
       return accountOf(accountId).balance(Date.now());
+    },
+    erase: async (): Promise<void> => {
+      calls.push("erase");
+      accounts.delete(accountId);
     },
   });
 
