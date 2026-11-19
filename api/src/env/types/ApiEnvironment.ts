@@ -1,5 +1,5 @@
-import type {CreditLedger} from "@src/ai/credits/CreditLedger";
-import type {SpendLedger} from "@src/ai/spend/SpendLedger";
+import type {CreditLedger} from "@src/durable-objects/credit-ledger/CreditLedger";
+import type {SpendLedger} from "@src/durable-objects/spend-ledger/SpendLedger";
 
 /**
  * The bindings the Worker is given: one `Match` Durable Object per friend code, one `CreditLedger` per account (named by the internal

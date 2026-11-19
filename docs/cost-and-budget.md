@@ -285,7 +285,7 @@ counters, the kill-switch flag and the alert thresholds. D1 stays for accounts, 
   quotas are the same for both (100,000 rows written and 5,000,000 read a day), so they do not decide it.
 - **The cost:** the ledger is split from the account tables, so account deletion and export must also call the account's object, and a
   report across all users needs a fan-out or a summary kept elsewhere.
-- **Not proved by the unit tests:** the ledger classes (`api/src/ai/credits/account/CreditAccount.ts`, `api/src/ai/spend/meter/SpendMeter.ts`) are plain
+- **Not proved by the unit tests:** the ledger classes (`api/src/durable-objects/credit-ledger/account/CreditAccount.ts`, `api/src/durable-objects/spend-ledger/meter/SpendMeter.ts`) are plain
   and synchronous and run in node; atomicity is the Durable Object's own serial guarantee. It was checked once, on 2026-11-17, by running
   the real `CreditLedger` and `SpendLedger` under `wrangler dev` behind a throwaway probe Worker (not in the repo, so not repeatable from
   it) and firing concurrent requests: 50 parallel reserves on a fresh account gave exactly 10 reserved; two requests for the last credit
