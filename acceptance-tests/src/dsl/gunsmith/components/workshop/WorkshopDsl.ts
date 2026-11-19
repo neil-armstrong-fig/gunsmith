@@ -1,4 +1,5 @@
 import type {Page} from "@playwright/test";
+import {ArenaWorkshopDsl} from "@src/dsl/gunsmith/components/workshop/components/arenas/ArenaWorkshopDsl";
 import {WorkshopPlaywright} from "@src/dsl/gunsmith/components/workshop/playwright/WorkshopPlaywright";
 import type {PowerMeter} from "@src/dsl/gunsmith/components/workshop/types/PowerMeter";
 import type {PromptCount} from "@src/dsl/gunsmith/components/workshop/types/PromptCount";
@@ -7,9 +8,11 @@ import {DslError} from "@src/dsl/gunsmith/errors/DslError";
 
 /** The workshop, where a player makes weapons, reached as `gunsmith.workshop`. */
 export class WorkshopDsl {
+  readonly arenas: ArenaWorkshopDsl;
   private readonly workshop: WorkshopPlaywright;
 
   constructor(page: Page) {
+    this.arenas = new ArenaWorkshopDsl(page);
     this.workshop = new WorkshopPlaywright(page);
   }
 

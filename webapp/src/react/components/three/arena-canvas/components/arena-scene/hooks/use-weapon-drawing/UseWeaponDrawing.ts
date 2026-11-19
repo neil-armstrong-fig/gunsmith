@@ -7,8 +7,8 @@ import {weaponDrawingOfPage} from "@src/game/scenario/weapon-drawing/WeaponDrawi
 import {loadedWeaponDrawing} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-weapon-drawing/texture/LoadedWeaponDrawing";
 import {loadWeaponDrawing} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-weapon-drawing/texture/load-weapon-drawing/LoadWeaponDrawing";
 import type {WeaponDrawing} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-weapon-drawing/types/WeaponDrawing";
-import {loadedSprite} from "@src/react/components/three/arena-canvas/sprites/loaded/LoadedSprite";
-import {spritesReadiness} from "@src/react/components/three/arena-canvas/sprites/SpritesReadiness";
+import {loadedSprite} from "@src/react/sprites/loaded/LoadedSprite";
+import {spritesReadiness} from "@src/react/sprites/SpritesReadiness";
 
 const AUTHORED_SPRITES = new Map<string, SpriteKey>([
   ["rifle", "sprite-rifle-default"],

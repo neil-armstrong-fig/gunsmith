@@ -7,7 +7,7 @@ import {shotPlacementOf} from "@src/react/components/three/arena-canvas/componen
 import {ShotPicture} from "@src/react/components/three/arena-canvas/components/arena-scene/components/bullets/shots/shot-picture/ShotPicture";
 import {ShotPlaceholder} from "@src/react/components/three/arena-canvas/components/arena-scene/components/bullets/shots/shot-placeholder/ShotPlaceholder";
 import {spritePlacementOf} from "@src/react/components/three/arena-canvas/components/arena-scene/components/sprite-plane/placement/SpritePlacementOf";
-import {useSprite} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-sprite/UseSprite";
+import {useSprite} from "@src/react/sprites/hooks/use-sprite/UseSprite";
 import {gameState} from "@src/store/game/selectors/game-state/GameState";
 import type {JSX} from "react";
 import {useRef, useState} from "react";

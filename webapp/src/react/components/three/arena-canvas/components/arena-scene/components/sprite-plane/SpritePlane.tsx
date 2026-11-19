@@ -1,7 +1,7 @@
 import {SPRITE_MANIFEST} from "@src/assets/sprites/SpriteManifest";
 import {spritePlacementOf} from "@src/react/components/three/arena-canvas/components/arena-scene/components/sprite-plane/placement/SpritePlacementOf";
 import type {SpriteKey} from "@src/assets/sprites/types/SpriteKey";
-import {useSprite} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-sprite/UseSprite";
+import {useSprite} from "@src/react/sprites/hooks/use-sprite/UseSprite";
 import type {JSX, Ref} from "react";
 import type {Mesh} from "three";
 

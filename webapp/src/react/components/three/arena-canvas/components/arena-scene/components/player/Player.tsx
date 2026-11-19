@@ -2,7 +2,7 @@ import {useFrame} from "@react-three/fiber";
 import {FighterPlaceholder} from "@src/react/components/three/arena-canvas/components/arena-scene/components/fighter-placeholder/FighterPlaceholder";
 import {HeldWeapon} from "@src/react/components/three/arena-canvas/components/arena-scene/components/held-weapon/HeldWeapon";
 import {SpritePlane} from "@src/react/components/three/arena-canvas/components/arena-scene/components/sprite-plane/SpritePlane";
-import {useSprite} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-sprite/UseSprite";
+import {useSprite} from "@src/react/sprites/hooks/use-sprite/UseSprite";
 import {gameState} from "@src/store/game/selectors/game-state/GameState";
 import type {JSX} from "react";
 import {useRef} from "react";

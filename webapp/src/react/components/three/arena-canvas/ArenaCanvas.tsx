@@ -1,6 +1,6 @@
 import {Canvas} from "@react-three/fiber";
 import {ArenaScene} from "@src/react/components/three/arena-canvas/components/arena-scene/ArenaScene";
-import {useSpritesReady} from "@src/react/components/three/arena-canvas/hooks/use-sprites-ready/UseSpritesReady";
+import {useSpritesReady} from "@src/react/sprites/hooks/use-sprites-ready/UseSpritesReady";
 import {aimReticleCursor} from "@src/react/components/three/arena-canvas/reticle/AimReticleCursor";
 import type {JSX} from "react";
 import {useState} from "react";
