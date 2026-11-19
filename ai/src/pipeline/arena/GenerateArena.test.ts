@@ -43,6 +43,47 @@ it("gives a built-in arena and refunds the credit when the repair is refused too
   expect(invoke).toHaveBeenCalledTimes(2);
 });
 
+it("makes an arena the model described in shapes, drawn into rows, when the format is shapes", async () => {
+  const shapes = {name: "Pillar Room", width: 10, height: 5, walls: [{x: 3, y: 1, width: 1, height: 1}]};
+  const dependencies = {...dependenciesWith([shapes]), format: "shapes"} as const;
+
+  const outcome = await generateArena({prompt: "a room with a pillar"}, dependencies);
+
+  expect(outcome).toMatchObject({
+    status: "created",
+    arena: {name: "Pillar Room", rows: ["##########", "#..#.....#", "#........#", "#........#", "##########"]},
+    modelCalls: 2,
+  });
+});
+
+it("repairs shapes that reach past the arena in shapes, and makes the repaired arena", async () => {
+  const tooWide = {name: "Wide Room", width: 10, height: 5, walls: [{x: 8, y: 1, width: 4, height: 1}]};
+  const fixed = {name: "Wide Room", width: 10, height: 5, walls: [{x: 6, y: 1, width: 3, height: 1}]};
+  const dependencies = {...dependenciesWith([tooWide, fixed]), format: "shapes"} as const;
+
+  const outcome = await generateArena({prompt: "a wide room"}, dependencies);
+
+  expect(outcome).toMatchObject({status: "created", refunded: false, modelCalls: 3});
+});
+
+it("asks for shapes on the first call and again on the repair, and for rows when no format is given", async () => {
+  const tooWide = {name: "Wide Room", width: 10, height: 5, walls: [{x: 8, y: 1, width: 4, height: 1}]};
+  const fixed = {name: "Wide Room", width: 10, height: 5};
+  const shapesDependencies = {...dependenciesWith([tooWide, fixed]), format: "shapes"} as const;
+  const shapesCalls = vi.spyOn(shapesDependencies.generator, "invoke");
+  const rowsDependencies = dependenciesWith([GOOD]);
+  const rowsCalls = vi.spyOn(rowsDependencies.generator, "invoke");
+
+  await generateArena({prompt: "a wide room"}, shapesDependencies);
+  await generateArena({prompt: "a room"}, rowsDependencies);
+
+  expect(shapesCalls).toHaveBeenCalledTimes(2);
+  for (const [messages] of shapesCalls.mock.calls) {
+    expect(JSON.stringify(messages)).toContain("walls: a list of wall rectangles");
+  }
+  expect(JSON.stringify(rowsCalls.mock.calls[0]?.[0])).toContain("the arena drawn as a list of text rows");
+});
+
 it("falls back when the model gives no answer at all, both times", async () => {
   const dependencies = dependenciesWith([GOOD]);
   vi.spyOn(dependencies.generator, "invoke").mockRejectedValue(new Error("connection refused"));

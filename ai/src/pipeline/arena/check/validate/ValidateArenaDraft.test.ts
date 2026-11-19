@@ -19,10 +19,52 @@ it("accepts every arena in engine's built-in pool, as a built-in must", () => {
   }
 });
 
-it("refuses a cover block, which no one has asked a generated arena to have yet, and says what to draw instead", () => {
+it("accepts a low cover block (c) in the middle of the floor, which engine plays as a wall that is low", () => {
   const rows = [...ROWS.slice(0, 2), "#...c....#", ...ROWS.slice(3)];
 
-  expect(errorsOf(draftWith({rows}))).toEqual(["A cover block (c) is not allowed; draw a wall (#) instead."]);
+  expect(validateArenaDraft(draftWith({rows})).ok).toBe(true);
+});
+
+it("still refuses a cover block that cuts the floor in two, as it would a wall", () => {
+  const rows = ["#########", "#...c...#", "#...c...#", "#...c...#", "#########"];
+
+  expect(errorsOf(draftWith({rows}))).toEqual([expect.stringMatching(/./)]);
+});
+
+it("refuses ragged rows by naming the row that is the wrong length, so the repair can find it", () => {
+  const rows = ["##########", "#........#", "#.........#", "#........#", "##########"];
+
+  expect(errorsOf(draftWith({rows}))).toEqual([
+    "Row 3 (counting from the top) has 11 characters, but most rows have 10: make every row 10 characters long.",
+  ]);
+});
+
+it("accepts an arena written as shapes, and hands back the drawing the shapes make", () => {
+  const shapes = {name: "Plain Room", width: 10, height: 5};
+
+  expect(validateArenaDraft(shapes)).toEqual({ok: true, arena: {name: "Plain Room", rows: ROWS}});
+});
+
+it("draws shapes before it checks the arena, so a wall across the floor is refused as the floor cut in two", () => {
+  const shapes = {name: "Cut", width: 10, height: 5, walls: [{x: 5, y: 1, width: 1, height: 3}]};
+
+  expect(errorsOf(shapes)).toEqual([expect.stringMatching(/./)]);
+});
+
+it("refuses a shape that reaches past the arena with the sentence naming it", () => {
+  const shapes = {name: "Wide", width: 10, height: 5, walls: [{x: 8, y: 1, width: 4, height: 1}]};
+
+  expect(errorsOf(shapes)).toEqual([expect.stringMatching(/^walls\[0\] reaches column 11 but the arena is 10 wide/)]);
+});
+
+it("refuses a stray field in shapes, as it does in a drawing", () => {
+  const shapes = {name: "Plain Room", width: 10, height: 5, ceiling: "glass"};
+
+  expect(errorsOf(shapes)).toEqual([expect.stringMatching(/ceiling/)]);
+});
+
+it("refuses a size outside the limits, naming the field", () => {
+  expect(errorsOf({name: "Tiny", width: 3, height: 5})).toEqual([expect.stringMatching(/^width: /)]);
 });
 
 it("refuses an answer that is not an object, naming the arena", () => {
@@ -53,12 +95,6 @@ it("refuses a row wider than the limit, naming which row", () => {
   const rows = [...ROWS.slice(0, 2), `#${".".repeat(60)}#`, ...ROWS.slice(3)];
 
   expect(errorsOf(draftWith({rows}))[0]).toMatch(/^rows\.2: /);
-});
-
-it("refuses rows of unequal length with the engine's own words", () => {
-  const rows = [...ROWS.slice(0, 2), "#.......#", ...ROWS.slice(3)];
-
-  expect(errorsOf(draftWith({rows}))).toEqual(["Every row of an arena must be the same length."]);
 });
 
 it("refuses a character the engine does not read", () => {

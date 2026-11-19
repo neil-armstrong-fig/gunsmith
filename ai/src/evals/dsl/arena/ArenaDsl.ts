@@ -45,6 +45,15 @@ export class ArenaDsl {
     }
   }
 
+  /** The model's own arena was created, and the low cover blocks the request asked for are still in its drawing. */
+  expectCoverKept(): void {
+    try {
+      this.pipeline.checkKeepsCover();
+    } catch (error) {
+      throw new DslError("Expected the model's own arena to be created with cover blocks", error);
+    }
+  }
+
   /** The model's arena could not be used, even after one repair, so a built-in arena was given. */
   expectBuiltInGiven(): void {
     try {

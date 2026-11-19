@@ -22,6 +22,16 @@ given.inProgress("a player asks for an arena, and the model must write one the e
     },
   );
 
+  // Cover is the newest character in the legend (`c`, allowed since engine's low cover blocks were integrated, 2026-11-19), so a model
+  // asked for it may leave it out, or draw one where the floor is cut in two. The arena has to be the model's own, with cover in it.
+  when("the player asks for an arena with low cover blocks to crouch behind", ({arena}) => {
+    beforeAll(() => arena.ask("an arena with low cover blocks to crouch behind"));
+
+    thenExpect("the model's own arena is created, not a built-in fallback, and its drawing has a cover block (c)", () =>
+      arena.expectCoverKept(),
+    );
+  });
+
   // The requests a model is most likely to answer with an arena the game cannot play. The player is never handed one: the model's own,
   // repaired, or a built-in arena with the credit refunded. That the player can play what they are given, and that the credit goes
   // back only for a built-in arena, are the standing criteria; this `when` adds that something is given.

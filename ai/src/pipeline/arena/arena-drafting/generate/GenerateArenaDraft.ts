@@ -1,16 +1,24 @@
 import {HumanMessage, SystemMessage} from "@langchain/core/messages";
 import type {BaseChatModel} from "@langchain/core/language_models/chat_models";
 import {requestBlock} from "@gunsmith/ai/pipeline/blocks/request/RequestBlock";
-import {ARENA_GENERATION_PROMPT} from "@gunsmith/ai/pipeline/arena/arena-drafting/generate/prompts/ArenaGenerationPrompt";
+import type {ArenaFormat} from "@gunsmith/ai/pipeline/arena/arena-drafting/format/ArenaFormat";
+import {draftingKitOf} from "@gunsmith/ai/pipeline/arena/arena-drafting/format/DraftingKitOf";
 import {askForArenaDraft} from "@gunsmith/ai/pipeline/arena/arena-drafting/shared/model-call/AskForArenaDraft";
 
 /**
  * Asks the strong model to write the arena a player described: the instructions in one message, the player's words apart from them
- * in a `<request>` data block. The answer is `unknown` until `validate` has parsed it (`askForArenaDraft`).
+ * in a `<request>` data block. `format` is how the model is asked to describe the arena (rows, by default, or shapes). The answer is `unknown` until `validate` has parsed it (`askForArenaDraft`).
  */
-export async function generateArenaDraft(prompt: string, generator: BaseChatModel): Promise<unknown> {
+export async function generateArenaDraft(
+  prompt: string,
+  generator: BaseChatModel,
+  format: ArenaFormat = "rows",
+): Promise<unknown> {
+  const kit = draftingKitOf(format);
+
   return askForArenaDraft(
-    [new SystemMessage(ARENA_GENERATION_PROMPT), new HumanMessage(requestBlock(prompt))],
+    [new SystemMessage(kit.generationPrompt), new HumanMessage(requestBlock(prompt))],
     generator,
+    kit.replySchema,
   );
 }

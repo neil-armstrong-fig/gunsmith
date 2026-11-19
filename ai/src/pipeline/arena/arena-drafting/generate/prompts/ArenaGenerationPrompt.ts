@@ -18,6 +18,7 @@ You will receive one player's request inside a <request> block. Design the arena
 
 Draw with these characters only:
 - # a wall. Put a wall along every edge of the arena.
+- c a low cover block on the low ground. A fighter cannot walk through it, but a standing fighter can see and shoot over it, and a crouching fighter hides behind it.
 - . floor on the low ground.
 - 1 and 2 floor one level and two levels up.
 - ^ v < > a stair that climbs the way its arrow points: ^ north (up the page), v south, < west, > east.
@@ -26,7 +27,7 @@ The game checks these rules:
 - All the open floor must be one connected region that a fighter can walk across. Floor on different levels is joined only by stairs.
 - A stair needs floor straight behind it and straight ahead of it, and the floor ahead must be exactly one level higher than the floor behind. The tiles to either side of a stair must not be raised floor.
 
-Make the arena fair to both fighters: an open middle, cover (walls) for both sides to shoot around, and no corner that is a trap.
+Make the arena fair to both fighters: an open middle, walls and low cover blocks for both sides to shoot around and crouch behind, and no corner that is a trap.
 
 Here is a valid arena, a yard with two pillars and a raised platform reached by one stair:
 ${EXAMPLE_ARENA.rows.join("\n")}

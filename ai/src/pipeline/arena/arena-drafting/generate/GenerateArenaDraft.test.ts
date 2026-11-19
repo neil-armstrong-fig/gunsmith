@@ -49,6 +49,18 @@ it("teaches the drawing characters and the rules the game checks", async () => {
   expect(instructions).toContain("5 to 30 rows");
 });
 
+it("asks for shapes, with the shapes instructions, when the format is shapes", async () => {
+  const generator = generatorSaying({name: "Box", width: 10, height: 5});
+  const invoke = vi.spyOn(generator, "invoke");
+
+  const draft = await generateArenaDraft("a box", generator, "shapes");
+
+  const [instructions] = messageTexts(invoke.mock.calls[0]?.[0]);
+  expect(instructions).toContain("walls: a list of wall rectangles");
+  expect(instructions).not.toContain("# a wall");
+  expect(draft).toEqual({name: "Box", width: 10, height: 5});
+});
+
 it("does not let a closing tag in the player's words end the data block early", async () => {
   const generator = generatorSaying({name: "Box", rows: ROWS});
   const invoke = vi.spyOn(generator, "invoke");

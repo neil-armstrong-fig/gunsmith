@@ -72,6 +72,20 @@ it("returns nothing when the model call throws", async () => {
   expect(await repairArenaDraft({prompt: "a box", previous: undefined, errors: ["e"]}, generator)).toBeUndefined();
 });
 
+it("repairs in shapes, with the shapes instructions, when the first answer was shapes", async () => {
+  const generator = generatorSaying({name: "Box", width: 10, height: 5});
+  const invoke = vi.spyOn(generator, "invoke");
+
+  await repairArenaDraft(
+    {prompt: "a box", previous: {name: "B", width: 3}, errors: ["width: too small"], format: "shapes"},
+    generator,
+  );
+
+  const [instructions] = messageTexts(invoke.mock.calls[0]?.[0]);
+  expect(instructions).toContain("walls: a list of wall rectangles");
+  expect(instructions).toContain("<problems> block");
+});
+
 /** The text of every message handed to the model, in order. The model's input is `unknown` to this test on purpose. */
 function messageTexts(input: unknown): string[] {
   if (!Array.isArray(input)) {

@@ -22,3 +22,12 @@ it("hands the model the faults and the first answer", async () => {
   expect(text).toContain("- name: too short");
   expect(text).toContain('{\\"name\\":\\"B\\"}');
 });
+
+it("asks the model again in shapes when the format is shapes", async () => {
+  const generator = new FakeListChatModel({responses: [JSON.stringify({name: "Box", width: 10, height: 5})]});
+  const invoke = vi.spyOn(generator, "invoke");
+
+  await repairNode(arenaGraphStateOf({draft: {name: "B"}, errors: ["width: too small"]}), generator, "shapes");
+
+  expect(JSON.stringify(invoke.mock.calls[0]?.[0])).toContain("walls: a list of wall rectangles");
+});

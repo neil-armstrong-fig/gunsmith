@@ -8,6 +8,15 @@ it("runs the real pipeline on the fake models, and creates the fake generator's 
   expect(outcome.modelCalls).toBe(2);
 });
 
+it("creates the cover arena on the clean path, with no repair, because the pipeline accepts a cover block", async () => {
+  const outcome = await new FakeArenaPipelineEvalDriver(undefined).run(
+    "an arena with low cover blocks to crouch behind",
+  );
+
+  expect(outcome.status).toBe("created");
+  expect(outcome.nodes).toEqual(["precheck", "moderation", "generate", "validate"]);
+});
+
 it("rejects a prompt that is only whitespace without calling a model", async () => {
   const outcome = await new FakeArenaPipelineEvalDriver(undefined).run("   ");
 
