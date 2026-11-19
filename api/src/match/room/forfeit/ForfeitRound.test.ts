@@ -1,8 +1,8 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
+import {DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/DuelBuiltInArena";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import type {World} from "@gunsmith/engine/game-loop/types/World";
 import {startMatch} from "@gunsmith/engine/match/StartMatch";
-import {MATCH_ARENA_ROWS} from "@src/match/room/arena/MatchArenaRows";
 import {forfeitRound} from "@src/match/room/forfeit/ForfeitRound";
 
 it("gives the round to the second seat when the first forfeits, and scores it for them", () => {
@@ -41,5 +41,5 @@ it("decides a round that belongs to no match without inventing a score", () => {
 });
 
 function roundBeingFought(): World {
-  return {...startingWorld(arenaFrom(MATCH_ARENA_ROWS), [], {x: 16.5, y: 6.5}), match: startMatch()};
+  return {...startingWorld(arenaFrom(DUEL_BUILT_IN_ARENA.rows), [], {x: 16.5, y: 6.5}), match: startMatch()};
 }
