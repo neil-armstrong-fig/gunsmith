@@ -40,7 +40,9 @@ Every TODO-<persona>.md belongs to its named persona. Future path assignments ar
 
 ## Integration workflow
 
-Main is an integration checkout. All seven personas develop in their own worktrees and carry their TODO/status/handoff updates with their commits. The integration session reviews and merges committed deliveries one at a time, validates main, and records its resulting commit/checks. Each worktree then merges committed main before continuing; updates are explicit, not automatic. Record the worktree path/branch and last merged main commit in the persona resume. Keep persistent worktrees and unfinished legacy work; no automatic teardown, rebase or work transfer. Follow [Operations](docs/agent-reference/Operations.md#development-worktrees-and-the-integration-checkout); existing git permissions remain in force.
+All seven personas develop in their own worktrees and carry their TODO/status/handoff updates with their commits. Once all sessions finish a turn, the user starts a super turn from `main`. The integration session waits for all seven worktrees to be clean and available, reviews and merges the deliveries, validates and records `main`, and fast-forwards every persona to the same commit. Resume after integration verifies all seven. At startup, check for any later changes to `main` and record the last synced commit in the persona resume. Follow [Operations](docs/agent-reference/Operations.md#development-worktrees-and-the-integration-checkout) for targeted integrations and blocked runs.
+
+The disposable rehearsal verified the clean-worktree gate, failed validation, interrupted sync, and repeat-run behavior. The first live run follows the commit of the workflow on `main` and the end of all seven persona turns.
 
 ## Active reservations and requests
 
