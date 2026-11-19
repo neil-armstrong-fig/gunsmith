@@ -27,9 +27,10 @@ change, try**, and the player never leaves the practice arena.
 
 - **One click.** The made card's main button is **Try it**, ahead of Save and Try again. It closes the panel, puts the weapon in slot 2
   and in hand, and the player is already standing in the practice arena. No menu, no loading, no cost.
-- **Ready to shoot at.** Dummies stand in a row at a few distances (for example 3, 6, 10 and 14 tiles) so range, spread and damage
-  can be felt, and the weapon's vision cone is visible as in a match.
-- **Never stuck.** Ammunition refills for free in the workshop (the magazine and reserve), and a key resets the dummies. Keys 1 and 2
+- **Ready to shoot at.** Four dummies stand at about 3, 6, 9 and 11 tiles (built 2026-11-19; the first plan said 3, 6, 10 and 14, which the
+  24-by-14 practice range cannot fit, and the rifle sees only 12), on different bearings so none shields another, so range, spread and
+  damage can be felt, and the weapon's vision cone is visible as in a match. (The mock-up still draws 3, 6, 10 and 14.)
+- **Never stuck.** Ammunition refills for free in the workshop (opening it fills both weapons), and **T** stands the dummies up again and fills both weapons. Keys 1 and 2
   swap between the default rifle and the new weapon, so it can be compared with something familiar.
 - **Straight back.** The same key that opened the panel returns to it with the prompt, the result and the shelf as they were, so
   **Try again** (the edit) and the next **Try it** are one press each.

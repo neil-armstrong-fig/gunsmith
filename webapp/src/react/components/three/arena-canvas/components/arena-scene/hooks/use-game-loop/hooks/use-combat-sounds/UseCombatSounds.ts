@@ -1,3 +1,4 @@
+import {usePressedKey} from "@src/react/hooks/use-pressed-key/UsePressedKey";
 import {CombatSounds} from "@src/sound/CombatSounds";
 import {WebAudioOutput} from "@src/sound/web-audio/WebAudioOutput";
 import {useAppStore} from "@src/store/app/UseAppStore";
@@ -14,26 +15,22 @@ export function useCombatSounds(): CombatSounds {
 
   useEffect(() => {
     output.start();
-    window.addEventListener("keydown", pressKey);
     window.addEventListener("blur", loseFocus);
 
     return () => {
-      window.removeEventListener("keydown", pressKey);
       window.removeEventListener("blur", loseFocus);
       output.stop();
     };
-
-    function pressKey(event: KeyboardEvent): void {
-      if (event.code === "KeyM" && !event.repeat) {
-        useAppStore.getState().toggleMuted();
-        sounds.cancel();
-      }
-    }
 
     function loseFocus(): void {
       sounds.cancel();
     }
   }, [output, sounds]);
+
+  usePressedKey("KeyM", () => {
+    useAppStore.getState().toggleMuted();
+    sounds.cancel();
+  });
 
   return sounds;
 }
