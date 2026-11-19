@@ -11,17 +11,17 @@ function plannedArenaRequest(): fc.Arbitrary<PlannedArenaRequest> {
   return fc.record({accountId: fc.constantFrom("acct-a", "acct-b"), outcome: plannedArenaOutcome()});
 }
 
-/** Created arenas are common, so an account is likely to spend all its credits and be refused. */
+/**
+ * Created arenas are common, so an account is likely to spend all its credits and be refused. The model calls vary with how the
+ * pipeline got there: an arena is made in two calls or, after the one repair, three; a built-in arena follows a refused repair
+ * (three calls; two is allowed too, so the property does not depend on the graph's exact path); a rejection is the moderation call alone.
+ */
 function plannedArenaOutcome(): fc.Arbitrary<PlannedArenaOutcome> {
   return fc.oneof(
     {
       weight: 6,
-      arbitrary: fc.constant<PlannedArenaOutcome>({
-        status: "created",
-        arena: {},
-        refunded: false,
-        nodes: [],
-        modelCalls: 2,
+      arbitrary: fc.constantFrom(2, 3).map<PlannedArenaOutcome>(modelCalls => {
+        return {status: "created", arena: {}, refunded: false, nodes: [], modelCalls};
       }),
     },
     {
@@ -36,13 +36,8 @@ function plannedArenaOutcome(): fc.Arbitrary<PlannedArenaOutcome> {
     },
     {
       weight: 1,
-      arbitrary: fc.constant<PlannedArenaOutcome>({
-        status: "builtIn",
-        arena: {},
-        reason: "none",
-        refunded: true,
-        nodes: [],
-        modelCalls: 3,
+      arbitrary: fc.constantFrom(2, 3).map<PlannedArenaOutcome>(modelCalls => {
+        return {status: "builtIn", arena: {}, reason: "none", refunded: true, nodes: [], modelCalls};
       }),
     },
     {weight: 1, arbitrary: fc.constant<PlannedArenaOutcome>("throws")},

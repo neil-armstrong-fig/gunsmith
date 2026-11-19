@@ -1,6 +1,6 @@
 import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
-import {WEAPON_SPEND} from "@src/durable-objects/spend-ledger/estimate/WeaponSpend";
-import {settledWeaponSpend} from "@src/durable-objects/spend-ledger/estimate/SettledWeaponSpend";
+import {WEAPON_SPEND} from "@src/durable-objects/spend-ledger/estimate/weapon/WeaponSpend";
+import {settledWeaponSpend} from "@src/durable-objects/spend-ledger/estimate/weapon/SettledWeaponSpend";
 
 it("settles a request at the model calls it made, each at the estimated price of a call", () => {
   expect(settledWeaponSpend(outcomeWithCalls(3))).toBe(3 * WEAPON_SPEND.perCallMicrodollars);

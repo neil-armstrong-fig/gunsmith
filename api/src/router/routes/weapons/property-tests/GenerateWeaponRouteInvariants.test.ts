@@ -1,8 +1,8 @@
 import fc from "fast-check";
 import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
 import {DAILY_CREDITS} from "@src/durable-objects/credit-ledger/account/DailyCredits";
-import {settledWeaponSpend} from "@src/durable-objects/spend-ledger/estimate/SettledWeaponSpend";
-import {WEAPON_SPEND} from "@src/durable-objects/spend-ledger/estimate/WeaponSpend";
+import {settledWeaponSpend} from "@src/durable-objects/spend-ledger/estimate/weapon/SettledWeaponSpend";
+import {WEAPON_SPEND} from "@src/durable-objects/spend-ledger/estimate/weapon/WeaponSpend";
 import {SPEND_CAPS} from "@src/durable-objects/spend-ledger/meter/SpendCaps";
 import {fakeLedgers} from "@src/router/routes/shared/fake-ledgers/FakeLedgers";
 import type {FakeLedgers} from "@src/router/routes/shared/fake-ledgers/types/FakeLedgers";

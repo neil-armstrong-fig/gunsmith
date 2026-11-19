@@ -1,6 +1,10 @@
 import type {ArenaOutcome} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcome";
 import type {CreditAccount} from "@src/durable-objects/credit-ledger/account/CreditAccount";
 import {DAILY_CREDITS} from "@src/durable-objects/credit-ledger/account/DailyCredits";
+import {ARENA_SPEND} from "@src/durable-objects/spend-ledger/estimate/arena/ArenaSpend";
+import {settledArenaSpend} from "@src/durable-objects/spend-ledger/estimate/arena/SettledArenaSpend";
+import {SPEND_CAPS} from "@src/durable-objects/spend-ledger/meter/SpendCaps";
+import type {SpendReservation} from "@src/durable-objects/spend-ledger/types/SpendReservation";
 import {fakeLedgers} from "@src/router/routes/shared/fake-ledgers/FakeLedgers";
 import {generateArenaRoute} from "@src/router/routes/arenas/GenerateArenaRoute";
 import type {ArenaSmith} from "@src/router/routes/arenas/types/ArenaSmith";
@@ -38,7 +42,7 @@ it("gives the credit back and still answers an arena when a built-in one is give
   expect(response.status).toBe(200);
   expect(await response.json()).toEqual({status: "builtIn", arena: {name: "Duel"}, reason: "no playable arena"});
   expect(ledgers.accountOf("acct-1").balance(Date.now())).toBe(DAILY_CREDITS);
-  expect(ledgers.calls).toEqual(["status", "reserve:arena", "refund"]);
+  expect(ledgers.calls).toEqual(["status", "reserve:arena", "spend:reserve", "spend:settle", "refund"]);
 });
 
 it("gives the credit back, once, and answers 502 when the pipeline throws", async () => {
@@ -51,12 +55,12 @@ it("gives the credit back, once, and answers 502 when the pipeline throws", asyn
   expect(ledgers.calls.filter(call => call === "refund")).toHaveLength(1);
 });
 
-it("asks whether AI is on before it takes a credit, and settles after the pipeline has run", async () => {
+it("asks whether AI is on, then takes the credit, then reserves the spend, and settles both after the pipeline has run", async () => {
   const ledgers = fakeLedgers();
 
   await generateArenaRoute(post({prompt: "a maze"}), ledgers.environment, smithThatAnswers(created));
 
-  expect(ledgers.calls).toEqual(["status", "reserve:arena", "settle:arena"]);
+  expect(ledgers.calls).toEqual(["status", "reserve:arena", "spend:reserve", "spend:settle", "settle:arena"]);
 });
 
 it("settles a rejected prompt at the rejected price", async () => {
@@ -64,7 +68,91 @@ it("settles a rejected prompt at the rejected price", async () => {
 
   await generateArenaRoute(post({prompt: "soup"}), ledgers.environment, smithThatAnswers(rejected));
 
-  expect(ledgers.calls).toEqual(["status", "reserve:arena", "settle:rejected"]);
+  expect(ledgers.calls).toEqual(["status", "reserve:arena", "spend:reserve", "spend:settle", "settle:rejected"]);
+});
+
+it("holds the whole reservation against the spend while the pipeline runs", async () => {
+  const ledgers = fakeLedgers();
+  let heldDuringTheRun = 0;
+  const smith: ArenaSmith = async () => {
+    heldDuringTheRun = ledgers.spendMeter.spentThisMonth();
+
+    return created;
+  };
+
+  await generateArenaRoute(post({prompt: "a maze"}), ledgers.environment, smith);
+
+  expect(heldDuringTheRun).toBe(ARENA_SPEND.reservedMicrodollars);
+});
+
+it("settles the spend at the model calls the request made, whatever it came to", async () => {
+  for (const outcome of [created, createdAfterRepair, rejected, builtIn]) {
+    const ledgers = fakeLedgers();
+
+    await generateArenaRoute(post({prompt: "a maze"}), ledgers.environment, smithThatAnswers(outcome));
+
+    expect(ledgers.spendMeter.spentThisMonth()).toBe(settledArenaSpend(outcome));
+    expect(heldReservations(ledgers.spendMeter.toState().reservations)).toBe(0);
+  }
+});
+
+it("keeps the spend of a built-in arena, since the model was billed even though the credit goes back", async () => {
+  const ledgers = fakeLedgers();
+
+  await generateArenaRoute(post({prompt: "a maze"}), ledgers.environment, smithThatAnswers(builtIn));
+
+  expect(ledgers.accountOf("acct-1").balance(Date.now())).toBe(DAILY_CREDITS);
+  expect(ledgers.spendMeter.spentThisMonth()).toBeGreaterThan(0);
+});
+
+it("keeps the whole reservation as spent when the pipeline throws, since its calls may have been billed", async () => {
+  const ledgers = fakeLedgers();
+
+  await generateArenaRoute(post({prompt: "a maze"}), ledgers.environment, smithThatThrows());
+
+  expect(ledgers.spendMeter.spentThisMonth()).toBe(ARENA_SPEND.reservedMicrodollars);
+  expect(heldReservations(ledgers.spendMeter.toState().reservations)).toBe(0);
+  expect(ledgers.calls).toEqual(["status", "reserve:arena", "spend:reserve", "spend:settle", "refund"]);
+});
+
+it("runs nothing, gives the credit back and says when AI returns when the reservation would cross a spend cap", async () => {
+  const ledgers = fakeLedgers();
+  const smith = smithThatAnswers(created);
+  ledgers.spendMeter.reserve(
+    "earlier",
+    SPEND_CAPS.dailyMicrodollars - ARENA_SPEND.reservedMicrodollars + 1,
+    Date.now(),
+  );
+
+  const response = await generateArenaRoute(post({prompt: "a maze"}), ledgers.environment, smith);
+
+  expect(response.status).toBe(503);
+  expect(await response.json()).toEqual({error: "ai-off", returnsAt: expect.any(Number)});
+  expect(smith).not.toHaveBeenCalled();
+  expect(ledgers.accountOf("acct-1").balance(Date.now())).toBe(DAILY_CREDITS);
+  expect(ledgers.calls).toEqual(["status", "reserve:arena", "spend:reserve", "refund", "status"]);
+});
+
+it("lets exactly as many requests through as fit under the cap when they arrive together, and refunds the rest", async () => {
+  const ledgers = fakeLedgers();
+  const smith = smithThatAnswers(created);
+  const earlierSpend = SPEND_CAPS.dailyMicrodollars - 2 * ARENA_SPEND.reservedMicrodollars;
+  ledgers.spendMeter.reserve("earlier", earlierSpend, Date.now());
+  ledgers.spendMeter.settle("earlier", earlierSpend, Date.now());
+  const accounts = ["acct-1", "acct-2", "acct-3", "acct-4", "acct-5"];
+
+  const responses = await Promise.all(
+    accounts.map(accountId => generateArenaRoute(post({prompt: "a maze"}, accountId), ledgers.environment, smith)),
+  );
+
+  expect(responses.filter(response => response.status === 200)).toHaveLength(2);
+  expect(responses.filter(response => response.status === 503)).toHaveLength(3);
+  expect(smith).toHaveBeenCalledTimes(2);
+  for (const accountId of accounts) {
+    const spentCredit = ledgers.accountOf(accountId).balance(Date.now()) < DAILY_CREDITS;
+    expect(spentCredit).toBe(responses[accounts.indexOf(accountId)]?.status === 200);
+  }
+  expect(heldReservations(ledgers.spendMeter.toState().reservations)).toBe(0);
 });
 
 it("runs nothing and takes nothing when AI is off, and says when it returns", async () => {
@@ -157,6 +245,14 @@ const created: ArenaOutcome = {
   modelCalls: 2,
 };
 
+const createdAfterRepair: ArenaOutcome = {
+  status: "created",
+  arena: {name: "Canyon"},
+  refunded: false,
+  nodes: ["precheck", "moderate", "generate", "repair"],
+  modelCalls: 3,
+};
+
 const rejected: ArenaOutcome = {
   status: "rejected",
   reason: "that is not an arena",
@@ -198,6 +294,10 @@ function rawPost(body: string, accountId = "acct-1"): Request {
 
 function postWithoutAccount(body: unknown): Request {
   return new Request("https://gunsmith.test/api/arenas", {method: "POST", body: JSON.stringify(body)});
+}
+
+function heldReservations(reservations: Record<string, SpendReservation>): number {
+  return Object.values(reservations).filter(reservation => reservation.held).length;
 }
 
 function spendEveryCredit(account: CreditAccount): void {

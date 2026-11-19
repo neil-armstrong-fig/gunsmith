@@ -1,6 +1,6 @@
 import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
-import {settledWeaponSpend} from "@src/durable-objects/spend-ledger/estimate/SettledWeaponSpend";
-import {WEAPON_SPEND} from "@src/durable-objects/spend-ledger/estimate/WeaponSpend";
+import {settledWeaponSpend} from "@src/durable-objects/spend-ledger/estimate/weapon/SettledWeaponSpend";
+import {WEAPON_SPEND} from "@src/durable-objects/spend-ledger/estimate/weapon/WeaponSpend";
 import type {ApiEnvironment} from "@src/env/types/ApiEnvironment";
 import {reserveCredit} from "@src/router/routes/shared/ReserveCredit";
 import type {CreditReservation} from "@src/router/routes/shared/types/CreditReservation";
