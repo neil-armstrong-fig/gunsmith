@@ -307,6 +307,30 @@ it("scores a decided round for each seat from its own side", () => {
   expect(room.snapshotFor("second")?.match).toEqual({playerWins: 0, opponentWins: 1, roundNumber: 1});
 });
 
+it("draws a round when both seats shoot each other down together, and scores neither", () => {
+  const room = startedRoom();
+
+  drawRound(room);
+
+  expect(room.snapshotFor("first")?.round).toBe("drawn");
+  expect(room.snapshotFor("second")?.round).toBe("drawn");
+  expect(room.snapshotFor("first")?.match).toEqual({playerWins: 0, opponentWins: 0, roundNumber: 1});
+  expect(room.snapshotFor("second")?.match).toEqual({playerWins: 0, opponentWins: 0, roundNumber: 1});
+});
+
+it("goes on to the next round after a draw, with the score as it was, once both seats ask", () => {
+  const room = startedRoom();
+  drawRound(room);
+
+  room.ready("first");
+  room.ready("second");
+  room.tick();
+
+  expect(room.snapshotFor("first")?.round).toBe("playing");
+  expect(room.snapshotFor("first")?.match).toEqual({playerWins: 0, opponentWins: 0, roundNumber: 2});
+  expect(room.snapshotFor("second")?.match).toEqual({playerWins: 0, opponentWins: 0, roundNumber: 2});
+});
+
 it("does not begin the next round while only one seat has asked for it", () => {
   const room = startedRoom();
   winRound(room, "first");
@@ -600,6 +624,21 @@ function winRound(room: MatchRoom, winner: Seat): void {
   }
 
   room.setInput(winner, IDLE, seq + 1);
+}
+
+/** Has both seats shoot at each other, standing still, until the round is decided: the same weapon from matching places, so both fall in one step. */
+function drawRound(room: MatchRoom): void {
+  const firstSeq = (room.snapshotFor("first")?.ack?.seq ?? 0) + 1;
+  const secondSeq = (room.snapshotFor("second")?.ack?.seq ?? 0) + 1;
+  room.setInput("first", {...IDLE, aimAt: room.snapshotFor("second")?.player.position, firing: true}, firstSeq);
+  room.setInput("second", {...IDLE, aimAt: room.snapshotFor("first")?.player.position, firing: true}, secondSeq);
+
+  for (let step = 0; step < MOST_STEPS_TO_DECIDE_A_ROUND && room.snapshotFor("first")?.round === "playing"; step += 1) {
+    room.tick();
+  }
+
+  room.setInput("first", IDLE, firstSeq + 1);
+  room.setInput("second", IDLE, secondSeq + 1);
 }
 
 /** Plays `seconds` of game time, a second at a time, with `seat` asking for something new in each, so that it is plainly there. */

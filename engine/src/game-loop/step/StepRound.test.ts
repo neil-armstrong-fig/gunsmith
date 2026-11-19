@@ -101,7 +101,7 @@ it("scores a round once, however long the finished world goes on being stepped",
   expect(playTicks(won, IDLE, 100).match).toEqual({playerWins: 1, opponentWins: 0, roundNumber: 1});
 });
 
-it("gives the opponent the round when both fall in the same step", () => {
+it("draws the round, and scores nobody, when both fall in the same step", () => {
   const world = shotAtPlayer(RIFLE.bulletDamage);
   const bothFalling: World = {
     ...world,
@@ -125,7 +125,8 @@ it("gives the opponent the round when both fall in the same step", () => {
 
   expect(after.player.health).toBe(0);
   expect(opponentOf(after).health).toBe(0);
-  expect(after.match).toEqual({playerWins: 0, opponentWins: 1, roundNumber: 1});
+  expect(after.round).toBe("drawn");
+  expect(after.match).toEqual({playerWins: 0, opponentWins: 0, roundNumber: 1});
 });
 
 it("has no match when it was not given one, whatever happens to the round", () => {

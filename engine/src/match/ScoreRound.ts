@@ -3,7 +3,7 @@ import type {RoundState} from "@gunsmith/engine/round/types/RoundState";
 
 /**
  * The match once a round has ended: a won round is the player's, a lost one the opponent's, and one still being fought
- * is nobody's.
+ * or drawn (both fell in the same step) is nobody's.
  */
 export function scoreRound(match: Match, round: RoundState): Match {
   if (round === "won") {

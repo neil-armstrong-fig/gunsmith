@@ -6,7 +6,7 @@ import type {World} from "@gunsmith/engine/game-loop/types/World";
  * Plays `seconds` of game time between two people: the world's `player` by `inputs.first` and its `opponent` by
  * `inputs.second`, both by the same rules as `step` (same walking, same caps on what an input may ask for, same shots).
  * No brain thinks for the opponent, so the world's brain is dropped. The first fighter is the world's player and the
- * second its opponent, so a draw in one step (both fall together) is still a loss for the first (`decideRound`).
+ * second its opponent, so both falling in one step is a drawn round that scores nobody (`decideRound`).
  */
 export function stepFighters(world: World, inputs: FighterInputs, seconds: number): World {
   return playStep(

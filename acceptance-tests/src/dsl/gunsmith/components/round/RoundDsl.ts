@@ -11,7 +11,7 @@ export class RoundDsl {
     this.round = new RoundPlaywright(page);
   }
 
-  /** Whether the round is still being fought, or has been won or lost. */
+  /** Whether the round is still being fought, or has been won, lost or drawn. */
   async getState(): Promise<RoundSnapshot> {
     try {
       return await this.round.getState();

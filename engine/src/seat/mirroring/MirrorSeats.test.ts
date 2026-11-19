@@ -39,6 +39,10 @@ it("turns a lost round into a won one", () => {
   expect(mirrorSeats({...duel(), round: "lost"}).round).toBe("won");
 });
 
+it("leaves a drawn round drawn, since it is the same for both seats", () => {
+  expect(mirrorSeats({...duel(), round: "drawn"}).round).toBe("drawn");
+});
+
 it("leaves a round still being fought as it is", () => {
   expect(mirrorSeats({...duel(), round: "playing"}).round).toBe("playing");
 });

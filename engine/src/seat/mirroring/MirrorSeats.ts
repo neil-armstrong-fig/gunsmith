@@ -32,6 +32,7 @@ function mirrorBullet(bullet: Bullet): Bullet {
   return {...bullet, shooter: bullet.shooter === "player" ? "opponent" : "player"};
 }
 
+/** A won round is the other seat's loss and the reverse; a round still being fought or drawn is the same for both. */
 function mirrorRound(round: RoundState): RoundState {
   if (round === "won") {
     return "lost";
