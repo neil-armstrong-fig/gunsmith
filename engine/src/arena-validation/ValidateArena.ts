@@ -1,3 +1,5 @@
+import {ARENA_LIMITS} from "@gunsmith/engine/arena-limits/ArenaLimits";
+import {floorShareOf} from "@gunsmith/engine/arena-validation/floor-share/FloorShareOf";
 import {openRegionsOf} from "@gunsmith/engine/arena-validation/regions/OpenRegionsOf";
 import type {ArenaProblem} from "@gunsmith/engine/arena-validation/types/ArenaProblem";
 import {whereIsTile} from "@gunsmith/engine/arena/drawing/stairs/WhereIsTile";
@@ -9,7 +11,8 @@ import type {Point} from "@gunsmith/engine/geometry/types/Point";
  * all when it can be played. It reads the arena and never throws, unlike `arenaFrom`, which stops at the first fault in a
  * drawing. The floor must be one piece a walker can cross, a stair the only way between levels: the largest piece (the first
  * of equals) is the arena, and every other piece is reported by its first tile and its size, in the order those tiles come.
- * Whether the arena is fair is not asked here.
+ * Too little open floor (`ARENA_LIMITS.floorShare`) is reported last, for the arena as a whole. Whether the arena is fair is
+ * not asked here.
  */
 export function validateArena(arena: Arena): readonly ArenaProblem[] {
   const regions = openRegionsOf(arena);
@@ -23,6 +26,11 @@ export function validateArena(arena: Arena): readonly ArenaProblem[] {
     if (region !== arenaRegion) {
       problems.push({kind: "disconnected", reason: describeCutOff(arena, region), tile: region[0]});
     }
+  }
+
+  const floorShare = floorShareOf(arena);
+  if (floorShare < ARENA_LIMITS.floorShare.min) {
+    problems.push({kind: "tooWalled", reason: describeTooWalled(arena, floorShare), tile: undefined});
   }
 
   return problems;
@@ -44,4 +52,11 @@ function describeCutOff(arena: Arena, region: readonly Point[]): string {
   const where = first ? whereIsTile(arena.height, {x: Math.floor(first.x), y: Math.floor(first.y)}) : "nowhere";
 
   return `${region.length} tiles of floor, starting at ${where}, cannot be walked to from the rest of the arena.`;
+}
+
+function describeTooWalled(arena: Arena, floorShare: number): string {
+  const floor = arena.solid.filter(solid => !solid).length;
+  const asked = Math.round(ARENA_LIMITS.floorShare.min * 100);
+
+  return `Open floor is only ${floor} of ${arena.width * arena.height} tiles (${Math.round(floorShare * 100)}%); at least ${asked}% of the arena must be open floor.`;
 }

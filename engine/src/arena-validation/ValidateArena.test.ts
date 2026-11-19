@@ -56,9 +56,9 @@ it("reports a platform that has no stair as cut off, since a drop is a wall", ()
 });
 
 it("keeps the first of equally large regions as the arena", () => {
-  const problems = validateArena(arenaFrom(["#####", "#.#.#", "#####"]));
+  const problems = validateArena(arenaFrom(["#######", "#..#..#", "#..#..#", "#..#..#", "#######"]));
 
-  expect(problems.map(problem => problem.tile)).toEqual([{x: 3.5, y: 1.5}]);
+  expect(problems.map(problem => problem.tile)).toEqual([{x: 4.5, y: 1.5}]);
 });
 
 it("counts the tiles of the region cut off, down every row of it", () => {
@@ -71,4 +71,32 @@ it("counts the tiles of the region cut off, down every row of it", () => {
       reason: "3 tiles of floor, starting at column 2, row 4, cannot be walked to from the rest of the arena.",
     },
   ]);
+});
+
+it("reports an arena that is nearly all wall as too walled, naming the share and the least asked", () => {
+  const problems = validateArena(arenaFrom(["#######", "#.....#", "#.#####", "#######"]));
+
+  expect(problems).toEqual([
+    {
+      kind: "tooWalled",
+      tile: undefined,
+      reason: "Open floor is only 6 of 28 tiles (21%); at least 25% of the arena must be open floor.",
+    },
+  ]);
+});
+
+it("accepts an arena whose floor is exactly the share asked for", () => {
+  expect(validateArena(arenaFrom(["#######", "#.....#", "#..####", "#######"]))).toEqual([]);
+});
+
+it("counts a cover block as wall when it asks for the floor", () => {
+  const problems = validateArena(arenaFrom(["#######", "#cccc.#", "#cccc.#", "#cccc.#", "#cccc.#", "#######"]));
+
+  expect(problems.map(problem => problem.kind)).toEqual(["tooWalled"]);
+});
+
+it("reports a cut-off region and the lack of floor together, the cut-off one first", () => {
+  const problems = validateArena(arenaFrom(["########", "#.#.####", "########"]));
+
+  expect(problems.map(problem => problem.kind)).toEqual(["disconnected", "tooWalled"]);
 });

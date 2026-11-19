@@ -6,4 +6,6 @@ export interface ArenaLimitRanges {
   width: LimitRange;
   /** How many tiles tall the arena may be: how many rows its drawing has. */
   height: LimitRange;
+  /** How much of the arena must be open floor, as a share of its tiles from 0 to 1: walls and cover blocks are not floor. */
+  floorShare: LimitRange;
 }

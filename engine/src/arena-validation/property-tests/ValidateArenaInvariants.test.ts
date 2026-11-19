@@ -1,4 +1,5 @@
 import fc from "fast-check";
+import {ARENA_LIMITS} from "@gunsmith/engine/arena-limits/ArenaLimits";
 import {anyArena} from "@gunsmith/engine/arena-validation/property-tests/arbitrary/AnyArena";
 import {flatArena} from "@gunsmith/engine/arena-validation/property-tests/arbitrary/FlatArena";
 import {flatRegionSizes} from "@gunsmith/engine/arena-validation/property-tests/oracle/FlatRegionSizes";
@@ -52,6 +53,18 @@ it("says there is no floor exactly when every tile is a wall, and then says noth
       if (!hasFloor) {
         expect(problems).toHaveLength(1);
       }
+    }),
+    {numRuns: RUNS},
+  );
+});
+
+it("calls an arena too walled exactly when it has some floor but less than the share asked for, however its walls fall", () => {
+  fc.assert(
+    fc.property(anyArena(), arena => {
+      const floor = arena.solid.filter(solid => !solid).length;
+      const tooLittle = floor > 0 && floor / arena.solid.length < ARENA_LIMITS.floorShare.min;
+
+      expect(validateArena(arena).some(problem => problem.kind === "tooWalled")).toBe(tooLittle);
     }),
     {numRuns: RUNS},
   );
