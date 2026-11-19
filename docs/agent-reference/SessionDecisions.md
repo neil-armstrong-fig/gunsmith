@@ -10,6 +10,13 @@ Current owners and consumer contracts are in [HANDOFF.md](../../HANDOFF.md). The
 - Crouch trades slower movement for longer forward vision, quieter movement and cover protection. Tune values through play.
 - Code finalises arenas and validates stair routes, spawns, pickup access and ring escape. Built-ins need the same fairness standard. Preserve random ring centres.
 
+## Making and choosing (the user, 2026-11-18; [concept](../selection-concept/README.md))
+
+- Making happens in the **workshop** (the practice arena plus a panel, no timer), never in a match. The pre-round only chooses from the shelf and the built-ins. Build order: workshop, a tutorial, then the pre-round's choosing, the arena pick and the reveal.
+- Any made weapon or prompt can be saved whether or not it was liked or used; saved items work with the AI off (only making pauses). Weapons and arenas have separate shelf limits set by the server, and paid extra spaces are possible later.
+- A made weapon is one click from **Try it** in the practice arena. Prompt limits are shown in characters (600 weapon, 1,000 arena). Rating is shown before Use; Try again edits the last result for 1 credit.
+- Play owns this end to end. Cosmetic recoil and the muzzle flash wait until after the MVP.
+
 ## Generated weapons
 
 - Code owns range clamps, power budget and deterministic downward balancing. Preserve deliberately weak weapons and unused budget; overall weakness need not mean every stat is weak.
