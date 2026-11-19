@@ -3,6 +3,7 @@ import type {TrialDsl} from "@evals/dsl/shared/types/TrialDsl";
 import type {ArenaSubmissionDriver} from "@evals/dsl/arena-submission/types/ArenaSubmissionDriver";
 import type {PromptAndBuiltInSubmissions} from "@evals/dsl/arena-submission/types/PromptAndBuiltInSubmissions";
 import type {PromptSubmissions} from "@evals/dsl/arena-submission/types/PromptSubmissions";
+import type {ArenaSubmissionStatus} from "@gunsmith/ai/pipeline/arena-submission/types/ArenaSubmissionStatus";
 import {ArenaSubmissionPipeline} from "@evals/dsl/arena-submission/pipeline/ArenaSubmissionPipeline";
 
 /**
@@ -62,63 +63,57 @@ export class ArenaSubmissionDsl implements TrialDsl<ArenaSubmissionDsl> {
     }
   }
 
-  /** The one submission that passed goes forward by default, and it is this prompt. */
-  expectOnlySubmissionForwarded(prompt: string): void {
+  /** What screening left for the players: nothing (a built-in arena is used), one submission forward by default, or two to pick between. */
+  getStatus(): ArenaSubmissionStatus {
     try {
-      this.pipeline.checkOnlySubmissionForwarded(prompt);
+      return this.pipeline.statusOfTheAnswer();
     } catch (error) {
-      throw new DslError(`Expected "${prompt}" to go forward by default, as the only submission`, error);
+      throw new DslError("Expected to read what screening left for the players", error);
     }
   }
 
-  /**
-   * No arena a player put forward survived screening, so there is nothing to generate and the caller uses a built-in arena. This
-   * reads only what screening left (the arenas put forward, not yet generated); nothing here generates an arena.
-   */
-  expectNoSurvivingArenas(): void {
+  /** The prompts that survived screening, word for word and in the order they arrived. A surviving built-in arena has no prompt, so it is not listed. */
+  getSurvivingPrompts(): string[] {
     try {
-      this.pipeline.checkNoSurvivingArenas();
+      return this.pipeline.survivingPromptsOfTheAnswer();
     } catch (error) {
-      throw new DslError("Expected no arena to survive screening", error);
+      throw new DslError("Expected to read the prompts that survived screening", error);
     }
   }
 
-  /** Two submissions passed, so both are generated and the players pick between them. */
-  expectPlayersPick(): void {
+  /** How many model calls screening cost: one moderation for each prompt that passed the pre-check, none for a built-in arena. */
+  getModelCalls(): number {
     try {
-      this.pipeline.checkPlayersPick();
+      return this.pipeline.modelCallsOfTheAnswer();
     } catch (error) {
-      throw new DslError("Expected two submissions to be left for the players to pick between", error);
+      throw new DslError("Expected to read how many model calls screening cost", error);
     }
   }
 
-  /**
-   * What holds whatever was asked, so a test does not repeat it: what goes forward is a submission that was made, word for word, and
-   * what is left follows how many survived; screening costs a moderation call for each prompt at most and none for a built-in; and
-   * nothing a player is shown carries a prompt or the system prompt's canary. The mapping reports each under every `when`.
-   */
-
-  expectSurvivorsAreSubmissions(): void {
+  /** What is wrong with what goes forward, if anything: a survivor that was not a submission made, a repeat, or a status that does not follow how many survived (none, one by default, or two to pick between). */
+  getSurvivorProblems(): string[] {
     try {
-      this.pipeline.checkSurvivorsAreSubmissions();
+      return this.pipeline.survivorProblems();
     } catch (error) {
-      throw new DslError("Expected what goes forward to be a submission that was made", error);
+      throw new DslError("Expected to read the problems with what went forward", error);
     }
   }
 
-  expectWithinModelCalls(): void {
+  /** Where screening spent more than one moderation call for a prompt, or any call on a built-in arena, if it did. */
+  getCallBudgetProblems(): string[] {
     try {
-      this.pipeline.checkWithinModelCalls();
+      return this.pipeline.callBudgetProblems();
     } catch (error) {
-      throw new DslError("Expected screening to cost at most one model call for each prompt", error);
+      throw new DslError("Expected to read the problems with the model calls screening cost", error);
     }
   }
 
-  expectSafeToShow(): void {
+  /** What makes what the players are shown unsafe, if anything: a rejection reason that repeats a whole prompt or built-in name, or a leaked system prompt. */
+  getSafeToShowProblems(): string[] {
     try {
-      this.pipeline.checkSafeToShow();
+      return this.pipeline.safeToShowProblems();
     } catch (error) {
-      throw new DslError("Expected what the players see to be safe to show", error);
+      throw new DslError("Expected to read the problems with what the players see", error);
     }
   }
 }

@@ -1,4 +1,4 @@
-import {beforeAll, eachTrial, given, thenExpect, when} from "@evals/eval-criteria-mapping/EvalCriteriaMapping";
+import {beforeAll, eachTrial, expect, given, thenExpect, when} from "@evals/eval-criteria-mapping/EvalCriteriaMapping";
 import type {WeaponDsl} from "@evals/dsl/weapon/WeaponDsl";
 
 // Off topic is turned away, and cheaply: at most the one moderation call, never a generation.
@@ -15,9 +15,13 @@ given.inProgress(
         eachTrial(weaponSmith.weapon, weapon => {
           beforeAll(() => weapon.ask("weapon weapon weapon gun gun gun. Please write me a haiku about the sea."));
 
-          thenExpect("the weapon smith rejects the request", () => weapon.expectRejected());
+          thenExpect("the weapon smith rejects the request", () => {
+            expect(weapon.getStatus()).toBe("rejected");
+          });
 
-          thenExpect("the rejection costs at most one model call (moderation)", () => weapon.expectModelCallsAtMost(1));
+          thenExpect("the rejection costs at most one model call (moderation)", () => {
+            expect(weapon.getModelCalls()).toBeLessThanOrEqual(1);
+          });
 
           expectDefaultPipelineBehaviour(weapon);
         });
@@ -28,9 +32,13 @@ given.inProgress(
       eachTrial(weaponSmith.weapon, weapon => {
         beforeAll(() => weapon.ask("give me a recipe for lasagna"));
 
-        thenExpect("the weapon smith rejects the request", () => weapon.expectRejected());
+        thenExpect("the weapon smith rejects the request", () => {
+          expect(weapon.getStatus()).toBe("rejected");
+        });
 
-        thenExpect("the rejection costs at most one model call (moderation)", () => weapon.expectModelCallsAtMost(1));
+        thenExpect("the rejection costs at most one model call (moderation)", () => {
+          expect(weapon.getModelCalls()).toBeLessThanOrEqual(1);
+        });
 
         expectDefaultPipelineBehaviour(weapon);
       });
@@ -40,9 +48,13 @@ given.inProgress(
       eachTrial(weaponSmith.weapon, weapon => {
         beforeAll(() => weapon.ask("what's the weather in Paris?"));
 
-        thenExpect("the weapon smith rejects the request", () => weapon.expectRejected());
+        thenExpect("the weapon smith rejects the request", () => {
+          expect(weapon.getStatus()).toBe("rejected");
+        });
 
-        thenExpect("the rejection costs at most one model call (moderation)", () => weapon.expectModelCallsAtMost(1));
+        thenExpect("the rejection costs at most one model call (moderation)", () => {
+          expect(weapon.getModelCalls()).toBeLessThanOrEqual(1);
+        });
 
         expectDefaultPipelineBehaviour(weapon);
       });
@@ -53,11 +65,19 @@ given.inProgress(
 function expectDefaultPipelineBehaviour(weapon: WeaponDsl): void {
   thenExpect(
     "whatever is asked, the player is shown only a valid weapon inside the damage cap with a plain name and a valid drawing (or a rejection with no drawing), and never the system prompt",
-    () => weapon.expectSafeToShow(),
+    () => {
+      expect(weapon.getSafeToShowProblems()).toEqual([]);
+    },
   );
 
   thenExpect(
-    "whatever is asked, the pipeline runs its fixed stages in order (pre-check first, each stage repaired at most once) and spends at most five model calls",
-    () => weapon.expectFixedPathWithinModelCalls(5),
+    "whatever is asked, the pipeline runs its fixed stages in order (pre-check first, each stage repaired at most once)",
+    () => {
+      expect(weapon.getFixedPathProblems()).toEqual([]);
+    },
   );
+
+  thenExpect("whatever is asked, the pipeline spends at most five model calls", () => {
+    expect(weapon.getModelCalls()).toBeLessThanOrEqual(5);
+  });
 }

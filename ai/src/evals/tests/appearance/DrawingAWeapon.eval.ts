@@ -1,4 +1,4 @@
-import {beforeAll, eachTrial, given, thenExpect, when} from "@evals/eval-criteria-mapping/EvalCriteriaMapping";
+import {beforeAll, eachTrial, expect, given, thenExpect, when} from "@evals/eval-criteria-mapping/EvalCriteriaMapping";
 import type {AppearanceDsl} from "@evals/dsl/appearance/AppearanceDsl";
 
 // What a weapon looks like is drawn by the model from the player's words and judged by code: a drawing that passes every rule is
@@ -9,44 +9,84 @@ import type {AppearanceDsl} from "@evals/dsl/appearance/AppearanceDsl";
 // Whether a drawing looks like what was asked for is for a person to judge, from the contact sheet; nothing here claims it.
 // In progress: drawing is the least finished feature. The user judged the contact sheet "really good" (2026-11-14) and 35 of 36 drawings were valid
 // first time on Haiku 5.5, but the drawing is not wired into the weapon pipeline yet and its call budget is not settled, so none of this gates.
+const ODDITIES = [
+  {
+    when: "the player asks for a rubber duck cannon that bounces angry little ducks around corners",
+    prompt: "A rubber duck cannon that bounces angry little ducks around corners. Big squeaks, tiny dignity.",
+    why: "one of `art`'s prompt-built oddities (docs/art/concepts/prompt-built-oddities.md): a shape that is not a gun",
+  },
+  {
+    when: "the player asks for a furious office fax machine that fires every rejected invoice at once",
+    prompt: "A furious office fax machine that fires every rejected invoice at once.",
+    why: "an oddity: a shape that is not a gun",
+  },
+  {
+    when: "the player asks for a teapot containing a tiny black hole",
+    prompt: "A teapot containing a tiny black hole. Pour one extremely bad idea at a time.",
+    why: "an oddity: a shape that is not a gun",
+  },
+  {
+    when: "the player asks for a disco cactus that sneezes a fan of glittering needles",
+    prompt: "A disco cactus that sneezes a fan of glittering needles.",
+    why: "an oddity: a shape that is not a gun",
+  },
+  {
+    when: "the player asks for a jellyfish lantern whose tentacles braid into a painfully focused beam",
+    prompt: "A jellyfish lantern whose tentacles braid into a painfully focused beam.",
+    why: "an oddity: a shape that is not a gun",
+  },
+  {
+    when: "the player asks for a bubblegum mortar that launches enormous gum bubbles which pop spectacularly",
+    prompt: "A bubblegum mortar that launches enormous gum bubbles which pop spectacularly.",
+    why: "an oddity: a shape that is not a gun",
+  },
+];
+
+// Requests that give the artist little or something it cannot draw: each must still give a complete, usable drawing, the model's own.
+const AWKWARD_REQUESTS = [
+  {
+    when: "the player says almost nothing about the look: just 'a gun'",
+    prompt: "a gun",
+    why: "an underspecified request must still give a complete, usable drawing",
+  },
+  {
+    when: "the player describes only the stats, not the look: a fast pistol with a small magazine",
+    prompt: "a fast pistol with a small magazine",
+    why: "an underspecified request must still give a complete, usable drawing",
+  },
+  {
+    when: "the player contradicts themselves: a tiny huge cannon that is both a toaster and a violin",
+    prompt: "a tiny huge cannon that is both a toaster and a violin",
+    why: "a contradiction must still give a complete, usable drawing",
+  },
+  {
+    when: "the player asks for something a drawing cannot do: a vacuum cleaner that pulls enemies toward you",
+    prompt: "a vacuum cleaner that pulls enemies toward you",
+    why: "a mechanic a drawing cannot show must still give a drawing",
+  },
+];
+
 given.inProgress(
   "a player describes how their weapon should look, and the model must draw it from those words instead of the plain stand-in",
   () => {
-    // `art`'s six prompt-built oddities (docs/art/concepts/prompt-built-oddities.md): each asks for a shape that is not a gun.
-    when("the player asks for a rubber duck cannon that bounces angry little ducks around corners", ({weaponSmith}) => {
-      eachTrial(weaponSmith.appearance, appearance => {
-        beforeAll(() =>
-          appearance.ask(
-            "A rubber duck cannon that bounces angry little ducks around corners. Big squeaks, tiny dignity.",
-          ),
-        );
-
-        thenExpect("the drawing shown is the model's own, not the plain stand-in, after at most one repair", () =>
-          appearance.expectDrawnByTheModel({maximumRepairs: 1}),
-        );
-
-        thenExpect(
-          "the model's first drawing is accepted without a repair call (code may fill in what it left out)",
-          () => appearance.expectDrawnByTheModel({maximumRepairs: 0}),
-        );
-
-        expectDefaultPipelineBehaviour(appearance);
-      });
-    });
-
-    when(
-      "the player asks for a furious office fax machine that fires every rejected invoice at once",
-      ({weaponSmith}) => {
+    when.each(
+      ODDITIES,
+      oddity => oddity.when,
+      (oddity, {weaponSmith}) => {
         eachTrial(weaponSmith.appearance, appearance => {
-          beforeAll(() => appearance.ask("A furious office fax machine that fires every rejected invoice at once."));
+          beforeAll(() => appearance.ask(oddity.prompt));
 
-          thenExpect("the drawing shown is the model's own, not the plain stand-in, after at most one repair", () =>
-            appearance.expectDrawnByTheModel({maximumRepairs: 1}),
-          );
+          thenExpect("the drawing shown is the model's own, not the plain stand-in, after at most one repair", () => {
+            expect(appearance.getStatus()).not.toBe("fallback");
+            expect(repairsIn(appearance)).toBeLessThanOrEqual(1);
+          });
 
           thenExpect(
             "the model's first drawing is accepted without a repair call (code may fill in what it left out)",
-            () => appearance.expectDrawnByTheModel({maximumRepairs: 0}),
+            () => {
+              expect(appearance.getStatus()).not.toBe("fallback");
+              expect(repairsIn(appearance)).toBe(0);
+            },
           );
 
           expectDefaultPipelineBehaviour(appearance);
@@ -54,118 +94,17 @@ given.inProgress(
       },
     );
 
-    when("the player asks for a teapot containing a tiny black hole", ({weaponSmith}) => {
-      eachTrial(weaponSmith.appearance, appearance => {
-        beforeAll(() =>
-          appearance.ask("A teapot containing a tiny black hole. Pour one extremely bad idea at a time."),
-        );
-
-        thenExpect("the drawing shown is the model's own, not the plain stand-in, after at most one repair", () =>
-          appearance.expectDrawnByTheModel({maximumRepairs: 1}),
-        );
-
-        thenExpect(
-          "the model's first drawing is accepted without a repair call (code may fill in what it left out)",
-          () => appearance.expectDrawnByTheModel({maximumRepairs: 0}),
-        );
-
-        expectDefaultPipelineBehaviour(appearance);
-      });
-    });
-
-    when("the player asks for a disco cactus that sneezes a fan of glittering needles", ({weaponSmith}) => {
-      eachTrial(weaponSmith.appearance, appearance => {
-        beforeAll(() => appearance.ask("A disco cactus that sneezes a fan of glittering needles."));
-
-        thenExpect("the drawing shown is the model's own, not the plain stand-in, after at most one repair", () =>
-          appearance.expectDrawnByTheModel({maximumRepairs: 1}),
-        );
-
-        thenExpect(
-          "the model's first drawing is accepted without a repair call (code may fill in what it left out)",
-          () => appearance.expectDrawnByTheModel({maximumRepairs: 0}),
-        );
-
-        expectDefaultPipelineBehaviour(appearance);
-      });
-    });
-
-    when(
-      "the player asks for a jellyfish lantern whose tentacles braid into a painfully focused beam",
-      ({weaponSmith}) => {
+    when.each(
+      AWKWARD_REQUESTS,
+      request => request.when,
+      (request, {weaponSmith}) => {
         eachTrial(weaponSmith.appearance, appearance => {
-          beforeAll(() => appearance.ask("A jellyfish lantern whose tentacles braid into a painfully focused beam."));
+          beforeAll(() => appearance.ask(request.prompt));
 
-          thenExpect("the drawing shown is the model's own, not the plain stand-in, after at most one repair", () =>
-            appearance.expectDrawnByTheModel({maximumRepairs: 1}),
-          );
-
-          thenExpect(
-            "the model's first drawing is accepted without a repair call (code may fill in what it left out)",
-            () => appearance.expectDrawnByTheModel({maximumRepairs: 0}),
-          );
-
-          expectDefaultPipelineBehaviour(appearance);
-        });
-      },
-    );
-
-    when(
-      "the player asks for a bubblegum mortar that launches enormous gum bubbles which pop spectacularly",
-      ({weaponSmith}) => {
-        eachTrial(weaponSmith.appearance, appearance => {
-          beforeAll(() =>
-            appearance.ask("A bubblegum mortar that launches enormous gum bubbles which pop spectacularly."),
-          );
-
-          thenExpect("the drawing shown is the model's own, not the plain stand-in, after at most one repair", () =>
-            appearance.expectDrawnByTheModel({maximumRepairs: 1}),
-          );
-
-          thenExpect(
-            "the model's first drawing is accepted without a repair call (code may fill in what it left out)",
-            () => appearance.expectDrawnByTheModel({maximumRepairs: 0}),
-          );
-
-          expectDefaultPipelineBehaviour(appearance);
-        });
-      },
-    );
-
-    // Underspecified requests must still give a complete, usable drawing.
-    when("the player says almost nothing about the look: just 'a gun'", ({weaponSmith}) => {
-      eachTrial(weaponSmith.appearance, appearance => {
-        beforeAll(() => appearance.ask("a gun"));
-
-        thenExpect("the drawing shown is the model's own, not the plain stand-in, after at most one repair", () =>
-          appearance.expectDrawnByTheModel({maximumRepairs: 1}),
-        );
-
-        expectDefaultPipelineBehaviour(appearance);
-      });
-    });
-
-    when("the player describes only the stats, not the look: a fast pistol with a small magazine", ({weaponSmith}) => {
-      eachTrial(weaponSmith.appearance, appearance => {
-        beforeAll(() => appearance.ask("a fast pistol with a small magazine"));
-
-        thenExpect("the drawing shown is the model's own, not the plain stand-in, after at most one repair", () =>
-          appearance.expectDrawnByTheModel({maximumRepairs: 1}),
-        );
-
-        expectDefaultPipelineBehaviour(appearance);
-      });
-    });
-
-    when(
-      "the player contradicts themselves: a tiny huge cannon that is both a toaster and a violin",
-      ({weaponSmith}) => {
-        eachTrial(weaponSmith.appearance, appearance => {
-          beforeAll(() => appearance.ask("a tiny huge cannon that is both a toaster and a violin"));
-
-          thenExpect("the drawing shown is the model's own, not the plain stand-in, after at most one repair", () =>
-            appearance.expectDrawnByTheModel({maximumRepairs: 1}),
-          );
+          thenExpect("the drawing shown is the model's own, not the plain stand-in, after at most one repair", () => {
+            expect(appearance.getStatus()).not.toBe("fallback");
+            expect(repairsIn(appearance)).toBeLessThanOrEqual(1);
+          });
 
           expectDefaultPipelineBehaviour(appearance);
         });
@@ -184,24 +123,9 @@ given.inProgress(
             ),
           );
 
-          thenExpect("the model writes at most 3000 output tokens across all its calls for the request", () =>
-            appearance.expectOutputTokensAtMost(3000),
-          );
-
-          expectDefaultPipelineBehaviour(appearance);
-        });
-      },
-    );
-
-    when(
-      "the player asks for something a drawing cannot do: a vacuum cleaner that pulls enemies toward you",
-      ({weaponSmith}) => {
-        eachTrial(weaponSmith.appearance, appearance => {
-          beforeAll(() => appearance.ask("a vacuum cleaner that pulls enemies toward you"));
-
-          thenExpect("the drawing shown is the model's own, not the plain stand-in, after at most one repair", () =>
-            appearance.expectDrawnByTheModel({maximumRepairs: 1}),
-          );
+          thenExpect("the model writes at most 3000 output tokens across all its calls for the request", () => {
+            expect(appearance.getOutputTokens()).toBeLessThanOrEqual(3000);
+          });
 
           expectDefaultPipelineBehaviour(appearance);
         });
@@ -221,7 +145,9 @@ given.inProgress(
 
           thenExpect(
             "the drawing shown is valid and inside the canvas, and draws something readable, however far off it the request ordered shapes",
-            () => appearance.expectSafeToShow(),
+            () => {
+              expect(appearance.getSafeToShowProblems()).toEqual([]);
+            },
           );
 
           expectDefaultPipelineBehaviour(appearance);
@@ -231,18 +157,30 @@ given.inProgress(
   },
 );
 
+function repairsIn(appearance: AppearanceDsl): number {
+  return appearance.getNodes().filter(node => node === "repair").length;
+}
+
 function expectDefaultPipelineBehaviour(appearance: AppearanceDsl): void {
-  thenExpect("whatever is asked, the drawing shown is valid and inside the canvas, and draws something readable", () =>
-    appearance.expectSafeToShow(),
+  thenExpect(
+    "whatever is asked, the drawing shown is valid and inside the canvas, and draws something readable",
+    () => {
+      expect(appearance.getSafeToShowProblems()).toEqual([]);
+    },
   );
 
   thenExpect(
     "whatever is asked, the plain stand-in is shown exactly when the ending says so, never passed off as the model's own drawing",
-    () => appearance.expectNoDisguisedStandIn(),
+    () => {
+      expect(appearance.getStandInProblems()).toEqual([]);
+    },
   );
 
-  thenExpect(
-    "whatever is asked, the pipeline follows the fixed route its ending requires and spends at most two model calls",
-    () => appearance.expectFixedPathWithinModelCalls(2),
-  );
+  thenExpect("whatever is asked, the pipeline follows the fixed route its ending requires", () => {
+    expect(appearance.getFixedPathProblems()).toEqual([]);
+  });
+
+  thenExpect("whatever is asked, the pipeline spends at most two model calls", () => {
+    expect(appearance.getModelCalls()).toBeLessThanOrEqual(2);
+  });
 }

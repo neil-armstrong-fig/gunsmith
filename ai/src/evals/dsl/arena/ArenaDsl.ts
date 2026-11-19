@@ -2,6 +2,7 @@ import {DslError} from "@evals/dsl/shared/errors/DslError";
 import type {TrialDsl} from "@evals/dsl/shared/types/TrialDsl";
 import type {ArenaPipelineDriver} from "@evals/dsl/arena/types/ArenaPipelineDriver";
 import {ArenaPipeline} from "@evals/dsl/arena/pipeline/ArenaPipeline";
+import type {ArenaOutcomeStatus} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcomeStatus";
 
 /**
  * The arena pipeline as a test sees it: ask it for an arena, then say what must be true of its answer. Every method only wraps
@@ -35,86 +36,66 @@ export class ArenaDsl implements TrialDsl<ArenaDsl> {
     }
   }
 
-  /** An arena was created, the model's own and playable. */
-  expectCreated(): void {
+  /** How the request ended: an arena created, the request rejected or a built-in arena given. The reading of one trial, so the spec states what it expects. */
+  getStatus(): ArenaOutcomeStatus {
     try {
-      this.pipeline.checkCreated();
+      return this.pipeline.statusOfTheAnswer();
     } catch (error) {
-      throw new DslError("Expected an arena to be created", error);
+      throw new DslError("Expected to read the status of the request", error);
     }
   }
 
-  /** An arena was given to play, the model's own or a built-in one: a request asked for properly never ends with nothing. */
-  expectArenaGiven(): void {
+  /** How many model calls the request cost, all stages together. The budget is the spec's to state. */
+  getModelCalls(): number {
     try {
-      this.pipeline.checkArenaGiven();
+      return this.pipeline.modelCallsOfTheAnswer();
     } catch (error) {
-      throw new DslError("Expected an arena to be given", error);
+      throw new DslError("Expected to read how many model calls the request cost", error);
     }
   }
 
-  /** The model's own arena was created, and the low cover blocks the request asked for are still in its drawing. */
-  expectCoverKept(): void {
+  /** Whether the credit went back to the player. */
+  wasRefunded(): boolean {
     try {
-      this.pipeline.checkKeepsCover();
+      return this.pipeline.refundOfTheAnswer();
     } catch (error) {
-      throw new DslError("Expected the model's own arena to be created with cover blocks", error);
+      throw new DslError("Expected to read whether the credit was refunded", error);
     }
   }
 
-  /** The model's arena could not be used, even after one repair, so a built-in arena was given. */
-  expectBuiltInGiven(): void {
+  /** Why no arena was given to play, if none was: a request asked for properly never ends with nothing, the model's own arena or a built-in one. */
+  getArenaGivenProblems(): string[] {
     try {
-      this.pipeline.checkBuiltInGiven();
+      return this.pipeline.arenaGivenProblems();
     } catch (error) {
-      throw new DslError("Expected a built-in arena to be given", error);
+      throw new DslError("Expected to read whether an arena was given", error);
     }
   }
 
-  /** The request was turned away: not an arena request, or too long. */
-  expectRejected(): void {
+  /** Why the arena given has no low cover block (`c`) in its drawing, if it has none, read as the engine reads it. A spec also states the status when it needs the model's own arena. */
+  getCoverProblems(): string[] {
     try {
-      this.pipeline.checkRejected();
+      return this.pipeline.coverProblems();
     } catch (error) {
-      throw new DslError("Expected the request to be rejected", error);
+      throw new DslError("Expected to read the cover in the arena given", error);
     }
   }
 
-  /** The request cost no more than this many model calls: none for unusable input, one for an off-topic question. */
-  expectModelCallsAtMost(maximumModelCalls: number): void {
+  /** What makes what the player is shown unsafe, if anything: an arena the engine would not play, or a leaked prompt. */
+  getSafeToShowProblems(): string[] {
     try {
-      this.pipeline.checkModelCallsAtMost(maximumModelCalls);
+      return this.pipeline.safeToShowProblems();
     } catch (error) {
-      throw new DslError(`Expected at most ${maximumModelCalls} model calls`, error);
+      throw new DslError("Expected to read the problems with what the player sees", error);
     }
   }
 
-  /** What the player is shown can be played, and carries no leaked prompt. */
-  expectSafeToShow(): void {
+  /** Where the pipeline left its fixed order, if it did: pre-check first, at most one repair, a built-in arena only after a failed one. */
+  getFixedPathProblems(): string[] {
     try {
-      this.pipeline.checkSafeToShow();
+      return this.pipeline.fixedPathProblems();
     } catch (error) {
-      throw new DslError("Expected what the player sees to be safe to show", error);
-    }
-  }
-
-  /** The credit goes back exactly when a built-in arena was given instead of the arena asked for. */
-  expectRefundedOnlyForBuiltIn(): void {
-    try {
-      this.pipeline.checkRefundedOnlyForBuiltIn();
-    } catch (error) {
-      throw new DslError("Expected the credit to be refunded only when a built-in arena was given", error);
-    }
-  }
-
-  expectFixedPathWithinModelCalls(maximumModelCalls: number): void {
-    try {
-      this.pipeline.checkFixedPathWithin(maximumModelCalls);
-    } catch (error) {
-      throw new DslError(
-        `Expected the pipeline to keep to its fixed path within ${maximumModelCalls} model calls`,
-        error,
-      );
+      throw new DslError("Expected to read the problems with the pipeline's path", error);
     }
   }
 }

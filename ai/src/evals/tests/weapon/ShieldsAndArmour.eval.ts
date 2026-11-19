@@ -1,4 +1,4 @@
-import {beforeAll, eachTrial, given, thenExpect, when} from "@evals/eval-criteria-mapping/EvalCriteriaMapping";
+import {beforeAll, eachTrial, expect, given, thenExpect, when} from "@evals/eval-criteria-mapping/EvalCriteriaMapping";
 import type {WeaponDsl} from "@evals/dsl/weapon/WeaponDsl";
 
 // The user's ruling (2026-11-12): no standalone shields or armour, but the weapon itself may be a shield with a direction that
@@ -13,7 +13,9 @@ given.inProgress("a player asks for a shield, which counts as a weapon and must 
     eachTrial(weaponSmith.weapon, weapon => {
       beforeAll(() => weapon.ask("a shield held out in front of me that reflects bullets back at the shooter"));
 
-      thenExpect("the weapon smith creates a weapon and does not reject the request", () => weapon.expectCreated());
+      thenExpect("the weapon smith creates a weapon and does not reject the request", () => {
+        expect(weapon.getStatus()).toBe("created");
+      });
 
       expectDefaultPipelineBehaviour(weapon);
     });
@@ -25,7 +27,9 @@ given.inProgress("a player asks for a shield, which counts as a weapon and must 
     eachTrial(weaponSmith.weapon, weapon => {
       beforeAll(() => weapon.ask("a riot shield"));
 
-      thenExpect("the weapon smith creates a weapon and does not reject the request", () => weapon.expectCreated());
+      thenExpect("the weapon smith creates a weapon and does not reject the request", () => {
+        expect(weapon.getStatus()).toBe("created");
+      });
 
       expectDefaultPipelineBehaviour(weapon);
     });
@@ -38,9 +42,13 @@ given("a player asks for passive worn protection, which is not a weapon and must
     eachTrial(weaponSmith.weapon, weapon => {
       beforeAll(() => weapon.ask("body armor that makes me take less damage"));
 
-      thenExpect("the weapon smith rejects the request", () => weapon.expectRejected());
+      thenExpect("the weapon smith rejects the request", () => {
+        expect(weapon.getStatus()).toBe("rejected");
+      });
 
-      thenExpect("the rejection costs at most one model call (moderation)", () => weapon.expectModelCallsAtMost(1));
+      thenExpect("the rejection costs at most one model call (moderation)", () => {
+        expect(weapon.getModelCalls()).toBeLessThanOrEqual(1);
+      });
 
       expectDefaultPipelineBehaviour(weapon);
     });
@@ -50,11 +58,19 @@ given("a player asks for passive worn protection, which is not a weapon and must
 function expectDefaultPipelineBehaviour(weapon: WeaponDsl): void {
   thenExpect(
     "whatever is asked, the player is shown only a valid weapon inside the damage cap with a plain name and a valid drawing (or a rejection with no drawing), and never the system prompt",
-    () => weapon.expectSafeToShow(),
+    () => {
+      expect(weapon.getSafeToShowProblems()).toEqual([]);
+    },
   );
 
   thenExpect(
-    "whatever is asked, the pipeline runs its fixed stages in order (pre-check first, each stage repaired at most once) and spends at most five model calls",
-    () => weapon.expectFixedPathWithinModelCalls(5),
+    "whatever is asked, the pipeline runs its fixed stages in order (pre-check first, each stage repaired at most once)",
+    () => {
+      expect(weapon.getFixedPathProblems()).toEqual([]);
+    },
   );
+
+  thenExpect("whatever is asked, the pipeline spends at most five model calls", () => {
+    expect(weapon.getModelCalls()).toBeLessThanOrEqual(5);
+  });
 }

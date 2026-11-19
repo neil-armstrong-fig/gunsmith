@@ -65,10 +65,13 @@ given("a player asks for a weapon whose look is described, so it must be drawn a
     eachTrial(weaponSmith.weapon, weapon => {
       beforeAll(() => weapon.ask("a cannon shaped like a rubber duck"));
 
-      thenExpect(
-        "the weapon smith creates a weapon with a valid drawing (a stand-in counts only if it is disclosed as one)",
-        () => weapon.expectCreatedAndDrawn(),
-      );
+      thenExpect("the weapon smith creates a weapon", () => {
+        expect(weapon.getStatus()).toBe("created");
+      });
+
+      thenExpect("its drawing is valid (a stand-in counts only if it is disclosed as one)", () => {
+        expect(weapon.getDrawingProblems()).toEqual([]);
+      });
 
       expectDefaultPipelineBehaviour(weapon);
     });
@@ -90,9 +93,17 @@ given.inProgress(
         eachTrial(weaponSmith.weapon, weapon => {
           beforeAll(() => weapon.ask("hits hard and fires fast but I do not care about anything else"));
 
-          thenExpect("a weapon is created and code balanced it, with no repair by the model", () =>
-            weapon.expectBalancedByCode({maximumRepairs: 0}),
-          );
+          thenExpect("the weapon smith creates a weapon", () => {
+            expect(weapon.getStatus()).toBe("created");
+          });
+
+          thenExpect("code balanced the weapon: the balance step ran", () => {
+            expect(weapon.getNodes()).toContain("balance");
+          });
+
+          thenExpect("the model was not asked to repair the stats", () => {
+            expect(weapon.getNodes()).not.toContain("repair");
+          });
 
           expectDefaultPipelineBehaviour(weapon);
         });
@@ -104,9 +115,9 @@ given.inProgress(
       eachTrial(weaponSmith.weapon, weapon => {
         beforeAll(() => weapon.ask("gun"));
 
-        thenExpect("the weapon smith creates a weapon and does not reject a one-word request", () =>
-          weapon.expectCreated(),
-        );
+        thenExpect("the weapon smith creates a weapon and does not reject a one-word request", () => {
+          expect(weapon.getStatus()).toBe("created");
+        });
 
         expectDefaultPipelineBehaviour(weapon);
       });
@@ -129,9 +140,17 @@ given("a player asks for a magazine or a reserve bigger than the stat ranges all
           ),
         );
 
-        thenExpect("a weapon is created and code balanced it, with no repair by the model", () =>
-          weapon.expectBalancedByCode({maximumRepairs: 0}),
-        );
+        thenExpect("the weapon smith creates a weapon", () => {
+          expect(weapon.getStatus()).toBe("created");
+        });
+
+        thenExpect("code balanced the weapon: the balance step ran", () => {
+          expect(weapon.getNodes()).toContain("balance");
+        });
+
+        thenExpect("the model was not asked to repair the stats", () => {
+          expect(weapon.getNodes()).not.toContain("repair");
+        });
 
         expectDefaultPipelineBehaviour(weapon);
       });
@@ -142,11 +161,19 @@ given("a player asks for a magazine or a reserve bigger than the stat ranges all
 function expectDefaultPipelineBehaviour(weapon: WeaponDsl): void {
   thenExpect(
     "whatever is asked, the player is shown only a valid weapon inside the damage cap with a plain name and a valid drawing (or a rejection with no drawing), and never the system prompt",
-    () => weapon.expectSafeToShow(),
+    () => {
+      expect(weapon.getSafeToShowProblems()).toEqual([]);
+    },
   );
 
   thenExpect(
-    "whatever is asked, the pipeline runs its fixed stages in order (pre-check first, each stage repaired at most once) and spends at most five model calls",
-    () => weapon.expectFixedPathWithinModelCalls(5),
+    "whatever is asked, the pipeline runs its fixed stages in order (pre-check first, each stage repaired at most once)",
+    () => {
+      expect(weapon.getFixedPathProblems()).toEqual([]);
+    },
   );
+
+  thenExpect("whatever is asked, the pipeline spends at most five model calls", () => {
+    expect(weapon.getModelCalls()).toBeLessThanOrEqual(5);
+  });
 }
