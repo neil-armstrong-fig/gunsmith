@@ -1,5 +1,5 @@
 import {inventoryIconUrl} from "@src/assets/inventory-icons/InventoryIconUrl";
-import {weaponThumbnailUrl} from "@src/assets/weapon-drawings/WeaponThumbnailUrl";
+import {weaponThumbnailUrl} from "@src/react/components/dom/ammo-hud/components/inventory-slot/thumbnail/WeaponThumbnailUrl";
 import {useMemo, useState} from "react";
 import type {JSX} from "react";
 
