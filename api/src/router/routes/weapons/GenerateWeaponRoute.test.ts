@@ -1,6 +1,9 @@
 import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
 import type {CreditAccount} from "@src/durable-objects/credit-ledger/account/CreditAccount";
 import {DAILY_CREDITS} from "@src/durable-objects/credit-ledger/account/DailyCredits";
+import {WEAPON_SPEND} from "@src/durable-objects/spend-ledger/estimate/WeaponSpend";
+import {SPEND_CAPS} from "@src/durable-objects/spend-ledger/meter/SpendCaps";
+import type {SpendReservation} from "@src/durable-objects/spend-ledger/types/SpendReservation";
 import {fakeLedgers} from "@src/router/routes/shared/fake-ledgers/FakeLedgers";
 import {generateWeaponRoute} from "@src/router/routes/weapons/GenerateWeaponRoute";
 import type {WeaponSmith} from "@src/router/routes/weapons/types/WeaponSmith";
@@ -50,12 +53,86 @@ it("gives the credit back, once, and answers 502 when the pipeline throws", asyn
   expect(ledgers.calls.filter(call => call === "refund")).toHaveLength(1);
 });
 
-it("asks whether AI is on before it takes a credit, and settles after the pipeline has run", async () => {
+it("asks whether AI is on, then takes the credit, then reserves the spend, and settles both after the pipeline has run", async () => {
   const ledgers = fakeLedgers();
 
   await generateWeaponRoute(post({prompt: "a rifle"}), ledgers.environment, smithThatAnswers(created));
 
-  expect(ledgers.calls).toEqual(["status", "reserve:weapon", "settle:weapon"]);
+  expect(ledgers.calls).toEqual(["status", "reserve:weapon", "spend:reserve", "spend:settle", "settle:weapon"]);
+});
+
+it("holds the whole reservation against the spend while the pipeline runs", async () => {
+  const ledgers = fakeLedgers();
+  let heldDuringTheRun = 0;
+  const smith: WeaponSmith = async () => {
+    heldDuringTheRun = ledgers.spendMeter.spentThisMonth();
+
+    return created;
+  };
+
+  await generateWeaponRoute(post({prompt: "a rifle"}), ledgers.environment, smith);
+
+  expect(heldDuringTheRun).toBe(WEAPON_SPEND.reservedMicrodollars);
+});
+
+it("settles the spend at the model calls the request made, whatever it came to", async () => {
+  for (const outcome of [created, rejected, invalid]) {
+    const ledgers = fakeLedgers();
+
+    await generateWeaponRoute(post({prompt: "a rifle"}), ledgers.environment, smithThatAnswers(outcome));
+
+    expect(ledgers.spendMeter.spentThisMonth()).toBe(outcome.modelCalls * WEAPON_SPEND.perCallMicrodollars);
+    expect(heldReservations(ledgers.spendMeter.toState().reservations)).toBe(0);
+  }
+});
+
+it("keeps the whole reservation as spent when the pipeline throws, since its calls may have been billed", async () => {
+  const ledgers = fakeLedgers();
+
+  await generateWeaponRoute(post({prompt: "a rifle"}), ledgers.environment, smithThatThrows());
+
+  expect(ledgers.spendMeter.spentThisMonth()).toBe(WEAPON_SPEND.reservedMicrodollars);
+  expect(heldReservations(ledgers.spendMeter.toState().reservations)).toBe(0);
+});
+
+it("runs nothing, gives the credit back and says when AI returns when the reservation would cross a spend cap", async () => {
+  const ledgers = fakeLedgers();
+  const smith = smithThatAnswers(created);
+  ledgers.spendMeter.reserve(
+    "earlier",
+    SPEND_CAPS.dailyMicrodollars - WEAPON_SPEND.reservedMicrodollars + 1,
+    Date.now(),
+  );
+
+  const response = await generateWeaponRoute(post({prompt: "a rifle"}), ledgers.environment, smith);
+
+  expect(response.status).toBe(503);
+  expect(await response.json()).toEqual({error: "ai-off", returnsAt: expect.any(Number)});
+  expect(smith).not.toHaveBeenCalled();
+  expect(ledgers.accountOf("acct-1").balance(Date.now())).toBe(DAILY_CREDITS);
+  expect(ledgers.calls).toEqual(["status", "reserve:weapon", "spend:reserve", "refund", "status"]);
+});
+
+it("lets exactly as many requests through as fit under the cap when they arrive together, and refunds the rest", async () => {
+  const ledgers = fakeLedgers();
+  const smith = smithThatAnswers(created);
+  const earlierSpend = SPEND_CAPS.dailyMicrodollars - 2 * WEAPON_SPEND.reservedMicrodollars;
+  ledgers.spendMeter.reserve("earlier", earlierSpend, Date.now());
+  ledgers.spendMeter.settle("earlier", earlierSpend, Date.now());
+  const accounts = ["acct-1", "acct-2", "acct-3", "acct-4", "acct-5"];
+
+  const responses = await Promise.all(
+    accounts.map(accountId => generateWeaponRoute(post({prompt: "a rifle"}, accountId), ledgers.environment, smith)),
+  );
+
+  expect(responses.filter(response => response.status === 200)).toHaveLength(2);
+  expect(responses.filter(response => response.status === 503)).toHaveLength(3);
+  expect(smith).toHaveBeenCalledTimes(2);
+  for (const accountId of accounts) {
+    const spentCredit = ledgers.accountOf(accountId).balance(Date.now()) < DAILY_CREDITS;
+    expect(spentCredit).toBe(responses[accounts.indexOf(accountId)]?.status === 200);
+  }
+  expect(heldReservations(ledgers.spendMeter.toState().reservations)).toBe(0);
 });
 
 it("runs nothing and takes nothing when AI is off, and says when it returns", async () => {
@@ -80,6 +157,7 @@ it("runs nothing when the account has no credits left", async () => {
   expect(await response.json()).toEqual({error: "no-credits"});
   expect(smith).not.toHaveBeenCalled();
   expect(ledgers.calls).toEqual(["status", "reserve:weapon"]);
+  expect(ledgers.spendMeter.spentThisMonth()).toBe(0);
 });
 
 it("charges each account its own credits", async () => {
@@ -181,6 +259,10 @@ function rawPost(body: string, accountId = "acct-1"): Request {
 
 function postWithoutAccount(body: unknown): Request {
   return new Request("https://gunsmith.test/api/weapons", {method: "POST", body: JSON.stringify(body)});
+}
+
+function heldReservations(reservations: Record<string, SpendReservation>): number {
+  return Object.values(reservations).filter(reservation => reservation.held).length;
 }
 
 function spendEveryCredit(account: CreditAccount): void {
