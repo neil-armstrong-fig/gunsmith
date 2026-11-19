@@ -6,7 +6,7 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 Checkout: `.claude/worktrees/ship`, branch `worktree-ship`, synced from committed main `6fed51d`. Persistent worktree. Merge newer committed main before new work when clean.
 
-Current slice: The M1 thumbnail placement follow-up is complete in the Ship worktree. `WeaponThumbnailUrl.ts` now sits under its sole caller, `InventorySlot.tsx`. The shared appearance parser and SVG renderer still supply the drawing.
+Current slice: The M1 thumbnail placement follow-up is integrated from `30f2230` via `c2522dd`. `WeaponThumbnailUrl.ts` now sits under its sole caller, `InventorySlot.tsx`. The shared appearance parser and SVG renderer still supply the drawing.
 
 Next action: Art is planning the workshop weapon result card and suggested that Ship reproduce the intermittent `DrawingThePickupMarker` pixel failure on a managed production preview and capture the failing screenshot for the owner. Production HUD wiring awaits AI and Engine's weapon-to-appearance association. When it lands, the first criterion should show that a generated weapon keeps its HUD drawing from creation through equip. Hosted CI and profiling await publication. AI owns paid selector/guard/evidence and opening spend reconciliation.
 

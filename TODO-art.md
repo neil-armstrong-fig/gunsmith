@@ -8,7 +8,7 @@ Art is in `.claude/worktrees/art` on `worktree-art`, synced to main `6fed51d` be
 
 Room weapon art and its two-browser spec are integrated. The user's approved low-cover artwork from `837f1d9` is integrated in `adbf7b4`.
 
-The workshop weapon result card now has the authored picture beside the name, a power meter and six compact stat rows. The delivery is validated and uncommitted in `worktree-art`.
+The workshop weapon result card now has the authored picture beside the name, a power meter and six compact stat rows. Integrated from `457ba87` via `3912cb1`, alongside Play’s Try it action.
 
 The next M1 art slice is the workshop arena preview. Resume when Play exposes the arena result and built-in arena row. Art owns the preview component, reuse of the terrain artwork and the browser drawing spec. The first criterion opens a deterministic Fair duel result and checks the floor ticks and wall braces in the preview. Compare Fair duel and Duel in the built-in row to catch a preview that reuses the wrong arena.
 
