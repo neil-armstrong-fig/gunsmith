@@ -1,4 +1,4 @@
 interface:
   display_name: "Integrate Worktrees"
   short_description: "Integrate and sync persona worktrees in a super turn"
-  default_prompt: "Use $integrate-worktrees to run a super turn once all seven persona sessions have finished and are paused."
+  default_prompt: "Use $integrate-worktrees to run a super turn."
