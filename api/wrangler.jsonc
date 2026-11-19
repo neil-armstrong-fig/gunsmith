@@ -7,7 +7,7 @@
   "compatibility_flags": ["nodejs_compat"],
   // One `Match` object per friend code: the room's authority. SQLite-backed, the only kind the free plan has.
   "durable_objects": {
-    // CREDITS: one `CreditLedger` per account; SPEND: the one `SpendLedger` (`api/src/ai/`, budget). Both hold their state in the
+    // CREDITS: one `CreditLedger` per account; SPEND: the one `SpendLedger` (`api/src/durable-objects/credit-ledger/` and `spend-ledger/`, budget). Both hold their state in the
     // object's own storage, and one request runs at a time, which is what makes a reserve atomic (`docs/cost-and-budget.md`).
     "bindings": [
       {"name": "MATCHES", "class_name": "Match"},

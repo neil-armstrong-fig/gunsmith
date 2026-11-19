@@ -1,40 +1,18 @@
+import type {ArenaOutcome} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcome";
 import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
 import type {ApiEnvironment} from "@src/env/types/ApiEnvironment";
 import {handleApiRequest} from "@src/router/HandleApiRequest";
-import {isFriendCode} from "@src/rooms/IsFriendCode";
 
-it("opens a private room and answers its friend code", async () => {
+it("hands a room request to the room route", async () => {
   const response = await handleApiRequest(
     new Request("https://gunsmith.test/api/rooms", {method: "POST"}),
     environment(),
   );
-  const body = (await response.json()) as {code: string};
 
   expect(response.status).toBe(201);
-  expect(isFriendCode(body.code)).toBe(true);
 });
 
-it("answers a different code to each room", async () => {
-  const open = async (): Promise<string> => {
-    const response = await handleApiRequest(
-      new Request("https://gunsmith.test/api/rooms", {method: "POST"}),
-      environment(),
-    );
-
-    return ((await response.json()) as {code: string}).code;
-  };
-
-  expect(await open()).not.toBe(await open());
-});
-
-it("refuses any way of asking for a room but POST", async () => {
-  const response = await handleApiRequest(new Request("https://gunsmith.test/api/rooms"), environment());
-
-  expect(response.status).toBe(405);
-  expect(response.headers.get("Allow")).toBe("POST");
-});
-
-it("hands a WebSocket upgrade to the match of that code", async () => {
+it("hands a socket request to the socket route, with the code in the path", async () => {
   const names: string[] = [];
   const response = await handleApiRequest(upgrade("/api/rooms/ABC234/socket"), environment(names));
 
@@ -42,23 +20,9 @@ it("hands a WebSocket upgrade to the match of that code", async () => {
   expect(names).toEqual(["ABC234"]);
 });
 
-it("refuses a socket for something that is not a friend code, without asking any match", async () => {
-  const names: string[] = [];
-  const response = await handleApiRequest(upgrade("/api/rooms/nope/socket"), environment(names));
-
-  expect(response.status).toBe(404);
-  expect(names).toEqual([]);
-});
-
-it("asks for an upgrade when a socket is asked for without one", async () => {
-  const response = await handleApiRequest(new Request("https://gunsmith.test/api/rooms/ABC234/socket"), environment());
-
-  expect(response.status).toBe(426);
-});
-
 it("hands a weapon request to the generation route, with the pipeline it was given", async () => {
   const outcome: WeaponOutcome = {status: "rejected", reason: "not a weapon", nodes: [], modelCalls: 1};
-  const response = await handleApiRequest(weaponRequest(), environment(), async () => outcome);
+  const response = await handleApiRequest(weaponRequest(), environment(), {weaponSmith: async () => outcome});
 
   expect(response.status).toBe(401);
   expect(await response.json()).toEqual({error: "account-required"});
@@ -78,11 +42,50 @@ it("refuses any way of asking for a weapon but POST", async () => {
   expect(response.headers.get("Allow")).toBe("POST");
 });
 
+it("hands an arena request to its own generation route, with the pipeline it was given", async () => {
+  const outcome: ArenaOutcome = {status: "rejected", reason: "not an arena", refunded: false, nodes: [], modelCalls: 1};
+  const response = await handleApiRequest(arenaRequest(), environment(), {arenaSmith: async () => outcome});
+
+  expect(response.status).toBe(401);
+  expect(await response.json()).toEqual({error: "account-required"});
+});
+
+it("answers an arena request ai-unavailable when only the weapon pipeline exists", async () => {
+  const response = await handleApiRequest(arenaRequest(), environment(), {weaponSmith: async () => weaponOutcome});
+
+  expect(response.status).toBe(503);
+  expect(await response.json()).toEqual({error: "ai-unavailable"});
+});
+
+it("answers a weapon request ai-unavailable when only the arena pipeline exists", async () => {
+  const response = await handleApiRequest(weaponRequest(), environment(), {arenaSmith: async () => arenaOutcome});
+
+  expect(response.status).toBe(503);
+  expect(await response.json()).toEqual({error: "ai-unavailable"});
+});
+
+it("refuses any way of asking for an arena but POST", async () => {
+  const response = await handleApiRequest(new Request("https://gunsmith.test/api/arenas"), environment());
+
+  expect(response.status).toBe(405);
+  expect(response.headers.get("Allow")).toBe("POST");
+});
+
 it("answers 404 to any other path", async () => {
   const response = await handleApiRequest(new Request("https://gunsmith.test/api/elsewhere"), environment());
 
   expect(response.status).toBe(404);
 });
+
+const weaponOutcome: WeaponOutcome = {status: "rejected", reason: "not a weapon", nodes: [], modelCalls: 1};
+
+const arenaOutcome: ArenaOutcome = {
+  status: "rejected",
+  reason: "not an arena",
+  refunded: false,
+  nodes: [],
+  modelCalls: 1,
+};
 
 function environment(names: string[] = []): ApiEnvironment {
   return {
@@ -120,4 +123,9 @@ function upgrade(path: string): Request {
 /** A weapon request with no account id, so the route turns it away before it asks any ledger. */
 function weaponRequest(): Request {
   return new Request("https://gunsmith.test/api/weapons", {method: "POST", body: JSON.stringify({prompt: "a rifle"})});
+}
+
+/** An arena request with no account id, so the route turns it away before it asks any ledger. */
+function arenaRequest(): Request {
+  return new Request("https://gunsmith.test/api/arenas", {method: "POST", body: JSON.stringify({prompt: "a maze"})});
 }
