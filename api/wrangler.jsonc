@@ -15,6 +15,11 @@
       {"name": "SPEND", "class_name": "SpendLedger"},
     ],
   },
+  // Budget alerts: `SpendLedger.alarm()` emails the 50/80/100% alerts through Email Routing (the personal site's contact Worker does the
+  // same). No `destination_address`: the recipient is the ALERT_TO_ADDRESS secret (`wrangler secret put`, or `.dev.vars` locally), so it
+  // never enters git, and Email Routing delivers only to an address verified in the dashboard. Unset, no alert is sent.
+  "send_email": [{"name": "ALERT_MAIL"}],
+  "vars": {"ALERT_FROM_ADDRESS": "alerts@neilarmstrong.dev"},
   "migrations": [
     {"tag": "v1", "new_sqlite_classes": ["Match"]},
     {"tag": "v2", "new_sqlite_classes": ["CreditLedger", "SpendLedger"]},

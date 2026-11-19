@@ -9,8 +9,9 @@ import {utcDay} from "@src/ai/utc/UtcDay";
 
 const NOTHING_YET = -1;
 
-/** The shares of the month's cap at which an alert is raised, once each (`docs/cost-and-budget.md`, layer 5). */
+/** The shares of the month's cap at which an alert is raised, each due until its delivery is marked sent (`docs/cost-and-budget.md`, layer 5). */
 const ALERT_PERCENTS: readonly number[] = [50, 80, 100];
+const FULL_BUDGET_PERCENT = 100;
 
 /**
  * The global AI spend, in microdollars, against the $1 a day and $20 a month caps. A request reserves its estimated cost before the
@@ -32,7 +33,7 @@ export class SpendMeter {
         monthlyMicrodollars: 0,
         dailyStopped: false,
         monthlyStopped: false,
-        alertsTaken: [],
+        alertsSent: [],
         reservations: {},
       },
     );
@@ -101,19 +102,39 @@ export class SpendMeter {
     return {on: true};
   }
 
-  /** The alert percentages the month's spend has passed since they were last taken, each handed out once. */
-  takeAlerts(): number[] {
-    const passed = ALERT_PERCENTS.filter(percent => {
-      return this.state.monthlyMicrodollars * 100 >= SPEND_CAPS.monthlyMicrodollars * percent;
+  /** The alert percentages the month's spend has passed and that have not been marked sent, lowest first. It changes nothing, so an alert whose delivery failed is still due. */
+  alertsDue(): number[] {
+    return ALERT_PERCENTS.filter(percent => {
+      return this.hasReached(percent) && !this.state.alertsSent.includes(percent);
     });
-    const due = passed.filter(percent => !this.state.alertsTaken.includes(percent));
-    this.state.alertsTaken.push(...due);
+  }
 
-    return due;
+  /** The month's spend so far in microdollars, reserved requests at their estimate and settled ones at their real cost. */
+  spentThisMonth(): number {
+    return this.state.monthlyMicrodollars;
+  }
+
+  /** Records that an alert's delivery succeeded, so it is no longer due this month. */
+  markAlertSent(percent: number): void {
+    if (!this.state.alertsSent.includes(percent)) {
+      this.state.alertsSent.push(percent);
+    }
   }
 
   toState(): SpendMeterState {
     return structuredClone(this.state);
+  }
+
+  /**
+   * Whether the month has reached this share of its cap. The cap itself counts as reached once a request has been refused for crossing
+   * it: that request is never reserved, so the spend stops short of the cap and could not otherwise reach it.
+   */
+  private hasReached(percent: number): boolean {
+    if (percent >= FULL_BUDGET_PERCENT && this.state.monthlyStopped) {
+      return true;
+    }
+
+    return this.state.monthlyMicrodollars * 100 >= SPEND_CAPS.monthlyMicrodollars * percent;
   }
 
   private startNewPeriods(now: number): void {
@@ -130,7 +151,7 @@ export class SpendMeter {
       this.state.month = month;
       this.state.monthlyMicrodollars = 0;
       this.state.monthlyStopped = false;
-      this.state.alertsTaken = [];
+      this.state.alertsSent = [];
       this.forgetRequestsOfEarlierMonths();
     }
   }

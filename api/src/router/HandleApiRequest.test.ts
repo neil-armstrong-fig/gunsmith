@@ -62,7 +62,13 @@ it("answers 404 to any other path", async () => {
 });
 
 function environment(names: string[] = []): ApiEnvironment {
-  return {MATCHES: matchesThatAnswer(names), CREDITS: unusedNamespace(), SPEND: unusedNamespace()};
+  return {
+    MATCHES: matchesThatAnswer(names),
+    CREDITS: unusedNamespace(),
+    SPEND: unusedNamespace(),
+    ALERT_MAIL: {} as SendEmail,
+    ALERT_FROM_ADDRESS: "alerts@gunsmith.test",
+  };
 }
 
 /** A `MATCHES` namespace whose every object answers 101 and remembers which name asked. */

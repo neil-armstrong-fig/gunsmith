@@ -273,14 +273,14 @@ against the fake AI adapter, never a paid one.
   - **when a player or a guest starts a match** then built-in weapons and arenas, the saved library and guest play all work as before, and no model call is made (AI off, game stays up).
 - **given tracing is failing or returning 429**
   - **when a generation runs** then it neither fails nor waits on the trace, and play is not delayed (tracing, `TODO-budget.md`).
-- **given the month's spend rises past 50, 80 and 100 percent** then each threshold raises its alert once (layer 5).
+- **given the month's spend rises past 50, 80 and 100 percent** then each threshold's alert is emailed once (layer 5, `SpendLedger.alarm()`); an alert whose email fails is retried and stays due until it is delivered. The 100 percent alert is due as soon as a request is refused for crossing the monthly cap, because that request is never reserved and the spend stops a little short of $20.
 
 **Decided (the user, 2026-11-17): the credit ledger and the spend counters live in Durable Objects, not D1.** A `CreditLedger` object per
 account (named by the internal account id) holds the balance and reservations; one `SpendLedger` singleton holds the daily and monthly
 counters, the kill-switch flag and the alert thresholds. D1 stays for accounts, sessions, library, ratings and history.
 - **Why:** an object runs one request at a time, so a synchronous reserve with no `await` between its read and its write cannot interleave
   (D1 has no `BEGIN`/`COMMIT`, so each rule would have to be one conditional statement); the 00:00 UTC and first-of-month resets happen when
-  the next call arrives, so no cron Worker is needed (an `alarm()` is only needed later, to push the alerts out); and it needs no new
+  the next call arrives, so no cron Worker is needed (an `alarm()` pushes the alerts out, below); and it needs no new
   dependency or provisioning (same pattern as `MATCHES`). The free-plan SQL
   quotas are the same for both (100,000 rows written and 5,000,000 read a day), so they do not decide it.
 - **The cost:** the ledger is split from the account tables, so account deletion and export must also call the account's object, and a
@@ -291,6 +291,21 @@ counters, the kill-switch flag and the alert thresholds. D1 stays for accounts, 
   it) and firing concurrent requests: 50 parallel reserves on a fresh account gave exactly 10 reserved; two requests for the last credit
   gave one; 30 parallel retries of one key charged once; 30 parallel refunds of one request refunded once; 30 parallel $0.10 spend
   reserves gave 10 reserved and then AI off until 00:00 UTC. A repeatable version needs the generation route (`server`).
+
+**Alert delivery (budget, 2026-11-18).** `SpendMeter.alertsDue()` lists the 50/80/100 percent alerts the month has reached and not had marked
+sent; `markAlertSent` records one. **100 percent is reached when a request is refused for crossing the monthly cap**, not only when spend
+equals the cap: a refused request is never reserved, so spend stops short of the cap and would otherwise never send the one alert that says
+AI is off (its email then says "used the monthly budget", not "reached 100%"). A spend that makes an alert due schedules the object's
+`alarm()` after its own change is saved; the alarm emails each due alert in turn through the `ALERT_MAIL` `send_email` binding (Email
+Routing, as the personal site's contact Worker does: sender `ALERT_FROM_ADDRESS`, recipient the `ALERT_TO_ADDRESS` secret) and marks it sent
+only after its email has gone (`sendDueAlerts`). A failed send throws, the runtime retries the alarm, and the alert stays due, so delivery
+is at least once. **Known gap:** if the runtime gives up retrying after AI is already off, the alert is sent only when a later `reserve` or
+`settle` schedules the alarm again (`status()` does not), which may be a while; the next month's first spend starts afresh. Unset
+`ALERT_TO_ADDRESS` and nothing is scheduled or sent. Checked under `wrangler dev` in local mode, which writes each email to a file and sends
+nothing, with the monthly cap temporarily $1 behind a throwaway probe Worker (not in the repo): the first run sent the 50, 80 and 100 percent
+emails once each as spend reached exactly $1.00; the second, after the review below, spent $0.80 and then had a $0.30 request refused, and
+sent 50, 80 and the 100 percent email (spend $0.80) once each. The retry path and a real delivery are not checked: a real send needs the
+deploy and the secret (manual step 20).
 
 **Still open:** where the cost estimator lives and who owns its prices; the generation route that the reserve and refund wrap (`server`).
 `ai`'s eval `paidSpendGuard` and its $1 total ledger are separate and untouched.

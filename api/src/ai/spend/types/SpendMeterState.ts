@@ -8,6 +8,6 @@ export interface SpendMeterState {
   monthlyMicrodollars: number;
   dailyStopped: boolean;
   monthlyStopped: boolean;
-  alertsTaken: number[];
+  alertsSent: number[];
   reservations: Record<string, SpendReservation>;
 }
