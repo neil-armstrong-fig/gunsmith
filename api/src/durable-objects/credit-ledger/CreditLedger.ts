@@ -12,6 +12,7 @@ const ACCOUNT_KEY = "account";
  * runtime's edge and is kept to wiring (not unit tested, like `durable-objects/match/Match.ts`): what is decided is in `CreditAccount`. It reads the
  * clock, loads the saved state, makes the one change and saves it again, **all in one synchronous run with no `await`**, so the object's
  * one-request-at-a-time guarantee makes two requests for the last credit safe. Callers use it over RPC: `stub.reserve(key, kind)`.
+ * `erase` is the one method that awaits: it is a single storage call that reads nothing first, so it cannot split a reserve.
  */
 export class CreditLedger extends DurableObject<ApiWorkerEnvironment> {
   reserve(key: string, kind: CreditKind): ReserveOutcome {
@@ -32,6 +33,11 @@ export class CreditLedger extends DurableObject<ApiWorkerEnvironment> {
 
   balance(): number {
     return this.change(account => account.balance(Date.now()));
+  }
+
+  /** Deletes everything the object stores, for `DELETE /api/account`. A later call starts from a fresh account. */
+  async erase(): Promise<void> {
+    await this.ctx.storage.deleteAll();
   }
 
   private change<Result>(use: (account: CreditAccount) => Result): Result {

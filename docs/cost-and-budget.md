@@ -304,7 +304,7 @@ counters, the kill-switch flag and the alert thresholds. D1 stays for accounts, 
   the next call arrives, so no cron Worker is needed (an `alarm()` pushes the alerts out, below); and it needs no new
   dependency or provisioning (same pattern as `MATCHES`). The free-plan SQL
   quotas are the same for both (100,000 rows written and 5,000,000 read a day), so they do not decide it.
-- **The cost:** the ledger is split from the account tables, so account deletion and export must also call the account's object, and a
+- **The cost:** the ledger is split from the account tables, so account deletion must also call the account's object (`CREDITS.getByName(accountId).erase()`, below) and export must read it, and a
   report across all users needs a fan-out or a summary kept elsewhere.
 - **Not proved by the unit tests:** the ledger classes (`api/src/durable-objects/credit-ledger/account/CreditAccount.ts`, `api/src/durable-objects/spend-ledger/meter/SpendMeter.ts`) are plain
   and synchronous and run in node; atomicity is the Durable Object's own serial guarantee. It was checked once, on 2026-11-17, by running
@@ -312,6 +312,8 @@ counters, the kill-switch flag and the alert thresholds. D1 stays for accounts, 
   it) and firing concurrent requests: 50 parallel reserves on a fresh account gave exactly 10 reserved; two requests for the last credit
   gave one; 30 parallel retries of one key charged once; 30 parallel refunds of one request refunded once; 30 parallel $0.10 spend
   reserves gave 10 reserved and then AI off until 00:00 UTC. A repeatable version needs the generation route (`server`).
+
+**Account deletion (budget, 2026-11-19).** `CreditLedger.erase()` calls `ctx.storage.deleteAll()`, so a deleted account's balance and reservations are gone and a later call starts from a fresh account (10 credits). `DELETE /api/account` (server) removes the D1 rows first and erases the ledger last. A reserve already in flight can still write a default record under the opaque id after the erase; it holds no personal data, so there is no tombstone (if that is later judged wrong, skip the write in `change` for an account with no saved state). Proved in two places: the fake ledger's `erase` by `FakeCreditLedger.test.ts` (four tests, four mutants killed), and the real object under `wrangler dev --local` behind a throwaway probe Worker (not in the repo, so not repeatable from it): three reserves took a balance from 10 to 7, `erase` returned it to 10 while another account stayed at 9, a reused request key charged again, erasing twice or an account never seen left 10, and 30 reserves racing one erase raised no error and left a balance between 0 and 10 (three runs ended at 0, so the race did not test ordering closely). Not checked: a deployed object.
 
 **Alert delivery (budget, 2026-11-18).** `SpendMeter.alertsDue()` lists the 50/80/100 percent alerts the month has reached and not had marked
 sent; `markAlertSent` records one. **100 percent is reached when a request is refused for crossing the monthly cap**, not only when spend
