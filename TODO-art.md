@@ -6,7 +6,11 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 Art is in `.claude/worktrees/art` on `worktree-art`, based on committed main `fb1a739`. Preserve this worktree and sync committed main before resuming.
 
-Room weapon art and its two-browser spec are integrated. Low-cover artwork is ready for review in this worktree. Art owns the tile SVG, sprite registration, terrain rendering and drawing spec for this delivery. The workshop result card and arena thumbnails can use the live terrain tiles once Play has a consumer. Start that slice with a browser criterion for an arena preview that displays the correct floor and wall artwork. AI and Engine own the production appearance association. For S4-1, recheck the refused pickup's body and outline separately from its muzzle at both scales once AI delivers the contrast change.
+Room weapon art and its two-browser spec are integrated. The user approved the low-cover artwork in `837f1d9`. Integration is pending.
+
+The next M1 art slice is the workshop arena preview. Play's workshop at `9e81ee9` has a weapon result card. Resume when Play exposes the arena result and built-in arena row. Art owns the preview component, reuse of the terrain artwork and the browser drawing spec. The first criterion opens a deterministic Fair duel result and checks the floor ticks and wall braces in the preview. Compare Fair duel and Duel in the built-in row to catch a preview that reuses the wrong arena.
+
+AI and Engine own the production appearance association. For S4-1, recheck the refused pickup's body and outline separately from its muzzle at both scales once AI delivers the contrast change.
 
 The [approved stair treatment](docs/art/terrain/README.md#playable-stair-preview) draws in every arena. Art reviewed the opposing stairs in `fair-duel` and the wall-side landing in `terraced` at 64 and 32 px per tile.
 
@@ -70,6 +74,11 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [ ] Case-study diagrams: pipeline, cost safeguards and eval loop.
 
 ## Verification/latest delivery
+
+Workshop preview baseline at `837f1d9`. The production build and all 33
+existing terrain drawing criteria passed. `pnpm checks` passed lint,
+formatting, strict types and 3,336 tests, with one existing audio skip.
+The workshop preview criterion awaits Play's arena view.
 
 2026-11-19, reinforced square in `worktree-art`. The user chose option C.
 All four updated drawing criteria failed against the continuous rim.
