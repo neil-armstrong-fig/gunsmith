@@ -1,5 +1,6 @@
 import type {Page} from "@playwright/test";
 import {WorkshopPlaywright} from "@src/dsl/gunsmith/components/workshop/playwright/WorkshopPlaywright";
+import type {PowerMeter} from "@src/dsl/gunsmith/components/workshop/types/PowerMeter";
 import type {PromptCount} from "@src/dsl/gunsmith/components/workshop/types/PromptCount";
 import type {WeaponResult} from "@src/dsl/gunsmith/components/workshop/types/WeaponResult";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
@@ -117,6 +118,14 @@ export class WorkshopDsl {
       return await this.workshop.getResult();
     } catch (error) {
       throw new DslError("Failed to read the result card", error);
+    }
+  }
+
+  async getPowerMeter(): Promise<PowerMeter> {
+    try {
+      return await this.workshop.getPowerMeter();
+    } catch (error) {
+      throw new DslError("Failed to read the power meter on the result card", error);
     }
   }
 }

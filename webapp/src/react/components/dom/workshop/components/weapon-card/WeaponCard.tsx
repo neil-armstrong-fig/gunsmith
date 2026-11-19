@@ -14,28 +14,57 @@ export function WeaponCard(): JSX.Element | undefined {
 
   const name = weapon.identity?.name ?? "Weapon";
   const picture = weaponPictureUrl(weapon.identity?.key);
+  const rating = Math.round(powerRatingOf(weapon) * 100);
 
   return (
     <section
       data-testid="workshop-result"
       aria-label="Result"
-      className="flex flex-col gap-3 rounded-md border border-gs-edge/40 px-4 py-3"
+      className="flex flex-col gap-3 rounded-md border border-gs-edge/40 bg-gs-background/35 px-4 py-3"
     >
-      <div className="flex items-center justify-between gap-4">
-        <h2 className="text-xl font-semibold text-gs-ui-text">{name}</h2>
+      <div className="flex items-center gap-4">
+        {picture && (
+          <img
+            src={picture}
+            alt={`${name}, drawn`}
+            width={80}
+            height={80}
+            className="size-20 shrink-0 rounded-md border border-gs-edge/40 bg-gs-floor-l1 object-contain p-[7px]"
+          />
+        )}
 
-        <p className="flex items-baseline gap-2">
-          <span className="text-xs tracking-wide text-gs-ui-muted uppercase">Power rating</span>
+        <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+          <h2 className="text-xl leading-tight font-semibold wrap-anywhere text-gs-ui-text">{name}</h2>
 
-          <span data-testid="workshop-rating" className="font-mono text-2xl text-gs-ui-text tabular-nums">
-            {Math.round(powerRatingOf(weapon) * 100)}
-          </span>
-        </p>
+          <p className="flex flex-wrap items-baseline justify-between gap-x-2">
+            <span className="text-xs tracking-wide text-gs-ui-muted uppercase">Power rating</span>
+
+            <span className="font-mono text-sm whitespace-nowrap text-gs-ui-muted tabular-nums">
+              <span data-testid="workshop-rating" className="text-lg font-semibold text-gs-ui-text">
+                {rating}
+              </span>
+              {" / 100"}
+            </span>
+          </p>
+
+          <div
+            role="meter"
+            aria-label="Power rating"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={rating}
+            className="h-1.5 overflow-hidden rounded-full bg-gs-floor-l2"
+          >
+            <div
+              data-testid="workshop-rating-fill"
+              className="h-full rounded-full bg-gs-success"
+              style={{width: `${rating}%`}}
+            />
+          </div>
+        </div>
       </div>
 
-      {picture && <img src={picture} alt={`${name}, drawn`} className="h-16 self-start" />}
-
-      <ul className="flex flex-col gap-1">
+      <ul className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,14rem),1fr))] gap-x-5">
         {statRowsOf(weapon).map(row => (
           <StatRow key={row.label} label={row.label} value={row.value} />
         ))}

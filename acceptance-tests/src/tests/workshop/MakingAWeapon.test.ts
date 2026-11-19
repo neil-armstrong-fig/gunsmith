@@ -88,6 +88,42 @@ given("the workshop is open on the practice range", () => {
     });
   });
 
+  when("the player compares the power of a fast weapon and a long-range weapon", () => {
+    let fastRating = 0;
+    let fastMeterValue = 0;
+    let fastTrackWidth = 0;
+    let fastFillWidth = 0;
+
+    beforeEach(async ({gunsmith}) => {
+      await gunsmith.workshop.pasteThePrompt("a fast little submachine gun");
+      await gunsmith.workshop.make();
+
+      fastRating = (await gunsmith.workshop.getResult()).rating;
+      const meter = await gunsmith.workshop.getPowerMeter();
+      fastMeterValue = meter.value;
+      fastTrackWidth = meter.trackWidth;
+      fastFillWidth = meter.fillWidth;
+
+      await gunsmith.workshop.pasteThePrompt("a long range sniper rifle");
+      await gunsmith.workshop.make();
+    });
+
+    then("the meter fills to the printed power rating for each weapon", async ({gunsmith}) => {
+      const {rating} = await gunsmith.workshop.getResult();
+      const meter = await gunsmith.workshop.getPowerMeter();
+
+      expect(rating).not.toBe(fastRating);
+      expect(fastMeterValue).toBe(fastRating);
+      expect(meter.value).toBe(rating);
+      expect(meter.minimum).toBe(0);
+      expect(meter.maximum).toBe(100);
+      expect(fastTrackWidth).toBeGreaterThan(0);
+      expect(meter.trackWidth).toBeGreaterThan(0);
+      expect(Math.abs(fastFillWidth - (fastTrackWidth * fastRating) / 100)).toBeLessThanOrEqual(1);
+      expect(Math.abs(meter.fillWidth - (meter.trackWidth * rating) / 100)).toBeLessThanOrEqual(1);
+    });
+  });
+
   when("the player has written nothing", () => {
     then("Make is off and no card is shown", async ({gunsmith}) => {
       expect(await gunsmith.workshop.canMake()).toBe(false);

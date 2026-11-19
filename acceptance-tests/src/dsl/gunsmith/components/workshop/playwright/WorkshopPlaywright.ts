@@ -1,4 +1,5 @@
 import type {Locator, Page} from "@playwright/test";
+import type {PowerMeter} from "@src/dsl/gunsmith/components/workshop/types/PowerMeter";
 import type {PromptCount} from "@src/dsl/gunsmith/components/workshop/types/PromptCount";
 import type {WeaponResult} from "@src/dsl/gunsmith/components/workshop/types/WeaponResult";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
@@ -79,6 +80,20 @@ export class WorkshopPlaywright extends BasePage {
       stats,
       pictureAddress: (await picture.getAttribute("src")) ?? "",
       pictureLoaded: await picture.evaluate(image => image instanceof HTMLImageElement && image.naturalWidth > 0),
+    };
+  }
+
+  async getPowerMeter(): Promise<PowerMeter> {
+    const meter = this.page.getByTestId("workshop-result").getByRole("meter", {name: "Power rating"});
+    await meter.waitFor({state: "visible"});
+    const fill = meter.getByTestId("workshop-rating-fill");
+
+    return {
+      minimum: Number.parseFloat((await meter.getAttribute("aria-valuemin")) ?? ""),
+      maximum: Number.parseFloat((await meter.getAttribute("aria-valuemax")) ?? ""),
+      value: Number.parseFloat((await meter.getAttribute("aria-valuenow")) ?? ""),
+      trackWidth: (await meter.boundingBox())?.width ?? 0,
+      fillWidth: (await fill.boundingBox())?.width ?? 0,
     };
   }
 
