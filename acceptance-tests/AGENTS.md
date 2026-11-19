@@ -99,6 +99,10 @@ Use seeded sparring to isolate player pickup behavior. Assert visibility and inv
 
 `ShakingTheCameraOnAHit` and `ReducingMotion` hold the game on a hit and read where the camera put the picture from `gunsmith.camera.getShake()` (the canvas's `data-camera-shake`, worked out from the camera's real position, so a shake computed but never applied fails). A shake lasts 100 ms: watch in 0.02 s steps and sample 0.03 s later, or it is over (a ring watched in 0.25 s steps let a mutant that made the ring shake survive). Before a spec that photographs the moment of a bullet hit, call `gunsmith.keepTheCameraStill()` (`?shake=0`); do not use reduced motion for that, it removes the brackets' opening and the trail those specs assert. `askForReducedMotion()` is `?reducedMotion=1`, `preferReducedMotion()` is the browser's `prefers-reduced-motion`; both go before `startDuel`. `getDamageOnScreen().leftBracketReachPixels` says whether the brackets opened.
 
+## The workshop
+
+`OpeningTheWorkshop`, `MakingAWeapon` and `TypingInTheWorkshop` (`tests/workshop/`, DSL `gunsmith.workshop`). Press B on the practice range (not in a duel). **Type with `typeThePrompt` (real key presses) when a criterion is about the game's keys, and `pasteThePrompt` (fill) for a long text**: a fill sends no keys. A pause criterion needs a walk already held when the panel opens, because the panel keeps its own keys from the game and so hides a missing pause; a key-leak criterion needs a latched key (R, a slot) read after closing, because the pause hides a leak while open. Mouse press: `holdTheMouseOnThePanel`. The stand-in's results are canned, so criteria compare two makes (fast against long-range) and never pin numbers.
+
 ## Sound
 
 Sound is not part of the state hook. The DSL traces fetch/decode to a manifest key and records source starts, loop flags and ended events. A recorded buffer start does not prove device playback, first-interaction context wake-up, masking or listening quality. The 100 ms burst merge cannot be arranged reliably in a browser, so it is unit-tested in `webapp/src/sound/damage-crunch/`.
