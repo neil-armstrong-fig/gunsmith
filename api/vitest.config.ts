@@ -5,7 +5,10 @@ import {configDefaults, defineConfig} from "vitest/config";
  * The property tests, which `pnpm test` (and so `pnpm checks`) deliberately leaves out, as the engine's are: a fresh seed each run means a
  * failure is not reproducible from the same commit. They run through `vitest.properties.config.ts` (`pnpm test:properties`). Listed by path.
  */
-export const PROPERTY_TESTS = ["src/match/property-tests/**/*Invariants.test.ts"];
+export const PROPERTY_TESTS = [
+  "src/match/property-tests/**/*Invariants.test.ts",
+  "src/generation/property-tests/**/*Invariants.test.ts",
+];
 
 /**
  * Plain node, as janggi's API: `@cloudflare/vitest-pool-workers` peers on vitest 4 and this workspace is on 5. What the Worker

@@ -1,3 +1,4 @@
+import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
 import type {ApiEnvironment} from "@src/env/types/ApiEnvironment";
 import {handleApiRequest} from "@src/router/HandleApiRequest";
 import {isFriendCode} from "@src/rooms/IsFriendCode";
@@ -55,6 +56,28 @@ it("asks for an upgrade when a socket is asked for without one", async () => {
   expect(response.status).toBe(426);
 });
 
+it("hands a weapon request to the generation route, with the pipeline it was given", async () => {
+  const outcome: WeaponOutcome = {status: "rejected", reason: "not a weapon", nodes: [], modelCalls: 1};
+  const response = await handleApiRequest(weaponRequest(), environment(), async () => outcome);
+
+  expect(response.status).toBe(401);
+  expect(await response.json()).toEqual({error: "account-required"});
+});
+
+it("answers a weapon request ai-unavailable while the Worker has no pipeline", async () => {
+  const response = await handleApiRequest(weaponRequest(), environment());
+
+  expect(response.status).toBe(503);
+  expect(await response.json()).toEqual({error: "ai-unavailable"});
+});
+
+it("refuses any way of asking for a weapon but POST", async () => {
+  const response = await handleApiRequest(new Request("https://gunsmith.test/api/weapons"), environment());
+
+  expect(response.status).toBe(405);
+  expect(response.headers.get("Allow")).toBe("POST");
+});
+
 it("answers 404 to any other path", async () => {
   const response = await handleApiRequest(new Request("https://gunsmith.test/api/elsewhere"), environment());
 
@@ -86,4 +109,9 @@ function unusedNamespace<Ledger extends Rpc.DurableObjectBranded>(): DurableObje
 
 function upgrade(path: string): Request {
   return new Request(`https://gunsmith.test${path}`, {headers: {Upgrade: "websocket"}});
+}
+
+/** A weapon request with no account id, so the route turns it away before it asks any ledger. */
+function weaponRequest(): Request {
+  return new Request("https://gunsmith.test/api/weapons", {method: "POST", body: JSON.stringify({prompt: "a rifle"})});
 }

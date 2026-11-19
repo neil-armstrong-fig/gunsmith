@@ -1,5 +1,6 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
+import {DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/DuelBuiltInArena";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import {stepFighters} from "@gunsmith/engine/game-loop/StepFighters";
 import type {FighterInputs} from "@gunsmith/engine/game-loop/types/FighterInputs";
@@ -11,7 +12,6 @@ import {startMatch} from "@gunsmith/engine/match/StartMatch";
 import type {Match} from "@gunsmith/engine/match/types/Match";
 import type {Seat} from "@gunsmith/engine/seat/types/Seat";
 import {viewOfSeat} from "@gunsmith/engine/seat/ViewOfSeat";
-import {MATCH_ARENA_ROWS} from "@src/match/room/arena/MatchArenaRows";
 import type {InputAck} from "@gunsmith/shared/online/types/InputAck";
 import {DEFAULT_FORFEIT_LIMITS} from "@src/match/room/DefaultForfeitLimits";
 import {askChanged} from "@src/match/room/forfeit/AskChanged";
@@ -45,7 +45,7 @@ const SEATS: readonly Seat[] = ["first", "second"];
  * (two people gone is a stall, not a win for either), and a decided match forfeits nothing.
  */
 export class MatchRoom {
-  private readonly arena: Arena = arenaFrom(MATCH_ARENA_ROWS);
+  private readonly arena: Arena = arenaFrom(DUEL_BUILT_IN_ARENA.rows);
   private readonly seated: Seat[] = [];
   private readonly tokens: Record<Seat, string> = {first: "", second: ""};
   private readonly asked: Record<Seat, Input> = {first: NOTHING_ASKED, second: NOTHING_ASKED};
@@ -129,7 +129,7 @@ export class MatchRoom {
 
   /** The word a browser is sent as it sits down, with the secret that gets the seat back for it. */
   joinedMessage(seat: Seat): JoinedMessage {
-    return {kind: "joined", seat, arena: MATCH_ARENA_ROWS, token: this.tokens[seat]};
+    return {kind: "joined", seat, arena: DUEL_BUILT_IN_ARENA.rows, token: this.tokens[seat]};
   }
 
   /**

@@ -1,3 +1,4 @@
+import {DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/DuelBuiltInArena";
 import type {Input} from "@gunsmith/engine/game-loop/types/Input";
 import type {Seat} from "@gunsmith/engine/seat/types/Seat";
 import {MatchRoom} from "@src/match/room/MatchRoom";
@@ -216,8 +217,10 @@ it("does not step a match that has not begun", () => {
   expect(room.snapshotFor("first")).toBeUndefined();
 });
 
-it("tells a seat the arena it plays in", () => {
-  expect(new MatchRoom().joinedMessage("second")).toEqual(expect.objectContaining({kind: "joined", seat: "second"}));
+it("tells a seat the arena it plays in, the engine's duel arena", () => {
+  expect(new MatchRoom().joinedMessage("second")).toEqual(
+    expect.objectContaining({kind: "joined", seat: "second", arena: DUEL_BUILT_IN_ARENA.rows}),
+  );
 });
 
 it("tells a seat which of its inputs the server last received, and how many steps have been played with it since", () => {
