@@ -3,7 +3,7 @@ import {CreditAccount} from "@src/durable-objects/credit-ledger/account/CreditAc
 import type {CreditKind} from "@src/durable-objects/credit-ledger/types/CreditKind";
 import type {CreditAccountState} from "@src/durable-objects/credit-ledger/types/CreditAccountState";
 import type {ReserveOutcome} from "@src/durable-objects/credit-ledger/types/ReserveOutcome";
-import type {ApiEnvironment} from "@src/env/types/ApiEnvironment";
+import type {ApiWorkerEnvironment} from "@src/env/types/ApiWorkerEnvironment";
 
 const ACCOUNT_KEY = "account";
 
@@ -13,7 +13,7 @@ const ACCOUNT_KEY = "account";
  * clock, loads the saved state, makes the one change and saves it again, **all in one synchronous run with no `await`**, so the object's
  * one-request-at-a-time guarantee makes two requests for the last credit safe. Callers use it over RPC: `stub.reserve(key, kind)`.
  */
-export class CreditLedger extends DurableObject<ApiEnvironment> {
+export class CreditLedger extends DurableObject<ApiWorkerEnvironment> {
   reserve(key: string, kind: CreditKind): ReserveOutcome {
     return this.change(account => account.reserve(key, kind, Date.now()));
   }

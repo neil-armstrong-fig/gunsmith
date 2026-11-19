@@ -3,6 +3,7 @@ import {DAILY_CREDITS} from "@src/durable-objects/credit-ledger/account/DailyCre
 import type {CreditKind} from "@src/durable-objects/credit-ledger/types/CreditKind";
 import {creditStatusRoute} from "@src/router/routes/credits/CreditStatusRoute";
 import {fakeLedgers} from "@src/router/routes/shared/fake-ledgers/FakeLedgers";
+import {cookieOfPlayer} from "@src/router/routes/shared/fake-accounts/CookieOfPlayer";
 
 /**
  * What must hold however often, and for whichever accounts, the panel asks: a read answers each account's own balance, changes
@@ -24,7 +25,7 @@ it("answers each account's own balance and leaves every balance as it was, howev
         ledgers.calls.length = 0;
 
         for (const accountId of askers) {
-          const response = await creditStatusRoute(read(accountId), ledgers.environment);
+          const response = await creditStatusRoute(read(accountId));
           const body: unknown = await response.json();
 
           expect(body).toMatchObject({balance: ledgers.accountOf(accountId).balance(Date.now())});
@@ -41,5 +42,5 @@ it("answers each account's own balance and leaves every balance as it was, howev
 });
 
 function read(accountId: string): Request {
-  return new Request("https://gunsmith.test/api/credits", {headers: {"X-Account-Id": accountId}});
+  return new Request("https://gunsmith.test/api/credits", {headers: {Cookie: cookieOfPlayer(accountId)}});
 }

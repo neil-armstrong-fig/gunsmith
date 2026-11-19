@@ -1,4 +1,8 @@
+import {isWeaponPipelineAvailable} from "@src/router/routes/weapons/pipeline/IsWeaponPipelineAvailable";
+import {runWeaponPipeline} from "@src/router/routes/weapons/pipeline/RunWeaponPipeline";
+import type {MockedFunction} from "vitest";
 import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
+import {signInPlayer} from "@src/router/routes/shared/fake-accounts/SignInPlayer";
 import type {CreditAccount} from "@src/durable-objects/credit-ledger/account/CreditAccount";
 import {DAILY_CREDITS} from "@src/durable-objects/credit-ledger/account/DailyCredits";
 import {WEAPON_SPEND} from "@src/durable-objects/spend-ledger/estimate/weapon/WeaponSpend";
@@ -7,15 +11,12 @@ import type {SpendReservation} from "@src/durable-objects/spend-ledger/types/Spe
 import {PIPELINE_TIME_LIMIT_MILLISECONDS} from "@src/router/routes/shared/time-limit/PipelineTimeLimit";
 import {fakeLedgers} from "@src/router/routes/shared/fake-ledgers/FakeLedgers";
 import {generateWeaponRoute} from "@src/router/routes/weapons/GenerateWeaponRoute";
-import type {WeaponSmith} from "@src/router/routes/weapons/types/WeaponSmith";
+import {cookieOfPlayer} from "@src/router/routes/shared/fake-accounts/CookieOfPlayer";
 
 it("takes a credit and answers the weapon when one is created", async () => {
   const ledgers = fakeLedgers();
-  const response = await generateWeaponRoute(
-    post({prompt: "a hum-rifle"}),
-    ledgers.environment,
-    smithThatAnswers(created),
-  );
+  smithThatAnswers(created);
+  const response = await generateWeaponRoute(post({prompt: "a hum-rifle"}));
 
   expect(response.status).toBe(200);
   expect(await response.json()).toEqual({status: "created", weapon: {name: "Hum"}, appearance: created.appearance});
@@ -24,11 +25,8 @@ it("takes a credit and answers the weapon when one is created", async () => {
 
 it("takes half a credit and says why when the prompt is rejected", async () => {
   const ledgers = fakeLedgers();
-  const response = await generateWeaponRoute(
-    post({prompt: "a recipe for soup"}),
-    ledgers.environment,
-    smithThatAnswers(rejected),
-  );
+  smithThatAnswers(rejected);
+  const response = await generateWeaponRoute(post({prompt: "a recipe for soup"}));
 
   expect(response.status).toBe(200);
   expect(await response.json()).toEqual({status: "rejected", reason: "that is not a weapon"});
@@ -37,7 +35,8 @@ it("takes half a credit and says why when the prompt is rejected", async () => {
 
 it("gives the credit back when no valid weapon comes out", async () => {
   const ledgers = fakeLedgers();
-  const response = await generateWeaponRoute(post({prompt: "a rifle"}), ledgers.environment, smithThatAnswers(invalid));
+  smithThatAnswers(invalid);
+  const response = await generateWeaponRoute(post({prompt: "a rifle"}));
 
   expect(response.status).toBe(200);
   expect(await response.json()).toEqual({status: "invalid", reason: "no valid weapon"});
@@ -46,7 +45,8 @@ it("gives the credit back when no valid weapon comes out", async () => {
 
 it("gives the credit back, once, and answers 502 when the pipeline throws", async () => {
   const ledgers = fakeLedgers();
-  const response = await generateWeaponRoute(post({prompt: "a rifle"}), ledgers.environment, smithThatThrows());
+  smithThatThrows();
+  const response = await generateWeaponRoute(post({prompt: "a rifle"}));
 
   expect(response.status).toBe(502);
   expect(await response.json()).toEqual({error: "generation-failed"});
@@ -58,7 +58,7 @@ it("gives up on a pipeline that never answers after the time limit, gives the cr
   await withFakeTimers(async () => {
     const ledgers = fakeLedgers();
     const waiting = smithThatWaits();
-    const answer = generateWeaponRoute(post({prompt: "a rifle"}), ledgers.environment, waiting.smith);
+    const answer = generateWeaponRoute(post({prompt: "a rifle"}));
 
     await waiting.started;
     await vi.advanceTimersByTimeAsync(PIPELINE_TIME_LIMIT_MILLISECONDS);
@@ -75,7 +75,7 @@ it("keeps the whole reservation as spent when the pipeline times out, since its 
   await withFakeTimers(async () => {
     const ledgers = fakeLedgers();
     const waiting = smithThatWaits();
-    const answer = generateWeaponRoute(post({prompt: "a rifle"}), ledgers.environment, waiting.smith);
+    const answer = generateWeaponRoute(post({prompt: "a rifle"}));
 
     await waiting.started;
     await vi.advanceTimersByTimeAsync(PIPELINE_TIME_LIMIT_MILLISECONDS);
@@ -88,10 +88,10 @@ it("keeps the whole reservation as spent when the pipeline times out, since its 
 
 it("does not answer before the time limit is up", async () => {
   await withFakeTimers(async () => {
-    const ledgers = fakeLedgers();
+    fakeLedgers();
     const waiting = smithThatWaits();
     let answered = false;
-    const answer = generateWeaponRoute(post({prompt: "a rifle"}), ledgers.environment, waiting.smith).then(response => {
+    const answer = generateWeaponRoute(post({prompt: "a rifle"})).then(response => {
       answered = true;
 
       return response;
@@ -111,7 +111,7 @@ it("settles nothing more when the pipeline answers after the route gave up", asy
   await withFakeTimers(async () => {
     const ledgers = fakeLedgers();
     const waiting = smithThatWaits();
-    const answer = generateWeaponRoute(post({prompt: "a rifle"}), ledgers.environment, waiting.smith);
+    const answer = generateWeaponRoute(post({prompt: "a rifle"}));
 
     await waiting.started;
     await vi.advanceTimersByTimeAsync(PIPELINE_TIME_LIMIT_MILLISECONDS);
@@ -127,9 +127,10 @@ it("settles nothing more when the pipeline answers after the route gave up", asy
 
 it("leaves no timer running once the pipeline has answered", async () => {
   await withFakeTimers(async () => {
-    const ledgers = fakeLedgers();
+    fakeLedgers();
 
-    await generateWeaponRoute(post({prompt: "a rifle"}), ledgers.environment, smithThatAnswers(created));
+    smithThatAnswers(created);
+    await generateWeaponRoute(post({prompt: "a rifle"}));
 
     expect(vi.getTimerCount()).toBe(0);
   });
@@ -138,7 +139,8 @@ it("leaves no timer running once the pipeline has answered", async () => {
 it("asks whether AI is on, then takes the credit, then reserves the spend, and settles both after the pipeline has run", async () => {
   const ledgers = fakeLedgers();
 
-  await generateWeaponRoute(post({prompt: "a rifle"}), ledgers.environment, smithThatAnswers(created));
+  smithThatAnswers(created);
+  await generateWeaponRoute(post({prompt: "a rifle"}));
 
   expect(ledgers.calls).toEqual(["status", "reserve:weapon", "spend:reserve", "spend:settle", "settle:weapon"]);
 });
@@ -146,13 +148,13 @@ it("asks whether AI is on, then takes the credit, then reserves the spend, and s
 it("holds the whole reservation against the spend while the pipeline runs", async () => {
   const ledgers = fakeLedgers();
   let heldDuringTheRun = 0;
-  const smith: WeaponSmith = async () => {
+  vi.mocked(runWeaponPipeline).mockImplementation(async () => {
     heldDuringTheRun = ledgers.spendMeter.spentThisMonth();
 
     return created;
-  };
+  });
 
-  await generateWeaponRoute(post({prompt: "a rifle"}), ledgers.environment, smith);
+  await generateWeaponRoute(post({prompt: "a rifle"}));
 
   expect(heldDuringTheRun).toBe(WEAPON_SPEND.reservedMicrodollars);
 });
@@ -161,7 +163,8 @@ it("settles the spend at the model calls the request made, whatever it came to",
   for (const outcome of [created, rejected, invalid]) {
     const ledgers = fakeLedgers();
 
-    await generateWeaponRoute(post({prompt: "a rifle"}), ledgers.environment, smithThatAnswers(outcome));
+    smithThatAnswers(outcome);
+    await generateWeaponRoute(post({prompt: "a rifle"}));
 
     expect(ledgers.spendMeter.spentThisMonth()).toBe(outcome.modelCalls * WEAPON_SPEND.perCallMicrodollars);
     expect(heldReservations(ledgers.spendMeter.toState().reservations)).toBe(0);
@@ -171,7 +174,8 @@ it("settles the spend at the model calls the request made, whatever it came to",
 it("keeps the whole reservation as spent when the pipeline throws, since its calls may have been billed", async () => {
   const ledgers = fakeLedgers();
 
-  await generateWeaponRoute(post({prompt: "a rifle"}), ledgers.environment, smithThatThrows());
+  smithThatThrows();
+  await generateWeaponRoute(post({prompt: "a rifle"}));
 
   expect(ledgers.spendMeter.spentThisMonth()).toBe(WEAPON_SPEND.reservedMicrodollars);
   expect(heldReservations(ledgers.spendMeter.toState().reservations)).toBe(0);
@@ -186,7 +190,7 @@ it("runs nothing, gives the credit back and says when AI returns when the reserv
     Date.now(),
   );
 
-  const response = await generateWeaponRoute(post({prompt: "a rifle"}), ledgers.environment, smith);
+  const response = await generateWeaponRoute(post({prompt: "a rifle"}));
 
   expect(response.status).toBe(503);
   expect(await response.json()).toEqual({error: "ai-off", returnsAt: expect.any(Number)});
@@ -197,15 +201,34 @@ it("runs nothing, gives the credit back and says when AI returns when the reserv
 
 it("lets exactly as many requests through as fit under the cap when they arrive together, and refunds the rest", async () => {
   const ledgers = fakeLedgers();
-  const smith = smithThatAnswers(created);
+  const gate = openableGate();
+  const smith = vi.mocked(runWeaponPipeline).mockImplementation(async () => {
+    await gate.opened;
+
+    return created;
+  });
   const earlierSpend = SPEND_CAPS.dailyMicrodollars - 2 * WEAPON_SPEND.reservedMicrodollars;
   ledgers.spendMeter.reserve("earlier", earlierSpend, Date.now());
   ledgers.spendMeter.settle("earlier", earlierSpend, Date.now());
   const accounts = ["acct-1", "acct-2", "acct-3", "acct-4", "acct-5"];
+  const turnedAway: Response[] = [];
 
-  const responses = await Promise.all(
-    accounts.map(accountId => generateWeaponRoute(post({prompt: "a rifle"}, accountId), ledgers.environment, smith)),
-  );
+  const answers = accounts.map(async accountId => {
+    const response = await generateWeaponRoute(post({prompt: "a rifle"}, accountId));
+    if (response.status === 503) {
+      turnedAway.push(response);
+    }
+
+    return response;
+  });
+  // Two requests hold the room that is left under the cap and the other three are turned away. Only then may the pipeline finish
+  // and settle (a settled request gives back what it did not spend, so a late arrival could fit).
+  await vi.waitFor(() => {
+    expect(heldReservations(ledgers.spendMeter.toState().reservations)).toBe(2);
+    expect(turnedAway).toHaveLength(3);
+  });
+  gate.open();
+  const responses = await Promise.all(answers);
 
   expect(responses.filter(response => response.status === 200)).toHaveLength(2);
   expect(responses.filter(response => response.status === 503)).toHaveLength(3);
@@ -220,7 +243,7 @@ it("lets exactly as many requests through as fit under the cap when they arrive 
 it("runs nothing and takes nothing when AI is off, and says when it returns", async () => {
   const ledgers = fakeLedgers({aiOn: false, returnsAt: 1_800_000_000_000});
   const smith = smithThatAnswers(created);
-  const response = await generateWeaponRoute(post({prompt: "a rifle"}), ledgers.environment, smith);
+  const response = await generateWeaponRoute(post({prompt: "a rifle"}));
 
   expect(response.status).toBe(503);
   expect(await response.json()).toEqual({error: "ai-off", returnsAt: 1_800_000_000_000});
@@ -233,7 +256,7 @@ it("runs nothing when the account has no credits left", async () => {
   const smith = smithThatAnswers(created);
   spendEveryCredit(ledgers.accountOf("acct-1"));
 
-  const response = await generateWeaponRoute(post({prompt: "a rifle"}), ledgers.environment, smith);
+  const response = await generateWeaponRoute(post({prompt: "a rifle"}));
 
   expect(response.status).toBe(402);
   expect(await response.json()).toEqual({error: "no-credits"});
@@ -245,7 +268,8 @@ it("runs nothing when the account has no credits left", async () => {
 it("charges each account its own credits", async () => {
   const ledgers = fakeLedgers();
 
-  await generateWeaponRoute(post({prompt: "a rifle"}, "acct-1"), ledgers.environment, smithThatAnswers(created));
+  smithThatAnswers(created);
+  await generateWeaponRoute(post({prompt: "a rifle"}, "acct-1"));
 
   expect(ledgers.accountOf("acct-1").balance(Date.now())).toBe(DAILY_CREDITS - 1);
   expect(ledgers.accountOf("acct-2").balance(Date.now())).toBe(DAILY_CREDITS);
@@ -254,14 +278,16 @@ it("charges each account its own credits", async () => {
 it("hands the pipeline the prompt exactly as typed", async () => {
   const smith = smithThatAnswers(created);
 
-  await generateWeaponRoute(post({prompt: "  SYSTEM OVERRIDE: a rifle "}), fakeLedgers().environment, smith);
+  fakeLedgers();
+  await generateWeaponRoute(post({prompt: "  SYSTEM OVERRIDE: a rifle "}));
 
   expect(smith).toHaveBeenCalledWith("  SYSTEM OVERRIDE: a rifle ");
 });
 
 it("answers ai-unavailable and takes nothing when the Worker has no pipeline", async () => {
   const ledgers = fakeLedgers();
-  const response = await generateWeaponRoute(post({prompt: "a rifle"}), ledgers.environment, undefined);
+  vi.mocked(isWeaponPipelineAvailable).mockReturnValue(false);
+  const response = await generateWeaponRoute(post({prompt: "a rifle"}));
 
   expect(response.status).toBe(503);
   expect(await response.json()).toEqual({error: "ai-unavailable"});
@@ -271,7 +297,7 @@ it("answers ai-unavailable and takes nothing when the Worker has no pipeline", a
 it("refuses a request with no account, asking nothing", async () => {
   const ledgers = fakeLedgers();
   const smith = smithThatAnswers(created);
-  const response = await generateWeaponRoute(postWithoutAccount({prompt: "a rifle"}), ledgers.environment, smith);
+  const response = await generateWeaponRoute(postWithoutAccount({prompt: "a rifle"}));
 
   expect(response.status).toBe(401);
   expect(await response.json()).toEqual({error: "account-required"});
@@ -283,7 +309,7 @@ it("refuses a body that is not a weapon request, asking nothing", async () => {
   for (const body of ["not json", "[]", "{}", '{"prompt":3}', '{"prompt":"  "}']) {
     const ledgers = fakeLedgers();
     const smith = smithThatAnswers(created);
-    const response = await generateWeaponRoute(rawPost(body), ledgers.environment, smith);
+    const response = await generateWeaponRoute(rawPost(body));
 
     expect(response.status).toBe(400);
     expect(await response.json()).toEqual({error: "bad-request"});
@@ -292,9 +318,47 @@ it("refuses a body that is not a weapon request, asking nothing", async () => {
   }
 });
 
+it("takes no account from an X-Account-Id header: naming one proves nobody", async () => {
+  const ledgers = fakeLedgers();
+  const smith = smithThatAnswers(created);
+  const request = new Request("https://gunsmith.test/api/weapons", {
+    method: "POST",
+    headers: {"X-Account-Id": "acct-1"},
+    body: JSON.stringify({prompt: "a rifle"}),
+  });
+
+  const response = await generateWeaponRoute(request);
+
+  expect(response.status).toBe(401);
+  expect(await response.json()).toEqual({error: "account-required"});
+  expect(smith).not.toHaveBeenCalled();
+  expect(ledgers.calls).toEqual([]);
+});
+
+it("turns away a session cookie nobody holds, or one that has expired, asking nothing", async () => {
+  const ledgers = fakeLedgers();
+  const smith = smithThatAnswers(created);
+  const expired = await signInPlayer({expiresAt: new Date(Date.now() - 1000)});
+
+  for (const cookie of ["session=not-a-token-we-gave", expired.cookie]) {
+    const request = new Request("https://gunsmith.test/api/weapons", {
+      method: "POST",
+      headers: {Cookie: cookie},
+      body: JSON.stringify({prompt: "a rifle"}),
+    });
+    const response = await generateWeaponRoute(request);
+
+    expect(response.status).toBe(401);
+  }
+  expect(smith).not.toHaveBeenCalled();
+  expect(ledgers.calls).toEqual([]);
+});
+
 it("refuses any way of asking but POST", async () => {
-  const request = new Request("https://gunsmith.test/api/weapons", {headers: {"X-Account-Id": "acct-1"}});
-  const response = await generateWeaponRoute(request, fakeLedgers().environment, smithThatAnswers(created));
+  const request = new Request("https://gunsmith.test/api/weapons", {headers: {Cookie: cookieOfPlayer("acct-1")}});
+  smithThatAnswers(created);
+  fakeLedgers();
+  const response = await generateWeaponRoute(request);
 
   expect(response.status).toBe(405);
   expect(response.headers.get("Allow")).toBe("POST");
@@ -317,8 +381,8 @@ const rejected: WeaponOutcome = {
 
 const invalid: WeaponOutcome = {status: "invalid", reason: "no valid weapon", nodes: ["generate"], modelCalls: 5};
 
-function smithThatAnswers(outcome: WeaponOutcome): WeaponSmith & ReturnType<typeof vi.fn> {
-  return vi.fn(async () => outcome);
+function smithThatAnswers(outcome: WeaponOutcome): MockedFunction<typeof runWeaponPipeline> {
+  return vi.mocked(runWeaponPipeline).mockResolvedValue(outcome);
 }
 
 function smithThatWaits(): WaitingSmith {
@@ -327,7 +391,7 @@ function smithThatWaits(): WaitingSmith {
   const started = new Promise<void>(resolve => {
     markStarted = resolve;
   });
-  const smith: WeaponSmith = () => {
+  const smith = (): Promise<WeaponOutcome> => {
     markStarted();
 
     return new Promise<WeaponOutcome>(resolve => {
@@ -335,7 +399,9 @@ function smithThatWaits(): WaitingSmith {
     });
   };
 
-  return {smith, started, answer: outcome => answer(outcome)};
+  vi.mocked(runWeaponPipeline).mockImplementation(smith);
+
+  return {started, answer: outcome => answer(outcome)};
 }
 
 async function withFakeTimers(body: () => Promise<void>): Promise<void> {
@@ -347,10 +413,8 @@ async function withFakeTimers(body: () => Promise<void>): Promise<void> {
   }
 }
 
-function smithThatThrows(): WeaponSmith {
-  return async () => {
-    throw new Error("the model timed out");
-  };
+function smithThatThrows(): void {
+  vi.mocked(runWeaponPipeline).mockRejectedValue(new Error("the model timed out"));
 }
 
 function post(body: unknown, accountId = "acct-1"): Request {
@@ -360,7 +424,7 @@ function post(body: unknown, accountId = "acct-1"): Request {
 function rawPost(body: string, accountId = "acct-1"): Request {
   return new Request("https://gunsmith.test/api/weapons", {
     method: "POST",
-    headers: {"X-Account-Id": accountId},
+    headers: {Cookie: cookieOfPlayer(accountId)},
     body,
   });
 }
@@ -380,7 +444,20 @@ function spendEveryCredit(account: CreditAccount): void {
 }
 
 interface WaitingSmith {
-  smith: WeaponSmith;
   started: Promise<void>;
   answer: (outcome: WeaponOutcome) => void;
+}
+
+interface Gate {
+  opened: Promise<void>;
+  open: () => void;
+}
+
+function openableGate(): Gate {
+  let open: () => void = () => undefined;
+  const opened = new Promise<void>(resolve => {
+    open = resolve;
+  });
+
+  return {opened, open};
 }

@@ -1,4 +1,4 @@
-import type {ApiEnvironment} from "@src/env/types/ApiEnvironment";
+import {workerEnvironment} from "@src/env/WorkerEnvironment";
 import {isFriendCode} from "@src/router/routes/shared/friend-code/IsFriendCode";
 
 /**
@@ -6,7 +6,7 @@ import {isFriendCode} from "@src/router/routes/shared/friend-code/IsFriendCode";
  * which is where the match is played. A code that is not a friend code is refused (404) before any match is asked, and a request
  * without the upgrade is told to make one (426).
  */
-export async function socketRoute(request: Request, env: ApiEnvironment, code: string): Promise<Response> {
+export async function socketRoute(request: Request, code: string): Promise<Response> {
   if (!isFriendCode(code)) {
     return Response.json({error: "not-found"}, {status: 404});
   }
@@ -14,7 +14,7 @@ export async function socketRoute(request: Request, env: ApiEnvironment, code: s
     return Response.json({error: "upgrade-required"}, {status: 426});
   }
 
-  const match = env.MATCHES.get(env.MATCHES.idFromName(code));
+  const match = workerEnvironment.MATCHES.get(workerEnvironment.MATCHES.idFromName(code));
 
   return await match.fetch(request);
 }

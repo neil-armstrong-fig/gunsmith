@@ -18,6 +18,12 @@ it("manages an isolated Worker before the production preview", async () => {
   ]);
 });
 
+it("starts the managed Worker for local use, so it trusts the pages the preview serves", async () => {
+  vi.stubEnv("PREVIEW_API_PORT", "9587");
+  const {default: config} = await import("./playwright.config");
+  expect(config.webServer).toMatchObject([{command: expect.stringContaining("--var ALLOW_LOOPBACK_ORIGINS:true")}, {}]);
+});
+
 it("proxies to an explicit API without starting a Worker", async () => {
   vi.stubEnv("API_URL", "https://api.example.com");
   const {default: config} = await import("./playwright.config");

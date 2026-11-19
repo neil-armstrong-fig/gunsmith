@@ -13,21 +13,26 @@
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:properties": "vitest run --config vitest.properties.config.ts",
-    "start": "wrangler dev --port ${API_PORT:-8787}"
+    "db:generate": "drizzle-kit generate",
+    "db:migrate:local": "wrangler d1 migrations apply gunsmith --local",
+    "start": "wrangler dev --port ${API_PORT:-8787} --var ALLOW_LOOPBACK_ORIGINS:true --var GOOGLE_REDIRECT_URI:http://localhost:${API_PORT:-8787}/api/auth/google/callback $(test -f ../.env.local && echo --env-file ../.env.local)"
   },
   "dependencies": {
     "@gunsmith/ai": "workspace:*",
     "@gunsmith/engine": "workspace:*",
-    "@gunsmith/shared": "workspace:*"
+    "@gunsmith/shared": "workspace:*",
+    "drizzle-orm": "catalog:"
   },
   "devDependencies": {
     "fast-check": "catalog:",
     "@cloudflare/workers-types": "catalog:",
     "@eslint/js": "catalog:",
     "@types/node": "catalog:",
+    "drizzle-kit": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
     "globals": "catalog:",
+    "oauth4webapi": "catalog:",
     "prettier": "catalog:",
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
