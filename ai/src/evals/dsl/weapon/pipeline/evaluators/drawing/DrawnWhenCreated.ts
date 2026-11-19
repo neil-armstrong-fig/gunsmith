@@ -1,5 +1,5 @@
 import {drawingValid} from "@evals/dsl/appearance/pipeline/evaluators/drawing/DrawingValid";
-import {standInDisclosed} from "@evals/dsl/appearance/pipeline/evaluators/drawing/StandInDisclosed";
+import {noDisguisedStandIn} from "@evals/dsl/appearance/pipeline/evaluators/drawing/NoDisguisedStandIn";
 import type {WeaponEvalInput} from "@evals/dsl/weapon/pipeline/types/WeaponEvalInput";
 import type {EvalScore} from "@evals/dsl/shared/types/EvalScore";
 import type {WeaponOutcomeStatus} from "@gunsmith/ai/pipeline/types/WeaponOutcomeStatus";
@@ -25,7 +25,7 @@ export function drawnWhenCreated({outcome}: WeaponEvalInput): EvalScore {
     return {key: KEY, score: 0, comment: `the drawing shown is not valid: ${valid.comment ?? "no reason given"}`};
   }
 
-  const disclosed = standInDisclosed({outcome: outcome.appearance});
+  const disclosed = noDisguisedStandIn({outcome: outcome.appearance});
   if (disclosed.score === 0) {
     return {key: KEY, score: 0, comment: disclosed.comment ?? "the stand-in is not disclosed"};
   }

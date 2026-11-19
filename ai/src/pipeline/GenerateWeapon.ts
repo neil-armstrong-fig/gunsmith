@@ -6,7 +6,7 @@ import {weaponOutcomeFromState} from "@gunsmith/ai/pipeline/weapon-graph/outcome
 
 /**
  * Turns a player's words into a weapon, or a rejection, or (when no valid weapon can be made) an invalid. It runs the request
- * through the weapon graph (`weapon-graph/`, a fixed LangGraph `StateGraph`: the token pre-check, the moderation judge,
+ * through the weapon graph (`weapon-graph/`, a fixed LangGraph `StateGraph`: the length pre-check, the moderation judge,
  * generation, then code's checks `validate`, `balance` and `rate`, at most one repair that puts the faults back to the model before
  * the same checks run again, and then the drawing by a second model with its own repair and its own disclosed stand-in; a rejected
  * or invalid request draws nothing) and reads the outcome off the state the run ended in. Model calls: moderation, generation and

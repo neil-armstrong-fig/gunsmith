@@ -1,5 +1,5 @@
 import {DslError} from "@evals/dsl/shared/errors/DslError";
-import type {StandingCriterion} from "@evals/dsl/shared/types/StandingCriterion";
+import type {TrialDsl} from "@evals/dsl/shared/types/TrialDsl";
 import type {ArenaSubmissionDriver} from "@evals/dsl/arena-submission/types/ArenaSubmissionDriver";
 import type {PromptAndBuiltInSubmissions} from "@evals/dsl/arena-submission/types/PromptAndBuiltInSubmissions";
 import type {PromptSubmissions} from "@evals/dsl/arena-submission/types/PromptSubmissions";
@@ -11,11 +11,22 @@ import {ArenaSubmissionPipeline} from "@evals/dsl/arena-submission/pipeline/Aren
  * pipeline beneath it in a `try` / `catch` and rethrows a `DslError` that says what was attempted, so a failed criterion reads as one
  * sentence. `ArenaSubmissionPipeline` does the work. An `expect` changes nothing, so the `then`s of one `when` can share one `ask`.
  */
-export class ArenaSubmissionDsl {
+export class ArenaSubmissionDsl implements TrialDsl<ArenaSubmissionDsl> {
+  readonly domain = "arenaSubmission";
   private readonly pipeline: ArenaSubmissionPipeline;
 
-  constructor(driver: ArenaSubmissionDriver) {
+  constructor(private readonly driver: ArenaSubmissionDriver) {
     this.pipeline = new ArenaSubmissionPipeline(driver);
+  }
+
+  /** How many times a request is run, which a spec reads to give each trial its own scope. */
+  get trials(): number {
+    return this.driver.trials;
+  }
+
+  /** A DSL for one trial: it asks once, on this DSL's driver, and holds only that trial's answer. */
+  forTrial(): ArenaSubmissionDsl {
+    return new ArenaSubmissionDsl({trials: 1, run: submissions => this.driver.run(submissions)});
   }
 
   /** Puts through screening the arena prompt of player 1, of player 2, of both or of neither. */
@@ -86,27 +97,8 @@ export class ArenaSubmissionDsl {
    * what is left follows how many survived; screening costs a moderation call for each prompt at most and none for a built-in; and
    * nothing a player is shown carries a prompt or the system prompt's canary. The mapping reports each under every `when`.
    */
-  standingCriteria(): StandingCriterion[] {
-    return [
-      {
-        description:
-          "whatever is submitted, only submissions that were made go forward, word for word and never twice, and what is left (none, one by default, or two to pick between) follows how many survived",
-        expect: () => this.expectSurvivorsAreSubmissions(),
-      },
-      {
-        description:
-          "whatever is submitted, screening spends at most one model call on each prompt and none on a built-in arena",
-        expect: () => this.expectWithinModelCalls(),
-      },
-      {
-        description:
-          "whatever is submitted, no rejection reason shown to the players repeats a whole prompt or built-in name, and nothing shown contains the system prompt",
-        expect: () => this.expectSafeToShow(),
-      },
-    ];
-  }
 
-  private expectSurvivorsAreSubmissions(): void {
+  expectSurvivorsAreSubmissions(): void {
     try {
       this.pipeline.checkSurvivorsAreSubmissions();
     } catch (error) {
@@ -114,7 +106,7 @@ export class ArenaSubmissionDsl {
     }
   }
 
-  private expectWithinModelCalls(): void {
+  expectWithinModelCalls(): void {
     try {
       this.pipeline.checkWithinModelCalls();
     } catch (error) {
@@ -122,7 +114,7 @@ export class ArenaSubmissionDsl {
     }
   }
 
-  private expectSafeToShow(): void {
+  expectSafeToShow(): void {
     try {
       this.pipeline.checkSafeToShow();
     } catch (error) {

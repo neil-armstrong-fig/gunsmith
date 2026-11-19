@@ -13,7 +13,7 @@ has a known weakness. Owners: `budget` for production AI spend/tracing, `ai` for
 | Alerts | 50%, 80%, 100% of the month |
 | Credits per player | 10 a day, reset 00:00 UTC |
 | Credit prices | weapon 1, arena 1, edit 1, rejected prompt 0.5, reuse free |
-| Prompt limits | weapon 150 tokens, arena 250 (rejected before any model call) |
+| Prompt limits | weapon 600 characters, arena 1,000 (about 150 and 250 tokens; rejected before any model call) |
 | Cost posture | Try the **free plan** first; accept **Workers Paid** with budgets and the kill switch if the spike says so |
 
 When the budget is exhausted: **AI off, game stays up.** New generation stops; the banner appears; the game runs on the saved
@@ -33,7 +33,7 @@ library and the built-in weapon and arena pool; guests are unaffected.
    provider's reported usage.
 4. **Per-user credits.** The ledger caps what one account can spend (atomic decrement, refund on timeout).
 5. **Cloudflare budget alerts.** Email at the thresholds above, as the last line, because they cannot stop anything.
-6. **Per-call limits:** `maxTokens`, the token pre-check, `modelCallLimitMiddleware`, one repair attempt, a timeout.
+6. **Per-call limits:** `maxTokens`, the length pre-check, `modelCallLimitMiddleware`, one repair attempt, a timeout.
 
 ## Cloudflare costs to understand
 
@@ -261,7 +261,7 @@ against the fake AI adapter, never a paid one.
   - **when a request times out after reserving** then the credit is refunded exactly once; **when the refund is retried** then it is a no-op (layer 4, refund on timeout).
 - **given a player with 10 credits**
   - **when a weapon, an arena or an edit is created** then 1 credit is taken; **when a prompt is rejected** then 0.5 is taken; **when a saved item is reused** then nothing is taken (credit prices).
-  - **when a prompt is over the limit (weapon 150 tokens, arena 250)** then it is rejected before any model call and charges nothing (prompt limits, layer 6).
+  - **when a prompt is over the limit (weapon 600 characters, arena 1,000)** then it is rejected before any model call and charges nothing (prompt limits, layer 6).
   - **when 00:00 UTC passes** then the balance is 10 again, whatever was spent the day before (credits per player).
 - **given today's global spend is just under $1**
   - **when a request's estimated cost would cross it** then AI is off until 00:00 UTC and the banner says so (daily soft cap).

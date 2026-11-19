@@ -10,7 +10,7 @@ import {statusFollowsSurvivors} from "@evals/dsl/arena-submission/pipeline/evalu
 import {statusMatches} from "@evals/dsl/arena-submission/pipeline/evaluators/survivors/StatusMatches";
 import {survivorIs} from "@evals/dsl/arena-submission/pipeline/evaluators/survivors/SurvivorIs";
 import {survivorsWereSubmitted} from "@evals/dsl/arena-submission/pipeline/evaluators/survivors/SurvivorsWereSubmitted";
-import {failuresAcrossTrials} from "@evals/dsl/shared/trials/FailuresAcrossTrials";
+import {failuresOf} from "@evals/dsl/shared/checks/FailuresOf";
 import type {ArenaSubmission} from "@gunsmith/ai/pipeline/arena-submission/types/ArenaSubmission";
 
 const FIRST_PLAYER = "first";
@@ -18,13 +18,12 @@ const SECOND_PLAYER = "second";
 
 /**
  * Arena-submission screening as seen from outside, the system under test: the one class that knows how to put submissions through it
- * and how to read what came back, as `ArenaPipeline` is for one arena. `ask…` runs the submissions once for every trial (a model's
- * answer varies) and holds the answers; each `check…` runs pure evaluators over them and holds only if it held in every trial
- * (pass^k), throwing one sentence for each check that failed. It catches nothing and wraps nothing: the DSL says what was attempted.
+ * and how to read what came back, as `ArenaPipeline` is for one arena. `ask…` runs the submissions once and holds the answer; each
+ * `check…` runs pure evaluators over it, throwing one sentence for each check that failed (each trial is a scope of its own, so pass^k is the mapping's). It catches nothing and wraps nothing: the DSL says what was attempted.
  */
 export class ArenaSubmissionPipeline {
   private readonly driver: ArenaSubmissionDriver;
-  private answered: ArenaSubmissionEvalInput[] = [];
+  private answered: ArenaSubmissionEvalInput | undefined;
 
   constructor(driver: ArenaSubmissionDriver) {
     this.driver = driver;
@@ -59,45 +58,39 @@ export class ArenaSubmissionPipeline {
   }
 
   checkOnlySubmissionForwarded(prompt: string): void {
-    this.checkEveryTrial([input => statusMatches(input, "only-submission"), input => survivorIs(input, prompt)]);
+    this.checkAnswer([input => statusMatches(input, "only-submission"), input => survivorIs(input, prompt)]);
   }
 
   checkNoSurvivingArenas(): void {
-    this.checkEveryTrial([input => statusMatches(input, "none")]);
+    this.checkAnswer([input => statusMatches(input, "none")]);
   }
 
   checkPlayersPick(): void {
-    this.checkEveryTrial([input => statusMatches(input, "players-pick")]);
+    this.checkAnswer([input => statusMatches(input, "players-pick")]);
   }
 
   checkSurvivorsAreSubmissions(): void {
-    this.checkEveryTrial([survivorsWereSubmitted, statusFollowsSurvivors]);
+    this.checkAnswer([survivorsWereSubmitted, statusFollowsSurvivors]);
   }
 
   checkWithinModelCalls(): void {
-    this.checkEveryTrial([screeningModelCallBudget]);
+    this.checkAnswer([screeningModelCallBudget]);
   }
 
   checkSafeToShow(): void {
-    this.checkEveryTrial([rejectionReasonsEchoNoPrompt, screeningNoCanaryLeak]);
+    this.checkAnswer([rejectionReasonsEchoNoPrompt, screeningNoCanaryLeak]);
   }
 
   private async ask(submissions: readonly ArenaSubmission[]): Promise<void> {
-    const answered: ArenaSubmissionEvalInput[] = [];
-
-    for (let trial = 0; trial < this.driver.trials; trial += 1) {
-      answered.push({submissions, screening: await this.driver.run(submissions)});
-    }
-
-    this.answered = answered;
+    this.answered = {submissions, screening: await this.driver.run(submissions)};
   }
 
-  private checkEveryTrial(checks: ArenaSubmissionEvaluator[]): void {
-    if (this.answered.length === 0) {
+  private checkAnswer(checks: ArenaSubmissionEvaluator[]): void {
+    if (!this.answered) {
       throw new Error("Ask for arena submissions to be screened (in a beforeAll) before expecting anything");
     }
 
-    const failures = checks.flatMap(check => failuresAcrossTrials(this.answered, check));
+    const failures = failuresOf(this.answered, checks);
     if (failures.length > 0) {
       throw new Error(failures.join("; "));
     }

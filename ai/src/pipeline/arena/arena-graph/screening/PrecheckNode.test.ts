@@ -14,7 +14,7 @@ it("turns away a request one character over the limit, saying how long it is", (
 
   expect(update).toEqual({
     nodes: ["precheck"],
-    rejectionReason: "That is too long: about 251 tokens, and the limit is 250. Shorten it.",
+    rejectionReason: "That is too long: it has 1001 characters, and the limit is 1000. Shorten it.",
   });
 });
 

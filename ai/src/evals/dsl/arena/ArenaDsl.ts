@@ -1,24 +1,32 @@
 import {DslError} from "@evals/dsl/shared/errors/DslError";
-import type {StandingCriterion} from "@evals/dsl/shared/types/StandingCriterion";
+import type {TrialDsl} from "@evals/dsl/shared/types/TrialDsl";
 import type {ArenaPipelineDriver} from "@evals/dsl/arena/types/ArenaPipelineDriver";
 import {ArenaPipeline} from "@evals/dsl/arena/pipeline/ArenaPipeline";
-
-// The most model calls any arena request may cost: moderation, generation and at most one repair (two when nothing needs repairing).
-const MAXIMUM_MODEL_CALLS = 3;
 
 /**
  * The arena pipeline as a test sees it: ask it for an arena, then say what must be true of its answer. Every method only wraps
  * the pipeline beneath it in a `try` / `catch` and rethrows a `DslError` that says what was attempted, so a failed criterion reads
  * as one sentence. `ArenaPipeline` does the work. An `expect` changes nothing, so the `then`s of one `when` can share one `ask`.
  */
-export class ArenaDsl {
+export class ArenaDsl implements TrialDsl<ArenaDsl> {
+  readonly domain = "arena";
   private readonly pipeline: ArenaPipeline;
 
-  constructor(driver: ArenaPipelineDriver) {
+  constructor(private readonly driver: ArenaPipelineDriver) {
     this.pipeline = new ArenaPipeline(driver);
   }
 
-  /** Puts a player's request through the pipeline, once for every trial, replacing the answers of any earlier request. */
+  /** How many times a request is run, which a spec reads to give each trial its own scope. */
+  get trials(): number {
+    return this.driver.trials;
+  }
+
+  /** A DSL for one trial: it asks once, on this DSL's driver, and holds only that trial's answer. */
+  forTrial(): ArenaDsl {
+    return new ArenaDsl({trials: 1, run: prompt => this.driver.run(prompt)});
+  }
+
+  /** Puts a player's request through the pipeline replacing the answer of any earlier request. */
   async ask(prompt: string): Promise<void> {
     try {
       await this.pipeline.ask(prompt);
@@ -99,32 +107,7 @@ export class ArenaDsl {
     }
   }
 
-  /**
-   * What holds whatever was asked, so a test does not repeat it: nothing unsafe is shown, the pipeline keeps to its fixed path
-   * within its three model calls, and the credit goes back exactly when a built-in arena is given. The mapping reports each under
-   * every `when`.
-   */
-  standingCriteria(): StandingCriterion[] {
-    return [
-      {
-        description:
-          "whatever is asked, the arena the player is given is playable by the engine's own rules (a rejection gives none), and nothing shown contains the system prompt",
-        expect: () => this.expectSafeToShow(),
-      },
-      {
-        description:
-          "whatever is asked, the pipeline runs its fixed stages in order (pre-check first, at most one repair) and spends at most three model calls",
-        expect: () => this.expectFixedPathWithinModelCalls(MAXIMUM_MODEL_CALLS),
-      },
-      {
-        description:
-          "whatever is asked, the credit is refunded exactly when a built-in arena is given instead of the one asked for",
-        expect: () => this.expectRefundedOnlyForBuiltIn(),
-      },
-    ];
-  }
-
-  private expectFixedPathWithinModelCalls(maximumModelCalls: number): void {
+  expectFixedPathWithinModelCalls(maximumModelCalls: number): void {
     try {
       this.pipeline.checkFixedPathWithin(maximumModelCalls);
     } catch (error) {

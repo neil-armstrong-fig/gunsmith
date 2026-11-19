@@ -11,7 +11,7 @@ const MOST_SUBMISSIONS = 2;
  * Screens the arenas two players put forward, so only ones that can be played reach them. Each prompt goes through the arena pipeline's
  * own pre-check and moderation (a built-in arena needs only to exist), and what is left decides what happens next: nothing (a
  * built-in arena is used), one submission (it goes forward by default), or two (both are generated with `generateArena`, and the
- * players pick between them with `resolveArenaPicks`). Nothing here chooses an arena: the players do. Model calls: one moderation for
+ * players pick between them with engine's `resolveArenaPicks`). Nothing here chooses an arena: the players do. Model calls: one moderation for
  * each prompt, two at most.
  */
 export async function screenArenaSubmissions(

@@ -20,7 +20,7 @@ See [schemas](schemas.md), [balancing](ai-stat-balancing.md), and [visual genera
 
 ## Eval and safety boundaries
 
-Specs use the mapping/DSL rather than models or pipeline internals. Each request runs once per trial; criteria inspect the same result, and every trial must satisfy a criterion. Plain `given` cases are regression coverage; `given.inProgress` tracks capability work. Deterministic evaluators come first; introduce a model judge only for a demonstrated failure and calibrate it with human labels.
+Specs use the mapping/DSL rather than models or pipeline internals. Each trial of a request has a scope of its own (`eachTrial`) and runs the request once; its criteria inspect that one answer, every trial must satisfy a criterion,. Plain `given` cases are regression coverage; `given.inProgress` tracks capability work. Deterministic evaluators come first; introduce a model judge only for a demonstrated failure and calibrate it with human labels.
 
 Fake, local and paid tiers measure different things. Scores do not transfer. Provider errors, spend stops and truncated output must fail paid validation explicitly rather than masquerading as legitimate rejection. Mutation evidence must name which criterion fell. The detailed commands and constraints live in [ai/AGENTS.md](../ai/AGENTS.md).
 
@@ -34,7 +34,7 @@ Geometry, stairs, spawn/pickup access and ring escape remain engine-owned validi
 
 ### Choosing the arena: the players pick, there is no AI judge
 
-**Decided by the user, 2026-11-18:** no model chooses the arena. Each player puts one forward, **a prompt or a built-in arena by name**. Screening checks each (`ai/src/pipeline/arena-submission/`) and every survivor is generated. Both players then see both arenas and each picks an arena, picks nothing, or chooses random. `resolveArenaPicks` (`ai/src/pipeline/arena-picking/`, pure, no model) settles two choices; chance is drawn from the engine's `nextRandom` on a salted stream of its own.
+**Decided by the user, 2026-11-18:** no model chooses the arena. Each player puts one forward, **a prompt or a built-in arena by name**. Screening checks each (`ai/src/pipeline/arena-submission/`) and every survivor is generated. Both players then see both arenas and each picks an arena, picks nothing, or chooses random. `resolveArenaPicks` (`engine/src/arena-picking/`, pure, no model; moved from `ai/` on 2026-11-19) settles two choices; chance is drawn from the engine's `nextRandom` on a salted stream of its own.
 
 | Player 1 | Player 2 | Played | `how` |
 | --- | --- | --- | --- |

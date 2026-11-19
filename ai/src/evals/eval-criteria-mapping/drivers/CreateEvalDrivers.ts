@@ -1,6 +1,6 @@
 import {unreachableTier} from "@evals/eval-criteria-mapping/environment/tier/unreachable/UnreachableTier";
 import type {EvalTier} from "@evals/eval-criteria-mapping/environment/tier/shared/types/EvalTier";
-import type {EvalDrivers} from "@evals/eval-criteria-mapping/drivers/types/EvalDrivers";
+import type {EvalDrivers} from "@evals/dsl/types/EvalDrivers";
 import {FakeAppearanceEvalDriver} from "@evals/eval-criteria-mapping/setups/appearance/fake/FakeAppearanceEvalDriver";
 import {LocalAppearanceEvalDriver} from "@evals/eval-criteria-mapping/setups/appearance/local/LocalAppearanceEvalDriver";
 import {PaidAppearanceEvalDriver} from "@evals/eval-criteria-mapping/setups/appearance/paid/PaidAppearanceEvalDriver";

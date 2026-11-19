@@ -1,6 +1,6 @@
 import type {WeaponEvalInput} from "@evals/dsl/weapon/pipeline/types/WeaponEvalInput";
 import type {EvalScore} from "@evals/dsl/shared/types/EvalScore";
-import {weaponDraftSchema} from "@gunsmith/ai/pipeline/weapon/WeaponDraft";
+import {damagePerSecondOf} from "@evals/dsl/weapon/pipeline/evaluators/created-weapon/DamagePerSecond";
 
 const KEY = "withinCaps";
 
@@ -14,12 +14,11 @@ export function withinCaps({outcome}: WeaponEvalInput): EvalScore {
     return {key: KEY, score: 1, comment: `${outcome.status}, nothing to rate`};
   }
 
-  const parsed = weaponDraftSchema.safeParse(outcome.weapon);
-  if (!parsed.success) {
+  const damagePerSecond = damagePerSecondOf(outcome.weapon);
+  if (damagePerSecond === undefined) {
     return {key: KEY, score: 0, comment: "weapon does not parse, so it cannot be rated"};
   }
 
-  const damagePerSecond = parsed.data.bulletDamage / parsed.data.fireIntervalSeconds;
   if (damagePerSecond <= MAX_DAMAGE_PER_SECOND) {
     return {key: KEY, score: 1};
   }

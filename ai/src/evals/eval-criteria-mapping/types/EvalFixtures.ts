@@ -1,15 +1,9 @@
-import type {ArenaDsl} from "@evals/dsl/arena/ArenaDsl";
-import type {ArenaSubmissionDsl} from "@evals/dsl/arena-submission/ArenaSubmissionDsl";
-import type {AppearanceDsl} from "@evals/dsl/appearance/AppearanceDsl";
-import type {WeaponDsl} from "@evals/dsl/weapon/WeaponDsl";
+import type {WeaponSmithDsl} from "@evals/dsl/WeaponSmithDsl";
 
 /**
- * What a `when` is handed: each DSL a spec may talk to, and nothing else. No driver, no pipeline, no model, no evaluator. A `when`
- * takes the ones it uses by name (`when("…", ({appearance}) => {…})`), which is how the mapping knows whose standing criteria it carries.
+ * What a `when` is handed: the weapon smith, whose members are the DSLs a spec may talk to, and nothing else. No driver, no pipeline,
+ * no model, no evaluator. A `when` takes a member into a scope of its own for each trial (`eachTrial(weaponSmith.weapon, weapon => {…})`).
  */
 export interface EvalFixtures {
-  weaponSmith: WeaponDsl;
-  appearance: AppearanceDsl;
-  arena: ArenaDsl;
-  arenaSubmission: ArenaSubmissionDsl;
+  weaponSmith: WeaponSmithDsl;
 }

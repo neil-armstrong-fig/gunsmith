@@ -2,7 +2,7 @@ import {vitestBaseConfig} from "@gunsmith/shared/config/vitest.base.js";
 import {defineConfig} from "vitest/config";
 
 // `pnpm evals:local`, `pnpm evals:paid`: the evals. They call a model, so `pnpm checks` leaves them out.
-// LangSmith tracking is off unless `EVAL_TRACK=1`, because eval traces count against the free plan's 5,000 a month.
+// The specs use native Vitest, not `langsmith/vitest`: its `ls.describe` cannot nest. LangChain tracing is its own environment setting.
 export default defineConfig({
   ...vitestBaseConfig,
   resolve: {tsconfigPaths: true},
@@ -18,6 +18,5 @@ export default defineConfig({
     hookTimeout: 180_000,
     // One spec file at a time: they share one local model, and each writes its own results file.
     fileParallelism: false,
-    env: {LANGSMITH_TEST_TRACKING: process.env.EVAL_TRACK === "1" ? "true" : "false"},
   },
 });

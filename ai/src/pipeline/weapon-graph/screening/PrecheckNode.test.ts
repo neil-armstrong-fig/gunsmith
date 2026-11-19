@@ -10,6 +10,7 @@ it("turns away a request that is too long, with the reason, without a model call
 
   expect(update.nodes).toEqual(["precheck"]);
   expect(update.rejectionReason).toContain("too long");
+  expect(update.rejectionReason).toContain("the limit is 600");
   expect(update.modelCalls).toBeUndefined();
 });
 
