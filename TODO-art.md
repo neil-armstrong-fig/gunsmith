@@ -4,11 +4,13 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 ## Resume here
 
-Art is in `.claude/worktrees/art` on `worktree-art`, based on committed main `fb1a739`. Preserve this worktree and sync committed main before resuming.
+Art is in `.claude/worktrees/art` on `worktree-art`, synced to main `6fed51d` before the workshop card slice. Preserve this worktree and sync committed main before resuming.
 
 Room weapon art and its two-browser spec are integrated. The user's approved low-cover artwork from `837f1d9` is integrated in `adbf7b4`.
 
-The next M1 art slice is the workshop arena preview. Play's workshop at `9e81ee9` has a weapon result card. Resume when Play exposes the arena result and built-in arena row. Art owns the preview component, reuse of the terrain artwork and the browser drawing spec. The first criterion opens a deterministic Fair duel result and checks the floor ticks and wall braces in the preview. Compare Fair duel and Duel in the built-in row to catch a preview that reuses the wrong arena.
+The workshop weapon result card now has the authored picture beside the name, a power meter and six compact stat rows. The delivery is validated and uncommitted in `worktree-art`.
+
+The next M1 art slice is the workshop arena preview. Resume when Play exposes the arena result and built-in arena row. Art owns the preview component, reuse of the terrain artwork and the browser drawing spec. The first criterion opens a deterministic Fair duel result and checks the floor ticks and wall braces in the preview. Compare Fair duel and Duel in the built-in row to catch a preview that reuses the wrong arena.
 
 AI and Engine own the production appearance association. For S4-1, recheck the refused pickup's body and outline separately from its muzzle at both scales once AI delivers the contrast change.
 
@@ -33,6 +35,8 @@ Reserve concrete files in [HANDOFF.md](HANDOFF.md) before overlapping another se
 Agree manifest keys/anchors with play and supported visual grammar with AI before production assets. The rifle shot is integrated (blue is your unmodified `effects/projectile-rifle`; see HANDOFF.md). No menus ahead of real consumers.
 
 ## Current milestone tasks
+
+- [x] Style the existing workshop weapon result card using the selection concept. Check that the meter and printed power rating agree for successive results.
 
 - [x] User chose C2 soft octagon after two marker comparisons. Lock artwork, clean rejected studies and integrate the marker with pickup rendering and browser coverage.
 
@@ -78,6 +82,17 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [ ] Case-study diagrams: pipeline, cost safeguards and eval loop.
 
 ## Verification/latest delivery
+
+2026-11-19, workshop weapon result card in `worktree-art` at `6fed51d`.
+The meter criterion failed on the old card and caught a 50% fixed fill in
+a copy of the production bundle. All 23 workshop browser criteria passed
+without retries. The preview wrapper logged a shutdown error after the tests,
+and the runner exited 0. Both cards were reviewed at 1024 × 560 and 1440 × 900.
+`pnpm checks` passed lint, formatting, strict types and 3,467 tests with one
+existing audio skip. The standards review used the root, webapp, React and
+acceptance instructions. The folder and caller audit confirmed that the new
+meter type lives under the workshop DSL's `types/` and its callers stay in
+the workshop.
 
 Workshop preview baseline at `837f1d9`. The production build and all 33
 existing terrain drawing criteria passed. `pnpm checks` passed lint,
