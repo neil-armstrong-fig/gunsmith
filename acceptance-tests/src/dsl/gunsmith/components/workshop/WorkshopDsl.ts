@@ -66,6 +66,24 @@ export class WorkshopDsl {
     }
   }
 
+  /** Presses Try it on the result card, which shuts the workshop and puts the made weapon in hand in slot 2. */
+  async tryIt(): Promise<void> {
+    try {
+      await this.workshop.tryIt();
+    } catch (error) {
+      throw new DslError("Failed to press Try it", error);
+    }
+  }
+
+  /** Whether the result card has a Try it button on the screen. */
+  async hasTryIt(): Promise<boolean> {
+    try {
+      return await this.workshop.hasTryIt();
+    } catch (error) {
+      throw new DslError("Failed to see whether there is a Try it button", error);
+    }
+  }
+
   /** Presses the mouse button down on the panel's title, which is no button, and holds it. */
   async holdTheMouseOnThePanel(): Promise<void> {
     try {
