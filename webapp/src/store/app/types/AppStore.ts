@@ -10,6 +10,10 @@ export interface AppStore {
   /** How hard a hit shakes the camera at most, in screen pixels: 12 by default (the user's choice; art's study said 2), or what the page's query (`?shake=<pixels>`) asks; 0 is off. */
   shakePixels: number;
   toggleMuted: () => void;
+  /** Whether the workshop's panel is open over the practice range. While it is, the game waits: no time passes and the keys typed in it are not the game's. */
+  workshopOpen: boolean;
+  openWorkshop: () => void;
+  closeWorkshop: () => void;
   /** Online only: the player pressed "Next round" (or "Play again") and the loop has not yet sent it to the server. */
   nextRoundAsked: boolean;
   askForNextRound: () => void;

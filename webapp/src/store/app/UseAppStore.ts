@@ -12,6 +12,13 @@ export const useAppStore = create<AppStore>()((set, get) => ({
   toggleMuted: () => {
     set(state => ({muted: !state.muted}));
   },
+  workshopOpen: false,
+  openWorkshop: () => {
+    set({workshopOpen: true});
+  },
+  closeWorkshop: () => {
+    set({workshopOpen: false});
+  },
   nextRoundAsked: false,
   askForNextRound: () => {
     set({nextRoundAsked: true});

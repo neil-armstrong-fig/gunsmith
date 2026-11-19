@@ -103,6 +103,11 @@ export function useGameLoop(): void {
       return;
     }
 
+    // The workshop is open over the practice range: the game waits. The steps this frame owed are dropped, not kept, so shutting it does not make up the time.
+    if (useAppStore.getState().workshopOpen) {
+      return;
+    }
+
     let world = startOfFrame;
     for (let tick = 0; tick < owed.ticks; tick += 1) {
       const input = {

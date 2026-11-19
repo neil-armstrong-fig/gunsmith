@@ -17,6 +17,7 @@ import {RoundDsl} from "@src/dsl/gunsmith/components/round/RoundDsl";
 import {SoundDsl} from "@src/dsl/gunsmith/components/sound/SoundDsl";
 import {VisionDsl} from "@src/dsl/gunsmith/components/vision/VisionDsl";
 import {WeaponDsl} from "@src/dsl/gunsmith/components/weapon/WeaponDsl";
+import {WorkshopDsl} from "@src/dsl/gunsmith/components/workshop/WorkshopDsl";
 import {GunsmithPlaywright} from "@src/dsl/gunsmith/playwright/GunsmithPlaywright";
 import type {ClosingRingRequest} from "@src/dsl/gunsmith/types/ClosingRingRequest";
 import type {PickupDrawingRequest} from "@src/dsl/gunsmith/types/PickupDrawingRequest";
@@ -42,6 +43,7 @@ export class GunsmithDsl {
   readonly round: RoundDsl;
   readonly sound: SoundDsl;
   readonly vision: VisionDsl;
+  readonly workshop: WorkshopDsl;
 
   constructor(page: Page) {
     this.gunsmith = new GunsmithPlaywright(page);
@@ -61,6 +63,7 @@ export class GunsmithDsl {
     this.round = new RoundDsl(page);
     this.sound = new SoundDsl(page);
     this.vision = new VisionDsl(page);
+    this.workshop = new WorkshopDsl(page);
   }
 
   /** Asks for a camera that never shakes (`?shake=0`) in whatever the spec opens next, so a screenshot taken at the moment of a hit is of the picture as it stands. */

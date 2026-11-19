@@ -18,6 +18,9 @@ const gameStoreMayImport = "^(?!zustand$|zustand/|@gunsmith/engine(?:/|$)|@src/g
 // The feedback store (`src/store/feedback/`) is smaller still: Zustand and its own folder, no engine and no world.
 const feedbackStoreMayImport = "^(?!zustand$|zustand/|@src/store/feedback/|\\./).+$";
 
+// The workshop store (`src/store/workshop/`) holds what is written and the weapon last made: Zustand, the engine's types and its own folder.
+const workshopStoreMayImport = "^(?!zustand$|zustand/|@gunsmith/engine(?:/|$)|@src/store/workshop/|\\./).+$";
+
 export default [
   ...baseConfig({tsconfigRootDir: import.meta.dirname, allowedPackages}),
   {
@@ -140,6 +143,22 @@ export default [
             regex: feedbackStoreMayImport,
             message:
               "The feedback store may import only zustand and its own folder: it holds the cues of the damage taken, not the world and not a choice.",
+          },
+        ],
+      }),
+    },
+  },
+  {
+    // The workshop store holds the prompt and the weapon last made and nothing else. After the store block above.
+    files: ["src/store/workshop/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": restrictedImports({
+        allowedPackages: ["@gunsmith/engine"],
+        patterns: [
+          {
+            regex: workshopStoreMayImport,
+            message:
+              "The workshop store may import only zustand, the engine's types and its own folder: it holds what is written and the weapon last made.",
           },
         ],
       }),

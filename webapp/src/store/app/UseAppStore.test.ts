@@ -7,8 +7,10 @@ beforeEach(() => {
 it("holds the choices about the game and nothing else, so adding state is a deliberate edit", () => {
   expect(Object.keys(useAppStore.getState()).sort()).toEqual([
     "askForNextRound",
+    "closeWorkshop",
     "muted",
     "nextRoundAsked",
+    "openWorkshop",
     "reconnecting",
     "reducedMotion",
     "setReconnecting",
@@ -17,6 +19,7 @@ it("holds the choices about the game and nothing else, so adding state is a deli
     "takeNextRoundAsk",
     "toggleMuted",
     "waitingForOtherPlayer",
+    "workshopOpen",
   ]);
 });
 
@@ -73,4 +76,16 @@ it("turns the sound off and on again with each toggle", () => {
   useAppStore.getState().toggleMuted();
 
   expect(useAppStore.getState().muted).toBe(false);
+});
+
+it("starts with the workshop shut, opens it and shuts it again", () => {
+  expect(useAppStore.getState().workshopOpen).toBe(false);
+
+  useAppStore.getState().openWorkshop();
+
+  expect(useAppStore.getState().workshopOpen).toBe(true);
+
+  useAppStore.getState().closeWorkshop();
+
+  expect(useAppStore.getState().workshopOpen).toBe(false);
 });
