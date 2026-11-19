@@ -8,12 +8,14 @@ import type {TierDriverSettings} from "@evals/eval-criteria-mapping/environment/
 import {keepArena} from "@evals/eval-criteria-mapping/setups/arena/shared/arenas/KeepArena";
 import {startArenas} from "@evals/eval-criteria-mapping/setups/arena/shared/arenas/StartArenas";
 import type {ArenaKeeping} from "@evals/eval-criteria-mapping/setups/arena/shared/arenas/types/ArenaKeeping";
+import type {ArenaPipelineRun} from "@evals/eval-criteria-mapping/setups/arena/shared/types/ArenaPipelineRun";
 
 const RESULTS_FOLDER = "src/evals/results";
 
 /**
  * What every tier's arena driver does: put a request through the real arena pipeline on the models its tier builds, and keep every
- * arena its model drew on a page to look at when the run keeps them. A tier overrides `createModels`.
+ * arena its model drew on a page to look at when the run keeps them. A tier overrides `createModels`, and `runThrough` where it must
+ * wrap a request (the paid tier).
  */
 export abstract class ArenaPipelineEvalDriver implements ArenaPipelineDriver {
   readonly trials: number;
@@ -33,7 +35,7 @@ export abstract class ArenaPipelineEvalDriver implements ArenaPipelineDriver {
     const dependencies = this.modelsOnFirstRequest();
     this.startArenasOnFirstRequest();
 
-    return generateArena({prompt}, dependencies).then(outcome => {
+    return this.runThrough(prompt, request => generateArena({prompt: request}, dependencies)).then(outcome => {
       keepArena({...this.keeping, arena: {prompt, outcome}});
 
       return outcome;
@@ -42,8 +44,13 @@ export abstract class ArenaPipelineEvalDriver implements ArenaPipelineDriver {
 
   protected abstract createModels(): ArenaPipelineDependencies;
 
-  // Built on the first request, not in the constructor: the mapping builds every driver when a spec file loads, and a tier without a
-  // model (the paid one, for now) must not fail a run that never asks for an arena.
+  /** What a request is put through. The models exist by now; the paid tier checks its spend and logs the calls around the pipeline here. */
+  protected runThrough(prompt: string, pipeline: ArenaPipelineRun): Promise<ArenaOutcome> {
+    return pipeline(prompt);
+  }
+
+  // Built on the first request, not in the constructor: the mapping builds every driver when a spec file loads, and the paid models
+  // need a key, which a run that never asks for an arena must not need.
   private modelsOnFirstRequest(): ArenaPipelineDependencies {
     this.models ??= this.createModels();
 
