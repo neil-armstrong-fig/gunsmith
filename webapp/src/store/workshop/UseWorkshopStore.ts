@@ -5,10 +5,18 @@ import {create} from "zustand";
 export const useWorkshopStore = create<WorkshopStore>()(set => ({
   prompt: "",
   weapon: undefined,
+  madeFromPrompt: "",
+  savedId: undefined,
   setPrompt: prompt => {
     set({prompt});
   },
   setWeapon: weapon => {
-    set({weapon});
+    set(state => ({weapon, madeFromPrompt: state.prompt, savedId: undefined}));
+  },
+  setSavedId: savedId => {
+    set({savedId});
+  },
+  showSavedWeapon: saved => {
+    set({prompt: saved.prompt, weapon: saved.weapon, madeFromPrompt: saved.prompt, savedId: saved.id});
   },
 }));
