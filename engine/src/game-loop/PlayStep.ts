@@ -53,6 +53,8 @@ export function playStep(world: World, play: Play, seconds: number): World {
     dummies: world.dummies,
     playerPosition: playerTurn.fighter.position,
     opponentPosition: opponentTurn?.fighter.position,
+    playerCrouching: playerTurn.fighter.crouching,
+    opponentCrouching: opponentTurn?.fighter.crouching,
     seconds,
   });
 

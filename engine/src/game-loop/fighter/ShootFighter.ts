@@ -26,6 +26,7 @@ export function shootFighter(arena: Arena, shooter: Shooter, turn: FighterTurn):
       aim: fighter.aim,
       weapon,
       level: eyeLevelAt(arena, fighter.position),
+      crouching: fighter.crouching,
     }),
   };
 }

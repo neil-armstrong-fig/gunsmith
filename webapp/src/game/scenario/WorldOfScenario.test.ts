@@ -1,4 +1,5 @@
 import {chooseStartingPlaces} from "@gunsmith/engine/arena-symmetry/ChooseStartingPlaces";
+import {isCover} from "@gunsmith/engine/arena/IsCover";
 import {isSolid} from "@gunsmith/engine/arena/IsSolid";
 import {levelOfTile} from "@gunsmith/engine/arena/LevelOfTile";
 import {stairOfTile} from "@gunsmith/engine/arena/StairOfTile";
@@ -8,6 +9,10 @@ import {disarmOpponent} from "@gunsmith/engine/opponent/DisarmOpponent";
 import {RIFLE} from "@gunsmith/engine/weapon/weapons/Rifle";
 import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
+import {step} from "@gunsmith/engine/game-loop/Step";
+import type {Input} from "@gunsmith/engine/game-loop/types/Input";
+import type {World} from "@gunsmith/engine/game-loop/types/World";
+import {PLAYER_HEALTH} from "@gunsmith/engine/health/PlayerHealth";
 import {startMatch} from "@gunsmith/engine/match/StartMatch";
 import type {Pickup} from "@gunsmith/engine/pickup/types/Pickup";
 import {startPickup} from "@gunsmith/engine/pickup/StartPickup";
@@ -32,135 +37,211 @@ import {PRACTICE_ARENA} from "@src/game/practice/PracticeArena";
 import {PRACTICE_DUMMIES} from "@src/game/practice/PracticeDummies";
 import {TERRACED_ARENA} from "@src/game/terraced/TerracedArena";
 import {TERRACED_OPPONENT} from "@src/game/terraced/TerracedOpponent";
+import {COVER_HALL_ARENA} from "@src/game/cover-hall/CoverHallArena";
+import {COVER_HALL_OPPONENT} from "@src/game/cover-hall/CoverHallOpponent";
+import {COVER_HALL_PLAYER} from "@src/game/cover-hall/CoverHallPlayer";
 import {worldOfScenario} from "@src/game/scenario/WorldOfScenario";
 
-it("makes the practice range with its dummies and no opponent", () => {
-  const world = worldOfScenario("practice", 1);
+describe("the practice range, the room, the duel and sparring", () => {
+  it("makes the practice range with its dummies and no opponent", () => {
+    const world = worldOfScenario("practice", 1);
 
-  expect(world).toEqual(startingWorld(PRACTICE_ARENA, PRACTICE_DUMMIES));
-  expect(world.opponent).toBeUndefined();
-  expect(world.dummies).not.toEqual([]);
-});
-
-it("makes a room's first world the duel's arena with the player alone: the server's snapshots replace it", () => {
-  const world = worldOfScenario("room", 1);
-
-  expect(world.arena).toEqual(DUEL_ARENA);
-  expect(world.opponent).toBeUndefined();
-  expect(world.opponentBrain).toBeUndefined();
-  expect(world.dummies).toEqual([]);
-});
-
-it("makes the duel with the opponent where it stands and no dummies", () => {
-  const world = worldOfScenario("duel", 7);
-
-  expect(world).toEqual({
-    ...giveOpponentBrain(startingWorld(DUEL_ARENA, [], DUEL_OPPONENT), 7),
-    match: startMatch(),
-    ring: duelRing(7),
-    pickup: duelPickup(7),
+    expect(world).toEqual(startingWorld(PRACTICE_ARENA, PRACTICE_DUMMIES));
+    expect(world.opponent).toBeUndefined();
+    expect(world.dummies).not.toEqual([]);
   });
-  expect(world.opponent?.position).toEqual(DUEL_OPPONENT);
-  expect(world.dummies).toEqual([]);
+
+  it("makes a room's first world the duel's arena with the player alone: the server's snapshots replace it", () => {
+    const world = worldOfScenario("room", 1);
+
+    expect(world.arena).toEqual(DUEL_ARENA);
+    expect(world.opponent).toBeUndefined();
+    expect(world.opponentBrain).toBeUndefined();
+    expect(world.dummies).toEqual([]);
+  });
+
+  it("makes the duel with the opponent where it stands and no dummies", () => {
+    const world = worldOfScenario("duel", 7);
+
+    expect(world).toEqual({
+      ...giveOpponentBrain(startingWorld(DUEL_ARENA, [], DUEL_OPPONENT), 7),
+      match: startMatch(),
+      ring: duelRing(7),
+      pickup: duelPickup(7),
+    });
+    expect(world.opponent?.position).toEqual(DUEL_OPPONENT);
+    expect(world.dummies).toEqual([]);
+  });
+
+  it("has nothing between the player and the opponent in the duel", () => {
+    const {player, opponent, arena} = worldOfScenario("duel", 1);
+    const row = Math.floor(player.position.y);
+
+    expect(Math.floor(opponent?.position.y ?? -1)).toBe(row);
+    for (let column = Math.floor(player.position.x); column <= Math.floor(opponent?.position.x ?? 0); column += 1) {
+      expect(isSolid(arena, column, row)).toBe(false);
+    }
+  });
+
+  it("makes sparring the duel with an opponent who has nothing to shoot with", () => {
+    const world = worldOfScenario("sparring", 7);
+
+    expect(world).toEqual({...disarmOpponent(startingWorld(DUEL_ARENA, [], DUEL_OPPONENT)), pickup: duelPickup(7)});
+    expect(world.opponent?.loadout.every(carried => carried.rounds === 0 && carried.reserve === 0)).toBe(true);
+    expect(world.player.loadout.every(carried => carried.rounds > 0)).toBe(true);
+  });
+
+  it("gives the duel's opponent a brain that draws from the seed it is given", () => {
+    expect(worldOfScenario("duel", 7).opponentBrain?.seed).toBe(7);
+    expect(worldOfScenario("duel", 8).opponentBrain?.seed).toBe(8);
+  });
+
+  it("gives the sparring opponent no brain, so it stands and takes it", () => {
+    expect(worldOfScenario("sparring", 7).opponentBrain).toBeUndefined();
+  });
+
+  it("gives the practice range no brain, since it has no opponent", () => {
+    expect(worldOfScenario("practice", 7).opponentBrain).toBeUndefined();
+  });
+
+  it("makes the duel a best-of-three, at nothing to nothing in its first round", () => {
+    expect(worldOfScenario("duel", 7).match).toEqual({playerWins: 0, opponentWins: 0, roundNumber: 1});
+  });
+
+  it("makes sparring and the practice range single rounds, with no match", () => {
+    expect(worldOfScenario("sparring", 7).match).toBeUndefined();
+    expect(worldOfScenario("practice", 7).match).toBeUndefined();
+  });
 });
 
-it("has nothing between the player and the opponent in the duel", () => {
-  const {player, opponent, arena} = worldOfScenario("duel", 1);
-  const row = Math.floor(player.position.y);
+describe("the ring", () => {
+  it("gives the duel the game's own ring, with none of its round played", () => {
+    const {ring} = worldOfScenario("duel", 7);
 
-  expect(Math.floor(opponent?.position.y ?? -1)).toBe(row);
-  for (let column = Math.floor(player.position.x); column <= Math.floor(opponent?.position.x ?? 0); column += 1) {
-    expect(isSolid(arena, column, row)).toBe(false);
+    expect(ring).toEqual(duelRing(7));
+    expect(ring?.roundSeconds).toBe(0);
+    expect(ring?.timing).toEqual(DEFAULT_RING_TIMING);
+  });
+
+  it("gives the duel the ring timing it is asked for", () => {
+    const timing = {startDelaySeconds: 2, closingSeconds: 9};
+
+    expect(worldOfScenario("duel", 7, timing).ring).toEqual(duelRing(7, timing));
+  });
+
+  it("gives the ring the damage scale it is asked for, so it hurts as much as the page said", () => {
+    const timing = {startDelaySeconds: 2, closingSeconds: 9, damageScale: 10};
+
+    expect(worldOfScenario("duel", 7, timing).ring?.timing.damageScale).toBe(10);
+    expect(worldOfScenario("sparring", 7, timing).ring?.timing.damageScale).toBe(10);
+  });
+
+  it("draws the ring's centre from the seed: another seed, another place", () => {
+    const centres = new Set<string>();
+    for (let seed = 0; seed < 30; seed++) {
+      centres.add(JSON.stringify(worldOfScenario("duel", seed).ring?.centre));
+    }
+
+    expect(centres.size).toBeGreaterThan(8);
+  });
+
+  it("gives sparring, the practice range and the heights arena no ring, so they stay endless", () => {
+    expect(worldOfScenario("sparring", 7).ring).toBeUndefined();
+    expect(worldOfScenario("practice", 7).ring).toBeUndefined();
+    expect(worldOfScenario("heights", 7).ring).toBeUndefined();
+  });
+
+  it("gives sparring a ring when it is asked for ring timing, and no other scenario", () => {
+    const timing = {startDelaySeconds: 1, closingSeconds: 6};
+
+    expect(worldOfScenario("sparring", 7, timing).ring).toEqual(duelRing(7, timing));
+    expect(worldOfScenario("practice", 7, timing).ring).toBeUndefined();
+    expect(worldOfScenario("heights", 7, timing).ring).toBeUndefined();
+  });
+
+  it("leaves sparring's opponent without a brain and its match unscored when it has a ring", () => {
+    const world = worldOfScenario("sparring", 7, {startDelaySeconds: 1, closingSeconds: 6});
+
+    expect(world.opponentBrain).toBeUndefined();
+    expect(world.match).toBeUndefined();
+  });
+});
+
+describe("the cover arena", () => {
+  it("opens the cover arena, with no ring even when asked for ring timing, and no weapon lying about", () => {
+    const timing = {startDelaySeconds: 1, closingSeconds: 6};
+
+    expect(worldOfScenario("cover", 7, timing)).toEqual(coverWorld());
+    expect(worldOfScenario("cover", 7, timing).ring).toBeUndefined();
+    expect(worldOfScenario("cover", 7).pickup).toBeUndefined();
+  });
+});
+
+describe("the cover hall", () => {
+  // Ten floor tiles in one row, numbered from 0 at the west end: cover at tiles 2 and 7, so each fighter has two tiles (0 and 1, 8 and 9) behind theirs.
+  const FIRST_FLOOR_COLUMN = 1;
+  const TICK = 1 / 60;
+  const STANDING: Input = {direction: {x: 0, y: 0}, firing: false, reload: false};
+
+  it("is a hall one tile wide and ten tiles long, with a cover block at its third and its eighth tile and nothing else in the way", () => {
+    const row = Array.from({length: 12}, (_, column) => column);
+    const coverColumns = row.filter(column => isCover(COVER_HALL_ARENA, column, 1));
+    const floorColumns = row.filter(column => !isSolid(COVER_HALL_ARENA, column, 1));
+
+    expect(coverColumns).toEqual([FIRST_FLOOR_COLUMN + 2, FIRST_FLOOR_COLUMN + 7]);
+    expect(floorColumns).toEqual([1, 2, 4, 5, 6, 7, 9, 10]);
+    expect(isSolid(COVER_HALL_ARENA, 5, 0)).toBe(true);
+    expect(isSolid(COVER_HALL_ARENA, 5, 2)).toBe(true);
+  });
+
+  it("stands the player and the opponent each right beside their own block, seven tiles apart on one row", () => {
+    const world = worldOfScenario("cover-hall", 1);
+
+    expect(world.arena).toBe(COVER_HALL_ARENA);
+    expect(world.player.position).toEqual(COVER_HALL_PLAYER);
+    expect(world.opponent?.position).toEqual(COVER_HALL_OPPONENT);
+    expect(COVER_HALL_PLAYER).toEqual({x: FIRST_FLOOR_COLUMN + 1.5, y: 1.5});
+    expect(COVER_HALL_OPPONENT).toEqual({x: FIRST_FLOOR_COLUMN + 8.5, y: 1.5});
+  });
+
+  it("gives the opponent a brain drawn from the seed, and is one round with no score, no ring, no dummies and no weapon lying about", () => {
+    const world = worldOfScenario("cover-hall", 5);
+    const seeded = giveOpponentBrain(startingWorld(COVER_HALL_ARENA, [], COVER_HALL_OPPONENT), 5);
+
+    expect(world.opponentBrain).toEqual(seeded.opponentBrain);
+    expect(world.match).toBeUndefined();
+    expect(world.ring).toBeUndefined();
+    expect(world.dummies).toEqual([]);
+    expect(world.pickup).toBeUndefined();
+  });
+
+  it("has an opponent that shoots a standing player over both blocks", () => {
+    const after = playSeconds(worldOfScenario("cover-hall", 1), STANDING, 10);
+
+    expect(after.player.health).toBeLessThan(PLAYER_HEALTH);
+  });
+
+  it("has an opponent that cannot see, and so never hurts, a player crouched beside their block", () => {
+    const after = playSeconds(worldOfScenario("cover-hall", 1), {...STANDING, crouching: true}, 10);
+
+    expect(after.player.health).toBe(PLAYER_HEALTH);
+  });
+
+  it("keeps the opponent in its own pocket, since a block cannot be walked through", () => {
+    const after = playSeconds(worldOfScenario("cover-hall", 1), STANDING, 10);
+
+    expect(after.opponent?.position.x).toBeGreaterThan(8);
+    expect(after.opponent?.position.x).toBeLessThan(11);
+  });
+
+  function playSeconds(world: World, input: Input, seconds: number): World {
+    let later = world;
+    for (let tick = 0; tick < seconds * 60; tick += 1) {
+      later = step(later, input, TICK);
+    }
+
+    return later;
   }
-});
-
-it("makes sparring the duel with an opponent who has nothing to shoot with", () => {
-  const world = worldOfScenario("sparring", 7);
-
-  expect(world).toEqual({...disarmOpponent(startingWorld(DUEL_ARENA, [], DUEL_OPPONENT)), pickup: duelPickup(7)});
-  expect(world.opponent?.loadout.every(carried => carried.rounds === 0 && carried.reserve === 0)).toBe(true);
-  expect(world.player.loadout.every(carried => carried.rounds > 0)).toBe(true);
-});
-
-it("gives the duel's opponent a brain that draws from the seed it is given", () => {
-  expect(worldOfScenario("duel", 7).opponentBrain?.seed).toBe(7);
-  expect(worldOfScenario("duel", 8).opponentBrain?.seed).toBe(8);
-});
-
-it("gives the sparring opponent no brain, so it stands and takes it", () => {
-  expect(worldOfScenario("sparring", 7).opponentBrain).toBeUndefined();
-});
-
-it("gives the practice range no brain, since it has no opponent", () => {
-  expect(worldOfScenario("practice", 7).opponentBrain).toBeUndefined();
-});
-
-it("makes the duel a best-of-three, at nothing to nothing in its first round", () => {
-  expect(worldOfScenario("duel", 7).match).toEqual({playerWins: 0, opponentWins: 0, roundNumber: 1});
-});
-
-it("makes sparring and the practice range single rounds, with no match", () => {
-  expect(worldOfScenario("sparring", 7).match).toBeUndefined();
-  expect(worldOfScenario("practice", 7).match).toBeUndefined();
-});
-
-it("gives the duel the game's own ring, with none of its round played", () => {
-  const {ring} = worldOfScenario("duel", 7);
-
-  expect(ring).toEqual(duelRing(7));
-  expect(ring?.roundSeconds).toBe(0);
-  expect(ring?.timing).toEqual(DEFAULT_RING_TIMING);
-});
-
-it("gives the duel the ring timing it is asked for", () => {
-  const timing = {startDelaySeconds: 2, closingSeconds: 9};
-
-  expect(worldOfScenario("duel", 7, timing).ring).toEqual(duelRing(7, timing));
-});
-
-it("gives the ring the damage scale it is asked for, so it hurts as much as the page said", () => {
-  const timing = {startDelaySeconds: 2, closingSeconds: 9, damageScale: 10};
-
-  expect(worldOfScenario("duel", 7, timing).ring?.timing.damageScale).toBe(10);
-  expect(worldOfScenario("sparring", 7, timing).ring?.timing.damageScale).toBe(10);
-});
-
-it("draws the ring's centre from the seed: another seed, another place", () => {
-  const centres = new Set<string>();
-  for (let seed = 0; seed < 30; seed++) {
-    centres.add(JSON.stringify(worldOfScenario("duel", seed).ring?.centre));
-  }
-
-  expect(centres.size).toBeGreaterThan(8);
-});
-
-it("gives sparring, the practice range and the heights arena no ring, so they stay endless", () => {
-  expect(worldOfScenario("sparring", 7).ring).toBeUndefined();
-  expect(worldOfScenario("practice", 7).ring).toBeUndefined();
-  expect(worldOfScenario("heights", 7).ring).toBeUndefined();
-});
-
-it("gives sparring a ring when it is asked for ring timing, and no other scenario", () => {
-  const timing = {startDelaySeconds: 1, closingSeconds: 6};
-
-  expect(worldOfScenario("sparring", 7, timing).ring).toEqual(duelRing(7, timing));
-  expect(worldOfScenario("practice", 7, timing).ring).toBeUndefined();
-  expect(worldOfScenario("heights", 7, timing).ring).toBeUndefined();
-});
-
-it("leaves sparring's opponent without a brain and its match unscored when it has a ring", () => {
-  const world = worldOfScenario("sparring", 7, {startDelaySeconds: 1, closingSeconds: 6});
-
-  expect(world.opponentBrain).toBeUndefined();
-  expect(world.match).toBeUndefined();
-});
-
-it("opens the cover arena, with no ring even when asked for ring timing, and no weapon lying about", () => {
-  const timing = {startDelaySeconds: 1, closingSeconds: 6};
-
-  expect(worldOfScenario("cover", 7, timing)).toEqual(coverWorld());
-  expect(worldOfScenario("cover", 7, timing).ring).toBeUndefined();
-  expect(worldOfScenario("cover", 7).pickup).toBeUndefined();
 });
 
 describe("the heights arena", () => {
@@ -361,18 +442,20 @@ describe("the fair duel", () => {
   });
 });
 
-it("lays a weapon between the fighters in the duel and in sparring, drawn from the seed", () => {
-  for (const scenario of ["duel", "sparring"] as const) {
-    expect(worldOfScenario(scenario, 8).pickup).toEqual(duelPickup(8));
-    expect(worldOfScenario(scenario, 8).pickup).toEqual(worldOfScenario(scenario, 8).pickup);
-    expect(worldOfScenario(scenario, 8).pickup?.position.x).toBe(13.5);
-  }
-  expect(worldOfScenario("duel", 8).pickup?.position).not.toEqual(worldOfScenario("duel", 6).pickup?.position);
-});
+describe("the weapon lying between the fighters", () => {
+  it("lays a weapon between the fighters in the duel and in sparring, drawn from the seed", () => {
+    for (const scenario of ["duel", "sparring"] as const) {
+      expect(worldOfScenario(scenario, 8).pickup).toEqual(duelPickup(8));
+      expect(worldOfScenario(scenario, 8).pickup).toEqual(worldOfScenario(scenario, 8).pickup);
+      expect(worldOfScenario(scenario, 8).pickup?.position.x).toBe(13.5);
+    }
+    expect(worldOfScenario("duel", 8).pickup?.position).not.toEqual(worldOfScenario("duel", 6).pickup?.position);
+  });
 
-it("lays no weapon in the practice range or the heights arena, which have no opponent to be as far from", () => {
-  expect(worldOfScenario("practice", 8).pickup).toBeUndefined();
-  expect(worldOfScenario("heights", 8).pickup).toBeUndefined();
+  it("lays no weapon in the practice range or the heights arena, which have no opponent to be as far from", () => {
+    expect(worldOfScenario("practice", 8).pickup).toBeUndefined();
+    expect(worldOfScenario("heights", 8).pickup).toBeUndefined();
+  });
 });
 
 function duelRing(seed: number, timing: RingTiming = DEFAULT_RING_TIMING): Ring {

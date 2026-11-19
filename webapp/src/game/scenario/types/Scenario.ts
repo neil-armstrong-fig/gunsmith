@@ -6,7 +6,7 @@
  * on the low ground in its sight, in one round with no ring, or the pickup race: the duel's arena and fighters in one round with no ring,
  * and a weapon lying much nearer the opponent than the player, or the fair duel: an arena that is the same picture turned half way round
  * (a platform in the middle), the fighters at a matching pair of places drawn from the seed, in one round with a ring (no score),
- * the cover arena: open low ground with two low cover blocks and three dummies east of them, one standing and two crouched, and no opponent,
+ * the cover arena: open low ground with two low cover blocks and three dummies east of them, one standing and two crouched, and no opponent, or the cover hall: a hall one tile wide and ten long with a low cover block at its third and eighth tile, the player and an opponent who shoots back each in the two tiles behind their own block, in one round with no ring,
  * the three-level terrain preview, or an online room (`?room=<code>`): the duel's arena with only the
  * player in it until the server's snapshots take over, since the server plays the match.
  */
@@ -16,6 +16,7 @@ export type Scenario =
   | "sparring"
   | "heights"
   | "cover"
+  | "cover-hall"
   | "terraced"
   | "overlook"
   | "pickup-race"

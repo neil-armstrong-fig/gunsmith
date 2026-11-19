@@ -74,7 +74,13 @@ it("starts a new bullet at the muzzle of the player where they now stand, and do
   const after = step(centred(), {...IDLE, direction: {x: 1, y: 0}, aimAt: east, firing: true}, TICK);
 
   expect(after.bullets[0]?.position).toEqual(
-    fireBullet("player", {from: after.player.position, aim: after.player.aim, weapon: RIFLE, level: 0}).position,
+    fireBullet("player", {
+      from: after.player.position,
+      aim: after.player.aim,
+      weapon: RIFLE,
+      level: 0,
+      crouching: false,
+    }).position,
   );
 });
 

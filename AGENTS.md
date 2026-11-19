@@ -58,6 +58,14 @@ keep — ask **does the `describe` name say something the `it` names would other
 say?** Yes for a subject with states (`beforeEach` narrowing per step) or genuinely different setups;
 no for a plain function (a flat list of `it(...)`) or as a filing cabinet with nothing in `beforeEach`.
 
+**A setup const in the middle of a test file is the sign a `describe` is needed.** An arena, ring, fixture or helper value
+declared between tests and used by only a handful of them means the file holds more than one setup: give each setup its own
+`describe`, named for it (`"across levels"`, `"past a cover block"`), with the const inside it. **Never mix top-level `it`s
+with `describe`s:** once a file has a `describe`, every test is in one, and a const that one group uses lives in that group.
+A const used by several groups, or read by a module-level helper function, stays at module level (helpers are `function`
+declarations below their callers). Adding a new setup to a flat file means regrouping the whole file, not adding one `describe`
+beside loose `it`s. Moving tests into groups changes no test name or body; check the count is the same before and after.
+
 This governs unit tests only — acceptance specs are the opposite case, their `given`/`when` nesting
 **is** the specification. See `acceptance-tests/AGENTS.md`.
 

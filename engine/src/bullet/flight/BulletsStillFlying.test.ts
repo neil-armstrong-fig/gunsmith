@@ -36,6 +36,7 @@ function meeting(contact: Contact, changes: Partial<Bullet> = {}): Meeting {
     speed: 20,
     shooter: "player",
     level: 0,
+    crouching: false,
     ...changes,
   };
 
