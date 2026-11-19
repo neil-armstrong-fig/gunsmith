@@ -22,6 +22,7 @@
 These documents describe future integration, not a deployed service:
 
 - [Match netcode](match-netcode.md)
+- [Sign-in](sign-in.md)
 - [Costs and budgets](cost-and-budget.md)
 - [Privacy and data](privacy-and-data.md)
 - [Manual setup](../MANUAL-SETUP-STEPS.md)
