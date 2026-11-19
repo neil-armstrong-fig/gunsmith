@@ -16,7 +16,7 @@ pnpm start:preview       # compile, then serve the build on http://localhost:300
 pnpm acceptance-tests    # needs one of the two running in another terminal; preview for the whole suite
 pnpm install-browsers    # one-time Playwright chromium download
 pnpm api:dev             # the API Worker locally (`wrangler dev`, port 8787, or `API_PORT=`); the webapp's `/api` proxy points at it (`API_URL=` for another port); see `api/AGENTS.md`
-pnpm test:properties     # property tests (engine, webapp/src/online, api/src/match), which `pnpm checks` leaves out
+pnpm test:properties     # property tests (engine, webapp/src/online, api/src/durable-objects/match), which `pnpm checks` leaves out
 pnpm evals               # complete free fake harness, all criteria gating; no model calls or traces
 ```
 
