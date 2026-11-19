@@ -1,5 +1,5 @@
 import type {AppearancePart} from "@gunsmith/shared/appearance/schema/part/AppearancePart";
-import {partSvg} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-weapon-drawing/texture/load-weapon-drawing/svg/part/PartSvg";
+import {partSvg} from "@src/assets/weapon-drawings/svg/part/PartSvg";
 
 const PALETTE = {accent: "weapon-blue", "accent-secondary": "weapon-violet"} as const;
 

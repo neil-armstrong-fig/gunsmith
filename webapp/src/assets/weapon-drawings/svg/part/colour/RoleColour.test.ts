@@ -2,11 +2,11 @@ import {readFileSync} from "node:fs";
 import {resolve} from "node:path";
 import {COLOUR_ROLES} from "@gunsmith/shared/appearance/vocabulary/colour/ColourRole";
 import {PALETTE_TOKENS} from "@gunsmith/shared/appearance/vocabulary/colour/PaletteToken";
-import {roleColour} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-weapon-drawing/texture/load-weapon-drawing/svg/colour/RoleColour";
+import {roleColour} from "@src/assets/weapon-drawings/svg/part/colour/RoleColour";
 
 const PALETTE = {accent: "weapon-blue", "accent-secondary": "weapon-violet"} as const;
 
-const CSS = readFileSync(resolve(import.meta.dirname, "../../../../../../../../../../../../index.css"), "utf8");
+const CSS = readFileSync(resolve(import.meta.dirname, "../../../../../index.css"), "utf8");
 
 it("draws nothing for the role none", () => {
   expect(roleColour("none", PALETTE)).toBe("none");

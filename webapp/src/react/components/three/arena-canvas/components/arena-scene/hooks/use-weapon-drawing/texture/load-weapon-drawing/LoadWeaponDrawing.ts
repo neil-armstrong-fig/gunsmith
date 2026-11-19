@@ -3,8 +3,8 @@ import {CanvasTexture} from "three";
 import {rasteriseSvg} from "@src/react/components/three/arena-canvas/sprites/load-sprites/raster/RasteriseSvg";
 import {spritesReadiness} from "@src/react/components/three/arena-canvas/sprites/SpritesReadiness";
 import {weaponDrawingTextures} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-weapon-drawing/texture/WeaponDrawingTextures";
-import {appearanceToDraw} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-weapon-drawing/texture/load-weapon-drawing/appearance-to-draw/AppearanceToDraw";
-import {appearanceSvg} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-weapon-drawing/texture/load-weapon-drawing/svg/AppearanceSvg";
+import {appearanceToDraw} from "@src/assets/weapon-drawings/appearance-to-draw/AppearanceToDraw";
+import {appearanceSvg} from "@src/assets/weapon-drawings/svg/AppearanceSvg";
 
 /** A drawing is rasterised this many times bigger than its design space, so it stays sharp when the arena is zoomed to fit a big window (as `loadSprites` does for art's pictures). */
 const RASTER_SCALE = 4;

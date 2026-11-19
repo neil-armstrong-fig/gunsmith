@@ -4,11 +4,11 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 ## Resume here
 
-Checkout: `.claude/worktrees/ship`, branch `worktree-ship`, synced from committed main `6186476`. Persistent worktree; main stays integration-only. Merge newer committed main before new work/delivery when clean; never stash another session's changes.
+Checkout: `.claude/worktrees/ship`, branch `worktree-ship`, synced from committed main `fb1a739`. Persistent worktree. Merge newer committed main before new work when clean.
 
-Current slice: function-order and module-level named-helper lint rules with full declaration-only cleanup across packages. Owned files: shared standards/config/tests, diagnosed helpers/tests in this checkout, root standards summary and ship coordination docs. Project remains M1. Preview delivery `249fc3c` is integrated at `c61bc32`. The standards slice is integrated from `5b7a97a`.
+Current slice: Art delegated reusable HUD thumbnails for generated weapons while the project remains on M1. The local pickup preview drives the same validated structural drawing into the held weapon and the 34 px HUD slot. Owned paths cover inventory presentation, shared webapp drawing utilities, the local fixtures and HUD acceptance coverage. Art owns low-cover terrain.
 
-Next action: sync newer main when clean. Hosted CI and profiling still await publication; AI owns paid selector/guard/evidence and opening spend reconciliation.
+Next action: AI and Engine supply the production weapon-to-appearance association, then Play can bind that appearance to the same thumbnail input. The next failing criterion is that a generated weapon keeps its HUD drawing from creation through equip in the real flow. Hosted CI and profiling await publication. AI owns paid selector/guard/evidence and opening spend reconciliation.
 
 ## Ownership
 
@@ -45,6 +45,10 @@ server supplies Worker/DO/storage bindings; budget supplies operational limits; 
 - [ ] Measure infrastructure costs with server/AI runtime measurements before proposing free versus Workers Paid.
 
 ## Verification/latest delivery
+
+2026-11-19 HUD acceptance cleanup: the HUD waits for the inventory icon and calls a focused screenshot reader that uses the shared colour matcher. Full repository checks and all 14 generated inventory, built-in inventory and pickup sound browser criteria passed. Reviewed root and acceptance instructions and checked the new helper’s folder and caller.
+
+2026-11-19 generated HUD thumbnails: six browser criteria failed first on the old HUD. Removing only the outline failed all six contour checks with the fixture artwork still present. Final production preview passed 125 HUD, pickup, held-weapon and room artwork criteria without retries. `pnpm checks` passed lint, formatting, strict types and 3,338 tests with one existing slow audio test skipped. Re-read the root, webapp, React and acceptance instructions and checked folder layout and callers. Reviewed six native-size Chromium HUD captures.
 
 2026-11-18 main sync: merged `6186476` into the ship worktree and resolved six conflicts. Verified 14 affected tests against main, preserving cases, assertions and helper bodies. `pnpm checks` passed lint, format, types and 2,838 tests with one existing slow audio render skipped. Properties passed 35/35, fake evals 170/170 and managed preview acceptance 293/293 on the first attempt. The managed wrappers logged errors at shutdown and both preview ports closed. Combined integration evidence is recorded in HANDOFF.md.
 2026-11-18: Restored nested `const` functions and narrowed helper declaration lint to helpers outside function scopes. All 23 original definitions match the ship baseline. `pnpm checks` passes with 2,621 tests and one existing skip. Properties 14/14 and fake evals 170/170 passed. All browser criteria passed across runs, with timing failures detailed in [HANDOFF.md](HANDOFF.md#latest-ship-delivery).
