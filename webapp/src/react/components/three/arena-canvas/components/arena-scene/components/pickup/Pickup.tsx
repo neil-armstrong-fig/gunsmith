@@ -16,8 +16,8 @@ const MARKER_HEIGHT_ABOVE_PICKUP = 0.01;
 /** The weapon lying in the arena, where the simulation says it is, drawn as its drawing (the placeholder disc when it has none) and only while the player sees it. */
 export function Pickup(): JSX.Element {
   const groupRef = useRef<Group>(null);
-  const weapon = useGameStore(state => state.world.pickup?.weapon);
-  const drawing = useWeaponDrawing(weapon);
+  const weaponKey = useGameStore(state => state.world.pickup?.weapon.identity?.key);
+  const drawing = useWeaponDrawing(weaponKey);
 
   useFrame(() => {
     if (!groupRef.current) {

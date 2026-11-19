@@ -1,6 +1,6 @@
 import type {Page} from "@playwright/test";
-import type {PlayerSnapshot} from "@gunsmith/shared/state-hook/types/PlayerSnapshot";
-import type {HeldWeaponAccent} from "@src/dsl/gunsmith/components/player/types/HeldWeaponAccent";
+import type {AimedPoint} from "@src/dsl/gunsmith/types/AimedPoint";
+import type {HeldWeaponAccent} from "@src/dsl/gunsmith/types/HeldWeaponAccent";
 import {colourIsNear} from "@src/dsl/gunsmith/playwright/look/ColourIsNear";
 import {coloursAtTiles} from "@src/dsl/gunsmith/playwright/screen/ColoursAtTiles";
 import type {Colour} from "@src/dsl/gunsmith/types/Colour";
@@ -13,10 +13,10 @@ const ACCENT_COLOURS: Record<HeldWeaponAccent, Colour> = {
 
 export async function hasHeldWeaponAccent(
   page: Page,
-  player: PlayerSnapshot,
+  aimedPoint: AimedPoint,
   accent: HeldWeaponAccent,
 ): Promise<boolean> {
-  const angle = (player.aimDegrees * Math.PI) / 180;
+  const angle = (aimedPoint.aimDegrees * Math.PI) / 180;
   const forwardX = Math.cos(angle);
   const forwardY = Math.sin(angle);
   const places = Array.from({length: 25 * 25}, (_, index) => {
@@ -24,8 +24,8 @@ export async function hasHeldWeaponAccent(
     const across = -0.24 + Math.floor(index / 25) * 0.02;
 
     return {
-      x: player.x + along * forwardX - across * forwardY,
-      y: player.y + along * forwardY + across * forwardX,
+      x: aimedPoint.x + along * forwardX - across * forwardY,
+      y: aimedPoint.y + along * forwardY + across * forwardX,
     };
   });
   const colours = await coloursAtTiles(page, places);

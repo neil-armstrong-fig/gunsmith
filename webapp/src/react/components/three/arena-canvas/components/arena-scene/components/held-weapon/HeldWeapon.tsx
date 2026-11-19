@@ -28,15 +28,15 @@ export function HeldWeapon({fighter, standingSprite, crouchedSprite}: Props): JS
   const gripRef = useRef<Group>(null);
   const standing = useSprite(standingSprite);
   const crouched = useSprite(crouchedSprite ?? standingSprite);
-  const weapon = useGameStore(state => {
+  const weaponKey = useGameStore(state => {
     const holder = state.world[fighter];
     if (!holder) {
       return undefined;
     }
 
-    return equippedWeapon(holder).weapon;
+    return equippedWeapon(holder).weapon.identity?.key;
   });
-  const drawing = useWeaponDrawing(weapon);
+  const drawing = useWeaponDrawing(weaponKey);
   const {pixelsPerTile} = SPRITE_MANIFEST[standingSprite];
 
   useFrame(() => {

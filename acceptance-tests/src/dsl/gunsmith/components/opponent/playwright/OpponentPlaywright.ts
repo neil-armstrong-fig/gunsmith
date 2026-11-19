@@ -2,6 +2,7 @@ import type {Page} from "@playwright/test";
 import type {OpponentSnapshot} from "@gunsmith/shared/state-hook/types/OpponentSnapshot";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
 import {runHeldUntil} from "@src/dsl/gunsmith/playwright/hold/RunHeldUntil";
+import {hasHeldWeaponAccent} from "@src/dsl/gunsmith/playwright/look/held-weapon/HasHeldWeaponAccent";
 import {hasRifleOnScreen} from "@src/dsl/gunsmith/playwright/look/held-rifle/HasRifleOnScreen";
 import {lookOfFighter} from "@src/dsl/gunsmith/playwright/look/look-of-fighter/LookOfFighter";
 import {lookOfHit} from "@src/dsl/gunsmith/playwright/look/look-of-hit/LookOfHit";
@@ -9,6 +10,8 @@ import {TEAM_ORANGE} from "@src/dsl/gunsmith/playwright/look/TeamOrange";
 import type {FighterLook} from "@src/dsl/gunsmith/types/FighterLook";
 import type {HitLook} from "@src/dsl/gunsmith/types/HitLook";
 import type {HurtWatch} from "@src/dsl/gunsmith/types/HurtWatch";
+import type {AimedPoint} from "@src/dsl/gunsmith/types/AimedPoint";
+import type {HeldWeaponAccent} from "@src/dsl/gunsmith/types/HeldWeaponAccent";
 import type {Point} from "@src/dsl/gunsmith/types/Point";
 
 export class OpponentPlaywright extends BasePage {
@@ -26,11 +29,19 @@ export class OpponentPlaywright extends BasePage {
     return opponent;
   }
 
-  async hasRifleOnScreen(): Promise<boolean> {
+  async hasRifleOnScreen(aimedPoint?: AimedPoint): Promise<boolean> {
+    if (aimedPoint) {
+      return await hasRifleOnScreen(this.page, aimedPoint, aimedPoint.aimDegrees);
+    }
+
     const opponent = await this.get();
 
     // The stationary sparring opponent starts facing west.
     return await hasRifleOnScreen(this.page, opponent, 180);
+  }
+
+  async hasHeldWeaponAccent(accent: HeldWeaponAccent, aimedPoint: AimedPoint): Promise<boolean> {
+    return await hasHeldWeaponAccent(this.page, aimedPoint, accent);
   }
 
   /** What a player sees where the opponent stands: its drawing counted by colour, and the compass points on its outline. The opponent must be standing still (sparring's is). */

@@ -1,5 +1,5 @@
 import type {Page} from "@playwright/test";
-import type {HeldWeaponAccent} from "@src/dsl/gunsmith/components/player/types/HeldWeaponAccent";
+import type {HeldWeaponAccent} from "@src/dsl/gunsmith/types/HeldWeaponAccent";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
 import {screenPositionOfTile} from "@src/dsl/gunsmith/components/player/playwright/screen/ScreenPositionOfTile";
 import type {Heading} from "@src/dsl/gunsmith/components/player/types/Heading";
@@ -9,7 +9,7 @@ import {isPast} from "@src/dsl/gunsmith/components/player/playwright/walking/IsP
 import {runHeldUntil} from "@src/dsl/gunsmith/playwright/hold/RunHeldUntil";
 import {lookOfDamage} from "@src/dsl/gunsmith/playwright/look/look-of-damage/LookOfDamage";
 import {lookOfHit} from "@src/dsl/gunsmith/playwright/look/look-of-hit/LookOfHit";
-import {hasHeldWeaponAccent} from "@src/dsl/gunsmith/components/player/playwright/held-weapon/HasHeldWeaponAccent";
+import {hasHeldWeaponAccent} from "@src/dsl/gunsmith/playwright/look/held-weapon/HasHeldWeaponAccent";
 import {hasRifleOnScreen} from "@src/dsl/gunsmith/playwright/look/held-rifle/HasRifleOnScreen";
 import {lookOfFighter} from "@src/dsl/gunsmith/playwright/look/look-of-fighter/LookOfFighter";
 import {TEAM_BLUE} from "@src/dsl/gunsmith/playwright/look/TeamBlue";
