@@ -105,7 +105,7 @@ Use seeded sparring to isolate player pickup behavior. Assert visibility and inv
 
 ## The workshop
 
-`OpeningTheWorkshop`, `MakingAWeapon` and `TypingInTheWorkshop` (`tests/workshop/`, DSL `gunsmith.workshop`). Press B on the practice range (not in a duel). **Type with `typeThePrompt` (real key presses) when a criterion is about the game's keys, and `pasteThePrompt` (fill) for a long text**: a fill sends no keys. A pause criterion needs a walk already held when the panel opens, because the panel keeps its own keys from the game and so hides a missing pause; a key-leak criterion needs a latched key (R, a slot) read after closing, because the pause hides a leak while open. Mouse press: `holdTheMouseOnThePanel`. The stand-in's results are canned, so criteria compare two makes (fast against long-range) and never pin numbers.
+`OpeningTheWorkshop`, `MakingAWeapon`, `TypingInTheWorkshop` and `TryingAWeapon` (`tests/workshop/`, DSL `gunsmith.workshop`; `tryIt()` presses Try it, `hasTryIt()` asks if the card offers it). Press B on the practice range (not in a duel). **Type with `typeThePrompt` (real key presses) when a criterion is about the game's keys, and `pasteThePrompt` (fill) for a long text**: a fill sends no keys. A pause criterion needs a walk already held when the panel opens, because the panel keeps its own keys from the game and so hides a missing pause; a key-leak criterion needs a latched key (R, a slot) read after closing, because the pause hides a leak while open. Mouse press: `holdTheMouseOnThePanel`. The stand-in's results are canned, so criteria compare two makes (fast against long-range) and never pin numbers.
 
 ## Sound
 

@@ -1,11 +1,18 @@
 import {powerRatingOf} from "@gunsmith/engine/power-rating/PowerRatingOf";
 import {weaponPictureUrl} from "@src/assets/weapon-pictures/WeaponPictureUrl";
+import {worldWithWeaponOnTrial} from "@src/react/components/dom/workshop/components/weapon-card/weapon-on-trial/WorldWithWeaponOnTrial";
 import {StatRow} from "@src/react/components/dom/workshop/components/weapon-card/components/stat-row/StatRow";
 import {statRowsOf} from "@src/react/components/dom/workshop/components/weapon-card/stat-rows/StatRowsOf";
+import {useAppStore} from "@src/store/app/UseAppStore";
+import {gameState} from "@src/store/game/selectors/game-state/GameState";
+import {useGameStore} from "@src/store/game/UseGameStore";
 import {useWorkshopStore} from "@src/store/workshop/UseWorkshopStore";
 import type {JSX} from "react";
 
-/** The card for the weapon last made: its name and drawing, its power rating and its stats, in plain words. Nothing shows before the first Make. */
+/**
+ * The card for the weapon last made: its name and drawing, its power rating and its stats, in plain words, and **Try it**, which puts the weapon in slot 2 and in
+ * hand on the practice range and shuts the workshop. Nothing shows before the first Make.
+ */
 export function WeaponCard(): JSX.Element | undefined {
   const weapon = useWorkshopStore(state => state.weapon);
   if (!weapon) {
@@ -32,6 +39,17 @@ export function WeaponCard(): JSX.Element | undefined {
           </span>
         </p>
       </div>
+
+      <button
+        type="button"
+        className="self-start rounded-md bg-gs-team-blue px-5 py-2 font-semibold text-gs-background"
+        onClick={() => {
+          useGameStore.getState().setWorld(worldWithWeaponOnTrial(gameState(), weapon));
+          useAppStore.getState().closeWorkshop();
+        }}
+      >
+        Try it
+      </button>
 
       {picture && <img src={picture} alt={`${name}, drawn`} className="h-16 self-start" />}
 
