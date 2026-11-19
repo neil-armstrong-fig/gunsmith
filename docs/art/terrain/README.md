@@ -41,10 +41,23 @@ SVG compositing approximates the WebGL presentation: this is neither an
 engine visibility test nor evidence of live shader colour equivalence. The
 dim region contains no concealed actors or exact-position effects.
 
-The existing picture loader registers the four SVGs and waits for each load
+The existing picture loader registers the terrain SVGs and waits for each load
 to settle. Flat materials are used while an image is loading and when it
 fails. The renderer applies the floor palette to the stair bands and draws
 drop edges and fog in their existing layers.
+
+## Playable low cover
+
+[`tile-low-cover.svg`](../../../webapp/public/assets/tiles/tile-low-cover.svg)
+uses a 64 × 64 canvas centred at (32, 32). The user chose the reinforced
+square, option C in the low-cover study. Four matching braces connect the
+edges to the slate top over a dark base. The inset leaves a floor margin
+around the square. The engine treats the entire cell as impassable.
+
+Open `?scenario=cover` at 1024 × 560 or 512 × 400 for 64 or 32 px per tile.
+Face east to see the first block lit, then turn away to see it dim under fog.
+`?scenario=cover-hall` uses the same artwork. The flat square serves as a
+fallback while the image loads or if it fails.
 
 ## Playable stair preview
 

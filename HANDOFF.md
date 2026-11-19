@@ -13,7 +13,7 @@ Ownership follows the assigned persona. Models below are defaults; no applicatio
 | ai | Claude | [TODO-ai.md](TODO-ai.md) | Arena screening, player selection and engine validation integrated. Owns model quality, fallback contrast and adapter coordination. |
 | server | Claude | [TODO-server.md](TODO-server.md) | Initial private-room networking integrated; Prediction/interpolation integrated; match flow/auth/persistence next. |
 | budget | Claude | [TODO-budget.md](TODO-budget.md) | Production ledger/spend boundaries with server/AI; credits, refunds, tracing and kill switch. |
-| art | Codex | [TODO-art.md](TODO-art.md) | Terrain and C2 marker integrated. Room weapon artwork is ready in `worktree-art`. Low-cover artwork is next. |
+| art | Codex | [TODO-art.md](TODO-art.md) | Terrain, C2 marker and room weapon artwork integrated. Approved low-cover artwork is in `837f1d9`. Workshop previews await Play's arena result view. |
 | ship | Codex | [TODO-ship.md](TODO-ship.md) | Repository tooling/CI now; infra/release when bindings and authorization exist. |
 
 ### Start prompts
@@ -76,6 +76,7 @@ Conflict resolutions preserved the persona status and handoff changes and kept b
 - **ai:** one parsed result shape for weapon and arena (today `WeaponOutcome.weapon` is `unknown`); say **characters** in the over-length refusal (it says "about 151 tokens"; the pre-check estimates tokens as characters ÷ 4, so the limits are 600 characters for a weapon and 1,000 for an arena) and expose the two limits as one number.
 - **budget:** the balance, price and reserve/refund the panel shows; the weapon route exists; sign-in and spend-reservation wiring remain. **ai, budget:** record each request's duration. Measured so far: a weapon with its drawing, median 5.9 s, max 8.3 s (historical, one machine); arenas, the Worker and the timeout are unmeasured.
 - **art:** the look of the result card, shelf and arena thumbnails; delivery draws the arena preview with the game's real tile art (`public/assets/tiles`).
+- **play → art:** the first workshop delivery (`9e81ee9`) handles weapons. For the arena preview, expose the parsed engine `Arena` and display name in the arena result view and built-in row, with a deterministic Fair duel result available to the browser spec. Art supplies one top-down preview for both surfaces using the game's tile loader and stair geometry. Play can pass resolved fair-start positions. An unseeded result uses a clearly labelled example pair from the engine. [Approved selection concept](docs/selection-concept/README.md#the-result-card).
 - **Gaps found while writing it (no owner yet):** online play still lacks combat events, and the "opponent is away" wording. Review the `DrawingTheShots` hidden-shot flake. Play's recoil and muzzle flash wait until after the MVP.
 
 **Art delivered room weapon artwork for Play and Server from `562c7f6`.** Both fighters resolve their held sprite from the equipped weapon's `identity.key`. The same lookup serves local pickups. Two browsers cover the default rifle, the marksman optic, switching back and drawing through loss and return of sight. The spec checks both received snapshots and canvas pixels. All five criteria went red first. The stale-drawing fault failed the canvas assertion, and wire privacy still passed. Production preview passed 94 criteria and `pnpm checks` passed. Ship completed the independent review of the integrated HUD, ring loop and pickup cue.
@@ -180,6 +181,9 @@ Before changing a consumed contract, record the proposal and affected owners her
 - [ ] Production art/audio and live release: art/play integrate their domains; ship validates release.
 
 ## Delivery log
+
+**Art → Engine and Play, low-cover terrain (2026-11-19).** The user chose option C, an inset square with four matching braces. `tile-low-cover` draws on existing cover cells beneath fog, with a flat square fallback. `DrawingLowCover` samples the braces, gaps, corners and exposed floor at 64 and 32 px per tile. All four updated criteria failed on the previous continuous rim. The idea of omitting braces along shared edges is on the post-MVP art checklist. The delivery is in `worktree-art`. [Terrain artwork](docs/art/terrain/README.md#playable-low-cover).
+
 - 2026-11-19, play (`worktree-play`, main `afc2092` already merged): **docs only, no code.** Wrote the selection concept (`docs/selection-concept/`, with a clickable mock-up), edited `docs/game-design.md` (pre-round now chooses; characters, not tokens; shelf limits; glossary) and `SessionDecisions.md`; reverted an unused draft `shotFired` engine event so the tree holds none of it. Nothing committed. Checks not run (the user: not needed for docs).
 - 2026-11-18, play (`worktree-play`, merged `worktree-ship` `6795b56` by fast-forward, main `963a09d` included; the added criteria are uncommitted): reviewed ship's ring loop and inventory HUD instead of building a second ring loop. Mutating ship's loop found three missing criteria, now added to `TakingDamage` and `CombatSounds.test.ts` (a bullet does not start the loop; muted before the ring it never plays; a mute stays muted). Root `pnpm checks` exit 0 (webapp 583); sound specs and `InventoryOnTheScreen` 22 of 22 on a production preview. **Contract change: none.** Ship still owns nothing further there; play owns later HUD behaviour.
 

@@ -31,7 +31,7 @@ is the approved C2 SVG. Its 88 × 88 canvas centres on (44, 44) and spans
 88 / 90 tiles at pickup scale. The local built-in SMG uses `sprite-submachine-gun`, Ship’s 64 × 64 silhouette. The pickup plane centres the same texture used in hand at (32, 32).
 
 Current M1 terrain keys are `tile-floor-l1`, `tile-floor-l2`,
-`tile-floor-l3`, and `tile-wall`. Each [approved terrain tile](terrain/README.md)
+`tile-floor-l3`, `tile-wall`, and `tile-low-cover`. Each [terrain tile](terrain/README.md)
 is an SVG with a 64 × 64 canvas centred at (32, 32), drawn at one cell per
 image. The flat materials serve as fallbacks.
 
