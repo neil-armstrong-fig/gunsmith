@@ -47,4 +47,6 @@ Three ways, each where it is cheapest.
 
 ## Not in this slice
 
-`DELETE /api/account`, renaming the display name, the library and its limits, ratings, rate limits beyond sign-in, and the production adapters (a paid call still needs the user's authorisation).
+`DELETE /api/account`, renaming the display name, ratings, rate limits beyond sign-in, and the production adapters (a paid call still needs the user's authorisation).
+
+The library (built 2026-11-19, after sign-in) is described in `api/AGENTS.md`: every created weapon and arena is kept by id, and saving, listing and removing go by that id under per-account limits (8 weapons, 3 arenas). Its rows are erased with the account (`ON DELETE cascade`).

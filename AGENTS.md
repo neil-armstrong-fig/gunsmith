@@ -112,7 +112,7 @@ Prettier owns formatting (`pnpm format`). What it won't tell you:
   exports `useMoveSelection`). A test takes the name of its subject and sits beside it.
 - **A file lives as close to its caller as it can, in a subdirectory of it.** A helper used by one
   file goes in a folder beneath it, never beside it; something shared rises to its callers' nearest
-  common ancestor and no further. **Do not extract a file for what only one file uses and nobody tunes or tests alone**: a
+  common ancestor and no further (as a folder named for its subject there, never loose: see the domain-folder rule below). **Do not extract a file for what only one file uses and nobody tunes or tests alone**: a
   fixed sentence or message, a one-off constant, a three-line helper stays in its one caller, a `const` above its use (the
   player-facing "invalid" message lives in the file that returns it). A constant gets its own file only when it is a tunable
   (a number or limit set by play, read by more than one file or by a test) or is shared.
@@ -129,8 +129,13 @@ Prettier owns formatting (`pnpm format`). What it won't tell you:
 - **A domain folder is its root file and nothing else loose.** `<domain>/` holds the entry point (the handful that say what
   the domain does), a `<domain>/types/` folder for every interface and type alias (never beside the file that uses it),
   and a subfolder named for its subject for each helper only the root file uses (`player/walking/PlayerSpeed.ts` serves
-  `MovePlayer.ts`). A constant or helper two domains share stays at the root of the domain that owns it
-  (`player/PlayerRadius.ts`), or rises to the nearest common ancestor of its callers and no further. Several entry points
+  `MovePlayer.ts`). **Where a shared file goes depends on who shares it.** What several helpers *inside one domain* share
+  (a limit read by two route helpers) goes in a subfolder named for its subject beneath that domain's root, so the root stays
+  the entry point (`routes/library/limits/ShelfLimits.ts`, read by `library/list-shelf/` and `library/save/`, not a loose
+  `library/ShelfLimits.ts`). What *other domains* also use stays at the root of the domain that owns it
+  (`player/PlayerRadius.ts`), or, when no domain owns it, rises to the nearest common ancestor of the callers' domains and no
+  further. Both are the same rule (as close to the callers as possible, no loose files beside the entry point); the choice is
+  only whether the callers are one domain's own helpers or different domains. Several entry points
   may share a root only when they share the subject (`match/` has five, all the match); a file that clearly does not is a
   different domain with a folder of its own. A package's `src/` follows the same rule: one entry file (`engine/src/Engine.ts`)
   and domain folders.
