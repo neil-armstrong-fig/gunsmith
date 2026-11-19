@@ -1,6 +1,9 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
+import {tileKeyOf} from "@gunsmith/engine/route/TileKeyOf";
 import {tilePathBetween} from "@gunsmith/engine/route/TilePathBetween";
+import type {WalkStep} from "@gunsmith/engine/route/types/WalkStep";
+import {walkingRoutesFrom} from "@gunsmith/engine/route/WalkingRoutesFrom";
 
 // A low ground to the west, a platform one level up to the east, and one stair between them at column 4, the top row of the floor.
 const withStair = arenaFrom(["##########", "#...>1111#", "#....1111#", "##########"]);
@@ -54,6 +57,26 @@ it("gives the same path each time it is asked", () => {
 
   expect(tilePathBetween(withStair, {x: 1.5, y: 1.5}, {x: 7.5, y: 2.5})).toEqual(first);
 });
+
+it("is the shortest way a full search finds, for every pair of tiles on a terraced arena", () => {
+  for (const from of walkingRoutesFrom(withStair, {x: 1.5, y: 1.5}).values()) {
+    const full = walkingRoutesFrom(withStair, from.tile);
+    for (const to of full.values()) {
+      expect(tilePathBetween(withStair, from.tile, to.tile)).toEqual(wayThrough(full, to.tile));
+    }
+  }
+});
+
+function wayThrough(routes: ReadonlyMap<string, WalkStep>, goal: Point): Point[] {
+  const way: Point[] = [];
+  let current = routes.get(tileKeyOf(goal));
+  while (current) {
+    way.unshift(current.tile);
+    current = current.cameFrom && routes.get(tileKeyOf(current.cameFrom));
+  }
+
+  return way;
+}
 
 function keysOf(path: readonly Point[] | undefined): string[] | undefined {
   return path?.map(tile => `${tile.x},${tile.y}`);
