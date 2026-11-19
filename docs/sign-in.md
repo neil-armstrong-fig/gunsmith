@@ -1,6 +1,6 @@
 # Sign-in
 
-**Status: built 2026-11-19 (server), except `DELETE /api/account`, which waits on budget's `CreditLedger` delete.** The design copies janggi's `api/` (`~/Development/Personal/janggi/api`), which already ships it. The user approved the three pins below on 2026-11-19 and they are in the catalog.
+**Status: built 2026-11-19 (server), except `DELETE /api/account`, which was waiting on budget's `CreditLedger` delete (delivered as `erase()`, 2026-11-19).** The design copies janggi's `api/` (`~/Development/Personal/janggi/api`), which already ships it. The user approved the three pins below on 2026-11-19 and they are in the catalog.
 
 ## Why now
 
@@ -40,11 +40,13 @@ Three ways, each where it is cheapest.
 
 ## Handoffs
 
-- **budget:** `DELETE /api/account` needs a `delete` on `CreditLedger` (the account's object). Credit routes name the account from the session.
+- **budget:** `CreditLedger.erase()` is built (2026-11-19): `DELETE /api/account` deletes the account and its sessions in D1 **first**, so no new authenticated request can start, then calls `CREDITS.getByName(accountId).erase()` **last**. A reserve already in flight may still write a fresh default record (a balance, no reservations) under the opaque id after the erase; it holds no personal data and is accepted. Credit routes name the account from the session.
 - **play:** call `GET /api/me`; the sign-in button is a link to `/api/auth/google?return=<page>` (an absolute address on an allowed origin). The workshop's calls to `POST /api/weapons` then carry the session cookie, not `X-Account-Id`.
 - **ship:** the D1 binding and database name, the `LOGIN_LIMITER` binding, `ALLOWED_ORIGINS` and the secrets `GOOGLE_OAUTH_CLIENT_ID` and `GOOGLE_OAUTH_CLIENT_SECRET`, in `infra/` (never `ALLOW_LOOPBACK_ORIGINS`).
 - The user verified the local Google round-trip in Chrome on 2026-11-19. `pnpm api:dev` loads the root `.env.local` with `--env-file` and sets `GOOGLE_REDIRECT_URI` from its port. Production still needs the registered callback, Worker secrets and D1 provisioning. [Manual setup](../MANUAL-SETUP-STEPS.md).
 
 ## Not in this slice
 
-`DELETE /api/account`, renaming the display name, the library and its limits, ratings, rate limits beyond sign-in, and the production adapters (a paid call still needs the user's authorisation).
+`DELETE /api/account`, renaming the display name, ratings, rate limits beyond sign-in, and the production adapters (a paid call still needs the user's authorisation).
+
+The library (built 2026-11-19, after sign-in) is described in `api/AGENTS.md`: every created weapon and arena is kept by id, and saving, listing and removing go by that id under per-account limits (8 weapons, 3 arenas). Its rows are erased with the account (`ON DELETE cascade`).

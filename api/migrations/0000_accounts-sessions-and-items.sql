@@ -1,3 +1,15 @@
+CREATE TABLE `generated_items` (
+	`id` text PRIMARY KEY NOT NULL,
+	`user_id` text NOT NULL,
+	`kind` text NOT NULL,
+	`prompt` text NOT NULL,
+	`payload` text NOT NULL,
+	`created_at` integer NOT NULL,
+	`saved_at` integer,
+	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
+CREATE INDEX `generated_items_user_id_saved_at` ON `generated_items` (`user_id`,`saved_at`);--> statement-breakpoint
 CREATE TABLE `sessions` (
 	`id_hash` text PRIMARY KEY NOT NULL,
 	`user_id` text NOT NULL,
