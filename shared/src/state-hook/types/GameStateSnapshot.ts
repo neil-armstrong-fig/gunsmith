@@ -20,7 +20,7 @@ export interface GameStateSnapshot {
   vision: VisionSnapshot;
   /** The scripted opponent; absent in a game that has none, such as the practice range. */
   opponent?: OpponentSnapshot | undefined;
-  /** Whether the round is still being fought, or has been won or lost. */
+  /** Whether the round is still being fought, or has been won, lost or drawn. */
   round: RoundSnapshot;
   /** The best-of-three this round belongs to; absent in a game that is not a match, such as the practice range or sparring. */
   match?: MatchSnapshot | undefined;

@@ -26,6 +26,7 @@ import {OVERLOOK_PLAYER} from "@src/game/overlook/OverlookPlayer";
 import {OVERWATCH_ARENA} from "@src/game/overwatch/OverwatchArena";
 import {OVERWATCH_OPPONENT} from "@src/game/overwatch/OverwatchOpponent";
 import {OVERWATCH_PLAYER} from "@src/game/overwatch/OverwatchPlayer";
+import {mutualKnockoutWorld} from "@src/game/mutual-knockout/MutualKnockoutWorld";
 import {PICKUP_RACE_PICKUP} from "@src/game/pickup-race/PickupRacePickup";
 import {PRACTICE_ARENA} from "@src/game/practice/PracticeArena";
 import {PRACTICE_DUMMIES} from "@src/game/practice/PracticeDummies";
@@ -42,7 +43,8 @@ import type {Scenario} from "@src/game/scenario/types/Scenario";
  * heights arena is the player and a dummy on each level, with one stair up to a platform, and the terraced duel is the duel's opponent
  * on low ground below a platform where the player starts, in one round (no score) with a ring, and the overlook is the same arena the
  * other way round, the opponent on the platform and the player on the low ground in its sight, in one round with no ring, and the pickup race is the
- * duel's arena and fighters in one round with no ring, with the weapon lying close to the opponent and far from the player.
+ * duel's arena and fighters in one round with no ring, with the weapon lying close to the opponent and far from the player, and the mutual
+ * knockout is the duel's first round of a match with no ring, an unarmed opponent and a shot in the air from each fighter that brings the other down.
  *
  * The duel and sparring also have a weapon lying between the fighters (`pickupOf`), drawn from `seed`.
  *
@@ -116,6 +118,10 @@ export function worldOfScenario(scenario: Scenario, seed: number, ringTiming?: R
     const world = giveOpponentBrain(engine.startingWorld(COVER_HALL_ARENA, [], COVER_HALL_OPPONENT), seed);
 
     return {...world, player: {...world.player, position: COVER_HALL_PLAYER}};
+  }
+
+  if (scenario === "mutual-knockout") {
+    return mutualKnockoutWorld();
   }
 
   if (scenario === "terrain") {

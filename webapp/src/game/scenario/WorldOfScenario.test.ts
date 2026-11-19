@@ -25,6 +25,7 @@ import {coverWorld} from "@src/game/cover/CoverWorld";
 import {DUEL_ARENA} from "@src/game/duel/DuelArena";
 import {DUEL_OPPONENT} from "@src/game/duel/DuelOpponent";
 import {FAIR_DUEL_ARENA} from "@src/game/fair-duel/FairDuelArena";
+import {mutualKnockoutWorld} from "@src/game/mutual-knockout/MutualKnockoutWorld";
 import {HEIGHTS_ARENA} from "@src/game/heights/HeightsArena";
 import {HEIGHTS_DUMMIES} from "@src/game/heights/HeightsDummies";
 import {OVERLOOK_OPPONENT} from "@src/game/overlook/OverlookOpponent";
@@ -439,6 +440,13 @@ describe("the fair duel", () => {
 
     expect(worldOfScenario("fair-duel", 9, timing).ring?.timing).toEqual(timing);
     expect(worldOfScenario("fair-duel", 9).ring?.timing).toEqual(DEFAULT_RING_TIMING);
+  });
+});
+
+describe("the mutual knockout", () => {
+  it("is the world the mutual knockout builds, whatever the seed", () => {
+    expect(worldOfScenario("mutual-knockout", 3)).toEqual(mutualKnockoutWorld());
+    expect(worldOfScenario("mutual-knockout", 11)).toEqual(mutualKnockoutWorld());
   });
 });
 

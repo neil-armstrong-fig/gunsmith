@@ -8,9 +8,14 @@ it("says the player lost when the round was lost", () => {
   expect(roundMessage("lost", undefined)).toBe("You lost");
 });
 
+it("says the round was a draw when both fell together", () => {
+  expect(roundMessage("drawn", undefined)).toBe("Draw");
+});
+
 it("says the round, not the match, while the match goes on", () => {
   expect(roundMessage("won", "playing")).toBe("You won");
   expect(roundMessage("lost", "playing")).toBe("You lost");
+  expect(roundMessage("drawn", "playing")).toBe("Draw");
 });
 
 it("says the match was won when the round that ended it was won", () => {

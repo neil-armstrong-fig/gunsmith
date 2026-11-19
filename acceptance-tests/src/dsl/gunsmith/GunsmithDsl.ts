@@ -279,6 +279,18 @@ export class GunsmithDsl {
   }
 
   /**
+   * Opens the mutual knockout: the duel's first round of a match, the opponent standing unarmed, and one shot in the air from each fighter at the
+   * other, each landing in the first step and each enough to bring its target down, so both fall together and the round is drawn.
+   */
+  async startMutualKnockout(): Promise<void> {
+    try {
+      await this.gunsmith.openMutualKnockout();
+    } catch (error) {
+      throw new DslError("Failed to open the mutual knockout", error);
+    }
+  }
+
+  /**
    * Opens the pickup race: the duel's arena with the player standing still and the opponent six tiles east, and a weapon lying
    * four tiles from the opponent and eight from the player. One round, no score, no ring; the opponent's choices are drawn from `seed`.
    */

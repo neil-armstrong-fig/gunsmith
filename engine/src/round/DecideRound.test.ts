@@ -12,8 +12,12 @@ it("is lost when the player has no health left", () => {
   expect(decideRound({playerHealth: 0, opponentHealth: 40})).toBe("lost");
 });
 
-it("is lost when both fall in the same step", () => {
-  expect(decideRound({playerHealth: 0, opponentHealth: 0})).toBe("lost");
+it("is drawn when both fall in the same step", () => {
+  expect(decideRound({playerHealth: 0, opponentHealth: 0})).toBe("drawn");
+});
+
+it("is drawn when both fall below zero in the same step", () => {
+  expect(decideRound({playerHealth: -5, opponentHealth: -20})).toBe("drawn");
 });
 
 it("never ends when there is no opponent", () => {

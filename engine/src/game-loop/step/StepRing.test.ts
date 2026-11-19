@@ -115,12 +115,13 @@ describe("with a closing ring", () => {
     expect(after.round).toBe("won");
   });
 
-  it("loses the round when the ring takes both fighters' last health in one step, as any simultaneous kill does", () => {
-    const world = sparring();
+  it("draws the round when the ring takes both fighters' last health in one step, as any simultaneous kill does", () => {
+    const world = sparringMatch();
     const dying = {...world, player: {...world.player, health: 0.1}, opponent: {...opponentOf(world), health: 0.1}};
     const after = step(withRing(dying, ringOn(FAR_CORNER, CLOSED)), IDLE, TICK);
 
-    expect(after.round).toBe("lost");
+    expect(after.round).toBe("drawn");
+    expect(after.match).toEqual({playerWins: 0, opponentWins: 0, roundNumber: 1});
   });
 
   it("scores a round the ring decides, once, as any other round", () => {

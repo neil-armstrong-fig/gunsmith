@@ -55,7 +55,9 @@ WASD move, mouse aim (360°), Ctrl or C crouch, **1** default rifle, **2** the c
      choose random, or nobody picks: one of the two arenas is drawn at random.
 2. **Reveal** (about 30 s): the arena preview and the four weapons with their stats and power rating.
 3. **Rounds.** Best of three, one life each, 100 HP, no healing. Pickups and spawns are random every round but **evenly
-   spaced**, so neither player can know them ahead of time. The arena and weapons stay the same for all rounds.
+   spaced**, so neither player can know them ahead of time. The arena and weapons stay the same for all rounds. If both
+   fighters fall in the same step (a shot each, or the ring), the round is a **draw**: nobody scores and the next round
+   follows.
 4. **Stalemate.** After the round timer a **closing ring** forces both players together at a random point on the map.
    Timer, speed and damage are *tunable*.
 5. **End.** The result, the rating change (public games), and the chance to favourite and rename weapons and arenas

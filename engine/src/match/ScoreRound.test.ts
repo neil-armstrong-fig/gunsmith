@@ -11,6 +11,10 @@ it("gives the opponent a win for a lost round", () => {
   expect(scoreRound(LEVEL, "lost")).toEqual({playerWins: 1, opponentWins: 2, roundNumber: 3});
 });
 
+it("gives nobody a win for a drawn round", () => {
+  expect(scoreRound(LEVEL, "drawn")).toEqual(LEVEL);
+});
+
 it("changes nothing while the round is still being fought", () => {
   expect(scoreRound(LEVEL, "playing")).toEqual(LEVEL);
 });
