@@ -4,11 +4,11 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 ## Resume here
 
-Checkout: `.claude/worktrees/ship`, branch `worktree-ship`, synced from committed main `fb1a739`. Persistent worktree. Merge newer committed main before new work when clean.
+Checkout: `.claude/worktrees/ship`, branch `worktree-ship`, synced from committed main `6fed51d`. Persistent worktree. Merge newer committed main before new work when clean.
 
-Current slice: Art delegated reusable HUD thumbnails for generated weapons while the project remains on M1. The local pickup preview drives the same validated structural drawing into the held weapon and the 34 px HUD slot. Owned paths cover inventory presentation, shared webapp drawing utilities, the local fixtures and HUD acceptance coverage. Art owns low-cover terrain.
+Current slice: The M1 thumbnail placement follow-up is complete in the Ship worktree. `WeaponThumbnailUrl.ts` now sits under its sole caller, `InventorySlot.tsx`. The shared appearance parser and SVG renderer still supply the drawing.
 
-Next action: AI and Engine supply the production weapon-to-appearance association, then Play can bind that appearance to the same thumbnail input. The next failing criterion is that a generated weapon keeps its HUD drawing from creation through equip in the real flow. Hosted CI and profiling await publication. AI owns paid selector/guard/evidence and opening spend reconciliation.
+Next action: Art is planning the workshop weapon result card and suggested that Ship reproduce the intermittent `DrawingThePickupMarker` pixel failure on a managed production preview and capture the failing screenshot for the owner. Production HUD wiring awaits AI and Engine's weapon-to-appearance association. When it lands, the first criterion should show that a generated weapon keeps its HUD drawing from creation through equip. Hosted CI and profiling await publication. AI owns paid selector/guard/evidence and opening spend reconciliation.
 
 ## MVP priority
 
@@ -49,6 +49,8 @@ server supplies Worker/DO/storage bindings; budget supplies operational limits; 
 - [ ] Measure infrastructure costs with server/AI runtime measurements before proposing free versus Workers Paid.
 
 ## Verification/latest delivery
+
+2026-11-19 thumbnail placement: the folder check failed on the integrated baseline. The old path is now absent, the moved helper matches the original byte for byte and `InventorySlot.tsx` is its only importer. Reviewed the root, webapp, React and acceptance instructions and audited the folders and callers. `pnpm checks` passed lint, formatting, strict types and 3,467 tests with one existing audio render skipped. All 10 generated and built-in inventory criteria passed on production preview without retries.
 
 2026-11-19 HUD acceptance cleanup: the HUD waits for the inventory icon and calls a focused screenshot reader that uses the shared colour matcher. Full repository checks and all 14 generated inventory, built-in inventory and pickup sound browser criteria passed. Reviewed root and acceptance instructions and checked the new helper’s folder and caller.
 
