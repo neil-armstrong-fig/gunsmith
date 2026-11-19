@@ -1,4 +1,5 @@
 import type {BaseChatModel} from "@langchain/core/language_models/chat_models";
+import type {ArenaFormat} from "@gunsmith/ai/pipeline/arena/arena-drafting/format/ArenaFormat";
 import type {ArenaDrawing} from "@gunsmith/ai/pipeline/arena/types/ArenaDrawing";
 
 /**
@@ -11,6 +12,8 @@ export interface ArenaPipelineDependencies {
   generator: BaseChatModel;
   /** The cheap model that judges whether a request is an arena request at all. */
   moderator: BaseChatModel;
+  /** How the generator is asked to describe an arena: the drawing's rows (the default) or shapes. The answer is checked the same either way. */
+  format?: ArenaFormat;
   /** The arenas to give when the model's cannot be used. Never empty. */
   builtInArenas: readonly ArenaDrawing[];
 }

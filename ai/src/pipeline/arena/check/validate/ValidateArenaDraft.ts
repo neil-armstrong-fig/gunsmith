@@ -3,38 +3,62 @@ import {validateArena} from "@gunsmith/engine/arena-validation/ValidateArena";
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import {arenaDraftSchema} from "@gunsmith/ai/pipeline/arena/check/validate/draft/ArenaDraft";
+import {rowLengthProblems} from "@gunsmith/ai/pipeline/arena/check/validate/row-lengths/RowLengthProblems";
+import {compileArenaShapes} from "@gunsmith/ai/pipeline/arena/arena-shapes/CompileArenaShapes";
+import {arenaShapesDraftSchema} from "@gunsmith/ai/pipeline/arena/arena-shapes/draft/ArenaShapesDraft";
 import type {ArenaValidation} from "@gunsmith/ai/pipeline/arena/check/validate/types/ArenaValidation";
 
 const MAX_ERROR_LENGTH = 160;
-
-// The legend the model is given has no cover block, so a drawing with one is the model's own invention. Engine reads it (`c`), and ai
-// refuses it until generated cover is wanted (engine's request, HANDOFF.md).
-const COVER_REFUSAL = "A cover block (c) is not allowed; draw a wall (#) instead.";
 
 // Engine's validator reports each cut-off piece of floor on its own, and a speckled drawing (the schema allows 30 rows of 40) could have
 // hundreds, every one of them sent to the repair call. The first few are enough to show the model what is wrong.
 const MAX_PROBLEMS_LISTED = 5;
 
 /**
- * Parses what the model wrote as an arena, in four steps that each stop the next: zod (the name and the drawing's size and shape),
- * then the engine's own reading of the drawing (`arenaFrom`, which refuses an unknown character, rows of unequal length and an
- * illegal stair), then our refusal of a cover block, then the engine's playability rules (`validateArena`). A refusal names the problems found in the step it stopped at
+ * Parses what the model wrote as an arena, as a drawing's rows or as shapes (drawn into rows first), in four steps that each stop the next: zod (the name and the drawing's size and shape),
+ * then the lengths of the rows (named, row by row, because engine's own refusal does not say which row), then the engine's own reading of the drawing (`arenaFrom`, which refuses an unknown character, rows of unequal length and an
+ * illegal stair; a cover block, `c`, is a legal character), then the engine's playability rules (`validateArena`, which treats a
+ * cover block as a wall). A refusal names the problems found in the step it stopped at
  * (the first few, then a count of the rest), each shortened, because `repair` shows them to the model and some of the words in them
  * (a stray field's name) came from the model, or through it from the player.
  */
 export function validateArenaDraft(candidate: unknown): ArenaValidation {
+  if (!isShapes(candidate)) {
+    return validateDrawing(candidate);
+  }
+
+  const shapes = arenaShapesDraftSchema.safeParse(candidate);
+  if (!shapes.success) {
+    return {ok: false, errors: schemaErrors(shapes.error.issues)};
+  }
+
+  const compiled = compileArenaShapes(shapes.data);
+  if (!compiled.ok) {
+    return {ok: false, errors: compiled.errors.map(sentenceOf)};
+  }
+
+  return validateDrawing(compiled.drawing);
+}
+
+/** An answer with a size and no rows is shapes (`arena-shapes/`); anything else is read as a drawing, and refused if it is not one. */
+function isShapes(candidate: unknown): boolean {
+  return typeof candidate === "object" && candidate !== null && !("rows" in candidate) && "width" in candidate;
+}
+
+function validateDrawing(candidate: unknown): ArenaValidation {
   const parsed = arenaDraftSchema.safeParse(candidate);
   if (!parsed.success) {
     return {ok: false, errors: schemaErrors(parsed.error.issues)};
   }
 
+  const raggedRows = rowLengthProblems(parsed.data.rows);
+  if (raggedRows.length > 0) {
+    return {ok: false, errors: raggedRows};
+  }
+
   const arena = read(parsed.data.rows);
   if (typeof arena === "string") {
     return {ok: false, errors: [sentenceOf(arena)]};
-  }
-
-  if (arena.cover.some(Boolean)) {
-    return {ok: false, errors: [COVER_REFUSAL]};
   }
 
   const problems = validateArena(arena).map(problem => problem.reason);

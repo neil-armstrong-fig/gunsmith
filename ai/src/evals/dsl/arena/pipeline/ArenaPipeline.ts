@@ -1,6 +1,7 @@
 import type {ArenaPipelineDriver} from "@evals/dsl/arena/types/ArenaPipelineDriver";
 import type {ArenaEvaluator} from "@evals/dsl/arena/pipeline/types/ArenaEvaluator";
 import {arenaGiven} from "@evals/dsl/arena/pipeline/evaluators/outcome/ArenaGiven";
+import {arenaKeepsCover} from "@evals/dsl/arena/pipeline/evaluators/outcome/ArenaKeepsCover";
 import {arenaModelCallBudget} from "@evals/dsl/arena/pipeline/evaluators/outcome/ArenaModelCallBudget";
 import {arenaNodePath} from "@evals/dsl/arena/pipeline/evaluators/outcome/ArenaNodePath";
 import {arenaOutcomeMatches} from "@evals/dsl/arena/pipeline/evaluators/outcome/ArenaOutcomeMatches";
@@ -42,6 +43,10 @@ export class ArenaPipeline {
 
   checkArenaGiven(): void {
     this.checkEveryTrial([arenaGiven]);
+  }
+
+  checkKeepsCover(): void {
+    this.checkEveryTrial([input => arenaOutcomeMatches(input, "created"), arenaKeepsCover]);
   }
 
   checkBuiltInGiven(): void {

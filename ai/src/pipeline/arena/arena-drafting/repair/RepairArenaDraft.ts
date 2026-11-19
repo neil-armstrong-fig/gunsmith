@@ -2,7 +2,7 @@ import {HumanMessage, SystemMessage} from "@langchain/core/messages";
 import type {BaseChatModel} from "@langchain/core/language_models/chat_models";
 import {dataBlock} from "@gunsmith/ai/pipeline/blocks/DataBlock";
 import {requestBlock} from "@gunsmith/ai/pipeline/blocks/request/RequestBlock";
-import {ARENA_REPAIR_PROMPT} from "@gunsmith/ai/pipeline/arena/arena-drafting/repair/prompts/ArenaRepairPrompt";
+import {draftingKitOf} from "@gunsmith/ai/pipeline/arena/arena-drafting/format/DraftingKitOf";
 import {askForArenaDraft} from "@gunsmith/ai/pipeline/arena/arena-drafting/shared/model-call/AskForArenaDraft";
 import type {ArenaRepairRequest} from "@gunsmith/ai/pipeline/arena/arena-drafting/repair/types/ArenaRepairRequest";
 
@@ -15,7 +15,8 @@ const MAX_PREVIOUS_LENGTH = 2500;
  * `validate` has parsed it again.
  */
 export async function repairArenaDraft(request: ArenaRepairRequest, generator: BaseChatModel): Promise<unknown> {
-  const messages = [new SystemMessage(ARENA_REPAIR_PROMPT), new HumanMessage(requestBlock(request.prompt))];
+  const kit = draftingKitOf(request.format ?? "rows");
+  const messages = [new SystemMessage(kit.repairPrompt), new HumanMessage(requestBlock(request.prompt))];
 
   const previous = previousBlock(request.previous);
   if (previous !== undefined) {
@@ -24,7 +25,7 @@ export async function repairArenaDraft(request: ArenaRepairRequest, generator: B
 
   messages.push(new HumanMessage(dataBlock("problems", request.errors.map(error => `- ${error}`).join("\n"))));
 
-  return askForArenaDraft(messages, generator);
+  return askForArenaDraft(messages, generator, kit.replySchema);
 }
 
 /** The first answer as shortened JSON in its data block, or nothing when the model gave no answer to show. */

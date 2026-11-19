@@ -5,6 +5,8 @@
 # Eval run summaries and kept drawings (copy a summary to a dated file to keep a baseline)
 src/evals/results/*-latest.json
 src/evals/results/*-latest.html
+# Marks which run the kept arenas belong to, so the spec files of one run share one page
+src/evals/results/*-latest.run
 src/evals/results/appearance-probe/
 
 # Paid weapon requests: tokens, stop reasons and latency, one JSON line each

@@ -4,3 +4,7 @@ import {EXAMPLE_ARENA} from "@gunsmith/ai/pipeline/arena/arena-drafting/generate
 it("is an arena the validator accepts, so the prompt only teaches drawings the game plays", () => {
   expect(validateArenaDraft(EXAMPLE_ARENA)).toEqual({ok: true, arena: EXAMPLE_ARENA});
 });
+
+it("draws no cover block, so an arena that has one was the model's choice and not a copy of the example", () => {
+  expect(EXAMPLE_ARENA.rows.join("")).not.toContain("c");
+});

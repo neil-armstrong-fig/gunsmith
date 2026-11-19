@@ -21,11 +21,29 @@ const UNPLAYABLE_REPLY = {
   ],
 };
 
+// The one request the arena specs expect the fake model to answer with cover (`AskingForAnArena`, "low cover blocks to crouch behind"),
+// word for word: the canned arena has none, so a spec asking for cover could not tell a model that kept it from one that dropped it.
+const COVER_REQUEST = "an arena with low cover blocks to crouch behind";
+
+const COVER_REPLY = {
+  name: "Low Wall Hall",
+  rows: [
+    "####################",
+    "#..................#",
+    "#...cc........cc...#",
+    "#..................#",
+    "#...cc........cc...#",
+    "#..................#",
+    "####################",
+  ],
+};
+
 const REQUEST_BLOCK = /^<request>\n([\s\S]*)\n<\/request>$/;
 
 /**
  * The fake tier's arena generator: a chat model that answers the generation function call like a real one. It draws a valid arena for
- * every request but the one above, and draws the same unplayable arena for that one on every try, repair included. Test-only.
+ * every request but two: an arena with cover blocks for the cover request, and, for the unplayable request, the same unplayable arena
+ * on every try, repair included. Test-only.
  */
 export class ArenaGenerationFakeModel extends BaseChatModel {
   constructor() {
@@ -54,6 +72,10 @@ export class ArenaGenerationFakeModel extends BaseChatModel {
     const requests = messages.map(message => message.text.match(REQUEST_BLOCK)?.[1]);
     if (requests.includes(UNPLAYABLE_REQUEST)) {
       return UNPLAYABLE_REPLY;
+    }
+
+    if (requests.includes(COVER_REQUEST)) {
+      return COVER_REPLY;
     }
 
     return FAKE_ARENA_REPLY;

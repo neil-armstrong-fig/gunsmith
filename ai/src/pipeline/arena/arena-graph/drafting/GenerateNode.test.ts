@@ -24,3 +24,12 @@ it("still counts the call when the model gave no answer", async () => {
     modelCalls: 1,
   });
 });
+
+it("asks the model for shapes when the format is shapes", async () => {
+  const generator = new FakeListChatModel({responses: [JSON.stringify({name: "Box", width: 10, height: 5})]});
+  const invoke = vi.spyOn(generator, "invoke");
+
+  await generateNode(arenaGraphStateOf(), generator, "shapes");
+
+  expect(JSON.stringify(invoke.mock.calls[0]?.[0])).toContain("walls: a list of wall rectangles");
+});
