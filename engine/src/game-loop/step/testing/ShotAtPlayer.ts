@@ -12,6 +12,7 @@ export function shotAtPlayer(playerHealth: number): World {
     speed: RIFLE.bulletSpeed,
     shooter: "opponent",
     level: 0,
+    crouching: false,
   } as const;
 
   return {...world, player: {...world.player, health: playerHealth}, bullets: [bullet]};

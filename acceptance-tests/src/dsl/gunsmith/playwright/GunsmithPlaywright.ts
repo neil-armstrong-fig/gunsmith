@@ -129,6 +129,11 @@ export class GunsmithPlaywright extends BasePage {
     await this.openScenario(`overwatch&seed=${seed}`);
   }
 
+  /** Opens the cover hall (a hall ten tiles long with a low cover block at its third and eighth tile, the player and the opponent each in the two-tile pocket behind theirs, one round, no ring), the opponent's choices drawn from `seed`. */
+  async openCoverHall(seed: number): Promise<void> {
+    await this.openScenario(`cover-hall&seed=${seed}`);
+  }
+
   /** Opens the pickup race (the duel's arena and fighters, one round, no ring, a weapon lying much nearer the opponent than the player), its choices drawn from `seed`. */
   async openPickupRace(seed: number): Promise<void> {
     await this.openScenario(`pickup-race&seed=${seed}`);

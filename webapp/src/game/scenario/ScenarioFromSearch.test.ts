@@ -49,6 +49,10 @@ it("asks for the overlook duel when the query says so", () => {
   expect(scenarioFromSearch("?scenario=overlook")).toBe("overlook");
 });
 
+it("asks for the cover hall when the query says so", () => {
+  expect(scenarioFromSearch("?scenario=cover-hall")).toBe("cover-hall");
+});
+
 it("asks for the overwatch when the query says so", () => {
   expect(scenarioFromSearch("?scenario=overwatch")).toBe("overwatch");
 });

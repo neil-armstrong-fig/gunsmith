@@ -13,5 +13,9 @@ export interface FlightRequest {
   playerPosition?: Point | undefined;
   /** Where the opponent stands: the player's bullets can hurt them. */
   opponentPosition?: Point | undefined;
+  /** Whether the player crouches: with a cover block right beside them, an opponent's bullet that crossed it passes over. Absent means standing. */
+  playerCrouching?: boolean | undefined;
+  /** Whether the opponent crouches, likewise for the player's bullets. Absent means standing. */
+  opponentCrouching?: boolean | undefined;
   seconds: number;
 }

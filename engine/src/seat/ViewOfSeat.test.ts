@@ -136,10 +136,28 @@ describe("what a seat is never told", () => {
       expect(sent).not.toContain("77.375");
     }
   });
+
+  it("is where a shot was fired from: a seen bullet carries its flight and the shooter's stance, and no place of origin", () => {
+    const world: World = {...duel(), bullets: [{...shot("opponent", 14.5), crouching: true}]};
+
+    for (const seat of ["first", "second"] as const) {
+      const [sent] = JSON.parse(JSON.stringify(viewOfSeat(world, seat).bullets)) as object[];
+
+      expect(Object.keys(sent ?? {}).sort()).toEqual([
+        "crouching",
+        "damage",
+        "direction",
+        "level",
+        "position",
+        "shooter",
+        "speed",
+      ]);
+    }
+  });
 });
 
 function shot(shooter: Bullet["shooter"], x: number): Bullet {
-  return {position: {x, y: 3.5}, direction: {x: 1, y: 0}, damage: 1, speed: 1, shooter, level: 0};
+  return {position: {x, y: 3.5}, direction: {x: 1, y: 0}, damage: 1, speed: 1, shooter, level: 0, crouching: false};
 }
 
 function duel(): World {

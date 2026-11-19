@@ -10,4 +10,6 @@ export interface ShotRequest {
   weapon: Weapon;
   /** The level of the shooter's eye, which the bullet keeps for its whole flight. */
   level: number;
+  /** Whether the shooter is crouching, which the bullet keeps for its whole flight. */
+  crouching: boolean;
 }

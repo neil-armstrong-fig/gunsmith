@@ -17,4 +17,6 @@ export interface Bullet {
   shooter: Shooter;
   /** The level of the shooter's eye when it was fired, which it keeps: it flies over lower ground and stops at a tile higher than this. */
   level: number;
+  /** Whether the shooter was crouching when it was fired: a crouched shooter's bullet is stopped by a low cover block, a standing one's flies over it. */
+  crouching: boolean;
 }

@@ -115,6 +115,7 @@ it("gives the opponent the round when both fall in the same step", () => {
         speed: RIFLE.bulletSpeed,
         shooter: "player",
         level: 0,
+        crouching: false,
       },
     ],
     match: startMatch(),

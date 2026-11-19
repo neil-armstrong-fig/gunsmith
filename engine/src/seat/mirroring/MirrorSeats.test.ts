@@ -13,6 +13,7 @@ const BULLET: Bullet = {
   speed: 1,
   shooter: "player",
   level: 0,
+  crouching: false,
 };
 
 it("swaps the two fighters", () => {

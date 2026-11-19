@@ -263,6 +263,19 @@ export class GunsmithDsl {
   }
 
   /**
+   * Opens the cover hall: a hall one tile wide and ten tiles long, with a low cover block at its third and its eighth tile. The player
+   * and the opponent each stand in the two tiles behind their own block, right beside it, seven tiles apart along one row, so every shot
+   * along the row crosses both blocks. One round, no score, no ring; the opponent's choices are drawn from `seed`.
+   */
+  async startCoverHall(seed: number): Promise<void> {
+    try {
+      await this.gunsmith.openCoverHall(seed);
+    } catch (error) {
+      throw new DslError(`Failed to open the cover hall with seed ${seed}`, error);
+    }
+  }
+
+  /**
    * Opens the pickup race: the duel's arena with the player standing still and the opponent six tiles east, and a weapon lying
    * four tiles from the opponent and eight from the player. One round, no score, no ring; the opponent's choices are drawn from `seed`.
    */
