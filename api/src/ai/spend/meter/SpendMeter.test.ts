@@ -130,39 +130,106 @@ it("does not let a settle from last month change this month's spend", () => {
 
   meter.settle("late", 0, FIRST_OF_DECEMBER);
 
-  expect(meter.takeAlerts()).toEqual([]);
+  expect(meter.alertsDue()).toEqual([]);
   for (let day = 2; day <= 12; day++) {
     meter.reserve(`december-${day}`, 900_000, Date.UTC(2026, 11, day, 12));
   }
-  expect(meter.takeAlerts()).toEqual([50]);
+  expect(meter.alertsDue()).toEqual([50]);
 });
 
-it("raises each alert once, as the month's spend passes 50, 80 and 100 percent", () => {
+it("makes each alert due once, as the month's spend passes 50, 80 and 100 percent", () => {
   const meter = new SpendMeter();
-  expect(meter.takeAlerts()).toEqual([]);
+  expect(meter.alertsDue()).toEqual([]);
 
   spendOnEachDay(meter, 900_000, {first: 1, last: 12});
-  expect(meter.takeAlerts()).toEqual([50]);
-  expect(meter.takeAlerts()).toEqual([]);
+  expect(meter.alertsDue()).toEqual([50]);
+  meter.markAlertSent(50);
+  expect(meter.alertsDue()).toEqual([]);
 
   spendOnEachDay(meter, 900_000, {first: 13, last: 18});
-  expect(meter.takeAlerts()).toEqual([80]);
+  expect(meter.alertsDue()).toEqual([80]);
+  meter.markAlertSent(80);
 
   spendOnEachDay(meter, 900_000, {first: 19, last: 22});
   meter.reserve("day-23", 200_000, noonOnNovember(23));
-  expect(meter.takeAlerts()).toEqual([100]);
+  expect(meter.alertsDue()).toEqual([100]);
 });
 
-it("raises the alerts again in the next month", () => {
+it("makes the 100 percent alert due when a request is refused for crossing the monthly cap, though spend stops short of it", () => {
+  const meter = new SpendMeter();
+  spendOnEachDay(meter, 900_000, {first: 1, last: 21});
+  meter.markAlertSent(50);
+  meter.markAlertSent(80);
+  expect(meter.alertsDue()).toEqual([]);
+
+  expect(meter.reserve("crosses", 900_000, noonOnNovember(22))).toBe("reserved");
+  expect(meter.reserve("refused", 900_000, noonOnNovember(23))).toBe("paused");
+
+  expect(meter.spentThisMonth()).toBeLessThan(SPEND_CAPS.monthlyMicrodollars);
+  expect(meter.alertsDue()).toEqual([100]);
+});
+
+it("makes only the 100 percent alert due when one oversized request stops AI early in the month", () => {
+  const meter = new SpendMeter();
+
+  expect(meter.reserve("oversized", SPEND_CAPS.monthlyMicrodollars + 1, NOON)).toBe("paused");
+
+  expect(meter.alertsDue()).toEqual([100]);
+});
+
+it("does not make the 100 percent alert due when only the daily cap stopped AI", () => {
+  const meter = new SpendMeter();
+  meter.reserve("first", 900_000, NOON);
+
+  expect(meter.reserve("second", 900_000, NOON)).toBe("paused");
+
+  expect(meter.alertsDue()).toEqual([]);
+});
+
+it("reports what has been spent this month, as settled", () => {
+  const meter = new SpendMeter();
+  meter.reserve("first", 600_000, NOON);
+  meter.reserve("second", 300_000, MIDNIGHT);
+  meter.settle("second", 100_000, MIDNIGHT);
+
+  expect(meter.spentThisMonth()).toBe(700_000);
+});
+
+it("keeps an alert due until it is marked sent, so a failed delivery is tried again", () => {
   const meter = new SpendMeter();
   spendOnEachDay(meter, 900_000, {first: 1, last: 12});
-  meter.takeAlerts();
+
+  expect(meter.alertsDue()).toEqual([50]);
+  expect(meter.alertsDue()).toEqual([50]);
+  expect(new SpendMeter(meter.toState()).alertsDue()).toEqual([50]);
+});
+
+it("lists every alert due when one spend passes several thresholds, lowest first", () => {
+  const meter = new SpendMeter();
+  spendOnEachDay(meter, 900_000, {first: 1, last: 18});
+
+  expect(meter.alertsDue()).toEqual([50, 80]);
+});
+
+it("marks one alert sent without marking the others", () => {
+  const meter = new SpendMeter();
+  spendOnEachDay(meter, 900_000, {first: 1, last: 18});
+
+  meter.markAlertSent(50);
+
+  expect(meter.alertsDue()).toEqual([80]);
+});
+
+it("makes the alerts due again in the next month", () => {
+  const meter = new SpendMeter();
+  spendOnEachDay(meter, 900_000, {first: 1, last: 12});
+  meter.markAlertSent(50);
 
   for (let day = 1; day <= 12; day++) {
     meter.reserve(`december-${day}`, 900_000, Date.UTC(2026, 11, day, 12));
   }
 
-  expect(meter.takeAlerts()).toEqual([50]);
+  expect(meter.alertsDue()).toEqual([50]);
 });
 
 it("keeps its spend, its stop and its reserved requests when rebuilt from its saved state", () => {
