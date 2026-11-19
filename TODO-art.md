@@ -6,7 +6,7 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 Art is in `.claude/worktrees/art` on `worktree-art`, based on committed main `fb1a739`. Preserve this worktree and sync committed main before resuming.
 
-Room weapon art and its two-browser spec are integrated. The user approved the low-cover artwork in `837f1d9`. Integration is pending.
+Room weapon art and its two-browser spec are integrated. The user's approved low-cover artwork from `837f1d9` is integrated in `adbf7b4`.
 
 The next M1 art slice is the workshop arena preview. Play's workshop at `9e81ee9` has a weapon result card. Resume when Play exposes the arena result and built-in arena row. Art owns the preview component, reuse of the terrain artwork and the browser drawing spec. The first criterion opens a deterministic Fair duel result and checks the floor ticks and wall braces in the preview. Compare Fair duel and Duel in the built-in row to catch a preview that reuses the wrong arena.
 
@@ -16,7 +16,7 @@ The [approved stair treatment](docs/art/terrain/README.md#playable-stair-preview
 
 Current milestone: M1/M6; the project remains on M1. Next audio task: combat masking, fatigue and levels once AI/play integrate runtime weapon-shot synthesis (not yet wired into the game sound output). Safari acceptance does not claim new headphone/speaker measurements. Preserve approved master hashes. Next failing check for any playback change: the relevant browser sound acceptance criterion before implementation.
 
-Ship's inventory HUD, local pickup cue and ring loop are integrated (`c372d86`). The integrated review is complete in `worktree-ship`, coordinated with Art. The submachine gun's magazine is still faint at 34 px. Status badges and generated thumbnails remain future work.
+Ship's inventory HUD, local pickup cue and ring loop are integrated (`c372d86`). The integrated review is complete in `worktree-ship`, coordinated with Art. The submachine gun's magazine is still faint at 34 px. Ship integrated generated thumbnails for local fixtures. Status badges and production appearance association remain open.
 
 ## Ownership
 
