@@ -1,6 +1,8 @@
 import {testAccounts} from "@src/accounts/testing/in-memory/TestAccounts";
 import type {NewAccount} from "@src/accounts/types/NewAccount";
+import type {NewGeneratedItem} from "@src/accounts/types/NewGeneratedItem";
 import type {NewSession} from "@src/accounts/types/NewSession";
+import type {SaveItemRequest} from "@src/accounts/types/SaveItemRequest";
 import {workerEnvironment} from "@src/env/WorkerEnvironment";
 import {isArenaPipelineAvailable} from "@src/router/routes/arenas/pipeline/IsArenaPipelineAvailable";
 import {isWeaponPipelineAvailable} from "@src/router/routes/weapons/pipeline/IsWeaponPipelineAvailable";
@@ -10,7 +12,7 @@ import type {GoogleExchange} from "@src/sign-in/types/GoogleExchange";
 
 /**
  * Runs before every test file, so a route's test reaches the Worker's collaborators by the same imports the route uses and gets
- * stand-ins. **Mocked here** (the things outside the process): the five account functions, which run on `testAccounts` (in memory, called through so a test can `vi.spyOn(testAccounts, ...)`;
+ * stand-ins. **Mocked here** (the things outside the process): the account functions, which run on `testAccounts` (in memory, called through so a test can `vi.spyOn(testAccounts, ...)`;
  * `accounts/testing/RealAccounts.test.ts` holds them to real D1), the two Google functions, which run on `testGoogle`, and the two generation pipelines (automocked). The Worker's bindings are the `workerEnvironment` object: a test sets
  * what it needs on it (`workerEnvironment.CREDITS = ...`) and **every key is removed after each test**, so nothing leaks into the next.
  */
@@ -29,6 +31,19 @@ vi.mock("@src/accounts/find-or-create-account/FindOrCreateAccount", () => ({
 }));
 vi.mock("@src/accounts/remove-account/RemoveAccount", () => ({
   removeAccount: (userId: string) => testAccounts.removeAccount(userId),
+}));
+
+vi.mock("@src/accounts/keep-generated-item/KeepGeneratedItem", () => ({
+  keepGeneratedItem: (item: NewGeneratedItem) => testAccounts.keepGeneratedItem(item),
+}));
+vi.mock("@src/accounts/saved-items-of-account/SavedItemsOfAccount", () => ({
+  savedItemsOfAccount: (userId: string) => testAccounts.savedItemsOfAccount(userId),
+}));
+vi.mock("@src/accounts/save-item/SaveItem", () => ({
+  saveItem: (request: SaveItemRequest) => testAccounts.saveItem(request),
+}));
+vi.mock("@src/accounts/unsave-item/UnsaveItem", () => ({
+  unsaveItem: (userId: string, id: string) => testAccounts.unsaveItem(userId, id),
 }));
 
 vi.mock("@src/sign-in/GoogleAuthorizationUrl", () => ({

@@ -6,6 +6,8 @@ import type {ArenaOutcomeStatus} from "@gunsmith/ai/pipeline/arena/types/ArenaOu
  */
 export interface ArenaAnswer {
   status: ArenaOutcomeStatus;
+  /** The id a created result is kept under: what the page sends to put it on the library shelf. Absent when nothing was kept. */
+  id?: string;
   arena?: unknown;
   reason?: string;
 }

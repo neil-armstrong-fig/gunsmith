@@ -3,6 +3,7 @@ import {settledWeaponSpend} from "@src/durable-objects/spend-ledger/estimate/wea
 import {WEAPON_SPEND} from "@src/durable-objects/spend-ledger/estimate/weapon/WeaponSpend";
 import {isWeaponPipelineAvailable} from "@src/router/routes/weapons/pipeline/IsWeaponPipelineAvailable";
 import {runWeaponPipeline} from "@src/router/routes/weapons/pipeline/RunWeaponPipeline";
+import {keepCreatedResult} from "@src/router/routes/shared/keep-result/KeepCreatedResult";
 import {reserveCredit} from "@src/router/routes/shared/ReserveCredit";
 import type {CreditReservation} from "@src/router/routes/shared/types/CreditReservation";
 import {failureAnswer} from "@src/router/routes/shared/time-limit/FailureAnswer";
@@ -18,7 +19,9 @@ import type {WeaponAnswer} from "@src/router/routes/weapons/types/WeaponAnswer";
  * worst case before the pipeline runs, so a burst cannot cross a cap**; refused, the credit is given back and AI is off until the cap's
  * period ends). The credit is then settled at what the request was (a weapon costs one credit, a rejected prompt half) or refunded in
  * full (no valid weapon, or the pipeline threw), and the spend at the model calls it made (`durable-objects/spend-ledger/estimate/`), or in full if the
- * pipeline threw or ran out of time (`shared/time-limit/`: 504 `generation-timed-out`), since its calls may have been billed.
+ * pipeline threw or ran out of time (`shared/time-limit/`: 504 `generation-timed-out`), since its calls may have been billed. **A created weapon
+ * is kept under an `id` the answer carries** (`shared/keep-result/`), so the library saves it by that id alone; if it cannot be kept the credit is
+ * refunded and the answer is 502.
  */
 export async function generateWeaponRoute(request: Request): Promise<Response> {
   const reservation = await reserveCredit(request, {
@@ -33,7 +36,8 @@ export async function generateWeaponRoute(request: Request): Promise<Response> {
   return await runAndSettle(reservation);
 }
 
-async function runAndSettle({credits, spend, key, prompt}: CreditReservation): Promise<Response> {
+async function runAndSettle(reservation: CreditReservation): Promise<Response> {
+  const {credits, spend, key, prompt} = reservation;
   let outcome: WeaponOutcome;
   try {
     outcome = await withTimeLimit(runWeaponPipeline(prompt), PIPELINE_TIME_LIMIT_MILLISECONDS);
@@ -46,7 +50,13 @@ async function runAndSettle({credits, spend, key, prompt}: CreditReservation): P
 
   await spend.settle(key, settledWeaponSpend(outcome));
   if (outcome.status === "created") {
+    const id = await keepCreatedResult(reservation, "weapon", {weapon: outcome.weapon, appearance: outcome.appearance});
+    if (id instanceof Response) {
+      return id;
+    }
     await credits.settle(key, "weapon");
+
+    return Response.json({...answerOf(outcome), id});
   }
   if (outcome.status === "rejected") {
     await credits.settle(key, "rejected");
