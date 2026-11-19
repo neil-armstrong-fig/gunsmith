@@ -10,6 +10,10 @@ Current slice: Art delegated reusable HUD thumbnails for generated weapons while
 
 Next action: AI and Engine supply the production weapon-to-appearance association, then Play can bind that appearance to the same thumbnail input. The next failing criterion is that a generated weapon keeps its HUD drawing from creation through equip in the real flow. Hosted CI and profiling await publication. AI owns paid selector/guard/evidence and opening spend reconciliation.
 
+## MVP priority
+
+Own release verification for the hosted private-room MVP. Collect Worker, auth and library requirements from Server and spend and alert bindings from Budget. Prepare hosted CI and deployment around those consumers. Run live acceptance and record the release evidence once authorized, with Budget owning the shutdown drill. See [the shared priorities](TODO.md#mvp-integration-priorities) and [handoffs](HANDOFF.md#mvp-ownership-and-handoffs).
+
 ## Ownership
 
 infra/, general CI/property workflow, root scripts and shared/config/ tooling, deployment configuration, manual setup and release/case-study evidence coordination. AI owns eval workflow behavior.

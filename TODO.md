@@ -44,6 +44,17 @@ M0 is complete; M1 is current. Later milestones proceed when their consumers and
 | M7 | **Ship** | Live at `gunsmith.neilarmstrong.dev`; acceptance passes against live; alerts and kill switch armed. |
 | M8 | **Case study and polish** | Measured outcomes and lessons are ready for a case study. |
 
+## MVP integration priorities
+
+Use **hosted private rooms** as the working MVP scope. A player can sign in, make a weapon and an arena in the workshop, try and save them, reload the shelf, and use the saved items in a best-of-three with a second browser. Guests can play practice and private rooms with built-ins. Public matchmaking, ratings, spectators and replay have their own backlog. M1 remains current until the local first-time-player checkpoint is recorded.
+
+1. **Play owns the workshop and first-time-player experience.** Finish the stand-in loop with Try it, Save and the shelf, then the tutorial, before the pre-round UI. Record the M1 playtest with Engine and prioritize the fixes it identifies. Expose the parsed arena result and a deterministic fixture so Art can deliver real-tile previews.
+2. **Server owns the production generation path.** Start with sign-in and the account boundary for credits and the saved library. In parallel, AI supplies validated Worker-safe adapters, cancellation and usage, and Budget supplies spend bounds and settlement rules. Integrate the in-flight Server timeout and Budget arena reservation together. Enable the real adapters only after verified account identity and both routes' spend and timeout paths are proven. Play owns the browser swap from the stand-in and the credit, rejection, timeout and AI-off states.
+3. **Server owns the authoritative room, and Play owns its player-facing flow.** Start the pre-round against built-ins as soon as the room messages have consumers, then add saved items through the same flow. Lock in weapons and arenas, use Engine's seeded arena pick rule, reveal the loadout and start the match. Carry approved appearance and combat cues through the existing rendering and seat-filtered paths. Prove the selected items reach the match in both browsers, hidden opponents stay off the wire and pre-round makes zero model calls.
+4. **Ship owns release verification.** Take binding requirements from Server and Budget, prepare the hosted checks and deployment, and run live private-room acceptance after authorization. Budget owns the shutdown drill and alert verification, with Play covering the AI-off UI. The drill must prove that new generation stops and saved items and guest play still work.
+
+For the next super turn, integrate reviewed deliveries through the existing workflow. The shared generation routes need one combined validation of spend reservation, settlement and timeout. See [MVP ownership and handoffs](HANDOFF.md#mvp-ownership-and-handoffs) for the writers and consumers.
+
 ## Blockers and requests
 
 - **engine → play:** local damage/hit events are integrated; play now consumes both. Inventory data was delivered by ship (`6795b56`, integrated `c372d86`). Extend merged bot routing and cross-level engagement/cover.

@@ -22,6 +22,10 @@ Done 2026-11-17: the concurrency/failure scenarios are written as a working draf
 
 Current milestone: M4–M5; the project remains on M1. Next failing test/check: still waits on server (sign-in/account identity, then a production `WeaponSmith` and a pipeline time limit) and `ai` (real `usage` on `WeaponOutcome`, then settle from tokens); the arena route needs its own estimate once arenas are measured. Tracing, Gateway and the shutdown drill need the user's authorisation and ship's bindings. Open questions (D1 vs Durable Object counters, where the cost estimator lives) are listed with the scenarios.
 
+## MVP priority
+
+Deliver the arena reservation and its settlement evidence for the next super turn. From that merge, Server writes both generation routes and Budget owns the estimates, ledgers and accounting scenarios those routes use. Verify concurrent reservations and timeout settlement together, then own the shutdown drill with Play's AI-off UI and Ship's authorized environment. See [the shared priorities](TODO.md#mvp-integration-priorities) and [handoffs](HANDOFF.md#mvp-ownership-and-handoffs).
+
 ## Ownership
 
 Production credits/reservations/refunds, Gateway, kill switch and tracing under api/src/durable-objects/credit-ledger/ and spend-ledger/ and their storage/tests; docs/cost-and-budget.md. AI retains eval-run spend guard ownership.
@@ -38,7 +42,7 @@ Wait for server account/storage and AI call boundaries. Independently turn [cost
 
 ## Later tasks
 
-- [ ] D1 atomic credits through the budget-owned ledger and server storage boundary: generation/edit prices, half-price rejection, daily reset, free reuse and timeout refund as specified in `docs/cost-and-budget.md`.
+- [ ] Complete atomic credit behavior through the credit Durable Object using verified account identity from Server. Verify generation/edit prices, half-price rejection, daily reset, free reuse and timeout refund as specified in `docs/cost-and-budget.md`.
 - [ ] Provider/AI Gateway wiring, per-user caching/rate/spend limits and burst-overshoot protection through atomic in-app reservations. Extend paid validation estimation/cache safeguards without resetting its existing ledger.
 - [ ] Provider hard cap, Gateway limits, global daily/monthly counters and cron kill switch; alerts at 50/80/100 percent of the approved monthly budget. The AI-off game must remain playable.
 - [ ] Run a controlled shutdown drill once authorized: exceed a tiny budget, prove calls stop, refunds/banner work and built-in play continues.

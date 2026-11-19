@@ -36,6 +36,10 @@ Checkout: `.claude/worktrees/server`, branch `worktree-server`, created 2026-11-
 
 Current milestone: M4; the project remains on M1. Next failing test/check: the ring and pickup in a room's rounds (seeded by the server; deferred by the user 2026-11-18, so ask before taking it); sound carries direction only (needs engine); arena spend reservation once budget has an estimate, and sign-in.
 
+## MVP priority
+
+Take the sign-in proposal and verified account identity first, then account-backed library storage and production adapter wiring. Combine the in-flight deadline and Budget's reservation at the super turn. Own the shared generation route changes and cancellation wiring after that merge. Own the authoritative pre-round and browser transport, including the online feedback hookup. Start with built-ins and agree the messages with Play. See [the shared priorities](TODO.md#mvp-integration-priorities) and [handoffs](HANDOFF.md#mvp-ownership-and-handoffs).
+
 ## Ownership
 
 api/ application/auth/match/persistence domains except budget-owned AI operations; browser networking/prediction, wire contracts and network acceptance tests.
@@ -65,7 +69,7 @@ Wait for M1 and engine consumers. Independently review [netcode](docs/match-netc
 
 ## Later tasks
 
-- [ ] Pre-round flow in a room (arena choice). Decided by the user 2026-11-18: no AI judge picks the arena; each player sees both submitted arenas and chooses one, nothing, or random. The rule is `resolveArenaPicks({picks, seed})` (pure, seeded, no model call), now in the `ai` worktree (`ai/src/pipeline/arena-picking/`, case table in that worktree's `docs/ai-pipeline.md` "Choosing the arena"); **engine owns it and will move it to `engine/src/arena-picking/` when `api/` needs it**, i.e. at this slice, so ask engine then. A pick is `{playerId, choice}`, `choice` one of `{kind: "arena", chosenPlayerId}`, `{kind: "random"}`, `{kind: "nothing"}`; the two picks go in a fixed order (the first listed is "first" for the seeded draw); pass the match seed as it is. **Rule updated by the user (ai's correction, 2026-11-18):** one player picks an arena and the other chooses random, then a first draw decides between the pick and random, and only if random wins does a second draw choose one of the two arenas; both random, random against nothing, or nobody picking is one draw over the two arenas. The result's `how` has five values (`agreed`, `coin`, `only-pick`, `pick-kept`, `random`), which the choice screen can show ("your opponent chose random, but the draw kept your pick"). My part: screen the submissions (`screenArenaSubmissions`), `generateArena` each survivor, show both, collect the two choices over the wire, resolve. The choice screen and its timing are play's and mine; wire messages designed with play.
+- [ ] Own the authoritative pre-round. Accept built-in and saved weapon and arena choices, lock them in, and reveal the approved stats and previews. For two distinct arenas, collect both choices in stable seat order and call Engine's `resolveArenaPicks({picks, seed})` with the match seed. Agree messages, timing and default selections with Play. Keep prompts private and prove zero generation calls in the two-browser spec.
 
 - [x] Scaffold api/ with package instructions and the AI import boundary; api:dev exists (2026-11-17). Still open: ship owns infra scaffolding.
 - [ ] One Worker serves assets and `/api/*`; plain runtime edge, `run_worker_first` for API paths. API imports AI in-process.

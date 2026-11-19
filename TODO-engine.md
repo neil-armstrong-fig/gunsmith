@@ -12,6 +12,10 @@ Checkout: worktree `.claude/worktrees/engine`, branch `worktree-engine`, last me
 
 Current milestone: M1–M3; the project remains on M1. Play’s held-clock correction for `ShootingAcrossLevels` is integrated. The built-in pool and arena size limits are integrated (`9bd8bfb`, merge `c650259`). **Low cover blocks, slice A (sight), are committed (`2b31e8d`) and integrated (`a7ee9d6`) (2026-11-18; task below).** **Slice B (bullets and cover) is integrated from `7381221`.** Next: the high-ground dominance design question (user and play; cover on a platform is not drawable yet), wall density and single-tile corridor limits, reflection and stair-legality diagnostics; each starts with a watched-red test. The inventory data is not mine: ship delivered it (`6795b56`, task below).
 
+## MVP priority
+
+Finish the mutual-knockout draw and use the M1 playtest with Play to pick the next arena or bot fixes. Own the deterministic arena pick, runtime weapon identity and rating contract, and seat-safe combat events. Hand those to AI, Server and Play where consumed. Coordinate common acceptance DSL/config changes through Play. See [the shared priorities](TODO.md#mvp-integration-priorities) and [handoffs](HANDOFF.md#mvp-ownership-and-handoffs).
+
 ## Ownership
 
 engine/ rules, combat event production, deterministic rating/balancing, arena validators and engine-owned shared vocabulary; matching acceptance scenarios.

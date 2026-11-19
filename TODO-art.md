@@ -18,6 +18,10 @@ Current milestone: M1/M6; the project remains on M1. Next audio task: combat mas
 
 Ship's inventory HUD, local pickup cue and ring loop are integrated (`c372d86`). The integrated review is complete in `worktree-ship`, coordinated with Art. The submachine gun's magazine is still faint at 34 px. Ship integrated generated thumbnails for local fixtures. Status badges and production appearance association remain open.
 
+## MVP priority
+
+Own the reusable arena preview for workshop results and pre-round choices. Build against Play's parsed arena and deterministic Fair duel fixture, using the shipped tiles and stair geometry. Coordinate the integration point with Play, and review the generated fallback with AI when its contrast change is ready. See [the shared priorities](TODO.md#mvp-integration-priorities) and [handoffs](HANDOFF.md#mvp-ownership-and-handoffs).
+
 ## Ownership
 
 webapp/public/assets/, webapp/audio/, asset manifests/loading, authored presentation/overlay components, copy and docs/art/. play owns combat/HUD behavior; AI owns generated renderer and shot synthesis.

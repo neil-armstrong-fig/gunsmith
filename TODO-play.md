@@ -23,6 +23,10 @@ Combat feedback and inventory integration.
 
 Current milestone: M1; the project remains on M1. Next failing test/check: none red. **Next action (2026-11-19):** the workshop's Try it, then Save and the shelf, of the [selection concept](docs/selection-concept/README.md) (acceptance spec first); the prompt box, Make and the result card are done. Held weapons are built (art); recoil and muzzle flash wait until after the MVP. Still open: the "opponent is away" notice (server asks), online combat feedback with server, `?scenario=cover` playtest, `sfx-death`, the M1 playtest checkpoint, and the intermittent `DrawingTheShots` hidden-shot spec (no owner).
 
+## MVP priority
+
+Finish Try it, Save and the stand-in shelf, then the tutorial and pre-round UI. Own the first-time M1 playtest with Engine and the end-to-end browser acceptance for the workshop-to-room flow. Give Art the parsed arena and deterministic Fair duel fixture early. Own the eventual workshop API swap, credit and failure states, and shared acceptance DSL/config edits for this slice. Server owns the room and its browser transport. See [the shared priorities](TODO.md#mvp-integration-priorities) and [handoffs](HANDOFF.md#mvp-ownership-and-handoffs).
+
 ## Ownership
 
 Webapp combat HUD, camera feedback, input/screenshot offsets, local sound playback and M1 playtests. Engine produces simulation events; art owns assets/manifests.
