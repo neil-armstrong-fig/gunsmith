@@ -1,5 +1,6 @@
 import {workerEnvironment} from "@src/env/WorkerEnvironment";
 import {isForgedRequest} from "@src/router/origin-check/IsForgedRequest";
+import {deleteAccountRoute} from "@src/router/routes/account/DeleteAccountRoute";
 import {generateArenaRoute} from "@src/router/routes/arenas/GenerateArenaRoute";
 import {creditStatusRoute} from "@src/router/routes/credits/CreditStatusRoute";
 import {libraryRoute} from "@src/router/routes/library/LibraryRoute";
@@ -20,7 +21,8 @@ const SOCKET_PATH = /^\/api\/rooms\/([^/]+)\/socket$/;
  * until it has a production adapter, and the route then answers `ai-unavailable`. `GET /api/credits` is the read the selection panel
  * shows (`routes/credits/CreditStatusRoute`). **Before any of them**, a state-changing request or a WebSocket upgrade from a page that is not
  * on the allowed-origins list is turned away (403 `forbidden-origin`, `origin-check/IsForgedRequest`). `/api/library` is the signed-in player's shelf (`routes/library/LibraryRoute`). `GET /api/me` answers who is signed in (`routes/me/ReadMeRoute`), `GET /api/auth/google` and its `/callback`
- * sign a player in with Google and `POST /api/auth/logout` out (`routes/sign-in/`, `routes/log-out/`).
+ * sign a player in with Google and `POST /api/auth/logout` out (`routes/sign-in/`, `routes/log-out/`); `DELETE /api/account` removes the
+ * signed-in player's account (`routes/account/DeleteAccountRoute`).
  */
 export async function handleApiRequest(request: Request): Promise<Response> {
   if (isForgedRequest(request, workerEnvironment)) {
@@ -59,6 +61,10 @@ export async function handleApiRequest(request: Request): Promise<Response> {
 
   if (pathname === "/api/auth/logout") {
     return await logOutRoute(request);
+  }
+
+  if (pathname === "/api/account") {
+    return await deleteAccountRoute(request);
   }
 
   const socket = SOCKET_PATH.exec(pathname);

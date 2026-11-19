@@ -6,6 +6,7 @@ import {oauthCookie} from "@src/router/routes/sign-in/start/oauth-cookie/OAuthCo
 import type {OAuthAttempt} from "@src/router/routes/sign-in/oauth/types/OAuthAttempt";
 import type {ApiWorkerEnvironment} from "@src/env/types/ApiWorkerEnvironment";
 import {accountOfRequest} from "@src/router/routes/shared/session/AccountOfRequest";
+import {subjectDigest} from "@src/router/routes/shared/subject-digest/SubjectDigest";
 
 const NOW = new Date("2026-11-19T12:00:00Z");
 const ATTEMPT: OAuthAttempt = {state: "state-1", codeVerifier: "verifier-1", returnTo: "https://gunsmith.test/play"};
@@ -119,6 +120,90 @@ describe("a player coming back from Google with the attempt they began", () => {
     await finishSignInRoute(callback());
 
     expect(testGoogle.exchanges[0]?.redirectUri).toBe("http://localhost:8787/api/auth/google/callback");
+  });
+});
+
+describe("a player whose account was deleted", () => {
+  const ONE_DAY = 24 * 60 * 60 * 1000;
+
+  beforeEach(() => {
+    vi.useFakeTimers({toFake: ["Date"], now: NOW});
+    configure({ACCOUNT_DIGEST_KEY: "test-digest-key"});
+    testGoogle.behaviour = {subject: "google-sub-1"};
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("gets the credit id the deleted account had, so deleting did not reset the allowance", async () => {
+    const before = await accountOfRequest(withSessionOf(await finishSignInRoute(callback())));
+    await testAccounts.removeAccount(before?.id ?? "", {subjectDigest, keepUntil: new Date(NOW.getTime() + ONE_DAY)});
+
+    const after = await accountOfRequest(withSessionOf(await finishSignInRoute(callback())));
+
+    expect(after?.id).toBe(before?.id);
+  });
+
+  it("gets the old credit id once only: the record is used up, and the account then keeps its id", async () => {
+    const before = await accountOfRequest(withSessionOf(await finishSignInRoute(callback())));
+    await testAccounts.removeAccount(before?.id ?? "", {subjectDigest, keepUntil: new Date(NOW.getTime() + ONE_DAY)});
+    const claim = vi.spyOn(testAccounts, "claimDeletedAccountId");
+
+    await finishSignInRoute(callback());
+    await finishSignInRoute(callback());
+
+    expect(claim.mock.results.length).toBe(2);
+    expect(await claim.mock.results[0]?.value).toBe(before?.id);
+    expect(await claim.mock.results[1]?.value).toBeUndefined();
+  });
+
+  it("gets a fresh id once the time to keep the record has come", async () => {
+    const before = await accountOfRequest(withSessionOf(await finishSignInRoute(callback())));
+    await testAccounts.removeAccount(before?.id ?? "", {subjectDigest, keepUntil: new Date(NOW.getTime() + ONE_DAY)});
+    vi.setSystemTime(new Date(NOW.getTime() + ONE_DAY));
+
+    const after = await accountOfRequest(withSessionOf(await finishSignInRoute(callback())));
+
+    expect(after?.id).not.toBe(before?.id);
+  });
+
+  it("does not hand the id to someone else's sign-in", async () => {
+    const before = await accountOfRequest(withSessionOf(await finishSignInRoute(callback())));
+    await testAccounts.removeAccount(before?.id ?? "", {subjectDigest, keepUntil: new Date(NOW.getTime() + ONE_DAY)});
+    testGoogle.behaviour = {subject: "google-sub-2"};
+
+    const other = await accountOfRequest(withSessionOf(await finishSignInRoute(callback())));
+
+    expect(other?.id).not.toBe(before?.id);
+  });
+
+  it("asks the keyed digest of the subject, never the subject itself", async () => {
+    const claim = vi.spyOn(testAccounts, "claimDeletedAccountId");
+
+    await finishSignInRoute(callback());
+
+    expect(claim).toHaveBeenCalledWith(await subjectDigest("google-sub-1"), NOW);
+    expect(claim.mock.calls[0]?.[0]).not.toContain("google-sub-1");
+  });
+
+  it("signs in as an ordinary new player, asking nothing, when no digest key is set", async () => {
+    Reflect.deleteProperty(workerEnvironment, "ACCOUNT_DIGEST_KEY");
+    const claim = vi.spyOn(testAccounts, "claimDeletedAccountId");
+
+    const response = await finishSignInRoute(callback());
+
+    expect(claim).not.toHaveBeenCalled();
+    expect(await accountOfRequest(withSessionOf(response))).toBeDefined();
+  });
+
+  it("sends them back signed out, rather than with a fresh allowance, when the record cannot be read", async () => {
+    vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    vi.spyOn(testAccounts, "claimDeletedAccountId").mockRejectedValue(new TypeError("D1 is down"));
+
+    const response = await finishSignInRoute(callback());
+
+    expectSignedOut(response, "https://gunsmith.test/play");
   });
 });
 

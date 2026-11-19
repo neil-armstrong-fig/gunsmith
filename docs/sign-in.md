@@ -1,6 +1,6 @@
 # Sign-in
 
-**Status: built 2026-11-19 (server), except `DELETE /api/account`, which was waiting on budget's `CreditLedger` delete (delivered as `erase()`, 2026-11-19).** The design copies janggi's `api/` (`~/Development/Personal/janggi/api`), which already ships it. The user approved the three pins below on 2026-11-19 and they are in the catalog.
+**Status: built 2026-11-19 (server), including `DELETE /api/account`, which keeps a keyed digest for 90 days so deleting does not reset the daily allowance (the user's rule, 2026-11-19).** The design copies janggi's `api/` (`~/Development/Personal/janggi/api`), which already ships it. The user approved the three pins below on 2026-11-19 and they are in the catalog.
 
 ## Why now
 
@@ -13,7 +13,7 @@ The API router hands both Google URLs to `SignInRoute.ts`, which dispatches to t
 - `GET /api/auth/google?return=` sends the player to Google: code flow with PKCE (S256), scope `openid` only, a random `state`. The attempt (state, verifier, checked return address) rides in a short cookie: `HttpOnly; Secure; SameSite=Lax`, path `/api/auth/google`, ten minutes.
 - `GET /api/auth/google/callback` compares the cookie's state, exchanges the code with `oauth4webapi` (it checks issuer, audience and expiry; the ID token's signature is not re-checked, which OpenID Connect allows for a token received straight from the token endpoint over TLS), reads `sub`, finds or creates the account and sets the session. **Any failure redirects back signed out**; there is no error page.
 - A **session** is a 256-bit random token in an `HttpOnly; Secure; SameSite=Lax` cookie for 30 days. D1 keeps only `sha256(token)`, so a leaked table cannot be replayed as cookies.
-- `POST /api/auth/logout` ends it and succeeds with none. `GET /api/me` is **always 200** `{signedIn, displayName?}` (never a 401, so a guest's page logs nothing for asking) and does not touch D1 when there is no cookie. `DELETE /api/account` removes the user and its sessions (and the account's `CreditLedger`), **not built yet**.
+- `POST /api/auth/logout` ends it and succeeds with none. `GET /api/me` is **always 200** `{signedIn, displayName?}` (never a 401, so a guest's page logs nothing for asking) and does not touch D1 when there is no cookie. `DELETE /api/account` removes the user, its sessions and kept items and answers 204 with the cookie cleared (401 with no session; 503 with no `ACCOUNT_DIGEST_KEY`; 500 and nothing cleared if D1 fails). **It does not erase the credit ledger and does not reset the allowance:** it keeps, for 90 days (`DELETED_ACCOUNT_RETENTION_DAYS`), the keyed HMAC of the Google subject beside the ledger's opaque id (`deleted_accounts`), and signing in again within that time gives the new account the same id and so the same balance. After 90 days the record is swept and the ledger erased. See [privacy](privacy-and-data.md).
 
 ## Decisions
 
@@ -40,13 +40,13 @@ Three ways, each where it is cheapest.
 
 ## Handoffs
 
-- **budget:** `CreditLedger.erase()` is built (2026-11-19): `DELETE /api/account` deletes the account and its sessions in D1 **first**, so no new authenticated request can start, then calls `CREDITS.getByName(accountId).erase()` **last**. A reserve already in flight may still write a fresh default record (a balance, no reservations) under the opaque id after the erase; it holds no personal data and is accepted. Credit routes name the account from the session.
+- **budget:** `CreditLedger.erase()` is built (2026-11-19) and is called **only for a deleted account whose 90 days have run out** (`DELETE /api/account` sweeps them), never at deletion, so deleting does not give back a fresh allowance (denial of wallet). A reserve already in flight may still write a fresh default record under the opaque id after an erase; it holds no personal data and is accepted. Asked of budget (not required): an alarm that erases an orphaned ledger by itself. Credit routes name the account from the session.
 - **play:** call `GET /api/me`; the sign-in button is a link to `/api/auth/google?return=<page>` (an absolute address on an allowed origin). The workshop's calls to `POST /api/weapons` then carry the session cookie, not `X-Account-Id`.
 - **ship:** the D1 binding and database name, the `LOGIN_LIMITER` binding, `ALLOWED_ORIGINS` and the secrets `GOOGLE_OAUTH_CLIENT_ID` and `GOOGLE_OAUTH_CLIENT_SECRET`, in `infra/` (never `ALLOW_LOOPBACK_ORIGINS`).
 - The user verified the local Google round-trip in Chrome on 2026-11-19. `pnpm api:dev` loads the root `.env.local` with `--env-file` and sets `GOOGLE_REDIRECT_URI` from its port. Production still needs the registered callback, Worker secrets and D1 provisioning. [Manual setup](../MANUAL-SETUP-STEPS.md).
 
 ## Not in this slice
 
-`DELETE /api/account`, renaming the display name, ratings, rate limits beyond sign-in, and the production adapters (a paid call still needs the user's authorisation).
+renaming the display name, ratings, rate limits beyond sign-in, and the production adapters (a paid call still needs the user's authorisation).
 
 The library (built 2026-11-19, after sign-in) is described in `api/AGENTS.md`: every created weapon and arena is kept by id, and saving, listing and removing go by that id under per-account limits (8 weapons, 3 arenas). Its rows are erased with the account (`ON DELETE cascade`).

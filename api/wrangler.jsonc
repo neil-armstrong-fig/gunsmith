@@ -22,7 +22,7 @@
   // ALLOWED_ORIGINS: the pages that may change things for a player or open a socket (`router/origin-check/`), comma separated. Local use
   // adds any localhost or 127.0.0.1 page through `ALLOW_LOOPBACK_ORIGINS`, which only the start scripts pass (`pnpm api:dev`, the managed
   // acceptance Worker): it is never declared here or in `infra/`, so a deployed Worker cannot have it. Secrets (`wrangler secret put`, or
-  // the root `.env.local` locally, which `pnpm api:dev` passes with --env-file): GOOGLE_OAUTH_CLIENT_ID and GOOGLE_OAUTH_CLIENT_SECRET.
+  // the root `.env.local` locally, which `pnpm api:dev` passes with --env-file): GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET and ACCOUNT_DIGEST_KEY (any long random string; without it an account cannot be deleted).
   // GOOGLE_REDIRECT_URI is set by the start script from the port, never here.
   "vars": {"ALERT_FROM_ADDRESS": "alerts@neilarmstrong.dev", "ALLOWED_ORIGINS": "https://gunsmith.neilarmstrong.dev"},
   // Ten sign-in starts or callbacks a minute per address (`router/routes/sign-in/login-limit/LoginAllowed`); a failing limiter lets the request through.

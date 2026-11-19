@@ -3,6 +3,7 @@ import {isArenaPipelineAvailable} from "@src/router/routes/arenas/pipeline/IsAre
 import {isWeaponPipelineAvailable} from "@src/router/routes/weapons/pipeline/IsWeaponPipelineAvailable";
 import {handleApiRequest} from "@src/router/HandleApiRequest";
 import {signInPlayer} from "@src/router/routes/shared/fake-accounts/SignInPlayer";
+import {fakeLedgers} from "@src/router/routes/shared/fake-ledgers/FakeLedgers";
 import {testGoogle} from "@src/sign-in/testing/TestGoogle";
 import {oauthCookie} from "@src/router/routes/sign-in/start/oauth-cookie/OAuthCookie";
 
@@ -161,6 +162,38 @@ it("turns away a logout from a page that is not the site", async () => {
   );
 
   expect(response.status).toBe(403);
+});
+
+it("hands an account deletion to the account route, and the player is then signed out", async () => {
+  fakeLedgers();
+  workerEnvironment.ACCOUNT_DIGEST_KEY = "test-digest-key";
+  const player = await signInPlayer();
+
+  const deleted = await handleApiRequest(
+    new Request("https://gunsmith.test/api/account", {
+      method: "DELETE",
+      headers: {...FROM_THE_SITE, Cookie: player.cookie},
+    }),
+  );
+  const after = await handleApiRequest(new Request("https://gunsmith.test/api/me", {headers: {Cookie: player.cookie}}));
+
+  expect(deleted.status).toBe(204);
+  expect(await after.json()).toEqual({signedIn: false});
+});
+
+it("turns away an account deletion from a page that is not the site, and deletes nothing", async () => {
+  const player = await signInPlayer();
+
+  const response = await handleApiRequest(
+    new Request("https://gunsmith.test/api/account", {
+      method: "DELETE",
+      headers: {Origin: "https://evil.test", Cookie: player.cookie},
+    }),
+  );
+  const after = await handleApiRequest(new Request("https://gunsmith.test/api/me", {headers: {Cookie: player.cookie}}));
+
+  expect(response.status).toBe(403);
+  expect(await after.json()).toMatchObject({signedIn: true});
 });
 
 it("turns away a state-changing request from a page that is not the site, before any route answers", async () => {
