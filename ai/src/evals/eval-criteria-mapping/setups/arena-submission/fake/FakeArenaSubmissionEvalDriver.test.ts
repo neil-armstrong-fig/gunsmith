@@ -22,7 +22,7 @@ it("turns away a prompt that is not an arena, and the other goes forward by defa
 });
 
 it("knows the built-in arenas of the fake tier", async () => {
-  const builtIn = {kind: "built-in" as const, playerId: "second", builtInName: "Open Room"};
+  const builtIn = {kind: "built-in" as const, playerId: "second", builtInName: "Duel"};
 
   const screening = await new FakeArenaSubmissionEvalDriver(undefined).run([FIRST, builtIn]);
 

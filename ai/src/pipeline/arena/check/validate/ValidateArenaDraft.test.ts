@@ -1,3 +1,4 @@
+import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
 import {validateArenaDraft} from "@gunsmith/ai/pipeline/arena/check/validate/ValidateArenaDraft";
 
 const ROWS = ["##########", "#........#", "#........#", "#........#", "##########"];
@@ -10,6 +11,18 @@ it("accepts an arena whose raised platform is reached by a stair", () => {
   const rows = ["##########", "#........#", "#...>11..#", "#...#11..#", "##########"];
 
   expect(validateArenaDraft(draftWith({rows})).ok).toBe(true);
+});
+
+it("accepts every arena in engine's built-in pool, as a built-in must", () => {
+  for (const arena of BUILT_IN_ARENAS) {
+    expect(validateArenaDraft(arena), arena.name).toEqual({ok: true, arena});
+  }
+});
+
+it("refuses a cover block, which no one has asked a generated arena to have yet, and says what to draw instead", () => {
+  const rows = [...ROWS.slice(0, 2), "#...c....#", ...ROWS.slice(3)];
+
+  expect(errorsOf(draftWith({rows}))).toEqual(["A cover block (c) is not allowed; draw a wall (#) instead."]);
 });
 
 it("refuses an answer that is not an object, naming the arena", () => {

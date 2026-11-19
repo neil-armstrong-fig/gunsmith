@@ -18,6 +18,16 @@ const notUpwards = "Imports run tests -> eval-criteria-mapping -> dsl, never bac
 const dslModelMessage =
   "The DSL runs the pipeline through its driver interface and checks it with evaluators; it never reaches a model or a test runner.";
 
+// What the mapping, and its setups, may not reach: the tests above it, and the checks behind the DSL.
+const mappingPatterns = [
+  {group: ["@evals/tests/**"], message: notUpwards},
+  {
+    group: ["@evals/dsl/**/pipeline/**", "@evals/dsl/shared/errors/**"],
+    message:
+      "The mapping does not run checks. They are the DSL's `expect` methods; import the DSL (or its types), not what is behind it.",
+  },
+];
+
 const modelPackages = ["vitest", "langsmith/vitest", "@langchain/core", "@langchain/ollama"];
 
 function noModelPackages(message) {
@@ -82,14 +92,18 @@ export default [
     rules: {
       "no-restricted-imports": restrictedImports({
         allowedPackages: ["@gunsmith/ai", "@gunsmith/shared"],
-        patterns: [
-          {group: ["@evals/tests/**"], message: notUpwards},
-          {
-            group: ["@evals/dsl/**/pipeline/**", "@evals/dsl/shared/errors/**"],
-            message:
-              "The mapping does not run checks. They are the DSL's `expect` methods; import the DSL (or its types), not what is behind it.",
-          },
-        ],
+        patterns: mappingPatterns,
+      }),
+    },
+  },
+  {
+    // A setup hands the pipeline what the game ships, so it may read the engine: the built-in arenas it falls back to are engine's
+    // (`BUILT_IN_ARENAS`), as engine and shared are shared resources. It still runs no checks (the patterns above).
+    files: ["src/evals/eval-criteria-mapping/setups/**"],
+    rules: {
+      "no-restricted-imports": restrictedImports({
+        allowedPackages: ["@gunsmith/ai", "@gunsmith/shared", "@gunsmith/engine"],
+        patterns: mappingPatterns,
       }),
     },
   },

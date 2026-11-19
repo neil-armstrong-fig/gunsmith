@@ -7,14 +7,18 @@ import type {ArenaValidation} from "@gunsmith/ai/pipeline/arena/check/validate/t
 
 const MAX_ERROR_LENGTH = 160;
 
+// The legend the model is given has no cover block, so a drawing with one is the model's own invention. Engine reads it (`c`), and ai
+// refuses it until generated cover is wanted (engine's request, HANDOFF.md).
+const COVER_REFUSAL = "A cover block (c) is not allowed; draw a wall (#) instead.";
+
 // Engine's validator reports each cut-off piece of floor on its own, and a speckled drawing (the schema allows 30 rows of 40) could have
 // hundreds, every one of them sent to the repair call. The first few are enough to show the model what is wrong.
 const MAX_PROBLEMS_LISTED = 5;
 
 /**
- * Parses what the model wrote as an arena, in three steps that each stop the next: zod (the name and the drawing's size and shape),
+ * Parses what the model wrote as an arena, in four steps that each stop the next: zod (the name and the drawing's size and shape),
  * then the engine's own reading of the drawing (`arenaFrom`, which refuses an unknown character, rows of unequal length and an
- * illegal stair), then the engine's playability rules (`validateArena`). A refusal names the problems found in the step it stopped at
+ * illegal stair), then our refusal of a cover block, then the engine's playability rules (`validateArena`). A refusal names the problems found in the step it stopped at
  * (the first few, then a count of the rest), each shortened, because `repair` shows them to the model and some of the words in them
  * (a stray field's name) came from the model, or through it from the player.
  */
@@ -27,6 +31,10 @@ export function validateArenaDraft(candidate: unknown): ArenaValidation {
   const arena = read(parsed.data.rows);
   if (typeof arena === "string") {
     return {ok: false, errors: [sentenceOf(arena)]};
+  }
+
+  if (arena.cover.some(Boolean)) {
+    return {ok: false, errors: [COVER_REFUSAL]};
   }
 
   const problems = validateArena(arena).map(problem => problem.reason);
