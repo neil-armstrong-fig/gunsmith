@@ -6,16 +6,16 @@ renames or removes one. **Never put an account id, token, secret or personal add
 | # | Step | Why | Who | Done |
 | - | ---- | --- | --- | ---- |
 | 1 | Pick the subdomain `gunsmith.neilarmstrong.dev` (one label below the registrable domain) | A deeper name has no free certificate | User | [ ] |
-| 2 | Create a **Google OAuth client** (web application). Register `http://localhost:<port>/api/auth/google/callback` for local development and the Worker's `/api/auth/google/callback` on the production domain before release. Keep the client credentials in the configured secret stores | Google OAuth setup | User | [ ] Local client and callback verified 2026-11-19. Production callback pending. |
+| 2 | Create a **Google OAuth client** (web application). Register `http://localhost:<port>/api/auth/google/callback` for local development and the production callback `https://gunsmith-api.neilarmstrong.dev/api/auth/google/callback`. Keep the client credentials in the configured secret stores | Google OAuth setup | User | [ ] Local client and callback verified 2026-11-19. Production callback pending. |
 | 3 | Create an account-scoped **Cloudflare API token** for deploys with Workers Scripts Edit and D1 Edit. Set `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`. Set a Workers subdomain on the account so the Alchemy state service can be reached | Provisioning and dashboard-managed custom domain | User | [ ] |
 | 4 | Choose an `ALCHEMY_PASSWORD` and a separate `ALCHEMY_STATE_TOKEN`, both long random values. Keep them stable for subsequent deployments to that account | State encryption and state-service authentication | User | [ ] |
 | 5 | Follow **First deploy** below on the production Cloudflare account | Verify the Worker, D1 and migration behavior | Ship with the user | [ ] |
-| 6 | Attach the Worker's custom domain in the Cloudflare dashboard | Whose domain it is, and where its DNS lives, is the owner's | User | [ ] |
+| 6 | Attach `gunsmith-api.neilarmstrong.dev` to `gunsmith-api` and `gunsmith.neilarmstrong.dev` to `gunsmith-webapp` in Cloudflare | Whose domain it is, and where its DNS lives, is the owner's | User | [ ] |
 | 7 | Create the **AI Gateway** and its **spend-limit rules** (per `user_id`, plus a global one) in the dashboard or API; enable caching and rate limits | Layer 2 of the cost controls (`docs/cost-and-budget.md`) | `ai` with the user | [ ] |
 | 8 | Create the **LLM provider key** with its own **hard spend cap** a little above the monthly ceiling. Store as a Worker secret | Layer 1 of the cost controls | User | [ ] |
 | 9 | Create a **LangSmith** account in the **EU region** (done 2026-11-12; sign in at `eu.smith.langchain.com`), a project (`gunsmith-dev`), and an API key made in that region (free tier; traces expire after 14 days). Store as a secret, and set `LANGSMITH_ENDPOINT=https://eu.api.smith.langchain.com` (no trailing slash) wherever the key is used. The free tier is enough: the pipeline runs in the Worker (`docs/ai-hosting.md`), so the Plus plan, which a hosted deployment needs, is not required | Tracing and evals | User | [ ] |
 | 10 | Set **Cloudflare budget alerts** (email) for $10, $16 and $20 of usage-based spend | The last line; they do not stop anything | User | [ ] |
-| 11 | Store `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `ALCHEMY_PASSWORD`, `ALCHEMY_STATE_TOKEN`, `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET` and `ALERT_TO_ADDRESS` in the ignored root `.env.local` and as **repository GitHub Actions secrets**. Alchemy binds the OAuth and alert values as Worker secrets. **Also `ACCOUNT_DIGEST_KEY` (any long random string; account deletion answers 503 without it), in `.env.local` and as an eighth repository secret, which ship must add to the Alchemy bindings** | Deployment and production sign-in | User | [x] Seven repository secret names verified 2026-11-20. [ ] `ACCOUNT_DIGEST_KEY` still to add. |
+| 11 | Store `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `ALCHEMY_PASSWORD`, `ALCHEMY_STATE_TOKEN`, `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET` and `ALERT_TO_ADDRESS` in the ignored root `.env.local` and as **repository GitHub Actions secrets**. Alchemy binds the OAuth and alert values as Worker secrets. **To enable account deletion, set a stable random `ACCOUNT_DIGEST_KEY` in both stores. Alchemy binds it as a Worker secret when supplied** | Deployment and production sign-in | User | [x] Seven repository secret names verified 2026-11-20. [ ] `ACCOUNT_DIGEST_KEY` still to add. |
 | 12 | Keep the private GitHub repo's Actions permissions read-only for contents, with repository read access to the allowed checkout/setup-node/upload-artifact/download-artifact and pnpm/action-setup actions. Use Checks and production-preview acceptance for required checks | PR CI uses zero deployment credentials. Property checks and AI evals run independently | User | [x] Repository created and hosted Actions runs verified |
 | 13 | Put `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET` and `ACCOUNT_DIGEST_KEY` (any long random string; without it `DELETE /api/account` answers 503) in the root `.env.local` (git-ignored; `pnpm api:dev` loads it, and the redirect URI `http://localhost:<port>/api/auth/google/callback` must be registered with the client; no `api/.dev.vars`) | Local real sign-in | User (the agents never read it) | [x] Local Google round-trip verified in Chrome on 2026-11-19. |
 | 14 | Run the **shutdown drill** once against the live Worker with a tiny budget | Proves the kill switch | `ai` with the user | [ ] |
@@ -33,24 +33,29 @@ renames or removes one. **Never put an account id, token, secret or personal add
    [Actions secrets](https://github.com/neil-armstrong-fig/gunsmith/settings/secrets/actions) or run
    `gh secret set NAME --repo neil-armstrong-fig/gunsmith` and use the private prompt for each value. Verify the names
    with `gh secret list --repo neil-armstrong-fig/gunsmith`. Keep `GUNSMITH_DEPLOY_ENABLED` unset for the first deploy.
-2. From the tested release commit, build and provision the Worker on the production account.
+2. From the tested release commit, build the webapp and deploy both Workers.
 
    ```bash
    pnpm --filter @gunsmith/webapp compile &&
    diff -u <(printf '/*\n  X-Robots-Tag: noindex\n') webapp/build/_headers &&
    printf '{"commit":"%s"}\n' "$(git rev-parse HEAD)" > webapp/build/release.json &&
-   SITE_ORIGIN=https://gunsmith.neilarmstrong.dev pnpm --filter @gunsmith/infra provision --env-file ../.env.local
+   SITE_ORIGIN=https://gunsmith.neilarmstrong.dev pnpm --filter @gunsmith/infra provision --env-file ../.env.local &&
+   pnpm --filter @gunsmith/infra exec wrangler deploy --config ../webapp/wrangler.jsonc --env-file ../.env.local
    ```
 
-   The deploy resolves `../.env.local` from the infra package directory. Attach `gunsmith.neilarmstrong.dev` to
-   `gunsmith-api` under **Settings → Domains & Routes** in Cloudflare. Record the D1 database ID, the SQLite
-   Durable Object namespace IDs and the applied SQL migration. Keep applied migrations immutable and add new ones
-   for subsequent schema changes.
-3. Check the homepage and a static asset for `X-Robots-Tag: noindex`, and check that `/robots.txt` allows search
-   crawlers to read the directive. A missing robots file permits crawling. Confirm `/release.json` reports the intended commit and
-   `curl -fsS --cookie 'session=release-check' https://gunsmith.neilarmstrong.dev/api/me` reports a signed-out session.
-   Verify real Google sign-in and a two-browser private room. Run
-   `WEBAPP_URL=https://gunsmith.neilarmstrong.dev pnpm acceptance-tests`.
+   Both commands resolve `../.env.local` from the infra package directory. In Cloudflare, use **Settings →
+   Domains & Routes** to attach each custom domain from step 6. The API Worker keeps its existing D1 and Durable
+   Object resources. Keep applied SQL migrations immutable and add new migrations for schema changes.
+3. Check the webapp homepage and a static asset for `X-Robots-Tag: noindex` and its `/release.json` for the intended
+   commit. Check that `/robots.txt`, if present, allows search crawlers to read the directive. On the API hostname, use
+   `curl -fsS --cookie 'session=release-check' https://gunsmith-api.neilarmstrong.dev/api/me` to check the session lookup.
+   Verify real Google sign-in on the API hostname and a two-browser private room from the webapp. Run live acceptance
+   from the ship worktree with both origins.
+
+   ```bash
+   WEBAPP_URL=https://gunsmith.neilarmstrong.dev RELEASE_API_URL=https://gunsmith-api.neilarmstrong.dev pnpm acceptance-tests
+   ```
+
 4. Once the release changes are on GitHub `main` and the first deployment is verified, set the repository Actions
    variable `GUNSMITH_DEPLOY_ENABLED=true` and dispatch CI from `main`. Confirm the second deploy preserved the
    database and namespace IDs, the migration record and the Worker secret names. Record the deployed SHA, Worker version

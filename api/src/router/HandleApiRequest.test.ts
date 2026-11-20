@@ -7,6 +7,50 @@ import {fakeLedgers} from "@src/router/routes/shared/fake-ledgers/FakeLedgers";
 import {testGoogle} from "@src/sign-in/testing/TestGoogle";
 import {oauthCookie} from "@src/router/routes/sign-in/start/oauth-cookie/OAuthCookie";
 
+it("allows the webapp's credentialed request to the API hostname", async () => {
+  const player = await signInPlayer({displayName: "Quiet Falcon"});
+  const response = await handleApiRequest(
+    new Request("https://api.gunsmith.test/api/me", {headers: {...FROM_THE_SITE, Cookie: player.cookie}}),
+  );
+
+  expect(response.headers.get("Access-Control-Allow-Origin")).toBe(FROM_THE_SITE.Origin);
+  expect(response.headers.get("Access-Control-Allow-Credentials")).toBe("true");
+  expect(response.headers.get("Vary")).toBe("Origin");
+  expect(await response.json()).toEqual({signedIn: true, displayName: "Quiet Falcon"});
+});
+
+it("allows the webapp to cache a JSON preflight", async () => {
+  const response = await handleApiRequest(
+    new Request("https://api.gunsmith.test/api/library", {
+      method: "OPTIONS",
+      headers: {
+        ...FROM_THE_SITE,
+        "Access-Control-Request-Method": "POST",
+        "Access-Control-Request-Headers": "content-type",
+      },
+    }),
+  );
+
+  expect(response.status).toBe(204);
+  expect(response.headers.get("Access-Control-Allow-Origin")).toBe(FROM_THE_SITE.Origin);
+  expect(response.headers.get("Access-Control-Allow-Credentials")).toBe("true");
+  expect(response.headers.get("Access-Control-Allow-Methods")).toContain("POST");
+  expect(response.headers.get("Access-Control-Allow-Headers")).toBe("Content-Type");
+  expect(response.headers.get("Access-Control-Max-Age")).toBe("7200");
+});
+
+it("withholds CORS permission from an untrusted origin", async () => {
+  const response = await handleApiRequest(
+    new Request("https://api.gunsmith.test/api/library", {
+      method: "OPTIONS",
+      headers: {Origin: "https://gunsmith.test.evil.test", "Access-Control-Request-Method": "POST"},
+    }),
+  );
+
+  expect(response.headers.get("Access-Control-Allow-Origin")).toBeNull();
+  expect(response.headers.get("Access-Control-Allow-Credentials")).toBeNull();
+});
+
 it("hands a room request to the room route", async () => {
   const response = await handleApiRequest(
     new Request("https://gunsmith.test/api/rooms", {method: "POST", headers: FROM_THE_SITE}),

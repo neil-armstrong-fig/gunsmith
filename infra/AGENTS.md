@@ -7,14 +7,14 @@ The returned app handle finalizes the deployment.
 - `src/secrets/Secrets.ts` validates deploy credentials before provisioning. The `gunsmith-alchemy-state` Worker
   stores deployment state.
 - `src/api-database/BuildApiDatabase.ts` declares the named D1 database and the API's SQL migrations.
-- `src/api-worker/BuildApiWorker.ts` declares the application Worker, assets and bindings. Match locally used bindings
+- `src/api-worker/BuildApiWorker.ts` declares the API Worker and its bindings. Match locally used bindings
   in `api/wrangler.jsonc`. Alchemy manages the deployed Durable Object migrations and Worker secrets.
 
-CI compiles the frontend and writes its commit marker into the artifact. Paths resolve from the workspace.
+CI compiles the frontend and writes its commit marker into the artifact. Wrangler serves the artifact through the static Worker declared in `webapp/wrangler.jsonc`. Paths resolve from the workspace.
 Runtime code imports no other Gunsmith package.
 
 Run `pnpm --filter @gunsmith/webapp compile`, then
-`pnpm --filter @gunsmith/api exec wrangler deploy --dry-run --assets ../webapp/build` to check the local Worker bundle and
-assets without deploy credentials. The package tests check the Alchemy declarations. The `provision` command deploys
+`pnpm --filter @gunsmith/api exec wrangler deploy --dry-run` and
+`pnpm --filter @gunsmith/infra exec wrangler deploy --dry-run --config ../webapp/wrangler.jsonc` to check both Workers. The package tests check the Alchemy declarations. The `provision` command deploys
 through Alchemy and requires authorization.
 See [manual setup](../MANUAL-SETUP-STEPS.md#first-deploy) for credentials, the custom domain, OAuth and rollout.

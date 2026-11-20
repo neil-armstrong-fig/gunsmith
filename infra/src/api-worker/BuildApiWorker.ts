@@ -1,6 +1,6 @@
 import alchemy from "alchemy";
-import {Assets, DurableObjectNamespace, EmailSender, RateLimit, Worker} from "alchemy/cloudflare";
-import type {D1Database} from "alchemy/cloudflare";
+import {DurableObjectNamespace, EmailSender, RateLimit, Worker} from "alchemy/cloudflare";
+import type {Bindings, D1Database} from "alchemy/cloudflare";
 import {siteOrigin} from "@src/api-worker/site/SiteOrigin";
 import {workspacePath} from "@src/paths/WorkspacePath";
 import {secrets} from "@src/secrets/Secrets";
@@ -15,16 +15,15 @@ export async function buildApiWorker(apiDatabase: D1Database): ReturnType<typeof
     compatibilityDate: "2026-11-01",
     compatibilityFlags: ["nodejs_compat"],
     adopt: true,
-    url: origin.hostname.endsWith(".workers.dev"),
+    url: false,
     previewSubdomains: false,
-    assets: {run_worker_first: ["/api/*"]},
     observability: {
       enabled: true,
       logs: {enabled: true, invocationLogs: false},
       traces: {enabled: false},
     },
     bindings: {
-      ASSETS: await Assets({path: workspacePath("webapp/build")}),
+      ...accountDigestBinding(),
       DB: apiDatabase,
       MATCHES: DurableObjectNamespace("matches", {className: "Match", sqlite: true}),
       CREDITS: DurableObjectNamespace("credits", {className: "CreditLedger", sqlite: true}),
@@ -38,4 +37,13 @@ export async function buildApiWorker(apiDatabase: D1Database): ReturnType<typeof
       GOOGLE_OAUTH_CLIENT_SECRET: alchemy.secret(secrets.GOOGLE_OAUTH_CLIENT_SECRET),
     },
   });
+}
+
+function accountDigestBinding(): Bindings {
+  const key = process.env["ACCOUNT_DIGEST_KEY"];
+  if (!key?.trim()) {
+    return {};
+  }
+
+  return {ACCOUNT_DIGEST_KEY: alchemy.secret(key)};
 }

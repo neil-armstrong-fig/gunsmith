@@ -4,7 +4,7 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 ## Resume here
 
-The persistent checkout is `.claude/worktrees/ship` on `worktree-ship`, synced to `origin/main` at `0143379` by merge `3dd9646`. The release now gates the built and hosted webapp on `noindex`. All seven credential names are present in GitHub Actions. The owner uploaded them from the shared root `.env.local`; the Cloudflare read-only checks passed. The release changes await the owner’s commit. Provision and verify production before enabling GitHub deployments.
+The persistent checkout is `.claude/worktrees/ship` on `worktree-ship`, fast-forwarded to `origin/main` at `7dcd1ee`. The first combined Worker from `d40d942` is live on the API hostname. The two-host release is verified locally and awaits the owner’s commit. A static test build was uploaded to `gunsmith-webapp` as version `8b2f62ff-f3f9-4e83-92c4-6cdc5d0ba93d`. Its custom domain resolves on public DNS. HTTPS returned the test build marker and `noindex`. Next, publish it, deploy the separate Workers and attach the webapp domain. Keep automatic releases disabled until the split is live and verified.
 
 Ship fixed the M1 pickup-marker acceptance setup. The [handoff](HANDOFF.md#latest-ship-delivery) records the original failing criterion, screenshot evidence and retained-marker check.
 
@@ -50,6 +50,8 @@ server supplies Worker/DO/storage bindings; budget supplies operational limits; 
 - [ ] Measure infrastructure costs with server/AI runtime measurements before proposing free versus Workers Paid.
 
 ## Verification/latest delivery
+
+2026-11-20 hostname split: the cross-origin room request reached the old Worker with 201 but Chromium blocked the response. The new code passed all 37 online criteria. Chromium also opened a room directly between separate local Workers after a JSON preflight and received its joined WebSocket frame. The exact CI smoke passed on both local origins. Both Wrangler dry runs and workflow lint passed. The D1 upgrade preserved a fixture user and applied the new migration once. `pnpm checks` passed 3,738 tests with one existing audio skip. The managed wrappers logged shutdown errors after acceptance exited zero.
 
 2026-11-20 production release setup: the build gate failed before `_headers` existed and then passed. The live CI check passed against a local Worker with migrated D1 and failed against a Vite preview missing the header. An SVG also carried `noindex`. `pnpm checks` passed lint, formatting, strict types and 3,646 tests with one existing audio skip. Production-preview acceptance passed 526 of 526 with no retries. The managed wrappers logged shutdown errors after the tests and the run exited zero. Workflow lint and Wrangler dry run passed.
 

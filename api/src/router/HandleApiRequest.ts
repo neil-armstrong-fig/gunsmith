@@ -1,4 +1,5 @@
 import {workerEnvironment} from "@src/env/WorkerEnvironment";
+import {corsHeadersFor} from "@src/router/cors/CorsHeadersFor";
 import {isForgedRequest} from "@src/router/origin-check/IsForgedRequest";
 import {deleteAccountRoute} from "@src/router/routes/account/DeleteAccountRoute";
 import {generateArenaRoute} from "@src/router/routes/arenas/GenerateArenaRoute";
@@ -15,8 +16,7 @@ const SOCKET_PATH = /^\/api\/rooms\/([^/]+)\/socket$/;
 
 /**
  * Answers one request to `/api/*` by handing it to the route that owns the path (`routes/`, one folder each). `POST /api/rooms` opens a private room and answers its friend code; a WebSocket upgrade to
- * `/api/rooms/<code>/socket` is handed to that room's `Match` object, which is where the match is played. The same Worker serves
- * the site, so there is no CORS: the browser asks the page's own origin. `POST /api/weapons` and `POST /api/arenas` are the generation
+ * `/api/rooms/<code>/socket` is handed to that room's `Match` object, which is where the match is played. The API allows credentialed HTTP requests from the webapp origin. `POST /api/weapons` and `POST /api/arenas` are the generation
  * routes (`routes/weapons/GenerateWeaponRoute`, `routes/arenas/GenerateArenaRoute`), each given its pipeline to run; the Worker gives none
  * until it has a production adapter, and the route then answers `ai-unavailable`. `GET /api/credits` is the read the selection panel
  * shows (`routes/credits/CreditStatusRoute`). **Before any of them**, a state-changing request or a WebSocket upgrade from a page that is not
@@ -25,6 +25,21 @@ const SOCKET_PATH = /^\/api\/rooms\/([^/]+)\/socket$/;
  * signed-in player's account (`routes/account/DeleteAccountRoute`).
  */
 export async function handleApiRequest(request: Request): Promise<Response> {
+  if (request.method === "OPTIONS" && request.headers.has("Access-Control-Request-Method")) {
+    return new Response(undefined, {status: 204, headers: corsHeadersFor(request)});
+  }
+
+  const response = await answerApiRequest(request);
+  if (request.headers.get("Upgrade") === "websocket") {
+    return response;
+  }
+
+  corsHeadersFor(request).forEach((value, name) => response.headers.append(name, value));
+
+  return response;
+}
+
+async function answerApiRequest(request: Request): Promise<Response> {
   if (isForgedRequest(request, workerEnvironment)) {
     return Response.json({error: "forbidden-origin"}, {status: 403});
   }

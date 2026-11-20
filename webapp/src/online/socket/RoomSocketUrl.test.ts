@@ -12,6 +12,12 @@ it("uses wss on a secure page", () => {
   );
 });
 
+it("connects the deployed webapp to the API hostname", () => {
+  expect(roomSocketUrl({protocol: "https:", host: "gunsmith.neilarmstrong.dev"}, "ABC234")).toBe(
+    "wss://gunsmith-api.neilarmstrong.dev/api/rooms/ABC234/socket",
+  );
+});
+
 it("carries the seat's token when it has one", () => {
   expect(roomSocketUrl({protocol: "http:", host: "h"}, "ABC234", {token: "a b&c"})).toBe(
     "ws://h/api/rooms/ABC234/socket?token=a%20b%26c",
