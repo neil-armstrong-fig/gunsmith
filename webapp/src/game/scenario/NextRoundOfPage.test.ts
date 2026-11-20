@@ -1,3 +1,5 @@
+import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
+import {FAIR_DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/FairDuelBuiltInArena";
 import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import type {Pickup} from "@gunsmith/engine/pickup/types/Pickup";
@@ -9,6 +11,7 @@ import type {Ring} from "@gunsmith/engine/ring/types/Ring";
 import type {RingTiming} from "@gunsmith/engine/ring/types/RingTiming";
 import {DUEL_ARENA} from "@src/game/duel/DuelArena";
 import {DUEL_OPPONENT} from "@src/game/duel/DuelOpponent";
+import {duelWorldOn} from "@src/game/scenario/duel-on-arena/DuelWorldOn";
 import {nextRoundOfPage} from "@src/game/scenario/NextRoundOfPage";
 
 beforeEach(() => {
@@ -88,3 +91,11 @@ function duelPickup(seed: number): Pickup {
 
   return startPickup({arena: DUEL_ARENA, starts: [player.position, DUEL_OPPONENT], seed, weapon: SUBMACHINE_GUN});
 }
+
+it("is a round on the arena the pre-round settled on, with the score kept and the opponent's seed moved on", () => {
+  const arena = arenaFrom(FAIR_DUEL_BUILT_IN_ARENA.rows);
+
+  const world = nextRoundOfPage({playerWins: 1, opponentWins: 0, roundNumber: 1}, undefined, arena);
+
+  expect(world).toEqual({...duelWorldOn(arena, 6), match: {playerWins: 1, opponentWins: 0, roundNumber: 2}});
+});

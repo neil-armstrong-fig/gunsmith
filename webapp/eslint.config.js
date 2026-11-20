@@ -28,6 +28,9 @@ const shelfStoreMayImport = "^(?!zustand$|zustand/|zod$|@gunsmith/engine(?:/|$)|
 const preRoundStoreMayImport =
   "^(?!zustand$|@gunsmith/engine(?:/|$)|@src/game/pre-round/|@src/store/pre-round/|\\./).+$";
 
+// The pre-round's memory (`src/store/pre-round-choices/`) holds the ids of what was last chosen and keeps them in the browser's storage: Zustand, zod (to read what the browser kept) and its own folder.
+const preRoundChoicesStoreMayImport = "^(?!zustand$|zustand/|zod$|@src/store/pre-round-choices/|\\./).+$";
+
 export default [
   ...baseConfig({tsconfigRootDir: import.meta.dirname, allowedPackages}),
   {
@@ -166,6 +169,22 @@ export default [
             regex: shelfStoreMayImport,
             message:
               "The shelf store may import only zustand, zod, the engine and its own folder: it holds the saved weapons and keeps them in the browser.",
+          },
+        ],
+      }),
+    },
+  },
+  {
+    // The pre-round's memory holds three ids and keeps them in the browser's storage. After the store block above.
+    files: ["src/store/pre-round-choices/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": restrictedImports({
+        allowedPackages: ["zod"],
+        patterns: [
+          {
+            regex: preRoundChoicesStoreMayImport,
+            message:
+              "The pre-round's memory may import only zustand, zod and its own folder: it holds the ids of what was last chosen.",
           },
         ],
       }),
