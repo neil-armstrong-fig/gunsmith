@@ -1,6 +1,6 @@
 # TODO: art
 
-**Active for M1 audio.** Art owns authored audio cues, playback integration with Play, and the listening review. Checkout: `worktree-art`, synced with GitHub main at `c280fbe`.
+**MVP audio checklist complete.** Art owns authored audio cues, playback integration with Play, and the listening review after weapon-specific shot synthesis. Checkout: `worktree-art`, synced with GitHub main at `8cbf2ef`.
 
 ## Handoff
 
@@ -52,7 +52,7 @@ Art owns the audio entries. The remaining entries follow the handoff above.
 
 - [x] Deliver the approved `sfx-ring-damage-loop` and wire its WAV into local play. The runtime delivery is integrated from `worktree-ship` (`c372d86`).
 
-- [x] Wire the audio pack's `sfx-pickup` MP3 into local play and cover the actual collection, opponent collection, mute and ordinary slot switching.
+- [x] Wire the audio pack's `sfx-pickup` MP3 into local play. Browser coverage distinguishes the player's direct cue from the nearby opponent's panned cue and covers mute and ordinary slot switching.
 
 - [x] Integrate the approved soft footstep for upright walking and the reload MP3 in local play. Crouched movement is silent.
 - [x] Ship an authored fallback shot sound for successful local and online shots, including the opponent’s spatial cue.
@@ -94,6 +94,10 @@ Art owns the audio entries. The remaining entries follow the handoff above.
 - [ ] Case-study diagrams: pipeline, cost safeguards and eval loop.
 
 ## Verification/latest delivery
+
+2026-11-20, pickup audio acceptance in `worktree-art`. The opponent criterion failed before the recorder captured stereo pan. In disposable builds, bypassing the panner failed the opponent criterion and adding a centered panner failed the collector criterion. `pnpm checks` passed lint, formatting, types and 3,923 tests with one existing audio skip. The standards review used the root and acceptance-test instructions and audited the existing sound folders and their callers.
+
+Production Chromium passed 38 of 39 audio criteria in each of two runs, with all pickup and two-browser hearing criteria green both times. The west-wall setup failed in the first run and the upright cadence criterion failed in the second. Each passed all three isolated reruns. The west-wall setup also failed once in five runs with the unmodified GitHub-main recorder. Cadence passed all five baseline runs.
 
 2026-11-20, references and Foley revisions in `worktree-art`. The practice range opens a standalone References & credits tab with Greg Lester’s guide. The references criterion failed before wiring and passes without firing a shot. Reload is a dry 0.60 s release, slide and seat. The outgoing hit is a muted 0.092 s contact. Chromium and WebKit decoded both. The audio notes regenerated all four runtime MP3s byte for byte, so the two temporary WAV renders were removed. Production Chromium passed 37 focused criteria and `pnpm checks` passed with 3,923 tests and one existing skip. The References layout was reviewed at 360 px and the folder and caller audit is complete. The revised cues are ready for the user to audition.
 

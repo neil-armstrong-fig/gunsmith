@@ -315,7 +315,9 @@ Before changing a consumed contract, record the proposal and affected owners her
 
 **Art → Engine, Server and Play, firing audio (2026-11-20).** `CombatEvent` gives each firing seat `{kind: "shotFired"}` once for its own successful shot. The opponent’s existing spatial `heard` event uses the same authored fallback recording. The Web Audio output can play the local and spatial voices together. The build recipe is in [the audio notes](webapp/audio/README.md#runtime-cues). AI owns weapon-specific synthesis.
 
-**Art → Play and Engine, local footsteps and reload (2026-11-20).** The local tick supplies actual movement, stance and reload starts to the sound output. Upright movement plays the approved softer footstep MP3 at 0.42 s intervals. Crouched movement is silent. The approved reload MP3 plays once when reload begins. Upstream spatial pickup playback now starts the same pickup file for a nearby opponent. `TakingAPickup` still expects zero starts in that case and fails identically on the merge baseline. A follow-up can distinguish spatial playback from the local pickup in the recorder. The remaining spatial footfall and listening work is in [Art’s checklist](TODO-art.md).
+**Art → Play and Engine, local footsteps and reload (2026-11-20).** The local tick supplies actual movement, stance and reload starts to the sound output. Upright movement plays the approved softer footstep MP3 at 0.42 s intervals. Crouched movement is silent. The approved reload MP3 plays once when reload begins.
+
+**Art → Play, pickup audio acceptance (2026-11-20).** `TakingAPickup` checks one direct playback for the collector and one right-panned playback when a nearby opponent collects. The recorder reads the stereo panner on the browser's output path. Bypassing the opponent's panner and adding a centered panner to the collector's cue each failed their corresponding criterion in disposable builds. The listening review follows weapon-specific synthesis. [Art checklist](TODO-art.md).
 
 **Art → AI and Engine, appearance review (2026-11-20).** The
 [12-study runtime grammar review](docs/art/concepts/top-down-oddities/README.md#runtime-grammar-review--2026-11-20)
