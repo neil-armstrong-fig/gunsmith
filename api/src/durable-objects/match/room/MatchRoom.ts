@@ -1,7 +1,7 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
+import {fairStart} from "@gunsmith/engine/arena-symmetry/FairStart";
 import {DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/DuelBuiltInArena";
-import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import {stepFighters} from "@gunsmith/engine/game-loop/StepFighters";
 import type {FighterInputs} from "@gunsmith/engine/game-loop/types/FighterInputs";
 import type {Input} from "@gunsmith/engine/game-loop/types/Input";
@@ -19,10 +19,9 @@ import {askChanged} from "@src/durable-objects/match/room/forfeit/AskChanged";
 import type {ForfeitLimits} from "@src/durable-objects/match/room/types/ForfeitLimits";
 import type {JoinedMessage} from "@src/durable-objects/match/room/types/JoinedMessage";
 import type {Readiness} from "@src/durable-objects/match/room/types/Readiness";
+import type {SeedMaker} from "@src/durable-objects/match/room/types/SeedMaker";
 import type {SnapshotMessage} from "@src/durable-objects/match/room/types/SnapshotMessage";
 import {MATCH_TICK} from "@src/durable-objects/match/tick/MatchTick";
-
-const SECOND_FIGHTER_STARTS_AT = {x: 16.5, y: 6.5};
 
 const NOTHING_ASKED: Input = {direction: {x: 0, y: 0}, firing: false, reload: false};
 
@@ -58,11 +57,13 @@ export class MatchRoom {
 
   /**
    * `limits` is how long the room waits for a person (the real ones unless a page asked for shorter). `makeToken` makes the secret each
-   * seat is given as it sits down: whoever shows it later is that seat's person.
+   * seat is given as it sits down: whoever shows it later is that seat's person. `makeSeed` makes the seed each round's fair start is
+   * drawn from (`fairStart`), so no round starts the fighters where the last did unless the draw says so.
    */
   constructor(
     private readonly limits: ForfeitLimits = DEFAULT_FORFEIT_LIMITS,
     private readonly makeToken: () => string = () => crypto.randomUUID(),
+    private readonly makeSeed: SeedMaker = () => crypto.getRandomValues(new Uint32Array(1))[0] ?? 0,
   ) {}
 
   /** The next free seat, or `undefined` when both are taken. The second to sit starts the match. */
@@ -293,9 +294,17 @@ export class MatchRoom {
     this.silentSeconds.second = 0;
   }
 
-  /** A round about to be fought: both fighters at their starting places with full health and magazines, in `match`. */
+  /**
+   * A round about to be fought: both fighters on the places the engine's fair start gives a seed drawn for the round, with full health
+   * and magazines, in `match`. The duel arena always has such places, so a round with none is a mistake in the drawing.
+   */
   private worldOfRound(match: Match): World {
-    return {...startingWorld(this.arena, [], SECOND_FIGHTER_STARTS_AT), match};
+    const world = fairStart(this.arena, this.makeSeed());
+    if (!world) {
+      throw new Error("The duel arena has no places to start the two fighters.");
+    }
+
+    return {...world, match};
   }
 
   private readinessOf(seat: Seat): Readiness {

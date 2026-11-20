@@ -72,20 +72,20 @@ show reload progress continuing on a stowed weapon or transfer it to the new one
 
 ## Weapon artwork and prompt-built identities
 
-| Approved source | HUD icon key | Identity cue |
+| Editable source | HUD icon key | Identity cue |
 | --- | --- | --- |
 | [Rifle](weapons/rifle/Icon.svg) | `rifle` | Broad receiver and short barrel |
 | [Marksman rifle](weapons/marksman-rifle/Icon.svg) | `marksman-rifle` | Long barrel, slim body and raised optic |
 | [Submachine gun](weapons/submachine-gun/Icon.svg) | `submachine-gun` | Short body and projecting magazine |
 
-The production SVGs copy the approved sources byte for byte. Play can call
+The production SVGs copy these sources byte for byte. Play can call
 `inventoryIconUrl(identity)` from `@src/assets/inventory-icons/InventoryIconUrl`
 with a HUD icon key. It returns the corresponding `/assets/ui/ui-weapon-*.svg`
 URL, or `undefined` for a missing or unsupported key. The HUD uses the built-in
 weapon identity key directly and draws a neutral mark for occupied slots without
-an icon. It fits the full 64 × 64 canvas into 34 × 34 px, facing right. In the 34 px
-Chromium check on the study's dark slot colours, the submachine gun's magazine
-blended into the background. Its main outline was still distinct in grayscale.
+an icon. It fits the full 64 × 64 canvas into 34 × 34 px, facing right. The built-in
+submachine gun uses a lighter `#687B8C` magazine fill so the projection reads
+against the dark slot when selected or stowed. The study above shows the original fill.
 
 For prompt-built weapons, render a thumbnail from the **same validated appearance**
 as the held weapon. Cache it by stable visual identity/revision, fit the bounded

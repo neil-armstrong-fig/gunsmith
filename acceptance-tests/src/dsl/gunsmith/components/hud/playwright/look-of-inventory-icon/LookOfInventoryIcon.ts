@@ -29,8 +29,19 @@ export async function lookOfInventoryIcon(page: Page, icon: Locator): Promise<In
     return colourAt(screenshot.channels, index);
   });
   const outline = pixelsNear(pixels, OUTLINE);
-  // The icon has transparent padding, so its top-left pixel shows the slot background.
+  // The generated icon outline check uses the top-left transparent padding as its reference.
   const background = luminance(colourAt(screenshot.channels, 0));
+  // The submachine gun's top-right corner is clear of the slot number and the drawing.
+  const magazineBackground = luminance(colourAt(screenshot.channels, screenshot.width - 1));
+  const visibleMagazinePixels = pixels.filter((pixel, index) => {
+    const x = index % screenshot.width;
+    const y = Math.floor(index / screenshot.width);
+
+    // This 34 px sample lies inside the submachine gun's projecting magazine, below the receiver.
+    if (x < 15 || x > 18 || y < 24 || y > 28) return false;
+
+    return (luminance(pixel) + 0.05) / (magazineBackground + 0.05) >= 3;
+  }).length;
 
   return {
     width: screenshot.width,
@@ -39,6 +50,7 @@ export async function lookOfInventoryIcon(page: Page, icon: Locator): Promise<In
     palePixels: pixelsNear(pixels, PALE_TEXT).length,
     mintPixels: pixelsNear(pixels, WEAPON_MINT).length,
     outlinePixels: outline.length,
+    visibleMagazinePixels,
     outlineContrast: outline.reduce((highest, pixel) => {
       return Math.max(highest, (luminance(pixel) + 0.05) / (background + 0.05));
     }, 0),

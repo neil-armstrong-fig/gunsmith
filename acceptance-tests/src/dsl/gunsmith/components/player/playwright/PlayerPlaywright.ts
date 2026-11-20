@@ -204,6 +204,14 @@ export class PlayerPlaywright extends BasePage {
     await this.page.mouse.move(pixel.x, pixel.y);
   }
 
+  /** Turns to face directly away from `tile`, by aiming at the tile one step on from the player in that direction, which is always inside the arena (a far point may be off the screen, where the mouse is not heard). */
+  async aimAwayFrom(tile: Point): Promise<void> {
+    const {x, y} = await this.getPosition();
+    const length = Math.hypot(x - tile.x, y - tile.y);
+
+    await this.aimAtTile({x: x + (x - tile.x) / length, y: y + (y - tile.y) / length});
+  }
+
   async getAimDegrees(): Promise<number> {
     const {player} = await this.readGameState();
 
