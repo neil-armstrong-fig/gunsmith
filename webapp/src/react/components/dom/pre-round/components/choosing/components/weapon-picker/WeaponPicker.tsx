@@ -1,4 +1,3 @@
-import type {Weapon} from "@gunsmith/engine/weapon/types/Weapon";
 import type {WeaponChoice} from "@src/react/components/dom/pre-round/components/choosing/choices/types/WeaponChoice";
 import {WeaponPicture} from "@src/react/components/dom/pre-round/components/weapon-picture/WeaponPicture";
 import type {JSX} from "react";
@@ -6,12 +5,12 @@ import type {JSX} from "react";
 interface Props {
   slot: number;
   choices: readonly WeaponChoice[];
-  chosen: Weapon;
-  onChoose: (weapon: Weapon) => void;
+  chosenId: string;
+  onChoose: (id: string) => void;
 }
 
 /** The weapons a player may take for one slot, one button each, the chosen one pressed. */
-export function WeaponPicker({slot, choices, chosen, onChoose}: Props): JSX.Element {
+export function WeaponPicker({slot, choices, chosenId, onChoose}: Props): JSX.Element {
   return (
     <div role="group" aria-label={`Weapon ${slot}`} className="flex flex-col gap-2">
       <h2 className="text-lg font-semibold text-gs-ui-text">{`Weapon ${slot}`}</h2>
@@ -21,10 +20,10 @@ export function WeaponPicker({slot, choices, chosen, onChoose}: Props): JSX.Elem
           <button
             key={choice.id}
             type="button"
-            aria-pressed={choice.weapon === chosen}
+            aria-pressed={choice.id === chosenId}
             className="flex items-center gap-2 rounded-md bg-gs-background px-3 py-2 text-gs-ui-text aria-pressed:outline-2 aria-pressed:outline-gs-team-blue"
             onClick={() => {
-              onChoose(choice.weapon);
+              onChoose(choice.id);
             }}
           >
             <WeaponPicture weapon={choice.weapon} />

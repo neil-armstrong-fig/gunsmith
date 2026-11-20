@@ -6,4 +6,10 @@ export interface RoomLimits {
   idleSeconds?: number;
   /** How long the two players have to choose their arena once both have sat, before the match begins on the defaults. None (0) unless the spec is about choosing. */
   preRoundSeconds?: number;
+  /** How long the round is fought before the ring starts to close. None given: the room's real ring (45 s), which a spec that does not mention the ring never meets. */
+  ringDelaySeconds?: number;
+  /** How long the ring then takes to close. None given: the real 30 s. */
+  ringClosingSeconds?: number;
+  /** The seed the room's rounds start from, where a spec needs to know the places. None given: 21, the duel's top-row and bottom-row pair in sight of each other. */
+  startSeed?: number;
 }

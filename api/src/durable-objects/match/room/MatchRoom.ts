@@ -12,10 +12,15 @@ import {forfeitRound} from "@gunsmith/engine/match/ForfeitRound";
 import {nextRound} from "@gunsmith/engine/match/NextRound";
 import {startMatch} from "@gunsmith/engine/match/StartMatch";
 import type {Match} from "@gunsmith/engine/match/types/Match";
+import {startPickup} from "@gunsmith/engine/pickup/StartPickup";
+import {DEFAULT_RING_TIMING} from "@gunsmith/engine/ring/DefaultRingTiming";
+import {startRing} from "@gunsmith/engine/ring/StartRing";
+import type {RingTiming} from "@gunsmith/engine/ring/types/RingTiming";
 import type {Seat} from "@gunsmith/engine/seat/types/Seat";
 import {viewOfSeat} from "@gunsmith/engine/seat/ViewOfSeat";
 import {MARKSMAN_RIFLE} from "@gunsmith/engine/weapon/weapons/MarksmanRifle";
 import {RIFLE} from "@gunsmith/engine/weapon/weapons/Rifle";
+import {SUBMACHINE_GUN} from "@gunsmith/engine/weapon/weapons/SubmachineGun";
 import type {InputAck} from "@gunsmith/shared/online/types/InputAck";
 import {DEFAULT_PRE_ROUND_SECONDS} from "@src/durable-objects/match/pre-round/DefaultPreRoundSeconds";
 import {PreRound} from "@src/durable-objects/match/pre-round/PreRound";
@@ -66,6 +71,7 @@ export class MatchRoom {
   private readonly limits: ForfeitLimits;
   private readonly makeToken: () => string;
   private readonly makeSeed: SeedMaker;
+  private readonly ringTiming: RingTiming;
   private readonly seated: Seat[] = [];
   private readonly tokens: Record<Seat, string> = {first: "", second: ""};
   private readonly asked: Record<Seat, Input> = {first: NOTHING_ASKED, second: NOTHING_ASKED};
@@ -83,6 +89,7 @@ export class MatchRoom {
     this.limits = options.limits ?? DEFAULT_FORFEIT_LIMITS;
     this.makeToken = options.makeToken ?? (() => crypto.randomUUID());
     this.makeSeed = options.makeSeed ?? (() => crypto.getRandomValues(new Uint32Array(1))[0] ?? 0);
+    this.ringTiming = options.ringTiming ?? DEFAULT_RING_TIMING;
     this.preRound = new PreRound(options.preRoundSeconds ?? DEFAULT_PRE_ROUND_SECONDS, this.makeSeed);
   }
 
@@ -409,15 +416,28 @@ export class MatchRoom {
 
   /**
    * A round about to be fought: both fighters on the places the engine's fair start gives a seed drawn for the round, with full health
-   * and magazines, in `match`. The duel arena always has such places, so a round with none is a mistake in the drawing.
+   * and magazines, in `match`, and the round's closing ring and the submachine gun lying as far from one as from the other, both
+   * drawn from that same seed on streams of their own. The arena always has such places (`validateArena` refuses one without), so a round
+   * with none is a mistake in the drawing.
    */
   private worldOfRound(match: Match): World {
-    const world = fairStart(this.arena, this.makeSeed());
-    if (!world) {
-      throw new Error("The duel arena has no places to start the two fighters.");
+    const seed = this.makeSeed();
+    const world = fairStart(this.arena, seed);
+    if (!world?.opponent) {
+      throw new Error("The arena has no places to start the two fighters.");
     }
 
-    return worldWithWeapons({...world, match}, this.weapons);
+    const starts = [world.player.position, world.opponent.position];
+
+    return worldWithWeapons(
+      {
+        ...world,
+        match,
+        ring: startRing({arena: this.arena, starts, seed, timing: this.ringTiming}),
+        pickup: startPickup({arena: this.arena, starts, seed, weapon: SUBMACHINE_GUN}),
+      },
+      this.weapons,
+    );
   }
 
   private readinessOf(seat: Seat): Readiness {

@@ -36,6 +36,11 @@ function snapshotOfFrame(frame: string): ReceivedSnapshot | undefined {
     snapshot.opponent = opponent;
   }
 
+  const pickup: unknown = Reflect.get(parsed, "pickup");
+  if (pickup !== undefined && pickup !== null) {
+    snapshot.pickup = pickup;
+  }
+
   const position = positionOfPlayer(Reflect.get(parsed, "player"));
   if (position) {
     snapshot.position = position;

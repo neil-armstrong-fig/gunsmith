@@ -47,6 +47,12 @@ it("passes on the seed the page pins for the room's starts, which the room's fir
   );
 });
 
+it("passes on how soon and how fast the page asks the room's ring to close", () => {
+  expect(
+    roomSocketUrl({protocol: "http:", host: "h"}, "ABC234", {search: "?room=ABC234&ringDelay=2&ringClosing=5"}),
+  ).toBe("ws://h/api/rooms/ABC234/socket?ringDelay=2&ringClosing=5");
+});
+
 it("passes on only those limits and that seed, and never what else the page's address says", () => {
   expect(roomSocketUrl({protocol: "http:", host: "h"}, "ABC234", {search: "?room=ABC234&lag=300&scenario=x"})).toBe(
     "ws://h/api/rooms/ABC234/socket",

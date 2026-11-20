@@ -4,8 +4,14 @@ import {SPAWN_SPACING_STEPS} from "@gunsmith/engine/arena-symmetry/SpawnSpacing"
 import {DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/DuelBuiltInArena";
 import type {CombatEvent} from "@gunsmith/engine/combat-events/types/CombatEvent";
 import type {Input} from "@gunsmith/engine/game-loop/types/Input";
+import type {Point} from "@gunsmith/engine/geometry/types/Point";
 import {routeDistancesFrom} from "@gunsmith/engine/pickup/placement/RouteDistancesFrom";
+import {startPickup} from "@gunsmith/engine/pickup/StartPickup";
+import {DEFAULT_RING_TIMING} from "@gunsmith/engine/ring/DefaultRingTiming";
+import {startRing} from "@gunsmith/engine/ring/StartRing";
+import type {RingTiming} from "@gunsmith/engine/ring/types/RingTiming";
 import type {Seat} from "@gunsmith/engine/seat/types/Seat";
+import {SUBMACHINE_GUN} from "@gunsmith/engine/weapon/weapons/SubmachineGun";
 import {MatchRoom} from "@src/durable-objects/match/room/MatchRoom";
 
 const IDLE: Input = {direction: {x: 0, y: 0}, firing: false, reload: false};
@@ -17,6 +23,9 @@ const STEPS_PER_SECOND = 60;
 
 /** A seed whose fair start in the duel arena has a clear line between the fighters, a few tiles apart, so a seat aimed at the other sees and can hit them. */
 const SEED_WITH_A_CLEAR_LINE = 2;
+
+/** A ring that has not begun to close in any time a test plays, for a test of what two idle seats do, which the ring would end. */
+const A_RING_THAT_NEVER_CLOSES: RingTiming = {startDelaySeconds: 1_000_000, closingSeconds: 30};
 
 const DUEL_ARENA = arenaFrom(DUEL_BUILT_IN_ARENA.rows);
 
@@ -180,6 +189,84 @@ it("starts the fighters at least the spacing apart on foot, whatever the seed", 
 
     expect(steps).toBeGreaterThanOrEqual(SPAWN_SPACING_STEPS);
   }
+});
+
+it("begins a round with the closing ring the engine draws from the round's seed, told to both seats", () => {
+  const room = new MatchRoom({makeSeed: () => SEED_WITH_A_CLEAR_LINE, preRoundSeconds: 0});
+  room.join();
+  room.join();
+
+  const expected = startRing({
+    arena: DUEL_ARENA,
+    starts: startsOfSeed(SEED_WITH_A_CLEAR_LINE),
+    seed: SEED_WITH_A_CLEAR_LINE,
+    timing: DEFAULT_RING_TIMING,
+  });
+  expect(room.snapshotFor("first")?.ring).toEqual(expected);
+  expect(room.snapshotFor("second")?.ring).toEqual(expected);
+});
+
+it("runs the ring on the timing the room is given", () => {
+  const timing = {startDelaySeconds: 3, closingSeconds: 7};
+  const room = new MatchRoom({makeSeed: () => SEED_WITH_A_CLEAR_LINE, preRoundSeconds: 0, ringTiming: timing});
+  room.join();
+  room.join();
+
+  expect(room.snapshotFor("first")?.ring?.timing).toEqual(timing);
+  expect(room.snapshotFor("second")?.ring?.timing).toEqual(timing);
+});
+
+it("starts the ring's clock again in the next round, on that round's seed", () => {
+  const seeds = [1, 2];
+  const room = new MatchRoom({makeSeed: () => seeds.shift() ?? 0, preRoundSeconds: 0});
+  room.join();
+  room.join();
+  winRound(room, "first");
+  expect(room.snapshotFor("first")?.ring?.roundSeconds).toBeGreaterThan(0);
+
+  room.ready("first");
+  room.ready("second");
+
+  const expected = startRing({arena: DUEL_ARENA, starts: startsOfSeed(2), seed: 2, timing: DEFAULT_RING_TIMING});
+  expect(room.snapshotFor("first")?.ring).toEqual(expected);
+});
+
+it("closes the ring on a seat who stands still outside it until the round is decided", () => {
+  const room = new MatchRoom({
+    makeSeed: () => SEED_WITH_A_CLEAR_LINE,
+    preRoundSeconds: 0,
+    ringTiming: {startDelaySeconds: 0, closingSeconds: 1},
+  });
+  room.join();
+  room.join();
+
+  playSecondsAsking(room, "first", 40);
+
+  expect(room.snapshotFor("first")?.round).not.toBe("playing");
+});
+
+it("lays the submachine gun where the engine says is as far from one fighter as the other, told to a seat only while it sees it", () => {
+  let told = 0;
+  let unseen = 0;
+  for (let seed = 0; seed < 25; seed += 1) {
+    const room = new MatchRoom({makeSeed: () => seed, preRoundSeconds: 0});
+    room.join();
+    room.join();
+    const expected = startPickup({arena: DUEL_ARENA, starts: startsOfSeed(seed), seed, weapon: SUBMACHINE_GUN});
+
+    for (const seat of ["first", "second"] as const) {
+      const pickup = room.snapshotFor(seat)?.pickup;
+      if (pickup) {
+        expect(pickup).toEqual(expected);
+        told += 1;
+      } else {
+        unseen += 1;
+      }
+    }
+  }
+
+  expect(told).toBeGreaterThan(0);
+  expect(unseen).toBeGreaterThan(0);
 });
 
 it("tells a seat about the other fighter only while it can see them", () => {
@@ -704,8 +791,23 @@ it("forfeits no round once the match is decided, whoever stays quiet", () => {
   expect(room.snapshotFor("first")?.round).toBe("won");
 });
 
+/** Where the two fighters start in the duel arena for `seed`: the first seat's, then the second's. */
+function startsOfSeed(seed: number): Point[] {
+  const world = fairStart(DUEL_ARENA, seed);
+  if (!world?.opponent) {
+    throw new Error(`The duel arena has no start for seed ${seed}.`);
+  }
+
+  return [world.player.position, world.opponent.position];
+}
+
+/** A room both seats have sat in, started on a seed with a clear line. Its ring never closes in any time a test plays: these tests are about seats, forfeits and rounds, and the real ring would end a round that two idle seats sit through for 75 s. */
 function startedRoom(): MatchRoom {
-  const room = new MatchRoom({makeSeed: () => SEED_WITH_A_CLEAR_LINE, preRoundSeconds: 0});
+  const room = new MatchRoom({
+    makeSeed: () => SEED_WITH_A_CLEAR_LINE,
+    preRoundSeconds: 0,
+    ringTiming: A_RING_THAT_NEVER_CLOSES,
+  });
   room.join();
   room.join();
 

@@ -1,13 +1,16 @@
 import type {Page} from "@playwright/test";
+import {ArenaPreRoundDsl} from "@src/dsl/gunsmith/components/pre-round/components/arena/ArenaPreRoundDsl";
 import {PreRoundPlaywright} from "@src/dsl/gunsmith/components/pre-round/playwright/PreRoundPlaywright";
 import type {PreRoundReveal} from "@src/dsl/gunsmith/components/pre-round/types/PreRoundReveal";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
 
 /** The pre-round: the choosing of weapons over the dimmed arena before a match against the bot, and the front door that leads to it, reached as `gunsmith.preRound`. */
 export class PreRoundDsl {
+  readonly arena: ArenaPreRoundDsl;
   private readonly preRound: PreRoundPlaywright;
 
   constructor(page: Page) {
+    this.arena = new ArenaPreRoundDsl(page);
     this.preRound = new PreRoundPlaywright(page);
   }
 

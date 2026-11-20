@@ -4,12 +4,8 @@ import {disarmOpponent} from "@gunsmith/engine/opponent/DisarmOpponent";
 import {giveOpponentBrain} from "@gunsmith/engine/opponent/GiveOpponentBrain";
 import {engine} from "@gunsmith/engine/Engine";
 import type {World} from "@gunsmith/engine/game-loop/types/World";
-import {startPickup} from "@gunsmith/engine/pickup/StartPickup";
-import type {Pickup} from "@gunsmith/engine/pickup/types/Pickup";
 import {startMatch} from "@gunsmith/engine/match/StartMatch";
-import {startRing} from "@gunsmith/engine/ring/StartRing";
 import {DEFAULT_RING_TIMING} from "@gunsmith/engine/ring/DefaultRingTiming";
-import type {Ring} from "@gunsmith/engine/ring/types/Ring";
 import type {RingTiming} from "@gunsmith/engine/ring/types/RingTiming";
 import {SUBMACHINE_GUN} from "@gunsmith/engine/weapon/weapons/SubmachineGun";
 import {COVER_HALL_ARENA} from "@src/game/cover-hall/CoverHallArena";
@@ -33,6 +29,8 @@ import {PRACTICE_DUMMIES} from "@src/game/practice/PracticeDummies";
 import {TERRACED_ARENA} from "@src/game/terraced/TerracedArena";
 import {TERRACED_OPPONENT} from "@src/game/terraced/TerracedOpponent";
 import {terrainPreview} from "@src/game/terrain-preview/TerrainPreview";
+import {pickupOf} from "@src/game/scenario/starting-parts/PickupOf";
+import {ringOf} from "@src/game/scenario/starting-parts/RingOf";
 import type {Scenario} from "@src/game/scenario/types/Scenario";
 
 /**
@@ -147,24 +145,4 @@ function fairDuelOf(seed: number, ringTiming: RingTiming): World {
   );
 
   return {...world, ring: ringOf(world, seed, ringTiming), pickup: pickupOf(world, seed)};
-}
-
-/** The ring for a world that has an opponent: it closes on ground both fighters can walk to from where they start. */
-function ringOf(world: World, seed: number, timing: RingTiming): Ring {
-  const starts = [world.player.position];
-  if (world.opponent) {
-    starts.push(world.opponent.position);
-  }
-
-  return startRing({arena: world.arena, starts, seed, timing});
-}
-
-/** The weapon lying in the arena for a world that has an opponent: as far from one fighter as the other by the way they would walk, drawn from `seed`. */
-function pickupOf(world: World, seed: number): Pickup {
-  const starts = [world.player.position];
-  if (world.opponent) {
-    starts.push(world.opponent.position);
-  }
-
-  return startPickup({arena: world.arena, starts, seed, weapon: SUBMACHINE_GUN});
 }

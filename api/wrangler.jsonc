@@ -23,7 +23,13 @@
   // acceptance Worker): it is never declared here or in `infra/`, so a deployed Worker cannot have it.
   // Wrangler binds only these secrets from the shared root .env.local. Alchemy uses the deploy credentials separately.
   "secrets": {
-    "required": ["GOOGLE_OAUTH_CLIENT_ID", "GOOGLE_OAUTH_CLIENT_SECRET", "ALERT_TO_ADDRESS", "ACCOUNT_DIGEST_KEY", "ANTHROPIC_API_KEY"],
+    "required": [
+      "GOOGLE_OAUTH_CLIENT_ID",
+      "GOOGLE_OAUTH_CLIENT_SECRET",
+      "ALERT_TO_ADDRESS",
+      "ACCOUNT_DIGEST_KEY",
+      "ANTHROPIC_API_KEY",
+    ],
   },
   // GOOGLE_REDIRECT_URI is set by the start script from the port, never here.
   "vars": {"ALERT_FROM_ADDRESS": "alerts@neilarmstrong.dev", "ALLOWED_ORIGINS": "https://gunsmith.neilarmstrong.dev"},
