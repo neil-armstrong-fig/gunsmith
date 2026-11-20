@@ -1,12 +1,22 @@
 import {RIFLE} from "@gunsmith/engine/weapon/weapons/Rifle";
+import {SUBMACHINE_GUN} from "@gunsmith/engine/weapon/weapons/SubmachineGun";
 import {useWorkshopStore} from "@src/store/workshop/UseWorkshopStore";
 
 beforeEach(() => {
   useWorkshopStore.setState(useWorkshopStore.getInitialState(), true);
 });
 
-it("holds the prompt and the last weapon and nothing else, so adding state is a deliberate edit", () => {
-  expect(Object.keys(useWorkshopStore.getState()).sort()).toEqual(["prompt", "setPrompt", "setWeapon", "weapon"]);
+it("holds the prompt, the last weapon, the words that made it and the shelf id it is saved under, and nothing else, so adding state is a deliberate edit", () => {
+  expect(Object.keys(useWorkshopStore.getState()).sort()).toEqual([
+    "madeFromPrompt",
+    "prompt",
+    "savedId",
+    "setPrompt",
+    "setSavedId",
+    "setWeapon",
+    "showSavedWeapon",
+    "weapon",
+  ]);
 });
 
 it("starts with nothing written and nothing made", () => {
@@ -26,4 +36,43 @@ it("keeps the weapon it is given", () => {
   useWorkshopStore.getState().setWeapon(RIFLE);
 
   expect(useWorkshopStore.getState().weapon).toBe(RIFLE);
+});
+
+it("remembers the words a weapon was made from, whatever is written in the box afterwards", () => {
+  useWorkshopStore.getState().setPrompt("a fast one");
+  useWorkshopStore.getState().setWeapon(RIFLE);
+  useWorkshopStore.getState().setPrompt("something else");
+
+  expect(useWorkshopStore.getState().madeFromPrompt).toBe("a fast one");
+});
+
+it("starts with nothing saved, and a new weapon is not the saved one", () => {
+  expect(useWorkshopStore.getState().savedId).toBeUndefined();
+
+  useWorkshopStore.getState().setWeapon(RIFLE);
+  useWorkshopStore.getState().setSavedId("a");
+  useWorkshopStore.getState().setWeapon(SUBMACHINE_GUN);
+
+  expect(useWorkshopStore.getState().savedId).toBeUndefined();
+});
+
+it("keeps the id a weapon was saved under", () => {
+  useWorkshopStore.getState().setWeapon(RIFLE);
+  useWorkshopStore.getState().setSavedId("a");
+
+  expect(useWorkshopStore.getState().savedId).toBe("a");
+});
+
+it("brings a saved weapon back as the card, with its words in the box and its id", () => {
+  useWorkshopStore.getState().setPrompt("something else");
+  useWorkshopStore.getState().setWeapon(RIFLE);
+
+  useWorkshopStore.getState().showSavedWeapon({id: "a", prompt: "a fast one", weapon: SUBMACHINE_GUN});
+
+  expect(useWorkshopStore.getState()).toMatchObject({
+    prompt: "a fast one",
+    madeFromPrompt: "a fast one",
+    weapon: SUBMACHINE_GUN,
+    savedId: "a",
+  });
 });

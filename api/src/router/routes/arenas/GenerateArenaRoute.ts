@@ -3,6 +3,7 @@ import {ARENA_SPEND} from "@src/durable-objects/spend-ledger/estimate/arena/Aren
 import {settledArenaSpend} from "@src/durable-objects/spend-ledger/estimate/arena/SettledArenaSpend";
 import {isArenaPipelineAvailable} from "@src/router/routes/arenas/pipeline/IsArenaPipelineAvailable";
 import {runArenaPipeline} from "@src/router/routes/arenas/pipeline/RunArenaPipeline";
+import {keepCreatedResult} from "@src/router/routes/shared/keep-result/KeepCreatedResult";
 import {reserveCredit} from "@src/router/routes/shared/ReserveCredit";
 import type {CreditReservation} from "@src/router/routes/shared/types/CreditReservation";
 import {failureAnswer} from "@src/router/routes/shared/time-limit/FailureAnswer";
@@ -17,6 +18,8 @@ import type {ArenaAnswer} from "@src/router/routes/arenas/types/ArenaAnswer";
  * arena costs one credit, a rejected prompt half) or refunded in full: when the pipeline threw (502), or when it could not make a
  * playable arena and gave a built-in one (`builtIn`: the player still gets an arena, and the credit goes back). The spend is settled
  * at the model calls the outcome made, `builtIn` included (the model was billed), or at the whole reservation if the pipeline threw or timed out (504).
+ * **A created arena is kept under an `id` the answer carries** (`shared/keep-result/`), so the library saves it by that id alone; if it
+ * cannot be kept the credit is refunded and the answer is 502.
  */
 export async function generateArenaRoute(request: Request): Promise<Response> {
   const reservation = await reserveCredit(request, {
@@ -31,7 +34,8 @@ export async function generateArenaRoute(request: Request): Promise<Response> {
   return await runAndSettle(reservation);
 }
 
-async function runAndSettle({credits, spend, key, prompt}: CreditReservation): Promise<Response> {
+async function runAndSettle(reservation: CreditReservation): Promise<Response> {
+  const {credits, spend, key, prompt} = reservation;
   let outcome: ArenaOutcome;
   try {
     outcome = await withTimeLimit(runArenaPipeline(prompt), PIPELINE_TIME_LIMIT_MILLISECONDS);
@@ -44,7 +48,13 @@ async function runAndSettle({credits, spend, key, prompt}: CreditReservation): P
 
   await spend.settle(key, settledArenaSpend(outcome));
   if (outcome.status === "created") {
+    const id = await keepCreatedResult(reservation, "arena", {arena: outcome.arena});
+    if (id instanceof Response) {
+      return id;
+    }
     await credits.settle(key, "arena");
+
+    return Response.json({...answerOf(outcome), id});
   }
   if (outcome.status === "rejected") {
     await credits.settle(key, "rejected");
