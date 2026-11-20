@@ -64,6 +64,53 @@ given("two browsers are in one private room", () => {
     );
   });
 
+  when("each player fires a single shot in turn", () => {
+    beforeEach(async ({gunsmith}) => {
+      const second = gunsmith.room.secondBrowser();
+      await gunsmith.player.switchTo(1);
+      await gunsmith.waitForGameSeconds(0.2);
+      await gunsmith.player.aimAtTile(await second.player.getPosition());
+      await gunsmith.player.fire();
+      await expect.poll(() => gunsmith.sound.getPlays("sfx-shot")).toHaveLength(1);
+      await second.player.aimAtTile(await gunsmith.player.getPosition());
+      await second.player.fire();
+    });
+
+    then("the first browser plays both its own shot and the shot it heard", async ({gunsmith}) => {
+      await expect
+        .poll(() => gunsmith.sound.getPlays("sfx-shot"))
+        .toMatchObject([
+          {contextState: "running", looping: false},
+          {contextState: "running", looping: false},
+        ]);
+    });
+  });
+
+  when("the first player moves closer and the second player taps an upright step", () => {
+    let previousFootfalls = 0;
+
+    beforeEach(async ({gunsmith}) => {
+      const second = gunsmith.room.secondBrowser();
+      await gunsmith.player.walkFor("south", 0.6);
+      await expect.poll(() => gunsmith.sound.getPlays("sfx-footstep")).not.toHaveLength(0);
+      await gunsmith.waitForGameSeconds(0.2);
+      previousFootfalls = (await gunsmith.sound.getPlays("sfx-footstep")).length;
+      await second.player.walkFor("north", 0.06);
+    });
+
+    then("the first browser plays the other player's step as well", async ({gunsmith}) => {
+      await expect
+        .poll(() => gunsmith.room.getEventsReceived())
+        .toContainEqual({
+          kind: "heard",
+          sound: "step",
+          sector: expect.any(Number),
+          loudness: expect.any(String),
+        });
+      await expect.poll(() => gunsmith.sound.getPlays("sfx-footstep")).toHaveLength(previousFootfalls + 1);
+    });
+  });
+
   when("the first player shoots at the second", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.aimAtTile(await gunsmith.room.secondBrowser().player.getPosition());

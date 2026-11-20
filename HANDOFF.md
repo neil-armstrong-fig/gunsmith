@@ -13,12 +13,12 @@ Ownership follows the assigned persona. Models below are defaults; no applicatio
 | ai | Claude | [TODO-ai.md](TODO-ai.md) | Arena screening, player selection and engine validation integrated. Owns model quality, fallback contrast and adapter coordination. |
 | server | Claude | [TODO-server.md](TODO-server.md) | Initial private-room networking integrated; Prediction/interpolation integrated; match flow/auth/persistence next. |
 | budget | Claude | [TODO-budget.md](TODO-budget.md) | Production ledger/spend boundaries with server/AI; credits, refunds, tracing and kill switch. |
-| art | Codex | [TODO-art.md](TODO-art.md) | **Done.** Art's checklist records the delivered assets, workshop reference and appearance review. The remaining work follows the ownership table below. |
+| art | Codex | [TODO-art.md](TODO-art.md) | Authored audio cues, runtime integration with Play, and listening review. |
 | ship | Codex | [TODO-ship.md](TODO-ship.md) | Repository tooling/CI now; infra/release when bindings and authorization exist. |
 
 ### Start prompts
 
-"You are play|engine|ai|server|budget|ship, continue the TODO. Follow the startup protocol in TODO.md and read applicable instructions before editing."
+"You are play|engine|ai|server|budget|art|ship, continue the TODO. Follow the startup protocol in TODO.md and read applicable instructions before editing."
 
 Read the shared status, handoff and your current checklist. Consult other checklists for dependencies and reserve concrete files before overlapping another session.
 
@@ -27,11 +27,12 @@ Read the shared status, handoff and your current checklist. Consult other checkl
 | Domain / paths | Primary writer | Consumers / boundaries |
 | --- | --- | --- |
 | engine/; simulation events, rating/caps, arena validation; engine vocabulary in shared | engine | play consumes local events/data; ai proposes preferences; server runs authority |
-| Webapp combat HUD, camera/input offsets, runtime sound playback and playtests | play | Engine writes rules and events |
+| Webapp combat HUD, camera/input offsets and playtests | play | Engine writes rules and events |
 | ai/; generated-appearance renderer, shot synthesis, AI adapter result schema and eval workflow | ai | Engine reviews rule constraints, Server wires the API, and Budget guards production calls |
 | api/ application, auth, match, account/library/history storage, browser networking/prediction and privacy/terms copy | server | Budget owns AI operations. Server owns shared API routing and common DB migration configuration |
 | api/src/durable-objects/credit-ledger/ and spend-ledger/ (was api/src/ai/), and api/src/router/routes/credits/ (the read-only credit-status route: its handler, tests and types): production credits/spend/Gateway/kill switch/tracing and domain storage/tests | budget | Coordinate credit schema/migration changes through server; ai retains its existing eval paid-spend guard |
-| Authored gameplay assets in webapp/public/assets/ and webapp/audio/, asset manifests/loading, workshop previews, styling/overlays, player-facing copy and relevant docs/art/ references | play | AI owns generated appearance and shot synthesis. Engine supplies terrain and combat rules. |
+| Authored gameplay assets in webapp/public/assets/, asset manifests/loading, workshop previews, styling/overlays, player-facing copy and relevant docs/art/ references | play | AI owns generated appearance and shot synthesis. Engine supplies terrain and combat rules. |
+| Authored audio in `webapp/audio/`, the runtime sound manifest and playback, and their sound specs | art | Coordinate game-loop changes and listening with Play. Engine owns gameplay sound events and AI owns weapon-shot synthesis. |
 | infra/, general CI/property workflow, root scripts, shared/config/, manual setup, release evidence, branding and case-study visuals | ship | Server and Budget supply bindings. AI owns eval workflow semantics. Live changes require authorization. |
 | acceptance-tests/ and consumed shared contracts | Feature owner | Reserve the feature's concrete files, including common DSL/hooks; domain owner writes shared contract changes after consumer review |
 | AGENTS.md, TODO.md, HANDOFF.md and other shared docs | Owner of described change | Update only your row/section; reread immediately before editing |
@@ -302,11 +303,19 @@ Before changing a consumed contract, record the proposal and affected owners her
 - [ ] Consumer-reviewed M2 contracts/manifest: domain writers above coordinate; withdrawn drafts stay withdrawn.
 - [ ] Full arena validity/caps/property coverage: engine extends the merged initial rating/balancer.
 - [ ] Real adapter/API, accounting and fallbacks: ai, server and budget each deliver their side.
-- [ ] Play integrates authored gameplay assets and audio, AI integrates generated appearance and shot synthesis, and Ship validates the release.
+- [ ] Play integrates authored gameplay assets, Art integrates authored audio, AI integrates generated appearance and shot synthesis, and Ship validates the release.
 
 ## Delivery log
 
-**Art closed on 2026-11-20.** The final Art development tip `52443a3` is on GitHub main. Play inherits the local arena workshop, shared preview, authored gameplay assets and static cues. AI takes the S4-1 re-review and production appearance work with Engine. Server takes privacy and terms copy. Ship takes release branding and case-study visuals. The Art checklist preserves the existing backlog and verification. [Art handoff](TODO-art.md#handoff).
+**Art → Play and build, references and audio (2026-11-20).** The practice range opens a standalone `/references.html` tab crediting Greg Lester’s Foley guide. Art used its layering approach for the drier reload and shorter outgoing hit cue. The user heard a small improvement and deferred further tuning. Decide the permanent location of the references link after MVP. The build notes reproduce the four runtime MP3s directly. [Audio build notes](webapp/audio/README.md#runtime-cues).
+
+**Art resumed for audio on 2026-11-20.** Art owns authored cues, playback integration, and listening review with Play. This slice touches `webapp/src/assets/sounds/`, `webapp/src/sound/`, the local tick in `UseGameLoop`, and sound acceptance specs. Play keeps the arena workshop and shared preview. AI owns weapon-shot synthesis and the appearance work with Engine. [Art handoff](TODO-art.md#handoff).
+
+**Art → Engine, Play and Server, footfalls (2026-11-20).** The walker gets a position-free `footstep` event on the first moving tick of an upright walk and every 0.42 s thereafter. A listener gets the existing sector and loudness event from the same footfall. `World` keeps walking progress per fighter and `SeatView` sends the event only. The same clip plays for both voices. The existing hearing range and stereo placement apply to opponents. [Audio notes](webapp/audio/README.md).
+
+**Art → Engine, Server and Play, firing audio (2026-11-20).** `CombatEvent` gives each firing seat `{kind: "shotFired"}` once for its own successful shot. The opponent’s existing spatial `heard` event uses the same authored fallback recording. The Web Audio output can play the local and spatial voices together. The build recipe is in [the audio notes](webapp/audio/README.md#runtime-cues). AI owns weapon-specific synthesis.
+
+**Art → Play and Engine, local footsteps and reload (2026-11-20).** The local tick supplies actual movement, stance and reload starts to the sound output. Upright movement plays the approved softer footstep MP3 at 0.42 s intervals. Crouched movement is silent. The approved reload MP3 plays once when reload begins. Upstream spatial pickup playback now starts the same pickup file for a nearby opponent. `TakingAPickup` still expects zero starts in that case and fails identically on the merge baseline. A follow-up can distinguish spatial playback from the local pickup in the recorder. The remaining spatial footfall and listening work is in [Art’s checklist](TODO-art.md).
 
 **Art → AI and Engine, appearance review (2026-11-20).** The
 [12-study runtime grammar review](docs/art/concepts/top-down-oddities/README.md#runtime-grammar-review--2026-11-20)

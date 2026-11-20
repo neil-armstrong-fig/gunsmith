@@ -6,10 +6,13 @@ import {panOfSector} from "@src/sound/spatial/PanOfSector";
 import type {SoundOutput} from "@src/sound/types/SoundOutput";
 
 /**
- * The file played for each sound the other fighter can be heard making. A shot and a footfall have none yet (art owes them), so
- * they are heard by the engine and played by nobody; the weapon being taken borrows the pickup's own sound.
+ * The cues for sounds heard from the other fighter. Shots and pickups use the same recordings as the player's cues.
  */
-const FILE_OF_HEARD_SOUND: Partial<Record<HeardSound, SoundKey>> = {pickup: "sfx-pickup"};
+const FILE_OF_HEARD_SOUND: Partial<Record<HeardSound, SoundKey>> = {
+  shot: "sfx-shot",
+  step: "sfx-footstep",
+  pickup: "sfx-pickup",
+};
 
 /**
  * Plays what the other fighter was heard doing, placed in the listener's ears: panned by the sector the engine says it came from

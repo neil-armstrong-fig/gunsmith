@@ -7,6 +7,7 @@ import type {Pickup} from "@gunsmith/engine/pickup/types/Pickup";
 import type {OpponentBrain} from "@gunsmith/engine/opponent/types/OpponentBrain";
 import type {Player} from "@gunsmith/engine/player/types/Player";
 import type {Ring} from "@gunsmith/engine/ring/types/Ring";
+import type {Footstep} from "@gunsmith/engine/sound/footsteps/types/Footstep";
 import type {RoundState} from "@gunsmith/engine/round/types/RoundState";
 
 /** Everything the simulation knows. A new one is returned from each step; none is ever changed in place. */
@@ -39,4 +40,7 @@ export interface World {
    * reads it in a match against a brain.
    */
   opponentEvents?: readonly CombatEvent[] | undefined;
+  /** Upright walking progress. Only the resulting events are sent to seats. */
+  footstep?: Footstep | undefined;
+  opponentFootstep?: Footstep | undefined;
 }
