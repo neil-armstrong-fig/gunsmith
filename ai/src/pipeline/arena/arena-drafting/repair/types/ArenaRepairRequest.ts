@@ -7,6 +7,6 @@ export interface ArenaRepairRequest {
   previous: unknown;
   /** Plain sentences from `validate`, never the player's own words (though a stray field's name may be in one). */
   errors: string[];
-  /** How the model was asked to describe the arena the first time, and is asked again; rows when absent. */
-  format?: ArenaFormat;
+  /** How the model was asked to describe the arena the first time, and is asked again. */
+  format: ArenaFormat;
 }

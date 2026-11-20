@@ -1,6 +1,7 @@
 import type {GenerateWeaponInput} from "@gunsmith/ai/pipeline/types/GenerateWeaponInput";
 import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
 import type {WeaponPipelineDependencies} from "@gunsmith/ai/pipeline/types/WeaponPipelineDependencies";
+import {RequestUsage} from "@gunsmith/ai/pipeline/usage/RequestUsage";
 import {createWeaponGraph} from "@gunsmith/ai/pipeline/weapon-graph/CreateWeaponGraph";
 import {weaponOutcomeFromState} from "@gunsmith/ai/pipeline/weapon-graph/outcome/WeaponOutcomeFromState";
 
@@ -17,7 +18,16 @@ export async function generateWeapon(
   weaponPipelineDependencies: WeaponPipelineDependencies,
 ): Promise<WeaponOutcome> {
   const weaponGraph = createWeaponGraph(weaponPipelineDependencies);
-  const endState = await weaponGraph.invoke({prompt: input.prompt});
+  const requestUsage = new RequestUsage();
+  const endState = await weaponGraph.invoke({prompt: input.prompt}, {signal: input.signal, callbacks: [requestUsage]});
 
-  return weaponOutcomeFromState(endState);
+  const outcome = weaponOutcomeFromState(endState);
+
+  // The drawing's model calls name their own recorder, and a call's own callbacks replace the ones it would inherit, so the graph's
+  // collector never sees them; the drawing reports its tokens on its outcome instead.
+  if (outcome.appearance) {
+    requestUsage.add(outcome.appearance.usage);
+  }
+
+  return {...outcome, usage: requestUsage.total()};
 }

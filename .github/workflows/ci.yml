@@ -11,7 +11,7 @@ permissions:
 
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   checks:
@@ -22,18 +22,70 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
+
       - uses: pnpm/action-setup@v6
+
       - uses: actions/setup-node@v7
         with:
           node-version: 26.13.0
           cache: pnpm
+
       - run: sudo apt-get update && sudo apt-get install -y ffmpeg glslang-tools
+
       - run: pnpm install --frozen-lockfile
+
       - run: pnpm checks
+
+  release-build:
+    name: Build release assets
+    needs: checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26.13.0
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm --filter @gunsmith/webapp compile
+
+      - name: Require noindex in the release assets
+        shell: bash
+        run: |
+          diff -u <(printf '/*\n  X-Robots-Tag: noindex\n') webapp/build/_headers
+
+      - name: Record the built commit
+        run: printf '{"commit":"%s"}\n' "$GITHUB_SHA" > webapp/build/release.json
+
+      - name: Check the API Worker bundle
+        run: pnpm --filter @gunsmith/api exec wrangler deploy --dry-run
+        env:
+          WRANGLER_SEND_METRICS: "false"
+
+      - name: Check the static webapp Worker
+        run: pnpm --filter @gunsmith/infra exec wrangler deploy --dry-run --config ../webapp/wrangler.jsonc
+        env:
+          WRANGLER_SEND_METRICS: "false"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-webapp
+          path: webapp/build/
+          overwrite: true
+          retention-days: 7
+          if-no-files-found: error
 
   acceptance-shards:
     name: Acceptance shard ${{ matrix.shard }}/4
-    needs: checks
+    needs: release-build
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     strategy:
@@ -44,21 +96,30 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
+
       - uses: pnpm/action-setup@v6
+
       - uses: actions/setup-node@v7
         with:
           node-version: 26.13.0
           cache: pnpm
+
       - run: pnpm install --frozen-lockfile
+
       - run: pnpm --filter @gunsmith/acceptance-tests exec playwright install --with-deps chromium
-      - name: Build production preview
-        run: pnpm --filter @gunsmith/webapp compile
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: release-webapp
+          path: webapp/build/
+
       - name: Run acceptance shard
         run: pnpm acceptance-tests --shard=${{ matrix.shard }}/${{ strategy.job-total }} --reporter=github,blob
         env:
           PREVIEW_ACCEPTANCE: "1"
           PREVIEW_API_MODE: local
           PLAYWRIGHT_BLOB_OUTPUT_NAME: shard-${{ matrix.shard }}.zip
+
       # Blobs include retry traces, screenshots and videos; preserve failures too.
       - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
@@ -71,53 +132,204 @@ jobs:
 
   acceptance-tests:
     name: Acceptance tests (production preview)
-    needs: [checks, acceptance-shards]
-    if: ${{ !cancelled() && needs.checks.result == 'success' }}
+    needs: [checks, release-build, acceptance-shards]
+    if: ${{ !cancelled() && needs.release-build.result == 'success' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
+
       - uses: pnpm/action-setup@v6
+
       - uses: actions/setup-node@v7
         with:
           node-version: 26.13.0
           cache: pnpm
+
       - run: pnpm install --frozen-lockfile
-      - uses: actions/download-artifact@v8
+
+      - uses: ./.github/actions/acceptance-report
         with:
-          pattern: playwright-blob-*
-          path: acceptance-tests/all-blob-reports/
-          merge-multiple: true
-      - name: Merge available shard reports
-        run: pnpm --filter @gunsmith/acceptance-tests exec playwright merge-reports --reporter=html all-blob-reports
+          blob-pattern: playwright-blob-*
+          report: playwright-preview
+          shards-result: ${{ needs.acceptance-shards.result }}
+
+  deploy:
+    name: Deploy to Cloudflare
+    needs: [checks, acceptance-tests]
+    if: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && vars.GUNSMITH_DEPLOY_ENABLED == 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    outputs:
+      current: ${{ steps.tip.outputs.current }}
+      url: ${{ steps.tip.outputs.url }}
+      api_url: ${{ steps.tip.outputs.api_url }}
+    env:
+      SITE_ORIGIN: https://gunsmith.neilarmstrong.dev
+      API_ORIGIN: https://gunsmith-api.neilarmstrong.dev
+    steps:
+      - name: Check the current main commit
+        id: tip
         env:
-          PLAYWRIGHT_HTML_OPEN: never
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tip="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)"
+          if [[ "$tip" != "$GITHUB_SHA" ]]; then
+            echo 'This run was superseded by a newer main commit.' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          echo 'current=true' >> "$GITHUB_OUTPUT"
+          echo "url=$SITE_ORIGIN" >> "$GITHUB_OUTPUT"
+          echo "api_url=$API_ORIGIN" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v7
+        if: steps.tip.outputs.current == 'true'
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@v6
+        if: steps.tip.outputs.current == 'true'
+
+      - uses: actions/setup-node@v7
+        if: steps.tip.outputs.current == 'true'
+        with:
+          node-version: 26.13.0
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+        if: steps.tip.outputs.current == 'true'
+
+      - uses: actions/download-artifact@v8
+        if: steps.tip.outputs.current == 'true'
+        with:
+          name: release-webapp
+          path: webapp/build/
+
+      - name: Deploy the API Worker
+        if: steps.tip.outputs.current == 'true'
+        run: pnpm --filter @gunsmith/infra provision
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          ALCHEMY_PASSWORD: ${{ secrets.ALCHEMY_PASSWORD }}
+          ALCHEMY_STATE_TOKEN: ${{ secrets.ALCHEMY_STATE_TOKEN }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          ALERT_TO_ADDRESS: ${{ secrets.ALERT_TO_ADDRESS }}
+          ACCOUNT_DIGEST_KEY: ${{ secrets.ACCOUNT_DIGEST_KEY }}
+
+      - name: Deploy the tested webapp build
+        if: steps.tip.outputs.current == 'true'
+        run: pnpm --filter @gunsmith/infra exec wrangler deploy --config ../webapp/wrangler.jsonc
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          WRANGLER_SEND_METRICS: "false"
+
+      - name: Verify the deployed commit, noindex and D1
+        if: steps.tip.outputs.current == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          for _ in $(seq 1 30); do
+            if curl --fail --silent --max-time 5 "$SITE_ORIGIN/release.json?commit=$GITHUB_SHA" |
+                jq -e --arg commit "$GITHUB_SHA" '.commit == $commit' > /dev/null; then
+              if ! curl --fail --silent --show-error --max-time 10 --dump-header - --output /dev/null "$SITE_ORIGIN/" |
+                  tr -d '\r' | grep -iEx 'X-Robots-Tag:[[:blank:]]*noindex[[:blank:]]*' > /dev/null; then
+                echo 'The deployed homepage must return X-Robots-Tag: noindex.' >&2
+                exit 1
+              fi
+              headers="$(mktemp)"
+              curl --fail --silent --show-error --max-time 10 --dump-header "$headers" \
+                --header "Origin: $SITE_ORIGIN" --cookie 'session=release-check' "$API_ORIGIN/api/me" |
+                jq -e '.signedIn == false' > /dev/null
+              tr -d '\r' < "$headers" | grep -iFx "Access-Control-Allow-Origin: $SITE_ORIGIN" > /dev/null
+              tr -d '\r' < "$headers" | grep -iFx 'Access-Control-Allow-Credentials: true' > /dev/null
+              printf 'Deployed `%s` to %s.\n' "$GITHUB_SHA" "$SITE_ORIGIN" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            sleep 4
+          done
+          echo 'The deployed asset marker did not match this commit.' >&2
+          exit 1
+
+  live-shards:
+    name: Live acceptance shard ${{ matrix.shard }}/4
+    needs: deploy
+    if: needs.deploy.outputs.current == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26.13.0
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm --filter @gunsmith/acceptance-tests exec playwright install --with-deps chromium
+
+      - name: Verify the deployed commit
+        env:
+          WEBAPP_URL: ${{ needs.deploy.outputs.url }}
+        shell: bash
+        run: |
+          curl --fail --silent --show-error --max-time 10 "$WEBAPP_URL/release.json?commit=$GITHUB_SHA" |
+            jq -e --arg commit "$GITHUB_SHA" '.commit == $commit'
+
+      - name: Run acceptance shard
+        run: pnpm acceptance-tests --shard=${{ matrix.shard }}/${{ strategy.job-total }} --reporter=github,blob
+        env:
+          WEBAPP_URL: ${{ needs.deploy.outputs.url }}
+          RELEASE_API_URL: ${{ needs.deploy.outputs.api_url }}
+          PLAYWRIGHT_BLOB_OUTPUT_NAME: shard-${{ matrix.shard }}.zip
+
+      # Blobs include retry traces, screenshots and videos; preserve failures too.
       - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
         with:
-          name: playwright-preview
-          path: acceptance-tests/playwright-report/
+          name: playwright-live-blob-${{ matrix.shard }}
+          path: acceptance-tests/blob-report/
           overwrite: true
           retention-days: 7
           if-no-files-found: error
-      # Merging a failed/partial run must never turn acceptance green.
-      - name: Require every shard and report
-        if: ${{ !cancelled() }}
-        shell: bash
-        env:
-          SHARDS_RESULT: ${{ needs.acceptance-shards.result }}
-        run: |
-          set -euo pipefail
-          missing=0
-          for shard in 1 2 3 4; do
-            if [[ ! -f "acceptance-tests/all-blob-reports/shard-$shard.zip" ]]; then
-              echo "Missing report for shard $shard/4" | tee -a "$GITHUB_STEP_SUMMARY"
-              missing=1
-            fi
-          done
-          if [[ "$SHARDS_RESULT" != success || "$missing" != 0 ]]; then
-            echo "Acceptance incomplete or failed: shards=$SHARDS_RESULT" | tee -a "$GITHUB_STEP_SUMMARY"
-            exit 1
-          fi
+
+  live-acceptance:
+    name: Acceptance tests (deployed build)
+    needs: [deploy, live-shards]
+    if: ${{ !cancelled() && needs.deploy.result == 'success' && needs.deploy.outputs.current == 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26.13.0
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - uses: ./.github/actions/acceptance-report
+        with:
+          blob-pattern: playwright-live-blob-*
+          report: playwright-live
+          shards-result: ${{ needs.live-shards.result }}

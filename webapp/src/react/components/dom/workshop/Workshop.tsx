@@ -1,3 +1,4 @@
+import {returnToPractice} from "@src/react/components/dom/workshop/arena-on-trial/ReturnToPractice";
 import {ArenaWorkshop} from "@src/react/components/dom/workshop/components/arena-workshop/ArenaWorkshop";
 import {WeaponCard} from "@src/react/components/dom/workshop/components/weapon-card/WeaponCard";
 import {WeaponShelf} from "@src/react/components/dom/workshop/components/weapon-shelf/WeaponShelf";
@@ -6,6 +7,7 @@ import {usePracticeResetKey} from "@src/react/components/dom/workshop/hooks/use-
 import {useWorkshopKey} from "@src/react/components/dom/workshop/hooks/use-workshop-key/UseWorkshopKey";
 import {usePressedKey} from "@src/react/hooks/use-pressed-key/UsePressedKey";
 import {useAppStore} from "@src/store/app/UseAppStore";
+import {useArenaWorkshopStore} from "@src/store/workshop/arena/UseArenaWorkshopStore";
 import type {JSX, KeyboardEvent} from "react";
 import {useEffect, useRef, useState} from "react";
 
@@ -19,6 +21,7 @@ export function Workshop(): JSX.Element | undefined {
   const open = useAppStore(state => state.workshopOpen);
   // Escape also shuts the panel when the focus has left it (a pressed Save turns disabled and the focus falls to the page); inside the panel its own handler does it first.
   usePressedKey("Escape", closeTheWorkshop, open);
+  const walkingAnArena = useArenaWorkshopStore(state => state.practiceWorld !== undefined);
   const [showArenas, setShowArenas] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -49,6 +52,19 @@ export function Workshop(): JSX.Element | undefined {
         className="flex w-[40rem] max-h-[92vh] max-w-[90vw] flex-col gap-4 overflow-y-auto rounded-md bg-gs-ui-surface px-6 py-5 shadow-lg outline-none [@media(max-height:680px)]:gap-3 [@media(max-height:680px)]:py-3"
       >
         <h1 className="text-2xl font-bold tracking-wide text-gs-ui-text">Workshop</h1>
+
+        {walkingAnArena && (
+          <button
+            type="button"
+            className="self-start rounded-md border border-gs-edge/40 px-3 py-1.5 text-sm"
+            onClick={() => {
+              returnToPractice();
+              useAppStore.getState().closeWorkshop();
+            }}
+          >
+            Return to practice
+          </button>
+        )}
 
         <div className="flex gap-2">
           <button

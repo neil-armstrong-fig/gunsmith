@@ -14,7 +14,7 @@ export class LocalArenaPipelineEvalDriver extends ArenaPipelineEvalDriver {
     super({tier: "local", requestedTrials, defaultTrials: ARENA_LOCAL_TRIALS, keepsGeneratedByDefault: true});
   }
 
-  // `EVAL_ARENA_FORMAT=shapes` has the model describe the arena as shapes instead of rows, to compare the two formats on one model.
+  // `EVAL_ARENA_FORMAT=rows` has the model draw the rows itself instead of shapes (the default), to compare the two formats on one model.
   // Temperature 0 and thinking off, as the weapon's local models: repeatable output for a loop that has to be fast. An arena is
   // a few hundred tokens of rows, so the generator is given far more room than a weapon's stats.
   protected createModels(): ArenaPipelineDependencies {

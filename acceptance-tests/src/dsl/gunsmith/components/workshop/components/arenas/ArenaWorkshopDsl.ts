@@ -20,6 +20,22 @@ export class ArenaWorkshopDsl {
     }
   }
 
+  async pressArenaAction(name: string, index = 0): Promise<void> {
+    try {
+      await this.arenas.pressArenaAction(name, index);
+    } catch (error) {
+      throw new DslError(`Failed to press ${name} in the arena workshop`, error);
+    }
+  }
+
+  async getSavedArenaPrompts(): Promise<string[]> {
+    try {
+      return await this.arenas.getSavedArenaPrompts();
+    } catch (error) {
+      throw new DslError("Failed to read the saved arena prompts", error);
+    }
+  }
+
   async getResultColours(name: string, size: Size, points: Point[]): Promise<Colour[]> {
     try {
       return await this.arenas.getResultColours(name, size, points);

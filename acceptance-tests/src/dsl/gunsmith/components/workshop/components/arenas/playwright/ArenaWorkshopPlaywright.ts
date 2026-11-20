@@ -17,6 +17,17 @@ export class ArenaWorkshopPlaywright extends BasePage {
     }
   }
 
+  async pressArenaAction(name: string, index: number): Promise<void> {
+    await this.page.getByRole("dialog", {name: "Workshop"}).getByRole("button", {name, exact: true}).nth(index).click();
+  }
+
+  async getSavedArenaPrompts(): Promise<string[]> {
+    return await this.page
+      .getByRole("region", {name: "Saved arenas"})
+      .getByTestId("saved-arena-prompt")
+      .allTextContents();
+  }
+
   async getResultColours(name: string, size: Size, points: Point[]): Promise<Colour[]> {
     return await this.coloursOf(
       this.result().getByRole("img", {name: `${name} arena layout`, exact: true}),

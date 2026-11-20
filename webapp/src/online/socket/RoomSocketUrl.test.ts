@@ -12,6 +12,12 @@ it("uses wss on a secure page", () => {
   );
 });
 
+it("connects the deployed webapp to the API hostname", () => {
+  expect(roomSocketUrl({protocol: "https:", host: "gunsmith.neilarmstrong.dev"}, "ABC234")).toBe(
+    "wss://gunsmith-api.neilarmstrong.dev/api/rooms/ABC234/socket",
+  );
+});
+
 it("carries the seat's token when it has one", () => {
   expect(roomSocketUrl({protocol: "http:", host: "h"}, "ABC234", {token: "a b&c"})).toBe(
     "ws://h/api/rooms/ABC234/socket?token=a%20b%26c",
@@ -35,7 +41,13 @@ it("passes on how long the page asks the room to wait, which the room's first co
   ).toBe("ws://h/api/rooms/ABC234/socket?reconnectSeconds=2&idleSeconds=3");
 });
 
-it("passes on only those limits, and never what else the page's address says", () => {
+it("passes on the seed the page pins for the room's starts, which the room's first connection sets", () => {
+  expect(roomSocketUrl({protocol: "http:", host: "h"}, "ABC234", {search: "?room=ABC234&startSeed=21"})).toBe(
+    "ws://h/api/rooms/ABC234/socket?startSeed=21",
+  );
+});
+
+it("passes on only those limits and that seed, and never what else the page's address says", () => {
   expect(roomSocketUrl({protocol: "http:", host: "h"}, "ABC234", {search: "?room=ABC234&lag=300&scenario=x"})).toBe(
     "ws://h/api/rooms/ABC234/socket",
   );

@@ -1,3 +1,4 @@
+import {PRACTICE_ARENA} from "@src/game/practice/PracticeArena";
 import {scenarioOfPage} from "@src/game/scenario/ScenarioOfPage";
 import {worldWithRangeReset} from "@src/react/components/dom/workshop/hooks/use-practice-reset-key/range-reset/WorldWithRangeReset";
 import {usePressedKey} from "@src/react/hooks/use-pressed-key/UsePressedKey";
@@ -17,5 +18,8 @@ export function usePracticeResetKey(): void {
 }
 
 function resetThePracticeRange(): void {
-  useGameStore.getState().setWorld(worldWithRangeReset(gameState()));
+  const world = gameState();
+  if (world.arena !== PRACTICE_ARENA) return;
+
+  useGameStore.getState().setWorld(worldWithRangeReset(world));
 }

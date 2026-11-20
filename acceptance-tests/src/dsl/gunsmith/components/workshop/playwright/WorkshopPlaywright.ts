@@ -113,7 +113,7 @@ export class WorkshopPlaywright extends BasePage {
   }
 
   private promptBox(): Locator {
-    return this.page.getByLabel("Describe your weapon");
+    return this.page.getByRole("textbox", {name: /^Describe your (weapon|arena)$/});
   }
 }
 

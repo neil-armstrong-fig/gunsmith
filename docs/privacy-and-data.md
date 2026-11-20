@@ -27,7 +27,8 @@ storage and controls described here are not implemented by the research delivery
 | ---- | --- | ---- |
 | Google `sub`, display name, created date | Identity | Until the account is deleted |
 | Session token hashes, expiry | Sign-in | Until expiry or sign-out |
-| Credit ledger | Daily AI allowance and refunds | Until the account is deleted |
+| Credit ledger | Daily AI allowance and refunds | Until the account is deleted, **then 90 days more** (below) |
+| Deleted-account record: keyed HMAC of the Google `sub`, the ledger's opaque id, expiry | So deleting and signing in again cannot reset the daily allowance (abuse of paid model calls) | 90 days after deletion, then deleted with the ledger |
 | Library: saved weapons and arenas, **with the prompts that made them** | "Use as a base and change the prompt"; reuse for free | Until the owner deletes them or the account |
 | Ratings and match history | Matchmaking and the history list | Until the account is deleted |
 | Recording metadata and share permissions | Authorized completed-match access | 14 days after completion, or deletion handling below |
@@ -70,7 +71,7 @@ traced for quality, the retention, and how to delete.
 
 ## Deletion
 
-`DELETE /api/account` removes the account, sessions, credits, library, ratings and history. Traces already
+`DELETE /api/account` removes the account, sessions, library, ratings and history at once. **Credits are the exception, for one stated purpose:** deleting must not give back a fresh allowance, or one Google account could reset its daily AI credits (and the paid model calls behind them) by deleting and signing in again. So for 90 days the database keeps only the keyed HMAC of the Google `sub` (a secret key, `ACCOUNT_DIGEST_KEY`), the opaque id the ledger holds the credits under, and the expiry; signing in again within that time gets the same ledger. Then the record is deleted and the ledger erased. The digest is personal data while kept, not anonymous; a different Google account is not recognised. **Why 90 days and not longer (2026-11-19):** the allowance refills at 00:00 UTC, so a day would stop the same abuse and 90 days is already the ceiling this document allows for a record kept past deletion; regulators judge such retention by necessity for the purpose and a documented balancing test (a 2-year retention was accepted in one published EDPB case, on facts about repeat account creation, not as a general rule), so a longer period needs a reason this purpose does not have (a non-refilling paid balance would be one). Not legal advice; the privacy page must describe this. Traces already
 in LangSmith expire on its retention schedule; the privacy page says so.
 
 Remove account links and ordinary recording/share access with deletion, deleting
@@ -87,8 +88,8 @@ not recognized by this mechanism.
 
 - Confirm whether LangSmith runs can be deleted on request by metadata.
 - Before online launch, verify the retention basis, erasure workflow and complete
-  deletion of recording chunks, evidence copies and references. History and the
-  ordinary ledger are deleted with the account; the minimal restriction record
+  deletion of recording chunks, evidence copies and references. History is deleted with the account and the
+  ordinary ledger 90 days after it (the deleted-account record above); the minimal restriction record
   is the bounded exception above.
 - A pseudonymous identifier (the Google `sub`) is still personal data under GDPR-style rules, so keep the stated limits and
   the deletion route honest. Not legal advice; check before the repo or the site goes public.

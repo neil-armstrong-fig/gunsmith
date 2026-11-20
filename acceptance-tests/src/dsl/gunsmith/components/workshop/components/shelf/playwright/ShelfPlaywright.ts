@@ -1,4 +1,5 @@
 import type {Locator, Page} from "@playwright/test";
+import {expect} from "@playwright/test";
 import type {ShelfItem} from "@src/dsl/gunsmith/components/workshop/components/shelf/types/ShelfItem";
 import type {ShelfMeter} from "@src/dsl/gunsmith/components/workshop/components/shelf/types/ShelfMeter";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
@@ -56,6 +57,21 @@ export class ShelfPlaywright extends BasePage {
 
   async isAskingWhichToReplace(): Promise<boolean> {
     return await this.page.getByRole("group", {name: "Replace which weapon?"}).isVisible();
+  }
+
+  async getReplacementPrompts(): Promise<string[]> {
+    const prompts = this.page
+      .getByRole("group", {name: "Replace which weapon?"})
+      .getByTestId("shelf-item-prompt")
+      .filter({visible: true});
+
+    for (const prompt of await prompts.all()) {
+      await expect
+        .poll(() => prompt.evaluate(element => element.scrollHeight - element.clientHeight))
+        .toBeLessThanOrEqual(1);
+    }
+
+    return await prompts.allInnerTexts();
   }
 
   async replaceItem(index: number): Promise<void> {
