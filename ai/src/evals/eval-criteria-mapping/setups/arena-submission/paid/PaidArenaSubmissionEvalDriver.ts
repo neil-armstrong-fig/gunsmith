@@ -1,8 +1,9 @@
 import type {ArenaSubmission} from "@gunsmith/ai/pipeline/arena-submission/types/ArenaSubmission";
 import type {ArenaSubmissionDependencies} from "@gunsmith/ai/pipeline/arena-submission/types/ArenaSubmissionDependencies";
 import type {ArenaSubmissionScreening} from "@gunsmith/ai/pipeline/arena-submission/types/ArenaSubmissionScreening";
+import {createArenaModels} from "@gunsmith/ai/adapter/CreateArenaModels";
 import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
-import {createPaidChatModel} from "@evals/eval-criteria-mapping/environment/tier/paid/CreatePaidChatModel";
+import {paidModelOptions} from "@evals/eval-criteria-mapping/environment/tier/paid/PaidModelOptions";
 import {runPaidRequest} from "@evals/eval-criteria-mapping/environment/tier/paid/run/RunPaidRequest";
 import {paidSpendGuard} from "@evals/eval-criteria-mapping/environment/tier/paid/spend/PaidSpendGuard";
 import {paidSpendLedger} from "@evals/eval-criteria-mapping/environment/tier/paid/spend/PaidSpendLedger";
@@ -11,9 +12,6 @@ import type {ArenaSubmissionRun} from "@evals/eval-criteria-mapping/setups/arena
 
 // What every paid screening cost in tokens and time, one JSON line each (`*-latest.jsonl` is git-ignored).
 const PAID_CALL_LOG = "src/evals/results/paid-arena-submission-calls-latest.jsonl";
-
-// The same room as the arena's moderator: a verdict is a few tokens, and a call cut off by `maxTokens` fails to parse.
-const PAID_MODERATION_MAX_TOKENS = 2000;
 
 // The screening is plain code, not a graph, so its calls name no node; moderation is the only call it makes.
 const SCREENING_STAGE = "moderation";
@@ -25,7 +23,7 @@ export class PaidArenaSubmissionEvalDriver extends ArenaSubmissionEvalDriver {
   }
 
   protected createModels(): ArenaSubmissionDependencies {
-    return {moderator: createPaidChatModel(PAID_MODERATION_MAX_TOKENS), builtInArenas: BUILT_IN_ARENAS};
+    return {moderator: createArenaModels(paidModelOptions()).moderator, builtInArenas: BUILT_IN_ARENAS};
   }
 
   protected override runThrough(

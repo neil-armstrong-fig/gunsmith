@@ -1,3 +1,4 @@
+import type {ModelUsage} from "@gunsmith/ai/pipeline/types/ModelUsage";
 import type {ArenaOutcomeStatus} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcomeStatus";
 
 /** The result of an arena request. DRAFT, local to `ai/` until engine and server freeze the real arena contract in `HANDOFF.md`. */
@@ -12,5 +13,10 @@ export interface ArenaOutcome {
   /** The graph nodes that ran, in order, so a test can see the path (the pre-check first; repair at most once). */
   nodes: string[];
   /** Model calls made (three at most: moderation, generation and one repair), so a test can prove a rejection cost nothing. */
-  modelCalls: number;
+  modelCalls: number; /**
+   * What the models reported they used, in tokens, summed over every call of the request (moderation, generation and the repair), so
+   * a settle can price tokens and not calls. Zero for a call that reported nothing. Always set by the pipeline; optional in the type
+   * until the consumers' own outcome literals carry it (HANDOFF, 2026-11-19).
+   */
+  usage?: ModelUsage;
 }

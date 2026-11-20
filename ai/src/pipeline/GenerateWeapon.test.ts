@@ -6,6 +6,9 @@ import {passingAppearance} from "@gunsmith/ai/pipeline/appearance/testing/Passin
 import {ToolCallingFakeModel} from "@gunsmith/ai/pipeline/appearance/testing/ToolCallingFakeModel";
 import type {WeaponPipelineDependencies} from "@gunsmith/ai/pipeline/types/WeaponPipelineDependencies";
 
+// None of these fake models reports tokens, so a request's usage is zero.
+const NO_TOKENS = {inputTokens: 0, outputTokens: 0};
+
 it("rejects an over-long prompt without calling a model", async () => {
   const weaponPipelineDependencies = fakeWeaponPipelineDependencies();
   const generatorCall = vi.spyOn(weaponPipelineDependencies.generator, "invoke");
@@ -39,6 +42,7 @@ it("rejects a request the moderator says is not about a weapon, after one model 
     reason: "That is a recipe.",
     nodes: ["precheck", "moderation"],
     modelCalls: 1,
+    usage: NO_TOKENS,
   });
   expect(generatorCall).not.toHaveBeenCalled();
   expect(appearanceCall).not.toHaveBeenCalled();
@@ -100,6 +104,7 @@ it("creates the weapon the generator wrote when it is valid and within the cap, 
     },
     nodes: [...STATS_NODES, ...DRAWING_NODES],
     modelCalls: 3,
+    usage: NO_TOKENS,
   });
 });
 
@@ -321,6 +326,7 @@ it("is invalid, with no weapon and no drawing, when the repaired weapon still fa
     reason: "We could not build a valid weapon from that request. Try describing it differently.",
     nodes: ["precheck", "moderation", "generate", "validate", "repair", "validate"],
     modelCalls: 3,
+    usage: NO_TOKENS,
   });
   expect(appearanceCall).not.toHaveBeenCalled();
 });
@@ -364,6 +370,7 @@ it("rejects an empty prompt with a reason the player can read", async () => {
     reason: "Describe the weapon you want.",
     nodes: ["precheck"],
     modelCalls: 0,
+    usage: NO_TOKENS,
   });
 });
 

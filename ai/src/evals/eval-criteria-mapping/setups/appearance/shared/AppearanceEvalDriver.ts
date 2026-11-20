@@ -8,13 +8,14 @@ import type {EvalTier} from "@evals/eval-criteria-mapping/environment/tier/share
 import type {TierDriverSettings} from "@evals/eval-criteria-mapping/environment/tier/shared/types/TierDriverSettings";
 import {keepDrawing} from "@evals/eval-criteria-mapping/setups/appearance/shared/drawings/KeepDrawing";
 import {startDrawings} from "@evals/eval-criteria-mapping/setups/appearance/shared/drawings/StartDrawings";
+import type {AppearancePipelineRun} from "@evals/eval-criteria-mapping/setups/appearance/shared/types/AppearancePipelineRun";
 
 const RESULTS_FOLDER = "src/evals/results";
 
 /**
  * What every tier's appearance driver does: put a request through the real appearance pipeline on the models its tier builds, and
- * keep the drawing for a person to look at when the run keeps them. A tier overrides `createModels`, and the two hooks around a
- * request where it needs to (the paid tier checks its spend there).
+ * keep the drawing for a person to look at when the run keeps them. A tier overrides `createModels`, and `runThrough` where it
+ * must wrap a request (the paid tier checks its spend and logs the calls there).
  */
 export abstract class AppearanceEvalDriver implements AppearanceDriver {
   readonly trials: number;
@@ -33,11 +34,9 @@ export abstract class AppearanceEvalDriver implements AppearanceDriver {
   async run(prompt: string): Promise<AppearanceOutcome> {
     const dependencies = this.modelsOnFirstRequest();
     this.startDrawingsOnFirstRequest();
-    this.beforeRequest();
 
-    const outcome = await generateAppearance({prompt}, dependencies);
+    const outcome = await this.runThrough(prompt, request => generateAppearance({prompt: request}, dependencies));
 
-    this.afterOutcome();
     keepDrawing({folder: RESULTS_FOLDER, tier: this.tier, enabled: this.keepsDrawings, drawing: {prompt, outcome}});
 
     return outcome;
@@ -45,14 +44,12 @@ export abstract class AppearanceEvalDriver implements AppearanceDriver {
 
   protected abstract createModels(): AppearanceDependencies;
 
-  /** Runs before each request. A tier that must stop a request before it is made does it here. */
-  protected beforeRequest(): void {
-    // Nothing to check before a request unless the tier says so.
-  }
-
-  /** Runs after each request and before its drawing is kept, so a tier can refuse a result it cannot stand behind. */
-  protected afterOutcome(): void {
-    // Nothing to check after a request unless the tier says so.
+  /**
+   * What a request is put through. The models exist by now; the paid tier checks its spend around the pipeline here and refuses a
+   * result it cannot stand behind, which happens before the drawing is kept.
+   */
+  protected runThrough(prompt: string, pipeline: AppearancePipelineRun): Promise<AppearanceOutcome> {
+    return pipeline(prompt);
   }
 
   // Built on the first request, not in the constructor: the mapping builds every driver when a spec file loads, and the paid model

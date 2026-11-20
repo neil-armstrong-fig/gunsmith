@@ -8,7 +8,7 @@ import type {ArenaGraphUpdate} from "@gunsmith/ai/pipeline/arena/arena-graph/sta
 export async function generateNode(
   state: ArenaGraphStateValues,
   generator: BaseChatModel,
-  format: ArenaFormat = "rows",
+  format: ArenaFormat,
 ): Promise<ArenaGraphUpdate> {
   const draft = await generateArenaDraft(state.prompt, generator, format);
 
