@@ -4,11 +4,11 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 ## Resume here
 
-The persistent checkout is `.claude/worktrees/ship` on `worktree-ship`, synced to main at `44873b7` for this slice. Merge newer committed main before new work when clean.
+The persistent checkout is `.claude/worktrees/ship` on `worktree-ship`, synced to `origin/main` at `5643770`. The release workflow and infrastructure are implemented and awaiting review. Next, get the release changes onto main, confirm hosted preview acceptance, then verify two deployments in an authorized throwaway account.
 
 Ship fixed the M1 pickup-marker acceptance setup. The [handoff](HANDOFF.md#latest-ship-delivery) records the original failing criterion, screenshot evidence and retained-marker check.
 
-Production HUD wiring awaits AI and Engine's weapon-to-appearance association. When it lands, the first criterion should show that a generated weapon keeps its HUD drawing from creation through equip. Hosted CI and profiling await publication. AI owns paid selector/guard/evidence and opening spend reconciliation.
+Production HUD wiring awaits AI and Engine's weapon-to-appearance association. When it lands, the first criterion should show that a generated weapon keeps its HUD drawing from creation through equip. Hosted CI runs; timing and release evidence live in [Operations](docs/agent-reference/Operations.md#ci-and-deployment). AI owns paid selector/guard/evidence and opening spend reconciliation.
 
 ## MVP priority
 
@@ -33,23 +33,27 @@ server supplies Worker/DO/storage bindings; budget supplies operational limits; 
 - [x] Manage local Worker startup and external API preview scripts; exclude generated Playwright reports from lint.
 - [x] Reproduce and fix the pickup-marker pixel failure on managed production preview.
 - [x] Budget request: enforce declarations below callers, including tests; reject module-level const arrow/function helpers, preserving nested const functions. Full cleanup, no baseline.
-- [ ] When infra is scaffolded, declare `CREDITS` → `CreditLedger` per account and singleton `SPEND` → `SpendLedger`, retaining migration `v2` with both `new_sqlite_classes`. D1 is for accounts/sessions/library/ratings/history; no provisioning in this slice.
-- [ ] Spend-alert email (from budget, built 2026-11-18 in `worktree-budget`, see [cost-and-budget.md](docs/cost-and-budget.md)): when infra is scaffolded, declare the `ALERT_MAIL` `send_email` binding (no `destination_address`) and the `ALERT_FROM_ADDRESS` var (`alerts@neilarmstrong.dev`, a sender on the zone with Email Routing) as `api/wrangler.jsonc` does. **`ALERT_TO_ADDRESS` is a Worker secret, never in git, config or CI logs:** the user sets it (`wrangler secret put ALERT_TO_ADDRESS`; [manual step 20](MANUAL-SETUP-STEPS.md)) and Alchemy must leave it in place on deploy. Unset, `SpendLedger` sends nothing, so the shutdown drill and live acceptance should confirm it is set. Cloudflare delivers only to an address verified in Email Routing. No provisioning or real send in this slice.
+- [x] Use the Worker manifest to bind `MATCHES`, `CREDITS`, `SPEND` and D1 in the deployed Worker. Retain the local `v1` and `v2` SQLite migrations. Alchemy manages deployed SQLite migrations.
+- [x] Include `ALERT_MAIL` and `ALERT_FROM_ADDRESS` in the deploy config. Deploy-time `ALERT_TO_ADDRESS` setup and binding verification happen during the authorized deploy.
 - [ ] Profile the first hosted sharded run: separate setup/build/test/merge time, total runner minutes and elapsed time; compare with the recorded 6.3-minute local baseline with budget.
 - [x] Settle eval policy with the user and deliver free fake CI/root mechanics; see [policy](docs/agent-reference/EvalPolicy.md).
 - [ ] Receive AI-owned paid selector/guard/evidence implementation and reconciled opening spend before local paid activation.
-- [ ] Verify the first hosted Actions run after authorized publication; API/infra provisioning awaits bindings and authorization.
+- [ ] Validate the new workflow on GitHub after the user commits and publishes it. The original CI is already running on GitHub.
 
 ## Later tasks
 
-- [ ] Add deployment and live acceptance after manual setup, real bindings and authorization. Property checks remain non-blocking; AI owns its eval workflow.
-- [ ] Alchemy infrastructure: Worker/assets, D1, Durable Objects and rate limits. Follow `MANUAL-SETUP-STEPS.md` on a throwaway account before production; keep local Wrangler config aligned.
+- [x] Implement the gated deploy and full live acceptance. Property checks remain independent, and AI owns its eval workflow.
+- [ ] Verify Alchemy D1 and Worker deployment in the throwaway account, then repeat after production authorization. Follow [First deploy](MANUAL-SETUP-STEPS.md#first-deploy).
 - [ ] Before publication, scrub secrets/history, local settings, personal paths and addresses. No deploy, commit or push without the required authorization.
 - [ ] Final tuning and case-study evidence, including the shutdown drill and real measurements.
-- [ ] Scaffold infra/ and its package instructions when server bindings exist; keep local Wrangler configuration aligned.
+- [x] Scaffold the infra package and its instructions. Keep the local Wrangler manifest and deployed Alchemy bindings aligned.
 - [ ] Measure infrastructure costs with server/AI runtime measurements before proposing free versus Workers Paid.
 
 ## Verification/latest delivery
+
+2026-11-19 infrastructure review: split database provisioning, Worker deployment and release handling into subject folders. Alchemy declares the database and Worker directly. The routing mutation failed only the same-origin configuration test. GitHub Actions step spacing has been normalized across workflows and the composite action.
+
+2026-11-19 release verification: `pnpm checks` passed 3,461 tests with the existing slow audio skip. All three deploy-config criteria failed against the scaffold and then passed. Actionlint and the complete/failed/missing shard-report probes passed. The Wrangler dry run bundled the Worker. The generated config served the release assets, queried migrated local D1 and passed all three WebSocket fog criteria. The two-worker preview run passed 496 of 500. Four workshop criteria failed while typing the prompt and all four passed twice in isolated reruns. The first hosted run after Engine's fix passed Checks before a newer main run superseded it. See [handoff](HANDOFF.md#latest-ship-delivery).
 
 2026-11-19 thumbnail placement: the folder check failed on the integrated baseline. The old path is now absent, the moved helper matches the original byte for byte and `InventorySlot.tsx` is its only importer. Reviewed the root, webapp, React and acceptance instructions and audited the folders and callers. `pnpm checks` passed lint, formatting, strict types and 3,467 tests with one existing audio render skipped. All 10 generated and built-in inventory criteria passed on production preview without retries.
 

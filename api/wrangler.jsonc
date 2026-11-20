@@ -1,6 +1,5 @@
 {
-  // For `wrangler dev` only. Production is declared in `infra/` (planned) and deployed by Alchemy, which keeps the same names and
-  // bindings: change them there too.
+  // The local Worker manifest. Keep these bindings aligned with the Alchemy Worker in `infra/`.
   "name": "gunsmith-api",
   "main": "src/ApiWorker.ts",
   "compatibility_date": "2026-11-01",
@@ -28,7 +27,7 @@
   // Ten sign-in starts or callbacks a minute per address (`router/routes/sign-in/login-limit/LoginAllowed`); a failing limiter lets the request through.
   "ratelimits": [{"name": "LOGIN_LIMITER", "namespace_id": "2001", "simple": {"limit": 10, "period": 60}}],
   // Accounts and sessions (`src/accounts/`, D1 through Drizzle). Local `wrangler dev` makes its own database whatever the id says;
-  // `infra/` provisions the real one and gives it its id. SQL lives in `migrations/` (`pnpm db:generate` writes it, Wrangler applies it).
+  // `infra/` provisions the real one and gives it its id. SQL lives in `migrations/` (`pnpm db:generate` writes it, Alchemy applies it in production).
   "d1_databases": [
     {
       "binding": "DB",

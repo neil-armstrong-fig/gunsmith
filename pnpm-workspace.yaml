@@ -3,6 +3,7 @@ packages:
   - ai
   - api
   - engine
+  - infra
   - shared
   - webapp
   - webapp/audio
@@ -38,10 +39,19 @@ strictDepBuilds: true
 allowBuilds:
   esbuild: true
   workerd: false
+  sharp: false
+
+# Match the undici dispatcher to Node's fetch, as Janggi does for Alchemy.
+packageExtensions:
+  alchemy@0.94.0:
+    dependencies:
+      undici: 7.29.0
 
 # Every external dependency is declared here once, exact-pinned, and each package says `catalog:`. A version changes in
 # one place for every package that uses it. Chosen 2026-11-12: the newest stable release at least seven days old.
 catalog:
+  alchemy: 0.94.0
+  tsx: 4.23.15
   # Type declarations for the Workers runtime (Durable Objects, WebSockets); `api/` is checked against them. Approved 2026-11-17, the version janggi's API uses.
   "@cloudflare/workers-types": 5.20260921.1
   # Offline Web Audio for art's Node-only TypeScript renderer (approved 2026-11-12).
