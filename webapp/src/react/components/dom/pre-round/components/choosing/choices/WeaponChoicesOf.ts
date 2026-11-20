@@ -1,10 +1,8 @@
-import {MARKSMAN_RIFLE} from "@gunsmith/engine/weapon/weapons/MarksmanRifle";
-import {RIFLE} from "@gunsmith/engine/weapon/weapons/Rifle";
-import {SUBMACHINE_GUN} from "@gunsmith/engine/weapon/weapons/SubmachineGun";
+import {BUILT_IN_WEAPONS} from "@gunsmith/engine/built-in-weapons/BuiltInWeapons";
 import type {WeaponChoice} from "@src/react/components/dom/pre-round/components/choosing/choices/types/WeaponChoice";
 import type {ShelfWeapon} from "@src/store/shelf/types/ShelfWeapon";
 
-const BUILT_IN_CHOICES: readonly WeaponChoice[] = [RIFLE, MARKSMAN_RIFLE, SUBMACHINE_GUN].map(weapon => ({
+const BUILT_IN_CHOICES: readonly WeaponChoice[] = BUILT_IN_WEAPONS.map(weapon => ({
   id: weapon.identity?.key ?? "",
   weapon,
 }));
