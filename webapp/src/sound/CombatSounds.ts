@@ -25,7 +25,7 @@ export class CombatSounds {
   }
 
   /** Call once after every step, with what it reported. */
-  afterTick({events, firing, round, seconds, reloadStarted}: TickCues): void {
+  afterTick({events, firing, round, seconds}: TickCues): void {
     const refused = events?.some(event => event.kind === "fireRefused") === true;
 
     if (this.click.shouldClick({refused, firing, round})) {
@@ -47,10 +47,7 @@ export class CombatSounds {
     for (const event of events ?? []) {
       if (event.kind === "shotFired") this.output.play("sfx-shot");
       if (event.kind === "footstep") this.output.play("sfx-footstep");
-    }
-
-    if (round === "playing" && reloadStarted) {
-      this.output.play("sfx-reload");
+      if (event.kind === "reloadStarted" && round === "playing") this.output.play("sfx-reload");
     }
 
     this.heard.play(events);

@@ -88,7 +88,11 @@ it("hands over the events the snapshots carried once, with the game time they co
   socket.receive(snapshotText({world: {...QUIET, events: [{kind: "pickupTaken"}]}, elapsedSeconds: 1.05}));
   socket.receive(snapshotText({elapsedSeconds: 1.1}));
 
-  expect(match.takeEvents()).toEqual({events: [heard, {kind: "pickupTaken"}], seconds: expect.closeTo(0.1, 9)});
+  expect(match.takeEvents()).toEqual({
+    events: [heard, {kind: "pickupTaken"}],
+    seconds: expect.closeTo(0.1, 9),
+    opponentVisible: true,
+  });
   expect(match.takeEvents()).toBeUndefined();
 });
 
@@ -99,7 +103,7 @@ it("hands over a quiet snapshot as no events and its time, so a frame with no ne
 
   socket.receive(snapshotText({elapsedSeconds: 1.05}));
 
-  expect(match.takeEvents()).toEqual({events: [], seconds: expect.closeTo(0.05, 9)});
+  expect(match.takeEvents()).toEqual({events: [], seconds: expect.closeTo(0.05, 9), opponentVisible: true});
 });
 
 it("covers no time for the first snapshot, and none when a new round turned the clock back", () => {
@@ -109,6 +113,23 @@ it("covers no time for the first snapshot, and none when a new round turned the 
 
   socket.receive(snapshotText({elapsedSeconds: 0.5}));
   expect(match.takeEvents()?.seconds).toBe(0);
+});
+
+it("reports the latest snapshot's visibility even if the rendered opponent is still held by interpolation", () => {
+  const {socket, match} = seatedMatch();
+  socket.receive(snapshotText({world: {...QUIET, events: [{kind: "hitLanded", on: "opponent"}]}, elapsedSeconds: 1}));
+  socket.receive(snapshotText({world: {...QUIET, opponent: undefined}, elapsedSeconds: 1.05}));
+
+  expect(match.worldToShow(0)?.opponent).toBeDefined();
+  expect(match.takeEvents()).toMatchObject({events: [{kind: "hitLanded", on: "opponent"}], opponentVisible: false});
+});
+
+it("discards a previous round's queued events when a new round arrives before the next frame", () => {
+  const {socket, match} = seatedMatch();
+  socket.receive(snapshotText({world: {...QUIET, events: [{kind: "hitLanded", on: "opponent"}]}, elapsedSeconds: 7}));
+  socket.receive(snapshotText({elapsedSeconds: 0}));
+
+  expect(match.takeEvents()).toEqual({events: [], seconds: 0, opponentVisible: true});
 });
 
 it("has no events to hand over before a snapshot has come, and shows none in the world each frame", () => {

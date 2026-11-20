@@ -87,6 +87,9 @@ describe("with two carried weapons", () => {
 
     expect(after.player.reloadRemainingSeconds).toBe(RIFLE.reloadSeconds);
     expect(after.player.loadout[0]?.rounds).toBe(3);
+    expect(after.events).toEqual([{kind: "reloadStarted"}]);
+    expect(step(after, {...IDLE, reload: true}, TICK).events).toBeUndefined();
+    expect(step(centred(), {...IDLE, reload: true}, TICK).events).toBeUndefined();
   });
 
   it("fills the magazine from the reserve once the reload time has passed, and not before", () => {
