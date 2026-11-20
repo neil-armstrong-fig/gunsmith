@@ -134,7 +134,14 @@ export function useGameLoop(): void {
 
       const before = world;
       world = engine.step(world, input, TICK_SECONDS);
-      sounds.afterTick({events: world.events, firing: input.firing, round: world.round, seconds: TICK_SECONDS});
+      const {reloadRemainingSeconds} = world.player;
+      sounds.afterTick({
+        events: world.events,
+        firing: input.firing,
+        round: world.round,
+        seconds: TICK_SECONDS,
+        reloadStarted: before.player.reloadRemainingSeconds === undefined && reloadRemainingSeconds !== undefined,
+      });
       recordFeedbackCues({before, after: world});
     }
 

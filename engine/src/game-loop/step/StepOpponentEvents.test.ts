@@ -95,14 +95,15 @@ it("tells the first fighter which way the second's shot came from, and the secon
   expect(second.opponentEvents).toContainEqual({kind: "heard", sound: "shot", sector: 6, loudness: "near"});
 });
 
-it("does not tell a fighter their own shot", () => {
+it("tells each fighter their own shot separately from what the other fighter hears", () => {
   const {events, opponentEvents} = playFrom(
     startingWorld(arena, [], FIGHTERS_APART),
     {first: FIRING_AT_THE_SECOND, second: IDLE},
     1,
   );
 
-  expect(events.filter(event => event.kind === "heard")).toEqual([]);
+  expect(events).toEqual([{kind: "shotFired"}]);
+  expect(opponentEvents.filter(event => event.kind === "shotFired")).toEqual([]);
   expect(opponentEvents.filter(event => event.kind === "heard")).toHaveLength(1);
 });
 
@@ -152,6 +153,18 @@ it("tells the other fighter a footfall from where the walker stands after the st
   const [heard] = stepFighters(world, {first: IDLE, second: walkingWest}, TICK).events ?? [];
 
   expect(heard).toMatchObject({sound: "step", loudness: "mid"});
+});
+
+it("reports a footfall on each short walk separated by a stop, even inside one stride", () => {
+  const world = startingWorld(arena, [], FIGHTERS_APART);
+  const walking: Input = {...IDLE, direction: {x: 0, y: 1}};
+  const first = stepFighters(world, {first: IDLE, second: walking}, TICK);
+  const still = stepFighters(first, {first: IDLE, second: IDLE}, TICK);
+  const second = stepFighters(still, {first: IDLE, second: walking}, TICK);
+
+  expect(first.events?.filter(isFootfall)).toHaveLength(1);
+  expect(still.events).toBeUndefined();
+  expect(second.events?.filter(isFootfall)).toHaveLength(1);
 });
 
 it("tells each fighter the other's footfalls while they walk, a stride apart", () => {

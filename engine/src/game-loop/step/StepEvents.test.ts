@@ -59,7 +59,7 @@ it("reports no empty click on the shot that empties the magazine, and none while
   };
   const shot = step(lastRound, EAST, TICK);
 
-  expect(shot.events).toBeUndefined();
+  expect(shot.events).toEqual([{kind: "shotFired"}]);
   expect(step(shot, EAST, TICK).events).toBeUndefined();
 });
 

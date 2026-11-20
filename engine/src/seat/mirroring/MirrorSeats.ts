@@ -26,6 +26,8 @@ export function mirrorSeats(world: World): World {
     match: world.match && mirrorMatch(world.match),
     events: world.opponentEvents,
     opponentEvents: world.events,
+    footstep: world.opponentFootstep,
+    opponentFootstep: world.footstep,
   };
 }
 
