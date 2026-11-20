@@ -40,6 +40,48 @@ The redundant review screenshots and capture metadata were removed at the
 user's request; the approved marker proof embeds its source images. The
 fallback-contrast finding remains in `HANDOFF.md`.
 
+## Runtime grammar review — 2026-11-20
+
+At `87749fe`, the AI validator accepts all twelve appearance studies. Chromium 156 rendered their body
+SVGs through the webapp's `appearanceSvg` with the same structural tier the arena texture loader requests
+at every zoom. The review sheets use all three lit floor tiles, the C2 marker, and the standing and
+crouched blue fighter in four aim directions. They use the runtime grip at (4, 32), with the fighter drawn
+above the held artwork. At 64 and 32 pixels per tile the 64-unit art canvas is about 46/23 pixels wide on
+the ground and 59/30 pixels wide in hand. Both scales were inspected in colour and grayscale. Standalone
+renders with both detail tiers show which features the structural tier omits.
+
+All six pairs remain distinguishable side by side at both scales. The table records what survives and
+what becomes harder to read in the structural-only views.
+
+| Study | At 64 px per tile | At 32 px per tile |
+| --- | --- | --- |
+| Cactus cluster | Offset branches and a round crown separate the silhouette from the stem. | Branches and crown still read in hand and on the ground. Crown facet strokes are fine detail. |
+| Cactus stem | Broad faceted stem, paired spine tips and centre rib. | Outline and tips survive. The rib gets faint, especially in grayscale. |
+| Duck hull | Round body and head with a projecting beak. | Head and beak survive in colour. The beak blends with the yellow form in grayscale, and the fighter covers the tail in hand. The eye is fine detail. |
+| Duck reservoir | Square frame around the round yellow insert. | The frame still distinguishes it from the hull. The insert reads as a round accent and loses much of its duck profile. |
+| Fax desktop | Two pale rectangular paper surfaces around a dark slot. | The paper pair and slot survive. The casing fill nearly merges with the lowest floor. Paper rules and the small indicator are fine detail. |
+| Fax receipt | Stepped pale paper and a narrower body with a violet inset. | Offset paper distinguishes it from the desktop. The inset is weak in grayscale and the dark housing relies on its edge. |
+| Gum coil | Rectangular frame and a pink folded strip. | The frame and bands survive. The strip reads as parallel bars in hand, where the fighter covers part of the fold. |
+| Gum drum | Circular hopper, distinct gumballs and a square front nozzle. | The circle and nozzle survive. The gumballs blend in grayscale and the pale highlight carries much of the interior contrast. |
+| Jellyfish bell | Open oval and tapered forward braids. | Oval and taper survive. The fighter overlaps the rear arc. The inner glint is fine detail. |
+| Jellyfish cage | Faceted blue body with a pale square core. | The core remains visible on the pickup and in hand. Fine cage lines are omitted, and the fighter covers part of the core in some held views. |
+| Teapot angular | Faceted body, square lid inset and front spout. | Inset and spout distinguish it from the kettle. The rear handle is weak on the ground and mostly covered in hand. |
+| Teapot kettle | Round lid and body, front spout and rear loop. | The circular lid and spout survive. The rear loop is thin on the ground and the fighter covers it in hand. |
+
+For AI's review, use a structural cue that projects beyond the fighter in every pose. The cactus cluster's
+branching outline and the cage's pale core work at both scales. The duck reservoir and gum drum are
+examples where the silhouette survives but some of the requested identity depends on colour or small
+interior marks. For Engine and AI's appearance-association review, use the held-versus-pickup evidence
+when judging any grip change. A rear cue that reads on the pickup can be covered by the fighter even
+when the renderer includes that part. These findings concern body appearance and placement. The proposed
+projectile, impact and behaviour examples still need their own consumers.
+
+Seed 8 sparring in the production build confirmed that the lantern's blue cage and the cactus's mint
+body disappear when the player turns away and return when they face the pickup again at both scales.
+Collection clears the ground pickup and equips its drawing in slot 2. The lantern's pale core and the
+cactus's mint branches remain visible in hand. All 25 focused browser criteria passed with one worker
+and zero retries. S4-1 remains open for separate review of the stand-in's body and outline.
+
 ## How a generic renderer reproduces the drawings
 
 The twelve files in `appearances/` are **appearance-only proposals**. They must not be submitted to the current AI

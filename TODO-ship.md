@@ -1,10 +1,12 @@
 # TODO: ship
 
+**FOCUS ON MVP TASKS FIRST**
+
 Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only relevant dependencies.
 
 ## Resume here
 
-The persistent checkout is `.claude/worktrees/ship` on `worktree-ship`, fast-forwarded to `origin/main` at `1e486f8`. The current slice owns `.github/workflows/ci.yml`. After publication, verify that Checks reaches `pnpm checks`, all four preview shards finish and the combined HTML report is present.
+The persistent checkout is `.claude/worktrees/ship` on `worktree-ship`. Merged `origin/main` at `52443a3` before publishing the CI update. The current slice owns `.github/workflows/ci.yml`. After publication, verify that Checks reaches `pnpm checks`, all four preview shards finish and the combined HTML report is present.
 
 The first combined Worker from `d40d942` is live on the API hostname. The locally verified two-host release reached GitHub main at `bc47751`. The webapp custom domain serves static test Worker version `8b2f62ff-f3f9-4e83-92c4-6cdc5d0ba93d` with `noindex`. The user deferred live rollout and automatic releases while Ship stabilizes CI.
 

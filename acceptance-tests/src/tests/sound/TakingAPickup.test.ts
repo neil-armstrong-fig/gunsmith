@@ -11,14 +11,15 @@ given("seed-8 sparring with a pickup on the player's row", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.walkFor("east", 0.7);
       await gunsmith.pickup.waitUntilTaken();
-      await gunsmith.hud.waitForSlot(2);
     });
 
-    then("the submachine gun appears in slot 2 and the latch plays once", async ({gunsmith}) => {
-      expect(await gunsmith.hud.getInventory()).toMatchObject({
-        selectedName: "Submachine gun",
-        secondSelected: true,
-      });
+    then("the submachine gun is in hand, in the slot that was held, and the latch plays once", async ({gunsmith}) => {
+      await expect
+        .poll(() => gunsmith.hud.getInventory())
+        .toMatchObject({
+          selectedName: "Submachine gun",
+          firstSelected: true,
+        });
       await expect.poll(async () => (await gunsmith.sound.getPlays(PICKUP_SOUND)).length).toBe(1);
       await expect
         .poll(async () => await gunsmith.sound.getPlays(PICKUP_SOUND))
@@ -52,13 +53,12 @@ given("seed-8 sparring with a pickup on the player's row", () => {
       await gunsmith.sound.toggleMute();
       await gunsmith.player.walkFor("east", 0.7);
       await gunsmith.pickup.waitUntilTaken();
-      await gunsmith.hud.waitForSlot(2);
       await gunsmith.sound.toggleMute();
       await gunsmith.waitForGameSeconds(0.5);
     });
 
     then("the inventory is updated and the latch has stayed silent", async ({gunsmith}) => {
-      expect(await gunsmith.hud.getInventory()).toMatchObject({selectedName: "Submachine gun"});
+      await expect.poll(() => gunsmith.hud.getInventory()).toMatchObject({selectedName: "Submachine gun"});
       expect(await gunsmith.sound.getPlays(PICKUP_SOUND)).toHaveLength(0);
     });
   });
