@@ -47,7 +47,15 @@ it("leaves a round still being fought as it is", () => {
   expect(mirrorSeats({...duel(), round: "playing"}).round).toBe("playing");
 });
 
-it("drops what happened to the first fighter", () => {
+it("gives each fighter's events to the other seat's side, so the second seat's are the player's", () => {
+  const world: World = {...duel(), opponentEvents: [{kind: "pickupTaken"}]};
+  const mirrored = mirrorSeats(world);
+
+  expect(mirrored.events).toEqual([{kind: "pickupTaken"}]);
+  expect(mirrored.opponentEvents).toEqual([{kind: "fireRefused", reason: "empty"}]);
+});
+
+it("has no events for the second seat when the opponent had none", () => {
   expect(mirrorSeats(duel()).events).toBeUndefined();
 });
 
@@ -58,7 +66,7 @@ it("returns a world with no opponent as it is", () => {
 });
 
 it("is its own inverse", () => {
-  const world = {...duel(), events: undefined, opponentBrain: undefined};
+  const world = {...duel(), opponentEvents: [{kind: "pickupTaken" as const}], opponentBrain: undefined};
 
   expect(mirrorSeats(mirrorSeats(world))).toEqual(world);
 });

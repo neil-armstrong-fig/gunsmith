@@ -2,6 +2,7 @@ import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import {fairStart} from "@gunsmith/engine/arena-symmetry/FairStart";
 import {DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/DuelBuiltInArena";
+import type {CombatEvent} from "@gunsmith/engine/combat-events/types/CombatEvent";
 import {stepFighters} from "@gunsmith/engine/game-loop/StepFighters";
 import type {FighterInputs} from "@gunsmith/engine/game-loop/types/FighterInputs";
 import type {Input} from "@gunsmith/engine/game-loop/types/Input";
@@ -14,10 +15,16 @@ import type {Match} from "@gunsmith/engine/match/types/Match";
 import type {Seat} from "@gunsmith/engine/seat/types/Seat";
 import {viewOfSeat} from "@gunsmith/engine/seat/ViewOfSeat";
 import type {InputAck} from "@gunsmith/shared/online/types/InputAck";
+import {DEFAULT_PRE_ROUND_SECONDS} from "@src/durable-objects/match/pre-round/DefaultPreRoundSeconds";
+import {PreRound} from "@src/durable-objects/match/pre-round/PreRound";
+import type {PreRoundMessage} from "@src/durable-objects/match/pre-round/types/PreRoundMessage";
+import type {PreRoundAction} from "@src/durable-objects/match/messages/types/PreRoundAction";
 import {DEFAULT_FORFEIT_LIMITS} from "@src/durable-objects/match/room/DefaultForfeitLimits";
 import {askChanged} from "@src/durable-objects/match/room/forfeit/AskChanged";
+import type {ArenaMessage} from "@src/durable-objects/match/room/types/ArenaMessage";
 import type {ForfeitLimits} from "@src/durable-objects/match/room/types/ForfeitLimits";
 import type {JoinedMessage} from "@src/durable-objects/match/room/types/JoinedMessage";
+import type {MatchRoomOptions} from "@src/durable-objects/match/room/types/MatchRoomOptions";
 import type {Readiness} from "@src/durable-objects/match/room/types/Readiness";
 import type {SeedMaker} from "@src/durable-objects/match/room/types/SeedMaker";
 import type {SnapshotMessage} from "@src/durable-objects/match/room/types/SnapshotMessage";
@@ -44,7 +51,13 @@ const SEATS: readonly Seat[] = ["first", "second"];
  * (two people gone is a stall, not a win for either), and a decided match forfeits nothing.
  */
 export class MatchRoom {
-  private readonly arena: Arena = arenaFrom(DUEL_BUILT_IN_ARENA.rows);
+  private arenaRows: readonly string[] = DUEL_BUILT_IN_ARENA.rows;
+  private arena: Arena = arenaFrom(DUEL_BUILT_IN_ARENA.rows);
+  private arenaToTell: ArenaMessage | undefined;
+  private readonly preRound: PreRound;
+  private readonly limits: ForfeitLimits;
+  private readonly makeToken: () => string;
+  private readonly makeSeed: SeedMaker;
   private readonly seated: Seat[] = [];
   private readonly tokens: Record<Seat, string> = {first: "", second: ""};
   private readonly asked: Record<Seat, Input> = {first: NOTHING_ASKED, second: NOTHING_ASKED};
@@ -54,19 +67,21 @@ export class MatchRoom {
   private readonly present: Record<Seat, boolean> = {first: true, second: true};
   private readonly silentSeconds: Record<Seat, number> = {first: 0, second: 0};
   private world: World | undefined;
+  /** What happened to each seat in the steps of the last `tick`, in order: the engine tells one step's, and a tick may play several. */
+  private happened: Record<Seat, CombatEvent[]> = {first: [], second: []};
+
+  /** What the room does unless `options` say otherwise (`MatchRoomOptions`). */
+  constructor(options: MatchRoomOptions = {}) {
+    this.limits = options.limits ?? DEFAULT_FORFEIT_LIMITS;
+    this.makeToken = options.makeToken ?? (() => crypto.randomUUID());
+    this.makeSeed = options.makeSeed ?? (() => crypto.getRandomValues(new Uint32Array(1))[0] ?? 0);
+    this.preRound = new PreRound(options.preRoundSeconds ?? DEFAULT_PRE_ROUND_SECONDS, this.makeSeed);
+  }
 
   /**
-   * `limits` is how long the room waits for a person (the real ones unless a page asked for shorter). `makeToken` makes the secret each
-   * seat is given as it sits down: whoever shows it later is that seat's person. `makeSeed` makes the seed each round's fair start is
-   * drawn from (`fairStart`), so no round starts the fighters where the last did unless the draw says so.
+   * The next free seat, or `undefined` when both are taken. The second to sit starts the pre-round's clock; the match itself begins
+   * when the pre-round has decided the arena (at once when the room is allowed no time to choose).
    */
-  constructor(
-    private readonly limits: ForfeitLimits = DEFAULT_FORFEIT_LIMITS,
-    private readonly makeToken: () => string = () => crypto.randomUUID(),
-    private readonly makeSeed: SeedMaker = () => crypto.getRandomValues(new Uint32Array(1))[0] ?? 0,
-  ) {}
-
-  /** The next free seat, or `undefined` when both are taken. The second to sit starts the match. */
   join(): Seat | undefined {
     const seat = this.nextFreeSeat();
     if (!seat) {
@@ -78,20 +93,22 @@ export class MatchRoom {
     this.present[seat] = true;
     this.silentSeconds[seat] = 0;
     if (seat === "second") {
-      this.world = this.worldOfRound(startMatch());
+      this.preRound.startClock();
+      this.beginMatchIfDecided();
     }
 
     return seat;
   }
 
   /**
-   * Notes that `seat`'s person is gone. Before the match begins the seat is given back: a browser that connects and goes (a page
-   * reloading) must not keep the room full, and its token is void. Once it has begun the seat is kept for its person, who may come back
-   * with its token (`reconnect`) and is not replaced by a stranger. Meanwhile the fighter stands still where it is, in the match and still
-   * hittable, as `docs/match-netcode.md` says, until the reconnect window runs out and the round is forfeited.
+   * Notes that `seat`'s person is gone. A seat on its own is given back, with what it had chosen: a browser that connects and goes (a page
+   * reloading) must not keep the room full, and its token is void. Once both have sat (the pre-round, then the match) the seat is kept
+   * for its person, who may come back with its token (`reconnect`) and is not replaced by a stranger. Meanwhile the fighter stands still
+   * where it is, in the match and still hittable, as `docs/match-netcode.md` says, until the reconnect window runs out and the round is
+   * forfeited.
    */
   leave(seat: Seat): void {
-    if (this.world) {
+    if (this.isCommitted()) {
       this.asked[seat] = NOTHING_ASKED;
       this.pulled[seat] = false;
       this.present[seat] = false;
@@ -104,6 +121,7 @@ export class MatchRoom {
     if (index >= 0) {
       this.seated.splice(index, 1);
       this.tokens[seat] = "";
+      this.preRound.release(seat);
     }
   }
 
@@ -115,7 +133,7 @@ export class MatchRoom {
    */
   reconnect(token: string): Seat | undefined {
     const seat = this.seatOfToken(token);
-    if (!seat || !this.world) {
+    if (!seat || !this.isCommitted()) {
       return undefined;
     }
 
@@ -128,9 +146,46 @@ export class MatchRoom {
     return seat;
   }
 
-  /** The word a browser is sent as it sits down, with the secret that gets the seat back for it. */
+  /**
+   * The word a browser is sent as it sits down, with the secret that gets the seat back for it. The arena is the room's current one: the
+   * duel arena (a backdrop) until the pre-round has decided, the decided one after, so a browser that returns mid-match is told the right one.
+   */
   joinedMessage(seat: Seat): JoinedMessage {
-    return {kind: "joined", seat, arena: DUEL_BUILT_IN_ARENA.rows, token: this.tokens[seat]};
+    return {kind: "joined", seat, arena: this.arenaRows, token: this.tokens[seat]};
+  }
+
+  /**
+   * What `seat` does while the room is choosing its arena (`PreRound` ignores it once decided). When it is the action that settles the
+   * arena the match begins at once, in the arena decided.
+   */
+  preRoundAction(seat: Seat, action: PreRoundAction): void {
+    if (action.kind === "chooseArena") {
+      this.preRound.chooseArena(seat, action.name);
+    }
+    if (action.kind === "lockInArena") {
+      this.preRound.lockIn(seat);
+    }
+    if (action.kind === "pickArena") {
+      this.preRound.pickArena(seat, action.pick);
+    }
+    this.beginMatchIfDecided();
+  }
+
+  /** What `seat` may be told while the room is choosing, or `undefined` once the match has begun or before the seat has sat. */
+  preRoundFor(seat: Seat): PreRoundMessage | undefined {
+    if (this.world || !this.seated.includes(seat)) {
+      return undefined;
+    }
+
+    return this.preRound.viewOf(seat);
+  }
+
+  /** The arena the match is played in, once, the first time it is asked after the pre-round has decided it. */
+  takeArenaMessage(): ArenaMessage | undefined {
+    const message = this.arenaToTell;
+    this.arenaToTell = undefined;
+
+    return message;
   }
 
   /**
@@ -178,7 +233,14 @@ export class MatchRoom {
    * plays it). A reload, weapon switch or trigger pull is played in the first step only.
    */
   tick(steps = 1): void {
-    if (!this.world || steps <= 0) {
+    this.happened = {first: [], second: []};
+    if (steps <= 0) {
+      return;
+    }
+    if (!this.world) {
+      this.preRound.tick(steps * MATCH_TICK.stepSeconds);
+      this.beginMatchIfDecided();
+
       return;
     }
 
@@ -186,6 +248,8 @@ export class MatchRoom {
     let world = this.world;
     for (let step = 0; step < steps; step += 1) {
       world = stepFighters(world, this.inputsOfStep(step), MATCH_TICK.stepSeconds);
+      this.happened.first.push(...(world.events ?? []));
+      this.happened.second.push(...(world.opponentEvents ?? []));
     }
     this.world = world;
     this.asked.first = withoutOneShots(this.asked.first);
@@ -212,7 +276,41 @@ export class MatchRoom {
       return undefined;
     }
 
-    return {kind: "snapshot", ...viewOfSeat(this.world, seat), ack: this.acked[seat], ready: this.readinessOf(seat)};
+    return {
+      kind: "snapshot",
+      ...viewOfSeat(this.world, seat),
+      events: this.eventsOf(seat),
+      ack: this.acked[seat],
+      ready: this.readinessOf(seat),
+    };
+  }
+
+  /** What happened to `seat` in the steps of the last tick, or `undefined` when nothing did. */
+  private eventsOf(seat: Seat): readonly CombatEvent[] | undefined {
+    const events = this.happened[seat];
+    if (events.length === 0) {
+      return undefined;
+    }
+
+    return events;
+  }
+
+  /** Both seats have sat: the room is no longer one a seat may be given back from. */
+  private isCommitted(): boolean {
+    return this.world !== undefined || this.seated.length === 2;
+  }
+
+  /** Once the pre-round has decided the arena, the match begins in it and both browsers are told it, once. */
+  private beginMatchIfDecided(): void {
+    const outcome = this.preRound.outcome();
+    if (!outcome || this.world) {
+      return;
+    }
+
+    this.arenaRows = outcome.arena.rows;
+    this.arena = arenaFrom(outcome.arena.rows);
+    this.arenaToTell = {kind: "arena", rows: outcome.arena.rows};
+    this.startRound(this.worldOfRound(startMatch()));
   }
 
   /** The round after the one `match` has just ended, or a fresh match when `match` is decided. */

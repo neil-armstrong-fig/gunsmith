@@ -15,4 +15,6 @@ export interface BulletFlight {
   opponentDamage: number;
   /** Every player's bullet that landed on the opponent or a dummy, in order, whether or not the player could see it. */
   playerHits: LandedHit[];
+  /** Every opponent's bullet that landed on the player, in order, as hits on "the opponent" from the opponent's side, whether or not the opponent could see it. */
+  opponentHits: LandedHit[];
 }

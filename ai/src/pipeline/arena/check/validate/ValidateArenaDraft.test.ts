@@ -153,8 +153,9 @@ it("lists the first few problems and counts the rest, so a speckled drawing cann
 
   expect(errors).toHaveLength(6);
   expect(errors.slice(0, 5)).toEqual(Array(5).fill(expect.stringContaining("1 tiles of floor")));
-  // 23 pieces of floor cut off from the largest, and a drawing that is only a fifth floor (engine's `tooWalled`).
-  expect(errors[5]).toBe("And 19 more of the same kind.");
+  // 23 pieces of floor cut off from the largest, no way to start two fighters on what is left (engine's `noStartingPlaces`)
+  // and a drawing that is only a fifth floor (engine's `tooWalled`).
+  expect(errors[5]).toBe("And 20 more of the same kind.");
 });
 
 it("shortens every sentence, because the model will be shown them", () => {

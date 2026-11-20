@@ -1,4 +1,4 @@
-import {isPlaceToStand} from "@gunsmith/engine/arena-symmetry/spawn-pairs/IsPlaceToStand";
+import {isPlaceToStand} from "@gunsmith/engine/arena-symmetry/IsPlaceToStand";
 import type {WalkSearch} from "@gunsmith/engine/arena-symmetry/spawn-pairs/matched-distances/types/WalkSearch";
 import type {PlacePair} from "@gunsmith/engine/arena-symmetry/spawn-pairs/types/PlacePair";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";

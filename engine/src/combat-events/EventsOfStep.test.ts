@@ -1,4 +1,5 @@
 import {eventsOfStep} from "@gunsmith/engine/combat-events/EventsOfStep";
+import type {HeardEvent} from "@gunsmith/engine/combat-events/types/HeardEvent";
 import type {CombatEvent} from "@gunsmith/engine/combat-events/types/CombatEvent";
 import type {DamageToPlayer} from "@gunsmith/engine/combat-events/types/DamageToPlayer";
 import type {EventsRequest} from "@gunsmith/engine/combat-events/types/EventsRequest";
@@ -48,9 +49,28 @@ it("reports a refusal, a loss and a hit together, the loss before the hit", () =
   ]);
 });
 
+it("reports what was heard of the other fighter, in order and after everything else", () => {
+  const shot: HeardEvent = {kind: "heard", sound: "shot", sector: 3, loudness: "far"};
+  const step: HeardEvent = {kind: "heard", sound: "step", sector: 5, loudness: "near"};
+
+  expect(eventsOf({heard: [shot, step], playerTookPickup: true, visibleHits: ["dummy"]})).toEqual([
+    {kind: "hitLanded", on: "dummy"},
+    {kind: "pickupTaken"},
+    shot,
+    step,
+  ]);
+});
+
 /** What `eventsOfStep` says about a quiet step, with `changes` made to what happened in it. */
 function eventsOf(changes: Partial<EventsRequest>): readonly CombatEvent[] | undefined {
-  return eventsOfStep({playerTurn: turn(), damage: UNHURT, visibleHits: [], playerTookPickup: false, ...changes});
+  return eventsOfStep({
+    playerTurn: turn(),
+    damage: UNHURT,
+    visibleHits: [],
+    playerTookPickup: false,
+    heard: [],
+    ...changes,
+  });
 }
 
 function turn(changes: Partial<FighterTurn> = {}): FighterTurn {

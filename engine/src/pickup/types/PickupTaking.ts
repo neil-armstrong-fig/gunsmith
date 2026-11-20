@@ -5,4 +5,5 @@ import type {Pickup} from "@gunsmith/engine/pickup/types/Pickup";
 export interface PickupTaking extends Fighters {
   pickup: Pickup | undefined;
   playerTookPickup: boolean;
+  opponentTookPickup: boolean;
 }
