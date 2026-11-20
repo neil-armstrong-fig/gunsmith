@@ -40,7 +40,7 @@ async function runAndSettle(reservation: CreditReservation): Promise<Response> {
   const {credits, spend, key, prompt} = reservation;
   let outcome: WeaponOutcome;
   try {
-    outcome = await withTimeLimit(runWeaponPipeline(prompt), PIPELINE_TIME_LIMIT_MILLISECONDS);
+    outcome = await withTimeLimit(signal => runWeaponPipeline(prompt, signal), PIPELINE_TIME_LIMIT_MILLISECONDS);
   } catch (error) {
     await spend.settle(key, WEAPON_SPEND.reservedMicrodollars);
     await credits.refund(key);

@@ -38,7 +38,7 @@ async function runAndSettle(reservation: CreditReservation): Promise<Response> {
   const {credits, spend, key, prompt} = reservation;
   let outcome: ArenaOutcome;
   try {
-    outcome = await withTimeLimit(runArenaPipeline(prompt), PIPELINE_TIME_LIMIT_MILLISECONDS);
+    outcome = await withTimeLimit(signal => runArenaPipeline(prompt, signal), PIPELINE_TIME_LIMIT_MILLISECONDS);
   } catch (error) {
     await spend.settle(key, ARENA_SPEND.reservedMicrodollars);
     await credits.refund(key);
