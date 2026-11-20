@@ -58,3 +58,9 @@ it("carries the token and the limits together", () => {
     "ws://h/api/rooms/ABC234/socket?token=t&idleSeconds=3",
   );
 });
+
+it("passes on how long the two seats have to choose, and keeps a nought, which means none", () => {
+  expect(roomSocketUrl({protocol: "http:", host: "h"}, "ABC234", {search: "?room=ABC234&preRoundSeconds=0"})).toBe(
+    "ws://h/api/rooms/ABC234/socket?preRoundSeconds=0",
+  );
+});

@@ -419,6 +419,76 @@ it("closes the socket", () => {
   expect(socket.closed).toBe(true);
 });
 
+const OTHER_ROWS = [
+  "##############",
+  "#............#",
+  "#............#",
+  "#............#",
+  "#............#",
+  "##############",
+];
+
+it("plays on the arena the server says was decided, in place of the one it was seated in", () => {
+  const {socket, match} = seatedMatch();
+
+  socket.receive(JSON.stringify({kind: "arena", rows: OTHER_ROWS}));
+  socket.receive(snapshotText({world: startingWorld(arenaFrom(OTHER_ROWS), [], {x: 8.5, y: 2.5})}));
+
+  expect(match.worldToShow(0)?.arena).toEqual(arenaFrom(OTHER_ROWS));
+});
+
+it("has nothing to show of the choosing until the server says something about it", () => {
+  const {match} = seatedMatch();
+
+  expect(match.preRound()).toBeUndefined();
+});
+
+it("shows what the server last said of the choosing, and stops once the match has begun", () => {
+  const {socket, match} = seatedMatch();
+  const frame = {kind: "preRound", stage: "choosing", own: {locked: false}, opponent: {locked: true, picked: false}};
+
+  socket.receive(JSON.stringify(frame));
+  expect(match.preRound()).toEqual(frame);
+
+  socket.receive(snapshotText());
+  expect(match.preRound()).toBeUndefined();
+});
+
+it("puts an arena forward by its name", () => {
+  const {socket, match} = seatedMatch();
+
+  match.chooseArena("Fair duel");
+
+  expect(socket.frames()).toEqual([{kind: "choose", step: "arena", choice: {kind: "builtIn", name: "Fair duel"}}]);
+});
+
+it("locks in the arena it has chosen", () => {
+  const {socket, match} = seatedMatch();
+
+  match.lockInArena();
+
+  expect(socket.frames()).toEqual([{kind: "lockIn", step: "arena"}]);
+});
+
+it("picks between the two arenas shown", () => {
+  const {socket, match} = seatedMatch();
+
+  match.pickArena({kind: "arena", seat: "second"});
+
+  expect(socket.frames()).toEqual([{kind: "pickArena", pick: {kind: "arena", seat: "second"}}]);
+});
+
+it("sends no choosing while the socket is not open", () => {
+  const {socket, match} = seatedMatch();
+  socket.readyState = 0;
+
+  match.chooseArena("Duel");
+  match.lockInArena();
+  match.pickArena({kind: "nothing"});
+
+  expect(socket.frames()).toEqual([]);
+});
+
 function snapshotText(request: SnapshotRequest = {}): string {
   const world = request.world ?? startingWorld(arenaFrom(ROWS), [], {x: 8.5, y: 2.5});
 

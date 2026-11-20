@@ -20,7 +20,7 @@ const SEED_WITH_A_CLEAR_LINE = 2;
 const DUEL_ARENA = arenaFrom(DUEL_BUILT_IN_ARENA.rows);
 
 it("seats the first person first and the second second, and nobody after", () => {
-  const room = new MatchRoom();
+  const room = new MatchRoom({preRoundSeconds: 0});
 
   expect(room.join()).toBe("first");
   expect(room.join()).toBe("second");
@@ -28,7 +28,7 @@ it("seats the first person first and the second second, and nobody after", () =>
 });
 
 it("gives a seat back when its person leaves before the match begins", () => {
-  const room = new MatchRoom();
+  const room = new MatchRoom({preRoundSeconds: 0});
   const first = room.join();
   if (!first) {
     throw new Error("no seat");
@@ -75,7 +75,7 @@ it("lets the token of a seat that is still held take it over, as a page that rel
 });
 
 it("has no token for a seat that was given back before the match began", () => {
-  const room = new MatchRoom();
+  const room = new MatchRoom({preRoundSeconds: 0});
   room.join();
   const token = room.joinedMessage("first").token;
   room.leave("first");
@@ -128,7 +128,7 @@ it("keeps a seat's ask to go on across its person leaving and returning", () => 
 });
 
 it("sends a seat nothing until both seats are taken", () => {
-  const room = new MatchRoom();
+  const room = new MatchRoom({preRoundSeconds: 0});
   room.join();
 
   expect(room.snapshotFor("first")).toBeUndefined();
@@ -154,7 +154,7 @@ it("starts the fighters on the places the engine's fair start gives for the roun
 
 it("draws a seed of its own for each round, so the next round starts on the places that seed gives", () => {
   const seeds = [1, 2];
-  const room = new MatchRoom(undefined, undefined, () => seeds.shift() ?? 0);
+  const room = new MatchRoom({makeSeed: () => seeds.shift() ?? 0, preRoundSeconds: 0});
   room.join();
   room.join();
   winRound(room, "first");
@@ -168,7 +168,7 @@ it("draws a seed of its own for each round, so the next round starts on the plac
 
 it("starts the fighters at least the spacing apart on foot, whatever the seed", () => {
   for (let seed = 0; seed < 25; seed += 1) {
-    const room = new MatchRoom(undefined, undefined, () => seed);
+    const room = new MatchRoom({makeSeed: () => seed, preRoundSeconds: 0});
     room.join();
     room.join();
     const first = room.snapshotFor("first")?.player.position ?? {x: 0, y: 0};
@@ -260,7 +260,7 @@ it("keeps a weapon switch a later input in the same snapshot did not repeat", ()
 });
 
 it("does not step a match that has not begun", () => {
-  const room = new MatchRoom();
+  const room = new MatchRoom({preRoundSeconds: 0});
   room.join();
   room.tick();
 
@@ -494,7 +494,7 @@ it("keeps the round for a person who comes back inside the window, and starts th
 });
 
 it("waits as long as the room was made to wait", () => {
-  const room = new MatchRoom({reconnectSeconds: 2, idleSeconds: 3});
+  const room = new MatchRoom({limits: {reconnectSeconds: 2, idleSeconds: 3}, preRoundSeconds: 0});
   room.join();
   room.join();
   room.leave("first");
@@ -577,7 +577,7 @@ it("forfeits nothing when both seats are away together", () => {
 });
 
 it("runs no clock before the match has begun", () => {
-  const room = new MatchRoom();
+  const room = new MatchRoom({preRoundSeconds: 0});
   room.join();
 
   playSeconds(room, 100);
@@ -658,7 +658,7 @@ it("forfeits no round once the match is decided, whoever stays quiet", () => {
 });
 
 function startedRoom(): MatchRoom {
-  const room = new MatchRoom(undefined, undefined, () => SEED_WITH_A_CLEAR_LINE);
+  const room = new MatchRoom({makeSeed: () => SEED_WITH_A_CLEAR_LINE, preRoundSeconds: 0});
   room.join();
   room.join();
 

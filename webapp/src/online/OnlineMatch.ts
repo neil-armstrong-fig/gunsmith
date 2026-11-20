@@ -18,7 +18,9 @@ import type {InputAck} from "@gunsmith/shared/online/types/InputAck";
 import type {SeatTokenKeeper} from "@src/online/seat-token/SeatTokenKeeper";
 import type {JoinedFrame} from "@src/online/types/JoinedFrame";
 import type {MatchSocket} from "@src/online/types/MatchSocket";
+import type {PreRoundFrame} from "@src/online/types/pre-round/PreRoundFrame";
 import type {Readiness} from "@src/online/types/Readiness";
+import type {SeatPick} from "@src/online/types/pre-round/SeatPick";
 import type {SnapshotFrame} from "@src/online/types/SnapshotFrame";
 import {TICK_SECONDS} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/clock/TickSeconds";
 
@@ -53,6 +55,7 @@ export class OnlineMatch {
   private arena: Arena | undefined;
   private latest: World | undefined;
   private ready: Readiness | undefined;
+  private choosing: PreRoundFrame | undefined;
   private readonly snapshots = new SnapshotBuffer(SNAPSHOTS_KEPT);
   private readonly renderClock = new RenderClock(INTERPOLATION_DELAY_SECONDS);
   private history = new InputHistory(HISTORY_STEPS);
@@ -113,6 +116,26 @@ export class OnlineMatch {
     }
 
     this.socket.send(JSON.stringify({kind: "ready"}));
+  }
+
+  /** What the server last said of the two seats choosing their arena before the match, from this seat's side; `undefined` before it says anything and once the match has begun. */
+  preRound(): PreRoundFrame | undefined {
+    return this.choosing;
+  }
+
+  /** Puts the built-in arena named `name` forward. It is not final until `lockInArena`, and the server ignores a name it does not know. */
+  chooseArena(name: string): void {
+    this.sendWhenOpen({kind: "choose", step: "arena", choice: {kind: "builtIn", name}});
+  }
+
+  /** Locks in the arena put forward (the duel arena if none was): the other player's is then shown. */
+  lockInArena(): void {
+    this.sendWhenOpen({kind: "lockIn", step: "arena"});
+  }
+
+  /** Votes, when both arenas are shown and differ, for one of them, for random, or for nothing. */
+  pickArena(pick: SeatPick): void {
+    this.sendWhenOpen({kind: "pickArena", pick});
   }
 
   /** Whether this player has asked to go on and the server is waiting for the other player to ask too. */
@@ -181,9 +204,25 @@ export class OnlineMatch {
     if (message?.kind === "joined") {
       this.takeSeat(message);
     }
+    if (message?.kind === "arena") {
+      this.arena = arenaFrom(message.rows);
+    }
+    if (message?.kind === "preRound") {
+      this.choosing = message;
+    }
     if (message?.kind === "snapshot" && this.arena) {
+      this.choosing = undefined;
       this.takeSnapshot(this.arena, message);
     }
+  }
+
+  /** Sends `frame` if the socket is open; a choice made while it is not is lost, and the player makes it again once the page is back. */
+  private sendWhenOpen(frame: object): void {
+    if (this.socket.readyState !== SOCKET_OPEN) {
+      return;
+    }
+
+    this.socket.send(JSON.stringify(frame));
   }
 
   /**
