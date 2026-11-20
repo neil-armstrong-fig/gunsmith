@@ -30,43 +30,60 @@ jobs:
           node-version: 26.13.0
           cache: pnpm
 
-      - name: Install native audio and shader tools
-        timeout-minutes: 5
+      - name: Detect missing native tools
+        id: native-packages
         shell: bash
         run: |
-          if ! command -v ffmpeg || ! command -v ffprobe || ! command -v glslangValidator; then
+          packages=()
+          if ! command -v ffmpeg >/dev/null || ! command -v ffprobe >/dev/null; then
+            packages+=(ffmpeg)
+          fi
+          if ! command -v glslangValidator >/dev/null; then
+            packages+=(glslang-tools)
+          fi
+          printf 'packages=%s\n' "${packages[*]}" >> "$GITHUB_OUTPUT"
+          printf 'image=%s\n' "${ImageVersion:-ubuntu-24.04}" >> "$GITHUB_OUTPUT"
+
+      - name: Restore native tool downloads
+        id: native-apt-cache
+        if: steps.native-packages.outputs.packages != ''
+        uses: actions/cache/restore@v6.1.0
+        with:
+          path: ${{ runner.temp }}/gunsmith-native-apt/*.deb
+          key: native-apt-v1-${{ runner.arch }}-${{ steps.native-packages.outputs.image }}-${{ steps.native-packages.outputs.packages }}
+
+      - name: Install native audio and shader tools
+        timeout-minutes: 10
+        shell: bash
+        env:
+          APT_ARCHIVES: ${{ runner.temp }}/gunsmith-native-apt
+          NATIVE_PACKAGES: ${{ steps.native-packages.outputs.packages }}
+        run: |
+          if [[ -n "$NATIVE_PACKAGES" ]]; then
+            read -r -a packages <<< "$NATIVE_PACKAGES"
+            mkdir -p "$APT_ARCHIVES"
             options=(-o Acquire::Retries=2 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20)
             sudo apt-get "${options[@]}" -o APT::Update::Error-Mode=any update
-            sudo apt-get "${options[@]}" install -y ffmpeg glslang-tools
+            sudo apt-get "${options[@]}" -o Dir::Cache::archives="$APT_ARCHIVES" \
+              -o APT::Keep-Downloaded-Packages=true install -y --no-install-recommends "${packages[@]}"
           fi
           command -v ffmpeg
           command -v ffprobe
           command -v glslangValidator
 
+      - name: Save native tool downloads
+        if: github.ref == 'refs/heads/main' && steps.native-packages.outputs.packages != '' && steps.native-apt-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6.1.0
+        with:
+          path: ${{ runner.temp }}/gunsmith-native-apt/*.deb
+          key: ${{ steps.native-apt-cache.outputs.cache-primary-key }}
+
       - run: pnpm install --frozen-lockfile
 
       - run: pnpm checks
 
-  release-build:
-    name: Build release assets
-    needs: checks
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-
-      - uses: pnpm/action-setup@v6
-
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 26.13.0
-          cache: pnpm
-
-      - run: pnpm install --frozen-lockfile
-
-      - run: pnpm --filter @gunsmith/webapp compile
+      - name: Build release assets
+        run: pnpm --filter @gunsmith/webapp compile
 
       - name: Require noindex in the release assets
         shell: bash
@@ -94,9 +111,9 @@ jobs:
           retention-days: 7
           if-no-files-found: error
 
-  acceptance-shards:
-    name: Acceptance shard ${{ matrix.shard }}/4
-    needs: release-build
+  acceptance-tests:
+    name: Acceptance tests (${{ matrix.shard }}/4)
+    needs: checks
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     strategy:
@@ -145,35 +162,9 @@ jobs:
           retention-days: 7
           if-no-files-found: error
 
-  acceptance-tests:
-    name: Acceptance tests (production preview)
-    needs: [checks, release-build, acceptance-shards]
-    if: ${{ !cancelled() && needs.release-build.result == 'success' }}
-    runs-on: ubuntu-24.04
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-
-      - uses: pnpm/action-setup@v6
-
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 26.13.0
-          cache: pnpm
-
-      - run: pnpm install --frozen-lockfile
-
-      - uses: ./.github/actions/acceptance-report
-        with:
-          blob-pattern: playwright-blob-*
-          report: playwright-preview
-          shards-result: ${{ needs.acceptance-shards.result }}
-
   deploy:
     name: Deploy to Cloudflare
-    needs: [checks, acceptance-tests]
+    needs: acceptance-tests
     if: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && vars.GUNSMITH_DEPLOY_ENABLED == 'true' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 20
@@ -272,8 +263,8 @@ jobs:
           echo 'The deployed asset marker did not match this commit.' >&2
           exit 1
 
-  live-shards:
-    name: Live acceptance shard ${{ matrix.shard }}/4
+  live-acceptance:
+    name: Acceptance tests against deployment (${{ matrix.shard }}/4)
     needs: deploy
     if: needs.deploy.outputs.current == 'true'
     runs-on: ubuntu-24.04
@@ -322,29 +313,3 @@ jobs:
           overwrite: true
           retention-days: 7
           if-no-files-found: error
-
-  live-acceptance:
-    name: Acceptance tests (deployed build)
-    needs: [deploy, live-shards]
-    if: ${{ !cancelled() && needs.deploy.result == 'success' && needs.deploy.outputs.current == 'true' }}
-    runs-on: ubuntu-24.04
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-
-      - uses: pnpm/action-setup@v6
-
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 26.13.0
-          cache: pnpm
-
-      - run: pnpm install --frozen-lockfile
-
-      - uses: ./.github/actions/acceptance-report
-        with:
-          blob-pattern: playwright-live-blob-*
-          report: playwright-live
-          shards-result: ${{ needs.live-shards.result }}

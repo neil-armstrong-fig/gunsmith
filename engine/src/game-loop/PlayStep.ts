@@ -11,7 +11,7 @@ import {scoreRound} from "@gunsmith/engine/match/ScoreRound";
 import {mirrorSeats} from "@gunsmith/engine/seat/mirroring/MirrorSeats";
 import type {NoiseRequest} from "@gunsmith/engine/game-loop/fighter/types/NoiseRequest";
 import {heardInStep} from "@gunsmith/engine/sound/HeardInStep";
-import {isFootfall} from "@gunsmith/engine/sound/footsteps/IsFootfall";
+import {footstepOf} from "@gunsmith/engine/sound/footsteps/FootstepOf";
 import type {NoiseOfFighter} from "@gunsmith/engine/sound/types/NoiseOfFighter";
 import {rememberShot} from "@gunsmith/engine/opponent/RememberShot";
 import {takePickup} from "@gunsmith/engine/pickup/TakePickup";
@@ -85,24 +85,34 @@ export function playStep(world: World, play: Play, seconds: number): World {
 
   const round = decideRound({playerHealth: player.health, opponentHealth: opponent?.health});
   const taking = takePickup(world.pickup, {player, opponent});
-  const playerNoise = noiseOf({
+  const footstep = footstepOf({
     before: world.player.position,
-    turn: playerTurn,
-    shot: playerShot,
-    elapsedSeconds: world.elapsedSeconds,
+    after: playerTurn.fighter.position,
+    crouching: playerTurn.fighter.crouching,
+    previous: world.footstep,
     seconds,
+  });
+  const opponentFootstep =
+    world.opponent &&
+    opponentTurn &&
+    footstepOf({
+      before: world.opponent.position,
+      after: opponentTurn.fighter.position,
+      crouching: opponentTurn.fighter.crouching,
+      previous: world.opponentFootstep,
+      seconds,
+    });
+
+  const playerNoise = noiseOf({
+    shot: playerShot,
+    footfall: footstep?.landed === true,
     tookPickupAt: taking.playerTookPickup ? world.pickup?.position : undefined,
   });
   const opponentNoise =
-    opponentTurn &&
-    world.opponent &&
     opponentShot &&
     noiseOf({
-      before: world.opponent.position,
-      turn: opponentTurn,
       shot: opponentShot,
-      elapsedSeconds: world.elapsedSeconds,
-      seconds,
+      footfall: opponentFootstep?.landed === true,
       tookPickupAt: taking.opponentTookPickup ? world.pickup?.position : undefined,
     });
 
@@ -121,11 +131,14 @@ export function playStep(world: World, play: Play, seconds: number): World {
     round,
     match: world.match && scoreRound(world.match, round),
     ring,
+    footstep,
+    opponentFootstep,
     events: eventsOfStep({
       playerTurn,
       damage: {health: playerShot.fighter.health, bullet: bulletFlight.playerDamage, ring: playerRingDamage},
       visibleHits,
       playerTookPickup: taking.playerTookPickup,
+      footfall: playerNoise.footfall,
       heard: opponentNoise ? heardInStep(playerShot.fighter.position, opponentNoise) : [],
     }),
     opponentEvents:
@@ -139,6 +152,7 @@ export function playStep(world: World, play: Play, seconds: number): World {
           bulletFlight.opponentHits,
         ),
         playerTookPickup: taking.opponentTookPickup,
+        footfall: opponentFootstep?.landed === true,
         heard: heardInStep(opponentShot.fighter.position, playerNoise),
       }),
   };
@@ -158,19 +172,6 @@ function hurt(fighter: Player, damage: number): Player {
 }
 
 /** What a fighter's step made that the other fighter may hear: a shot that left the weapon, a foot coming down, a weapon taken. */
-function noiseOf(request: NoiseRequest): NoiseOfFighter {
-  const {before, turn, shot, elapsedSeconds, seconds, tookPickupAt} = request;
-
-  return {
-    position: shot.fighter.position,
-    shot: shot.bullet !== undefined,
-    footfall: isFootfall({
-      before,
-      after: turn.fighter.position,
-      crouching: turn.fighter.crouching,
-      elapsedSeconds,
-      seconds,
-    }),
-    tookPickupAt,
-  };
+function noiseOf({shot, footfall, tookPickupAt}: NoiseRequest): NoiseOfFighter {
+  return {position: shot.fighter.position, shot: shot.bullet !== undefined, footfall, tookPickupAt};
 }

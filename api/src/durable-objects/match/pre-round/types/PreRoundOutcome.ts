@@ -1,8 +1,8 @@
-import type {BuiltInArena} from "@gunsmith/engine/built-in-arenas/types/BuiltInArena";
-import type {ArenaHow} from "@src/durable-objects/match/pre-round/types/ArenaHow";
+import type {Seat} from "@gunsmith/engine/seat/types/Seat";
+import type {ArenaOutcome} from "@src/durable-objects/match/pre-round/types/ArenaOutcome";
+import type {WeaponPair} from "@src/durable-objects/match/pre-round/types/WeaponPair";
 
-/** What the pre-round decided, once it has: the arena the match is played in and how it was settled. */
-export interface PreRoundOutcome {
-  arena: BuiltInArena;
-  how: ArenaHow;
+/** What the pre-round decided, once it has: the arena the match is played in, how it was settled, and the weapons each seat carries. */
+export interface PreRoundOutcome extends ArenaOutcome {
+  weapons: Record<Seat, WeaponPair>;
 }

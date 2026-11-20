@@ -18,14 +18,18 @@ import {startRing} from "@gunsmith/engine/ring/StartRing";
 import type {RingTiming} from "@gunsmith/engine/ring/types/RingTiming";
 import type {Seat} from "@gunsmith/engine/seat/types/Seat";
 import {viewOfSeat} from "@gunsmith/engine/seat/ViewOfSeat";
+import {MARKSMAN_RIFLE} from "@gunsmith/engine/weapon/weapons/MarksmanRifle";
+import {RIFLE} from "@gunsmith/engine/weapon/weapons/Rifle";
 import {SUBMACHINE_GUN} from "@gunsmith/engine/weapon/weapons/SubmachineGun";
 import type {InputAck} from "@gunsmith/shared/online/types/InputAck";
 import {DEFAULT_PRE_ROUND_SECONDS} from "@src/durable-objects/match/pre-round/DefaultPreRoundSeconds";
 import {PreRound} from "@src/durable-objects/match/pre-round/PreRound";
+import type {WeaponPair} from "@src/durable-objects/match/pre-round/types/WeaponPair";
 import type {PreRoundMessage} from "@src/durable-objects/match/pre-round/types/PreRoundMessage";
 import type {PreRoundAction} from "@src/durable-objects/match/messages/types/PreRoundAction";
 import {DEFAULT_FORFEIT_LIMITS} from "@src/durable-objects/match/room/DefaultForfeitLimits";
 import {askChanged} from "@src/durable-objects/match/room/forfeit/AskChanged";
+import {worldWithWeapons} from "@src/durable-objects/match/room/weapons/WorldWithWeapons";
 import type {ArenaMessage} from "@src/durable-objects/match/room/types/ArenaMessage";
 import type {ForfeitLimits} from "@src/durable-objects/match/room/types/ForfeitLimits";
 import type {JoinedMessage} from "@src/durable-objects/match/room/types/JoinedMessage";
@@ -40,6 +44,9 @@ const NOTHING_ASKED: Input = {direction: {x: 0, y: 0}, firing: false, reload: fa
 const OTHER_SEAT: Record<Seat, Seat> = {first: "second", second: "first"};
 
 const SEATS: readonly Seat[] = ["first", "second"];
+
+/** What a seat carries until the pre-round says otherwise: the engine's starting pair. */
+const DEFAULT_WEAPONS: WeaponPair = {first: RIFLE, second: MARKSMAN_RIFLE};
 
 /**
  * One private room's match, as plain state with no network in it: who has taken which seat, what each seat last asked for, and
@@ -59,6 +66,7 @@ export class MatchRoom {
   private arenaRows: readonly string[] = DUEL_BUILT_IN_ARENA.rows;
   private arena: Arena = arenaFrom(DUEL_BUILT_IN_ARENA.rows);
   private arenaToTell: ArenaMessage | undefined;
+  private weapons: Record<Seat, WeaponPair> = {first: DEFAULT_WEAPONS, second: DEFAULT_WEAPONS};
   private readonly preRound: PreRound;
   private readonly limits: ForfeitLimits;
   private readonly makeToken: () => string;
@@ -170,7 +178,13 @@ export class MatchRoom {
       this.preRound.chooseArena(seat, action.name);
     }
     if (action.kind === "lockInArena") {
-      this.preRound.lockIn(seat);
+      this.preRound.lockInArena(seat);
+    }
+    if (action.kind === "chooseWeapons") {
+      this.preRound.chooseWeapons(seat, action.keys);
+    }
+    if (action.kind === "lockInWeapons") {
+      this.preRound.lockInWeapons(seat);
     }
     if (action.kind === "pickArena") {
       this.preRound.pickArena(seat, action.pick);
@@ -317,6 +331,7 @@ export class MatchRoom {
     this.arenaRows = outcome.arena.rows;
     this.arena = arenaFrom(outcome.arena.rows);
     this.arenaToTell = {kind: "arena", rows: outcome.arena.rows};
+    this.weapons = outcome.weapons;
     this.startRound(this.worldOfRound(startMatch()));
   }
 
@@ -414,12 +429,15 @@ export class MatchRoom {
 
     const starts = [world.player.position, world.opponent.position];
 
-    return {
-      ...world,
-      match,
-      ring: startRing({arena: this.arena, starts, seed, timing: this.ringTiming}),
-      pickup: startPickup({arena: this.arena, starts, seed, weapon: SUBMACHINE_GUN}),
-    };
+    return worldWithWeapons(
+      {
+        ...world,
+        match,
+        ring: startRing({arena: this.arena, starts, seed, timing: this.ringTiming}),
+        pickup: startPickup({arena: this.arena, starts, seed, weapon: SUBMACHINE_GUN}),
+      },
+      this.weapons,
+    );
   }
 
   private readinessOf(seat: Seat): Readiness {

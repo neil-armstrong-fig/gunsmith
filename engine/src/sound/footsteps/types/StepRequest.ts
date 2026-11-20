@@ -1,6 +1,7 @@
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
+import type {Footstep} from "@gunsmith/engine/sound/footsteps/types/Footstep";
 
-/** What `isFootfall` is told about one fighter in one step. */
+/** What `footstepOf` is told about one fighter in one step. */
 export interface StepRequest {
   /** Where the fighter stood before the step. */
   before: Point;
@@ -8,8 +9,8 @@ export interface StepRequest {
   after: Point;
   /** Whether they are crouched after the step. */
   crouching: boolean;
-  /** Game time at the start of the step, in seconds. */
-  elapsedSeconds: number;
+  /** Progress from the previous tick, if the fighter was walking upright. */
+  previous: Footstep | undefined;
   /** The game time the step covers. */
   seconds: number;
 }

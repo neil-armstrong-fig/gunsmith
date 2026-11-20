@@ -1,4 +1,5 @@
 import {decideMatch} from "@gunsmith/engine/match/DecideMatch";
+import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import {nextRoundOfPage} from "@src/game/scenario/NextRoundOfPage";
 import {worldOfPage} from "@src/game/scenario/WorldOfPage";
 import {goOn} from "@src/react/components/dom/round-banner/go-on/GoOn";
@@ -54,7 +55,7 @@ export function RoundBanner(): JSX.Element | undefined {
           type="button"
           className="rounded-md bg-gs-team-blue px-6 py-3 text-lg font-semibold text-gs-background"
           onClick={() => {
-            goOn(() => nextRoundOfPage(match, usePreRoundStore.getState().picks));
+            goOn(() => nextRoundOfPage(match, usePreRoundStore.getState().picks, arenaOfPreRound()));
           }}
         >
           Next round
@@ -75,4 +76,8 @@ export function RoundBanner(): JSX.Element | undefined {
       )}
     </div>
   );
+}
+
+function arenaOfPreRound(): Arena | undefined {
+  return usePreRoundStore.getState().arena?.arena;
 }

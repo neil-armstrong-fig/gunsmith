@@ -6,7 +6,7 @@ export interface NoiseOfFighter {
   position: Point;
   /** Whether a shot left their weapon. */
   shot: boolean;
-  /** Whether a foot came down (`isFootfall`). */
+  /** Whether a foot came down (`footstepOf`). */
   footfall: boolean;
   /** Where the weapon lay that they took in this step, or `undefined` when they took none. */
   tookPickupAt: Point | undefined;

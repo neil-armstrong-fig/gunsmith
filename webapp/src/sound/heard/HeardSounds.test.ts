@@ -42,7 +42,7 @@ it("plays each pickup heard, in order, each from its own side", () => {
   expect(output.plays.map(play => play.options?.pan)).toEqual([1, -1]);
 });
 
-it("plays nothing for a shot or a footfall, which have no sound file yet", () => {
+it("plays heard shots and feet with their direction and loudness", () => {
   const output = new RecordingOutput();
 
   new HeardSounds(output).play([
@@ -50,7 +50,10 @@ it("plays nothing for a shot or a footfall, which have no sound file yet", () =>
     {kind: "heard", sound: "step", sector: 4, loudness: "mid"},
   ]);
 
-  expect(output.plays).toEqual([]);
+  expect(output.plays).toEqual([
+    {key: "sfx-shot", options: {pan: 1, gain: 1}},
+    {key: "sfx-footstep", options: {pan: 0, gain: 0.5}},
+  ]);
 });
 
 it("plays nothing for what happened to the listener themselves, or for no events", () => {

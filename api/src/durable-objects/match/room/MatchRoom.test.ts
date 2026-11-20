@@ -438,20 +438,23 @@ it("tells a seat which way the other seat's shot came from, with every step of a
   expect(room.snapshotFor("first")?.events).toEqual([
     {kind: "heard", sound: "shot", sector: expect.any(Number), loudness: expect.stringMatching(/^(near|mid|far)$/)},
   ]);
-  expect(room.snapshotFor("second")?.events).toBeUndefined();
+  expect(room.snapshotFor("second")?.events).toEqual([{kind: "shotFired"}]);
 });
 
 it("tells a seat its events once: a tick that owed no step, and the tick after the shot, carry none", () => {
   const room = startedRoom();
   room.setInput("second", {...IDLE, aimAt: room.snapshotFor("first")?.player.position, firing: true}, 0);
   room.tick();
+  expect(room.snapshotFor("second")?.events).toEqual([{kind: "shotFired"}]);
   room.setInput("second", IDLE, 1);
 
   room.tick(0);
   expect(room.snapshotFor("first")?.events).toBeUndefined();
+  expect(room.snapshotFor("second")?.events).toBeUndefined();
 
   room.tick();
   expect(room.snapshotFor("first")?.events).toBeUndefined();
+  expect(room.snapshotFor("second")?.events).toBeUndefined();
 });
 
 it("tells a seat what its own shots and the other seat's did to it, each its own", () => {

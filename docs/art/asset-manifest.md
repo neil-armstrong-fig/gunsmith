@@ -12,6 +12,7 @@ Current M1 sound mapping: `sfx-empty-click` is integrated in
 `empty-tight` WAV master; `sfx-damage-crunch` is integrated beside it, encoded by play from
 `webapp/audio/studies/combat-feedback/damage-crunch.wav` with the audio workspace's recipe. MP3 is the approved production format for future
 static cues. `sfx-pickup` uses the audio pack's encoded MP3 as a one-shot for local weapon collection.
+Upright walking uses the damped `sfx-footstep` MP3 for both the walker and opponents in hearing range. The reload layers a release, slide and seat. The outgoing hit cue is a short contact and a subdued low layer. The fallback `sfx-shot` cue plays for an actual shot and uses spatial placement when heard from the opponent.
 `sfx-ring-damage-loop` uses the approved two-second WAV for gapless playback during local ring damage.
 The broader manifest and planned keys below remain unfrozen.
 
@@ -24,7 +25,7 @@ The broader manifest and planned keys below remain unfrozen.
 - A missing file falls back to the placeholder and logs once in development; a build check lists missing keys.
 - Palette tokens, not hex, are used in the webapp; sprites may use the palette's actual colours.
 - Sizes are the design size; supply 2x for raster images. Sprites face **right** (positive x) at rest; the game rotates them.
-- Weapon sounds are **not** in the manifest: they are synthesised from the weapon's `sound` block.
+- The runtime uses an authored fallback shot cue. Weapon-specific sounds will use the weapon’s `sound` block.
 
 Current M1 pickup sprite: [`sprite-pickup-marker`](concepts/top-down-oddities/pickup-markers/README.md)
 is the approved C2 SVG. Its 88 × 88 canvas centres on (44, 44) and spans
@@ -63,7 +64,7 @@ its cached drawing in both placements.
 | `ui-hud-frame`, `ui-slot-1`, `ui-slot-2`, `ui-health`, `ui-ammo`, `ui-credit` | HUD | varies | SVG |
 | `ui-button`, `ui-panel`, `ui-power-gauge`, `ui-progress-step` | Menus and the reveal | varies | SVG |
 | `brand-logo`, `brand-favicon-*`, `brand-social` | Logo, icons, social-preview image | varies | SVG and PNG |
-| `sfx-drop`, `sfx-reload`, `sfx-step-stand`, `sfx-step-crouch`, `sfx-hit`, `sfx-death`, `sfx-ring-warning`, `sfx-ui-click`, `sfx-round-start`, `sfx-round-end` | Static sounds (`docs/art/audio.md`) | n/a | `.mp3` |
+| `sfx-drop`, `sfx-reload`, `sfx-footstep`, `sfx-hit`, `sfx-death`, `sfx-ring-warning`, `sfx-ui-click`, `sfx-round-start`, `sfx-round-end` | Static sounds (`docs/art/audio.md`) | n/a | `.mp3` |
 | `music-loop-menu`, `music-loop-match` | Looping music | n/a | `.mp3` |
 
 ## Delivery protocol
