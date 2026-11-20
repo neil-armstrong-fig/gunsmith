@@ -82,26 +82,8 @@ jobs:
 
       - run: pnpm checks
 
-  release-build:
-    name: Build release assets
-    needs: checks
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-
-      - uses: pnpm/action-setup@v6
-
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 26.13.0
-          cache: pnpm
-
-      - run: pnpm install --frozen-lockfile
-
-      - run: pnpm --filter @gunsmith/webapp compile
+      - name: Build release assets
+        run: pnpm --filter @gunsmith/webapp compile
 
       - name: Require noindex in the release assets
         shell: bash
@@ -129,9 +111,9 @@ jobs:
           retention-days: 7
           if-no-files-found: error
 
-  acceptance-shards:
-    name: Acceptance shard ${{ matrix.shard }}/4
-    needs: release-build
+  acceptance-tests:
+    name: Acceptance tests (${{ matrix.shard }}/4)
+    needs: checks
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     strategy:
@@ -180,35 +162,9 @@ jobs:
           retention-days: 7
           if-no-files-found: error
 
-  acceptance-tests:
-    name: Acceptance tests (production preview)
-    needs: [checks, release-build, acceptance-shards]
-    if: ${{ !cancelled() && needs.release-build.result == 'success' }}
-    runs-on: ubuntu-24.04
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-
-      - uses: pnpm/action-setup@v6
-
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 26.13.0
-          cache: pnpm
-
-      - run: pnpm install --frozen-lockfile
-
-      - uses: ./.github/actions/acceptance-report
-        with:
-          blob-pattern: playwright-blob-*
-          report: playwright-preview
-          shards-result: ${{ needs.acceptance-shards.result }}
-
   deploy:
     name: Deploy to Cloudflare
-    needs: [checks, acceptance-tests]
+    needs: acceptance-tests
     if: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && vars.GUNSMITH_DEPLOY_ENABLED == 'true' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 20
@@ -307,8 +263,8 @@ jobs:
           echo 'The deployed asset marker did not match this commit.' >&2
           exit 1
 
-  live-shards:
-    name: Live acceptance shard ${{ matrix.shard }}/4
+  live-acceptance:
+    name: Acceptance tests against deployment (${{ matrix.shard }}/4)
     needs: deploy
     if: needs.deploy.outputs.current == 'true'
     runs-on: ubuntu-24.04
@@ -357,29 +313,3 @@ jobs:
           overwrite: true
           retention-days: 7
           if-no-files-found: error
-
-  live-acceptance:
-    name: Acceptance tests (deployed build)
-    needs: [deploy, live-shards]
-    if: ${{ !cancelled() && needs.deploy.result == 'success' && needs.deploy.outputs.current == 'true' }}
-    runs-on: ubuntu-24.04
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-
-      - uses: pnpm/action-setup@v6
-
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 26.13.0
-          cache: pnpm
-
-      - run: pnpm install --frozen-lockfile
-
-      - uses: ./.github/actions/acceptance-report
-        with:
-          blob-pattern: playwright-live-blob-*
-          report: playwright-live
-          shards-result: ${{ needs.live-shards.result }}
