@@ -1,3 +1,4 @@
+import {claimDeletedAccountId} from "@src/accounts/claim-deleted-account-id/ClaimDeletedAccountId";
 import {createSession} from "@src/accounts/create-session/CreateSession";
 import {findOrCreateAccount} from "@src/accounts/find-or-create-account/FindOrCreateAccount";
 import {workerEnvironment} from "@src/env/WorkerEnvironment";
@@ -10,6 +11,8 @@ import {clearedOauthCookie} from "@src/router/routes/sign-in/finish/oauth-cookie
 import {oauthAttemptFrom} from "@src/router/routes/sign-in/finish/oauth-cookie/OAuthAttemptFrom";
 import {respondRedirect} from "@src/router/routes/sign-in/redirect/RespondRedirect";
 import {returnAddress} from "@src/router/routes/sign-in/redirect/ReturnAddress";
+import {isSubjectDigestConfigured} from "@src/router/routes/shared/subject-digest/IsSubjectDigestConfigured";
+import {subjectDigest} from "@src/router/routes/shared/subject-digest/SubjectDigest";
 import {hashSessionToken} from "@src/router/routes/shared/session/HashSessionToken";
 import {randomToken} from "@src/router/routes/shared/session/RandomToken";
 import {sessionCookie} from "@src/router/routes/sign-in/finish/session-cookie/SessionCookie";
@@ -61,7 +64,7 @@ export async function finishSignInRoute(request: Request): Promise<Response> {
     });
     const now = new Date();
     const account = await findOrCreateAccount(subject, {
-      id: crypto.randomUUID(),
+      id: (await creditIdOfDeletedAccount(subject, now)) ?? crypto.randomUUID(),
       displayName: generatedDisplayName(),
       now,
     });
@@ -82,4 +85,17 @@ function signedOut(failure: SignInFailure, returnTo: string, error?: unknown): R
   logSignInFailure(failure, error);
 
   return respondRedirect(returnTo, [clearedOauthCookie()]);
+}
+
+/**
+ * The id a person's deleted account was held under, if it is still being kept: the new account takes it, so deleting and signing in
+ * again does not reset the daily credits (`DELETE /api/account`). Asked of the keyed digest, never the subject. With no key set nothing
+ * could have been kept, so nothing is asked. A failure to read it ends the sign-in (signed out) rather than hand out a fresh allowance.
+ */
+async function creditIdOfDeletedAccount(googleSub: string, now: Date): Promise<string | undefined> {
+  if (!isSubjectDigestConfigured()) {
+    return undefined;
+  }
+
+  return await claimDeletedAccountId(await subjectDigest(googleSub), now);
 }

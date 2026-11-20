@@ -1,3 +1,4 @@
+import type {AccountRemoval} from "@src/accounts/types/AccountRemoval";
 import {testAccounts} from "@src/accounts/testing/in-memory/TestAccounts";
 import type {NewAccount} from "@src/accounts/types/NewAccount";
 import type {NewGeneratedItem} from "@src/accounts/types/NewGeneratedItem";
@@ -30,7 +31,13 @@ vi.mock("@src/accounts/find-or-create-account/FindOrCreateAccount", () => ({
     testAccounts.findOrCreateAccount(googleSub, newAccount),
 }));
 vi.mock("@src/accounts/remove-account/RemoveAccount", () => ({
-  removeAccount: (userId: string) => testAccounts.removeAccount(userId),
+  removeAccount: (userId: string, removal: AccountRemoval) => testAccounts.removeAccount(userId, removal),
+}));
+vi.mock("@src/accounts/claim-deleted-account-id/ClaimDeletedAccountId", () => ({
+  claimDeletedAccountId: (subjectDigest: string, now: Date) => testAccounts.claimDeletedAccountId(subjectDigest, now),
+}));
+vi.mock("@src/accounts/sweep-deleted-accounts/SweepDeletedAccounts", () => ({
+  sweepDeletedAccounts: (now: Date) => testAccounts.sweepDeletedAccounts(now),
 }));
 
 vi.mock("@src/accounts/keep-generated-item/KeepGeneratedItem", () => ({

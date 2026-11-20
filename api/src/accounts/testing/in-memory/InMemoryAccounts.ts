@@ -1,3 +1,4 @@
+import type {AccountRemoval} from "@src/accounts/types/AccountRemoval";
 import type {Account} from "@src/accounts/types/Account";
 import {limitOfKind} from "@src/accounts/limit-of-kind/LimitOfKind";
 import type {NewGeneratedItem} from "@src/accounts/types/NewGeneratedItem";
@@ -15,6 +16,11 @@ interface SavedShelfItem extends NewGeneratedItem {
   savedAt: Date;
 }
 
+interface KeptRecord {
+  creditAccountId: string;
+  keepUntil: Date;
+}
+
 interface StoredAccount extends Account {
   googleSub: string;
 }
@@ -28,6 +34,7 @@ export class InMemoryAccounts {
   private accounts: StoredAccount[] = [];
   private sessions: NewSession[] = [];
   private items: StoredItem[] = [];
+  private kept = new Map<string, KeptRecord>();
 
   findOrCreateAccount = async (googleSub: string, newAccount: NewAccount): Promise<Account> => {
     const existing = this.accounts.find(account => account.googleSub === googleSub);
@@ -58,10 +65,39 @@ export class InMemoryAccounts {
     this.sessions = this.sessions.filter(session => session.idHash !== idHash);
   };
 
-  removeAccount = async (userId: string): Promise<void> => {
-    this.accounts = this.accounts.filter(account => account.id !== userId);
+  removeAccount = async (userId: string, {subjectDigest, keepUntil}: AccountRemoval): Promise<void> => {
+    const account = this.accounts.find(candidate => candidate.id === userId);
+    if (!account) {
+      return;
+    }
+
+    this.kept.set(await subjectDigest(account.googleSub), {creditAccountId: userId, keepUntil});
+    this.accounts = this.accounts.filter(stored => stored.id !== userId);
     this.sessions = this.sessions.filter(session => session.userId !== userId);
     this.items = this.items.filter(item => item.userId !== userId);
+  };
+
+  claimDeletedAccountId = async (subjectDigest: string, now: Date): Promise<string | undefined> => {
+    const record = this.kept.get(subjectDigest);
+    if (!record || record.keepUntil.getTime() <= now.getTime()) {
+      return undefined;
+    }
+
+    this.kept.delete(subjectDigest);
+
+    return record.creditAccountId;
+  };
+
+  sweepDeletedAccounts = async (now: Date): Promise<string[]> => {
+    const swept: string[] = [];
+    for (const [digest, record] of this.kept) {
+      if (record.keepUntil.getTime() <= now.getTime()) {
+        this.kept.delete(digest);
+        swept.push(record.creditAccountId);
+      }
+    }
+
+    return swept;
   };
 
   keepGeneratedItem = async (item: NewGeneratedItem): Promise<void> => {
@@ -108,6 +144,7 @@ export class InMemoryAccounts {
     this.accounts = [];
     this.sessions = [];
     this.items = [];
+    this.kept = new Map();
   };
 
   private shelfOf(userId: string): SavedShelfItem[] {

@@ -1,0 +1,56 @@
+name: Acceptance report
+description: Publish available Playwright reports and require all four shards to pass
+inputs:
+  blob-pattern:
+    description: Artifact glob for this suite
+    required: true
+  report:
+    description: Combined HTML artifact name
+    required: true
+  shards-result:
+    description: Outcome of the sharded acceptance job
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/download-artifact@v8
+      with:
+        pattern: ${{ inputs.blob-pattern }}
+        path: acceptance-tests/all-blob-reports/
+        merge-multiple: true
+
+    - name: Merge available shard reports
+      shell: bash
+      run: pnpm --filter @gunsmith/acceptance-tests exec playwright merge-reports --reporter=html all-blob-reports
+      env:
+        PLAYWRIGHT_HTML_OPEN: never
+
+    - uses: actions/upload-artifact@v7
+      if: ${{ !cancelled() }}
+      with:
+        name: ${{ inputs.report }}
+        path: acceptance-tests/playwright-report/
+        overwrite: true
+        retention-days: 7
+        if-no-files-found: error
+
+    # Merging a failed/partial run must never turn acceptance green.
+    - name: Require every shard and report
+      if: ${{ !cancelled() }}
+      shell: bash
+      env:
+        SHARDS_RESULT: ${{ inputs.shards-result }}
+      run: |
+        set -euo pipefail
+        missing=0
+        for shard in 1 2 3 4; do
+          if [[ ! -f "acceptance-tests/all-blob-reports/shard-$shard.zip" ]]; then
+            echo "Missing report for shard $shard/4" | tee -a "$GITHUB_STEP_SUMMARY"
+            missing=1
+          fi
+        done
+        if [[ "$SHARDS_RESULT" != success || "$missing" != 0 ]]; then
+          echo "Acceptance incomplete or failed: shards=$SHARDS_RESULT" | tee -a "$GITHUB_STEP_SUMMARY"
+          exit 1
+        fi

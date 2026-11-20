@@ -1,10 +1,9 @@
 import {isHalfTurnSymmetric} from "@gunsmith/engine/arena-symmetry/IsHalfTurnSymmetric";
+import {drawStartingPlaces} from "@gunsmith/engine/arena-symmetry/DrawStartingPlaces";
 import {spawnPairsOf} from "@gunsmith/engine/arena-symmetry/spawn-pairs/SpawnPairsOf";
-import {SPAWN_SEED_SALT} from "@gunsmith/engine/arena-symmetry/spawn-pairs/SpawnSeedSalt";
-import {SPAWN_SPACING_STEPS} from "@gunsmith/engine/arena-symmetry/spawn-pairs/SpawnSpacing";
+import {SPAWN_SPACING_STEPS} from "@gunsmith/engine/arena-symmetry/SpawnSpacing";
 import type {StartingPlaces} from "@gunsmith/engine/arena-symmetry/types/StartingPlaces";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
-import {nextRandom} from "@gunsmith/engine/random/NextRandom";
 
 /**
  * Where the two fighters of a round start, as a pair of tiles a half turn takes onto one another, so that each begins on the
@@ -18,16 +17,5 @@ export function chooseStartingPlaces(arena: Arena, seed: number): StartingPlaces
     return undefined;
   }
 
-  const pairs = spawnPairsOf(arena, SPAWN_SPACING_STEPS);
-  const pairDraw = nextRandom(seed ^ SPAWN_SEED_SALT);
-  const pair = pairs[Math.floor(pairDraw.value * pairs.length)];
-  if (!pair) {
-    return undefined;
-  }
-
-  if (nextRandom(pairDraw.seed).value < 0.5) {
-    return {player: pair.first, opponent: pair.second};
-  }
-
-  return {player: pair.second, opponent: pair.first};
+  return drawStartingPlaces(spawnPairsOf(arena, SPAWN_SPACING_STEPS), seed);
 }

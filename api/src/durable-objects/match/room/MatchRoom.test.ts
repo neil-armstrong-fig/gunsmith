@@ -1,5 +1,9 @@
+import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
+import {fairStart} from "@gunsmith/engine/arena-symmetry/FairStart";
+import {SPAWN_SPACING_STEPS} from "@gunsmith/engine/arena-symmetry/SpawnSpacing";
 import {DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/DuelBuiltInArena";
 import type {Input} from "@gunsmith/engine/game-loop/types/Input";
+import {routeDistancesFrom} from "@gunsmith/engine/pickup/placement/RouteDistancesFrom";
 import type {Seat} from "@gunsmith/engine/seat/types/Seat";
 import {MatchRoom} from "@src/durable-objects/match/room/MatchRoom";
 
@@ -9,6 +13,11 @@ const IDLE: Input = {direction: {x: 0, y: 0}, firing: false, reload: false};
 const MOST_STEPS_TO_DECIDE_A_ROUND = 1200;
 
 const STEPS_PER_SECOND = 60;
+
+/** A seed whose fair start in the duel arena has a clear line between the fighters, a few tiles apart, so a seat aimed at the other sees and can hit them. */
+const SEED_WITH_A_CLEAR_LINE = 2;
+
+const DUEL_ARENA = arenaFrom(DUEL_BUILT_IN_ARENA.rows);
 
 it("seats the first person first and the second second, and nobody after", () => {
   const room = new MatchRoom();
@@ -134,6 +143,44 @@ it("sends each seat a snapshot once both are seated, each from its own side", ()
   expect(first?.player.position).not.toEqual(second?.player.position);
 });
 
+it("starts the fighters on the places the engine's fair start gives for the round's seed, each seat on its own", () => {
+  const world = fairStart(DUEL_ARENA, SEED_WITH_A_CLEAR_LINE);
+  const room = startedRoom();
+
+  expect(world).toBeDefined();
+  expect(room.snapshotFor("first")?.player.position).toEqual(world?.player.position);
+  expect(room.snapshotFor("second")?.player.position).toEqual(world?.opponent?.position);
+});
+
+it("draws a seed of its own for each round, so the next round starts on the places that seed gives", () => {
+  const seeds = [1, 2];
+  const room = new MatchRoom(undefined, undefined, () => seeds.shift() ?? 0);
+  room.join();
+  room.join();
+  winRound(room, "first");
+
+  room.ready("first");
+  room.ready("second");
+
+  expect(room.snapshotFor("first")?.player.position).toEqual(fairStart(DUEL_ARENA, 2)?.player.position);
+  expect(room.snapshotFor("second")?.player.position).toEqual(fairStart(DUEL_ARENA, 2)?.opponent?.position);
+});
+
+it("starts the fighters at least the spacing apart on foot, whatever the seed", () => {
+  for (let seed = 0; seed < 25; seed += 1) {
+    const room = new MatchRoom(undefined, undefined, () => seed);
+    room.join();
+    room.join();
+    const first = room.snapshotFor("first")?.player.position ?? {x: 0, y: 0};
+    const second = room.snapshotFor("second")?.player.position ?? {x: 0, y: 0};
+    const steps = routeDistancesFrom(DUEL_ARENA, first).get(
+      Math.floor(second.y) * DUEL_ARENA.width + Math.floor(second.x),
+    );
+
+    expect(steps).toBeGreaterThanOrEqual(SPAWN_SPACING_STEPS);
+  }
+});
+
 it("tells a seat about the other fighter only while it can see them", () => {
   const room = startedRoom();
   const toFace = room.snapshotFor("second")?.player.position;
@@ -145,7 +192,8 @@ it("tells a seat about the other fighter only while it can see them", () => {
   room.tick();
   expect(room.snapshotFor("first")?.opponent).toBeDefined();
 
-  room.setInput("first", {...IDLE, aimAt: {x: 1.5, y: 6.5}}, 0);
+  const own = room.snapshotFor("first")?.player.position ?? toFace;
+  room.setInput("first", {...IDLE, aimAt: {x: 2 * own.x - toFace.x, y: 2 * own.y - toFace.y}}, 0);
   room.tick();
   expect(room.snapshotFor("first")?.opponent).toBeUndefined();
 });
@@ -153,18 +201,20 @@ it("tells a seat about the other fighter only while it can see them", () => {
 it("plays each seat by its own input", () => {
   const room = startedRoom();
   const before = room.snapshotFor("second")?.player.position;
+  const firstBefore = room.snapshotFor("first")?.player.position;
 
   room.setInput("second", {...IDLE, direction: {x: 0, y: 1}}, 0);
   room.tick();
 
   expect(room.snapshotFor("second")?.player.position.y).toBeGreaterThan(before?.y ?? Infinity);
-  expect(room.snapshotFor("first")?.player.position.y).toBe(6.5);
+  expect(room.snapshotFor("first")?.player.position).toEqual(firstBefore);
 });
 
 it("plays the steps it is told, so a late clock can catch up", () => {
   const walkingNorth: Input = {...IDLE, direction: {x: 0, y: 1}};
   const slow = startedRoom();
   const caughtUp = startedRoom();
+  const startY = slow.snapshotFor("second")?.player.position.y ?? 0;
 
   slow.setInput("second", walkingNorth, 0);
   slow.tick(1);
@@ -174,7 +224,7 @@ it("plays the steps it is told, so a late clock can catch up", () => {
   const slowY = slow.snapshotFor("second")?.player.position.y ?? 0;
   const caughtUpY = caughtUp.snapshotFor("second")?.player.position.y ?? 0;
 
-  expect(caughtUpY - 6.5).toBeCloseTo(3 * (slowY - 6.5), 6);
+  expect(caughtUpY - startY).toBeCloseTo(3 * (slowY - startY), 6);
 });
 
 it("plays no step for none owed", () => {
@@ -247,13 +297,14 @@ it("starts counting the steps again when a newer input arrives", () => {
 
 it("ignores an input older than one it already has", () => {
   const room = startedRoom();
+  const startY = room.snapshotFor("first")?.player.position.y ?? Infinity;
 
   room.setInput("first", {...IDLE, direction: {x: 0, y: 1}}, 9);
   room.setInput("first", {...IDLE, direction: {x: 0, y: -1}}, 8);
   room.tick();
 
   expect(room.snapshotFor("first")?.ack?.seq).toBe(9);
-  expect(room.snapshotFor("first")?.player.position.y).toBeGreaterThan(6.5);
+  expect(room.snapshotFor("first")?.player.position.y).toBeGreaterThan(startY);
 });
 
 it("keeps a reload asked on a tick that owed no step until a step plays it", () => {
@@ -356,7 +407,9 @@ it("begins the next round when both seats have asked for it: the score kept, bot
   expect(room.snapshotFor("first")?.match).toEqual({playerWins: 1, opponentWins: 0, roundNumber: 2});
   expect(room.snapshotFor("second")?.match).toEqual({playerWins: 0, opponentWins: 1, roundNumber: 2});
   expect(room.snapshotFor("second")?.player.health).toBe(room.snapshotFor("first")?.player.health);
-  expect(room.snapshotFor("first")?.player.position).toEqual({x: 10.5, y: 6.5});
+  expect(room.snapshotFor("first")?.player.position).toEqual(
+    fairStart(DUEL_ARENA, SEED_WITH_A_CLEAR_LINE)?.player.position,
+  );
   expect(room.snapshotFor("first")?.ready).toEqual({player: false, opponent: false});
 });
 
@@ -605,7 +658,7 @@ it("forfeits no round once the match is decided, whoever stays quiet", () => {
 });
 
 function startedRoom(): MatchRoom {
-  const room = new MatchRoom();
+  const room = new MatchRoom(undefined, undefined, () => SEED_WITH_A_CLEAR_LINE);
   room.join();
   room.join();
 
