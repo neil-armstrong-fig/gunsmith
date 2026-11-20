@@ -41,6 +41,11 @@ function snapshotOfFrame(frame: string): ReceivedSnapshot | undefined {
     snapshot.position = position;
   }
 
+  const events: unknown = Reflect.get(parsed, "events");
+  if (Array.isArray(events)) {
+    snapshot.events = events;
+  }
+
   const elapsedSeconds: unknown = Reflect.get(parsed, "elapsedSeconds");
   if (typeof elapsedSeconds === "number") {
     snapshot.elapsedSeconds = elapsedSeconds;

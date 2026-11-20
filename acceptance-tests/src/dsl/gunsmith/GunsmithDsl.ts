@@ -11,6 +11,7 @@ import {LONG_DUEL_SEED} from "@src/dsl/gunsmith/duel/LongDuelSeed";
 import {OpponentDsl} from "@src/dsl/gunsmith/components/opponent/OpponentDsl";
 import {PickupDsl} from "@src/dsl/gunsmith/components/pickup/PickupDsl";
 import {PlayerDsl} from "@src/dsl/gunsmith/components/player/PlayerDsl";
+import {ReferencesDsl} from "@src/dsl/gunsmith/components/references/ReferencesDsl";
 import {RingDsl} from "@src/dsl/gunsmith/components/ring/RingDsl";
 import {RoomDsl} from "@src/dsl/gunsmith/components/room/RoomDsl";
 import {RoundDsl} from "@src/dsl/gunsmith/components/round/RoundDsl";
@@ -40,6 +41,7 @@ export class GunsmithDsl {
   readonly match: MatchDsl;
   readonly pickup: PickupDsl;
   readonly preRound: PreRoundDsl;
+  readonly references: ReferencesDsl;
   readonly ring: RingDsl;
   readonly room: RoomDsl;
   readonly round: RoundDsl;
@@ -61,6 +63,7 @@ export class GunsmithDsl {
     this.match = new MatchDsl(page);
     this.pickup = new PickupDsl(page);
     this.preRound = new PreRoundDsl(page);
+    this.references = new ReferencesDsl(page);
     this.ring = new RingDsl(page);
     this.room = new RoomDsl(page, secondPage => new GunsmithDsl(secondPage));
     this.round = new RoundDsl(page);

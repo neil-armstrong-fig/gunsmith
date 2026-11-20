@@ -24,6 +24,15 @@ it("reads where the server put the seat's own fighter and its game time", () => 
   expect(snapshots).toEqual([{position: {x: 3, y: 4}, elapsedSeconds: 1.5}, {}]);
 });
 
+it("reads the events a snapshot carries, and none from a frame whose events are not a list", () => {
+  const snapshots = snapshotsOfFrames([
+    JSON.stringify({kind: "snapshot", events: [{kind: "heard", sound: "shot", sector: 2}]}),
+    JSON.stringify({kind: "snapshot", events: "heard"}),
+  ]);
+
+  expect(snapshots).toEqual([{events: [{kind: "heard", sound: "shot", sector: 2}]}, {}]);
+});
+
 it("treats a null opponent as absent", () => {
   expect(snapshotsOfFrames([JSON.stringify({kind: "snapshot", opponent: null})])).toEqual([{}]);
 });

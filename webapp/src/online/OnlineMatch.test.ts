@@ -54,6 +54,7 @@ interface SnapshotRequest {
 }
 
 const JOINED = JSON.stringify({kind: "joined", seat: "first", arena: ROWS});
+const QUIET = startingWorld(arenaFrom(ROWS), [], {x: 8.5, y: 2.5});
 const START = startingWorld(arenaFrom(ROWS), [], {x: 8.5, y: 2.5}).player.position;
 
 interface SeatedMatch {
@@ -78,6 +79,45 @@ it("builds the world a snapshot describes, on the arena it was seated in", () =>
   expect(world?.arena).toEqual(arenaFrom(ROWS));
   expect(world?.player.position).toEqual(START);
   expect(world?.opponent?.position).toEqual({x: 8.5, y: 2.5});
+});
+
+it("hands over the events the snapshots carried once, with the game time they cover, and nothing after", () => {
+  const {socket, match} = seatedMatch();
+  const heard = {kind: "heard", sound: "pickup", sector: 6, loudness: "mid"} as const;
+  socket.receive(snapshotText({world: {...QUIET, events: [heard]}, elapsedSeconds: 1}));
+  socket.receive(snapshotText({world: {...QUIET, events: [{kind: "pickupTaken"}]}, elapsedSeconds: 1.05}));
+  socket.receive(snapshotText({elapsedSeconds: 1.1}));
+
+  expect(match.takeEvents()).toEqual({events: [heard, {kind: "pickupTaken"}], seconds: expect.closeTo(0.1, 9)});
+  expect(match.takeEvents()).toBeUndefined();
+});
+
+it("hands over a quiet snapshot as no events and its time, so a frame with no news is not taken for one", () => {
+  const {socket, match} = seatedMatch();
+  socket.receive(snapshotText({elapsedSeconds: 1}));
+  match.takeEvents();
+
+  socket.receive(snapshotText({elapsedSeconds: 1.05}));
+
+  expect(match.takeEvents()).toEqual({events: [], seconds: expect.closeTo(0.05, 9)});
+});
+
+it("covers no time for the first snapshot, and none when a new round turned the clock back", () => {
+  const {socket, match} = seatedMatch();
+  socket.receive(snapshotText({elapsedSeconds: 7}));
+  expect(match.takeEvents()?.seconds).toBe(0);
+
+  socket.receive(snapshotText({elapsedSeconds: 0.5}));
+  expect(match.takeEvents()?.seconds).toBe(0);
+});
+
+it("has no events to hand over before a snapshot has come, and shows none in the world each frame", () => {
+  const {socket, match} = seatedMatch();
+  expect(match.takeEvents()).toBeUndefined();
+
+  socket.receive(snapshotText({world: {...QUIET, events: [{kind: "pickupTaken"}]}}));
+
+  expect(match.worldToShow(0)?.events).toBeUndefined();
 });
 
 it("ignores frames it cannot read", () => {

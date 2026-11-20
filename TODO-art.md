@@ -1,12 +1,16 @@
 # TODO: art
 
-**FOCUS ON MVP TASKS FIRST**
+**MVP audio checklist complete.** Art owns authored audio cues, playback integration with Play, and the listening review after weapon-specific shot synthesis. Checkout: `worktree-art`, synced with GitHub main at `8cbf2ef`.
 
-Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only relevant dependencies.
+## Handoff
 
-## Resume here
+- **Play** takes the arena preview and workshop presentation, authored gameplay and UI assets and their manifests, and player-facing copy. Engine supplies terrain and combat rules, and Budget supplies credit and AI-off behavior.
+- **AI** takes the S4-1 fallback contrast fix and native-size re-review, generated appearance and shot synthesis, and dataset prompt examples. Engine helps review the appearance association with runtime weapon identity.
+- **Server** takes privacy and terms copy for accounts and player data. **Ship** takes release branding, publication and case-study visuals.
 
-Art is in `.claude/worktrees/art` on `worktree-art`. Last merged GitHub main: `460f3bb`. The validated art merge `0143379`, including the submachine gun inventory icon from `8318df4`, was pushed to GitHub main.
+## Delivered work
+
+The final Art development tip `52443a3` is on GitHub main. The local arena workshop (`17d3ae8`), the weapon shelf replacement picker (`8c0adef`) and the 12-study appearance review (`a748da3`) are integrated.
 
 The local workshop's full-shelf replacement picker is committed at `8c0adef`. `SavedWeaponSummary` supplies the thumbnail, name, power rating and prompt for both the shelf and `ReplacementChoice`. `TheWeaponShelf` checks distinct prompts on identical stand-in weapons and replacement in place.
 
@@ -26,25 +30,13 @@ AI and Engine own the production appearance association. For S4-1, recheck the r
 
 The [approved stair treatment](docs/art/terrain/README.md#playable-stair-preview) draws in every arena. Art reviewed the opposing stairs in `fair-duel` and the wall-side landing in `terraced` at 64 and 32 px per tile.
 
-Current milestone: M1/M6; the project remains on M1. Next audio task: combat masking, fatigue and levels once AI/play integrate runtime weapon-shot synthesis (not yet wired into the game sound output). Safari acceptance does not claim new headphone/speaker measurements. Preserve approved master hashes. Next failing check for any playback change: the relevant browser sound acceptance criterion before implementation.
+Art and Play's next audio review is combat masking, fatigue and levels once runtime weapon-shot synthesis is integrated. The user accepted Safari playback on 2026-11-17. Headphone and speaker measurements remain open. Preserve approved master hashes and write the relevant browser criterion before any playback change.
 
 Ship's inventory HUD, local pickup cue and ring loop are integrated (`c372d86`). Art followed up on Ship's review with a lighter fill on the built-in submachine gun's magazine at 34 px. The delivery covers the authored SVG pair and the HUD browser criteria. Ship integrated generated thumbnails for local fixtures. Status badges and production appearance association remain open.
 
-## MVP priority
+## Milestone checklist
 
-Maintain the shared arena preview for workshop results and pre-round choices. Play can pass a parsed arena, its name and any resolved starting places. Review the generated weapon fallback with AI when its contrast change is ready. See [the shared priorities](TODO.md#mvp-integration-priorities) and [handoffs](HANDOFF.md#mvp-ownership-and-handoffs).
-
-## Ownership
-
-webapp/public/assets/, webapp/audio/, asset manifests/loading, authored presentation/overlay components, copy and docs/art/. play owns combat/HUD behavior; AI owns generated renderer and shot synthesis.
-
-Reserve concrete files in [HANDOFF.md](HANDOFF.md) before overlapping another session. Shared contracts change there first; the domain owner writes the change and consumers review it.
-
-## Dependencies/handoffs
-
-Agree manifest keys/anchors with play and supported visual grammar with AI before production assets. The rifle shot is integrated (blue is your unmodified `effects/projectile-rifle`; see HANDOFF.md). No menus ahead of real consumers.
-
-## Current milestone tasks
+Art owns the audio entries. The remaining entries follow the handoff above.
 
 - [x] Style the existing workshop weapon result card using the selection concept. Check that the meter and printed power rating agree for successive results.
 
@@ -60,19 +52,24 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 
 - [x] Deliver the approved `sfx-ring-damage-loop` and wire its WAV into local play. The runtime delivery is integrated from `worktree-ship` (`c372d86`).
 
-- [x] Wire the audio pack's `sfx-pickup` MP3 into local play and cover the actual collection, opponent collection, mute and ordinary slot switching.
+- [x] Wire the audio pack's `sfx-pickup` MP3 into local play. Browser coverage distinguishes the player's direct cue from the nearby opponent's panned cue and covers mute and ordinary slot switching.
+
+- [x] Integrate the approved soft footstep for upright walking and the reload MP3 in local play. Crouched movement is silent.
+- [x] Ship an authored fallback shot sound for successful local and online shots, including the opponent’s spatial cue.
 
 - [x] Review the integrated inventory HUD, ring loop and pickup cue in the production build.
 
 - [x] Approve the existing matching orange rifle shot (`fx-projectile-rifle-orange.svg`) as selected by the user on 2026-11-17. Native 64/32 px and in-game review pass; keep the 64×64 canvas, current shape/scale, `#FF9B54` and tip (49, 32). The colour mutation was caught by both manifest and browser assertions; the original asset hash was restored. Later weapon classes still need both team variants; muzzle flash remains descoped until feature complete.
 - [x] Measure the shipped empty click’s onset/content and event cadence in Chromium/WebKit at default, 44.1 and 48 kHz: 13 starts per 13 holds in all six runs, including repeats shorter than the buffer. WebKit’s main transient is about 12 ms later; no global correction or threshold change. See the audio handoff.
 - [x] Accept native Safari audio as good enough by user decision on 2026-11-17; close the onset, first-gesture wake-up and fast-repeat listening follow-up without additional device testing. This records acceptance, not new headphone/speaker measurements.
-- [ ] Check fatigue, masking and levels on headphones/speakers once AI/play wire the real weapon-shot synth into runtime audio. The current game output only has the static empty click; general audition approval is not proof of these tests.
-- [ ] Map future static cues to approved MP3 as play integrates them; support playback/ducking/volume integration. Weapon-shot synthesis belongs to AI; art supplies static cues. Crunch export and current ring-onset mapping reviewed on 2026-11-17; future outgoing-hit/static cues remain open.
+- [x] Play the damped footfall on upright movement onset and for nearby listeners in local and online play.
 - [x] Review all twelve oddities at 64/32 px per tile using the current appearance grammar and renderer.
 - [ ] Review Art's findings with AI and Engine as part of production appearance association.
 
 ## Later tasks
+
+- [ ] Revisit cue timbre and the combat mix. The user heard a small improvement in the revised reload and hit cues and deferred further tuning. Check fatigue, masking and levels on headphones and speakers once weapon-specific synthesis is integrated.
+- [ ] After MVP, decide where players should find References & credits.
 
 - [ ] Add overlays only as a spec needs them: pause/settings, pre-round generation/reveal, library, account and rooms. Do not rebuild the abandoned screen map wholesale. Coordinate state/actions with play, AI and server.
 
@@ -97,6 +94,18 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [ ] Case-study diagrams: pipeline, cost safeguards and eval loop.
 
 ## Verification/latest delivery
+
+2026-11-20, pickup audio acceptance in `worktree-art`. The opponent criterion failed before the recorder captured stereo pan. In disposable builds, bypassing the panner failed the opponent criterion and adding a centered panner failed the collector criterion. `pnpm checks` passed lint, formatting, types and 3,923 tests with one existing audio skip. The standards review used the root and acceptance-test instructions and audited the existing sound folders and their callers.
+
+Production Chromium passed 38 of 39 audio criteria in each of two runs, with all pickup and two-browser hearing criteria green both times. The west-wall setup failed in the first run and the upright cadence criterion failed in the second. Each passed all three isolated reruns. The west-wall setup also failed once in five runs with the unmodified GitHub-main recorder. Cadence passed all five baseline runs.
+
+2026-11-20, references and Foley revisions in `worktree-art`. The practice range opens a standalone References & credits tab with Greg Lester’s guide. The references criterion failed before wiring and passes without firing a shot. Reload is a dry 0.60 s release, slide and seat. The outgoing hit is a muted 0.092 s contact. Chromium and WebKit decoded both. The audio notes regenerated all four runtime MP3s byte for byte, so the two temporary WAV renders were removed. Production Chromium passed 37 focused criteria and `pnpm checks` passed with 3,923 tests and one existing skip. The References layout was reviewed at 360 px and the folder and caller audit is complete. The revised cues are ready for the user to audition.
+
+2026-11-20, damped footsteps and movement taps in `worktree-art`. Both the local short-tap criterion and Engine’s listener test failed before the change. Production Chromium passed 15 focused browser criteria, including the short-tap listener in an online room. `pnpm checks` passed with 3,923 tests and one existing skip. All 55 properties passed. Chromium and WebKit decoded the new sample at −39.31 and −40.10 dBFS RMS. Art recorded the heel-and-scuff recipe in the audio build notes. The standards and folder/caller audit covered engine, API, webapp, React, audio and acceptance instructions. In-game listening is open.
+
+2026-11-20, softer upright footsteps and shooting in `worktree-art`. Crouched movement is silent. The engine emits a position-free event for a successfully fired shot and the browser plays the authored fallback for both the shooter and the listener. The local and two-browser shot criteria went red before wiring, as did the crouch silence criterion. The upright criterion rejected the wrong clip in a separate build. Production Chromium passed all 32 targeted criteria. The full sound group passed 30 of 31. The sole failure was the previously reproduced opponent-pickup expectation. Chromium and WebKit decoded the shot with a peak of −1.83 dBFS. `pnpm checks` passed with 3,923 tests and one existing audio skip. All 55 properties passed. The folder and caller audit used root, webapp, React, audio, engine, API and acceptance instructions. Review the fallback mix on headphones and speakers, then repeat when weapon-specific synthesis arrives.
+
+2026-11-20, local audio in `worktree-art`. Art merged `c280fbe` as `d93dd90`. The three new positive browser criteria failed before playback was wired. The wall, full-magazine reload and mute criteria each caught a deliberately broken build. `pnpm checks` passed with 3,923 tests and one existing audio skip. All 55 properties passed. Production Chromium passed 42 of 43 focused criteria, including all six new ones. The opponent-pickup failure reproduces on the merge baseline. Chromium and WebKit decoded the three production MP3s with the crouched step about 9 dB quieter than the standing step. Headphone and speaker listening remains open. Reviewed root, webapp, React, audio and acceptance instructions and completed the folder and caller audit.
 
 2026-11-20, runtime appearance review in `worktree-art`. All twelve studies
 passed the AI appearance validator and were inspected in the current

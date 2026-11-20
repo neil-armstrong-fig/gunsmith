@@ -1,8 +1,10 @@
 import {SOUND_KEYS} from "@src/assets/sounds/SoundKeys";
 import {SOUND_URLS} from "@src/assets/sounds/SoundUrls";
 import type {SoundKey} from "@src/assets/sounds/types/SoundKey";
+import type {PlayOptions} from "@src/sound/types/PlayOptions";
 import type {SoundOutput} from "@src/sound/types/SoundOutput";
 import type {LoopVoice} from "@src/sound/web-audio/types/LoopVoice";
+import {connectVoice} from "@src/sound/web-audio/voice/ConnectVoice";
 
 const LOOP_FADE_SECONDS = 0.1;
 
@@ -10,13 +12,13 @@ const LOOP_FADE_SECONDS = 0.1;
  * Plays the game's sounds through the browser's Web Audio. `start` makes the audio context, loads every sound and listens for
  * the first press or key, since a context made before one is suspended and a sound started in it is never heard (it would
  * also play late, when the context woke up); until it is running a sound is dropped, not queued. `stop` closes it again.
- * A sound that is still playing when the same one starts again is replaced, so one voice per sound. It plays nothing while
- * `isMuted` says so.
+ * A repeat replaces the previous voice in the same channel. Local and spatial voices can overlap. Playback respects `isMuted`.
  */
 export class WebAudioOutput implements SoundOutput {
   private context: AudioContext | undefined;
   private readonly buffers = new Map<SoundKey, AudioBuffer>();
   private readonly voices = new Map<SoundKey, AudioBufferSourceNode>();
+  private readonly placedVoices = new Map<SoundKey, AudioBufferSourceNode>();
   private readonly loops = new Map<SoundKey, LoopVoice>();
 
   constructor(private readonly isMuted: () => boolean) {}
@@ -42,20 +44,21 @@ export class WebAudioOutput implements SoundOutput {
     this.context = undefined;
   }
 
-  play(key: SoundKey): void {
+  play(key: SoundKey, options?: PlayOptions): void {
     const {context} = this;
     const buffer = this.buffers.get(key);
     if (!context || !buffer || this.isMuted() || context.state !== "running") {
       return;
     }
 
-    this.voices.get(key)?.stop();
+    const voices = this.voicesFor(options);
+    voices.get(key)?.stop();
 
     const voice = context.createBufferSource();
     voice.buffer = buffer;
-    voice.connect(context.destination);
+    connectVoice(context, voice, options);
     voice.start();
-    this.voices.set(key, voice);
+    voices.set(key, voice);
   }
 
   startLoop(key: SoundKey): void {
@@ -106,9 +109,21 @@ export class WebAudioOutput implements SoundOutput {
 
     this.voices.clear();
 
+    for (const voice of this.placedVoices.values()) {
+      voice.stop();
+    }
+
+    this.placedVoices.clear();
+
     for (const key of this.loops.keys()) {
       this.stopLoop(key);
     }
+  }
+
+  private voicesFor(options: PlayOptions | undefined): Map<SoundKey, AudioBufferSourceNode> {
+    if (options) return this.placedVoices;
+
+    return this.voices;
   }
 
   private readonly wake = (): void => {

@@ -46,10 +46,10 @@ describe("with a pickup lying in the arena", () => {
     expect(world.pickup).toBeUndefined();
     expect(world.opponent?.loadout[0]?.weapon).toBe(SUBMACHINE_GUN);
     expect(world.player.loadout[1]?.weapon).toBe(MARKSMAN_RIFLE);
-    expect(world.events).toBeUndefined();
+    expect(world.events).toEqual([{kind: "heard", sound: "pickup", sector: 6, loudness: "near"}]);
   });
 
-  it("reports nothing to the player when the opponent wins a tie", () => {
+  it("reports to the player only the sound of the weapon taken when the opponent wins a tie", () => {
     const base = withPickup();
     const player = {...base.player, position: lying.position};
     const opponent = {...player, health: OPPONENT_HEALTH};
@@ -57,7 +57,7 @@ describe("with a pickup lying in the arena", () => {
 
     expect(world.opponent?.loadout[0]?.weapon).toBe(SUBMACHINE_GUN);
     expect(world.player.loadout[1]?.weapon).toBe(MARKSMAN_RIFLE);
-    expect(world.events).toBeUndefined();
+    expect(world.events).toEqual([{kind: "heard", sound: "pickup", sector: 0, loudness: "near"}]);
   });
 
   it("is not taken once the round is over: a frozen world takes nothing", () => {
