@@ -30,7 +30,18 @@ jobs:
           node-version: 26.13.0
           cache: pnpm
 
-      - run: sudo apt-get update && sudo apt-get install -y ffmpeg glslang-tools
+      - name: Install native audio and shader tools
+        timeout-minutes: 5
+        shell: bash
+        run: |
+          if ! command -v ffmpeg || ! command -v ffprobe || ! command -v glslangValidator; then
+            options=(-o Acquire::Retries=2 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20)
+            sudo apt-get "${options[@]}" -o APT::Update::Error-Mode=any update
+            sudo apt-get "${options[@]}" install -y ffmpeg glslang-tools
+          fi
+          command -v ffmpeg
+          command -v ffprobe
+          command -v glslangValidator
 
       - run: pnpm install --frozen-lockfile
 
@@ -65,7 +76,13 @@ jobs:
       - name: Record the built commit
         run: printf '{"commit":"%s"}\n' "$GITHUB_SHA" > webapp/build/release.json
 
-      - run: pnpm --filter @gunsmith/api exec wrangler deploy --dry-run --assets ../webapp/build
+      - name: Check the API Worker bundle
+        run: pnpm --filter @gunsmith/api exec wrangler deploy --dry-run
+        env:
+          WRANGLER_SEND_METRICS: "false"
+
+      - name: Check the static webapp Worker
+        run: pnpm --filter @gunsmith/infra exec wrangler deploy --dry-run --config ../webapp/wrangler.jsonc
         env:
           WRANGLER_SEND_METRICS: "false"
 
@@ -100,7 +117,9 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - run: pnpm --filter @gunsmith/acceptance-tests exec playwright install --with-deps chromium
+      - name: Install Chromium and system dependencies
+        timeout-minutes: 5
+        run: pnpm --filter @gunsmith/acceptance-tests exec playwright install --with-deps chromium
 
       - uses: actions/download-artifact@v8
         with:
@@ -108,7 +127,9 @@ jobs:
           path: webapp/build/
 
       - name: Run acceptance shard
-        run: pnpm acceptance-tests --shard=${{ matrix.shard }}/${{ strategy.job-total }} --reporter=github,blob
+        # One worker leaves CPU for Chromium rendering and the local Worker. Playwright's
+        # deadline leaves time to write and upload its blob before the job deadline.
+        run: pnpm acceptance-tests --shard=${{ matrix.shard }}/${{ strategy.job-total }} --workers=1 --global-timeout=1200000 --reporter=github,line,blob
         env:
           PREVIEW_ACCEPTANCE: "1"
           PREVIEW_API_MODE: local
@@ -159,8 +180,10 @@ jobs:
     outputs:
       current: ${{ steps.tip.outputs.current }}
       url: ${{ steps.tip.outputs.url }}
+      api_url: ${{ steps.tip.outputs.api_url }}
     env:
       SITE_ORIGIN: https://gunsmith.neilarmstrong.dev
+      API_ORIGIN: https://gunsmith-api.neilarmstrong.dev
     steps:
       - name: Check the current main commit
         id: tip
@@ -176,6 +199,7 @@ jobs:
           fi
           echo 'current=true' >> "$GITHUB_OUTPUT"
           echo "url=$SITE_ORIGIN" >> "$GITHUB_OUTPUT"
+          echo "api_url=$API_ORIGIN" >> "$GITHUB_OUTPUT"
 
       - uses: actions/checkout@v7
         if: steps.tip.outputs.current == 'true'
@@ -200,7 +224,7 @@ jobs:
           name: release-webapp
           path: webapp/build/
 
-      - name: Deploy the tested build
+      - name: Deploy the API Worker
         if: steps.tip.outputs.current == 'true'
         run: pnpm --filter @gunsmith/infra provision
         env:
@@ -211,6 +235,15 @@ jobs:
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           ALERT_TO_ADDRESS: ${{ secrets.ALERT_TO_ADDRESS }}
+          ACCOUNT_DIGEST_KEY: ${{ secrets.ACCOUNT_DIGEST_KEY }}
+
+      - name: Deploy the tested webapp build
+        if: steps.tip.outputs.current == 'true'
+        run: pnpm --filter @gunsmith/infra exec wrangler deploy --config ../webapp/wrangler.jsonc
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          WRANGLER_SEND_METRICS: "false"
 
       - name: Verify the deployed commit, noindex and D1
         if: steps.tip.outputs.current == 'true'
@@ -225,8 +258,12 @@ jobs:
                 echo 'The deployed homepage must return X-Robots-Tag: noindex.' >&2
                 exit 1
               fi
-              curl --fail --silent --show-error --max-time 10 --cookie 'session=release-check' "$SITE_ORIGIN/api/me" |
+              headers="$(mktemp)"
+              curl --fail --silent --show-error --max-time 10 --dump-header "$headers" \
+                --header "Origin: $SITE_ORIGIN" --cookie 'session=release-check' "$API_ORIGIN/api/me" |
                 jq -e '.signedIn == false' > /dev/null
+              tr -d '\r' < "$headers" | grep -iFx "Access-Control-Allow-Origin: $SITE_ORIGIN" > /dev/null
+              tr -d '\r' < "$headers" | grep -iFx 'Access-Control-Allow-Credentials: true' > /dev/null
               printf 'Deployed `%s` to %s.\n' "$GITHUB_SHA" "$SITE_ORIGIN" >> "$GITHUB_STEP_SUMMARY"
               exit 0
             fi
@@ -273,6 +310,7 @@ jobs:
         run: pnpm acceptance-tests --shard=${{ matrix.shard }}/${{ strategy.job-total }} --reporter=github,blob
         env:
           WEBAPP_URL: ${{ needs.deploy.outputs.url }}
+          RELEASE_API_URL: ${{ needs.deploy.outputs.api_url }}
           PLAYWRIGHT_BLOB_OUTPUT_NAME: shard-${{ matrix.shard }}.zip
 
       # Blobs include retry traces, screenshots and videos; preserve failures too.

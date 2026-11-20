@@ -17,6 +17,7 @@ import {RoundDsl} from "@src/dsl/gunsmith/components/round/RoundDsl";
 import {SoundDsl} from "@src/dsl/gunsmith/components/sound/SoundDsl";
 import {VisionDsl} from "@src/dsl/gunsmith/components/vision/VisionDsl";
 import {WeaponDsl} from "@src/dsl/gunsmith/components/weapon/WeaponDsl";
+import {PreRoundDsl} from "@src/dsl/gunsmith/components/pre-round/PreRoundDsl";
 import {WorkshopDsl} from "@src/dsl/gunsmith/components/workshop/WorkshopDsl";
 import {GunsmithPlaywright} from "@src/dsl/gunsmith/playwright/GunsmithPlaywright";
 import type {ClosingRingRequest} from "@src/dsl/gunsmith/types/ClosingRingRequest";
@@ -38,6 +39,7 @@ export class GunsmithDsl {
   readonly opponent: OpponentDsl;
   readonly match: MatchDsl;
   readonly pickup: PickupDsl;
+  readonly preRound: PreRoundDsl;
   readonly ring: RingDsl;
   readonly room: RoomDsl;
   readonly round: RoundDsl;
@@ -58,6 +60,7 @@ export class GunsmithDsl {
     this.opponent = new OpponentDsl(page);
     this.match = new MatchDsl(page);
     this.pickup = new PickupDsl(page);
+    this.preRound = new PreRoundDsl(page);
     this.ring = new RingDsl(page);
     this.room = new RoomDsl(page, secondPage => new GunsmithDsl(secondPage));
     this.round = new RoundDsl(page);
@@ -133,6 +136,15 @@ export class GunsmithDsl {
       await this.gunsmith.openDuel(DUEL_SEED);
     } catch (error) {
       throw new DslError("Failed to open the duel", error);
+    }
+  }
+
+  /** Opens the duel as the practice range's "Fight the bot" does: the match waits behind the pre-round, where weapons are chosen, until the player starts it. */
+  async startDuelWithPreRound(): Promise<void> {
+    try {
+      await this.gunsmith.openDuelWithPreRound(DUEL_SEED);
+    } catch (error) {
+      throw new DslError("Failed to open the duel with its pre-round", error);
     }
   }
 

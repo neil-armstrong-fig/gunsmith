@@ -11,7 +11,7 @@ import type {ArenaGraphUpdate} from "@gunsmith/ai/pipeline/arena/arena-graph/sta
 export async function repairNode(
   state: ArenaGraphStateValues,
   generator: BaseChatModel,
-  format: ArenaFormat = "rows",
+  format: ArenaFormat,
 ): Promise<ArenaGraphUpdate> {
   const draft = await repairArenaDraft(
     {prompt: state.prompt, previous: state.draft, errors: state.errors, format},

@@ -47,7 +47,7 @@ export default [
   // `package.json` does not export `evals/`). (Call `restrictedImports` rather than writing the rule: flat config replaces, not merges.)
   {
     files: ["src/**/*.ts"],
-    ignores: ["src/evals/**"],
+    ignores: ["src/evals/**", "src/adapter/**"],
     rules: {
       "no-restricted-imports": restrictedImports({
         allowedPackages,
@@ -57,6 +57,11 @@ export default [
             message: "Eval-only: import it from `src/evals/`, never from the rest of `src/` (the Worker bundles it).",
           },
           {name: "langsmith/vitest", message: "Eval-only: import it from `src/evals/`, never from the rest of `src/`."},
+          {
+            name: "@langchain/anthropic",
+            message:
+              "Build models in `src/adapter/` (one place, no retries); the pipeline is handed its models, never builds them.",
+          },
         ],
       }),
     },

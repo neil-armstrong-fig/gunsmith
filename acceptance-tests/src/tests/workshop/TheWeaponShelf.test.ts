@@ -81,16 +81,17 @@ given("the workshop is open, with one weapon saved", () => {
 });
 
 given("the workshop is open, with the shelf full of fast weapons", () => {
+  const promptBeginning = `${FAST_PROMPT} with a compact grip${" and a bright stripe".repeat(18)}`;
   let limit = 0;
   let fastName = "";
   let longRangeName = "";
 
   beforeEach(async ({gunsmith}) => {
     await gunsmith.workshop.open();
-    await gunsmith.workshop.typeThePrompt(FAST_PROMPT);
 
     limit = (await gunsmith.workshop.shelf.getMeter()).limit;
     for (let saved = 0; saved < limit; saved++) {
+      await gunsmith.workshop.pasteThePrompt(`${promptBeginning} for practice target ${saved + 1}`);
       await gunsmith.workshop.make();
       await gunsmith.workshop.shelf.save();
     }
@@ -121,6 +122,18 @@ given("the workshop is open, with the shelf full of fast weapons", () => {
       expect(items.every(item => item.name === fastName)).toBe(true);
     });
 
+    then(
+      "the picker shows the saved prompts that distinguish weapons of the same name and rating",
+      async ({gunsmith}) => {
+        const items = await gunsmith.workshop.shelf.getItems();
+
+        expect(new Set(items.map(item => item.name)).size).toBe(1);
+        expect(new Set(items.map(item => item.rating)).size).toBe(1);
+        expect(new Set(items.map(item => item.prompt)).size).toBe(limit);
+        expect(await gunsmith.workshop.shelf.getReplacementPrompts()).toEqual(items.map(item => item.prompt));
+      },
+    );
+
     when("the player replaces the second saved weapon", () => {
       beforeEach(async ({gunsmith}) => {
         await gunsmith.workshop.shelf.replaceItem(1);
@@ -133,7 +146,13 @@ given("the workshop is open, with the shelf full of fast weapons", () => {
         expect(items.map(item => item.name)).toEqual(
           Array.from({length: limit}, (_, index) => (index === 1 ? longRangeName : fastName)),
         );
-        expect(items[1]?.prompt).toBe(LONG_RANGE_PROMPT);
+        expect(items.map(item => item.prompt)).toEqual(
+          Array.from({length: limit}, (_, index) => {
+            if (index === 1) return LONG_RANGE_PROMPT;
+
+            return `${promptBeginning} for practice target ${index + 1}`;
+          }),
+        );
       });
 
       then("the question is gone and the card says Saved", async ({gunsmith}) => {

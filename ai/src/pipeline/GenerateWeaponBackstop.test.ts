@@ -4,6 +4,9 @@ import {passingAppearance} from "@gunsmith/ai/pipeline/appearance/testing/Passin
 import {ToolCallingFakeModel} from "@gunsmith/ai/pipeline/appearance/testing/ToolCallingFakeModel";
 import type {WeaponPipelineDependencies} from "@gunsmith/ai/pipeline/types/WeaponPipelineDependencies";
 
+// None of these fake models reports tokens, so a request's usage is zero.
+const NO_TOKENS = {inputTokens: 0, outputTokens: 0};
+
 // Balancing never leaves a weapon over a limit, so the backstop behind it can only be reached by a balancer that fails. This file
 // stands in one that does, to prove `rate` still refuses what it is handed, that the refusal goes to the one repair like any other,
 // and that a weapon still over a limit after it is invalid and is never drawn.
@@ -48,6 +51,7 @@ it("is invalid, repaired once, drawn never, when balancing leaves a weapon over 
       "rate",
     ],
     modelCalls: 3,
+    usage: NO_TOKENS,
   });
   expect(generatorCall).toHaveBeenCalledTimes(2);
   expect(appearanceCall).not.toHaveBeenCalled();

@@ -1,10 +1,14 @@
 # TODO: ship
 
+**FOCUS ON MVP TASKS FIRST**
+
 Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only relevant dependencies.
 
 ## Resume here
 
-The persistent checkout is `.claude/worktrees/ship` on `worktree-ship`, synced to `origin/main` at `0143379` by merge `3dd9646`. The release now gates the built and hosted webapp on `noindex`. All seven credential names are present in GitHub Actions. The owner uploaded them from the shared root `.env.local`; the Cloudflare read-only checks passed. The release changes await the owner’s commit. Provision and verify production before enabling GitHub deployments.
+The persistent checkout is `.claude/worktrees/ship` on `worktree-ship`. Merged `origin/main` at `52443a3` before publishing the CI update. The current slice owns `.github/workflows/ci.yml`. After publication, verify that Checks reaches `pnpm checks`, all four preview shards finish and the combined HTML report is present.
+
+The first combined Worker from `d40d942` is live on the API hostname. The locally verified two-host release reached GitHub main at `bc47751`. The webapp custom domain serves static test Worker version `8b2f62ff-f3f9-4e83-92c4-6cdc5d0ba93d` with `noindex`. The user deferred live rollout and automatic releases while Ship stabilizes CI.
 
 Ship fixed the M1 pickup-marker acceptance setup. The [handoff](HANDOFF.md#latest-ship-delivery) records the original failing criterion, screenshot evidence and retained-marker check.
 
@@ -35,10 +39,10 @@ server supplies Worker/DO/storage bindings; budget supplies operational limits; 
 - [x] Budget request: enforce declarations below callers, including tests; reject module-level const arrow/function helpers, preserving nested const functions. Full cleanup, no baseline.
 - [x] Use the Worker manifest to bind `MATCHES`, `CREDITS`, `SPEND` and D1 in the deployed Worker. Retain the local `v1` and `v2` SQLite migrations. Alchemy manages deployed SQLite migrations.
 - [x] Include `ALERT_MAIL` and `ALERT_FROM_ADDRESS` in the deploy config. Deploy-time `ALERT_TO_ADDRESS` setup and binding verification happen during the authorized deploy.
-- [ ] Profile the first hosted sharded run: separate setup/build/test/merge time, total runner minutes and elapsed time; compare with the recorded 6.3-minute local baseline with budget.
+- [ ] Profile the next hosted sharded run against the failed [36-minute baseline](docs/agent-reference/Operations.md#ci-and-deployment). Record setup, build, test and report durations, retries, elapsed time and total runner minutes.
 - [x] Settle eval policy with the user and deliver free fake CI/root mechanics; see [policy](docs/agent-reference/EvalPolicy.md).
 - [ ] Receive AI-owned paid selector/guard/evidence implementation and reconciled opening spend before local paid activation.
-- [ ] Validate the new workflow on GitHub after the user commits and publishes it. The original CI is already running on GitHub.
+- [ ] Validate the four single-worker preview shards and the combined report after the user commits and publishes the workflow. Review traces for repeatable gameplay failures and follow up with the owners.
 
 ## Later tasks
 
@@ -50,6 +54,10 @@ server supplies Worker/DO/storage bindings; budget supplies operational limits; 
 - [ ] Measure infrastructure costs with server/AI runtime measurements before proposing free versus Workers Paid.
 
 ## Verification/latest delivery
+
+2026-11-20 CI stabilization: the pre-edit check found an unbounded native tool install. The revised step passed installed-tool, missing-tool and failed-APT probes. All 543 local production-preview criteria passed without retries. The four single-worker shards took 4.6, 6.3, 8.7 and 6.6 minutes in two waves, with a merged HTML report. The deadline probe failed with a valid partial blob. Workflow lint, `pnpm checks` (3,767 passed and one existing skip), both Wrangler dry runs and 275 fake evals passed. The next check is the hosted run after publication.
+
+2026-11-20 hostname split: the cross-origin room request reached the old Worker with 201 but Chromium blocked the response. The new code passed all 37 online criteria. Chromium also opened a room directly between separate local Workers after a JSON preflight and received its joined WebSocket frame. The exact CI smoke passed on both local origins. Both Wrangler dry runs and workflow lint passed. The D1 upgrade preserved a fixture user and applied the new migration once. `pnpm checks` passed 3,738 tests with one existing audio skip. The managed wrappers logged shutdown errors after acceptance exited zero.
 
 2026-11-20 production release setup: the build gate failed before `_headers` existed and then passed. The live CI check passed against a local Worker with migrated D1 and failed against a Vite preview missing the header. An SVG also carried `noindex`. `pnpm checks` passed lint, formatting, strict types and 3,646 tests with one existing audio skip. Production-preview acceptance passed 526 of 526 with no retries. The managed wrappers logged shutdown errors after the tests and the run exited zero. Workflow lint and Wrangler dry run passed.
 

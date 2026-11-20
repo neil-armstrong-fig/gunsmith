@@ -134,8 +134,8 @@ export class HudPlaywright extends BasePage {
     };
   }
 
-  async getSecondInventoryIconLook(): Promise<InventoryIconLook> {
-    const icon = await this.loadedInventoryIcon(this.hud().getByTestId("inventory-slot-2"));
+  async getInventoryIconLook(slot: number): Promise<InventoryIconLook> {
+    const icon = await this.loadedInventoryIcon(this.hud().getByTestId(`inventory-slot-${slot}`));
 
     return await lookOfInventoryIcon(this.page, icon);
   }

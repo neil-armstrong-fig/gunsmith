@@ -1,5 +1,7 @@
 import type {Weapon} from "@gunsmith/engine/weapon/types/Weapon";
-import {ratingPercentOf} from "@src/react/components/dom/workshop/rating-percent/RatingPercentOf";
+import {SaveWeaponButton} from "@src/react/components/dom/workshop/components/weapon-card/components/save-weapon/components/save-weapon-button/SaveWeaponButton";
+import {SavedWeaponButton} from "@src/react/components/dom/workshop/components/weapon-card/components/save-weapon/components/saved-weapon-button/SavedWeaponButton";
+import {WeaponReplacementPicker} from "@src/react/components/dom/workshop/components/weapon-card/components/save-weapon/components/weapon-replacement-picker/WeaponReplacementPicker";
 import {useShelfStore} from "@src/store/shelf/UseShelfStore";
 import type {ShelfWeaponRequest} from "@src/store/shelf/types/ShelfWeaponRequest";
 import {useWorkshopStore} from "@src/store/workshop/UseWorkshopStore";
@@ -24,83 +26,38 @@ export function SaveWeapon({weapon}: Props): JSX.Element {
   const isSaved = savedId !== undefined && saved.some(item => item.id === savedId);
   const asking = askedAbout === weapon && saved.length >= limit;
 
-  return (
-    <>
-      {isSaved && (
-        <button type="button" disabled className="rounded-md border border-gs-edge/40 px-5 py-2 text-gs-ui-muted">
-          Saved
-        </button>
-      )}
+  const save = (): void => {
+    const id = useShelfStore.getState().saveWeapon(requestOf(weapon));
+    if (id === undefined) {
+      setAskedAbout(weapon);
+      return;
+    }
 
-      {!isSaved && (
-        <>
-          {!asking && (
-            <button
-              type="button"
-              className="rounded-md border border-gs-team-blue px-5 py-2 font-semibold text-gs-team-blue"
-              onClick={() => {
-                const id = useShelfStore.getState().saveWeapon(requestOf(weapon));
-                if (id === undefined) {
-                  setAskedAbout(weapon);
-                  return;
-                }
+    useWorkshopStore.getState().setSavedId(id);
+  };
 
-                useWorkshopStore.getState().setSavedId(id);
-              }}
-            >
-              Save
-            </button>
-          )}
+  const replace = (idToReplace: string): void => {
+    const id = useShelfStore.getState().replaceWeapon(idToReplace, requestOf(weapon));
+    if (id !== undefined) {
+      useWorkshopStore.getState().setSavedId(id);
+    }
 
-          {asking && (
-            <div
-              role="group"
-              aria-label="Replace which weapon?"
-              className="flex w-full flex-col gap-2 rounded-md border border-gs-edge/40 px-3 py-2"
-            >
-              <p className="text-sm text-gs-ui-muted">The shelf is full. Replace which weapon?</p>
+    setAskedAbout(undefined);
+  };
 
-              <ul className="flex flex-col gap-1">
-                {saved.map(item => (
-                  <li key={item.id} className="flex items-center justify-between gap-3">
-                    <span className="min-w-0 truncate text-sm text-gs-ui-text">
-                      {item.weapon.identity?.name ?? "Weapon"}
-                      <span className="text-gs-ui-muted"> · {ratingPercentOf(item.weapon)}</span>
-                    </span>
+  const cancel = (): void => {
+    setAskedAbout(undefined);
+  };
 
-                    <button
-                      type="button"
-                      className="rounded-sm border border-gs-edge/40 px-2 py-0.5 text-sm text-gs-ui-text"
-                      onClick={() => {
-                        const id = useShelfStore.getState().replaceWeapon(item.id, requestOf(weapon));
-                        if (id !== undefined) {
-                          useWorkshopStore.getState().setSavedId(id);
-                        }
+  if (isSaved) {
+    return <SavedWeaponButton />;
+  }
 
-                        setAskedAbout(undefined);
-                      }}
-                    >
-                      Replace
-                    </button>
-                  </li>
-                ))}
-              </ul>
+  if (asking) {
+    return <WeaponReplacementPicker weapons={saved} onReplace={replace} onCancel={cancel} />;
+  }
 
-              <button
-                type="button"
-                className="self-start rounded-sm px-2 py-0.5 text-sm text-gs-ui-muted"
-                onClick={() => {
-                  setAskedAbout(undefined);
-                }}
-              >
-                Cancel
-              </button>
-            </div>
-          )}
-        </>
-      )}
-    </>
-  );
+  return <SaveWeaponButton onSave={save} />;
 }
 
 function requestOf(weapon: Weapon): ShelfWeaponRequest {

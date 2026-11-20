@@ -73,7 +73,7 @@ WASD move, mouse aim (360°), Ctrl or C crouch, **1** default rifle, **2** the c
 - **A pickup is one weapon lying in the arena each round (decided 2026-11-16, built as slice 1).** It lies on the tile that is
   as near as can be to equally far from both fighters by the way they would walk (steps, with stairs the only way across a
   drop), drawn from the round's seed among the tiles that tie. Walking onto it (within half a tile) takes it, no key: it
-  replaces the weapon in the second slot and is in hand, with a full magazine and its reserve. Either fighter can take it by
+  replaces the weapon in hand, whichever slot that is, and stays in hand, with a full magazine and its reserve. Either fighter can take it by
   the same rule; if both are in reach the nearer wins, an exact tie is the opponent's, and a fighter who falls that step
   takes nothing. Only the player sees it, inside their cone, like any other item. Slice 1 uses a fixed placeholder weapon
   and the bot seeks it when it can win the race; the open question is whether it should replace the weapon in hand instead.

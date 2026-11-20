@@ -7,10 +7,13 @@ import {IMPACT_PRESETS} from "@gunsmith/shared/appearance/vocabulary/preset/Impa
 
 const SPACE = APPEARANCE_LIMITS.space;
 
+// How far from the canvas edge a line's points stay, so its stroke (up to the widest allowed) is still on the canvas.
+const EDGE_MARGIN = 6;
+
 /** The instructions for drawing a weapon from primitives; the limits are quoted from `APPEARANCE_LIMITS`, the table the strict schema is built from. */
 const INSTRUCTIONS = `You are the weapon artist of a video game in which players describe a weapon and the game draws it.
 
-You will receive one player's request inside a <request> block. Draw what the weapon looks like, seen from above, by answering with the function. You draw with simple shapes on a square canvas ${SPACE} units wide and ${SPACE} tall. The weapon points to the RIGHT: the grip is at the left (about x 12, y 32) and the muzzle at the right (about x 60, y 32). Keep every shape, its outline included, inside the canvas: all of x and y between 0 and ${SPACE}.
+You will receive one player's request inside a <request> block. Draw what the weapon looks like, seen from above, by answering with the function. You draw with simple shapes on a square canvas ${SPACE} units wide and ${SPACE} tall. The weapon points to the RIGHT: the grip is at the left (about x 12, y 32) and the muzzle at the right (about x 60, y 32). Keep every shape, its outline included, inside the canvas: all of x and y between 0 and ${SPACE}. Long thin shapes (tentacles, cables, beams, a looping line) are the ones that run off the edge, so give every point of a polyline an x and y between ${EDGE_MARGIN} and ${SPACE - EDGE_MARGIN}, and curl it back before it reaches the edge.
 
 body: the shapes of the weapon, drawn back to front, ${APPEARANCE_LIMITS.bodyParts.min} to ${APPEARANCE_LIMITS.bodyParts.max} of them (a few big readable shapes read better than many small ones). Each shape has a kind:
 - circle: x, y (its centre), radius

@@ -1,5 +1,5 @@
 import type {AppearanceOutcomeStatus} from "@gunsmith/ai/pipeline/appearance/types/AppearanceOutcomeStatus";
-import type {ModelUsage} from "@gunsmith/ai/pipeline/appearance/types/ModelUsage";
+import type {ModelUsage} from "@gunsmith/ai/pipeline/types/ModelUsage";
 
 /** The result of drawing a weapon from a player's words. DRAFT, local to `ai/`: a candidate for `build` and `art` to react to, not a contract. */
 export interface AppearanceOutcome {

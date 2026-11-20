@@ -12,7 +12,7 @@ export interface ArenaPipelineDependencies {
   generator: BaseChatModel;
   /** The cheap model that judges whether a request is an arena request at all. */
   moderator: BaseChatModel;
-  /** How the generator is asked to describe an arena: the drawing's rows (the default) or shapes. The answer is checked the same either way. */
+  /** How the generator is asked to describe an arena: the drawing's rows or shapes; shapes (`DEFAULT_ARENA_FORMAT`) when absent. The answer is checked the same either way. */
   format?: ArenaFormat;
   /** The arenas to give when the model's cannot be used. Never empty. */
   builtInArenas: readonly ArenaDrawing[];

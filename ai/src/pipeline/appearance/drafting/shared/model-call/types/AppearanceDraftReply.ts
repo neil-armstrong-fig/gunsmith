@@ -1,4 +1,4 @@
-import type {ModelUsage} from "@gunsmith/ai/pipeline/appearance/types/ModelUsage";
+import type {ModelUsage} from "@gunsmith/ai/pipeline/types/ModelUsage";
 
 /** What one call to the model gave back: its answer, `unknown` and unchecked on purpose, and what the call cost. */
 export interface AppearanceDraftReply {

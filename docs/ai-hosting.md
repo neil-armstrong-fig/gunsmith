@@ -8,7 +8,7 @@ Run LangChain.js and LangGraph.js inside the planned API Worker. The API will im
 
 ## Evidence and limits
 
-Local workerd measurements recorded the real graph at 2908.92 KiB uncompressed / 541.20 KiB gzipped and response wall times of 75 ms cold, then 10 and 9 ms. These are historical local measurements, not CPU usage, provider latency or evidence of free-plan fit. Re-measure the current graph before choosing a production plan.
+Local workerd measurements recorded the real graph at 2908.92 KiB uncompressed / 541.20 KiB gzipped and response wall times of 75 ms cold, then 10 and 9 ms. These are historical local measurements, not CPU usage, provider latency or evidence of free-plan fit. Re-measure the current graph before choosing a production plan. **Re-measured 2026-11-20 (dry-run bundle, `wrangler deploy --dry-run`, no CPU):** a Worker entry holding the production adapter (`ai/src/adapter/`, `@langchain/anthropic` included) and both pipelines (`generateWeapon`, `generateArena`, with engine's built-in arenas) bundles to 3540.15 KiB uncompressed and 668.66 KiB gzipped.
 
 ## Integration requirements
 

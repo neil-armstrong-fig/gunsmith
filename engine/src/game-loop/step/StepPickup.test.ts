@@ -13,15 +13,15 @@ import {centred} from "@gunsmith/engine/game-loop/step/testing/Centred";
 describe("with a pickup lying in the arena", () => {
   const lying = {position: {x: 6.5, y: 4.5}, weapon: SUBMACHINE_GUN};
 
-  it("is taken by the player who walks onto it, who then holds its weapon in the second slot", () => {
+  it("is taken by the player who walks onto it, who then holds its weapon in the slot they held", () => {
     let world: World = {...withPickup(), player: {...withPickup().player, position: {x: 5.0, y: 4.5}}};
     for (let tick = 0; tick < 60; tick++) {
       world = step(world, walking(1, 0), TICK);
     }
 
     expect(world.pickup).toBeUndefined();
-    expect(world.player.loadout[1]?.weapon).toBe(SUBMACHINE_GUN);
-    expect(world.player.equippedIndex).toBe(1);
+    expect(world.player.loadout[0]?.weapon).toBe(SUBMACHINE_GUN);
+    expect(world.player.equippedIndex).toBe(0);
   });
 
   it("is left lying while nobody is in reach, and stays in the world as it was", () => {
@@ -44,7 +44,7 @@ describe("with a pickup lying in the arena", () => {
     const world = step(disarmOpponent({...base, opponent}), IDLE, TICK);
 
     expect(world.pickup).toBeUndefined();
-    expect(world.opponent?.loadout[1]?.weapon).toBe(SUBMACHINE_GUN);
+    expect(world.opponent?.loadout[0]?.weapon).toBe(SUBMACHINE_GUN);
     expect(world.player.loadout[1]?.weapon).toBe(MARKSMAN_RIFLE);
     expect(world.events).toEqual([{kind: "heard", sound: "pickup", sector: 6, loudness: "near"}]);
   });
@@ -55,7 +55,7 @@ describe("with a pickup lying in the arena", () => {
     const opponent = {...player, health: OPPONENT_HEALTH};
     const world = step(disarmOpponent({...base, player, opponent}), IDLE, TICK);
 
-    expect(world.opponent?.loadout[1]?.weapon).toBe(SUBMACHINE_GUN);
+    expect(world.opponent?.loadout[0]?.weapon).toBe(SUBMACHINE_GUN);
     expect(world.player.loadout[1]?.weapon).toBe(MARKSMAN_RIFLE);
     expect(world.events).toEqual([{kind: "heard", sound: "pickup", sector: 0, loudness: "near"}]);
   });

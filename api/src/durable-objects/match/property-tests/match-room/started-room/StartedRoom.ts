@@ -1,11 +1,13 @@
 import {MatchRoom} from "@src/durable-objects/match/room/MatchRoom";
 
-/** The seed every room of a property run starts its fighters from, so two rooms given the same inputs start, and so play, alike. */
-const SAME_START_SEED = 2;
+const SEED = 21;
 
-/** A room with both seats taken, so its match has begun, the fighters on the same places in every room. */
+/**
+ * A room with both seats taken, so its match has begun. **The start is pinned** (`SEED`): each round's fair start is drawn from a random
+ * seed, so two rooms made to be compared would otherwise begin the fighters in different places.
+ */
 export function startedRoom(): MatchRoom {
-  const room = new MatchRoom(undefined, undefined, () => SAME_START_SEED);
+  const room = new MatchRoom({makeSeed: () => SEED, preRoundSeconds: 0});
   room.join();
   room.join();
 

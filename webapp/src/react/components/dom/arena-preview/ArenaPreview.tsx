@@ -24,7 +24,13 @@ export function ArenaPreview({arena, name, startingPlaces}: Props): JSX.Element 
 
   return (
     <figure>
-      <ArenaPreviewCanvas arena={arena} name={name} descriptionId={places && captionId} places={places} />
+      <ArenaPreviewCanvas
+        key={`${arena.width}x${arena.height}`}
+        arena={arena}
+        name={name}
+        descriptionId={places && captionId}
+        places={places}
+      />
 
       {places && (
         <figcaption id={captionId} className="mt-1 text-xs text-gs-ui-muted">

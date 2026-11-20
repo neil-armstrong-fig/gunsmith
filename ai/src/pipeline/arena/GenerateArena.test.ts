@@ -2,11 +2,16 @@ import {FakeListChatModel} from "@langchain/core/utils/testing";
 import {generateArena} from "@gunsmith/ai/pipeline/arena/GenerateArena";
 import type {ArenaPipelineDependencies} from "@gunsmith/ai/pipeline/arena/types/ArenaPipelineDependencies";
 
+// None of these fake models reports tokens, so a request's usage is zero.
+const NO_TOKENS = {inputTokens: 0, outputTokens: 0};
+
 const GOOD = {name: "Plain Room", rows: ["##########", "#........#", "#........#", "#........#", "##########"]};
 const OTHER_GOOD = {name: "Pillar Room", rows: ["##########", "#..#..#..#", "#........#", "#..#..#..#", "##########"]};
 const BAD = {name: "Cut In Two", rows: ["##########", "#...#....#", "#...#....#", "#...#....#", "##########"]};
 const BUILT_IN = {name: "Open Room", rows: ["##########", "#........#", "#........#", "#........#", "##########"]};
 const ARENA_REQUEST = {isArenaRequest: true, reason: "pillars"};
+const TOO_WIDE_SHAPES = {name: "Wide Room", width: 10, height: 5, walls: [{x: 8, y: 1, width: 4, height: 1}]};
+const FIXED_SHAPES = {name: "Wide Room", width: 10, height: 5};
 
 it("makes the arena the model drew when it passes every check, with two model calls and nothing refunded", async () => {
   const outcome = await generateArena({prompt: "a plain room"}, dependenciesWith([GOOD]));
@@ -17,6 +22,7 @@ it("makes the arena the model drew when it passes every check, with two model ca
     refunded: false,
     nodes: ["precheck", "moderation", "generate", "validate"],
     modelCalls: 2,
+    usage: NO_TOKENS,
   });
 });
 
@@ -29,6 +35,7 @@ it("repairs a refused arena once, checks the repair, and makes it when it passes
     refunded: false,
     nodes: ["precheck", "moderation", "generate", "validate", "repair", "validate"],
     modelCalls: 3,
+    usage: NO_TOKENS,
   });
 });
 
@@ -53,6 +60,7 @@ it("makes an arena the model described in shapes, drawn into rows, when the form
     status: "created",
     arena: {name: "Pillar Room", rows: ["##########", "#..#.....#", "#........#", "#........#", "##########"]},
     modelCalls: 2,
+    usage: NO_TOKENS,
   });
 });
 
@@ -66,22 +74,29 @@ it("repairs shapes that reach past the arena in shapes, and makes the repaired a
   expect(outcome).toMatchObject({status: "created", refunded: false, modelCalls: 3});
 });
 
-it("asks for shapes on the first call and again on the repair, and for rows when no format is given", async () => {
-  const tooWide = {name: "Wide Room", width: 10, height: 5, walls: [{x: 8, y: 1, width: 4, height: 1}]};
-  const fixed = {name: "Wide Room", width: 10, height: 5};
-  const shapesDependencies = {...dependenciesWith([tooWide, fixed]), format: "shapes"} as const;
-  const shapesCalls = vi.spyOn(shapesDependencies.generator, "invoke");
-  const rowsDependencies = dependenciesWith([GOOD]);
-  const rowsCalls = vi.spyOn(rowsDependencies.generator, "invoke");
+it("asks for shapes on the first call and again on the repair when no format is given, the format that failed least on Haiku", async () => {
+  const {generator, moderator, builtInArenas} = dependenciesWith([TOO_WIDE_SHAPES, FIXED_SHAPES]);
+  const calls = vi.spyOn(generator, "invoke");
 
-  await generateArena({prompt: "a wide room"}, shapesDependencies);
-  await generateArena({prompt: "a room"}, rowsDependencies);
+  const outcome = await generateArena({prompt: "a wide room"}, {generator, moderator, builtInArenas});
 
-  expect(shapesCalls).toHaveBeenCalledTimes(2);
-  for (const [messages] of shapesCalls.mock.calls) {
+  expect(outcome).toMatchObject({status: "created", modelCalls: 3});
+  expect(calls).toHaveBeenCalledTimes(2);
+  for (const [messages] of calls.mock.calls) {
     expect(JSON.stringify(messages)).toContain("walls: a list of wall rectangles");
   }
-  expect(JSON.stringify(rowsCalls.mock.calls[0]?.[0])).toContain("the arena drawn as a list of text rows");
+});
+
+it("asks for rows on the first call and again on the repair when the format is rows", async () => {
+  const dependencies = dependenciesWith([BAD, OTHER_GOOD]);
+  const calls = vi.spyOn(dependencies.generator, "invoke");
+
+  await generateArena({prompt: "a room"}, dependencies);
+
+  expect(calls).toHaveBeenCalledTimes(2);
+  for (const [messages] of calls.mock.calls) {
+    expect(JSON.stringify(messages)).toContain("the arena drawn as a list of text rows");
+  }
 });
 
 it("falls back when the model gives no answer at all, both times", async () => {
@@ -105,6 +120,7 @@ it("turns away a request that is not about an arena after one model call, and ne
     refunded: false,
     nodes: ["precheck", "moderation"],
     modelCalls: 1,
+    usage: NO_TOKENS,
   });
   expect(invoke).not.toHaveBeenCalled();
 });
@@ -119,10 +135,12 @@ it("turns away a request that is too long before any model is called", async () 
   expect(moderate).not.toHaveBeenCalled();
 });
 
+// The fake generator answers in rows unless a test says otherwise, so the format is named: the pipeline's own default is shapes.
 function dependenciesWith(generatorReplies: unknown[], verdict: unknown = ARENA_REQUEST): ArenaPipelineDependencies {
   return {
     generator: new FakeListChatModel({responses: generatorReplies.map(reply => JSON.stringify(reply))}),
     moderator: new FakeListChatModel({responses: [JSON.stringify(verdict)]}),
+    format: "rows",
     builtInArenas: [BUILT_IN],
   };
 }

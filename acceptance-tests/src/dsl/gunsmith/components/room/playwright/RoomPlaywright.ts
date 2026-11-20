@@ -105,17 +105,15 @@ export class RoomPlaywright extends BasePage {
     return code;
   }
 
-  /**
-   * Asks for the room the way the app does: a `fetch` from a page of the site, which carries that page's `Origin`, as the Worker requires
-   * of every state-changing request. (Playwright's own request context sends none.) `/api/me` is the cheapest page of the site to stand on.
-   */
+  /** A real browser request supplies the webapp's Origin and exercises credentialed CORS on a split deployment. */
   private async askForRoom(): Promise<string> {
-    await this.page.goto("/api/me");
-    const answer = await this.page.evaluate(async (): Promise<RoomAnswer> => {
-      const response = await fetch("/api/rooms", {method: "POST"});
+    await this.page.goto("/", {waitUntil: "commit"});
+    const apiUrl = process.env["RELEASE_API_URL"] ?? new URL(this.page.url()).origin;
+    const answer = await this.page.evaluate(async (url): Promise<RoomAnswer> => {
+      const response = await fetch(new URL("/api/rooms", url), {method: "POST", credentials: "include"});
 
       return {status: response.status, body: await response.json()};
-    });
+    }, apiUrl);
     if (answer.status !== 201) {
       throw new Error(`POST /api/rooms answered ${answer.status}, not a room.`);
     }

@@ -19,8 +19,9 @@ vi.mock("@src/secrets/Secrets", () => ({
   },
 }));
 
-it("declares the same API bindings as local Wrangler and serves the release assets", async () => {
-  vi.stubEnv("SITE_ORIGIN", "https://gunsmith-api.example.workers.dev");
+it("declares the API bindings and keeps the webapp assets off the API Worker", async () => {
+  vi.stubEnv("SITE_ORIGIN", "https://gunsmith.example");
+  vi.stubEnv("ACCOUNT_DIGEST_KEY", "test-account-digest");
 
   try {
     const scope = new Scope({scopeName: "test", stage: "test", phase: "up", parent: null, noTrack: true});
@@ -42,10 +43,9 @@ it("declares the same API bindings as local Wrangler and serves the release asse
         entrypoint: manifest.main,
         compatibilityDate: manifest.compatibility_date,
         compatibilityFlags: manifest.compatibility_flags,
-        assets: {run_worker_first: ["/api/*"]},
-        url: true,
+        url: false,
         bindings: {
-          ASSETS: {type: "assets", path: workspacePath("webapp/build")},
+          ACCOUNT_DIGEST_KEY: expect.objectContaining({type: "secret"}),
           DB: apiDatabase,
           MATCHES: expect.objectContaining({className: "Match", sqlite: true}),
           CREDITS: expect.objectContaining({className: "CreditLedger", sqlite: true}),
@@ -53,13 +53,14 @@ it("declares the same API bindings as local Wrangler and serves the release asse
           LOGIN_LIMITER: {type: "ratelimit", namespace_id: 2001, simple: {limit: 10, period: 60}},
           ALERT_MAIL: {type: "send_email"},
           ALERT_FROM_ADDRESS: manifest.vars["ALERT_FROM_ADDRESS"],
-          ALLOWED_ORIGINS: "https://gunsmith-api.example.workers.dev",
+          ALLOWED_ORIGINS: "https://gunsmith.example",
           ALERT_TO_ADDRESS: expect.objectContaining({type: "secret"}),
           GOOGLE_OAUTH_CLIENT_ID: expect.objectContaining({type: "secret"}),
           GOOGLE_OAUTH_CLIENT_SECRET: expect.objectContaining({type: "secret"}),
         },
       }),
     );
+    expect(cloudflare.Worker).not.toHaveBeenCalledWith("api", expect.objectContaining({assets: expect.anything()}));
   } finally {
     vi.unstubAllEnvs();
   }

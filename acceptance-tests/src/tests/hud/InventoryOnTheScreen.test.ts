@@ -43,49 +43,75 @@ given("a sparring match whose pickup is on the fighters' row", () => {
     beforeEach(async ({gunsmith}) => {
       startingWidth = (await gunsmith.hud.getInventory()).widthPixels;
       await gunsmith.player.walkFor("east", 0.7);
-      await gunsmith.hud.waitForSlot(2);
+      await gunsmith.pickup.waitUntilTaken();
     });
 
-    then("the second icon and name become the submachine gun without widening the HUD", async ({gunsmith}) => {
-      expect(await gunsmith.hud.getInventory()).toEqual({
-        selectedName: "Submachine gun",
-        firstIcon: RIFLE_ICON,
-        secondIcon: SUBMACHINE_GUN_ICON,
-        firstSelected: false,
-        secondSelected: true,
-        widthPixels: startingWidth,
-      });
-    });
+    then(
+      "the icon and name of the weapon in hand become the submachine gun without widening the HUD",
+      async ({gunsmith}) => {
+        await expect
+          .poll(() => gunsmith.hud.getInventory())
+          .toEqual({
+            selectedName: "Submachine gun",
+            firstIcon: SUBMACHINE_GUN_ICON,
+            secondIcon: MARKSMAN_RIFLE_ICON,
+            firstSelected: true,
+            secondSelected: false,
+            widthPixels: startingWidth,
+          });
+      },
+    );
 
     then("the selected submachine gun's magazine stands out against the slot", async ({gunsmith}) => {
-      const look = await gunsmith.hud.getSecondInventoryIconLook();
+      const look = await gunsmith.hud.getInventoryIconLook(1);
 
       expect(look).toMatchObject({width: 34, height: 34});
       expect(look.visibleMagazinePixels).toBeGreaterThanOrEqual(MINIMUM_MAGAZINE_PIXELS);
     });
 
-    when("the player switches back to slot 1", () => {
+    when("the player switches to slot 2", () => {
       beforeEach(async ({gunsmith}) => {
-        await gunsmith.player.switchTo(1);
-        await gunsmith.hud.waitForSlot(1);
+        await gunsmith.player.switchTo(2);
+        await gunsmith.hud.waitForSlot(2);
       });
 
-      then("the HUD keeps the pickup visible while the rifle is in hand", async ({gunsmith}) => {
+      then("the HUD keeps the pickup visible while the marksman rifle is in hand", async ({gunsmith}) => {
         expect(await gunsmith.hud.getInventory()).toMatchObject({
-          selectedName: "Rifle",
-          firstIcon: RIFLE_ICON,
-          secondIcon: SUBMACHINE_GUN_ICON,
-          firstSelected: true,
-          secondSelected: false,
+          selectedName: "Marksman rifle",
+          firstIcon: SUBMACHINE_GUN_ICON,
+          secondIcon: MARKSMAN_RIFLE_ICON,
+          firstSelected: false,
+          secondSelected: true,
         });
       });
 
       then("the stowed submachine gun's magazine stands out against the slot", async ({gunsmith}) => {
-        const look = await gunsmith.hud.getSecondInventoryIconLook();
+        const look = await gunsmith.hud.getInventoryIconLook(1);
 
         expect(look).toMatchObject({width: 34, height: 34});
         expect(look.visibleMagazinePixels).toBeGreaterThanOrEqual(MINIMUM_MAGAZINE_PIXELS);
       });
+    });
+  });
+
+  when("the player holds the second weapon and takes the pickup", () => {
+    beforeEach(async ({gunsmith}) => {
+      await gunsmith.player.switchTo(2);
+      await gunsmith.hud.waitForSlot(2);
+      await gunsmith.player.walkFor("east", 0.7);
+      await gunsmith.pickup.waitUntilTaken();
+    });
+
+    then("the second icon and name become the submachine gun and the rifle stays", async ({gunsmith}) => {
+      await expect
+        .poll(() => gunsmith.hud.getInventory())
+        .toMatchObject({
+          selectedName: "Submachine gun",
+          firstIcon: RIFLE_ICON,
+          secondIcon: SUBMACHINE_GUN_ICON,
+          firstSelected: false,
+          secondSelected: true,
+        });
     });
   });
 });

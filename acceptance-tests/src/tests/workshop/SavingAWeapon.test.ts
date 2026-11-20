@@ -56,6 +56,16 @@ given("the workshop is open on the practice range, with nothing saved", () => {
         expect(await gunsmith.workshop.shelf.canSave()).toBe(false);
       });
 
+      when("the player presses Escape", () => {
+        beforeEach(async ({gunsmith}) => {
+          await gunsmith.workshop.close();
+        });
+
+        then("the workshop shuts, though the Save button that had the focus is now disabled", async ({gunsmith}) => {
+          expect(await gunsmith.workshop.isOpen()).toBe(false);
+        });
+      });
+
       when("the page is reloaded and the workshop opened again", () => {
         let name = "";
         let rating = 0;

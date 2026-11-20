@@ -68,6 +68,15 @@ it("puts both fighters back at full health and full magazines", () => {
   expect(world.bullets).toEqual([]);
 });
 
+it("carries the weapons a player locked in at the pre-round into the round, the opponent keeping its own", () => {
+  const picks = {first: SUBMACHINE_GUN, second: SUBMACHINE_GUN};
+  const world = nextRoundOfPage({playerWins: 0, opponentWins: 1, roundNumber: 1}, picks);
+  const plain = nextRoundOfPage({playerWins: 0, opponentWins: 1, roundNumber: 1});
+
+  expect(world.player.loadout.map(carried => carried.weapon)).toEqual([SUBMACHINE_GUN, SUBMACHINE_GUN]);
+  expect(world.opponent).toEqual(plain.opponent);
+});
+
 function duelRing(seed: number, timing: RingTiming = DEFAULT_RING_TIMING): Ring {
   const {player} = startingWorld(DUEL_ARENA, [], DUEL_OPPONENT);
 
