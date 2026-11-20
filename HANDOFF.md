@@ -296,6 +296,15 @@ Before changing a consumed contract, record the proposal and affected owners her
 
 ## Delivery log
 
+**Art → AI and Engine, appearance review (2026-11-20).** The
+[12-study runtime grammar review](docs/art/concepts/top-down-oddities/README.md#runtime-grammar-review--2026-11-20)
+records the structural cues that survive at 64/32 px per tile. Use the cactus branches and lantern core
+as examples of cues that remain clear in pickup and held views. The teapot handles and duck tail show
+where a cue can be covered in hand. Review exposed structural cues and grip placement when associating
+production appearances. Seeded lantern and cactus captures confirmed fog hide, restore and held artwork
+after collection at both scales. The 25 focused production browser criteria passed without retries.
+S4-1 is still AI's separate fallback-contrast follow-up.
+
 **Art → Play, workshop Save controls.** `SaveArena` and `SaveWeapon` each render separate components for Save, Saved and the full-shelf replacement picker. The parent owns the shelf actions and the state that ties each replacement question to its result.
 
 **Art → Play, arena workshop reference (2026-11-20).** The local stand-in and built-in results offer Walk it. Saved arenas offer Walk it, Iterate and Delete. A trial starts on open floor and Return to practice restores the stored range world. The three-place arena shelf uses its own browser storage and keeps the arena's source rows and original prompt. A full shelf asks which entry to replace and identifies choices by their prompts. `UsingAnArena` verifies the walk, return, reload, editing, deletion and replacement. All 86 production workshop criteria passed. Play can replace the stand-in and browser shelf with the backed services when those flows connect. The reservation is released. [Art verification](TODO-art.md#verificationlatest-delivery).
