@@ -3,9 +3,9 @@ import type {SocketAsk} from "@src/online/socket/types/SocketAsk";
 
 /**
  * The page's query fields that are passed on to the room (`api/` reads them from its first connection): how long it waits for a person
- * (`parseForfeitLimits`) and the seed its rounds start from (`parseStartSeed`). Tuning seams, like `?lag=`.
+ * (`parseForfeitLimits`), how long the two seats have to choose (`parsePreRoundSeconds`) and the seed its rounds start from (`parseStartSeed`). Tuning seams, like `?lag=`.
  */
-const PASSED_ON = ["reconnectSeconds", "idleSeconds", "startSeed"];
+const PASSED_ON = ["reconnectSeconds", "idleSeconds", "preRoundSeconds", "startSeed"];
 
 /**
  * The deployed webapp connects directly to the API Worker. Local pages use Vite's WebSocket proxy. `ask.token` is the secret the room gave this browser's seat, shown to get the seat back; `ask.search` is

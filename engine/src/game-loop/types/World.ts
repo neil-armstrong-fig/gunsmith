@@ -7,6 +7,7 @@ import type {Pickup} from "@gunsmith/engine/pickup/types/Pickup";
 import type {OpponentBrain} from "@gunsmith/engine/opponent/types/OpponentBrain";
 import type {Player} from "@gunsmith/engine/player/types/Player";
 import type {Ring} from "@gunsmith/engine/ring/types/Ring";
+import type {Footstep} from "@gunsmith/engine/sound/footsteps/types/Footstep";
 import type {RoundState} from "@gunsmith/engine/round/types/RoundState";
 
 /** Everything the simulation knows. A new one is returned from each step; none is ever changed in place. */
@@ -33,4 +34,13 @@ export interface World {
   pickup?: Pickup | undefined;
   /** What happened to the local player in the step that made this world, and only that step; absent when nothing did, and in a frozen world. */
   events?: readonly CombatEvent[] | undefined;
+  /**
+   * What happened to the opponent in the step that made this world, by the same rules and in the same words as `events`, for a
+   * second person to be told (`viewOfSeat`); absent when nothing did, in a frozen world and when the world has no opponent. Nothing
+   * reads it in a match against a brain.
+   */
+  opponentEvents?: readonly CombatEvent[] | undefined;
+  /** Upright walking progress. Only the resulting events are sent to seats. */
+  footstep?: Footstep | undefined;
+  opponentFootstep?: Footstep | undefined;
 }

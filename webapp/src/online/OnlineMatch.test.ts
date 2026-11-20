@@ -54,6 +54,7 @@ interface SnapshotRequest {
 }
 
 const JOINED = JSON.stringify({kind: "joined", seat: "first", arena: ROWS});
+const QUIET = startingWorld(arenaFrom(ROWS), [], {x: 8.5, y: 2.5});
 const START = startingWorld(arenaFrom(ROWS), [], {x: 8.5, y: 2.5}).player.position;
 
 interface SeatedMatch {
@@ -78,6 +79,45 @@ it("builds the world a snapshot describes, on the arena it was seated in", () =>
   expect(world?.arena).toEqual(arenaFrom(ROWS));
   expect(world?.player.position).toEqual(START);
   expect(world?.opponent?.position).toEqual({x: 8.5, y: 2.5});
+});
+
+it("hands over the events the snapshots carried once, with the game time they cover, and nothing after", () => {
+  const {socket, match} = seatedMatch();
+  const heard = {kind: "heard", sound: "pickup", sector: 6, loudness: "mid"} as const;
+  socket.receive(snapshotText({world: {...QUIET, events: [heard]}, elapsedSeconds: 1}));
+  socket.receive(snapshotText({world: {...QUIET, events: [{kind: "pickupTaken"}]}, elapsedSeconds: 1.05}));
+  socket.receive(snapshotText({elapsedSeconds: 1.1}));
+
+  expect(match.takeEvents()).toEqual({events: [heard, {kind: "pickupTaken"}], seconds: expect.closeTo(0.1, 9)});
+  expect(match.takeEvents()).toBeUndefined();
+});
+
+it("hands over a quiet snapshot as no events and its time, so a frame with no news is not taken for one", () => {
+  const {socket, match} = seatedMatch();
+  socket.receive(snapshotText({elapsedSeconds: 1}));
+  match.takeEvents();
+
+  socket.receive(snapshotText({elapsedSeconds: 1.05}));
+
+  expect(match.takeEvents()).toEqual({events: [], seconds: expect.closeTo(0.05, 9)});
+});
+
+it("covers no time for the first snapshot, and none when a new round turned the clock back", () => {
+  const {socket, match} = seatedMatch();
+  socket.receive(snapshotText({elapsedSeconds: 7}));
+  expect(match.takeEvents()?.seconds).toBe(0);
+
+  socket.receive(snapshotText({elapsedSeconds: 0.5}));
+  expect(match.takeEvents()?.seconds).toBe(0);
+});
+
+it("has no events to hand over before a snapshot has come, and shows none in the world each frame", () => {
+  const {socket, match} = seatedMatch();
+  expect(match.takeEvents()).toBeUndefined();
+
+  socket.receive(snapshotText({world: {...QUIET, events: [{kind: "pickupTaken"}]}}));
+
+  expect(match.worldToShow(0)?.events).toBeUndefined();
 });
 
 it("ignores frames it cannot read", () => {
@@ -417,6 +457,108 @@ it("closes the socket", () => {
   new OnlineMatch(socket).close();
 
   expect(socket.closed).toBe(true);
+});
+
+const OTHER_ROWS = [
+  "##############",
+  "#............#",
+  "#............#",
+  "#............#",
+  "#............#",
+  "##############",
+];
+
+it("plays on the arena the server says was decided, in place of the one it was seated in", () => {
+  const {socket, match} = seatedMatch();
+
+  socket.receive(JSON.stringify({kind: "arena", rows: OTHER_ROWS}));
+  socket.receive(snapshotText({world: startingWorld(arenaFrom(OTHER_ROWS), [], {x: 8.5, y: 2.5})}));
+
+  expect(match.worldToShow(0)?.arena).toEqual(arenaFrom(OTHER_ROWS));
+});
+
+it("has nothing to show of the choosing until the server says something about it", () => {
+  const {match} = seatedMatch();
+
+  expect(match.preRound()).toBeUndefined();
+});
+
+it("shows what the server last said of the choosing, and stops once the match has begun", () => {
+  const {socket, match} = seatedMatch();
+  const frame = {
+    kind: "preRound",
+    stage: "choosing",
+    own: {locked: false, weapons: {locked: false}},
+    opponent: {locked: true, picked: false, weapons: {locked: false}},
+  };
+
+  socket.receive(JSON.stringify(frame));
+  expect(match.preRound()).toEqual(frame);
+
+  socket.receive(snapshotText());
+  expect(match.preRound()).toBeUndefined();
+});
+
+it("puts an arena forward by its name", () => {
+  const {socket, match} = seatedMatch();
+
+  match.chooseArena("Fair duel");
+
+  expect(socket.frames()).toEqual([{kind: "choose", step: "arena", choice: {kind: "builtIn", name: "Fair duel"}}]);
+});
+
+it("locks in the arena it has chosen", () => {
+  const {socket, match} = seatedMatch();
+
+  match.lockInArena();
+
+  expect(socket.frames()).toEqual([{kind: "lockIn", step: "arena"}]);
+});
+
+it("puts two built-in weapons forward by their keys, slot 1 then slot 2", () => {
+  const {socket, match} = seatedMatch();
+
+  match.chooseWeapons(["submachine-gun", "rifle"]);
+
+  expect(socket.frames()).toEqual([
+    {
+      kind: "choose",
+      step: "weapons",
+      choice: [
+        {kind: "builtIn", key: "submachine-gun"},
+        {kind: "builtIn", key: "rifle"},
+      ],
+    },
+  ]);
+});
+
+it("locks in the weapons it has chosen", () => {
+  const {socket, match} = seatedMatch();
+
+  match.lockInWeapons();
+
+  expect(socket.frames()).toEqual([{kind: "lockIn", step: "weapons"}]);
+});
+
+it("picks between the two arenas shown", () => {
+  const {socket, match} = seatedMatch();
+
+  match.pickArena({kind: "arena", seat: "second"});
+
+  expect(socket.frames()).toEqual([{kind: "pickArena", pick: {kind: "arena", seat: "second"}}]);
+});
+
+it("sends no choosing while the socket is not open", () => {
+  const {socket, match} = seatedMatch();
+  socket.readyState = 0;
+
+  match.chooseArena("Duel");
+  match.lockInArena();
+  match.chooseWeapons(["rifle", "rifle"]);
+  match.lockInWeapons();
+  match.pickArena({kind: "nothing"});
+
+  expect(socket.frames()).toEqual([]);
 });
 
 function snapshotText(request: SnapshotRequest = {}): string {

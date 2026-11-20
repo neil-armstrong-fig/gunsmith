@@ -1,15 +1,18 @@
 import {CombatSounds} from "@src/sound/CombatSounds";
+import type {PlayOptions} from "@src/sound/types/PlayOptions";
 import type {SoundOutput} from "@src/sound/types/SoundOutput";
 import type {TickCues} from "@src/sound/types/TickCues";
 
 class RecordingOutput implements SoundOutput {
   readonly played: string[] = [];
+  readonly placed: (PlayOptions | undefined)[] = [];
   readonly loopStarts: string[] = [];
   readonly loopStops: string[] = [];
   stops = 0;
 
-  play(key: string): void {
+  play(key: string, options?: PlayOptions): void {
     this.played.push(key);
+    this.placed.push(options);
   }
 
   startLoop(key: string): void {
@@ -140,4 +143,19 @@ it("plays the crunch and the hit confirmation as two cues when the players hurt 
   });
 
   expect(output.played).toEqual(["sfx-damage-crunch", "sfx-hit"]);
+});
+
+it("plays the other fighter's pickup, panned and quietened, and the player's own pickup in the middle at full volume", () => {
+  const output = new RecordingOutput();
+  const sounds = new CombatSounds(output);
+
+  sounds.afterTick({...EMPTY_CLICK, firing: false, events: [{kind: "pickupTaken"}]});
+  sounds.afterTick({
+    ...EMPTY_CLICK,
+    firing: false,
+    events: [{kind: "heard", sound: "pickup", sector: 2, loudness: "mid"}],
+  });
+
+  expect(output.played).toEqual(["sfx-pickup", "sfx-pickup"]);
+  expect(output.placed).toEqual([undefined, {pan: 1, gain: 0.5}]);
 });

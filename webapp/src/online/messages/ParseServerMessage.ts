@@ -1,4 +1,5 @@
 import type {ServerMessage} from "@src/online/types/ServerMessage";
+import {PRE_ROUND_STAGES} from "@src/online/types/pre-round/PreRoundStages";
 
 /**
  * The frame the server sent, or `undefined` for text that is not one. What arrives is `unknown` until here: it checks the shape
@@ -23,8 +24,62 @@ export function parseServerMessage(text: string): ServerMessage | undefined {
   if (kind === "snapshot" && isSnapshot(parsed)) {
     return parsed as ServerMessage;
   }
+  if (kind === "arena" && isArena(parsed)) {
+    return parsed as ServerMessage;
+  }
+  if (kind === "preRound" && isPreRound(parsed)) {
+    return parsed as ServerMessage;
+  }
 
   return undefined;
+}
+
+function isArena(frame: object): boolean {
+  const rows = Reflect.get(frame, "rows");
+
+  return Array.isArray(rows) && rows.every(row => typeof row === "string");
+}
+
+/** The choosing: a known stage, an optional clock, and what each seat may be told, as flags and names. Refused, not guessed at, if it is not. */
+function isPreRound(frame: object): boolean {
+  const stage: unknown = Reflect.get(frame, "stage");
+  const secondsLeft: unknown = Reflect.get(frame, "secondsLeft");
+  const own: unknown = Reflect.get(frame, "own");
+  const opponent: unknown = Reflect.get(frame, "opponent");
+
+  return (
+    PRE_ROUND_STAGES.some(known => known === stage) &&
+    (secondsLeft === undefined || typeof secondsLeft === "number") &&
+    hasFlags(own, ["locked"]) &&
+    hasFlags(opponent, ["locked", "picked"]) &&
+    hasWeaponsStep(own) &&
+    hasWeaponsStep(opponent)
+  );
+}
+
+/** Whether `value` carries a weapons step: `locked` as a flag and, if it has them, `keys` as exactly two names. */
+function hasWeaponsStep(value: unknown): boolean {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  const weapons: unknown = Reflect.get(value, "weapons");
+  if (!hasFlags(weapons, ["locked"])) {
+    return false;
+  }
+
+  const keys: unknown = typeof weapons === "object" && weapons !== null ? Reflect.get(weapons, "keys") : undefined;
+
+  return keys === undefined || (Array.isArray(keys) && keys.length === 2 && keys.every(key => typeof key === "string"));
+}
+
+/** Whether `value` is an object whose named fields are all true or false. */
+function hasFlags(value: unknown, names: readonly string[]): boolean {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  return names.every(name => typeof Reflect.get(value, name) === "boolean");
 }
 
 function isJoined(frame: object): boolean {

@@ -1,12 +1,45 @@
 # Gunsmith audio pack 02
 
-Current routing: art owns static cues/codec QA; play owns runtime combat playback; ai owns weapon-shot synthesis. See root HANDOFF.md for current ownership.
+Current routing: Art owns authored cues, codec QA and playback integration with Play. AI owns weapon-shot synthesis. See root HANDOFF.md for current ownership.
 
 Original local synthesis, regenerated with native Web Audio on 2026-11-12.
 **The user approved the expanded pack on 2026-11-12: "Sounds great".**
 Detailed fatigue, cross-device and in-game masking review remain before production.
-These are concepts, with candidate names from the existing asset spec. Nothing
-is installed in the game or registered in a runtime manifest.
+
+## Runtime cues
+
+Pickup uses the pack’s MP3. The runtime footstep, shot, reload and outgoing hit
+are separate authored cues. Upright footfalls play on the first moving tick and
+every 0.42 s while movement continues. Crouched movement is silent. The
+footstep layers a muted heel contact and a faint toe scuff. Reload layers a
+release, a soft slide and a firmer seat. Hit confirmation is a short contact
+with a subdued low layer. The techniques are credited on the game’s
+[References & credits](../public/references.html) page.
+[Greg Lester’s Foley guide](https://www.gameaudiolearning.com/knowledgebase/how-to-record-foley-for-games).
+
+Render the runtime MP3s from the repository root. The footstep and shot are
+quantised to 16-bit PCM before encoding, which matches their original export.
+The numbered expressions are the envelope timings and gains for each layer.
+
+```sh
+render_cue() {
+  ffmpeg -y -hide_banner -v error -f lavfi \
+    -i "anoisesrc=r=48000:d=$2:a=$3:seed=$4" -af "$5" \
+    -c:a libmp3lame -q:a 2 -write_xing 1 "webapp/src/assets/sounds/files/$1.mp3"
+}
+
+render_cue sfx-footstep 0.14 1 60819 \
+  "asplit=2[heel][toe];[heel]highpass=f=100,lowpass=f=540:p=2,aeval='val(0)*0.71*(1-exp(-t/0.006))*exp(-t/0.021)'[contact];[toe]highpass=f=540,lowpass=f=1550:p=2,aeval='val(0)*0.124*exp(-pow((t-0.036)/0.015,2))'[scuff];[contact][scuff]amix=inputs=2:normalize=0,afade=t=out:st=0.11:d=0.03,aformat=sample_fmts=s16"
+
+render_cue sfx-shot 0.16 0.95 18153 \
+  "highpass=f=175,lowpass=f=4100,aeval='val(0)*(1-exp(-t/0.00055))*(1.35*exp(-t/0.009)+0.25*exp(-t/0.04))+0.48*sin(2*PI*(82*t+1.8*(1-exp(-t/0.011))))*(1-exp(-t/0.0015))*exp(-t/0.017)',afade=t=out:st=0.122:d=0.038,aformat=sample_fmts=s16"
+
+render_cue sfx-reload 0.60 1 67421 \
+  "asplit=3[release][slide][seat];[release]highpass=f=720,lowpass=f=2600,aeval='val(0)*0.9*if(gte(t,0.028),(1-exp(-(t-0.028)/0.002))*exp(-(t-0.028)/0.012),0)'[a];[slide]highpass=f=230,lowpass=f=1280,aeval='val(0)*0.42*exp(-pow((t-0.225)/0.048,2))'[b];[seat]highpass=f=280,lowpass=f=2300,aeval='val(0)*1.25*if(gte(t,0.43),(1-exp(-(t-0.43)/0.0015))*exp(-(t-0.43)/0.015),0)'[c];[a][b][c]amix=inputs=3:normalize=0,afade=t=out:st=0.54:d=0.06"
+
+render_cue sfx-hit 0.092 1 41591 \
+  "asplit=2[contact][weight];[contact]highpass=f=850,lowpass=f=2750,aeval='val(0)*1.15*(1-exp(-t/0.0015))*exp(-t/0.009)'[a];[weight]highpass=f=230,lowpass=f=760,aeval='val(0)*0.78*(1-exp(-t/0.003))*exp(-t/0.015)'[b];[a][b]amix=inputs=2:normalize=0,afade=t=out:st=0.068:d=0.024"
+```
 
 Start with [the mixed audition](generated-audio/audition-mix.wav), then compare
 [match music](generated-audio/music-loop-match.wav) and [menu music](generated-audio/music-loop-menu.wav).

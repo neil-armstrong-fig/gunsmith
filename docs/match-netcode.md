@@ -143,8 +143,16 @@ What the code gives today, and what the design still needs:
 - **Gap: two human fighters.** `step(world, input, seconds)` takes one input and thinks for the opponent itself
   (`thinkOpponent`). An authoritative match needs both seats' inputs per step and a view per seat. Engine owns the shape;
   requested in `HANDOFF.md`.
-- **Gap: a sound domain.** `engine/src/` has none, and `World.events` holds only what happened to the local player, so
-  "direction only" sound cannot be tested yet.
+- **Sound (2026-11-20):** `engine/src/sound/` (`hearSound`, `HEARING_RANGES` shot 20, step 8, pickup 12, `direction/SectorOf`, `footsteps/IsFootfall`,
+  `loudness/LoudnessOf`). A shot, a footfall or the taking of a weapon by the other fighter within that sound's range, seen or not, becomes
+  `{kind: "heard", sound, sector, loudness}` in the listener's own events: sector 0 is north and the rest follow clockwise, eight in all;
+  loudness is the near, mid or far third of the sound's range. No place, no distance and **no level for each speaker**: the browser works
+  out the ears from the sector and band (`webapp/src/sound/spatial/`), so the wire carries nothing finer than that. Walls do not muffle it;
+  a crouched fighter's footfalls are silent (their shots are not). **Not built:** loudness by weapon, a low-pass for sounds from behind, a
+  sound file for a shot or a footfall (art), and the heard pickup in a room (rooms have no pickup). Each seat is told its own events (`SeatView.events`): its own damage, the hits it
+  confirmed on a target it saw, its pickup, its refused trigger and the shots it heard; the room gathers every step of a tick
+  (`MatchRoom`), and the browser's `OnlineMatch` puts them on the first world it shows after the snapshot. The wire message `sound` in
+  the draft list above is not used: the heard shot rides in `events`. `TwoBrowsersHearingEachOther` reads the frames.
 - **Gap: effects.** Bullets are filtered by the same rule, but hit and hurt effects are not modelled in `World`; hidden
   effects must be absent from the snapshot once they are.
 - **The first acceptance scenario** is `TwoBrowsersHidingFromEachOther`: it reads the frames each browser *received*, not

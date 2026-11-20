@@ -83,6 +83,13 @@ export function useGameLoop(): void {
         useGameStore.getState().setWorld(shown);
       }
 
+      // What the snapshots since the last frame said happened to this player (the server's events, not the browser's own: nothing is stepped
+      // here) goes to the sounds once, and only when a snapshot came: a frame with no news must not stop the ring loop the last one started.
+      const told = onlineMatch?.takeEvents();
+      if (shown && told) {
+        sounds.afterTick({events: told.events, firing: trigger.isFiring(), round: shown.round, seconds: told.seconds});
+      }
+
       // The banner's "Next round" and "Play again" ask through the app store (the engine is not stepped here to start a round); the loop
       // sends the ask once, and tells the store whether the server is now waiting for the other player, which the banner says.
       const appStore = useAppStore.getState();
@@ -127,7 +134,14 @@ export function useGameLoop(): void {
 
       const before = world;
       world = engine.step(world, input, TICK_SECONDS);
-      sounds.afterTick({events: world.events, firing: input.firing, round: world.round, seconds: TICK_SECONDS});
+      const {reloadRemainingSeconds} = world.player;
+      sounds.afterTick({
+        events: world.events,
+        firing: input.firing,
+        round: world.round,
+        seconds: TICK_SECONDS,
+        reloadStarted: before.player.reloadRemainingSeconds === undefined && reloadRemainingSeconds !== undefined,
+      });
       recordFeedbackCues({before, after: world});
     }
 

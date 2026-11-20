@@ -298,6 +298,8 @@ describe("bullets and fighters", () => {
     expect(flight.playerDamage).toBe(DAMAGE);
     expect(flight.opponentDamage).toBe(0);
     expect(flight.bullets).toEqual([]);
+    expect(flight.opponentHits).toEqual([{on: "opponent", dummyIndex: undefined}]);
+    expect(flight.playerHits).toEqual([]);
   });
 
   it("does no damage when nobody is there to be hit", () => {

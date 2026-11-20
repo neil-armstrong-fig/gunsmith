@@ -7,8 +7,8 @@ import type {RoundState} from "@gunsmith/engine/round/types/RoundState";
  * The world as the second fighter would see it were it the player: the two fighters swapped, each bullet belonging to the
  * other side, the score and the round's outcome turned round. Nothing is added or removed, so any rule written for the
  * player (sight, above all) holds for the second seat unchanged. A world with no opponent has no second seat and is
- * returned as it is. What happened to the first fighter (`events`) and the opponent's brain are not the second's, so
- * they are dropped.
+ * returned as it is. What happened to each fighter (`events` and `opponentEvents`) goes with them, so the second seat's
+ * events are the player's; the opponent's brain is not the second's and is dropped.
  */
 export function mirrorSeats(world: World): World {
   const {opponent} = world;
@@ -24,7 +24,10 @@ export function mirrorSeats(world: World): World {
     bullets: world.bullets.map(mirrorBullet),
     round: mirrorRound(world.round),
     match: world.match && mirrorMatch(world.match),
-    events: undefined,
+    events: world.opponentEvents,
+    opponentEvents: world.events,
+    footstep: world.opponentFootstep,
+    opponentFootstep: world.footstep,
   };
 }
 

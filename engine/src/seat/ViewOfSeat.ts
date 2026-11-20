@@ -8,8 +8,9 @@ import {visibleToSeat} from "@gunsmith/engine/seat/VisibleToSeat";
  * What `seat` may be told about `world`: its own fighter, and the other fighter, the shots and the pickup only where
  * `visibleToSeat` says it sees them, so a hidden one is not in the answer at all (an absent field, not a flag). The
  * closing ring is told to everyone. The second seat's view is written from its own side (`mirrorSeats`), so each seat is
- * the `player` of what it is told. Dummies, brains and combat events are not told: they are the server's or the first
- * fighter's alone.
+ * the `player` of what it is told. What happened to the seat itself in the step (`events`: its own damage, hits, pickup, refused
+ * trigger, and the direction of the other fighter's shot) is told, never what happened to the other seat. Dummies and brains are
+ * not told: they are the server's alone.
  */
 export function viewOfSeat(world: World, seat: Seat): SeatView {
   const seen = visibleToSeat(world, seat);
@@ -24,5 +25,6 @@ export function viewOfSeat(world: World, seat: Seat): SeatView {
     match: own.match,
     round: own.round,
     elapsedSeconds: own.elapsedSeconds,
+    events: own.events,
   };
 }

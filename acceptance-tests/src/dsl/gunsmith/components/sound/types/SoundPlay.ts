@@ -6,4 +6,6 @@ export interface SoundPlay {
   contextState: string;
   looping: boolean;
   ended: boolean;
+  /** The stereo pan when the source is connected through a panner. */
+  pan?: number;
 }

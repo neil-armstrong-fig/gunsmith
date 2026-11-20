@@ -2,7 +2,7 @@ import {scenarioOfPage} from "@src/game/scenario/ScenarioOfPage";
 import {useAppStore} from "@src/store/app/UseAppStore";
 import type {JSX} from "react";
 
-/** The way from the practice range into a match: "Fight the bot" opens the duel behind its pre-round. A small button in a corner, gone while the workshop is up, and a press on it never fires a shot. */
+/** From the practice range, enter a match or open the sources in a separate tab. */
 export function FrontDoor(): JSX.Element | undefined {
   const workshopOpen = useAppStore(state => state.workshopOpen);
   if (scenarioOfPage() !== "practice" || workshopOpen) {
@@ -10,17 +10,31 @@ export function FrontDoor(): JSX.Element | undefined {
   }
 
   return (
-    <button
-      type="button"
-      className="fixed top-3 left-3 rounded-md bg-gs-ui-surface px-3 py-2 text-sm font-semibold text-gs-ui-text"
-      onMouseDown={event => {
-        event.stopPropagation();
-      }}
-      onClick={() => {
-        location.assign("/?scenario=duel&preRound=1");
-      }}
-    >
-      Fight the bot
-    </button>
+    <nav aria-label="Practice range" className="pointer-events-none fixed top-3 left-3 flex flex-col items-start gap-1">
+      <button
+        type="button"
+        className="pointer-events-auto rounded-md bg-gs-ui-surface px-3 py-2 text-sm font-semibold text-gs-ui-text"
+        onMouseDown={event => {
+          event.stopPropagation();
+        }}
+        onClick={() => {
+          location.assign("/?scenario=duel&preRound=1");
+        }}
+      >
+        Fight the bot
+      </button>
+
+      <a
+        href="/references.html"
+        target="_blank"
+        rel="noopener"
+        className="pointer-events-auto rounded-md bg-gs-ui-surface px-3 py-2 text-xs text-gs-ui-text underline underline-offset-4 hover:text-gs-team-blue"
+        onMouseDown={event => {
+          event.stopPropagation();
+        }}
+      >
+        References &amp; credits
+      </a>
+    </nav>
   );
 }

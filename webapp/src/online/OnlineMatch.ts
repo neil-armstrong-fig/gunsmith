@@ -7,6 +7,7 @@ import type {Player} from "@gunsmith/engine/player/types/Player";
 import {worldOfSeatView} from "@gunsmith/engine/seat/WorldOfSeatView";
 import {opponentAt} from "@src/online/interpolation/OpponentAt";
 import {RenderClock} from "@src/online/interpolation/RenderClock";
+import type {EventsOfSnapshots} from "@src/online/types/EventsOfSnapshots";
 import {SnapshotBuffer} from "@src/online/interpolation/SnapshotBuffer";
 import {parseServerMessage} from "@src/online/messages/ParseServerMessage";
 import {inputChanged} from "@src/online/prediction/changes/InputChanged";
@@ -18,7 +19,10 @@ import type {InputAck} from "@gunsmith/shared/online/types/InputAck";
 import type {SeatTokenKeeper} from "@src/online/seat-token/SeatTokenKeeper";
 import type {JoinedFrame} from "@src/online/types/JoinedFrame";
 import type {MatchSocket} from "@src/online/types/MatchSocket";
+import type {PreRoundFrame} from "@src/online/types/pre-round/PreRoundFrame";
 import type {Readiness} from "@src/online/types/Readiness";
+import type {SeatPick} from "@src/online/types/pre-round/SeatPick";
+import type {WeaponKeys} from "@src/online/types/pre-round/WeaponKeys";
 import type {SnapshotFrame} from "@src/online/types/SnapshotFrame";
 import {TICK_SECONDS} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/clock/TickSeconds";
 
@@ -53,7 +57,10 @@ export class OnlineMatch {
   private arena: Arena | undefined;
   private latest: World | undefined;
   private ready: Readiness | undefined;
+  private choosing: PreRoundFrame | undefined;
   private readonly snapshots = new SnapshotBuffer(SNAPSHOTS_KEPT);
+  /** What the snapshots since the last `takeEvents` said happened to this player; kept until taken, so a frame that comes late loses none. */
+  private eventsNotYetTaken: EventsOfSnapshots | undefined;
   private readonly renderClock = new RenderClock(INTERPOLATION_DELAY_SECONDS);
   private history = new InputHistory(HISTORY_STEPS);
   private predicted: Player | undefined;
@@ -90,6 +97,7 @@ export class OnlineMatch {
   /**
    * The world to draw: the newest snapshot's, with this player where the browser has them and the other fighter where the blend puts
    * them. `leftoverSeconds` is how far the frame is into the step after the last played. `undefined` until the first snapshot comes.
+   * Its `events` are none: what snapshots carried is read once with `takeEvents`, not once a frame.
    */
   worldToShow(leftoverSeconds: number): World | undefined {
     const latest = this.latest;
@@ -103,7 +111,24 @@ export class OnlineMatch {
       newestElapsedSeconds: newest.elapsedSeconds,
     });
 
-    return {...latest, player: this.shownPlayer(latest.player), opponent: opponentAt(this.snapshots.all, shownAt)};
+    return {
+      ...latest,
+      player: this.shownPlayer(latest.player),
+      opponent: opponentAt(this.snapshots.all, shownAt),
+      events: undefined,
+    };
+  }
+
+  /**
+   * What the snapshots that came since this was last called said happened to this player (damage, hits, a pickup, a shot or footfall
+   * heard) with the game time they cover, or `undefined` when none came: the sounds ask once a frame and play each event once. A
+   * frame that has no news must not be mistaken for a quiet snapshot, which is why a quiet one comes back with no events and a time.
+   */
+  takeEvents(): EventsOfSnapshots | undefined {
+    const taken = this.eventsNotYetTaken;
+    this.eventsNotYetTaken = undefined;
+
+    return taken;
   }
 
   /** Asks the server to go on, to the next round or, once the match is decided, to a fresh one. It begins when both players have asked. */
@@ -113,6 +138,40 @@ export class OnlineMatch {
     }
 
     this.socket.send(JSON.stringify({kind: "ready"}));
+  }
+
+  /** What the server last said of the two seats choosing their arena before the match, from this seat's side; `undefined` before it says anything and once the match has begun. */
+  preRound(): PreRoundFrame | undefined {
+    return this.choosing;
+  }
+
+  /** Puts the built-in arena named `name` forward. It is not final until `lockInArena`, and the server ignores a name it does not know. */
+  chooseArena(name: string): void {
+    this.sendWhenOpen({kind: "choose", step: "arena", choice: {kind: "builtIn", name}});
+  }
+
+  /** Locks in the arena put forward (the duel arena if none was): the other player's is then shown. */
+  lockInArena(): void {
+    this.sendWhenOpen({kind: "lockIn", step: "arena"});
+  }
+
+  /** Puts two built-in weapons forward by their keys (slot 1, slot 2). They are not final until `lockInWeapons`, and the server ignores a key it does not know. */
+  chooseWeapons(keys: WeaponKeys): void {
+    this.sendWhenOpen({
+      kind: "choose",
+      step: "weapons",
+      choice: keys.map(key => ({kind: "builtIn", key})),
+    });
+  }
+
+  /** Locks in the weapons put forward (the rifle and the marksman rifle if none): the other player's are then shown. */
+  lockInWeapons(): void {
+    this.sendWhenOpen({kind: "lockIn", step: "weapons"});
+  }
+
+  /** Votes, when both arenas are shown and differ, for one of them, for random, or for nothing. */
+  pickArena(pick: SeatPick): void {
+    this.sendWhenOpen({kind: "pickArena", pick});
   }
 
   /** Whether this player has asked to go on and the server is waiting for the other player to ask too. */
@@ -181,9 +240,25 @@ export class OnlineMatch {
     if (message?.kind === "joined") {
       this.takeSeat(message);
     }
+    if (message?.kind === "arena") {
+      this.arena = arenaFrom(message.rows);
+    }
+    if (message?.kind === "preRound") {
+      this.choosing = message;
+    }
     if (message?.kind === "snapshot" && this.arena) {
+      this.choosing = undefined;
       this.takeSnapshot(this.arena, message);
     }
+  }
+
+  /** Sends `frame` if the socket is open; a choice made while it is not is lost, and the player makes it again once the page is back. */
+  private sendWhenOpen(frame: object): void {
+    if (this.socket.readyState !== SOCKET_OPEN) {
+      return;
+    }
+
+    this.socket.send(JSON.stringify(frame));
   }
 
   /**
@@ -204,7 +279,19 @@ export class OnlineMatch {
     }
   }
 
+  /** Adds a snapshot's events and the game time since the one before it (none for the first, and none when a new round turned the clock back) to those not yet taken. */
+  private noteEvents(message: SnapshotFrame): void {
+    const before = this.latest?.elapsedSeconds;
+    const seconds = Math.max(0, message.elapsedSeconds - (before ?? message.elapsedSeconds));
+
+    this.eventsNotYetTaken = {
+      events: [...(this.eventsNotYetTaken?.events ?? []), ...(message.events ?? [])],
+      seconds: (this.eventsNotYetTaken?.seconds ?? 0) + seconds,
+    };
+  }
+
   private takeSnapshot(arena: Arena, message: SnapshotFrame): void {
+    this.noteEvents(message);
     this.latest = worldOfSeatView(arena, message);
     this.ready = message.ready;
     this.snapshots.add({

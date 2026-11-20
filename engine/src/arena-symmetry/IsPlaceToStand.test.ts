@@ -1,5 +1,5 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
-import {isPlaceToStand} from "@gunsmith/engine/arena-symmetry/spawn-pairs/IsPlaceToStand";
+import {isPlaceToStand} from "@gunsmith/engine/arena-symmetry/IsPlaceToStand";
 
 // Row-major from the south, five to a row: 0 is a wall, 6 a cover block, 7 low floor, 12 a stair climbing east and 13 the floor it climbs to.
 const ARENA = arenaFrom(["#####", "#.>1#", "#c..#", "#####"]);

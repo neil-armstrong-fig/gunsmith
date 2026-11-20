@@ -11,4 +11,6 @@ export interface TickCues {
   round: RoundState;
   /** The game time the step covered. */
   seconds: number;
+  /** Reload starts from the local simulation. */
+  reloadStarted?: boolean;
 }
