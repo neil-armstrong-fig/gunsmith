@@ -93,6 +93,15 @@ export class ShelfDsl {
     }
   }
 
+  /** The visible saved prompts in the order of the replacement choices. */
+  async getReplacementPrompts(): Promise<string[]> {
+    try {
+      return await this.shelf.getReplacementPrompts();
+    } catch (error) {
+      throw new DslError("Failed to read the prompts in the replacement choices", error);
+    }
+  }
+
   /** Presses Replace beside the saved weapon at `index` in the card's question. */
   async replaceItem(index: number): Promise<void> {
     try {

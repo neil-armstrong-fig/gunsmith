@@ -4,7 +4,9 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 ## Resume here
 
-Art is in `.claude/worktrees/art` on `worktree-art`, synced to main `e967cbd` for the submachine gun inventory icon. Preserve this worktree and sync committed main before resuming.
+Art is in `.claude/worktrees/art` on `worktree-art`. Last merged GitHub main: `e907866`. The validated art merge `0143379`, including the submachine gun inventory icon from `8318df4`, was pushed to GitHub main.
+
+The local workshop's full-shelf replacement picker is ready for review in this worktree. `SavedWeaponSummary` supplies the thumbnail, name, power rating and prompt for both the shelf and `ReplacementChoice`; the picker wraps the full prompt and associates it with the Replace button. `TheWeaponShelf` checks distinct prompts on identical stand-in weapons and replacement in place. Next workshop slice is preview reuse when Play supplies a parsed generated arena. Start with a browser criterion that distinguishes the generated arena's drawn terrain from the built-in choices.
 
 Room weapon art and its two-browser spec are integrated. The user's approved low-cover artwork from `837f1d9` is integrated in `adbf7b4`.
 
@@ -39,6 +41,8 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [x] Style the existing workshop weapon result card using the selection concept. Check that the meter and printed power rating agree for successive results.
 
 - [x] Draw workshop arena previews from the engine's built-in Duel and Fair duel using the shipped tile artwork and stair geometry.
+
+- [x] Show authored thumbnails and full saved prompts when choosing which weapon to replace on a full workshop shelf.
 
 - [x] User chose C2 soft octagon after two marker comparisons. Lock artwork, clean rejected studies and integrate the marker with pickup rendering and browser coverage.
 
@@ -84,6 +88,17 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [ ] Case-study diagrams: pipeline, cost safeguards and eval loop.
 
 ## Verification/latest delivery
+
+2026-11-20, workshop shelf replacement picker in `worktree-art`.
+The prompt criterion failed on the old picker and on a disposable
+production build with the picker prompt text removed. All 72 workshop
+criteria passed on the production preview without retries. Chromium review
+at 1024 × 560 and 1440 × 900 verified loaded thumbnails, full prompts,
+accessible descriptions and keyboard replacement. `pnpm checks` passed
+lint, formatting, strict typechecks and 3,644 tests with one existing audio
+skip. The preview wrapper logged a shutdown error after the tests and the
+runner exited 0. Re-read the root, webapp, React and acceptance instructions
+and audited the touched folders and callers.
 
 2026-11-19, built-in submachine gun inventory icon in `worktree-art`.
 Both new magazine contrast criteria failed before the fill change and

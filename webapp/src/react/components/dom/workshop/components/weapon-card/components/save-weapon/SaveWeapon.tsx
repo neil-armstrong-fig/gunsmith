@@ -1,5 +1,5 @@
 import type {Weapon} from "@gunsmith/engine/weapon/types/Weapon";
-import {ratingPercentOf} from "@src/react/components/dom/workshop/rating-percent/RatingPercentOf";
+import {ReplacementChoice} from "@src/react/components/dom/workshop/components/weapon-card/components/save-weapon/components/replacement-choice/ReplacementChoice";
 import {useShelfStore} from "@src/store/shelf/UseShelfStore";
 import type {ShelfWeaponRequest} from "@src/store/shelf/types/ShelfWeaponRequest";
 import {useWorkshopStore} from "@src/store/workshop/UseWorkshopStore";
@@ -23,6 +23,15 @@ export function SaveWeapon({weapon}: Props): JSX.Element {
 
   const isSaved = savedId !== undefined && saved.some(item => item.id === savedId);
   const asking = askedAbout === weapon && saved.length >= limit;
+
+  const replace = (idToReplace: string): void => {
+    const id = useShelfStore.getState().replaceWeapon(idToReplace, requestOf(weapon));
+    if (id !== undefined) {
+      useWorkshopStore.getState().setSavedId(id);
+    }
+
+    setAskedAbout(undefined);
+  };
 
   return (
     <>
@@ -60,29 +69,9 @@ export function SaveWeapon({weapon}: Props): JSX.Element {
             >
               <p className="text-sm text-gs-ui-muted">The shelf is full. Replace which weapon?</p>
 
-              <ul className="flex flex-col gap-1">
+              <ul className="flex flex-col gap-2">
                 {saved.map(item => (
-                  <li key={item.id} className="flex items-center justify-between gap-3">
-                    <span className="min-w-0 truncate text-sm text-gs-ui-text">
-                      {item.weapon.identity?.name ?? "Weapon"}
-                      <span className="text-gs-ui-muted"> · {ratingPercentOf(item.weapon)}</span>
-                    </span>
-
-                    <button
-                      type="button"
-                      className="rounded-sm border border-gs-edge/40 px-2 py-0.5 text-sm text-gs-ui-text"
-                      onClick={() => {
-                        const id = useShelfStore.getState().replaceWeapon(item.id, requestOf(weapon));
-                        if (id !== undefined) {
-                          useWorkshopStore.getState().setSavedId(id);
-                        }
-
-                        setAskedAbout(undefined);
-                      }}
-                    >
-                      Replace
-                    </button>
-                  </li>
+                  <ReplacementChoice key={item.id} saved={item} onReplace={replace} />
                 ))}
               </ul>
 
