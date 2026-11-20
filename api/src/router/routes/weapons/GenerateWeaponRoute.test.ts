@@ -1,3 +1,7 @@
+import {saveItem} from "@src/accounts/save-item/SaveItem";
+import {savedItemsOfAccount} from "@src/accounts/saved-items-of-account/SavedItemsOfAccount";
+import {testAccounts} from "@src/accounts/testing/in-memory/TestAccounts";
+import {SHELF_LIMITS} from "@src/router/routes/library/limits/ShelfLimits";
 import {isWeaponPipelineAvailable} from "@src/router/routes/weapons/pipeline/IsWeaponPipelineAvailable";
 import {runWeaponPipeline} from "@src/router/routes/weapons/pipeline/RunWeaponPipeline";
 import type {MockedFunction} from "vitest";
@@ -19,8 +23,69 @@ it("takes a credit and answers the weapon when one is created", async () => {
   const response = await generateWeaponRoute(post({prompt: "a hum-rifle"}));
 
   expect(response.status).toBe(200);
-  expect(await response.json()).toEqual({status: "created", weapon: {name: "Hum"}, appearance: created.appearance});
+  expect(await response.json()).toEqual({
+    id: expect.any(String),
+    status: "created",
+    weapon: {name: "Hum"},
+    appearance: created.appearance,
+  });
   expect(ledgers.accountOf("acct-1").balance(Date.now())).toBe(DAILY_CREDITS - 1);
+});
+
+it("keeps the created weapon under the id it answers, off the shelf until it is saved by that id", async () => {
+  fakeLedgers();
+  smithThatAnswers(created);
+  const answer = (await (await generateWeaponRoute(post({prompt: "a hum-rifle"}))).json()) as {id: string};
+
+  expect(await savedItemsOfAccount("acct-1")).toEqual([]);
+  expect(await saveItem({id: answer.id, userId: "acct-1", now: new Date(), limits: SHELF_LIMITS})).toEqual({
+    status: "saved",
+  });
+  expect(await savedItemsOfAccount("acct-1")).toEqual([
+    expect.objectContaining({
+      id: answer.id,
+      kind: "weapon",
+      prompt: "a hum-rifle",
+      payload: {weapon: {name: "Hum"}, appearance: created.appearance},
+    }),
+  ]);
+});
+
+it("gives each created weapon an id of its own", async () => {
+  fakeLedgers();
+  smithThatAnswers(created);
+  const first = (await (await generateWeaponRoute(post({prompt: "one"}))).json()) as {id: string};
+  const second = (await (await generateWeaponRoute(post({prompt: "two"}))).json()) as {id: string};
+
+  expect(second.id).not.toBe(first.id);
+});
+
+it("keeps nothing and answers no id when the outcome is not a created weapon", async () => {
+  const keeping = vi.spyOn(testAccounts, "keepGeneratedItem");
+
+  for (const outcome of [rejected, invalid]) {
+    fakeLedgers();
+    smithThatAnswers(outcome);
+    const answer = await (await generateWeaponRoute(post({prompt: "anything"}))).json();
+
+    expect(answer).not.toHaveProperty("id");
+  }
+  expect(keeping).not.toHaveBeenCalled();
+});
+
+it("gives the credit back, once, and answers 502 when the created weapon cannot be kept, still settling the spend of its calls", async () => {
+  const ledgers = fakeLedgers();
+  smithThatAnswers(created);
+  vi.spyOn(testAccounts, "keepGeneratedItem").mockRejectedValue(new Error("the database is down"));
+
+  const response = await generateWeaponRoute(post({prompt: "a hum-rifle"}));
+
+  expect(response.status).toBe(502);
+  expect(await response.json()).toEqual({error: "generation-failed"});
+  expect(ledgers.accountOf("acct-1").balance(Date.now())).toBe(DAILY_CREDITS);
+  expect(ledgers.calls.filter(call => call === "refund")).toHaveLength(1);
+  expect(ledgers.calls).not.toContain("settle:weapon");
+  expect(ledgers.spendMeter.spentThisMonth()).toBe(created.modelCalls * WEAPON_SPEND.perCallMicrodollars);
 });
 
 it("takes half a credit and says why when the prompt is rejected", async () => {

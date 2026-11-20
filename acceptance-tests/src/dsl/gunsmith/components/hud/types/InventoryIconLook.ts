@@ -6,4 +6,5 @@ export interface InventoryIconLook {
   mintPixels: number;
   outlinePixels: number;
   outlineContrast: number;
+  visibleMagazinePixels: number;
 }

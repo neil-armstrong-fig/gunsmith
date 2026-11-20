@@ -149,7 +149,7 @@ replaces it.
 Local, no AI call. The panel opened by a key in the practice arena, with **Try it** one click away (see above); the prompt box with its character count; the making, made,
 turned-away, too-long and timed-out states, answered by the stand-in; the result card with the rating; **Use** (the weapon goes into
 slot 2 and can be tried on the dummies), **Try again**, **Save**; and the shelf in local storage with Use, Iterate and Delete.
-Acceptance first, as everywhere. The pre-round's choosing, the arena pick and the reveal follow, then the real route, then the
+**Built so far (2026-11-19):** the prompt box, Make (stand-in), the result card, Try it, the free refills and dummy fan, and **Save with a weapon shelf** (local storage, Try it, Iterate, Delete, a full shelf asks which to replace); arenas, prompt-only saves and the making states are not. Acceptance first, as everywhere. The pre-round's choosing, the arena pick and the reveal follow, then the real route, then the
 tutorial the user has in mind.
 
 ## Decisions (the user, 2026-11-18)

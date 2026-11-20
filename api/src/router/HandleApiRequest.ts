@@ -2,6 +2,7 @@ import {workerEnvironment} from "@src/env/WorkerEnvironment";
 import {isForgedRequest} from "@src/router/origin-check/IsForgedRequest";
 import {generateArenaRoute} from "@src/router/routes/arenas/GenerateArenaRoute";
 import {creditStatusRoute} from "@src/router/routes/credits/CreditStatusRoute";
+import {libraryRoute} from "@src/router/routes/library/LibraryRoute";
 import {logOutRoute} from "@src/router/routes/log-out/LogOutRoute";
 import {readMeRoute} from "@src/router/routes/me/ReadMeRoute";
 import {openRoomRoute} from "@src/router/routes/rooms/OpenRoomRoute";
@@ -18,7 +19,7 @@ const SOCKET_PATH = /^\/api\/rooms\/([^/]+)\/socket$/;
  * routes (`routes/weapons/GenerateWeaponRoute`, `routes/arenas/GenerateArenaRoute`), each given its pipeline to run; the Worker gives none
  * until it has a production adapter, and the route then answers `ai-unavailable`. `GET /api/credits` is the read the selection panel
  * shows (`routes/credits/CreditStatusRoute`). **Before any of them**, a state-changing request or a WebSocket upgrade from a page that is not
- * on the allowed-origins list is turned away (403 `forbidden-origin`, `origin-check/IsForgedRequest`). `GET /api/me` answers who is signed in (`routes/me/ReadMeRoute`), `GET /api/auth/google` and its `/callback`
+ * on the allowed-origins list is turned away (403 `forbidden-origin`, `origin-check/IsForgedRequest`). `/api/library` is the signed-in player's shelf (`routes/library/LibraryRoute`). `GET /api/me` answers who is signed in (`routes/me/ReadMeRoute`), `GET /api/auth/google` and its `/callback`
  * sign a player in with Google and `POST /api/auth/logout` out (`routes/sign-in/`, `routes/log-out/`).
  */
 export async function handleApiRequest(request: Request): Promise<Response> {
@@ -42,6 +43,10 @@ export async function handleApiRequest(request: Request): Promise<Response> {
 
   if (pathname === "/api/credits") {
     return await creditStatusRoute(request);
+  }
+
+  if (pathname === "/api/library" || pathname.startsWith("/api/library/")) {
+    return await libraryRoute(request);
   }
 
   if (pathname === "/api/me") {

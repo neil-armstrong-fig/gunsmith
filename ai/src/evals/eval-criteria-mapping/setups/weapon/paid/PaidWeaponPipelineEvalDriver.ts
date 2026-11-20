@@ -1,9 +1,9 @@
 import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
 import type {WeaponPipelineDependencies} from "@gunsmith/ai/pipeline/types/WeaponPipelineDependencies";
+import {runPaidRequest} from "@evals/eval-criteria-mapping/environment/tier/paid/run/RunPaidRequest";
 import {paidSpendGuard} from "@evals/eval-criteria-mapping/environment/tier/paid/spend/PaidSpendGuard";
 import {paidSpendLedger} from "@evals/eval-criteria-mapping/environment/tier/paid/spend/PaidSpendLedger";
 import {createPaidWeaponModels} from "@evals/eval-criteria-mapping/setups/weapon/paid/models/PaidWeaponModels";
-import {runPaidWeapon} from "@evals/eval-criteria-mapping/setups/weapon/paid/run/RunPaidWeapon";
 import {WeaponPipelineEvalDriver} from "@evals/eval-criteria-mapping/setups/weapon/shared/WeaponPipelineEvalDriver";
 import type {WeaponPipelineRun} from "@evals/eval-criteria-mapping/setups/weapon/shared/types/WeaponPipelineRun";
 
@@ -21,11 +21,12 @@ export class PaidWeaponPipelineEvalDriver extends WeaponPipelineEvalDriver {
   }
 
   protected override runThrough(prompt: string, pipeline: WeaponPipelineRun): Promise<WeaponOutcome> {
-    return runPaidWeapon(prompt, {
-      pipeline,
+    return runPaidRequest(prompt, {
+      run: () => pipeline(prompt),
       ledger: paidSpendLedger(),
       guard: paidSpendGuard(),
       logFile: PAID_CALL_LOG,
+      subject: "the weapon",
     });
   }
 }

@@ -4,10 +4,11 @@ import type {ArenaSubmissionDependencies} from "@gunsmith/ai/pipeline/arena-subm
 import type {ArenaSubmissionScreening} from "@gunsmith/ai/pipeline/arena-submission/types/ArenaSubmissionScreening";
 import type {ArenaSubmissionDriver} from "@evals/dsl/arena-submission/types/ArenaSubmissionDriver";
 import {trialCount} from "@evals/eval-criteria-mapping/environment/tier/shared/trials/TrialCount";
+import type {ArenaSubmissionRun} from "@evals/eval-criteria-mapping/setups/arena-submission/shared/types/ArenaSubmissionRun";
 
 /**
  * What every tier's arena-submission driver does: put submissions through the real screening on the models its tier builds, as many
- * times as the tier (or `EVAL_TRIALS`) asks. A tier overrides `createModels`.
+ * times as the tier (or `EVAL_TRIALS`) asks. A tier overrides `createModels`, and `runThrough` where it must wrap a screening (the paid tier).
  */
 export abstract class ArenaSubmissionEvalDriver implements ArenaSubmissionDriver {
   readonly trials: number;
@@ -18,13 +19,23 @@ export abstract class ArenaSubmissionEvalDriver implements ArenaSubmissionDriver
   }
 
   run(submissions: readonly ArenaSubmission[]): Promise<ArenaSubmissionScreening> {
-    return screenArenaSubmissions({submissions}, this.modelsOnFirstRun());
+    const dependencies = this.modelsOnFirstRun();
+
+    return this.runThrough(submissions, requested => screenArenaSubmissions({submissions: requested}, dependencies));
   }
 
   protected abstract createModels(): ArenaSubmissionDependencies;
 
-  // Built on the first run, not in the constructor: the mapping builds every driver when a spec file loads, and a tier without a
-  // model (the paid one, for now) must not fail a run that never screens.
+  /** What a screening is put through. The models exist by now; the paid tier checks its spend and logs the calls around it here. */
+  protected runThrough(
+    submissions: readonly ArenaSubmission[],
+    screening: ArenaSubmissionRun,
+  ): Promise<ArenaSubmissionScreening> {
+    return screening(submissions);
+  }
+
+  // Built on the first run, not in the constructor: the mapping builds every driver when a spec file loads, and the paid models
+  // need a key, which a run that never screens must not need.
   private modelsOnFirstRun(): ArenaSubmissionDependencies {
     this.models ??= this.createModels();
 
