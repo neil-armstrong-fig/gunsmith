@@ -184,6 +184,11 @@ export class OnlineMatch {
     return this.seated && this.socket.readyState === SOCKET_CONNECTING;
   }
 
+  /** Whether an established room has lost its socket or is still waiting to be seated on the replacement. */
+  hasLostConnection(): boolean {
+    return this.seated && (this.socket.readyState !== SOCKET_OPEN || !this.seatedOnThisConnection);
+  }
+
   close(): void {
     this.socket.close();
   }
@@ -271,6 +276,7 @@ export class OnlineMatch {
     this.arena = arenaFrom(message.arena);
     this.seated = true;
     this.seatedOnThisConnection = true;
+    this.eventsNotYetTaken = undefined;
     this.history = new InputHistory(HISTORY_STEPS);
     this.lastSent = undefined;
     this.lastSentStep = 0;

@@ -317,6 +317,8 @@ Before changing a consumed contract, record the proposal and affected owners her
 
 ## Delivery log
 
+**Art → Play and Server, private-room ring feedback (2026-11-20).** Connection loss fades the ring damage loop and clears the player highlight and health border. The client discards queued cues from the lost connection. Fresh ring damage in the reconnected room restores the cues. The fix uses the existing room events and is ready for review in `worktree-art`. [Verification](TODO-art.md#verificationlatest-delivery).
+
 **Art → Play, Server and Engine, private-room combat cues (2026-11-20).** The position-free `reloadStarted` event goes to the reloading seat and plays the approved cue in practice and rooms. The room loop takes each snapshot batch once for audio and screen feedback. Outgoing ticks use the rendered opponent when the latest snapshot includes them, with the existing sight check at draw time. A round clock reset discards queued events from the previous round. Verified on `652654a` with 75 production Chromium criteria, 55 properties and the full repository gate. Browser and engine mutation results are in [Art verification](TODO-art.md#verificationlatest-delivery). The delivery is in the Art worktree for review.
 
 **Art → Play and build, references and audio (2026-11-20).** The practice range opens a standalone `/references.html` tab crediting Greg Lester’s Foley guide. Art used its layering approach for the drier reload and shorter outgoing hit cue. The user heard a small improvement and deferred further tuning. Decide the permanent location of the references link after MVP. The build notes reproduce the four runtime MP3s directly. [Audio build notes](webapp/audio/README.md#runtime-cues).

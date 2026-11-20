@@ -82,7 +82,10 @@ export function useGameLoop(): void {
 
       const shown = onlineMatch?.worldToShow(owed.leftoverSeconds);
       const told = onlineMatch?.takeEvents();
-      if (shown && told) {
+      if (shown && onlineMatch?.hasLostConnection()) {
+        sounds.stopRingDamage();
+        recordFeedbackCues({events: undefined, round: shown.round, hitPlaces: []});
+      } else if (shown && told) {
         const {events, seconds, opponentVisible} = told;
         const {round, opponent} = shown;
         const hitPlaces: Point[] = [];

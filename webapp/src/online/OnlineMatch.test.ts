@@ -132,6 +132,20 @@ it("discards a previous round's queued events when a new round arrives before th
   expect(match.takeEvents()).toEqual({events: [], seconds: 0, opponentVisible: true});
 });
 
+it("discards the lost connection's queued ring damage when the server seats the browser again", () => {
+  const {socket, match} = seatedMatch();
+  socket.receive(
+    snapshotText({world: {...QUIET, events: [{kind: "damageTaken", cause: "ring", amount: 1}]}, elapsedSeconds: 7}),
+  );
+  socket.readyState = 0;
+  match.step(IDLE);
+  socket.readyState = 1;
+  socket.receive(JOINED);
+  socket.receive(snapshotText({elapsedSeconds: 7.1}));
+
+  expect(match.takeEvents()?.events).toEqual([]);
+});
+
 it("has no events to hand over before a snapshot has come, and shows none in the world each frame", () => {
   const {socket, match} = seatedMatch();
   expect(match.takeEvents()).toBeUndefined();

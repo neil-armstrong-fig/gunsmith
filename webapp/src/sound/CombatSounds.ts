@@ -55,8 +55,13 @@ export class CombatSounds {
     if (round === "playing" && events?.some(event => event.kind === "damageTaken" && event.cause === "ring")) {
       this.output.startLoop(RING_LOOP);
     } else {
-      this.output.stopLoop(RING_LOOP);
+      this.stopRingDamage();
     }
+  }
+
+  /** Fades the continuous ring cue when ring damage stops or the room connection is lost. */
+  stopRingDamage(): void {
+    this.output.stopLoop(RING_LOOP);
   }
 
   /** Stops whatever is playing and wants a fresh press of the trigger before the next click. */
