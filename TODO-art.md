@@ -1,12 +1,16 @@
 # TODO: art
 
-**FOCUS ON MVP TASKS FIRST**
+**Done — 2026-11-20.** The dedicated Art session is closed. The remaining work follows the ownership below and in [HANDOFF.md](HANDOFF.md#folder-and-contract-ownership).
 
-Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only relevant dependencies.
+## Handoff
 
-## Resume here
+- **Play** takes the arena preview and workshop presentation, authored gameplay and UI assets and manifests, static cues, player-facing copy, and combat listening once AI's shot synthesis is in the game. Engine supplies terrain and combat rules, and Budget supplies credit and AI-off behavior.
+- **AI** takes the S4-1 fallback contrast fix and native-size re-review, generated appearance and shot synthesis, and dataset prompt examples. Engine helps review the appearance association with runtime weapon identity.
+- **Server** takes privacy and terms copy for accounts and player data. **Ship** takes release branding, publication and case-study visuals.
 
-Art is in `.claude/worktrees/art` on `worktree-art`. Last merged GitHub main: `460f3bb`. The validated art merge `0143379`, including the submachine gun inventory icon from `8318df4`, was pushed to GitHub main.
+## Delivered work
+
+The final Art development tip `52443a3` is on GitHub main. The local arena workshop (`17d3ae8`), the weapon shelf replacement picker (`8c0adef`) and the 12-study appearance review (`a748da3`) are integrated.
 
 The local workshop's full-shelf replacement picker is committed at `8c0adef`. `SavedWeaponSummary` supplies the thumbnail, name, power rating and prompt for both the shelf and `ReplacementChoice`. `TheWeaponShelf` checks distinct prompts on identical stand-in weapons and replacement in place.
 
@@ -26,25 +30,13 @@ AI and Engine own the production appearance association. For S4-1, recheck the r
 
 The [approved stair treatment](docs/art/terrain/README.md#playable-stair-preview) draws in every arena. Art reviewed the opposing stairs in `fair-duel` and the wall-side landing in `terraced` at 64 and 32 px per tile.
 
-Current milestone: M1/M6; the project remains on M1. Next audio task: combat masking, fatigue and levels once AI/play integrate runtime weapon-shot synthesis (not yet wired into the game sound output). Safari acceptance does not claim new headphone/speaker measurements. Preserve approved master hashes. Next failing check for any playback change: the relevant browser sound acceptance criterion before implementation.
+Play's next audio review is combat masking, fatigue and levels once runtime weapon-shot synthesis is integrated. The user accepted Safari playback on 2026-11-17. Headphone and speaker measurements remain open. Preserve approved master hashes and write the relevant browser criterion before any playback change.
 
 Ship's inventory HUD, local pickup cue and ring loop are integrated (`c372d86`). Art followed up on Ship's review with a lighter fill on the built-in submachine gun's magazine at 34 px. The delivery covers the authored SVG pair and the HUD browser criteria. Ship integrated generated thumbnails for local fixtures. Status badges and production appearance association remain open.
 
-## MVP priority
+## Milestone checklist
 
-Maintain the shared arena preview for workshop results and pre-round choices. Play can pass a parsed arena, its name and any resolved starting places. Review the generated weapon fallback with AI when its contrast change is ready. See [the shared priorities](TODO.md#mvp-integration-priorities) and [handoffs](HANDOFF.md#mvp-ownership-and-handoffs).
-
-## Ownership
-
-webapp/public/assets/, webapp/audio/, asset manifests/loading, authored presentation/overlay components, copy and docs/art/. play owns combat/HUD behavior; AI owns generated renderer and shot synthesis.
-
-Reserve concrete files in [HANDOFF.md](HANDOFF.md) before overlapping another session. Shared contracts change there first; the domain owner writes the change and consumers review it.
-
-## Dependencies/handoffs
-
-Agree manifest keys/anchors with play and supported visual grammar with AI before production assets. The rifle shot is integrated (blue is your unmodified `effects/projectile-rifle`; see HANDOFF.md). No menus ahead of real consumers.
-
-## Current milestone tasks
+Open entries retain their scope and pass to the owners above.
 
 - [x] Style the existing workshop weapon result card using the selection concept. Check that the meter and printed power rating agree for successive results.
 
@@ -68,7 +60,7 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [x] Measure the shipped empty click’s onset/content and event cadence in Chromium/WebKit at default, 44.1 and 48 kHz: 13 starts per 13 holds in all six runs, including repeats shorter than the buffer. WebKit’s main transient is about 12 ms later; no global correction or threshold change. See the audio handoff.
 - [x] Accept native Safari audio as good enough by user decision on 2026-11-17; close the onset, first-gesture wake-up and fast-repeat listening follow-up without additional device testing. This records acceptance, not new headphone/speaker measurements.
 - [ ] Check fatigue, masking and levels on headphones/speakers once AI/play wire the real weapon-shot synth into runtime audio. The current game output only has the static empty click; general audition approval is not proof of these tests.
-- [ ] Map future static cues to approved MP3 as play integrates them; support playback/ducking/volume integration. Weapon-shot synthesis belongs to AI; art supplies static cues. Crunch export and current ring-onset mapping reviewed on 2026-11-17; future outgoing-hit/static cues remain open.
+- [ ] Play maps future static cues to approved MP3s and owns playback, ducking and volume. AI owns weapon-shot synthesis. The 2026-11-17 review covers crunch export and the ring onset. Future static cues remain open.
 - [x] Review all twelve oddities at 64/32 px per tile using the current appearance grammar and renderer.
 - [ ] Review Art's findings with AI and Engine as part of production appearance association.
 
