@@ -10,6 +10,41 @@ it("reads a seat locking in its arena", () => {
   expect(parsePreRoundMessage('{"kind":"lockIn","step":"arena"}')).toEqual({kind: "lockInArena"});
 });
 
+it("reads a seat choosing two built-in weapons, slot 1 then slot 2", () => {
+  const text =
+    '{"kind":"choose","step":"weapons","choice":[{"kind":"builtIn","key":"submachine-gun"},{"kind":"builtIn","key":"rifle"}]}';
+
+  expect(parsePreRoundMessage(text)).toEqual({kind: "chooseWeapons", keys: ["submachine-gun", "rifle"]});
+});
+
+it("reads a seat locking in its weapons", () => {
+  expect(parsePreRoundMessage('{"kind":"lockIn","step":"weapons"}')).toEqual({kind: "lockInWeapons"});
+});
+
+it("does not take weapons that are not exactly two built-in keys", () => {
+  const one = '{"kind":"choose","step":"weapons","choice":[{"kind":"builtIn","key":"rifle"}]}';
+  const three =
+    '{"kind":"choose","step":"weapons","choice":[{"kind":"builtIn","key":"a"},{"kind":"builtIn","key":"b"},{"kind":"builtIn","key":"c"}]}';
+  const saved =
+    '{"kind":"choose","step":"weapons","choice":[{"kind":"builtIn","key":"rifle"},{"kind":"saved","id":"abc"}]}';
+  const number =
+    '{"kind":"choose","step":"weapons","choice":[{"kind":"builtIn","key":"rifle"},{"kind":"builtIn","key":7}]}';
+
+  expect(parsePreRoundMessage(one)).toBeUndefined();
+  expect(parsePreRoundMessage(three)).toBeUndefined();
+  expect(parsePreRoundMessage(saved)).toBeUndefined();
+  expect(
+    parsePreRoundMessage(
+      '{"kind":"choose","step":"weapons","choice":[{"kind":"builtIn","key":"rifle"},{"kind":"saved","key":"rifle"}]}',
+    ),
+  ).toBeUndefined();
+  expect(parsePreRoundMessage(number)).toBeUndefined();
+  expect(
+    parsePreRoundMessage('{"kind":"choose","step":"weapons","choice":{"kind":"builtIn","key":"rifle"}}'),
+  ).toBeUndefined();
+  expect(parsePreRoundMessage('{"kind":"choose","step":"weapons"}')).toBeUndefined();
+});
+
 it("reads a pick of one of the two arenas", () => {
   const text = '{"kind":"pickArena","pick":{"kind":"arena","seat":"second"}}';
 
