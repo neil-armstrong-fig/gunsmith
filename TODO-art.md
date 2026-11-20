@@ -1,5 +1,7 @@
 # TODO: art
 
+**FOCUS ON MVP TASKS FIRST**
+
 Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only relevant dependencies.
 
 ## Resume here

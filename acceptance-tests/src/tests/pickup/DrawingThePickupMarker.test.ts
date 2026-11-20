@@ -105,9 +105,9 @@ given.each(
         });
       }
 
-      then("the weapon goes into the second slot and leaves no marker on the floor", async ({gunsmith}) => {
+      then("the weapon replaces the one in hand and leaves no marker on the floor", async ({gunsmith}) => {
         expect(await gunsmith.pickup.get()).toBeUndefined();
-        expect(await gunsmith.weapon.get()).toMatchObject({slot: 2, rounds: pickup.magazineSize});
+        expect(await gunsmith.weapon.get()).toMatchObject({slot: 1, rounds: pickup.magazineSize});
         expect((await gunsmith.pickup.getMarkerOnScreen(pickup, CLEAR_FLOOR)).markedPixels).toBe(0);
       });
     });

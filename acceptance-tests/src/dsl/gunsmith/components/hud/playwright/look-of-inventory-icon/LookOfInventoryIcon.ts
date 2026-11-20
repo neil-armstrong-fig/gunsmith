@@ -29,8 +29,7 @@ export async function lookOfInventoryIcon(page: Page, icon: Locator): Promise<In
     return colourAt(screenshot.channels, index);
   });
   const outline = pixelsNear(pixels, OUTLINE);
-  // The icon has transparent padding, so its top-left pixel shows the slot background.
-  const background = luminance(colourAt(screenshot.channels, 0));
+  const background = backgroundLuminance(screenshot.channels, screenshot.width, screenshot.height);
 
   return {
     width: screenshot.width,
@@ -43,6 +42,16 @@ export async function lookOfInventoryIcon(page: Page, icon: Locator): Promise<In
       return Math.max(highest, (luminance(pixel) + 0.05) / (background + 0.05));
     }, 0),
   };
+}
+
+/**
+ * The icon has transparent padding, so its corners show the slot background. The slot's number can sit on one corner, so the
+ * background is the darkest of the four.
+ */
+function backgroundLuminance(channels: readonly number[], width: number, height: number): number {
+  const corners = [0, width - 1, width * (height - 1), width * height - 1];
+
+  return Math.min(...corners.map(pixel => luminance(colourAt(channels, pixel))));
 }
 
 function colourAt(channels: readonly number[], pixel: number): Colour {

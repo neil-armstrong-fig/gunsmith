@@ -1,5 +1,7 @@
 # TODO: ai
 
+**FOCUS ON MVP TASKS FIRST**
+
 Model: **Claude**. Follow the startup protocol in [TODO.md](TODO.md); read only relevant dependencies.
 
 ## Resume here

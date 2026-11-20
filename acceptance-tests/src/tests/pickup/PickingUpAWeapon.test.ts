@@ -65,14 +65,16 @@ given("a sparring match whose weapon lies on the row the fighters stand on", () 
 
   when("the player walks east, over the weapon", () => {
     let weaponLying: PickupSnapshot | undefined;
-    let firstWeaponRounds = 0;
-    let firstWeaponReserve = 0;
+    let secondWeaponBefore = {rounds: 0, reserve: 0};
 
     beforeEach(async ({gunsmith}) => {
       weaponLying = await gunsmith.pickup.get();
+      await gunsmith.player.switchTo(2);
+      await gunsmith.weapon.waitForSlot(2);
       const carried = await gunsmith.weapon.get();
-      firstWeaponRounds = carried.rounds;
-      firstWeaponReserve = carried.reserve;
+      secondWeaponBefore = {rounds: carried.rounds, reserve: carried.reserve};
+      await gunsmith.player.switchTo(1);
+      await gunsmith.weapon.waitForSlot(1);
 
       await gunsmith.player.walkFor("east", WALK_PAST_THE_MIDDLE_SECONDS);
     });
@@ -82,7 +84,44 @@ given("a sparring match whose weapon lies on the row the fighters stand on", () 
       expect(await gunsmith.pickup.get()).toBeUndefined();
     });
 
-    then("the player holds it, in the second slot, with a full magazine and its reserve", async ({gunsmith}) => {
+    then("the player holds it in the slot they held, with a full magazine and its reserve", async ({gunsmith}) => {
+      const carried = await gunsmith.weapon.get();
+
+      expect(carried.slot).toBe(1);
+      expect(carried.rounds).toBe(weaponLying?.magazineSize);
+      expect(carried.reserve).toBe(weaponLying?.startingReserve);
+    });
+
+    when("the player then switches to the second weapon", () => {
+      beforeEach(async ({gunsmith}) => {
+        await gunsmith.player.switchTo(2);
+        await gunsmith.weapon.waitForSlot(2);
+      });
+
+      then("it is as it was, with its own rounds", async ({gunsmith}) => {
+        const carried = await gunsmith.weapon.get();
+
+        expect(carried.rounds).toBe(secondWeaponBefore.rounds);
+        expect(carried.reserve).toBe(secondWeaponBefore.reserve);
+      });
+    });
+  });
+
+  when("the player holds the second weapon and walks east, over the weapon", () => {
+    let weaponLying: PickupSnapshot | undefined;
+    let firstWeaponBefore = {rounds: 0, reserve: 0};
+
+    beforeEach(async ({gunsmith}) => {
+      weaponLying = await gunsmith.pickup.get();
+      const carried = await gunsmith.weapon.get();
+      firstWeaponBefore = {rounds: carried.rounds, reserve: carried.reserve};
+
+      await gunsmith.player.switchTo(2);
+      await gunsmith.weapon.waitForSlot(2);
+      await gunsmith.player.walkFor("east", WALK_PAST_THE_MIDDLE_SECONDS);
+    });
+
+    then("the player holds it in the second slot, with a full magazine and its reserve", async ({gunsmith}) => {
       const carried = await gunsmith.weapon.get();
 
       expect(carried.slot).toBe(2);
@@ -90,7 +129,7 @@ given("a sparring match whose weapon lies on the row the fighters stand on", () 
       expect(carried.reserve).toBe(weaponLying?.startingReserve);
     });
 
-    when("the player then switches back to the first weapon", () => {
+    when("the player then switches to the first weapon", () => {
       beforeEach(async ({gunsmith}) => {
         await gunsmith.player.switchTo(1);
         await gunsmith.weapon.waitForSlot(1);
@@ -99,8 +138,8 @@ given("a sparring match whose weapon lies on the row the fighters stand on", () 
       then("it is as it was, with its own rounds", async ({gunsmith}) => {
         const carried = await gunsmith.weapon.get();
 
-        expect(carried.rounds).toBe(firstWeaponRounds);
-        expect(carried.reserve).toBe(firstWeaponReserve);
+        expect(carried.rounds).toBe(firstWeaponBefore.rounds);
+        expect(carried.reserve).toBe(firstWeaponBefore.reserve);
       });
     });
   });
