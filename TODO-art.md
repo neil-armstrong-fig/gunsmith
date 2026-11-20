@@ -6,13 +6,15 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 Art is in `.claude/worktrees/art` on `worktree-art`. Last merged GitHub main: `e907866`. The validated art merge `0143379`, including the submachine gun inventory icon from `8318df4`, was pushed to GitHub main.
 
-The local workshop's full-shelf replacement picker is ready for review in this worktree. `SavedWeaponSummary` supplies the thumbnail, name, power rating and prompt for both the shelf and `ReplacementChoice`; the picker wraps the full prompt and associates it with the Replace button. `TheWeaponShelf` checks distinct prompts on identical stand-in weapons and replacement in place. Next workshop slice is preview reuse when Play supplies a parsed generated arena. Start with a browser criterion that distinguishes the generated arena's drawn terrain from the built-in choices.
+The local workshop's full-shelf replacement picker is committed at `8c0adef`. `SavedWeaponSummary` supplies the thumbnail, name, power rating and prompt for both the shelf and `ReplacementChoice`. `TheWeaponShelf` checks distinct prompts on identical stand-in weapons and replacement in place.
+
+At the user's request Art built the local arena workshop reference while Play was unavailable. The Arenas tab takes up to 1,000 characters and uses Make to preview one of two labelled stand-ins. Walk it opens the arena and Return to practice restores the previous range. The separate three-place browser shelf supports Save, Walk it, Iterate, Delete and replacement. It keeps the source rows and the prompt used to make them. The next integration is Play's live route after sign-in and production adapter wiring. Start with a browser criterion that returns a deterministic created arena from a fake API and verifies its terrain through the existing card.
 
 Room weapon art and its two-browser spec are integrated. The user's approved low-cover artwork from `837f1d9` is integrated in `adbf7b4`.
 
 The workshop weapon result card now has the authored picture beside the name, a power meter and six compact stat rows. Integrated from `457ba87` via `3912cb1`, alongside Play’s Try it action.
 
-The workshop arena preview is integrated from `a091b3e` via `eeb19d3`. Open the workshop, choose Arenas, then choose Duel or Fair duel for a larger preview. The built-in pool supplies both the row and the deterministic Fair duel result. The match and preview render the same terrain through React Three Fiber. Next, hand the same component a parsed generated arena from Play's workshop flow, then reuse it for future pre-round choices.
+The workshop arena preview is integrated from `a091b3e` via `eeb19d3`. The built-in pool supplies Duel and Fair duel. The match and preview render the same terrain through React Three Fiber. Reuse the preview for future pre-round choices.
 
 AI and Engine own the production appearance association. For S4-1, recheck the refused pickup's body and outline separately from its muzzle at both scales once AI delivers the contrast change.
 
@@ -88,6 +90,44 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [ ] Case-study diagrams: pipeline, cost safeguards and eval loop.
 
 ## Verification/latest delivery
+
+The arena and weapon Save controls each delegate their three rendered
+states to separate components. Shelf actions stay in the parent.
+All 33 focused production criteria and `pnpm checks` passed. The folder
+and caller audit confirmed each new component has one parent.
+
+2026-11-20, arena workshop reference in `worktree-art`.
+Six `UsingAnArena` criteria failed on the old build before the actions were
+implemented. The suite now covers eight criteria, including walking after
+a reload and keeping range dummies out of an arena trial. Both of those
+criteria failed with the relevant behavior disabled in a disposable build.
+The hydration unit test failed with drawing validation removed and passed
+after restoring the check. All 86 production workshop criteria passed
+without retries. `pnpm checks` passed lint, formatting, typechecks and
+3,647 tests with one existing audio skip. Reviewed root, webapp, React and
+acceptance instructions and audited the changed folders and callers.
+
+2026-11-20, local arena making in `worktree-art`. Three new
+`DrawingAnArenaPreview` criteria failed on the old build because the arena
+prompt was absent. All three then passed, covering the off-centre wall,
+the raised platform and retained result at 1024 × 560, and the 1,000-character
+limit. Moving the wall one tile in a disposable build failed the pixel
+criterion. Both layouts pass engine validation. The production preview
+passed all 78 workshop criteria without retries. `pnpm checks` passed lint,
+formatting, typechecks and 3,646 tests with one existing audio skip.
+Re-read the root, webapp, React and acceptance instructions and audited the
+changed folders and callers.
+
+2026-11-20, workshop arena result card in `worktree-art`.
+`DrawingAnArenaPreview` detected the missing eastern wall brace after
+switching from Fair duel to Duel on the original production build.
+The check passed with the camera refit, and all 75 workshop criteria passed
+on the production preview without retries. The full Fair duel result is
+visible at 1024 × 560, 1280 × 720 and 1440 × 900. Both preview wrappers logged
+shutdown errors, Playwright exited 0 and both ports closed. `pnpm checks`
+passed lint, formatting, strict typechecks and 3,644 tests with one existing audio skip.
+Re-read the root, webapp, React and acceptance instructions and audited the
+changed folders and callers. Play's generated-arena flow is still pending.
 
 2026-11-20, workshop shelf replacement picker in `worktree-art`.
 The prompt criterion failed on the old picker and on a disposable
