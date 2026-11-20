@@ -4,7 +4,7 @@ import {arenaGraphStateOf} from "@gunsmith/ai/pipeline/arena/arena-graph/testing
 const ARENA = {name: "Box", rows: ["#####", "#...#", "#####"]};
 const BUILT_IN = {name: "Open Room", rows: ["######", "#....#", "######"]};
 
-it("reports a turned-away request with the reason, no arena and nothing to refund", () => {
+it("reports a request turned away after a model call with the reason, no arena, and no refund, because the model was used", () => {
   const outcome = arenaOutcomeFromState(
     arenaGraphStateOf({rejectionReason: "not an arena", nodes: ["precheck", "moderation"], modelCalls: 1}),
   );
@@ -16,6 +16,14 @@ it("reports a turned-away request with the reason, no arena and nothing to refun
     nodes: ["precheck", "moderation"],
     modelCalls: 1,
   });
+});
+
+it("refunds a request turned away before any model call, the only request that costs nothing", () => {
+  const outcome = arenaOutcomeFromState(
+    arenaGraphStateOf({rejectionReason: "too long", nodes: ["precheck"], modelCalls: 0}),
+  );
+
+  expect(outcome).toMatchObject({status: "rejected", refunded: true, modelCalls: 0});
 });
 
 it("reports a made arena as created, with nothing refunded", () => {
@@ -32,13 +40,13 @@ it("reports a made arena as created, with nothing refunded", () => {
   });
 });
 
-it("reports a built-in arena, tells the player why and refunds the credit", () => {
+it("reports a built-in arena and tells the player why, without a refund, because the model's work was paid for", () => {
   const outcome = arenaOutcomeFromState(
-    arenaGraphStateOf({builtIn: BUILT_IN, errors: ["rows: too few"], repaired: true}),
+    arenaGraphStateOf({builtIn: BUILT_IN, errors: ["rows: too few"], repaired: true, modelCalls: 3}),
   );
 
-  expect(outcome).toMatchObject({status: "builtIn", arena: BUILT_IN, refunded: true});
-  expect(outcome.reason).toContain("Your credit is refunded");
+  expect(outcome).toMatchObject({status: "builtIn", arena: BUILT_IN, refunded: false});
+  expect(outcome.reason).toBe("We could not build a playable arena from that request, so here is one of ours.");
 });
 
 it("never hands on an arena that a later check refused", () => {

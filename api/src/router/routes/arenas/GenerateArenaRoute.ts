@@ -15,9 +15,10 @@ import type {ArenaAnswer} from "@src/router/routes/arenas/types/ArenaAnswer";
  * `POST /api/arenas` with `{prompt}` from a signed-in player (the session cookie names the account that pays): turns the words into an arena through the
  * pipeline it is handed, with the same credit and spend rules around the call as `GenerateWeaponRoute`: the credit, then the global
  * spend at its worst case (`ARENA_SPEND`), are reserved before the pipeline runs. The credit is settled at what the request was (an
- * arena costs one credit, a rejected prompt half) or refunded in full: when the pipeline threw (502), or when it could not make a
- * playable arena and gave a built-in one (`builtIn`: the player still gets an arena, and the credit goes back). The spend is settled
- * at the model calls the outcome made, `builtIn` included (the model was billed), or at the whole reservation if the pipeline threw or timed out (504).
+ * arena costs one credit, a rejected prompt half, and so does a built-in arena, given when no playable one could be made: the model
+ * was used) or refunded in full: when the pipeline threw (502), or when the request was turned away before any model call
+ * (`outcome.refunded`, which `ai` sets exactly then). The spend is settled at the model calls the outcome made, `builtIn` included
+ * (the model was billed), or at the whole reservation if the pipeline threw or timed out (504).
  * **A created arena is kept under an `id` the answer carries** (`shared/keep-result/`), so the library saves it by that id alone; if it
  * cannot be kept the credit is refunded and the answer is 502.
  */
@@ -56,11 +57,16 @@ async function runAndSettle(reservation: CreditReservation): Promise<Response> {
 
     return Response.json({...answerOf(outcome), id});
   }
+  if (outcome.refunded) {
+    await credits.refund(key);
+
+    return Response.json(answerOf(outcome));
+  }
   if (outcome.status === "rejected") {
     await credits.settle(key, "rejected");
   }
   if (outcome.status === "builtIn") {
-    await credits.refund(key);
+    await credits.settle(key, "unusable");
   }
 
   return Response.json(answerOf(outcome));

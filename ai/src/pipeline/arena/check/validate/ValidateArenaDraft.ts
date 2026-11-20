@@ -4,6 +4,8 @@ import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import {arenaDraftSchema} from "@gunsmith/ai/pipeline/arena/check/validate/draft/ArenaDraft";
 import {rowLengthProblems} from "@gunsmith/ai/pipeline/arena/check/validate/row-lengths/RowLengthProblems";
+import {repairArena} from "@gunsmith/engine/arena-repair/RepairArena";
+import {withoutEmptyRectangles} from "@gunsmith/ai/pipeline/arena/check/validate/empty-rectangles/WithoutEmptyRectangles";
 import {compileArenaShapes} from "@gunsmith/ai/pipeline/arena/arena-shapes/CompileArenaShapes";
 import {arenaShapesDraftSchema} from "@gunsmith/ai/pipeline/arena/arena-shapes/draft/ArenaShapesDraft";
 import type {ArenaValidation} from "@gunsmith/ai/pipeline/arena/check/validate/types/ArenaValidation";
@@ -15,10 +17,13 @@ const MAX_ERROR_LENGTH = 160;
 const MAX_PROBLEMS_LISTED = 5;
 
 /**
- * Parses what the model wrote as an arena, as a drawing's rows or as shapes (drawn into rows first), in four steps that each stop the next: zod (the name and the drawing's size and shape),
- * then the lengths of the rows (named, row by row, because engine's own refusal does not say which row), then the engine's own reading of the drawing (`arenaFrom`, which refuses an unknown character, rows of unequal length and an
- * illegal stair; a cover block, `c`, is a legal character), then the engine's playability rules (`validateArena`, which treats a
- * cover block as a wall). A refusal names the problems found in the step it stopped at
+ * Parses what the model wrote as an arena, as a drawing's rows or as shapes (drawn into rows first, after any rectangle with no size is
+ * dropped), in five steps that each stop the next: zod (the name and the drawing's size and shape), then the lengths of the rows (named,
+ * row by row, because engine's own refusal does not say which row), then engine's repair of the faults a model draws most often (`repairArena`:
+ * an illegal stair, a platform nobody can reach, a piece of floor cut off), which asks the model for nothing and changes a drawing that has none
+ * of them not at all, then the engine's own reading of the repaired drawing (`arenaFrom`, which refuses an unknown character and rows of unequal
+ * length; a cover block, `c`, is a legal character), then the engine's playability rules (`validateArena`, which treats a
+ * cover block as a wall) on what is left. The arena handed back is the repaired drawing. A refusal names the problems found in the step it stopped at
  * (the first few, then a count of the rest), each shortened, because `repair` shows them to the model and some of the words in them
  * (a stray field's name) came from the model, or through it from the player.
  */
@@ -27,7 +32,7 @@ export function validateArenaDraft(candidate: unknown): ArenaValidation {
     return validateDrawing(candidate);
   }
 
-  const shapes = arenaShapesDraftSchema.safeParse(candidate);
+  const shapes = arenaShapesDraftSchema.safeParse(withoutEmptyRectangles(candidate));
   if (!shapes.success) {
     return {ok: false, errors: schemaErrors(shapes.error.issues)};
   }
@@ -56,7 +61,8 @@ function validateDrawing(candidate: unknown): ArenaValidation {
     return {ok: false, errors: raggedRows};
   }
 
-  const arena = read(parsed.data.rows);
+  const repaired = repairArena(parsed.data.rows).rows;
+  const arena = read(repaired);
   if (typeof arena === "string") {
     return {ok: false, errors: [sentenceOf(arena)]};
   }
@@ -66,7 +72,7 @@ function validateDrawing(candidate: unknown): ArenaValidation {
     return {ok: false, errors: firstProblemsOf(problems)};
   }
 
-  return {ok: true, arena: parsed.data};
+  return {ok: true, arena: {...parsed.data, rows: repaired}};
 }
 
 /** The first few problems, each shortened, and one sentence counting the rest, so a drawing with hundreds cannot flood the repair. */

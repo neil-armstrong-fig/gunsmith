@@ -94,15 +94,27 @@ it("takes half a credit and says why when the prompt is rejected", async () => {
   expect(ledgers.accountOf("acct-1").balance(Date.now())).toBe(DAILY_CREDITS - 0.5);
 });
 
-it("gives the credit back and still answers an arena when a built-in one is given", async () => {
+it("takes half a credit, not the whole of it and not none, and still answers an arena when a built-in one is given", async () => {
   const ledgers = fakeLedgers();
   smithThatAnswers(builtIn);
   const response = await generateArenaRoute(post({prompt: "a maze"}));
 
   expect(response.status).toBe(200);
   expect(await response.json()).toEqual({status: "builtIn", arena: {name: "Duel"}, reason: "no playable arena"});
+  expect(ledgers.accountOf("acct-1").balance(Date.now())).toBe(DAILY_CREDITS - 0.5);
+  expect(ledgers.calls).toEqual(["status", "reserve:arena", "spend:reserve", "spend:settle", "settle:unusable"]);
+});
+
+it("gives the credit back when the prompt was turned away before any model call, the one request that cost nothing", async () => {
+  const ledgers = fakeLedgers();
+  smithThatAnswers(turnedAwayBeforeTheModel);
+  const response = await generateArenaRoute(post({prompt: "x".repeat(2000)}));
+
+  expect(response.status).toBe(200);
+  expect(await response.json()).toEqual({status: "rejected", reason: "that is too long"});
   expect(ledgers.accountOf("acct-1").balance(Date.now())).toBe(DAILY_CREDITS);
   expect(ledgers.calls).toEqual(["status", "reserve:arena", "spend:reserve", "spend:settle", "refund"]);
+  expect(ledgers.spendMeter.spentThisMonth()).toBe(0);
 });
 
 it("gives the credit back, once, and answers 502 when the pipeline throws", async () => {
@@ -228,14 +240,14 @@ it("settles the spend at the model calls the request made, whatever it came to",
   }
 });
 
-it("keeps the spend of a built-in arena, since the model was billed even though the credit goes back", async () => {
+it("keeps the spend of a built-in arena, since the model was billed, and the half credit with it", async () => {
   const ledgers = fakeLedgers();
 
   smithThatAnswers(builtIn);
   await generateArenaRoute(post({prompt: "a maze"}));
 
-  expect(ledgers.accountOf("acct-1").balance(Date.now())).toBe(DAILY_CREDITS);
-  expect(ledgers.spendMeter.spentThisMonth()).toBeGreaterThan(0);
+  expect(ledgers.accountOf("acct-1").balance(Date.now())).toBe(DAILY_CREDITS - 0.5);
+  expect(ledgers.spendMeter.spentThisMonth()).toBe(settledArenaSpend(builtIn));
 });
 
 it("keeps the whole reservation as spent when the pipeline throws, since its calls may have been billed", async () => {
@@ -459,9 +471,17 @@ const builtIn: ArenaOutcome = {
   status: "builtIn",
   arena: {name: "Duel"},
   reason: "no playable arena",
-  refunded: true,
+  refunded: false,
   nodes: ["generate", "repair"],
   modelCalls: 3,
+};
+
+const turnedAwayBeforeTheModel: ArenaOutcome = {
+  status: "rejected",
+  reason: "that is too long",
+  refunded: true,
+  nodes: ["precheck"],
+  modelCalls: 0,
 };
 
 function smithThatAnswers(outcome: ArenaOutcome): MockedFunction<typeof runArenaPipeline> {

@@ -76,6 +76,15 @@ it("charges half a credit for a rejected prompt, the rest returned", () => {
   expect(account.balance(NOON)).toBe(DAILY_CREDITS - 0.5);
 });
 
+it("charges half a credit for a request that reached the model and gave nothing usable, the rest returned", () => {
+  const account = new CreditAccount();
+  account.reserve("unusable", "arena", NOON);
+
+  account.settle("unusable", "unusable", NOON);
+
+  expect(account.balance(NOON)).toBe(DAILY_CREDITS - 0.5);
+});
+
 it("charges nothing for reusing a saved item, even with no credits left", () => {
   const account = new CreditAccount();
   for (let spent = 0; spent < DAILY_CREDITS; spent++) {

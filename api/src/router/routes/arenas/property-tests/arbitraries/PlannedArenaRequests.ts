@@ -2,7 +2,7 @@ import fc from "fast-check";
 import type {PlannedArenaOutcome} from "@src/router/routes/arenas/property-tests/types/PlannedArenaOutcome";
 import type {PlannedArenaRequest} from "@src/router/routes/arenas/property-tests/types/PlannedArenaRequest";
 
-/** 15 to 40 requests from two accounts (so one runs out of credits), each ending as the arena pipeline can end: an arena, a rejection, a built-in arena, or a throw. */
+/** 15 to 40 requests from two accounts (so one runs out of credits), each ending as the arena pipeline can end: an arena, a rejection after the moderation call, a turn-away before any model call, a built-in arena, or a throw. */
 export function plannedArenaRequests(): fc.Arbitrary<PlannedArenaRequest[]> {
   return fc.array(plannedArenaRequest(), {minLength: 15, maxLength: 40});
 }
@@ -37,7 +37,17 @@ function plannedArenaOutcome(): fc.Arbitrary<PlannedArenaOutcome> {
     {
       weight: 1,
       arbitrary: fc.constantFrom(2, 3).map<PlannedArenaOutcome>(modelCalls => {
-        return {status: "builtIn", arena: {}, reason: "none", refunded: true, nodes: [], modelCalls};
+        return {status: "builtIn", arena: {}, reason: "none", refunded: false, nodes: [], modelCalls};
+      }),
+    },
+    {
+      weight: 1,
+      arbitrary: fc.constant<PlannedArenaOutcome>({
+        status: "rejected",
+        reason: "too long",
+        refunded: true,
+        nodes: [],
+        modelCalls: 0,
       }),
     },
     {weight: 1, arbitrary: fc.constant<PlannedArenaOutcome>("throws")},

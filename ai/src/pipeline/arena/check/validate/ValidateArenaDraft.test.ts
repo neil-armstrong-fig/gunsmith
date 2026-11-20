@@ -25,10 +25,16 @@ it("accepts a low cover block (c) in the middle of the floor, which engine plays
   expect(validateArenaDraft(draftWith({rows})).ok).toBe(true);
 });
 
-it("still refuses a cover block that cuts the floor in two, as it would a wall", () => {
+it("repairs a cover block that cuts the floor in two by cutting one block away, where it would refuse it as a wall", () => {
   const rows = ["#########", "#...c...#", "#...c...#", "#...c...#", "#########"];
 
-  expect(errorsOf(draftWith({rows}))).toEqual([expect.stringMatching(/./)]);
+  const validation = validateArenaDraft(draftWith({rows}));
+
+  expect(validation.ok).toBe(true);
+  if (validation.ok) {
+    expect(columnOf(validation.arena.rows, 4)).toHaveLength(1);
+    expect(validation.arena.rows.join("").replaceAll(/[^c]/g, "")).toHaveLength(2);
+  }
 });
 
 it("refuses ragged rows by naming the row that is the wrong length, so the repair can find it", () => {
@@ -45,10 +51,21 @@ it("accepts an arena written as shapes, and hands back the drawing the shapes ma
   expect(validateArenaDraft(shapes)).toEqual({ok: true, arena: {name: "Plain Room", rows: ROWS}});
 });
 
-it("draws shapes before it checks the arena, so a wall across the floor is refused as the floor cut in two", () => {
+it("draws shapes before it checks the arena, so a wall across the floor is repaired as a drawing's would be", () => {
   const shapes = {name: "Cut", width: 10, height: 5, walls: [{x: 5, y: 1, width: 1, height: 3}]};
 
-  expect(errorsOf(shapes)).toEqual([expect.stringMatching(/./)]);
+  const validation = validateArenaDraft(shapes);
+
+  expect(validation.ok).toBe(true);
+  if (validation.ok) {
+    expect(columnOf(validation.arena.rows, 5)).toHaveLength(1);
+  }
+});
+
+it("drops a rectangle with no size from shapes instead of refusing it, as a stat past its range is clamped", () => {
+  const shapes = {name: "Plain Room", width: 10, height: 5, walls: [{x: 0, y: 0, width: 0, height: 0}]};
+
+  expect(validateArenaDraft(shapes)).toEqual({ok: true, arena: {name: "Plain Room", rows: ROWS}});
 });
 
 it("refuses a shape that reaches past the arena with the sentence naming it", () => {
@@ -103,10 +120,10 @@ it("refuses a character the engine does not read", () => {
   expect(errorsOf(draftWith({rows}))).toHaveLength(1);
 });
 
-it("refuses a stair with no landing, with the engine's words", () => {
+it("draws a stair with no landing as floor, where it would refuse it with the engine's words", () => {
   const rows = ["##########", "#........#", "#.......>#", "#........#", "##########"];
 
-  expect(errorsOf(draftWith({rows}))).toHaveLength(1);
+  expect(validateArenaDraft(draftWith({rows}))).toEqual({ok: true, arena: {name: "Plain Room", rows: ROWS}});
 });
 
 it("refuses an arena of walls only", () => {
@@ -115,47 +132,64 @@ it("refuses an arena of walls only", () => {
   expect(errorsOf(draftWith({rows}))).toEqual(["The arena has no floor to stand on."]);
 });
 
-it("refuses an arena whose floor is cut in two, saying how much of the smaller part is cut off", () => {
-  const rows = ["##########", "#...#....#", "#...#....#", "#...#....#", "##########"];
+it("opens a door through a wall that cuts the floor in two, however big the parts", () => {
+  const small = ["##########", "#...#....#", "#...#....#", "#...#....#", "##########"];
+  const big = [
+    "####################",
+    "#........#.........#",
+    "#........#.........#",
+    "#........#.........#",
+    "#........#.........#",
+    "####################",
+  ];
 
-  expect(errorsOf(draftWith({rows}))).toEqual([expect.stringContaining("9 tiles of floor")]);
+  for (const [rows, wall] of [
+    [small, 4],
+    [big, 9],
+  ] as const) {
+    const opened = validateArenaDraft(draftWith({rows}));
+
+    expect(opened.ok).toBe(true);
+    if (opened.ok) {
+      expect(columnOf(opened.arena.rows, wall)).toHaveLength(1);
+      expect(opened.arena.rows[0]).toBe(rows[0]);
+    }
+  }
 });
 
-it("names every part of the floor that is cut off, not only the first", () => {
-  const rows = ["#############", "#..#...#....#", "#..#...#....#", "#..#...#....#", "#############"];
-
-  expect(errorsOf(draftWith({rows}))).toEqual([
-    expect.stringContaining("6 tiles of floor"),
-    expect.stringContaining("9 tiles of floor"),
-  ]);
-});
-
-it("refuses a raised platform with no stair up to it", () => {
+it("gives a platform with no stair up to it one, where it would refuse it", () => {
   const rows = ["##########", "#........#", "#...#11..#", "#...#11..#", "##########"];
 
-  expect(errorsOf(draftWith({rows}))[0]).toContain("cannot be walked to");
+  const validation = validateArenaDraft(draftWith({rows}));
+
+  expect(validation.ok).toBe(true);
+  if (validation.ok) {
+    expect(validation.arena.rows.join("").replaceAll(/[^<>^v]/g, "")).toHaveLength(1);
+    expect(validation.arena.rows.join("").replaceAll(/[^1]/g, "")).toBe("1111");
+  }
 });
 
-it("lists the first few problems and counts the rest, so a speckled drawing cannot flood the repair", () => {
-  const rows = [
-    "#############",
-    "#.#.#.#.#.#.#",
-    "#############",
-    "#.#.#.#.#.#.#",
-    "#############",
-    "#.#.#.#.#.#.#",
-    "#############",
-    "#.#.#.#.#.#.#",
-    "#############",
-  ];
+it("still refuses an arena that is nearly all wall, because no repair can make floor", () => {
+  const rows = ["##########", "#...######", "##########", "##########", "##########"];
+
+  expect(errorsOf(draftWith({rows}))).toContainEqual(expect.stringMatching(/^Open floor is only 3 of 50 tiles/));
+});
+
+it("lists the first few problems and counts the rest, when a drawing has more faults than a repair will mend", () => {
+  const row = `#${".#".repeat(19)}#`;
+  const rows = Array.from({length: 30}, (_, index) => {
+    if (index % 2 === 0) {
+      return "#".repeat(40);
+    }
+
+    return row;
+  });
 
   const errors = errorsOf(draftWith({rows}));
 
   expect(errors).toHaveLength(6);
   expect(errors.slice(0, 5)).toEqual(Array(5).fill(expect.stringContaining("1 tiles of floor")));
-  // 23 pieces of floor cut off from the largest, no way to start two fighters on what is left (engine's `noStartingPlaces`)
-  // and a drawing that is only a fifth floor (engine's `tooWalled`).
-  expect(errors[5]).toBe("And 20 more of the same kind.");
+  expect(errors[5]).toMatch(/^And \d+ more of the same kind\.$/);
 });
 
 it("shortens every sentence, because the model will be shown them", () => {
@@ -165,6 +199,15 @@ it("shortens every sentence, because the model will be shown them", () => {
     expect(error.length).toBeLessThanOrEqual(160);
   }
 });
+
+/** The floor tiles of one column of a drawing, the interior rows only: how many ways there are through a wall that stands in it. */
+function columnOf(rows: readonly string[], column: number): string {
+  return rows
+    .slice(1, -1)
+    .map(row => row[column])
+    .join("")
+    .replaceAll(/[^.]/g, "");
+}
 
 function errorsOf(candidate: unknown): string[] {
   const validation = validateArenaDraft(candidate);

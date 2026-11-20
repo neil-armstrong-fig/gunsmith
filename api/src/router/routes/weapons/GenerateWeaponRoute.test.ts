@@ -98,14 +98,27 @@ it("takes half a credit and says why when the prompt is rejected", async () => {
   expect(ledgers.accountOf("acct-1").balance(Date.now())).toBe(DAILY_CREDITS - 0.5);
 });
 
-it("gives the credit back when no valid weapon comes out", async () => {
+it("takes half a credit when no valid weapon comes out, because the model was used", async () => {
   const ledgers = fakeLedgers();
   smithThatAnswers(invalid);
   const response = await generateWeaponRoute(post({prompt: "a rifle"}));
 
   expect(response.status).toBe(200);
   expect(await response.json()).toEqual({status: "invalid", reason: "no valid weapon"});
+  expect(ledgers.accountOf("acct-1").balance(Date.now())).toBe(DAILY_CREDITS - 0.5);
+  expect(ledgers.calls).toContain("settle:unusable");
+  expect(ledgers.calls).not.toContain("refund");
+});
+
+it("gives the credit back when the prompt was turned away before any model call, the one request that cost nothing", async () => {
+  const ledgers = fakeLedgers();
+  smithThatAnswers(turnedAwayBeforeTheModel);
+  const response = await generateWeaponRoute(post({prompt: "x".repeat(2000)}));
+
+  expect(response.status).toBe(200);
+  expect(await response.json()).toEqual({status: "rejected", reason: "that is too long"});
   expect(ledgers.accountOf("acct-1").balance(Date.now())).toBe(DAILY_CREDITS);
+  expect(ledgers.calls).toContain("refund");
 });
 
 it("gives the credit back, once, and answers 502 when the pipeline throws", async () => {
@@ -444,7 +457,14 @@ const rejected: WeaponOutcome = {
   modelCalls: 1,
 };
 
-const invalid: WeaponOutcome = {status: "invalid", reason: "no valid weapon", nodes: ["generate"], modelCalls: 5};
+const invalid: WeaponOutcome = {status: "invalid", reason: "no valid weapon", nodes: ["generate"], modelCalls: 3};
+
+const turnedAwayBeforeTheModel: WeaponOutcome = {
+  status: "rejected",
+  reason: "that is too long",
+  nodes: ["precheck"],
+  modelCalls: 0,
+};
 
 function smithThatAnswers(outcome: WeaponOutcome): MockedFunction<typeof runWeaponPipeline> {
   return vi.mocked(runWeaponPipeline).mockResolvedValue(outcome);
