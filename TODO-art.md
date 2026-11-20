@@ -1,6 +1,6 @@
 # TODO: art
 
-**MVP audio checklist complete.** Art owns authored audio cues, playback integration with Play, and the listening review after weapon-specific shot synthesis. Checkout: `worktree-art`, synced with GitHub main at `4f38a65`.
+**MVP audio checklist complete.** Art owns authored audio cues, playback integration with Play, and the listening review after weapon-specific shot synthesis. Checkout: `worktree-art`, last upstream commit merged `27052bc`.
 
 ## Handoff
 
@@ -97,6 +97,8 @@ Art owns the audio entries. The remaining entries follow the handoff above.
 - [ ] Case-study diagrams: pipeline, cost safeguards and eval loop.
 
 ## Verification/latest delivery
+
+GitHub sync combined Art's ring feedback fix `daadb0f` with Ship's account-retention change `27052bc`. `pnpm checks` passed lint, formatting, strict types and 4,013 tests with one existing slow audio-render skip. Chromium production preview passed all three disconnect and reconnect criteria without retries. The preview and Worker reported shutdown errors after the tests, and the command exited successfully.
 
 2026-11-20, private-room ring feedback in `worktree-art` on `4f38a65`. All three browser criteria and the queued-event unit test failed before the fix. Production Chromium passed all 54 focused criteria without retries, with nonfatal WebSocket proxy `EPIPE` messages. `pnpm checks` passed lint, formatting, strict types and 4,012 tests with one existing slow audio-render skip. All 15 webapp properties passed. Reviewed the root, webapp, React and acceptance-test instructions and audited the affected folders and their callers. The next Art task is the listening review after weapon-specific synthesis lands.
 

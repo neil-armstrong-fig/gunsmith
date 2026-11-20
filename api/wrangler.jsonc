@@ -4,6 +4,7 @@
   "main": "src/ApiWorker.ts",
   "compatibility_date": "2026-11-01",
   "compatibility_flags": ["nodejs_compat"],
+  "triggers": {"crons": ["0 4 * * *"]},
   // One `Match` object per friend code: the room's authority. SQLite-backed, the only kind the free plan has.
   "durable_objects": {
     // CREDITS: one `CreditLedger` per account; SPEND: the one `SpendLedger` (`api/src/durable-objects/credit-ledger/` and `spend-ledger/`, budget). Both hold their state in the

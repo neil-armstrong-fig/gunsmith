@@ -1,6 +1,5 @@
 import {removeAccount} from "@src/accounts/remove-account/RemoveAccount";
-import {sweepDeletedAccounts} from "@src/accounts/sweep-deleted-accounts/SweepDeletedAccounts";
-import {workerEnvironment} from "@src/env/WorkerEnvironment";
+import {eraseExpiredCredits} from "@src/account-retention/EraseExpiredCredits";
 import {DELETED_ACCOUNT_RETENTION_DAYS} from "@src/router/routes/account/retention/DeletedAccountRetention";
 import {accountOfRequest} from "@src/router/routes/shared/session/AccountOfRequest";
 import {clearedSessionCookie} from "@src/router/routes/shared/session/ClearedSessionCookie";
@@ -18,8 +17,8 @@ const A_DAY_MILLISECONDS = 24 * 60 * 60 * 1000;
  * `DELETED_ACCOUNT_RETENTION_DAYS` only, the keyed digest of the player's Google subject beside the opaque id the ledger holds their
  * credits under, and signing in again within that time gives the new account the same id (`router/routes/sign-in/finish/`). Otherwise
  * delete-and-sign-in would reset the daily credits, and the spend behind them, on demand. What is kept is described in
- * `docs/privacy-and-data.md`. After the time the record is swept and its ledger erased (here, on the next deletion; a daily sweep is
- * `ship`'s to schedule).
+ * `docs/privacy-and-data.md`. After the time the record is swept and its ledger erased by the daily Worker schedule
+ * or by another account deletion.
  *
  * - No `ACCOUNT_DIGEST_KEY`: 503 `deletion-unavailable`, nothing removed (the record could not be made, and removing without it would
  *   reopen the reset).
@@ -53,37 +52,4 @@ export async function deleteAccountRoute(request: Request): Promise<Response> {
   await eraseExpiredCredits(now);
 
   return new Response(null, {status: 204, headers: {"Set-Cookie": clearedSessionCookie()}});
-}
-
-/**
- * Forgets the records whose retention has run out and erases the ledgers they named, **each on its own**: the records are already gone,
- * so one ledger that fails must not leave the rest unerased. Never fails the request: the deletion has happened.
- */
-async function eraseExpiredCredits(now: Date): Promise<void> {
-  let creditAccountIds: string[];
-  try {
-    creditAccountIds = await sweepDeletedAccounts(now);
-  } catch (error) {
-    logNotErased(error);
-
-    return;
-  }
-
-  for (const creditAccountId of creditAccountIds) {
-    try {
-      await workerEnvironment.CREDITS.getByName(creditAccountId).erase();
-    } catch (error) {
-      logNotErased(error);
-    }
-  }
-}
-
-function logNotErased(error: unknown): void {
-  console.warn(
-    JSON.stringify({
-      route: "account",
-      outcome: "credits-not-erased",
-      error: error instanceof Error ? error.name : undefined,
-    }),
-  );
 }
