@@ -202,6 +202,14 @@ export class PlayerDsl {
   }
 
   /** Which way the player faces, in degrees: 0 is east, 90 is north, and it runs from -180 to 180. */
+  async aimAwayFrom(tile: Point): Promise<void> {
+    try {
+      await this.player.aimAwayFrom(tile);
+    } catch (error) {
+      throw new DslError(`Failed to turn away from tile ${tile.x}, ${tile.y}`, error);
+    }
+  }
+
   async getAimDegrees(): Promise<number> {
     try {
       return await this.player.getAimDegrees();

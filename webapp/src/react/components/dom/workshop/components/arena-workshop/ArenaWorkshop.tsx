@@ -1,22 +1,29 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
-import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
 import {ArenaPreview} from "@src/react/components/dom/arena-preview/ArenaPreview";
+import {walkTheArena} from "@src/react/components/dom/workshop/arena-on-trial/WalkTheArena";
+import {ArenaPrompt} from "@src/react/components/dom/workshop/components/arena-workshop/components/arena-prompt/ArenaPrompt";
+import {ArenaResult} from "@src/react/components/dom/workshop/components/arena-workshop/components/arena-result/ArenaResult";
+import {ArenaShelf} from "@src/react/components/dom/workshop/components/arena-workshop/components/arena-shelf/ArenaShelf";
+import {SaveArena} from "@src/react/components/dom/workshop/components/arena-workshop/components/save-arena/SaveArena";
+import {useArenaWorkshopStore} from "@src/store/workshop/arena/UseArenaWorkshopStore";
 import type {JSX} from "react";
-import {useLayoutEffect, useRef, useState} from "react";
+import {useLayoutEffect, useRef} from "react";
 
-const BUILT_INS = BUILT_IN_ARENAS.map(({name, rows}) => ({name, arena: arenaFrom(rows)}));
+const BUILT_INS = BUILT_IN_ARENAS.map(({name, rows}) => ({name, rows, arena: arenaFrom(rows)}));
 
 export function ArenaWorkshop(): JSX.Element {
-  const [selected, setSelected] = useState<(typeof BUILT_INS)[number]>();
+  const result = useArenaWorkshopStore(state => state.result);
   const resultRef = useRef<HTMLElement>(null);
 
   useLayoutEffect(() => {
     resultRef.current?.scrollIntoView({block: "nearest"});
-  }, [selected]);
+  }, [result]);
 
   return (
     <div className="flex flex-col gap-3">
+      <ArenaPrompt />
+
       <section aria-label="Built-in arenas">
         <h2 className="mb-2 text-sm font-semibold">Built-in arenas</h2>
 
@@ -25,15 +32,15 @@ export function ArenaWorkshop(): JSX.Element {
             <div key={builtIn.name} className="min-w-0 rounded-md bg-gs-background p-2">
               <button
                 type="button"
-                aria-pressed={selected === builtIn}
+                aria-pressed={result === builtIn}
                 className="mb-2 w-full rounded-sm border border-gs-edge/40 px-2 py-1 text-sm aria-pressed:border-gs-team-blue"
                 onClick={() => {
-                  if (selected === builtIn) {
+                  if (result === builtIn) {
                     resultRef.current?.scrollIntoView({block: "nearest"});
                     return;
                   }
 
-                  setSelected(builtIn);
+                  useArenaWorkshopStore.getState().setResult(builtIn);
                 }}
               >
                 {builtIn.name}
@@ -45,28 +52,25 @@ export function ArenaWorkshop(): JSX.Element {
         </div>
       </section>
 
-      {selected && (
-        <section
-          ref={resultRef}
-          aria-label="Arena result"
-          className="rounded-md bg-gs-background p-3 [@media(max-height:680px)]:[--arena-preview-max-height:24vh]"
-        >
-          <h2 className="font-semibold">{selected.name}</h2>
+      {result && (
+        <ArenaResult ref={resultRef} arena={result.arena} name={result.name}>
+          <div className="mt-2 flex flex-wrap items-start gap-2">
+            <button
+              type="button"
+              className="rounded-md bg-gs-team-blue px-4 py-1.5 font-semibold text-gs-background"
+              onClick={() => {
+                walkTheArena(result.arena);
+              }}
+            >
+              Walk it
+            </button>
 
-          <p className="mb-2 text-sm text-gs-ui-muted">
-            {selected.arena.width} × {selected.arena.height} tiles · {levelsOf(selected.arena)}
-          </p>
-
-          <ArenaPreview arena={selected.arena} name={selected.name} />
-        </section>
+            {result.madeFromPrompt !== undefined && <SaveArena result={result} prompt={result.madeFromPrompt} />}
+          </div>
+        </ArenaResult>
       )}
+
+      <ArenaShelf />
     </div>
   );
-}
-
-function levelsOf(arena: Arena): string {
-  const count = Math.max(...arena.levels) + 1;
-  if (count === 1) return "1 level";
-
-  return `${count} levels`;
 }

@@ -4,6 +4,7 @@ import {parseInputMessage} from "@src/durable-objects/match/messages/ParseInputM
 import {parseReadyMessage} from "@src/durable-objects/match/messages/ParseReadyMessage";
 import {MatchRoom} from "@src/durable-objects/match/room/MatchRoom";
 import {MATCH_TICK} from "@src/durable-objects/match/tick/MatchTick";
+import {parseStartSeed} from "@src/durable-objects/match/start-seed/ParseStartSeed";
 import {stepsOwed} from "@src/durable-objects/match/tick/StepsOwed";
 
 /** Nothing a player may send is as long as this: a longer frame is dropped unread. */
@@ -51,7 +52,8 @@ export class Match {
 
   /**
    * The room's first connection sets how long it waits for a person (`?reconnectSeconds=`, `?idleSeconds=`, only ever shorter than the real
-   * limits: `parseForfeitLimits`); later connections' say is ignored, so a seat's person cannot shorten the other's time.
+   * limits: `parseForfeitLimits`) and may pin the seed its rounds start from (`?startSeed=`, `parseStartSeed`, a spec's seam); later
+   * connections' say is ignored, so a seat's person cannot shorten the other's time.
    */
   private openRoom(request: Request): void {
     if (this.opened) {
@@ -59,7 +61,8 @@ export class Match {
     }
 
     this.opened = true;
-    this.room = new MatchRoom(parseForfeitLimits(new URL(request.url).searchParams));
+    const search = new URL(request.url).searchParams;
+    this.room = new MatchRoom(parseForfeitLimits(search), undefined, parseStartSeed(search));
   }
 
   /** The token the browser shows (`?token=`), or `undefined` when it shows none or something too long to be one. */

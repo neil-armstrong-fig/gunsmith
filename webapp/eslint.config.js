@@ -21,6 +21,9 @@ const feedbackStoreMayImport = "^(?!zustand$|zustand/|@src/store/feedback/|\\./)
 // The workshop store (`src/store/workshop/`) holds what is written and the weapon last made: Zustand, the engine's types and its own folder.
 const workshopStoreMayImport = "^(?!zustand$|zustand/|@gunsmith/engine(?:/|$)|@src/store/workshop/|\\./).+$";
 
+// The shelf store (`src/store/shelf/`) holds the saved weapons and keeps them in the browser's storage: Zustand, zod (to read what the browser kept), the engine and its own folder.
+const shelfStoreMayImport = "^(?!zustand$|zustand/|zod$|@gunsmith/engine(?:/|$)|@src/store/shelf/|\\./).+$";
+
 export default [
   ...baseConfig({tsconfigRootDir: import.meta.dirname, allowedPackages}),
   {
@@ -143,6 +146,22 @@ export default [
             regex: feedbackStoreMayImport,
             message:
               "The feedback store may import only zustand and its own folder: it holds the cues of the damage taken, not the world and not a choice.",
+          },
+        ],
+      }),
+    },
+  },
+  {
+    // The shelf store holds the saved weapons and nothing else. After the store block above.
+    files: ["src/store/shelf/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": restrictedImports({
+        allowedPackages: ["@gunsmith/engine"],
+        patterns: [
+          {
+            regex: shelfStoreMayImport,
+            message:
+              "The shelf store may import only zustand, zod, the engine and its own folder: it holds the saved weapons and keeps them in the browser.",
           },
         ],
       }),

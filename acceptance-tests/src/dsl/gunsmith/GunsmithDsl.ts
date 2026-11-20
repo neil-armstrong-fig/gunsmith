@@ -93,6 +93,15 @@ export class GunsmithDsl {
     }
   }
 
+  /** Reloads the page, as a player does, and waits until the arena is on screen: whatever the browser keeps (the shelf) stays and the rest starts again. */
+  async reloadThePage(): Promise<void> {
+    try {
+      await this.gunsmith.reloadThePage();
+    } catch (error) {
+      throw new DslError("Failed to reload the page", error);
+    }
+  }
+
   /** Opens the game and waits until the arena is on screen. */
   async begin(): Promise<void> {
     try {

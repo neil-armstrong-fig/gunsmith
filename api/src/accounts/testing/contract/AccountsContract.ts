@@ -1,9 +1,12 @@
+import type {AccountRemoval} from "@src/accounts/types/AccountRemoval";
 import type {AccountFunctions} from "@src/accounts/types/AccountFunctions";
 import type {ItemKind} from "@src/accounts/types/ItemKind";
 import type {SaveItemResult} from "@src/accounts/types/SaveItemResult";
 
 const NOW = new Date("2026-11-19T12:00:00Z");
 const LATER = new Date("2026-11-20T12:00:00Z");
+const MUCH_LATER = new Date("2027-02-17T12:00:00Z");
+const REMOVAL: AccountRemoval = {subjectDigest: async googleSub => `digest-of-${googleSub}`, keepUntil: MUCH_LATER};
 
 /**
  * What the account functions must do, run against the in-memory ones every route test uses and against real D1, so the two cannot
@@ -97,7 +100,7 @@ export function accountsContract(makeAccounts: () => Promise<AccountFunctions>):
       await accounts.createSession({idHash: "hash-1", userId: "acct-1", expiresAt: LATER});
       await accounts.createSession({idHash: "hash-2", userId: "acct-2", expiresAt: LATER});
 
-      await accounts.removeAccount("acct-1");
+      await accounts.removeAccount("acct-1", REMOVAL);
 
       expect(await accounts.accountOfSession("hash-1", NOW)).toBeUndefined();
       expect(await accounts.accountOfSession("hash-2", NOW)).toEqual({id: "acct-2", displayName: "Loud Heron"});
@@ -105,7 +108,7 @@ export function accountsContract(makeAccounts: () => Promise<AccountFunctions>):
 
     it("makes a new account for a subject whose account was removed", async () => {
       await accounts.findOrCreateAccount("sub-1", {id: "acct-1", displayName: "Quiet Falcon", now: NOW});
-      await accounts.removeAccount("acct-1");
+      await accounts.removeAccount("acct-1", REMOVAL);
 
       const again = await accounts.findOrCreateAccount("sub-1", {id: "acct-9", displayName: "Loud Heron", now: LATER});
 
@@ -113,7 +116,83 @@ export function accountsContract(makeAccounts: () => Promise<AccountFunctions>):
     });
 
     it("removes an account that is not there without complaint", async () => {
-      await expect(accounts.removeAccount("acct-nobody")).resolves.toBeUndefined();
+      await expect(accounts.removeAccount("acct-nobody", REMOVAL)).resolves.toBeUndefined();
+    });
+  });
+
+  describe("a deleted account's credits", () => {
+    beforeEach(async () => {
+      await accounts.findOrCreateAccount("sub-1", {id: "acct-1", displayName: "Quiet Falcon", now: NOW});
+      await accounts.findOrCreateAccount("sub-2", {id: "acct-2", displayName: "Loud Heron", now: NOW});
+    });
+
+    it("hands the removed account's credit id back to the same person's digest while it is kept", async () => {
+      await accounts.removeAccount("acct-1", REMOVAL);
+
+      expect(await accounts.claimDeletedAccountId("digest-of-sub-1", LATER)).toBe("acct-1");
+    });
+
+    it("hands it back once: the claim uses the record up", async () => {
+      await accounts.removeAccount("acct-1", REMOVAL);
+      await accounts.claimDeletedAccountId("digest-of-sub-1", LATER);
+
+      expect(await accounts.claimDeletedAccountId("digest-of-sub-1", LATER)).toBeUndefined();
+    });
+
+    it("hands it to only one of two claims that arrive together", async () => {
+      await accounts.removeAccount("acct-1", REMOVAL);
+
+      const claims = await Promise.all([
+        accounts.claimDeletedAccountId("digest-of-sub-1", LATER),
+        accounts.claimDeletedAccountId("digest-of-sub-1", LATER),
+      ]);
+
+      expect(claims.filter(claim => claim === "acct-1")).toHaveLength(1);
+    });
+
+    it("hands nothing back once the time to keep it has come", async () => {
+      await accounts.removeAccount("acct-1", REMOVAL);
+
+      expect(await accounts.claimDeletedAccountId("digest-of-sub-1", new Date(MUCH_LATER.getTime() - 1000))).toBe(
+        "acct-1",
+      );
+      await accounts.removeAccount("acct-2", REMOVAL);
+      expect(await accounts.claimDeletedAccountId("digest-of-sub-2", MUCH_LATER)).toBeUndefined();
+    });
+
+    it("hands nothing back to a digest it does not hold", async () => {
+      await accounts.removeAccount("acct-1", REMOVAL);
+
+      expect(await accounts.claimDeletedAccountId("digest-of-sub-9", LATER)).toBeUndefined();
+    });
+
+    it("keeps nothing for an account that was not there", async () => {
+      await accounts.removeAccount("acct-nobody", REMOVAL);
+
+      expect(await accounts.sweepDeletedAccounts(new Date("2100-01-01T00:00:00Z"))).toEqual([]);
+    });
+
+    it("keeps only the record of the account removed", async () => {
+      await accounts.removeAccount("acct-1", REMOVAL);
+
+      expect(await accounts.claimDeletedAccountId("digest-of-sub-2", LATER)).toBeUndefined();
+    });
+
+    it("replaces a record still held for the same person when the account is made and removed again", async () => {
+      await accounts.removeAccount("acct-1", REMOVAL);
+      await accounts.findOrCreateAccount("sub-1", {id: "acct-7", displayName: "Quiet Falcon", now: LATER});
+      await accounts.removeAccount("acct-7", REMOVAL);
+
+      expect(await accounts.claimDeletedAccountId("digest-of-sub-1", LATER)).toBe("acct-7");
+    });
+
+    it("sweeps what has expired, answering the credit ids to erase, and leaves what is still kept", async () => {
+      await accounts.removeAccount("acct-1", {...REMOVAL, keepUntil: LATER});
+      await accounts.removeAccount("acct-2", REMOVAL);
+
+      expect(await accounts.sweepDeletedAccounts(LATER)).toEqual(["acct-1"]);
+      expect(await accounts.sweepDeletedAccounts(LATER)).toEqual([]);
+      expect(await accounts.claimDeletedAccountId("digest-of-sub-2", LATER)).toBe("acct-2");
     });
   });
 
@@ -267,7 +346,7 @@ export function accountsContract(makeAccounts: () => Promise<AccountFunctions>):
     it("removes an account's items with it, so a later account with the same id does not inherit them", async () => {
       await keepAndSave(["item-1"], "acct-1", "weapon");
 
-      await accounts.removeAccount("acct-1");
+      await accounts.removeAccount("acct-1", REMOVAL);
       await accounts.findOrCreateAccount("sub-3", {id: "acct-1", displayName: "Calm Otter", now: LATER});
 
       expect(await accounts.savedItemsOfAccount("acct-1")).toEqual([]);

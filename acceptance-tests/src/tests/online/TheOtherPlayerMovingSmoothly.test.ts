@@ -19,7 +19,7 @@ given("two browsers are in one private room and the first is sent only every fou
 
   when("the second player walks towards the first and stops", () => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.room.secondBrowser().player.walkFor("west", 0.8);
+      await gunsmith.room.secondBrowser().player.walkFor("north", 0.8);
       await expect.poll(() => gunsmith.room.hasBeenToldWhereTheOtherPlayerIs()).toBe(true);
     });
 

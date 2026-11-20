@@ -24,11 +24,11 @@ The game fills the window. Menus are added only when needed. Browser acceptance 
 
 ## Planned online system
 
-One Cloudflare Worker will serve static assets and `/api/*`, keeping session cookies same-origin. A Match Durable Object runs the same engine authoritatively at 60 Hz with 30 Hz snapshots; clients predict local movement and interpolate the opponent. Player snapshots must omit hidden opponents, and hidden sounds expose only quantised direction. See [netcode](match-netcode.md).
+Cloudflare Workers serve the static webapp at `gunsmith.neilarmstrong.dev` and the API at `gunsmith-api.neilarmstrong.dev`. The API allows credentialed requests from the exact webapp origin and keeps session cookies on the API hostname. A Match Durable Object runs the same engine authoritatively at 60 Hz with 30 Hz snapshots; clients predict local movement and interpolate the opponent. Player snapshots must omit hidden opponents, and hidden sounds expose only quantised direction. See [netcode](match-netcode.md).
 
 The planned API imports `ai/` in-process using Workers-compatible LangChain/LangGraph. D1 is planned for accounts, library and match history; the sign-in design is in [sign-in](sign-in.md). CreditLedger and SpendLedger Durable Objects hold credits and spend counters. Budget owns atomic spend enforcement and tracing; server owns routing and common storage configuration. Private recording storage is a future fair-play capability, not an existing binding.
 
-`api/` exists locally; `infra/` remains planned. Alchemy deployment, Google sign-in, D1, matchmaking, AI generation routes and live acceptance await real consumers, reviewed contracts and provisioning authorization. Intended deployment is `gunsmith.neilarmstrong.dev`; forks will need their own domain and manual setup.
+The API includes Google sign-in and D1 migrations. The release workflow in `infra/` uses Alchemy for D1, the application Worker and assets. Cloudflare provisioning and the first live acceptance run await authorization. Intended deployment is `gunsmith.neilarmstrong.dev`; forks will need their own domain and manual setup.
 
 ## Decisions and unresolved measurements
 

@@ -1,6 +1,5 @@
 {
-  // For `wrangler dev` only. Production is declared in `infra/` (planned) and deployed by Alchemy, which keeps the same names and
-  // bindings: change them there too.
+  // The local Worker manifest. Keep these bindings aligned with the Alchemy Worker in `infra/`.
   "name": "gunsmith-api",
   "main": "src/ApiWorker.ts",
   "compatibility_date": "2026-11-01",
@@ -16,19 +15,22 @@
     ],
   },
   // Budget alerts: `SpendLedger.alarm()` emails the 50/80/100% alerts through Email Routing (the personal site's contact Worker does the
-  // same). No `destination_address`: the recipient is the ALERT_TO_ADDRESS secret (`wrangler secret put`, or `.dev.vars` locally), so it
+  // same). No `destination_address`: the recipient is the ALERT_TO_ADDRESS secret (the root `.env.local` for local development), so it
   // never enters git, and Email Routing delivers only to an address verified in the dashboard. Unset, no alert is sent.
   "send_email": [{"name": "ALERT_MAIL"}],
   // ALLOWED_ORIGINS: the pages that may change things for a player or open a socket (`router/origin-check/`), comma separated. Local use
   // adds any localhost or 127.0.0.1 page through `ALLOW_LOOPBACK_ORIGINS`, which only the start scripts pass (`pnpm api:dev`, the managed
-  // acceptance Worker): it is never declared here or in `infra/`, so a deployed Worker cannot have it. Secrets (`wrangler secret put`, or
-  // the root `.env.local` locally, which `pnpm api:dev` passes with --env-file): GOOGLE_OAUTH_CLIENT_ID and GOOGLE_OAUTH_CLIENT_SECRET.
+  // acceptance Worker): it is never declared here or in `infra/`, so a deployed Worker cannot have it.
+  // Wrangler binds only these secrets from the shared root .env.local. Alchemy uses the deploy credentials separately.
+  "secrets": {
+    "required": ["GOOGLE_OAUTH_CLIENT_ID", "GOOGLE_OAUTH_CLIENT_SECRET", "ALERT_TO_ADDRESS", "ACCOUNT_DIGEST_KEY"],
+  },
   // GOOGLE_REDIRECT_URI is set by the start script from the port, never here.
   "vars": {"ALERT_FROM_ADDRESS": "alerts@neilarmstrong.dev", "ALLOWED_ORIGINS": "https://gunsmith.neilarmstrong.dev"},
   // Ten sign-in starts or callbacks a minute per address (`router/routes/sign-in/login-limit/LoginAllowed`); a failing limiter lets the request through.
   "ratelimits": [{"name": "LOGIN_LIMITER", "namespace_id": "2001", "simple": {"limit": 10, "period": 60}}],
   // Accounts and sessions (`src/accounts/`, D1 through Drizzle). Local `wrangler dev` makes its own database whatever the id says;
-  // `infra/` provisions the real one and gives it its id. SQL lives in `migrations/` (`pnpm db:generate` writes it, Wrangler applies it).
+  // `infra/` provisions the real one and gives it its id. SQL lives in `migrations/` (`pnpm db:generate` writes it, Alchemy applies it in production).
   "d1_databases": [
     {
       "binding": "DB",

@@ -59,9 +59,7 @@ given("two stationary players in one private room facing each other", () => {
       beforeEach(async ({gunsmith}) => {
         await expect.poll(() => gunsmith.opponent.hasHeldWeaponAccent("violet", secondPose)).toBe(true);
 
-        const first = await gunsmith.player.getPosition();
-
-        await gunsmith.player.aimAtTile({x: 2 * first.x - secondPose.x, y: 2 * first.y - secondPose.y});
+        await gunsmith.player.aimAwayFrom(secondPose);
         await expect.poll(() => gunsmith.room.hasBeenToldWhereTheOtherPlayerIs()).toBe(false);
       });
 
