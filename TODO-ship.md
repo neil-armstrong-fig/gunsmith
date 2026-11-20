@@ -6,7 +6,7 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 ## Resume here
 
-The persistent checkout is `.claude/worktrees/ship` on `worktree-ship`. Merged `origin/main` at `52443a3` before publishing the CI update. The current slice owns `.github/workflows/ci.yml`. After publication, verify that Checks reaches `pnpm checks`, all four preview shards finish and the combined HTML report is present.
+The persistent checkout is `.claude/worktrees/ship` on `worktree-ship`, fast-forwarded to `c280fbe`. The current slice owns `.github/workflows/property-tests.yml` and the root property command. After publication, verify that the next scheduled run reports all three suites and uploads `property-tests-log`. Also verify that the preview workflow reaches `pnpm checks`, all four shards finish and the combined HTML report is present.
 
 The first combined Worker from `d40d942` is live on the API hostname. The locally verified two-host release reached GitHub main at `bc47751`. The webapp custom domain serves static test Worker version `8b2f62ff-f3f9-4e83-92c4-6cdc5d0ba93d` with `noindex`. The user deferred live rollout and automatic releases while Ship stabilizes CI.
 
