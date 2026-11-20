@@ -45,6 +45,12 @@ export class GunsmithPlaywright extends BasePage {
     await this.waitForArena();
   }
 
+  /** Loads the page again, as a player's reload does, and waits for the arena. What the browser stores stays; what the page holds in memory does not. */
+  async reloadThePage(): Promise<void> {
+    await this.page.reload();
+    await this.waitForArena();
+  }
+
   /** Opens the duel with the opponent's every choice drawn from `seed`, so the same seed plays the same match. */
   async openDuel(seed: number): Promise<void> {
     await this.openScenario(`duel&seed=${seed}`);

@@ -46,11 +46,11 @@ export class WorkshopPlaywright extends BasePage {
   }
 
   async tryIt(): Promise<void> {
-    await this.page.getByRole("button", {name: "Try it"}).click();
+    await this.page.getByTestId("workshop-result").getByRole("button", {name: "Try it"}).click();
   }
 
   async hasTryIt(): Promise<boolean> {
-    return await this.page.getByRole("button", {name: "Try it"}).isVisible();
+    return await this.page.getByTestId("workshop-result").getByRole("button", {name: "Try it"}).isVisible();
   }
 
   /** Presses the mouse button down on the panel's own title, in empty space that is no button, and keeps it down. */
