@@ -288,6 +288,15 @@ export class RoomDsl {
     }
   }
 
+  /** Whether the latest snapshot the server sent this browser holds the weapon lying in the arena. One this player cannot see, or one already taken, must be absent from it. */
+  hasBeenToldWhereTheWeaponLies(): boolean {
+    try {
+      return this.room.hasBeenToldWhereTheWeaponLies();
+    } catch (error) {
+      throw new DslError("Failed to read whether the weapon is in the latest snapshot", error);
+    }
+  }
+
   /** Every event the server has told this browser about its own player, in order, exactly as the frames carried them: what a shot did to it, what its shots did, and the direction a shot was heard from. */
   getEventsReceived(): readonly unknown[] {
     try {

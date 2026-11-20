@@ -4,6 +4,7 @@ import {parseInputMessage} from "@src/durable-objects/match/messages/ParseInputM
 import {parsePreRoundMessage} from "@src/durable-objects/match/messages/ParsePreRoundMessage";
 import {parseReadyMessage} from "@src/durable-objects/match/messages/ParseReadyMessage";
 import {parsePreRoundSeconds} from "@src/durable-objects/match/pre-round-seconds/ParsePreRoundSeconds";
+import {parseRingTiming} from "@src/durable-objects/match/ring-timing/ParseRingTiming";
 import {MatchRoom} from "@src/durable-objects/match/room/MatchRoom";
 import {MATCH_TICK} from "@src/durable-objects/match/tick/MatchTick";
 import {parseStartSeed} from "@src/durable-objects/match/start-seed/ParseStartSeed";
@@ -55,7 +56,8 @@ export class Match {
   /**
    * The room's first connection sets how long it waits for a person (`?reconnectSeconds=`, `?idleSeconds=`, only ever shorter than the real
    * limits: `parseForfeitLimits`), how long the two seats have to choose (`?preRoundSeconds=`, `parsePreRoundSeconds`, `0` for none) and may
-   * pin the seed its rounds start from (`?startSeed=`, `parseStartSeed`, a spec's seam); later
+   * pin the seed its rounds start from (`?startSeed=`, `parseStartSeed`, a spec's seam) and
+   * may bring the ring sooner or faster (`?ringDelay=`, `?ringClosing=`, `parseRingTiming`); later
    * connections' say is ignored, so a seat's person cannot shorten the other's time.
    */
   private openRoom(request: Request): void {
@@ -69,6 +71,7 @@ export class Match {
       limits: parseForfeitLimits(search),
       makeSeed: parseStartSeed(search),
       preRoundSeconds: parsePreRoundSeconds(search),
+      ringTiming: parseRingTiming(search),
     });
   }
 

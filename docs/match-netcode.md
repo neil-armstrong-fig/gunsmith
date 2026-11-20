@@ -149,7 +149,7 @@ What the code gives today, and what the design still needs:
   loudness is the near, mid or far third of the sound's range. No place, no distance and **no level for each speaker**: the browser works
   out the ears from the sector and band (`webapp/src/sound/spatial/`), so the wire carries nothing finer than that. Walls do not muffle it;
   a crouched fighter's footfalls are silent (their shots are not). **Not built:** loudness by weapon, a low-pass for sounds from behind, a
-  sound file for a shot or a footfall (art), and the heard pickup in a room (rooms have no pickup). Each seat is told its own events (`SeatView.events`): its own damage, the hits it
+  sound file for a shot or a footfall (art). A heard pickup in a room is built and specified (`TwoBrowsersFightingForTheWeapon`). Each seat is told its own events (`SeatView.events`): its own damage, the hits it
   confirmed on a target it saw, its pickup, its refused trigger and the shots it heard; the room gathers every step of a tick
   (`MatchRoom`), and the browser's `OnlineMatch` puts them on the first world it shows after the snapshot. The wire message `sound` in
   the draft list above is not used: the heard shot rides in `events`. `TwoBrowsersHearingEachOther` reads the frames.
@@ -164,7 +164,7 @@ What the code gives today, and what the design still needs:
   carries `round` and `match` (scored from each seat's side), so a decided round needs no separate message. A client sends `{kind: "ready"}`;
   it counts only once the round is decided. When both seats have sent it the server begins the next round (score kept) or, after a decided
   match, a fresh match. A snapshot carries `ready {player, opponent}` so a seat can say it is waiting. Specs: `TwoBrowsersPlayingARound`,
-  `TwoBrowsersPlayingABestOfThree`. Not built: the pre-round phase, deadlines, the ring and pickup in a room.
+  `TwoBrowsersPlayingABestOfThree`. Not built: the pre-round phase, deadlines. A room round has the closing ring and a submachine gun lying fair between the seats (2026-11-20).
 
 ## Open questions
 

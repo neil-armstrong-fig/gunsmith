@@ -459,4 +459,11 @@ export class RoomPlaywright extends BasePage {
 
     return snapshots.at(-1)?.opponent !== undefined;
   }
+
+  /** Whether the latest snapshot sent to this browser holds the weapon lying in the arena. */
+  hasBeenToldWhereTheWeaponLies(): boolean {
+    const snapshots = snapshotsOfFrames(this.framesReceived);
+
+    return snapshots.at(-1)?.pickup !== undefined;
+  }
 }

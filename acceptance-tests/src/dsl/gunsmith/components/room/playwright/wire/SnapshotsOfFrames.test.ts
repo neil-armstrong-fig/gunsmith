@@ -36,3 +36,13 @@ it("reads the events a snapshot carries, and none from a frame whose events are 
 it("treats a null opponent as absent", () => {
   expect(snapshotsOfFrames([JSON.stringify({kind: "snapshot", opponent: null})])).toEqual([{}]);
 });
+
+it("keeps the weapon lying in the arena when the frame tells of one, and treats a null or missing one as absent", () => {
+  const snapshots = snapshotsOfFrames([
+    JSON.stringify({kind: "snapshot", pickup: {position: {x: 10.5, y: 5.5}}}),
+    JSON.stringify({kind: "snapshot", pickup: null}),
+    JSON.stringify({kind: "snapshot"}),
+  ]);
+
+  expect(snapshots).toEqual([{pickup: {position: {x: 10.5, y: 5.5}}}, {}, {}]);
+});
