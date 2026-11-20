@@ -57,6 +57,11 @@ jobs:
 
       - run: pnpm --filter @gunsmith/webapp compile
 
+      - name: Require noindex in the release assets
+        shell: bash
+        run: |
+          diff -u <(printf '/*\n  X-Robots-Tag: noindex\n') webapp/build/_headers
+
       - name: Record the built commit
         run: printf '{"commit":"%s"}\n' "$GITHUB_SHA" > webapp/build/release.json
 
@@ -207,7 +212,7 @@ jobs:
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           ALERT_TO_ADDRESS: ${{ secrets.ALERT_TO_ADDRESS }}
 
-      - name: Wait for the deployed commit and check D1
+      - name: Verify the deployed commit, noindex and D1
         if: steps.tip.outputs.current == 'true'
         shell: bash
         run: |
@@ -215,6 +220,11 @@ jobs:
           for _ in $(seq 1 30); do
             if curl --fail --silent --max-time 5 "$SITE_ORIGIN/release.json?commit=$GITHUB_SHA" |
                 jq -e --arg commit "$GITHUB_SHA" '.commit == $commit' > /dev/null; then
+              if ! curl --fail --silent --show-error --max-time 10 --dump-header - --output /dev/null "$SITE_ORIGIN/" |
+                  tr -d '\r' | grep -iEx 'X-Robots-Tag:[[:blank:]]*noindex[[:blank:]]*' > /dev/null; then
+                echo 'The deployed homepage must return X-Robots-Tag: noindex.' >&2
+                exit 1
+              fi
               curl --fail --silent --show-error --max-time 10 --cookie 'session=release-check' "$SITE_ORIGIN/api/me" |
                 jq -e '.signedIn == false' > /dev/null
               printf 'Deployed `%s` to %s.\n' "$GITHUB_SHA" "$SITE_ORIGIN" >> "$GITHUB_STEP_SUMMARY"

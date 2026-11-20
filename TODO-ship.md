@@ -4,7 +4,7 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 ## Resume here
 
-The persistent checkout is `.claude/worktrees/ship` on `worktree-ship`, synced to `origin/main` at `5643770`. The release workflow and infrastructure are implemented and awaiting review. Next, get the release changes onto main, confirm hosted preview acceptance, then verify two deployments in an authorized throwaway account.
+The persistent checkout is `.claude/worktrees/ship` on `worktree-ship`, synced to `origin/main` at `0143379` by merge `3dd9646`. The release now gates the built and hosted webapp on `noindex`. All seven credential names are present in GitHub Actions. The owner uploaded them from the shared root `.env.local`; the Cloudflare read-only checks passed. The release changes await the owner’s commit. Provision and verify production before enabling GitHub deployments.
 
 Ship fixed the M1 pickup-marker acceptance setup. The [handoff](HANDOFF.md#latest-ship-delivery) records the original failing criterion, screenshot evidence and retained-marker check.
 
@@ -43,13 +43,15 @@ server supplies Worker/DO/storage bindings; budget supplies operational limits; 
 ## Later tasks
 
 - [x] Implement the gated deploy and full live acceptance. Property checks remain independent, and AI owns its eval workflow.
-- [ ] Verify Alchemy D1 and Worker deployment in the throwaway account, then repeat after production authorization. Follow [First deploy](MANUAL-SETUP-STEPS.md#first-deploy).
+- [ ] Verify the first Alchemy D1 and Worker deployment on production with `noindex`, then verify a GitHub redeploy preserves resources. Follow [First deploy](MANUAL-SETUP-STEPS.md#first-deploy).
 - [ ] Before publication, scrub secrets/history, local settings, personal paths and addresses. No deploy, commit or push without the required authorization.
 - [ ] Final tuning and case-study evidence, including the shutdown drill and real measurements.
 - [x] Scaffold the infra package and its instructions. Keep the local Wrangler manifest and deployed Alchemy bindings aligned.
 - [ ] Measure infrastructure costs with server/AI runtime measurements before proposing free versus Workers Paid.
 
 ## Verification/latest delivery
+
+2026-11-20 production release setup: the build gate failed before `_headers` existed and then passed. The live CI check passed against a local Worker with migrated D1 and failed against a Vite preview missing the header. An SVG also carried `noindex`. `pnpm checks` passed lint, formatting, strict types and 3,646 tests with one existing audio skip. Production-preview acceptance passed 526 of 526 with no retries. The managed wrappers logged shutdown errors after the tests and the run exited zero. Workflow lint and Wrangler dry run passed.
 
 2026-11-19 infrastructure review: split database provisioning, Worker deployment and release handling into subject folders. Alchemy declares the database and Worker directly. The routing mutation failed only the same-origin configuration test. GitHub Actions step spacing has been normalized across workflows and the composite action.
 
