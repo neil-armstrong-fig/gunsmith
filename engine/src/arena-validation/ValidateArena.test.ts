@@ -95,8 +95,48 @@ it("counts a cover block as wall when it asks for the floor", () => {
   expect(problems.map(problem => problem.kind)).toEqual(["tooWalled"]);
 });
 
-it("reports a cut-off region and the lack of floor together, the cut-off one first", () => {
+it("reports a cut-off region, the lack of places to stand and the lack of floor together, in that order", () => {
   const problems = validateArena(arenaFrom(["########", "#.#.####", "########"]));
 
-  expect(problems.map(problem => problem.kind)).toEqual(["disconnected", "tooWalled"]);
+  expect(problems.map(problem => problem.kind)).toEqual(["disconnected", "noStartingPlaces", "tooWalled"]);
+});
+
+it("reports an arena with a single place to stand, where the two fighters cannot both start", () => {
+  const problems = validateArena(arenaFrom(["###", "#.#", "###"]));
+
+  expect(problems).toContainEqual({
+    kind: "noStartingPlaces",
+    tile: undefined,
+    reason: "The arena has fewer than two places to stand, so the two fighters cannot both start.",
+  });
+});
+
+it("accepts an arena with exactly two places to stand, the fighters starting at its two ends", () => {
+  expect(validateArena(arenaFrom([".."]))).toEqual([]);
+});
+
+it("does not say there is nowhere to start when only the middle of the arena is cut off from the rest of it", () => {
+  const rows = ["#########", "#..###..#", "#..#.#..#", "#..###..#", "#########"];
+
+  const kinds = validateArena(arenaFrom(rows)).map(problem => problem.kind);
+
+  expect(kinds).toContain("disconnected");
+  expect(kinds).not.toContain("noStartingPlaces");
+});
+
+it("reports an arena whose two places to stand are on different levels, since the fighters start on one", () => {
+  const kinds = validateArena(arenaFrom(["#####", "#.>1#", "#####"])).map(problem => problem.kind);
+
+  expect(kinds).toContain("noStartingPlaces");
+});
+
+it("accepts an arena with two places to stand on a platform, though no two on the low ground", () => {
+  expect(validateArena(arenaFrom([".>11"]))).toEqual([]);
+});
+
+it("finds places to stand in a later region when the first one has only a single tile", () => {
+  const kinds = validateArena(arenaFrom(["#######", "#.#...#", "#######"])).map(problem => problem.kind);
+
+  expect(kinds).toContain("disconnected");
+  expect(kinds).not.toContain("noStartingPlaces");
 });

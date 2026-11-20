@@ -1,4 +1,4 @@
-import {isPlaceToStand} from "@gunsmith/engine/arena-symmetry/spawn-pairs/IsPlaceToStand";
+import {isPlaceToStand} from "@gunsmith/engine/arena-symmetry/IsPlaceToStand";
 import type {PlacePair} from "@gunsmith/engine/arena-symmetry/spawn-pairs/types/PlacePair";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
