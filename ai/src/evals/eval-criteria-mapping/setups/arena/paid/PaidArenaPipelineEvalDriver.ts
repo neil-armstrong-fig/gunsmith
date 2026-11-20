@@ -18,7 +18,7 @@ export class PaidArenaPipelineEvalDriver extends ArenaPipelineEvalDriver {
     super({tier: "paid", requestedTrials, defaultTrials: 1, keepsGeneratedByDefault: false});
   }
 
-  // `EVAL_ARENA_FORMAT=shapes` has the model describe the arena as shapes instead of rows, as the local tier does.
+  // `EVAL_ARENA_FORMAT=rows` has the model draw the rows itself instead of shapes (the default), as the local tier does.
   protected createModels(): ArenaPipelineDependencies {
     return {
       ...createPaidArenaModels(),

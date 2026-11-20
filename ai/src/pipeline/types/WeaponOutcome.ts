@@ -1,3 +1,4 @@
+import type {ModelUsage} from "@gunsmith/ai/pipeline/types/ModelUsage";
 import type {WeaponOutcomeStatus} from "@gunsmith/ai/pipeline/types/WeaponOutcomeStatus";
 import type {AppearanceOutcome} from "@gunsmith/ai/pipeline/appearance/types/AppearanceOutcome";
 
@@ -19,5 +20,10 @@ export interface WeaponOutcome {
    */
   nodes: string[];
   /** Model calls made, both stages together (five at most), so a test can prove a rejection cost nothing (or one call). */
-  modelCalls: number;
+  modelCalls: number; /**
+   * What the models reported they used, in tokens, summed over every call of the request (moderation, generation, each repair and
+   * the drawing), so a settle can price tokens and not calls. Zero for a call that reported nothing. Always set by the pipeline;
+   * optional in the type until the consumers' own outcome literals carry it (HANDOFF, 2026-11-19).
+   */
+  usage?: ModelUsage;
 }

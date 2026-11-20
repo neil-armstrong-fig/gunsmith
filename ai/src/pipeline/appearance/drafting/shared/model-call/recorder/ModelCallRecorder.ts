@@ -10,6 +10,9 @@ import type {LLMResult} from "@langchain/core/outputs";
  */
 export class ModelCallRecorder extends BaseCallbackHandler {
   name = "ModelCallRecorder";
+  // Awaited, so the graph waits for the report: otherwise LangChain runs it on one shared background queue, behind whatever is
+  // already queued (a tracer's report, another request's), and the call's tokens are read before they are recorded.
+  override awaitHandlers = true;
   inputTokens = 0;
   outputTokens = 0;
   toolCallArguments: unknown = undefined;

@@ -1,10 +1,12 @@
 # TODO: art
 
+**FOCUS ON MVP TASKS FIRST**
+
 Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only relevant dependencies.
 
 ## Resume here
 
-Art is in `.claude/worktrees/art` on `worktree-art`. Last merged GitHub main: `e907866`. The validated art merge `0143379`, including the submachine gun inventory icon from `8318df4`, was pushed to GitHub main.
+Art is in `.claude/worktrees/art` on `worktree-art`. Last merged GitHub main: `460f3bb`. The validated art merge `0143379`, including the submachine gun inventory icon from `8318df4`, was pushed to GitHub main.
 
 The local workshop's full-shelf replacement picker is committed at `8c0adef`. `SavedWeaponSummary` supplies the thumbnail, name, power rating and prompt for both the shelf and `ReplacementChoice`. `TheWeaponShelf` checks distinct prompts on identical stand-in weapons and replacement in place.
 
@@ -15,6 +17,10 @@ Room weapon art and its two-browser spec are integrated. The user's approved low
 The workshop weapon result card now has the authored picture beside the name, a power meter and six compact stat rows. Integrated from `457ba87` via `3912cb1`, alongside Play’s Try it action.
 
 The workshop arena preview is integrated from `a091b3e` via `eeb19d3`. The built-in pool supplies Duel and Fair duel. The match and preview render the same terrain through React Three Fiber. Reuse the preview for future pre-round choices.
+
+The [runtime grammar review](docs/art/concepts/top-down-oddities/README.md#runtime-grammar-review--2026-11-20)
+covers all twelve studies at 64 and 32 px per tile. The evidence is ready for AI and Engine to review
+for production appearance association. Keep a defining structural feature outside the fighter's silhouette.
 
 AI and Engine own the production appearance association. For S4-1, recheck the refused pickup's body and outline separately from its muzzle at both scales once AI delivers the contrast change.
 
@@ -63,7 +69,8 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [x] Accept native Safari audio as good enough by user decision on 2026-11-17; close the onset, first-gesture wake-up and fast-repeat listening follow-up without additional device testing. This records acceptance, not new headphone/speaker measurements.
 - [ ] Check fatigue, masking and levels on headphones/speakers once AI/play wire the real weapon-shot synth into runtime audio. The current game output only has the static empty click; general audition approval is not proof of these tests.
 - [ ] Map future static cues to approved MP3 as play integrates them; support playback/ducking/volume integration. Weapon-shot synthesis belongs to AI; art supplies static cues. Crunch export and current ring-onset mapping reviewed on 2026-11-17; future outgoing-hit/static cues remain open.
-- [ ] Review the visual-schema proposal with AI and engine; validate supported oddities in top-down compositions at 64/32 px using the agreed grammar.
+- [x] Review all twelve oddities at 64/32 px per tile using the current appearance grammar and renderer.
+- [ ] Review Art's findings with AI and Engine as part of production appearance association.
 
 ## Later tasks
 
@@ -90,6 +97,14 @@ Agree manifest keys/anchors with play and supported visual grammar with AI befor
 - [ ] Case-study diagrams: pipeline, cost safeguards and eval loop.
 
 ## Verification/latest delivery
+
+2026-11-20, runtime appearance review in `worktree-art`. All twelve studies
+passed the AI appearance validator and were inspected in the current
+structural tier. The lantern and cactus passed the seeded pickup, fog and
+held-art checks at 64 and 32 px per tile. Chromium passed all 25 focused
+production criteria without retries. `pnpm checks` passed on Node 26.13.1
+with 3,741 tests and one existing audio skip. The documentation review
+checked the new links and audited the changed folders and references.
 
 The arena and weapon Save controls each delegate their three rendered
 states to separate components. Shelf actions stay in the parent.

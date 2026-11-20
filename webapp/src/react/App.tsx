@@ -1,6 +1,8 @@
 import {AmmoHud} from "@src/react/components/dom/ammo-hud/AmmoHud";
 import {ConnectionNotice} from "@src/react/components/dom/connection-notice/ConnectionNotice";
+import {FrontDoor} from "@src/react/components/dom/front-door/FrontDoor";
 import {HealthHud} from "@src/react/components/dom/health-hud/HealthHud";
+import {PreRound} from "@src/react/components/dom/pre-round/PreRound";
 import {RingHud} from "@src/react/components/dom/ring-hud/RingHud";
 import {RoundBanner} from "@src/react/components/dom/round-banner/RoundBanner";
 import {ScoreHud} from "@src/react/components/dom/score-hud/ScoreHud";
@@ -27,6 +29,10 @@ export function App(): JSX.Element {
       <ConnectionNotice />
 
       <Workshop />
+
+      <PreRound />
+
+      <FrontDoor />
     </>
   );
 }

@@ -7,12 +7,12 @@ import {askForArenaDraft} from "@gunsmith/ai/pipeline/arena/arena-drafting/share
 
 /**
  * Asks the strong model to write the arena a player described: the instructions in one message, the player's words apart from them
- * in a `<request>` data block. `format` is how the model is asked to describe the arena (rows, by default, or shapes). The answer is `unknown` until `validate` has parsed it (`askForArenaDraft`).
+ * in a `<request>` data block. `format` is how the model is asked to describe the arena (rows or shapes). The answer is `unknown` until `validate` has parsed it (`askForArenaDraft`).
  */
 export async function generateArenaDraft(
   prompt: string,
   generator: BaseChatModel,
-  format: ArenaFormat = "rows",
+  format: ArenaFormat,
 ): Promise<unknown> {
   const kit = draftingKitOf(format);
 

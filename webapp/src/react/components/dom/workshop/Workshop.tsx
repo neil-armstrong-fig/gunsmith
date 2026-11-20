@@ -5,6 +5,7 @@ import {WeaponShelf} from "@src/react/components/dom/workshop/components/weapon-
 import {WeaponPrompt} from "@src/react/components/dom/workshop/components/weapon-prompt/WeaponPrompt";
 import {usePracticeResetKey} from "@src/react/components/dom/workshop/hooks/use-practice-reset-key/UsePracticeResetKey";
 import {useWorkshopKey} from "@src/react/components/dom/workshop/hooks/use-workshop-key/UseWorkshopKey";
+import {usePressedKey} from "@src/react/hooks/use-pressed-key/UsePressedKey";
 import {useAppStore} from "@src/store/app/UseAppStore";
 import {useArenaWorkshopStore} from "@src/store/workshop/arena/UseArenaWorkshopStore";
 import type {JSX, KeyboardEvent} from "react";
@@ -18,6 +19,8 @@ export function Workshop(): JSX.Element | undefined {
   useWorkshopKey();
   usePracticeResetKey();
   const open = useAppStore(state => state.workshopOpen);
+  // Escape also shuts the panel when the focus has left it (a pressed Save turns disabled and the focus falls to the page); inside the panel its own handler does it first.
+  usePressedKey("Escape", closeTheWorkshop, open);
   const walkingAnArena = useArenaWorkshopStore(state => state.practiceWorld !== undefined);
   const [showArenas, setShowArenas] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -107,6 +110,10 @@ function keepToThePanel(event: KeyboardEvent): void {
   event.stopPropagation();
 
   if (event.code === "Escape") {
-    useAppStore.getState().closeWorkshop();
+    closeTheWorkshop();
   }
+}
+
+function closeTheWorkshop(): void {
+  useAppStore.getState().closeWorkshop();
 }

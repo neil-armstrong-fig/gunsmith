@@ -5,7 +5,10 @@ holds the two things the root `AGENTS.md` points here for, and the JSX conventio
 
 - **Every component gets its own file, in its own folder**, however small it is or how few callers it has. This is the one
   place the root rule about declaring functions below their callers does not apply: that rule is for plain functions.
-  Inline a component only where extracting it would be actively misleading, and say why in a comment.
+  **Never a second component in a file**, not even a private one only that file uses (a `Side` or a `Row` under its
+  parent's `Props`): it goes in `<parent folder>/components/<name>/<Name>.tsx` with its own `Props`. A file holds one
+  component and its plain helper functions. Inline a component only where extracting it would be actively misleading,
+  and say why in a comment.
 - **A component's props interface is called `Props` and is not exported.** It stays in the component's file.
 - **A blank line between sibling JSX elements**, in the DOM and in a react-three-fiber tree. The `<circleGeometry>` and
   the `<meshBasicMaterial>` inside a `<mesh>` are siblings, and so are three `<span>`s in a row. Two elements pressed

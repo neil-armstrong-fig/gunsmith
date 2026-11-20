@@ -144,7 +144,7 @@ describe("with a seeded opponent", () => {
       return undefined;
     });
 
-    expect(taken?.opponent?.loadout[1]?.weapon).toBe(SUBMACHINE_GUN);
+    expect(taken?.opponent?.loadout[0]?.weapon).toBe(SUBMACHINE_GUN);
     expect(taken?.player.health).toBe(PLAYER_HEALTH);
   });
 
