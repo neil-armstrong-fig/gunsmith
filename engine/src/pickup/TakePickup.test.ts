@@ -18,6 +18,8 @@ it("is taken by the player who stands on it, who holds it and leaves nothing lyi
   expect(taking.player.loadout[1]?.weapon).toBe(SUBMACHINE_GUN);
   expect(taking.player.equippedIndex).toBe(1);
   expect(taking.opponent).toEqual(opponent);
+  expect(taking.playerTookPickup).toBe(true);
+  expect(taking.opponentTookPickup).toBe(false);
 });
 
 it("is taken by the opponent by the same rule", () => {
@@ -26,6 +28,8 @@ it("is taken by the opponent by the same rule", () => {
   expect(taking.pickup).toBeUndefined();
   expect(taking.opponent?.loadout[1]?.weapon).toBe(SUBMACHINE_GUN);
   expect(taking.player).toEqual(player);
+  expect(taking.opponentTookPickup).toBe(true);
+  expect(taking.playerTookPickup).toBe(false);
 });
 
 it("is taken from just inside its reach and not from just outside it", () => {
@@ -69,6 +73,7 @@ it("changes nothing when nothing lies there, or there is no opponent", () => {
     player,
     opponent,
     playerTookPickup: false,
+    opponentTookPickup: false,
   });
   expect(takePickup(lying, {player: {...player, position: at(5.5)}}).opponent).toBeUndefined();
 });

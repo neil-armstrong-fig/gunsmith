@@ -2,6 +2,7 @@ import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import {fairStart} from "@gunsmith/engine/arena-symmetry/FairStart";
 import {DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/DuelBuiltInArena";
+import type {CombatEvent} from "@gunsmith/engine/combat-events/types/CombatEvent";
 import {stepFighters} from "@gunsmith/engine/game-loop/StepFighters";
 import type {FighterInputs} from "@gunsmith/engine/game-loop/types/FighterInputs";
 import type {Input} from "@gunsmith/engine/game-loop/types/Input";
@@ -54,6 +55,8 @@ export class MatchRoom {
   private readonly present: Record<Seat, boolean> = {first: true, second: true};
   private readonly silentSeconds: Record<Seat, number> = {first: 0, second: 0};
   private world: World | undefined;
+  /** What happened to each seat in the steps of the last `tick`, in order: the engine tells one step's, and a tick may play several. */
+  private happened: Record<Seat, CombatEvent[]> = {first: [], second: []};
 
   /**
    * `limits` is how long the room waits for a person (the real ones unless a page asked for shorter). `makeToken` makes the secret each
@@ -178,6 +181,7 @@ export class MatchRoom {
    * plays it). A reload, weapon switch or trigger pull is played in the first step only.
    */
   tick(steps = 1): void {
+    this.happened = {first: [], second: []};
     if (!this.world || steps <= 0) {
       return;
     }
@@ -186,6 +190,8 @@ export class MatchRoom {
     let world = this.world;
     for (let step = 0; step < steps; step += 1) {
       world = stepFighters(world, this.inputsOfStep(step), MATCH_TICK.stepSeconds);
+      this.happened.first.push(...(world.events ?? []));
+      this.happened.second.push(...(world.opponentEvents ?? []));
     }
     this.world = world;
     this.asked.first = withoutOneShots(this.asked.first);
@@ -212,7 +218,23 @@ export class MatchRoom {
       return undefined;
     }
 
-    return {kind: "snapshot", ...viewOfSeat(this.world, seat), ack: this.acked[seat], ready: this.readinessOf(seat)};
+    return {
+      kind: "snapshot",
+      ...viewOfSeat(this.world, seat),
+      events: this.eventsOf(seat),
+      ack: this.acked[seat],
+      ready: this.readinessOf(seat),
+    };
+  }
+
+  /** What happened to `seat` in the steps of the last tick, or `undefined` when nothing did. */
+  private eventsOf(seat: Seat): readonly CombatEvent[] | undefined {
+    const events = this.happened[seat];
+    if (events.length === 0) {
+      return undefined;
+    }
+
+    return events;
   }
 
   /** The round after the one `match` has just ended, or a fresh match when `match` is decided. */

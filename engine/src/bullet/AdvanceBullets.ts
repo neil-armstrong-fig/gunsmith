@@ -3,6 +3,7 @@ import {bulletsStillFlying} from "@gunsmith/engine/bullet/flight/BulletsStillFly
 import {meetBullet} from "@gunsmith/engine/bullet/flight/MeetBullet";
 import {damageDealtBy} from "@gunsmith/engine/bullet/hit/DamageDealtBy";
 import {landedHitsOf} from "@gunsmith/engine/bullet/hit/LandedHitsOf";
+import {landedHitsOfOpponent} from "@gunsmith/engine/bullet/hit/LandedHitsOfOpponent";
 import {strikesOf} from "@gunsmith/engine/bullet/hit/StrikesOf";
 import type {BulletFlight} from "@gunsmith/engine/bullet/types/BulletFlight";
 import type {FlightRequest} from "@gunsmith/engine/bullet/types/FlightRequest";
@@ -15,7 +16,8 @@ import {hurtDummies} from "@gunsmith/engine/dummy/HurtDummies";
  * meets a target and a wall in the same step hurts the target if the target was nearer. Every bullet is judged against the
  * dummies and fighters as they stood at the start of the step, so two bullets landing together both count. Returns the
  * bullets still in the air, the dummies still standing, the damage that landed on each fighter, and every player's bullet
- * that landed on a target (`playerHits`, not yet judged for whether the player could see it).
+ * that landed on a target (`playerHits`, not yet judged for whether the player could see it) and every opponent's bullet that
+ * landed on the player (`opponentHits`, likewise).
  */
 export function advanceBullets(arena: Arena, flightRequest: FlightRequest): BulletFlight {
   const meetings = flightRequest.bullets.map(bullet => meetBullet(arena, flightRequest, bullet));
@@ -26,5 +28,6 @@ export function advanceBullets(arena: Arena, flightRequest: FlightRequest): Bull
     playerDamage: damageDealtBy(meetings, "opponent"),
     opponentDamage: damageDealtBy(meetings, "player"),
     playerHits: landedHitsOf(meetings),
+    opponentHits: landedHitsOfOpponent(meetings),
   };
 }

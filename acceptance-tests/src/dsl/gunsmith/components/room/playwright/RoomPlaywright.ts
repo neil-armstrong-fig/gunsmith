@@ -450,6 +450,11 @@ export class RoomPlaywright extends BasePage {
     return Math.hypot(shown.x - told.x, shown.y - told.y);
   }
 
+  /** Every event the server has told this browser, in the order it was told them, as the frames carried them. */
+  getEventsReceived(): readonly unknown[] {
+    return snapshotsOfFrames(this.framesReceived).flatMap(snapshot => snapshot.events ?? []);
+  }
+
   /** Whether the latest snapshot sent to this browser holds the other seat's fighter. */
   hasBeenToldWhereTheOtherPlayerIs(): boolean {
     const snapshots = snapshotsOfFrames(this.framesReceived);

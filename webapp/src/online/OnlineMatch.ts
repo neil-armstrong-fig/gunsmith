@@ -7,6 +7,7 @@ import type {Player} from "@gunsmith/engine/player/types/Player";
 import {worldOfSeatView} from "@gunsmith/engine/seat/WorldOfSeatView";
 import {opponentAt} from "@src/online/interpolation/OpponentAt";
 import {RenderClock} from "@src/online/interpolation/RenderClock";
+import type {EventsOfSnapshots} from "@src/online/types/EventsOfSnapshots";
 import {SnapshotBuffer} from "@src/online/interpolation/SnapshotBuffer";
 import {parseServerMessage} from "@src/online/messages/ParseServerMessage";
 import {inputChanged} from "@src/online/prediction/changes/InputChanged";
@@ -54,6 +55,8 @@ export class OnlineMatch {
   private latest: World | undefined;
   private ready: Readiness | undefined;
   private readonly snapshots = new SnapshotBuffer(SNAPSHOTS_KEPT);
+  /** What the snapshots since the last `takeEvents` said happened to this player; kept until taken, so a frame that comes late loses none. */
+  private eventsNotYetTaken: EventsOfSnapshots | undefined;
   private readonly renderClock = new RenderClock(INTERPOLATION_DELAY_SECONDS);
   private history = new InputHistory(HISTORY_STEPS);
   private predicted: Player | undefined;
@@ -90,6 +93,7 @@ export class OnlineMatch {
   /**
    * The world to draw: the newest snapshot's, with this player where the browser has them and the other fighter where the blend puts
    * them. `leftoverSeconds` is how far the frame is into the step after the last played. `undefined` until the first snapshot comes.
+   * Its `events` are none: what snapshots carried is read once with `takeEvents`, not once a frame.
    */
   worldToShow(leftoverSeconds: number): World | undefined {
     const latest = this.latest;
@@ -103,7 +107,24 @@ export class OnlineMatch {
       newestElapsedSeconds: newest.elapsedSeconds,
     });
 
-    return {...latest, player: this.shownPlayer(latest.player), opponent: opponentAt(this.snapshots.all, shownAt)};
+    return {
+      ...latest,
+      player: this.shownPlayer(latest.player),
+      opponent: opponentAt(this.snapshots.all, shownAt),
+      events: undefined,
+    };
+  }
+
+  /**
+   * What the snapshots that came since this was last called said happened to this player (damage, hits, a pickup, a shot or footfall
+   * heard) with the game time they cover, or `undefined` when none came: the sounds ask once a frame and play each event once. A
+   * frame that has no news must not be mistaken for a quiet snapshot, which is why a quiet one comes back with no events and a time.
+   */
+  takeEvents(): EventsOfSnapshots | undefined {
+    const taken = this.eventsNotYetTaken;
+    this.eventsNotYetTaken = undefined;
+
+    return taken;
   }
 
   /** Asks the server to go on, to the next round or, once the match is decided, to a fresh one. It begins when both players have asked. */
@@ -204,7 +225,19 @@ export class OnlineMatch {
     }
   }
 
+  /** Adds a snapshot's events and the game time since the one before it (none for the first, and none when a new round turned the clock back) to those not yet taken. */
+  private noteEvents(message: SnapshotFrame): void {
+    const before = this.latest?.elapsedSeconds;
+    const seconds = Math.max(0, message.elapsedSeconds - (before ?? message.elapsedSeconds));
+
+    this.eventsNotYetTaken = {
+      events: [...(this.eventsNotYetTaken?.events ?? []), ...(message.events ?? [])],
+      seconds: (this.eventsNotYetTaken?.seconds ?? 0) + seconds,
+    };
+  }
+
   private takeSnapshot(arena: Arena, message: SnapshotFrame): void {
+    this.noteEvents(message);
     this.latest = worldOfSeatView(arena, message);
     this.ready = message.ready;
     this.snapshots.add({

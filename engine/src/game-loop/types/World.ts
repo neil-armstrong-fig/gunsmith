@@ -33,4 +33,10 @@ export interface World {
   pickup?: Pickup | undefined;
   /** What happened to the local player in the step that made this world, and only that step; absent when nothing did, and in a frozen world. */
   events?: readonly CombatEvent[] | undefined;
+  /**
+   * What happened to the opponent in the step that made this world, by the same rules and in the same words as `events`, for a
+   * second person to be told (`viewOfSeat`); absent when nothing did, in a frozen world and when the world has no opponent. Nothing
+   * reads it in a match against a brain.
+   */
+  opponentEvents?: readonly CombatEvent[] | undefined;
 }

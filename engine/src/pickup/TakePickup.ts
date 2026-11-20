@@ -14,13 +14,13 @@ import type {Player} from "@gunsmith/engine/player/types/Player";
 export function takePickup(pickup: Pickup | undefined, fighters: Fighters): PickupTaking {
   const {player, opponent} = fighters;
   if (!pickup) {
-    return {pickup, player, opponent, playerTookPickup: false};
+    return {pickup, player, opponent, playerTookPickup: false, opponentTookPickup: false};
   }
 
   const playerDistance = distanceInReach(player, pickup);
   const opponentDistance = opponent && distanceInReach(opponent, pickup);
   if (playerDistance === undefined && opponentDistance === undefined) {
-    return {pickup, player, opponent, playerTookPickup: false};
+    return {pickup, player, opponent, playerTookPickup: false, opponentTookPickup: false};
   }
 
   if (
@@ -28,10 +28,22 @@ export function takePickup(pickup: Pickup | undefined, fighters: Fighters): Pick
     opponentDistance !== undefined &&
     (playerDistance === undefined || opponentDistance <= playerDistance)
   ) {
-    return {pickup: undefined, player, opponent: withPickedUpWeapon(opponent, pickup.weapon), playerTookPickup: false};
+    return {
+      pickup: undefined,
+      player,
+      opponent: withPickedUpWeapon(opponent, pickup.weapon),
+      playerTookPickup: false,
+      opponentTookPickup: true,
+    };
   }
 
-  return {pickup: undefined, player: withPickedUpWeapon(player, pickup.weapon), opponent, playerTookPickup: true};
+  return {
+    pickup: undefined,
+    player: withPickedUpWeapon(player, pickup.weapon),
+    opponent,
+    playerTookPickup: true,
+    opponentTookPickup: false,
+  };
 }
 
 /** How far the fighter is from the pickup, or `undefined` when they have no health left or are out of reach. */

@@ -1,8 +1,10 @@
 import {SOUND_KEYS} from "@src/assets/sounds/SoundKeys";
 import {SOUND_URLS} from "@src/assets/sounds/SoundUrls";
 import type {SoundKey} from "@src/assets/sounds/types/SoundKey";
+import type {PlayOptions} from "@src/sound/types/PlayOptions";
 import type {SoundOutput} from "@src/sound/types/SoundOutput";
 import type {LoopVoice} from "@src/sound/web-audio/types/LoopVoice";
+import {connectVoice} from "@src/sound/web-audio/voice/ConnectVoice";
 
 const LOOP_FADE_SECONDS = 0.1;
 
@@ -42,7 +44,7 @@ export class WebAudioOutput implements SoundOutput {
     this.context = undefined;
   }
 
-  play(key: SoundKey): void {
+  play(key: SoundKey, options?: PlayOptions): void {
     const {context} = this;
     const buffer = this.buffers.get(key);
     if (!context || !buffer || this.isMuted() || context.state !== "running") {
@@ -53,7 +55,7 @@ export class WebAudioOutput implements SoundOutput {
 
     const voice = context.createBufferSource();
     voice.buffer = buffer;
-    voice.connect(context.destination);
+    connectVoice(context, voice, options);
     voice.start();
     this.voices.set(key, voice);
   }

@@ -2,6 +2,7 @@ import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import {fairStart} from "@gunsmith/engine/arena-symmetry/FairStart";
 import {SPAWN_SPACING_STEPS} from "@gunsmith/engine/arena-symmetry/SpawnSpacing";
 import {DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/DuelBuiltInArena";
+import type {CombatEvent} from "@gunsmith/engine/combat-events/types/CombatEvent";
 import type {Input} from "@gunsmith/engine/game-loop/types/Input";
 import {routeDistancesFrom} from "@gunsmith/engine/pickup/placement/RouteDistancesFrom";
 import type {Seat} from "@gunsmith/engine/seat/types/Seat";
@@ -338,6 +339,49 @@ it("does not play a click again on the ticks after it", () => {
   room.tick(3);
 
   expect(room.snapshotFor("first")?.player.loadout[0]?.rounds).toBe(rounds - 1);
+});
+
+it("tells a seat which way the other seat's shot came from, with every step of a tick counted, not only the last", () => {
+  const room = startedRoom();
+  const aimAt = room.snapshotFor("first")?.player.position;
+  room.setInput("second", {...IDLE, aimAt, firing: true}, 0);
+
+  room.tick(5);
+
+  expect(room.snapshotFor("first")?.events).toEqual([
+    {kind: "heard", sound: "shot", sector: expect.any(Number), loudness: expect.stringMatching(/^(near|mid|far)$/)},
+  ]);
+  expect(room.snapshotFor("second")?.events).toBeUndefined();
+});
+
+it("tells a seat its events once: a tick that owed no step, and the tick after the shot, carry none", () => {
+  const room = startedRoom();
+  room.setInput("second", {...IDLE, aimAt: room.snapshotFor("first")?.player.position, firing: true}, 0);
+  room.tick();
+  room.setInput("second", IDLE, 1);
+
+  room.tick(0);
+  expect(room.snapshotFor("first")?.events).toBeUndefined();
+
+  room.tick();
+  expect(room.snapshotFor("first")?.events).toBeUndefined();
+});
+
+it("tells a seat what its own shots and the other seat's did to it, each its own", () => {
+  const room = startedRoom();
+  const told: Record<Seat, CombatEvent[]> = {first: [], second: []};
+  room.setInput("first", {...IDLE, aimAt: room.snapshotFor("second")?.player.position, firing: true}, 0);
+
+  for (let step = 0; step < 200; step += 1) {
+    room.tick();
+    told.first.push(...(room.snapshotFor("first")?.events ?? []));
+    told.second.push(...(room.snapshotFor("second")?.events ?? []));
+  }
+
+  expect(told.first).toContainEqual({kind: "hitLanded", on: "opponent"});
+  expect(told.first.filter(event => event.kind === "damageTaken")).toEqual([]);
+  expect(told.second).toContainEqual({kind: "damageTaken", cause: "bullet", amount: expect.any(Number)});
+  expect(told.second.filter(event => event.kind === "hitLanded")).toEqual([]);
 });
 
 it("begins a match at nothing to nothing, in its first round", () => {

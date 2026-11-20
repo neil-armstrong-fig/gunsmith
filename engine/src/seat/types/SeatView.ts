@@ -1,4 +1,5 @@
 import type {Bullet} from "@gunsmith/engine/bullet/types/Bullet";
+import type {CombatEvent} from "@gunsmith/engine/combat-events/types/CombatEvent";
 import type {Match} from "@gunsmith/engine/match/types/Match";
 import type {Pickup} from "@gunsmith/engine/pickup/types/Pickup";
 import type {Player} from "@gunsmith/engine/player/types/Player";
@@ -28,4 +29,10 @@ export interface SeatView {
   round: RoundState;
   /** Game time since the round began, in seconds. */
   elapsedSeconds: number;
+  /**
+   * What happened to this seat's own fighter in the steps since the last view, for it to show or play: its own damage, hits it
+   * confirmed on a target it saw, a pickup it took and the direction a shot was heard from (`HeardEvent`, a sector and nothing
+   * else). Never about the other fighter. Absent when nothing happened.
+   */
+  events?: readonly CombatEvent[] | undefined;
 }

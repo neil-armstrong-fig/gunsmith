@@ -111,14 +111,34 @@ describe("the round", () => {
 });
 
 describe("what a seat is never told", () => {
-  it("is the brain, the events or the dummies: sent as JSON, only what it may know is there", () => {
-    const withSecrets = giveOpponentBrain(
-      {...duel(), dummies: [{position: {x: 3.5, y: 3.5}, health: 5}], events: [{kind: "fireRefused", reason: "empty"}]},
-      7,
-    );
+  it("is the brain or the dummies: sent as JSON, only what it may know is there", () => {
+    const withSecrets = giveOpponentBrain({...duel(), dummies: [{position: {x: 3.5, y: 3.5}, health: 5}]}, 7);
     const sent = JSON.parse(JSON.stringify(viewOfSeat(withSecrets, "first"))) as object;
 
     expect(Object.keys(sent).sort()).toEqual(["bullets", "elapsedSeconds", "opponent", "player", "round"]);
+  });
+
+  it("is what happened to the other seat: each is told its own events and only those", () => {
+    const world: World = {
+      ...duel(),
+      events: [{kind: "fireRefused", reason: "empty"}],
+      opponentEvents: [{kind: "pickupTaken"}],
+    };
+    const first = JSON.stringify(viewOfSeat(world, "first"));
+    const second = JSON.stringify(viewOfSeat(world, "second"));
+
+    expect(first).toContain("fireRefused");
+    expect(first).not.toContain("pickupTaken");
+    expect(second).toContain("pickupTaken");
+    expect(second).not.toContain("fireRefused");
+  });
+
+  it("is where a shooter stood: a sound heard is told as its kind, a sector and a loudness, and nothing else", () => {
+    const heard = {kind: "heard", sound: "shot", sector: 5, loudness: "mid"} as const;
+    const world: World = {...duel(), opponent: undefined, events: [heard]};
+    const [told] = JSON.parse(JSON.stringify(viewOfSeat(world, "first").events)) as object[];
+
+    expect(told).toEqual({kind: "heard", sound: "shot", sector: 5, loudness: "mid"});
   });
 
   it("is where a shot that hurt the opponent came from, which its brain remembers", () => {

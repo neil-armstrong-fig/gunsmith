@@ -17,6 +17,13 @@ it("builds the world a seat was told about, with the fighters it sees", () => {
   expect(rebuilt).toEqual(world);
 });
 
+it("keeps the events the seat was told, as JSON", () => {
+  const world: World = {...duel(), events: [{kind: "heard", sound: "shot", sector: 2, loudness: "far"}]};
+  const sent = JSON.parse(JSON.stringify(viewOfSeat(world, "first"))) as ReturnType<typeof viewOfSeat>;
+
+  expect(worldOfSeatView(room, sent).events).toEqual([{kind: "heard", sound: "shot", sector: 2, loudness: "far"}]);
+});
+
 it("builds a world with no opponent when the seat was told of none", () => {
   const world = duel();
   const turnedAway: World = {...world, player: {...world.player, aim: {x: -1, y: 0}}};
