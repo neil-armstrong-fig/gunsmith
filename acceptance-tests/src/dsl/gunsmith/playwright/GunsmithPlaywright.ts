@@ -56,6 +56,11 @@ export class GunsmithPlaywright extends BasePage {
     await this.openScenario(`duel&seed=${seed}`);
   }
 
+  /** Opens the duel behind its pre-round (`?preRound=1`), as the practice range's "Fight the bot" does. */
+  async openDuelWithPreRound(seed: number): Promise<void> {
+    await this.openScenario(`duel&seed=${seed}&preRound=1`);
+  }
+
   async openSparring(): Promise<void> {
     await this.openScenario("sparring");
   }

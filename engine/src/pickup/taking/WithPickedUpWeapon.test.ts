@@ -5,8 +5,19 @@ import {SUBMACHINE_GUN} from "@gunsmith/engine/weapon/weapons/SubmachineGun";
 
 const player = startingWorld(arenaFrom(["#####", "#...#", "#####"])).player;
 
-it("puts the weapon in the second slot, in hand, with a full magazine and its reserve", () => {
-  const taken = withPickedUpWeapon(player, SUBMACHINE_GUN);
+it("replaces the weapon in hand, which stays in hand with a full magazine and its reserve", () => {
+  const taken = withPickedUpWeapon({...player, equippedIndex: 0}, SUBMACHINE_GUN);
+
+  expect(taken.loadout[0]).toEqual({
+    weapon: SUBMACHINE_GUN,
+    rounds: SUBMACHINE_GUN.magazineSize,
+    reserve: SUBMACHINE_GUN.startingReserve,
+  });
+  expect(taken.equippedIndex).toBe(0);
+});
+
+it("replaces the second weapon when that is the one in hand", () => {
+  const taken = withPickedUpWeapon({...player, equippedIndex: 1}, SUBMACHINE_GUN);
 
   expect(taken.loadout[1]).toEqual({
     weapon: SUBMACHINE_GUN,
@@ -16,9 +27,10 @@ it("puts the weapon in the second slot, in hand, with a full magazine and its re
   expect(taken.equippedIndex).toBe(1);
 });
 
-it("leaves the first slot as it was, rounds and all", () => {
+it("leaves the weapon not in hand as it was, rounds and all", () => {
   const spent = {
     ...player,
+    equippedIndex: 1,
     loadout: [
       {...(player.loadout[0] ?? {weapon: SUBMACHINE_GUN, reserve: 0}), rounds: 3, reserve: 7},
       ...player.loadout.slice(1),
@@ -37,6 +49,6 @@ it("cancels a reload in progress and leaves the cool-down and health alone", () 
   expect(taken.health).toBe(40);
 });
 
-it("replaces the second slot even when the first weapon is in hand", () => {
-  expect(withPickedUpWeapon({...player, equippedIndex: 0}, SUBMACHINE_GUN).loadout).toHaveLength(2);
+it("keeps the same number of weapons", () => {
+  expect(withPickedUpWeapon(player, SUBMACHINE_GUN).loadout).toHaveLength(player.loadout.length);
 });

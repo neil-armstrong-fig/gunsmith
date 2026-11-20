@@ -15,8 +15,8 @@ it("is taken by the player who stands on it, who holds it and leaves nothing lyi
   const taking = takePickup(lying, {player: {...player, position: at(5.5)}, opponent});
 
   expect(taking.pickup).toBeUndefined();
-  expect(taking.player.loadout[1]?.weapon).toBe(SUBMACHINE_GUN);
-  expect(taking.player.equippedIndex).toBe(1);
+  expect(taking.player.loadout[0]?.weapon).toBe(SUBMACHINE_GUN);
+  expect(taking.player.equippedIndex).toBe(0);
   expect(taking.opponent).toEqual(opponent);
 });
 
@@ -24,7 +24,7 @@ it("is taken by the opponent by the same rule", () => {
   const taking = takePickup(lying, {player, opponent: {...opponent, position: at(5.5)}});
 
   expect(taking.pickup).toBeUndefined();
-  expect(taking.opponent?.loadout[1]?.weapon).toBe(SUBMACHINE_GUN);
+  expect(taking.opponent?.loadout[0]?.weapon).toBe(SUBMACHINE_GUN);
   expect(taking.player).toEqual(player);
 });
 
@@ -43,7 +43,7 @@ it("goes to the nearer fighter when both are within reach", () => {
     opponent: {...opponent, position: at(5.5 + 0.3)},
   });
 
-  expect(taking.player.loadout[1]?.weapon).toBe(SUBMACHINE_GUN);
+  expect(taking.player.loadout[0]?.weapon).toBe(SUBMACHINE_GUN);
   expect(taking.opponent).toEqual({...opponent, position: at(5.5 + 0.3)});
 });
 
@@ -53,8 +53,8 @@ it("goes to the opponent when both are exactly as near", () => {
     opponent: {...opponent, position: at(5.6)},
   });
 
-  expect(taking.opponent?.loadout[1]?.weapon).toBe(SUBMACHINE_GUN);
-  expect(taking.player.loadout[1]?.weapon).not.toBe(SUBMACHINE_GUN);
+  expect(taking.opponent?.loadout[0]?.weapon).toBe(SUBMACHINE_GUN);
+  expect(taking.player.loadout[0]?.weapon).not.toBe(SUBMACHINE_GUN);
 });
 
 it("is not taken by a fighter with no health left", () => {

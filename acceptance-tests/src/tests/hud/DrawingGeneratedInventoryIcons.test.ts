@@ -13,11 +13,11 @@ given.each(
     beforeEach(async ({gunsmith}) => {
       await gunsmith.startSparringWithPickupDrawing({seed: 8, drawing});
       await gunsmith.player.walkFor("east", 0.7);
-      await gunsmith.hud.waitForSlot(2);
+      await gunsmith.pickup.waitUntilTaken();
     });
 
     then("the HUD draws the weapon with a readable outline at inventory size", async ({gunsmith}) => {
-      const look = await gunsmith.hud.getSecondInventoryIconLook();
+      const look = await gunsmith.hud.getInventoryIconLook(1);
 
       expect(look[feature]).toBeGreaterThanOrEqual(minimum);
       expect(look).toMatchObject({width: 34, height: 34});
@@ -25,14 +25,14 @@ given.each(
       expect(look.outlineContrast).toBeGreaterThanOrEqual(3);
     });
 
-    when("the player switches back to the rifle", () => {
+    when("the player switches to the second weapon", () => {
       beforeEach(async ({gunsmith}) => {
-        await gunsmith.player.switchTo(1);
-        await gunsmith.hud.waitForSlot(1);
+        await gunsmith.player.switchTo(2);
+        await gunsmith.hud.waitForSlot(2);
       });
 
       then("the same drawing and readable outline stay with the stowed weapon", async ({gunsmith}) => {
-        const look = await gunsmith.hud.getSecondInventoryIconLook();
+        const look = await gunsmith.hud.getInventoryIconLook(1);
 
         expect(look[feature]).toBeGreaterThanOrEqual(minimum);
         expect(look.outlinePixels).toBeGreaterThanOrEqual(8);

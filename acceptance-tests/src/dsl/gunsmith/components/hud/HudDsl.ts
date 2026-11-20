@@ -33,11 +33,11 @@ export class HudDsl {
     }
   }
 
-  async getSecondInventoryIconLook(): Promise<InventoryIconLook> {
+  async getInventoryIconLook(slot: number): Promise<InventoryIconLook> {
     try {
-      return await this.hud.getSecondInventoryIconLook();
+      return await this.hud.getInventoryIconLook(slot);
     } catch (error) {
-      throw new DslError("Failed to read the drawing in the second weapon slot", error);
+      throw new DslError(`Failed to read the drawing in weapon slot ${slot}`, error);
     }
   }
 

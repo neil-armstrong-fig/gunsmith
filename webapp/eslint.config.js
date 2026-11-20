@@ -24,6 +24,10 @@ const workshopStoreMayImport = "^(?!zustand$|zustand/|@gunsmith/engine(?:/|$)|@s
 // The shelf store (`src/store/shelf/`) holds the saved weapons and keeps them in the browser's storage: Zustand, zod (to read what the browser kept), the engine and its own folder.
 const shelfStoreMayImport = "^(?!zustand$|zustand/|zod$|@gunsmith/engine(?:/|$)|@src/store/shelf/|\\./).+$";
 
+// The pre-round store (`src/store/pre-round/`) holds where the pre-round stands and the weapons locked in: Zustand, the engine's types (and its weapons in a test), the page's ask for it, the picks' type and its own folder.
+const preRoundStoreMayImport =
+  "^(?!zustand$|@gunsmith/engine(?:/|$)|@src/game/pre-round/|@src/store/pre-round/|\\./).+$";
+
 export default [
   ...baseConfig({tsconfigRootDir: import.meta.dirname, allowedPackages}),
   {
@@ -162,6 +166,22 @@ export default [
             regex: shelfStoreMayImport,
             message:
               "The shelf store may import only zustand, zod, the engine and its own folder: it holds the saved weapons and keeps them in the browser.",
+          },
+        ],
+      }),
+    },
+  },
+  {
+    // The pre-round store holds the phase and the picks and nothing else. After the store block above.
+    files: ["src/store/pre-round/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": restrictedImports({
+        allowedPackages: ["@gunsmith/engine"],
+        patterns: [
+          {
+            regex: preRoundStoreMayImport,
+            message:
+              "The pre-round store may import only zustand, the engine, game/pre-round and its own folder: it holds where the pre-round stands and the weapons locked in.",
           },
         ],
       }),

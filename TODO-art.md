@@ -1,10 +1,12 @@
 # TODO: art
 
+**FOCUS ON MVP TASKS FIRST**
+
 Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only relevant dependencies.
 
 ## Resume here
 
-Art is in `.claude/worktrees/art` on `worktree-art`. Last merged GitHub main: `bc47751` (merge `87749fe`). The validated art merge `0143379`, including the submachine gun inventory icon from `8318df4`, was pushed to GitHub main.
+Art is in `.claude/worktrees/art` on `worktree-art`. Last merged GitHub main: `460f3bb`. The validated art merge `0143379`, including the submachine gun inventory icon from `8318df4`, was pushed to GitHub main.
 
 The local workshop's full-shelf replacement picker is committed at `8c0adef`. `SavedWeaponSummary` supplies the thumbnail, name, power rating and prompt for both the shelf and `ReplacementChoice`. `TheWeaponShelf` checks distinct prompts on identical stand-in weapons and replacement in place.
 

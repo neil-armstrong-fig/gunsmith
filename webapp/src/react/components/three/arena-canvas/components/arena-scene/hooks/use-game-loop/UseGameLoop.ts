@@ -3,6 +3,7 @@ import {engine} from "@gunsmith/engine/Engine";
 import {STATE_HOOK_NAME} from "@gunsmith/shared/state-hook/StateHookName";
 import {gameState} from "@src/store/game/selectors/game-state/GameState";
 import {useAppStore} from "@src/store/app/UseAppStore";
+import {usePreRoundStore} from "@src/store/pre-round/UsePreRoundStore";
 import {useGameStore} from "@src/store/game/UseGameStore";
 import {arenaPointAtPixel} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/pointer/ArenaPointAtPixel";
 import {recordFeedbackCues} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/feedback/RecordFeedbackCues";
@@ -105,6 +106,11 @@ export function useGameLoop(): void {
 
     // The workshop is open over the practice range: the game waits. The steps this frame owed are dropped, not kept, so shutting it does not make up the time.
     if (useAppStore.getState().workshopOpen) {
+      return;
+    }
+
+    // The pre-round is up over a duel: the match has not begun, so the game waits in the same way.
+    if (usePreRoundStore.getState().phase !== "fighting") {
       return;
     }
 

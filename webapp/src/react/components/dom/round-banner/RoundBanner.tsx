@@ -9,6 +9,7 @@ import {useAppStore} from "@src/store/app/UseAppStore";
 import {selectMatch} from "@src/store/game/selectors/select-match/SelectMatch";
 import {selectRound} from "@src/store/game/selectors/select-round/SelectRound";
 import {useGameStore} from "@src/store/game/UseGameStore";
+import {usePreRoundStore} from "@src/store/pre-round/UsePreRoundStore";
 import type {JSX} from "react";
 
 /**
@@ -53,7 +54,7 @@ export function RoundBanner(): JSX.Element | undefined {
           type="button"
           className="rounded-md bg-gs-team-blue px-6 py-3 text-lg font-semibold text-gs-background"
           onClick={() => {
-            goOn(() => nextRoundOfPage(match));
+            goOn(() => nextRoundOfPage(match, usePreRoundStore.getState().picks));
           }}
         >
           Next round
@@ -66,6 +67,7 @@ export function RoundBanner(): JSX.Element | undefined {
           className="rounded-md bg-gs-team-blue px-6 py-3 text-lg font-semibold text-gs-background"
           onClick={() => {
             goOn(worldOfPage);
+            usePreRoundStore.getState().restart();
           }}
         >
           Play again

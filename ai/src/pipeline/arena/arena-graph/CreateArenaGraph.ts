@@ -1,5 +1,6 @@
 import {END, START, StateGraph} from "@langchain/langgraph";
 import type {ArenaPipelineDependencies} from "@gunsmith/ai/pipeline/arena/types/ArenaPipelineDependencies";
+import {DEFAULT_ARENA_FORMAT} from "@gunsmith/ai/pipeline/arena/arena-drafting/format/DefaultArenaFormat";
 import {validateNode} from "@gunsmith/ai/pipeline/arena/arena-graph/checking/ValidateNode";
 import {generateNode} from "@gunsmith/ai/pipeline/arena/arena-graph/drafting/GenerateNode";
 import {repairNode} from "@gunsmith/ai/pipeline/arena/arena-graph/drafting/RepairNode";
@@ -20,16 +21,14 @@ import type {ArenaGraph} from "@gunsmith/ai/pipeline/arena/arena-graph/types/Are
  * The models and the built-in arenas are handed in and live in the nodes' closures, never in the state.
  */
 export function createArenaGraph(arenaPipelineDependencies: ArenaPipelineDependencies): ArenaGraph {
+  const format = arenaPipelineDependencies.format ?? DEFAULT_ARENA_FORMAT;
+
   return new StateGraph(ArenaGraphState)
     .addNode("precheck", precheckNode)
     .addNode("moderation", state => moderationNode(state, arenaPipelineDependencies.moderator))
-    .addNode("generate", state =>
-      generateNode(state, arenaPipelineDependencies.generator, arenaPipelineDependencies.format),
-    )
+    .addNode("generate", state => generateNode(state, arenaPipelineDependencies.generator, format))
     .addNode("validate", validateNode)
-    .addNode("repair", state =>
-      repairNode(state, arenaPipelineDependencies.generator, arenaPipelineDependencies.format),
-    )
+    .addNode("repair", state => repairNode(state, arenaPipelineDependencies.generator, format))
     .addNode("fallback", state => fallbackNode(state, arenaPipelineDependencies.builtInArenas))
     .addEdge(START, "precheck")
     .addConditionalEdges("precheck", continueUnlessRejected("moderation"), ["moderation", END])

@@ -180,6 +180,17 @@ Per request: a rejection or a pre-check turn-away costs $0.00015 or nothing; an 
 
 **Largest-arena probe (2026-11-19, `ai`, 1 trial each, two requests asking for the engine's 40 by 30 maximum; a throwaway spec, deleted).** Rows: generation 391 and 250 output tokens (about $0.00031 and $0.00021), each followed by a repair of 362 and 235 tokens; **both fell back to a built-in**; the two requests cost $0.00084 and $0.00067 and took 5.2 s and 3.6 s. Shapes: generation 744 and 593 tokens (about $0.00054 and $0.00044, 2.9 s and 2.3 s); the several-rooms request needed a 744-token repair and **fell back** ($0.00135, 6.3 s), the open battlefield was **created first time** ($0.00063, 3.1 s). **Large arenas stay inside `ARENA_SPEND`'s worst case:** the dearest request was 1,350 µ$ against the 2,300 µ$ three-call figure (generation 540 µ$ against 1,000, repair 700 against 1,150), so **the assumed prices are a fair upper bound for the largest arena and should not be lowered on the small-arena numbers above**; the typical arena costs far less. Quality: 3 of 4 large requests fell back (rows 2 of 2, shapes 1 of 2), so large arenas are where the model fails, whichever format; the slowest request was 6.3 s against the 30 s limit. Paid spend for the probe $0.0035; the turn's ledger total is $0.0309. The kept arenas are in `ai/src/evals/results/arenas-paid-large-{rows,shapes}-latest.html`.
 
+## Drawing on Haiku, tuned 2026-11-20 (Haiku 5.5, the appearance spec, run by `ai` with the user's go of up to $0.05)
+
+The 2026-11-19 re-measure had five "the model's own drawing" criteria red. The drawing now has its own call log (stage `draw`), so each call's tokens and time are recorded. Rerun at 3 trials, 33 drawings: **the red was one request, the jellyfish lantern with braided tentacles, which fell back to the stand-in in 1 of 3 trials.** The model drew polylines past the 64 by 64 canvas, and the repair, told the exact overshoot ("pull it in by 21"), drew them past it again (2 calls, 6,463 input and 2,000 output tokens, 6.9 s). The cause is the prompt, not the validator or the harness: it said to stay inside the canvas but not how far a long thin shape reaches. One sentence was added (every point of a polyline between 6 and 58, "curl it back before it reaches the edge").
+
+| Run of the lantern request     | Fell back | Calls each                   |
+| ------------------------------ | --------- | ---------------------------- |
+| Without the sentence, 6 trials | 4 of 6    | 2 on a fallback, 1 otherwise |
+| With the sentence, 6 trials    | 0 of 6    | 1                            |
+
+The whole spec at 1 trial with the sentence: 66 of 66 criteria, 12 of 12 drawings valid. A created drawing costs about $0.0027 to $0.0035 (2,600 input and 600 to 1,000 output tokens, 2.4 to 3.8 s), which matches the 601 µ$ measure for the weapon's drawing step to within the model's own variation. **Spend this turn $0.0457** (ledger $0.0766 of the $1 ceiling): the 3-trial run $0.0255, two 6-trial lantern runs $0.0043 and $0.0075 and the 1-trial spec $0.0084. Three trials of one request cannot show a rate, and the 4 of 6 against 0 of 6 is the evidence that the sentence matters, not a measured fallback rate for production.
+
 ## Cheaper models for the drawing, stats and moderation: the shortlist (researched 2026-11-15, approved by the user)
 
 > **Decision (the user, 2026-11-16): the other models were not good enough, so Haiku 5.5 on the user's own Anthropic key stays the model for the drawing, the stats and moderation, for now.**

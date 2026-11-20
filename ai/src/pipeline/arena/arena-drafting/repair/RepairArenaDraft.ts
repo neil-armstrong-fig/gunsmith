@@ -15,7 +15,7 @@ const MAX_PREVIOUS_LENGTH = 2500;
  * `validate` has parsed it again.
  */
 export async function repairArenaDraft(request: ArenaRepairRequest, generator: BaseChatModel): Promise<unknown> {
-  const kit = draftingKitOf(request.format ?? "rows");
+  const kit = draftingKitOf(request.format);
   const messages = [new SystemMessage(kit.repairPrompt), new HumanMessage(requestBlock(request.prompt))];
 
   const previous = previousBlock(request.previous);
