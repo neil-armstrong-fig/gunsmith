@@ -1,5 +1,6 @@
 import type {ArenaOutcome} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcome";
 import {ARENA_SPEND} from "@src/durable-objects/spend-ledger/estimate/arena/ArenaSpend";
+import {pricedUsage} from "@src/durable-objects/spend-ledger/estimate/tokens/PricedUsage";
 import {settledArenaSpend} from "@src/durable-objects/spend-ledger/estimate/arena/SettledArenaSpend";
 
 it("prices the first call as moderation, the second as the arena's generation and the third as its repair", () => {
@@ -12,22 +13,23 @@ it("prices the first call as moderation, the second as the arena's generation an
   );
 });
 
-it("settles at the tokens the models reported when the outcome carries them, not at its calls", () => {
-  expect(settledArenaSpend({...outcomeWithCalls(3), usage: {inputTokens: 2_000, outputTokens: 300}})).toBe(350);
-});
-
-it("falls back to the priced calls when the models reported no tokens", () => {
-  expect(settledArenaSpend({...outcomeWithCalls(2), usage: {inputTokens: 0, outputTokens: 0}})).toBe(
-    ARENA_SPEND.moderationMicrodollars + ARENA_SPEND.generationMicrodollars,
-  );
-});
-
-it("charges nothing for a request that never reached a model, whatever it reports", () => {
-  expect(settledArenaSpend({...outcomeWithCalls(0), usage: {inputTokens: 5, outputTokens: 5}})).toBe(0);
-});
-
 it("charges nothing for a request that never reached a model", () => {
   expect(settledArenaSpend(outcomeWithCalls(0))).toBe(0);
+});
+
+it("settles at the tokens the models reported, priced, whatever the number of calls", () => {
+  const reported = {inputTokens: 1_500, outputTokens: 400};
+
+  expect(settledArenaSpend({...outcomeWithCalls(3), usage: reported})).toBe(pricedUsage(reported));
+  expect(settledArenaSpend({...outcomeWithCalls(1), usage: reported})).toBe(350);
+});
+
+it("falls back to the price of each call's place when the models reported no tokens", () => {
+  const nothingReported = {inputTokens: 0, outputTokens: 0};
+
+  expect(settledArenaSpend({...outcomeWithCalls(2), usage: nothingReported})).toBe(
+    ARENA_SPEND.moderationMicrodollars + ARENA_SPEND.generationMicrodollars,
+  );
 });
 
 it("reserves at least what the most model calls a request can make would settle at", () => {

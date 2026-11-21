@@ -22,6 +22,7 @@ const ALLOWED_SNAPSHOT_FIELDS = [
 /** Every kind of event a seat may be told of itself, and the keys of the one that is about the other fighter: a sound heard says which way and roughly how loud, no more. */
 const ALLOWED_EVENT_KINDS = [
   "shotFired",
+  "reloadStarted",
   "footstep",
   "fireRefused",
   "damageTaken",
@@ -56,7 +57,7 @@ function expectOnlyAllowedEvents(events: unknown): void {
 
   for (const event of events as Record<string, unknown>[]) {
     expect(ALLOWED_EVENT_KINDS).toContain(event["kind"]);
-    if (event["kind"] === "shotFired" || event["kind"] === "footstep") {
+    if (event["kind"] === "shotFired" || event["kind"] === "footstep" || event["kind"] === "reloadStarted") {
       expect(Object.keys(event)).toEqual(["kind"]);
     }
 
