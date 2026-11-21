@@ -12,13 +12,15 @@ import {isJoinedFrame} from "@src/dsl/gunsmith/components/room/playwright/wire/I
 import {isSnapshotFrame} from "@src/dsl/gunsmith/components/room/playwright/wire/IsSnapshotFrame";
 import {snapshotsOfFrames} from "@src/dsl/gunsmith/components/room/playwright/wire/SnapshotsOfFrames";
 import {addressOfRoom} from "@src/dsl/gunsmith/components/room/playwright/address/AddressOfRoom";
+import {RoundPlaywright} from "@src/dsl/gunsmith/components/round/playwright/RoundPlaywright";
+import type {RoundSnapshot} from "@gunsmith/shared/state-hook/types/RoundSnapshot";
 import {PlayerPlaywright} from "@src/dsl/gunsmith/components/player/playwright/PlayerPlaywright";
 import type {Heading} from "@src/dsl/gunsmith/components/player/types/Heading";
 import type {RoomLimits} from "@src/dsl/gunsmith/components/room/types/RoomLimits";
 import type {RoomAnswer} from "@src/dsl/gunsmith/components/room/playwright/types/RoomAnswer";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
 
-/** How long each step of `keepMovingFor` walks, in game seconds. */
+/** How long each step of `keepMovingUntil` walks, in game seconds. */
 const MOVE_SECONDS = 0.25;
 
 /** The page's own list of where it showed the player each frame (`startRecordingTheShownFighters`). */
@@ -250,12 +252,34 @@ export class RoomPlaywright extends BasePage {
    * Keeps this browser's player asking for something new, walking a little east and then west, for `seconds` of real time: a player who
    * is plainly there, however long the room waits on the other one.
    */
-  async keepMovingFor(seconds: number): Promise<void> {
-    const until = Date.now() + seconds * 1000;
+  async keepMovingUntilTheRoundIs(state: RoundSnapshot, timeoutSeconds: number): Promise<void> {
+    const round = new RoundPlaywright(this.page);
+
+    await this.keepMovingUntil(async () => (await round.getState()) === state, timeoutSeconds);
+  }
+
+  async keepMovingUntilPlayAgainIsOffered(timeoutSeconds: number): Promise<void> {
+    const round = new RoundPlaywright(this.page);
+
+    await this.keepMovingUntil(() => round.isPlayAgainOffered(), timeoutSeconds);
+  }
+
+  /** Walks to and fro until `isDone` says so, checked after each short walk; throws if it has not by `timeoutSeconds` of real time. */
+  private async keepMovingUntil(isDone: () => Promise<boolean>, timeoutSeconds: number): Promise<void> {
+    const until = Date.now() + timeoutSeconds * 1000;
     while (Date.now() < until) {
       await this.walkALittle("east");
+      if (await isDone()) {
+        return;
+      }
+
       await this.walkALittle("west");
+      if (await isDone()) {
+        return;
+      }
     }
+
+    throw new Error(`The room was not as asked after ${timeoutSeconds} seconds of moving.`);
   }
 
   /**

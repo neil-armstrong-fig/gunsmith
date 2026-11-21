@@ -22,7 +22,7 @@ library and the built-in weapon and arena pool; guests are unaffected.
 ## The layers
 
 1. **Provider hard cap.** A spend limit on the provider key itself, set a
-   little above the global ceiling. The only layer that truly cannot be exceeded by our bugs.
+   little above the global ceiling. The only layer that truly cannot be exceeded by our bugs. **Set (the user, 2026-11-21): the provider account is prepaid with $20 from the start, so the balance is the hard cap** (keep auto-reload off).
 2. **AI Gateway spend limits.** Dollar budgets on the gateway: up to 20 rules, rolling or fixed window, scoped by provider,
    model or custom metadata, **split by `user_id`** for a per-user budget. Exceeding returns HTTP 429. *Weakness:* limits are
    eventually consistent (cost is recorded after each request), so a burst can overshoot; costs are best-effort
@@ -367,7 +367,9 @@ deploy and the secret (manual step 20).
 
 **A timeout settles like a throw (budget, 2026-11-19).** Server's pipeline time limit (`routes/shared/time-limit/`, 30 s) stops the route waiting, not the model call (`@gunsmith/ai` takes no abort signal), so the calls of a request that ran out of time may still be billed. Both routes therefore treat a timeout as a throw: the credit is refunded, the whole spend reservation (`WEAPON_SPEND` or `ARENA_SPEND.reservedMicrodollars`) is settled as spent, and only the answer differs (504 `generation-timed-out`, not 502 `generation-failed`). Server's first version of the time limit was written before the arena route reserved spend; when the two meet, the arena's catch must do all three steps, which a timeout test per route pins (a hanging pipeline: credit back once, spend equal to the reservation, 504). Until `ai` takes an abort signal the worst case is a late bill on a request the player already saw fail, which the caps absorb.
 
-**Still open:** provider cancellation and real token usage in the settle for both routes (`ai`); measuring an arena's real cost once a paid run is authorised.
+**Settle from tokens (budget, 2026-11-21).** `settledWeaponSpend` and `settledArenaSpend` now price `outcome.usage` (ai's summed tokens over every call, delivered in `fb852a3`) at Haiku 5.5's list price, $0.10 in and $0.50 out a million, 0.1 and 0.5 µ$ a token, rounded up to whole microdollars (`estimate/token-price/TokenSpend`). A request whose models reported no tokens still settles at the calls (`WEAPON_SPEND.perCallMicrodollars`; the arena's price by place), and one that made no call settles at nothing. The reservations stay as they were: they are the worst case, not the price. Not measured: that the production adapter's `usage` agrees with the Console's bill; compare once a paid run is authorised.
+
+**Still open:** provider cancellation (`ai`, `server`); measuring an arena's real cost against the Console once a paid run is authorised.
 `ai`'s eval `paidSpendGuard` and its $1 total ledger are separate and untouched.
 
 ## Sources

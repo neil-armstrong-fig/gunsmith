@@ -84,6 +84,17 @@ it("gives the credit back, once, and answers 502 when the created arena cannot b
   expect(ledgers.spendMeter.spentThisMonth()).toBe(settledArenaSpend(created));
 });
 
+it("settles the month's spend at the tokens the models reported, not at their priced calls", async () => {
+  const ledgers = fakeLedgers();
+  smithThatAnswers({...created, usage: {inputTokens: 2_000, outputTokens: 300}});
+
+  const response = await generateArenaRoute(post({prompt: "a foggy canyon"}));
+
+  expect(response.status).toBe(200);
+  expect(ledgers.spendMeter.spentThisMonth()).toBe(350);
+  expect(ledgers.spendMeter.spentThisMonth()).not.toBe(settledArenaSpend(created));
+});
+
 it("takes half a credit and says why when the prompt is rejected", async () => {
   const ledgers = fakeLedgers();
   smithThatAnswers(rejected);

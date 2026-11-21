@@ -24,7 +24,7 @@ given("the workshop is open on the practice range, with nothing saved", () => {
 
   when("the player makes a weapon", () => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.workshop.typeThePrompt(FAST_PROMPT);
+      await gunsmith.workshop.pasteThePrompt(FAST_PROMPT);
       await gunsmith.workshop.make();
     });
 
@@ -112,7 +112,7 @@ given("the workshop is open on the practice range, with nothing saved", () => {
 
   when("the player makes a weapon, then changes the words in the box, then saves", () => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.workshop.typeThePrompt(FAST_PROMPT);
+      await gunsmith.workshop.pasteThePrompt(FAST_PROMPT);
       await gunsmith.workshop.make();
       await gunsmith.workshop.pasteThePrompt(LONG_RANGE_PROMPT);
       await gunsmith.workshop.shelf.save();
