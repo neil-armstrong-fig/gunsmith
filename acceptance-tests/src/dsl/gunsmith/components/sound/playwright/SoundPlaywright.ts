@@ -98,12 +98,21 @@ export class SoundPlaywright extends BasePage {
     }, RECORD_NAMES);
   }
 
-  /** Every start of a sound is noted with its file's address and whether the audio was running. */
+  /** Notes each sound start and the stereo pan on the source's path to the output. */
   private async noteStarts(): Promise<void> {
     await this.page.addInitScript((names: RecordNames) => {
       const plays = Reflect.get(window, names.plays) as SoundPlay[];
       const urlOfBuffer = Reflect.get(window, names.urlOfBuffer) as WeakMap<AudioBuffer, string>;
+      const destinations = new WeakMap<AudioNode, AudioNode>();
+      const originalConnect = AudioNode.prototype.connect;
       const originalStart = AudioBufferSourceNode.prototype.start;
+
+      Reflect.set(AudioNode.prototype, "connect", function (this: AudioNode, ...args: unknown[]): unknown {
+        const destination: unknown = Reflect.apply(originalConnect, this, args);
+        if (destination instanceof AudioNode) destinations.set(this, destination);
+
+        return destination;
+      });
 
       Reflect.set(
         AudioBufferSourceNode.prototype,
@@ -116,6 +125,13 @@ export class SoundPlaywright extends BasePage {
             looping: this.loop,
             ended: false,
           };
+
+          // A spatial voice goes through a gain and then a stereo panner.
+          const gain = destinations.get(this);
+          const panner = gain && destinations.get(gain);
+          if (panner instanceof StereoPannerNode && destinations.get(panner) === this.context.destination) {
+            play.pan = panner.pan.value;
+          }
 
           this.addEventListener(
             "ended",

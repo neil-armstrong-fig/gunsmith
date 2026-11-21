@@ -19,6 +19,19 @@ it("gives the two seats time to choose when a spec is about choosing", () => {
   expect(addressOfRoom("ABC234", {preRoundSeconds: 30})).toBe("/?room=ABC234&preRoundSeconds=30&startSeed=21");
 });
 
+it("shows the ring's timing when a spec is about the ring, so a round need not last 75 seconds", () => {
+  expect(addressOfRoom("ABC234", {ringDelaySeconds: 2, ringClosingSeconds: 6})).toBe(
+    "/?room=ABC234&preRoundSeconds=0&startSeed=21&ringDelay=2&ringClosing=6",
+  );
+  expect(addressOfRoom("ABC234", {ringDelaySeconds: 0})).toBe(
+    "/?room=ABC234&preRoundSeconds=0&startSeed=21&ringDelay=0",
+  );
+});
+
+it("starts the fighters from another seed when a spec needs the weapon on a straight walk from them", () => {
+  expect(addressOfRoom("ABC234", {startSeed: 131})).toBe("/?room=ABC234&preRoundSeconds=0&startSeed=131");
+});
+
 it("escapes a code that is not plain", () => {
   expect(addressOfRoom("a/b")).toBe("/?room=a%2Fb&preRoundSeconds=0&startSeed=21");
 });

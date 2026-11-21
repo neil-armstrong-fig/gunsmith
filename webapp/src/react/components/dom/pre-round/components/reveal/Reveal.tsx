@@ -1,4 +1,5 @@
 import type {Weapon} from "@gunsmith/engine/weapon/types/Weapon";
+import {ArenaReveal} from "@src/react/components/dom/pre-round/components/reveal/components/arena-reveal/ArenaReveal";
 import {Side} from "@src/react/components/dom/pre-round/components/reveal/components/side/Side";
 import type {SlotWeapon} from "@src/react/components/dom/pre-round/components/reveal/types/SlotWeapon";
 import {startTheMatch} from "@src/react/components/dom/pre-round/components/reveal/start-match/StartTheMatch";
@@ -6,10 +7,11 @@ import {gameState} from "@src/store/game/selectors/game-state/GameState";
 import {usePreRoundStore} from "@src/store/pre-round/UsePreRoundStore";
 import type {JSX} from "react";
 
-/** The second step: both fighters' weapons side by side, the opponent's as the match will give it, and the button that begins round 1. */
+/** The last step: both fighters' weapons side by side, the opponent's as the match will give it, the arena the player chose, and the button that begins round 1. */
 export function Reveal(): JSX.Element | undefined {
   const picks = usePreRoundStore(state => state.picks);
-  if (!picks) {
+  const arena = usePreRoundStore(state => state.arena);
+  if (!picks || !arena) {
     return undefined;
   }
 
@@ -23,11 +25,13 @@ export function Reveal(): JSX.Element | undefined {
         <Side testId="reveal-opponent" title="The bot" weapons={inSlots(opponent)} />
       </div>
 
+      <ArenaReveal />
+
       <button
         type="button"
         className="self-start rounded-md bg-gs-team-blue px-6 py-3 text-lg font-semibold text-gs-background"
         onClick={() => {
-          startTheMatch(picks);
+          startTheMatch(picks, arena);
         }}
       >
         Start the match

@@ -8,7 +8,8 @@ const START_SEED = 21;
  * (`?reconnectSeconds=`, `?idleSeconds=`); a limit left out is left off, so the room keeps its own. The time to choose
  * (`?preRoundSeconds=`) is always shown and is **none** unless a spec is about choosing, so a room begins its match as the second player
  * sits, as it did before there was a pre-round. The start seed is always shown (`?startSeed=`), so no spec depends on a draw: the room's
- * real starts are random.
+ * real starts are random. A spec about the ring shows its timing (`?ringDelay=`, `?ringClosing=`); one that is not meets the real ring,
+ * which starts after 45 seconds.
  */
 export function addressOfRoom(code: string, limits: RoomLimits = {}): string {
   const search = new URLSearchParams({room: code});
@@ -20,7 +21,13 @@ export function addressOfRoom(code: string, limits: RoomLimits = {}): string {
   }
 
   search.set("preRoundSeconds", String(limits.preRoundSeconds ?? 0));
-  search.set("startSeed", String(START_SEED));
+  search.set("startSeed", String(limits.startSeed ?? START_SEED));
+  if (limits.ringDelaySeconds !== undefined) {
+    search.set("ringDelay", String(limits.ringDelaySeconds));
+  }
+  if (limits.ringClosingSeconds !== undefined) {
+    search.set("ringClosing", String(limits.ringClosingSeconds));
+  }
 
   return `/?${search.toString()}`;
 }

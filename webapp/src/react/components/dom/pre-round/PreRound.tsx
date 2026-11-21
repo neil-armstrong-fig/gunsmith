@@ -5,7 +5,7 @@ import type {JSX, KeyboardEvent} from "react";
 import {useEffect, useRef} from "react";
 
 /**
- * The pre-round: a panel over the dimmed arena of a duel opened with `?preRound=1`, where the player chooses a weapon for each slot, locks in and sees both fighters' weapons before round 1.
+ * The pre-round: a panel over the dimmed arena of a duel opened with `?preRound=1`, where the player chooses a weapon for each slot and an arena, locks in and sees both fighters' weapons and the arena before round 1.
  * The game waits while it is up (`UseGameLoop` reads the store's phase), and the panel keeps its keys and mouse presses to itself, as the workshop does, so a click or a typed key is never the game's.
  */
 export function PreRound(): JSX.Element | undefined {

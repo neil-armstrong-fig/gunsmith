@@ -12,8 +12,8 @@ it("reports nothing when nothing happened to the player", () => {
   expect(eventsOf({})).toBeUndefined();
 });
 
-it("reports nothing for a shot that left the weapon", () => {
-  expect(eventsOf({playerTurn: turn({fires: true})})).toBeUndefined();
+it("reports a fired shot without any position or weapon details", () => {
+  expect(eventsOf({playerTurn: turn({fires: true})})).toEqual([{kind: "shotFired"}]);
 });
 
 it("reports a refused trigger with its reason", () => {
@@ -68,6 +68,7 @@ function eventsOf(changes: Partial<EventsRequest>): readonly CombatEvent[] | und
     damage: UNHURT,
     visibleHits: [],
     playerTookPickup: false,
+    footfall: false,
     heard: [],
     ...changes,
   });

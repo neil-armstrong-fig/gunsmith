@@ -31,6 +31,8 @@ given("seed-8 sparring with a pickup on the player's row", () => {
             ended: true,
           }),
         ]);
+      const [play] = await gunsmith.sound.getPlays(PICKUP_SOUND);
+      expect(play).not.toHaveProperty("pan");
     });
   });
 
@@ -72,9 +74,14 @@ given("a pickup race with the weapon nearer the opponent", () => {
       await gunsmith.pickup.waitUntilTaken(15);
     });
 
-    then("the opponent gets its larger magazine and the local pickup cue stays silent", async ({gunsmith}) => {
-      expect((await gunsmith.opponent.get()).rounds).toBeGreaterThan(12);
-      expect(await gunsmith.sound.getPlays(PICKUP_SOUND)).toHaveLength(0);
-    });
+    then(
+      "the opponent gets its larger magazine and the player hears one pickup cue from the right",
+      async ({gunsmith}) => {
+        expect((await gunsmith.opponent.get()).rounds).toBeGreaterThan(12);
+        await expect
+          .poll(() => gunsmith.sound.getPlays(PICKUP_SOUND))
+          .toMatchObject([{contextState: "running", looping: false, pan: expect.closeTo(Math.SQRT1_2, 5)}]);
+      },
+    );
   });
 });

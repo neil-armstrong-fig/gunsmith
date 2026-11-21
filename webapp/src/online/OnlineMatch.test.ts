@@ -485,7 +485,12 @@ it("has nothing to show of the choosing until the server says something about it
 
 it("shows what the server last said of the choosing, and stops once the match has begun", () => {
   const {socket, match} = seatedMatch();
-  const frame = {kind: "preRound", stage: "choosing", own: {locked: false}, opponent: {locked: true, picked: false}};
+  const frame = {
+    kind: "preRound",
+    stage: "choosing",
+    own: {locked: false, weapons: {locked: false}},
+    opponent: {locked: true, picked: false, weapons: {locked: false}},
+  };
 
   socket.receive(JSON.stringify(frame));
   expect(match.preRound()).toEqual(frame);
@@ -510,6 +515,31 @@ it("locks in the arena it has chosen", () => {
   expect(socket.frames()).toEqual([{kind: "lockIn", step: "arena"}]);
 });
 
+it("puts two built-in weapons forward by their keys, slot 1 then slot 2", () => {
+  const {socket, match} = seatedMatch();
+
+  match.chooseWeapons(["submachine-gun", "rifle"]);
+
+  expect(socket.frames()).toEqual([
+    {
+      kind: "choose",
+      step: "weapons",
+      choice: [
+        {kind: "builtIn", key: "submachine-gun"},
+        {kind: "builtIn", key: "rifle"},
+      ],
+    },
+  ]);
+});
+
+it("locks in the weapons it has chosen", () => {
+  const {socket, match} = seatedMatch();
+
+  match.lockInWeapons();
+
+  expect(socket.frames()).toEqual([{kind: "lockIn", step: "weapons"}]);
+});
+
 it("picks between the two arenas shown", () => {
   const {socket, match} = seatedMatch();
 
@@ -524,6 +554,8 @@ it("sends no choosing while the socket is not open", () => {
 
   match.chooseArena("Duel");
   match.lockInArena();
+  match.chooseWeapons(["rifle", "rifle"]);
+  match.lockInWeapons();
   match.pickArena({kind: "nothing"});
 
   expect(socket.frames()).toEqual([]);

@@ -1,17 +1,26 @@
 import {DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/DuelBuiltInArena";
 import {FAIR_DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/FairDuelBuiltInArena";
+import {MARKSMAN_RIFLE} from "@gunsmith/engine/weapon/weapons/MarksmanRifle";
+import {RIFLE} from "@gunsmith/engine/weapon/weapons/Rifle";
+import {SUBMACHINE_GUN} from "@gunsmith/engine/weapon/weapons/SubmachineGun";
+import type {Seat} from "@gunsmith/engine/seat/types/Seat";
 import {PreRound} from "@src/durable-objects/match/pre-round/PreRound";
 
 const DUEL = DUEL_BUILT_IN_ARENA.name;
 const FAIR_DUEL = FAIR_DUEL_BUILT_IN_ARENA.name;
+const DEFAULT_WEAPONS = {first: RIFLE, second: MARKSMAN_RIFLE};
 
 it("decides on the duel arena when both seats lock in having chosen nothing", () => {
   const preRound = new PreRound(60, () => 1);
 
-  preRound.lockIn("first");
-  preRound.lockIn("second");
+  choose(preRound, "first", DUEL);
+  choose(preRound, "second", DUEL);
 
-  expect(preRound.outcome()).toEqual({arena: DUEL_BUILT_IN_ARENA, how: "same"});
+  expect(preRound.outcome()).toEqual({
+    arena: DUEL_BUILT_IN_ARENA,
+    how: "same",
+    weapons: {first: DEFAULT_WEAPONS, second: DEFAULT_WEAPONS},
+  });
 });
 
 it("decides on the arena both seats put forward without asking either to pick", () => {
@@ -20,7 +29,7 @@ it("decides on the arena both seats put forward without asking either to pick", 
   choose(preRound, "first", FAIR_DUEL);
   choose(preRound, "second", FAIR_DUEL);
 
-  expect(preRound.outcome()).toEqual({arena: FAIR_DUEL_BUILT_IN_ARENA, how: "same"});
+  expect(preRound.outcome()).toMatchObject({arena: FAIR_DUEL_BUILT_IN_ARENA, how: "same"});
 });
 
 it("offers both arenas to be picked from once both are locked in and they differ", () => {
@@ -42,7 +51,7 @@ it("plays the arena a seat picks when the other picks nothing", () => {
   preRound.pickArena("first", {kind: "arena", seat: "second"});
   preRound.pickArena("second", {kind: "nothing"});
 
-  expect(preRound.outcome()).toEqual({arena: FAIR_DUEL_BUILT_IN_ARENA, how: "only-pick"});
+  expect(preRound.outcome()).toMatchObject({arena: FAIR_DUEL_BUILT_IN_ARENA, how: "only-pick"});
 });
 
 it("plays the arena both seats picked", () => {
@@ -53,7 +62,7 @@ it("plays the arena both seats picked", () => {
   preRound.pickArena("first", {kind: "arena", seat: "first"});
   preRound.pickArena("second", {kind: "arena", seat: "first"});
 
-  expect(preRound.outcome()).toEqual({arena: DUEL_BUILT_IN_ARENA, how: "agreed"});
+  expect(preRound.outcome()).toMatchObject({arena: DUEL_BUILT_IN_ARENA, how: "agreed"});
 });
 
 it("settles two different picks with the seed it is given, the same way every time", () => {
@@ -75,13 +84,13 @@ it("settles two different picks with the seed it is given, the same way every ti
 it("does not show a seat the other's arena until both are locked in", () => {
   const preRound = new PreRound(60, () => 1);
   preRound.chooseArena("second", FAIR_DUEL);
-  preRound.lockIn("second");
+  preRound.lockInArena("second");
 
   const before = preRound.viewOf("first");
-  preRound.lockIn("first");
+  preRound.lockInArena("first");
   const after = preRound.viewOf("first");
 
-  expect(before.opponent).toEqual({locked: true, picked: false});
+  expect(before.opponent).toEqual({locked: true, picked: false, weapons: {locked: false}});
   expect(after.opponent.arena).toBe(FAIR_DUEL);
 });
 
@@ -90,7 +99,7 @@ it("tells a seat only whether the other has locked in, not what they chose, whil
 
   preRound.chooseArena("second", FAIR_DUEL);
   const drafting = preRound.viewOf("first");
-  preRound.lockIn("second");
+  preRound.lockInArena("second");
   const locked = preRound.viewOf("first");
 
   expect(JSON.stringify(drafting)).not.toContain(FAIR_DUEL);
@@ -122,7 +131,7 @@ it("ignores a pick before both arenas are shown and one after it has decided", (
   choose(preRound, "second", DUEL);
   preRound.pickArena("first", {kind: "arena", seat: "second"});
 
-  expect(preRound.outcome()).toEqual({arena: DUEL_BUILT_IN_ARENA, how: "same"});
+  expect(preRound.outcome()).toMatchObject({arena: DUEL_BUILT_IN_ARENA, how: "same"});
   expect(preRound.viewOf("first").own.pick).toBeUndefined();
 });
 
@@ -167,7 +176,7 @@ it("keeps a seat's first pick: it cannot be changed", () => {
   preRound.pickArena("first", {kind: "arena", seat: "first"});
   preRound.pickArena("second", {kind: "nothing"});
 
-  expect(preRound.outcome()).toEqual({arena: FAIR_DUEL_BUILT_IN_ARENA, how: "only-pick"});
+  expect(preRound.outcome()).toMatchObject({arena: FAIR_DUEL_BUILT_IN_ARENA, how: "only-pick"});
 });
 
 it("counts a pick not made when the time runs out as picking nothing", () => {
@@ -179,7 +188,7 @@ it("counts a pick not made when the time runs out as picking nothing", () => {
 
   preRound.tick(60);
 
-  expect(preRound.outcome()).toEqual({arena: FAIR_DUEL_BUILT_IN_ARENA, how: "only-pick"});
+  expect(preRound.outcome()).toMatchObject({arena: FAIR_DUEL_BUILT_IN_ARENA, how: "only-pick"});
 });
 
 it("decides at once on the defaults when it is allowed no time", () => {
@@ -187,7 +196,7 @@ it("decides at once on the defaults when it is allowed no time", () => {
 
   preRound.startClock();
 
-  expect(preRound.outcome()).toEqual({arena: DUEL_BUILT_IN_ARENA, how: "same"});
+  expect(preRound.outcome()).toMatchObject({arena: DUEL_BUILT_IN_ARENA, how: "same"});
 });
 
 it("stops counting once it has decided", () => {
@@ -207,11 +216,107 @@ it("forgets everything a seat chose when it is released, and nothing of the othe
 
   preRound.release("first");
 
-  expect(preRound.viewOf("first").own).toEqual({locked: false});
-  expect(preRound.viewOf("second").own).toEqual({arena: DUEL, locked: false});
+  expect(preRound.viewOf("first").own).toEqual({locked: false, weapons: {locked: false}});
+  expect(preRound.viewOf("second").own).toEqual({arena: DUEL, locked: false, weapons: {locked: false}});
 });
 
-function choose(preRound: PreRound, seat: "first" | "second", arena: string): void {
+it("waits for both seats' weapons: a decided arena is not a decided pre-round", () => {
+  const preRound = new PreRound(60, () => 1);
+
+  preRound.lockInArena("first");
+  preRound.lockInArena("second");
+
+  expect(preRound.outcome()).toBeUndefined();
+  expect(preRound.viewOf("first").stage).toBe("choosing");
+});
+
+it("plays the weapons each seat locked in, each in its own slot", () => {
+  const preRound = new PreRound(60, () => 1);
+  preRound.lockInArena("first");
+  preRound.lockInArena("second");
+
+  preRound.chooseWeapons("first", ["submachine-gun", "rifle"]);
+  preRound.lockInWeapons("first");
+  preRound.lockInWeapons("second");
+
+  expect(preRound.outcome()?.weapons).toEqual({first: {first: SUBMACHINE_GUN, second: RIFLE}, second: DEFAULT_WEAPONS});
+});
+
+it("lets a seat that chooses no weapons have the rifle and the marksman rifle", () => {
+  const preRound = new PreRound(60, () => 1);
+
+  preRound.lockInWeapons("first");
+
+  expect(preRound.viewOf("first").own.weapons).toEqual({keys: ["rifle", "marksman-rifle"], locked: true});
+});
+
+it("ignores weapons that are not built in, and a pair with one that is not", () => {
+  const preRound = new PreRound(60, () => 1);
+
+  preRound.chooseWeapons("first", ["rifle", "no-such-weapon"]);
+  preRound.chooseWeapons("first", ["no-such-weapon", "rifle"]);
+
+  expect(preRound.viewOf("first").own.weapons).toEqual({locked: false});
+});
+
+it("keeps locked-in weapons: they cannot be changed", () => {
+  const preRound = new PreRound(60, () => 1);
+  preRound.chooseWeapons("first", ["submachine-gun", "submachine-gun"]);
+  preRound.lockInWeapons("first");
+
+  preRound.chooseWeapons("first", ["rifle", "rifle"]);
+
+  expect(preRound.viewOf("first").own.weapons).toEqual({keys: ["submachine-gun", "submachine-gun"], locked: true});
+});
+
+it("shows a seat the other's weapons only once both seats have locked in their weapons", () => {
+  const preRound = new PreRound(60, () => 1);
+  preRound.chooseWeapons("second", ["submachine-gun", "rifle"]);
+  preRound.lockInWeapons("second");
+
+  const before = preRound.viewOf("first");
+  preRound.lockInWeapons("first");
+  const after = preRound.viewOf("first");
+
+  expect(before.opponent.weapons).toEqual({locked: true});
+  expect(JSON.stringify(before)).not.toContain("submachine-gun");
+  expect(after.opponent.weapons).toEqual({locked: true, keys: ["submachine-gun", "rifle"]});
+});
+
+it("keeps a seat's weapons draft to itself", () => {
+  const preRound = new PreRound(60, () => 1);
+
+  preRound.chooseWeapons("second", ["submachine-gun", "rifle"]);
+
+  expect(JSON.stringify(preRound.viewOf("first"))).not.toContain("submachine-gun");
+});
+
+it("gives a seat that has not locked in its weapons the defaults when the time runs out, whatever it had in mind", () => {
+  const preRound = new PreRound(60, () => 1);
+  choose(preRound, "first", DUEL);
+  preRound.chooseWeapons("second", ["submachine-gun", "submachine-gun"]);
+  preRound.lockInArena("second");
+  preRound.startClock();
+
+  preRound.tick(60);
+
+  expect(preRound.viewOf("second").own.weapons).toEqual({keys: ["rifle", "marksman-rifle"], locked: true});
+  expect(preRound.outcome()?.weapons.second).toEqual(DEFAULT_WEAPONS);
+});
+
+it("forgets the weapons a seat chose when it is released", () => {
+  const preRound = new PreRound(60, () => 1);
+  preRound.chooseWeapons("first", ["submachine-gun", "rifle"]);
+  preRound.lockInWeapons("first");
+
+  preRound.release("first");
+
+  expect(preRound.viewOf("first").own.weapons).toEqual({locked: false});
+});
+
+/** The seat puts `arena` forward and locks in both steps: that arena, and the default weapons. */
+function choose(preRound: PreRound, seat: Seat, arena: string): void {
   preRound.chooseArena(seat, arena);
-  preRound.lockIn(seat);
+  preRound.lockInArena(seat);
+  preRound.lockInWeapons(seat);
 }

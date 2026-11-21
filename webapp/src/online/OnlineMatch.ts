@@ -22,6 +22,7 @@ import type {MatchSocket} from "@src/online/types/MatchSocket";
 import type {PreRoundFrame} from "@src/online/types/pre-round/PreRoundFrame";
 import type {Readiness} from "@src/online/types/Readiness";
 import type {SeatPick} from "@src/online/types/pre-round/SeatPick";
+import type {WeaponKeys} from "@src/online/types/pre-round/WeaponKeys";
 import type {SnapshotFrame} from "@src/online/types/SnapshotFrame";
 import {TICK_SECONDS} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/clock/TickSeconds";
 
@@ -152,6 +153,20 @@ export class OnlineMatch {
   /** Locks in the arena put forward (the duel arena if none was): the other player's is then shown. */
   lockInArena(): void {
     this.sendWhenOpen({kind: "lockIn", step: "arena"});
+  }
+
+  /** Puts two built-in weapons forward by their keys (slot 1, slot 2). They are not final until `lockInWeapons`, and the server ignores a key it does not know. */
+  chooseWeapons(keys: WeaponKeys): void {
+    this.sendWhenOpen({
+      kind: "choose",
+      step: "weapons",
+      choice: keys.map(key => ({kind: "builtIn", key})),
+    });
+  }
+
+  /** Locks in the weapons put forward (the rifle and the marksman rifle if none): the other player's are then shown. */
+  lockInWeapons(): void {
+    this.sendWhenOpen({kind: "lockIn", step: "weapons"});
   }
 
   /** Votes, when both arenas are shown and differ, for one of them, for random, or for nothing. */

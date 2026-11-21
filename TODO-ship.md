@@ -6,7 +6,7 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 ## Resume here
 
-The persistent checkout is `.claude/worktrees/ship` on `worktree-ship`. Merged `origin/main` at `52443a3` before publishing the CI update. The current slice owns `.github/workflows/ci.yml`. After publication, verify that Checks reaches `pnpm checks`, all four preview shards finish and the combined HTML report is present.
+The persistent checkout is `.claude/worktrees/ship` on `worktree-ship`, synced to `9c81558`. The current slice simplifies `.github/workflows/ci.yml` to Checks, preview acceptance, deploy and deployed acceptance. After publication, verify the release artifact and all four preview shard blobs. Compare native setup timings on matching runner images. The next scheduled property run should also report all three suites and upload `property-tests-log`.
 
 The first combined Worker from `d40d942` is live on the API hostname. The locally verified two-host release reached GitHub main at `bc47751`. The webapp custom domain serves static test Worker version `8b2f62ff-f3f9-4e83-92c4-6cdc5d0ba93d` with `noindex`. The user deferred live rollout and automatic releases while Ship stabilizes CI.
 
@@ -33,7 +33,7 @@ server supplies Worker/DO/storage bindings; budget supplies operational limits; 
 - [x] Prepare self-contained documentation and preserve original sources privately before a future open-source release.
 
 - [x] Add repository checks, production-preview acceptance and independent property-test CI.
-- [x] Implement four acceptance shards, two workers per shard, unique blob artifacts, combined HTML reporting and an all-shards gate.
+- [x] Gate deployment directly on four acceptance shards with individual blob artifacts.
 - [x] Manage local Worker startup and external API preview scripts; exclude generated Playwright reports from lint.
 - [x] Reproduce and fix the pickup-marker pixel failure on managed production preview.
 - [x] Budget request: enforce declarations below callers, including tests; reject module-level const arrow/function helpers, preserving nested const functions. Full cleanup, no baseline.
@@ -42,7 +42,7 @@ server supplies Worker/DO/storage bindings; budget supplies operational limits; 
 - [ ] Profile the next hosted sharded run against the failed [36-minute baseline](docs/agent-reference/Operations.md#ci-and-deployment). Record setup, build, test and report durations, retries, elapsed time and total runner minutes.
 - [x] Settle eval policy with the user and deliver free fake CI/root mechanics; see [policy](docs/agent-reference/EvalPolicy.md).
 - [ ] Receive AI-owned paid selector/guard/evidence implementation and reconciled opening spend before local paid activation.
-- [ ] Validate the four single-worker preview shards and the combined report after the user commits and publishes the workflow. Review traces for repeatable gameplay failures and follow up with the owners.
+- [ ] Validate the four single-worker preview shards and their blob artifacts after publication. Review traces for repeatable gameplay failures and follow up with the owners.
 
 ## Later tasks
 

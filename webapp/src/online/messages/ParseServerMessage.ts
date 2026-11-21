@@ -51,8 +51,26 @@ function isPreRound(frame: object): boolean {
     PRE_ROUND_STAGES.some(known => known === stage) &&
     (secondsLeft === undefined || typeof secondsLeft === "number") &&
     hasFlags(own, ["locked"]) &&
-    hasFlags(opponent, ["locked", "picked"])
+    hasFlags(opponent, ["locked", "picked"]) &&
+    hasWeaponsStep(own) &&
+    hasWeaponsStep(opponent)
   );
+}
+
+/** Whether `value` carries a weapons step: `locked` as a flag and, if it has them, `keys` as exactly two names. */
+function hasWeaponsStep(value: unknown): boolean {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  const weapons: unknown = Reflect.get(value, "weapons");
+  if (!hasFlags(weapons, ["locked"])) {
+    return false;
+  }
+
+  const keys: unknown = typeof weapons === "object" && weapons !== null ? Reflect.get(weapons, "keys") : undefined;
+
+  return keys === undefined || (Array.isArray(keys) && keys.length === 2 && keys.every(key => typeof key === "string"));
 }
 
 /** Whether `value` is an object whose named fields are all true or false. */

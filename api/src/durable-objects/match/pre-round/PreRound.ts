@@ -3,13 +3,19 @@ import type {ArenaPick} from "@gunsmith/engine/arena-picking/types/ArenaPick";
 import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
 import {DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/DuelBuiltInArena";
 import type {BuiltInArena} from "@gunsmith/engine/built-in-arenas/types/BuiltInArena";
+import type {Weapon} from "@gunsmith/engine/weapon/types/Weapon";
 import type {Seat} from "@gunsmith/engine/seat/types/Seat";
+import type {ArenaOutcome} from "@src/durable-objects/match/pre-round/types/ArenaOutcome";
 import type {OpponentPreRound} from "@src/durable-objects/match/pre-round/types/OpponentPreRound";
 import type {PreRoundMessage} from "@src/durable-objects/match/pre-round/types/PreRoundMessage";
 import type {PreRoundOutcome} from "@src/durable-objects/match/pre-round/types/PreRoundOutcome";
 import type {PreRoundSeat} from "@src/durable-objects/match/pre-round/types/PreRoundSeat";
 import type {PreRoundStage} from "@src/durable-objects/match/pre-round/types/PreRoundStage";
 import type {SeatPick} from "@src/durable-objects/match/pre-round/types/SeatPick";
+import type {WeaponKeys} from "@src/durable-objects/match/pre-round/types/WeaponKeys";
+import type {WeaponPair} from "@src/durable-objects/match/pre-round/types/WeaponPair";
+import {builtInWeaponKeyed} from "@src/durable-objects/match/pre-round/weapons/BuiltInWeaponKeyed";
+import {DEFAULT_WEAPON_KEYS} from "@src/durable-objects/match/pre-round/weapons/DefaultWeaponKeys";
 import type {SeedMaker} from "@src/durable-objects/match/room/types/SeedMaker";
 
 const SEATS: readonly Seat[] = ["first", "second"];
@@ -26,9 +32,10 @@ const OTHER_SEAT: Record<Seat, Seat> = {first: "second", second: "first"};
  * what it may know: the other's arena is absent until both are locked in, and no prompt is ever here.
  */
 export class PreRound {
-  private readonly seats: Record<Seat, PreRoundSeat> = {first: {locked: false}, second: {locked: false}};
+  private readonly seats: Record<Seat, PreRoundSeat> = {first: freshSeat(), second: freshSeat()};
   private secondsLeft: number;
   private clockRunning = false;
+  private arenaSettled: ArenaOutcome | undefined;
   private decided: PreRoundOutcome | undefined;
 
   constructor(
@@ -51,13 +58,37 @@ export class PreRound {
   }
 
   /** `seat` locks in the arena it has chosen (the duel arena if it chose none). It cannot change it afterwards. */
-  lockIn(seat: Seat): void {
+  lockInArena(seat: Seat): void {
     if (this.stage() !== "choosing" || this.seats[seat].locked) {
       return;
     }
 
     this.seats[seat].arena ??= DUEL_BUILT_IN_ARENA.name;
     this.seats[seat].locked = true;
+    this.settle();
+  }
+
+  /** `seat` puts the built-in weapons with these keys forward (slot 1, slot 2), if both are built in and the seat has not locked in its weapons. Anything else is ignored. */
+  chooseWeapons(seat: Seat, keys: WeaponKeys): void {
+    if (this.decided || this.seats[seat].weapons.locked) {
+      return;
+    }
+    if (!keys.every(key => builtInWeaponKeyed(key))) {
+      return;
+    }
+
+    this.seats[seat].weapons.keys = keys;
+  }
+
+  /** `seat` locks in the weapons it has chosen (the rifle and the marksman rifle if it chose none). It cannot change them afterwards. */
+  lockInWeapons(seat: Seat): void {
+    const weapons = this.seats[seat].weapons;
+    if (this.decided || weapons.locked) {
+      return;
+    }
+
+    weapons.keys ??= DEFAULT_WEAPON_KEYS;
+    weapons.locked = true;
     this.settle();
   }
 
@@ -73,7 +104,7 @@ export class PreRound {
 
   /** `seat` has left on its own before the other sat: whatever it chose is forgotten, so whoever sits there next starts clean. */
   release(seat: Seat): void {
-    this.seats[seat] = {locked: false};
+    this.seats[seat] = freshSeat();
   }
 
   /** Both seats have sat: the time allowed begins to run. With none allowed the pre-round is decided on the defaults at once. */
@@ -102,7 +133,7 @@ export class PreRound {
     const message: PreRoundMessage = {
       kind: "preRound",
       stage: this.stage(),
-      own: {...this.seats[seat]},
+      own: {...this.seats[seat], weapons: {...this.seats[seat].weapons}},
       opponent: this.opponentOf(seat),
     };
     if (this.clockRunning) {
@@ -119,6 +150,9 @@ export class PreRound {
     if (this.decided) {
       return "decided";
     }
+    if (this.arenaSettled) {
+      return "choosing";
+    }
     if (this.seats.first.locked && this.seats.second.locked) {
       return "picking";
     }
@@ -126,31 +160,54 @@ export class PreRound {
     return "choosing";
   }
 
-  /** What `seat` may see of the other seat: flags always, their arena only once both are locked in. */
+  /** What `seat` may see of the other seat: flags always, their arena only once both are locked in and their weapons only once both seats have locked in theirs. */
   private opponentOf(seat: Seat): OpponentPreRound {
     const other = this.seats[OTHER_SEAT[seat]];
-    const opponent: OpponentPreRound = {locked: other.locked, picked: other.pick !== undefined};
+    const opponent: OpponentPreRound = {
+      locked: other.locked,
+      picked: other.pick !== undefined,
+      weapons: {locked: other.weapons.locked},
+    };
     if (this.seats.first.locked && this.seats.second.locked && other.arena) {
       opponent.arena = other.arena;
+    }
+    if (this.seats.first.weapons.locked && this.seats.second.weapons.locked && other.weapons.keys) {
+      opponent.weapons.keys = other.weapons.keys;
     }
 
     return opponent;
   }
 
-  /** Decides if the seats' locks and picks say enough: one arena between them, or both have picked. */
+  /** Decides if the seats' locks and picks say enough: the arena settled and both seats' weapons locked in. */
   private settle(): void {
+    this.settleArena();
+    if (!this.arenaSettled || !this.seats.first.weapons.locked || !this.seats.second.weapons.locked) {
+      return;
+    }
+
+    this.decided = {
+      ...this.arenaSettled,
+      weapons: {
+        first: weaponPairOf(this.seats.first.weapons.keys),
+        second: weaponPairOf(this.seats.second.weapons.keys),
+      },
+    };
+  }
+
+  /** Settles the arena if the seats' arena locks and picks say enough: one arena between them, or both have picked. */
+  private settleArena(): void {
     if (this.stage() !== "picking") {
       return;
     }
 
     const first = this.seats.first.arena;
     if (first === this.seats.second.arena) {
-      this.decided = {arena: builtInArenaNamed(first) ?? DUEL_BUILT_IN_ARENA, how: "same"};
+      this.arenaSettled = {arena: builtInArenaNamed(first) ?? DUEL_BUILT_IN_ARENA, how: "same"};
 
       return;
     }
     if (this.seats.first.pick && this.seats.second.pick) {
-      this.decided = this.resolved();
+      this.arenaSettled = this.resolved();
     }
   }
 
@@ -163,7 +220,11 @@ export class PreRound {
       if (!this.seats[seat].locked) {
         delete this.seats[seat].arena;
       }
-      this.lockIn(seat);
+      if (!this.seats[seat].weapons.locked) {
+        delete this.seats[seat].weapons.keys;
+      }
+      this.lockInArena(seat);
+      this.lockInWeapons(seat);
     }
     for (const seat of SEATS) {
       this.pickArena(seat, {kind: "nothing"});
@@ -171,13 +232,33 @@ export class PreRound {
   }
 
   /** The engine's rule over the two picks, drawing from a seed made now. Both seats have picked when this is called. */
-  private resolved(): PreRoundOutcome {
+  private resolved(): ArenaOutcome {
     const picks = SEATS.map(seat => arenaPickOf(seat, this.seats[seat].pick));
     const resolution = resolveArenaPicks({picks, seed: this.makeSeed()});
     const chosen = SEATS.find(seat => seat === resolution.chosenPlayerId) ?? "first";
 
     return {arena: builtInArenaNamed(this.seats[chosen].arena) ?? DUEL_BUILT_IN_ARENA, how: resolution.how};
   }
+}
+
+function freshSeat(): PreRoundSeat {
+  return {locked: false, weapons: {locked: false}};
+}
+
+/** The two weapons named by `keys`; the defaults for any that is not built in (`chooseWeapons` never lets one in). */
+function weaponPairOf(keys: WeaponKeys | undefined): WeaponPair {
+  const [first, second] = keys ?? DEFAULT_WEAPON_KEYS;
+
+  return {first: builtInWeaponOf(first), second: builtInWeaponOf(second)};
+}
+
+function builtInWeaponOf(key: string): Weapon {
+  const weapon = builtInWeaponKeyed(key) ?? builtInWeaponKeyed(DEFAULT_WEAPON_KEYS[0]);
+  if (!weapon) {
+    throw new Error("The rifle is not a built-in weapon.");
+  }
+
+  return weapon;
 }
 
 function arenaPickOf(seat: Seat, pick: SeatPick | undefined): ArenaPick {
