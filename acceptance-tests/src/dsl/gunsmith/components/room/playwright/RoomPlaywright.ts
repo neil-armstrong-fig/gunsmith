@@ -203,6 +203,14 @@ export class RoomPlaywright extends BasePage {
     this.secondContext = await this.openBrowserBeside(code, beforeOpening);
   }
 
+  /** Opens a second browser, in a context of its own, with this browser's origin, and leaves it where it is. `beforeOpening` is handed its page first. */
+  async openSecondBrowserBeside(beforeOpening: (secondPage: Page) => void): Promise<void> {
+    this.origin = new URL(this.page.url()).origin;
+    const {context, page} = await this.newBrowserBeside();
+    this.secondContext = context;
+    beforeOpening(page);
+  }
+
   /**
    * Opens a browser with no seat in the room `code` names, as a stranger who has the friend code would, and waits until the server has
    * turned its connection away: the room is full, so the page never has an arena to wait for.

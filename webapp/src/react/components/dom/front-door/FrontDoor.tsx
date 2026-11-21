@@ -1,8 +1,9 @@
 import {scenarioOfPage} from "@src/game/scenario/ScenarioOfPage";
+import {RoomEntry} from "@src/react/components/dom/front-door/components/room-entry/RoomEntry";
 import {useAppStore} from "@src/store/app/UseAppStore";
 import type {JSX} from "react";
 
-/** From the practice range, enter a match or open the sources in a separate tab. */
+/** From the practice range, enter a match against the bot, make or join a private room, or open the sources in a separate tab. */
 export function FrontDoor(): JSX.Element | undefined {
   const workshopOpen = useAppStore(state => state.workshopOpen);
   if (scenarioOfPage() !== "practice" || workshopOpen) {
@@ -23,6 +24,8 @@ export function FrontDoor(): JSX.Element | undefined {
       >
         Fight the bot
       </button>
+
+      <RoomEntry />
 
       <a
         href="/references.html"
