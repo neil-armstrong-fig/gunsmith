@@ -49,7 +49,7 @@ it("reports no empty click when the trigger is not held", () => {
 it("reports no empty click while the empty weapon is being reloaded", () => {
   const reloading = step(dry(centred(), 30), {...EAST, reload: true}, TICK);
 
-  expect(reloading.events).toBeUndefined();
+  expect(reloading.events).toEqual([{kind: "reloadStarted"}]);
 });
 
 it("reports no empty click on the shot that empties the magazine, and none while the last shot cools down", () => {

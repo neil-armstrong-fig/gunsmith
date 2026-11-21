@@ -6,4 +6,6 @@ export interface EventsOfSnapshots {
   events: readonly CombatEvent[];
   /** The game time those snapshots cover, in seconds: what the sounds' own clocks run on. */
   seconds: number;
+  /** Whether the latest snapshot included the opponent, independently of render interpolation. */
+  opponentVisible: boolean;
 }

@@ -1,3 +1,4 @@
+import {eraseExpiredCredits} from "@src/account-retention/EraseExpiredCredits";
 import type {ApiWorkerEnvironment} from "@src/env/types/ApiWorkerEnvironment";
 import {handleApiRequest} from "@src/router/HandleApiRequest";
 
@@ -5,6 +6,9 @@ import {handleApiRequest} from "@src/router/HandleApiRequest";
 export default {
   async fetch(request: Request): Promise<Response> {
     return await handleApiRequest(request);
+  },
+  async scheduled(controller): Promise<void> {
+    await eraseExpiredCredits(new Date(controller.scheduledTime));
   },
 } satisfies ExportedHandler<ApiWorkerEnvironment>;
 

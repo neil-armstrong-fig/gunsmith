@@ -1,6 +1,6 @@
 # TODO: art
 
-**MVP audio checklist complete.** Art owns authored audio cues, playback integration with Play, and the listening review after weapon-specific shot synthesis. Checkout: `worktree-art`, synced with GitHub main at `8cbf2ef`.
+**MVP audio checklist complete.** Art owns authored audio cues, playback integration with Play, and the listening review after weapon-specific shot synthesis. Checkout: `worktree-art`, last upstream commit merged `27052bc`.
 
 ## Handoff
 
@@ -55,6 +55,9 @@ Art owns the audio entries. The remaining entries follow the handoff above.
 - [x] Wire the audio pack's `sfx-pickup` MP3 into local play. Browser coverage distinguishes the player's direct cue from the nearby opponent's panned cue and covers mute and ordinary slot switching.
 
 - [x] Integrate the approved soft footstep for upright walking and the reload MP3 in local play. Crouched movement is silent.
+- [x] Play the approved reload cue once for either seat when its own reload starts in a private room. The browser checks cover repeat requests, a full magazine, mute and seat isolation.
+- [x] Bring the damage brackets, health trail, camera shake and visible hit ticks to private rooms with Play and Server.
+- [x] Clear the ring damage loop, player highlight and health border when the room connection drops. Restore them when fresh server snapshots report ring damage again.
 - [x] Ship an authored fallback shot sound for successful local and online shots, including the opponent’s spatial cue.
 
 - [x] Review the integrated inventory HUD, ring loop and pickup cue in the production build.
@@ -94,6 +97,12 @@ Art owns the audio entries. The remaining entries follow the handoff above.
 - [ ] Case-study diagrams: pipeline, cost safeguards and eval loop.
 
 ## Verification/latest delivery
+
+GitHub sync combined Art's ring feedback fix `daadb0f` with Ship's account-retention change `27052bc`. `pnpm checks` passed lint, formatting, strict types and 4,013 tests with one existing slow audio-render skip. Chromium production preview passed all three disconnect and reconnect criteria without retries. The preview and Worker reported shutdown errors after the tests, and the command exited successfully.
+
+2026-11-20, private-room ring feedback in `worktree-art` on `4f38a65`. All three browser criteria and the queued-event unit test failed before the fix. Production Chromium passed all 54 focused criteria without retries, with nonfatal WebSocket proxy `EPIPE` messages. `pnpm checks` passed lint, formatting, strict types and 4,012 tests with one existing slow audio-render skip. All 15 webapp properties passed. Reviewed the root, webapp, React and acceptance-test instructions and audited the affected folders and their callers. The next Art task is the listening review after weapon-specific synthesis lands.
+
+2026-11-20, private-room reload and hit feedback in `worktree-art` on `652654a`. All seven original acceptance criteria went red before wiring. A disposable build with both browser hookups disabled failed all five targeted criteria, and suppressing the engine reload event failed the two matching unit assertions. The restored engine tests passed 47/47. The final production-preview Chromium run passed 75/75, including the nine new criteria and the integrated ring and pickup specs. `pnpm checks` passed lint, formatting, strict types and 4,011 tests with one existing audio-render skip. All 55 properties passed. The standards review covered root, Engine, API, Webapp, React and acceptance-test instructions, with a folder and caller audit.
 
 2026-11-20, pickup audio acceptance in `worktree-art`. The opponent criterion failed before the recorder captured stereo pan. In disposable builds, bypassing the panner failed the opponent criterion and adding a centered panner failed the collector criterion. `pnpm checks` passed lint, formatting, types and 3,923 tests with one existing audio skip. The standards review used the root and acceptance-test instructions and audited the existing sound folders and their callers.
 
