@@ -10,7 +10,7 @@ given("the workshop is open, with one weapon saved", () => {
 
   beforeEach(async ({gunsmith}) => {
     await gunsmith.workshop.open();
-    await gunsmith.workshop.typeThePrompt(FAST_PROMPT);
+    await gunsmith.workshop.pasteThePrompt(FAST_PROMPT);
     await gunsmith.workshop.make();
 
     const result = await gunsmith.workshop.getResult();

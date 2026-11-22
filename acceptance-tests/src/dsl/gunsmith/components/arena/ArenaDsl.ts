@@ -34,6 +34,15 @@ export class ArenaDsl {
     }
   }
 
+  /** Whether the arena is drawn every frame; it is not while the workshop is open, when the game waits and the last picture stays under the panel. */
+  async isDrawing(): Promise<boolean> {
+    try {
+      return await this.arena.isDrawing();
+    } catch (error) {
+      throw new DslError("Failed to see whether the arena is being drawn", error);
+    }
+  }
+
   /** The mouse cursor the browser shows while the mouse is over `place`: a picture and its hotspot, or a plain keyword. */
   async getCursorOver(place: CursorPlace): Promise<Cursor> {
     try {

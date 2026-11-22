@@ -15,10 +15,12 @@ const BORDER_PIXELS = 2;
 const FLASH_IS_OVER_SECONDS = 0.22;
 const HIT_WATCH = {maxSeconds: 10, stepSeconds: 0.02};
 
-// The ring starts to close after three seconds and is closed in six more, on a point drawn from the seed. Seed 14 closes on a point one tile from the opponent's
-// start, so the player, who stands still in sparring where nothing else can hurt them, is left outside it at about 7.5 s and falls at about 12.6 s (`TakingDamage`).
-const DELAY_SECONDS = 3;
-const CLOSING_SECONDS = 6;
+// The ring starts to close after one second and is closed in two more, on a point drawn from the seed. Seed 14 closes on a point one tile from the opponent's
+// start, so the player, who stands still in sparring where nothing else can hurt them, is left outside it at about 2.5 s and falls at about 7.6 s (`TakingDamage`).
+// A third of the game's own ring (three seconds and six): a held game draws every frame, so what a spec costs follows the game seconds it runs, and at the
+// game's own timing the held specs took 30 s on the CI runner, which draws without a graphics card.
+const DELAY_SECONDS = 1;
+const CLOSING_SECONDS = 2;
 const PLAYER_LEFT_OUTSIDE_SEED = 14;
 const LONGEST_ROUND_SECONDS = 13.5 + 15;
 const RING_HURTS_BY_SECONDS = 15;

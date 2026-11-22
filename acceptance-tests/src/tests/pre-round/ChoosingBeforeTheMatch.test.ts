@@ -12,7 +12,7 @@ given("the practice range, with a weapon the player made and saved", () => {
 
   beforeEach(async ({gunsmith}) => {
     await gunsmith.workshop.open();
-    await gunsmith.workshop.typeThePrompt(FAST_PROMPT);
+    await gunsmith.workshop.pasteThePrompt(FAST_PROMPT);
     await gunsmith.workshop.make();
     madeName = (await gunsmith.workshop.getResult()).name;
     await gunsmith.workshop.shelf.save();

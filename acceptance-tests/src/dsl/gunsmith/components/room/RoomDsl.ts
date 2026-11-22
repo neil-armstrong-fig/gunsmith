@@ -1,4 +1,6 @@
 import type {Page} from "@playwright/test";
+import type {RoundSnapshot} from "@gunsmith/shared/state-hook/types/RoundSnapshot";
+import {FrontDoorDsl} from "@src/dsl/gunsmith/components/room/components/front-door/FrontDoorDsl";
 import {RoomPlaywright} from "@src/dsl/gunsmith/components/room/playwright/RoomPlaywright";
 import type {ConnectionDelay} from "@src/dsl/gunsmith/components/room/playwright/wire/delayed-line/types/ConnectionDelay";
 import type {RoomLimits} from "@src/dsl/gunsmith/components/room/types/RoomLimits";
@@ -10,6 +12,8 @@ type MakeGunsmith = (page: Page) => GunsmithDsl;
 
 /** A private room two browsers share, reached as `gunsmith.room`. What a browser knows of the other player is what the server sent it. */
 export class RoomDsl {
+  /** How a player reaches a room from the practice range: make one, or type a friend code in. */
+  readonly frontDoor: FrontDoorDsl;
   private readonly room: RoomPlaywright;
   private second: GunsmithDsl | undefined;
   private stranger: GunsmithDsl | undefined;
@@ -18,6 +22,7 @@ export class RoomDsl {
     page: Page,
     private readonly makeGunsmith: MakeGunsmith,
   ) {
+    this.frontDoor = new FrontDoorDsl(page);
     this.room = new RoomPlaywright(page);
   }
 
@@ -42,12 +47,24 @@ export class RoomDsl {
     }
   }
 
-  /** Keeps this browser's player asking for something new, walking to and fro, for `seconds`: they are plainly there. */
-  async keepMovingFor(seconds: number): Promise<void> {
+  /**
+   * Keeps this browser's player asking for something new, walking to and fro, until the round is `state` on their screen: they are plainly there.
+   * It stops at the moment the state is seen, not after a time, so a slow machine cannot carry it past the moment a spec means to read.
+   */
+  async keepMovingUntilTheRoundIs(state: RoundSnapshot, timeoutSeconds: number): Promise<void> {
     try {
-      await this.room.keepMovingFor(seconds);
+      await this.room.keepMovingUntilTheRoundIs(state, timeoutSeconds);
     } catch (error) {
-      throw new DslError(`Failed to keep moving for ${seconds} seconds`, error);
+      throw new DslError(`Failed to keep moving until the round was ${state}`, error);
+    }
+  }
+
+  /** As `keepMovingUntilTheRoundIs`, until the match is decided and the banner offers a fresh one ("Play again"). */
+  async keepMovingUntilPlayAgainIsOffered(timeoutSeconds: number): Promise<void> {
+    try {
+      await this.room.keepMovingUntilPlayAgainIsOffered(timeoutSeconds);
+    } catch (error) {
+      throw new DslError("Failed to keep moving until Play again was offered", error);
     }
   }
 
@@ -61,6 +78,22 @@ export class RoomDsl {
       await this.secondBrowser().room.waitForTheMatch();
     } catch (error) {
       throw new DslError(`Failed to join room ${code} with a second browser`, error);
+    }
+  }
+
+  /**
+   * Opens a second browser, with a session of its own, on the practice range with `limits` on its address, as this browser's practice range
+   * has them. It is reached as `secondBrowser()`, and its `room.frontDoor` types the friend code in.
+   */
+  async openASecondBrowserOnThePracticeRange(limits: RoomLimits = {}): Promise<void> {
+    try {
+      await this.room.openSecondBrowserBeside(secondPage => {
+        this.second = this.makeGunsmith(secondPage);
+        this.second.room.startWatching();
+      });
+      await this.secondBrowser().room.frontDoor.openThePracticeRange(limits);
+    } catch (error) {
+      throw new DslError("Failed to open a second browser on the practice range", error);
     }
   }
 

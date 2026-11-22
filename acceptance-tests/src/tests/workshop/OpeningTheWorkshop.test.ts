@@ -48,6 +48,10 @@ given("the practice range, held still", () => {
     then("the workshop is open", async ({gunsmith}) => {
       expect(await gunsmith.workshop.isOpen()).toBe(true);
     });
+
+    then("the arena is no longer drawn, so a slow machine's keys reach the panel", async ({gunsmith}) => {
+      expect(await gunsmith.arena.isDrawing()).toBe(false);
+    });
   });
 
   when("the player opens the workshop, closes it with Escape and holds the walk key", () => {
@@ -66,6 +70,10 @@ given("the practice range, held still", () => {
 
     then("the game goes on and the player walks", () => {
       expect(endX).toBeGreaterThan(startX + CLEARLY_WALKED_TILES);
+    });
+
+    then("the arena is drawn again", async ({gunsmith}) => {
+      expect(await gunsmith.arena.isDrawing()).toBe(true);
     });
   });
 });
