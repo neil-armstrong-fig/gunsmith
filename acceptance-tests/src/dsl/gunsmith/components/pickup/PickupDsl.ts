@@ -2,6 +2,7 @@ import type {Page} from "@playwright/test";
 import type {PickupSnapshot} from "@gunsmith/shared/state-hook/types/PickupSnapshot";
 import {PickupPlaywright} from "@src/dsl/gunsmith/components/pickup/playwright/PickupPlaywright";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
+import type {PickupBodyLook} from "@src/dsl/gunsmith/components/pickup/types/PickupBodyLook";
 import type {PickupMarkerLook} from "@src/dsl/gunsmith/components/pickup/types/PickupMarkerLook";
 import type {Point} from "@src/dsl/gunsmith/types/Point";
 import type {PickupLook} from "@src/dsl/gunsmith/types/PickupLook";
@@ -29,6 +30,15 @@ export class PickupDsl {
       return await this.pickup.getLookOnScreen();
     } catch (error) {
       throw new DslError("Failed to read what the pickup looks like on the screen", error);
+    }
+  }
+
+  /** How the middle of the weapon's body reads against a clear tile of the same floor in the same light. */
+  async getBodyOnScreen(centre: Point, clearFloor: Point): Promise<PickupBodyLook> {
+    try {
+      return await this.pickup.getBodyOnScreen(centre, clearFloor);
+    } catch (error) {
+      throw new DslError("Failed to read the weapon's body on the screen", error);
     }
   }
 

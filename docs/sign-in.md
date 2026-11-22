@@ -41,7 +41,7 @@ Three ways, each where it is cheapest.
 ## Handoffs
 
 - **budget:** `CreditLedger.erase()` is built (2026-11-19) and is called **only for a deleted account whose 90 days have run out** (the scheduled Worker sweeps daily at 04:00 UTC, and `DELETE /api/account` also sweeps), never at deletion, so deleting does not give back a fresh allowance (denial of wallet). A reserve already in flight may still write a fresh default record under the opaque id after an erase; it holds no personal data and is accepted. Asked of budget (not required): an alarm that erases an orphaned ledger by itself. Credit routes name the account from the session.
-- **play:** call `GET /api/me`; the sign-in button links to the API origin’s `/api/auth/google?return=<page>` (an absolute address on an allowed origin). The workshop's calls to `POST /api/weapons` then carry the session cookie, not `X-Account-Id`.
+- **Art:** the arena workshop reads `GET /api/me` and links to the API origin’s `/api/auth/google?return=<page>` with an absolute address on an allowed origin. Its generation and library requests include the session cookie. Weapon generation follows the same sign-in contract.
 - **ship:** the D1 binding and database name, the `LOGIN_LIMITER` binding, `ALLOWED_ORIGINS` and the secrets `GOOGLE_OAUTH_CLIENT_ID` and `GOOGLE_OAUTH_CLIENT_SECRET`, in `infra/` (never `ALLOW_LOOPBACK_ORIGINS`).
 - The user verified the local Google round-trip in Chrome on 2026-11-19. `pnpm api:dev` loads the root `.env.local` with `--env-file` and sets `GOOGLE_REDIRECT_URI` from its port. Production still needs the registered callback, Worker secrets and D1 provisioning. [Manual setup](../MANUAL-SETUP-STEPS.md).
 

@@ -1,4 +1,5 @@
 import {Choosing} from "@src/react/components/dom/pre-round/components/choosing/Choosing";
+import {returnToMainMenu} from "@src/react/components/dom/game-menu/returning/ReturnToMainMenu";
 import {Reveal} from "@src/react/components/dom/pre-round/components/reveal/Reveal";
 import {usePreRoundStore} from "@src/store/pre-round/UsePreRoundStore";
 import type {JSX, KeyboardEvent} from "react";
@@ -38,7 +39,24 @@ export function PreRound(): JSX.Element | undefined {
         tabIndex={-1}
         className="flex w-[40rem] max-h-[92vh] max-w-[90vw] flex-col gap-4 overflow-y-auto rounded-md bg-gs-ui-surface px-6 py-5 shadow-lg outline-none"
       >
-        <h1 className="text-2xl font-bold tracking-wide text-gs-ui-text">Pre-round</h1>
+        <div className="flex items-center justify-between gap-4">
+          <h1 className="text-2xl font-bold tracking-wide text-gs-ui-text">Pre-round</h1>
+
+          <button
+            type="button"
+            className="rounded-md border border-gs-edge/40 px-3 py-1.5 text-sm hover:border-gs-team-blue focus-visible:outline-2 focus-visible:outline-gs-team-blue"
+            onClick={() => {
+              if (phase === "revealed") {
+                usePreRoundStore.getState().restart();
+                return;
+              }
+
+              returnToMainMenu();
+            }}
+          >
+            Back
+          </button>
+        </div>
 
         {phase === "choosing" && <Choosing />}
 

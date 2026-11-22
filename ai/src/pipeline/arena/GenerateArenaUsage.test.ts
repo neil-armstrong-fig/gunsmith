@@ -4,7 +4,8 @@ import type {ArenaPipelineDependencies} from "@gunsmith/ai/pipeline/arena/types/
 import {reportUsage} from "@gunsmith/ai/pipeline/testing/ReportUsage";
 
 const GOOD = {name: "Plain Room", rows: ["##########", "#........#", "#........#", "#........#", "##########"]};
-const BAD = {name: "Cut In Two", rows: ["##########", "#...#....#", "#...#....#", "#...#....#", "##########"]};
+// Nearly all wall: not a fault the repair of drawings can mend (it makes no floor), so the model has to be asked again.
+const BAD = {name: "Solid Block", rows: ["##########", "#...######", "##########", "##########", "##########"]};
 
 const MODERATION = {inputTokens: 100, outputTokens: 10};
 const DRAWING = {inputTokens: 200, outputTokens: 50};

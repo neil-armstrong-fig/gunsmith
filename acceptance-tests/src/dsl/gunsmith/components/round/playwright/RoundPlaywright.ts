@@ -8,6 +8,10 @@ export class RoundPlaywright extends BasePage {
     super(page);
   }
 
+  async backToMainMenu(): Promise<void> {
+    await this.page.getByTestId("round-banner").getByRole("button", {name: "Back to main menu", exact: true}).click();
+  }
+
   async getState(): Promise<RoundSnapshot> {
     const {round} = await this.readGameState();
 

@@ -12,6 +12,22 @@ export class ArenaWorkshopDsl {
     this.arenas = new ArenaWorkshopPlaywright(page);
   }
 
+  async arrangeSignedInArena(generationPaused = false): Promise<void> {
+    try {
+      await this.arenas.arrangeSignedInArena(generationPaused);
+    } catch (error) {
+      throw new DslError("Failed to arrange a signed-in arena workshop", error);
+    }
+  }
+
+  async getMakeError(): Promise<string> {
+    try {
+      return await this.arenas.getMakeError();
+    } catch (error) {
+      throw new DslError("Failed to read the arena generation error", error);
+    }
+  }
+
   async open(name?: string): Promise<void> {
     try {
       await this.arenas.open(name);
@@ -33,6 +49,14 @@ export class ArenaWorkshopDsl {
       return await this.arenas.getSavedArenaPrompts();
     } catch (error) {
       throw new DslError("Failed to read the saved arena prompts", error);
+    }
+  }
+
+  async getSavedArenaColours(name: string, size: Size, points: Point[]): Promise<Colour[]> {
+    try {
+      return await this.arenas.getSavedArenaColours(name, size, points);
+    } catch (error) {
+      throw new DslError("Failed to see the saved arena drawing", error);
     }
   }
 

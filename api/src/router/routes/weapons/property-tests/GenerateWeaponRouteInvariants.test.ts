@@ -131,7 +131,10 @@ function costOf(requests: readonly PlannedRequest[], ran: ReadonlySet<number>, a
     if (request.outcome.status === "created") {
       cost += 1;
     }
-    if (request.outcome.status === "rejected") {
+    if (request.outcome.status === "rejected" && request.outcome.modelCalls > 0) {
+      cost += 0.5;
+    }
+    if (request.outcome.status === "invalid") {
       cost += 0.5;
     }
   });

@@ -1,9 +1,5 @@
-import type {ChooseArenaAction} from "@src/durable-objects/match/messages/types/ChooseArenaAction";
-import type {ChooseWeaponsAction} from "@src/durable-objects/match/messages/types/ChooseWeaponsAction";
-import type {LockInArenaAction} from "@src/durable-objects/match/messages/types/LockInArenaAction";
-import type {LockInWeaponsAction} from "@src/durable-objects/match/messages/types/LockInWeaponsAction";
-import type {PickArenaAction} from "@src/durable-objects/match/messages/types/PickArenaAction";
+import type {PreRoundChoice} from "@src/durable-objects/match/messages/types/PreRoundChoice";
+import type {PreRoundCommand} from "@src/durable-objects/match/messages/types/PreRoundCommand";
 
 /** Something a seat may do while the room is choosing. */
-export type PreRoundAction =
-  ChooseArenaAction | LockInArenaAction | ChooseWeaponsAction | LockInWeaponsAction | PickArenaAction;
+export type PreRoundAction = PreRoundChoice | PreRoundCommand;

@@ -18,6 +18,10 @@ export class WorkshopPlaywright extends BasePage {
     super(page);
   }
 
+  async pressBack(): Promise<void> {
+    await this.page.getByRole("dialog", {name: "Workshop"}).getByRole("button", {name: "Back", exact: true}).click();
+  }
+
   async open(): Promise<void> {
     await this.page.keyboard.press(WORKSHOP_KEY);
   }

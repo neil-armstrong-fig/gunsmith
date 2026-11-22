@@ -6,6 +6,8 @@ export const useArenaWorkshopStore = create<ArenaWorkshopStore>()(set => ({
   result: undefined,
   savedId: undefined,
   practiceWorld: undefined,
+  making: false,
+  makeError: undefined,
   setPrompt: prompt => {
     set({prompt});
   },
@@ -20,5 +22,11 @@ export const useArenaWorkshopStore = create<ArenaWorkshopStore>()(set => ({
   },
   setPracticeWorld: practiceWorld => {
     set({practiceWorld});
+  },
+  setMaking: making => {
+    set({making});
+  },
+  setMakeError: makeError => {
+    set({makeError});
   },
 }));

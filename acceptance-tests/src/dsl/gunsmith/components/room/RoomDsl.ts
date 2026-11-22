@@ -1,6 +1,6 @@
 import type {Page} from "@playwright/test";
 import type {RoundSnapshot} from "@gunsmith/shared/state-hook/types/RoundSnapshot";
-import {FrontDoorDsl} from "@src/dsl/gunsmith/components/room/components/front-door/FrontDoorDsl";
+import {RoomEntryDsl} from "@src/dsl/gunsmith/components/room/components/room-entry/RoomEntryDsl";
 import {RoomPlaywright} from "@src/dsl/gunsmith/components/room/playwright/RoomPlaywright";
 import type {ConnectionDelay} from "@src/dsl/gunsmith/components/room/playwright/wire/delayed-line/types/ConnectionDelay";
 import type {RoomLimits} from "@src/dsl/gunsmith/components/room/types/RoomLimits";
@@ -13,7 +13,7 @@ type MakeGunsmith = (page: Page) => GunsmithDsl;
 /** A private room two browsers share, reached as `gunsmith.room`. What a browser knows of the other player is what the server sent it. */
 export class RoomDsl {
   /** How a player reaches a room from the practice range: make one, or type a friend code in. */
-  readonly frontDoor: FrontDoorDsl;
+  readonly entry: RoomEntryDsl;
   private readonly room: RoomPlaywright;
   private second: GunsmithDsl | undefined;
   private stranger: GunsmithDsl | undefined;
@@ -22,7 +22,7 @@ export class RoomDsl {
     page: Page,
     private readonly makeGunsmith: MakeGunsmith,
   ) {
-    this.frontDoor = new FrontDoorDsl(page);
+    this.entry = new RoomEntryDsl(page);
     this.room = new RoomPlaywright(page);
   }
 
@@ -83,7 +83,7 @@ export class RoomDsl {
 
   /**
    * Opens a second browser, with a session of its own, on the practice range with `limits` on its address, as this browser's practice range
-   * has them. It is reached as `secondBrowser()`, and its `room.frontDoor` types the friend code in.
+   * has them. It is reached as `secondBrowser()`, and its `room.entry` types the friend code in.
    */
   async openASecondBrowserOnThePracticeRange(limits: RoomLimits = {}): Promise<void> {
     try {
@@ -91,7 +91,7 @@ export class RoomDsl {
         this.second = this.makeGunsmith(secondPage);
         this.second.room.startWatching();
       });
-      await this.secondBrowser().room.frontDoor.openThePracticeRange(limits);
+      await this.secondBrowser().room.entry.openThePracticeRange(limits);
     } catch (error) {
       throw new DslError("Failed to open a second browser on the practice range", error);
     }

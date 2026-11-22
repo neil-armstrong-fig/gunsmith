@@ -7,11 +7,23 @@ interface Props {
   prompt: string;
   limit: number;
   placeholder?: string;
+  making?: boolean;
+  waiting?: boolean;
   onPromptChange: (prompt: string) => void;
   onMake: () => void;
 }
 
-export function WorkshopPrompt({id, label, prompt, limit, placeholder, onPromptChange, onMake}: Props): JSX.Element {
+export function WorkshopPrompt({
+  id,
+  label,
+  prompt,
+  limit,
+  placeholder,
+  making,
+  waiting,
+  onPromptChange,
+  onMake,
+}: Props): JSX.Element {
   const readout = promptReadoutOf(prompt, limit);
 
   return (
@@ -39,11 +51,12 @@ export function WorkshopPrompt({id, label, prompt, limit, placeholder, onPromptC
 
         <button
           type="button"
-          disabled={!readout.canMake}
+          disabled={!readout.canMake || making || waiting}
           className="rounded-md bg-gs-team-blue px-5 py-2 font-semibold text-gs-background disabled:opacity-40"
           onClick={onMake}
         >
-          Make
+          {making && "Making…"}
+          {!making && "Make"}
         </button>
       </div>
     </div>

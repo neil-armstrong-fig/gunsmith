@@ -8,7 +8,7 @@ export interface ArenaOutcome {
   arena?: unknown;
   /** Why a request was rejected or fell back to a built-in arena, in words a player may see. */
   reason?: string;
-  /** The credit goes back: true exactly when a built-in arena was given because the model's arena could not be used. */
+  /** The credit goes back: true exactly when the request was turned away before any model was called (`modelCalls` is 0). A request that reached the model is paid for, whatever came of it. */
   refunded: boolean;
   /** The graph nodes that ran, in order, so a test can see the path (the pre-check first; repair at most once). */
   nodes: string[];

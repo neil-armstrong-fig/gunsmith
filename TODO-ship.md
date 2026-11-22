@@ -6,9 +6,11 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 ## Resume here
 
-The persistent checkout is `.claude/worktrees/ship` on `worktree-ship`, synced to `4f38a65`. The daily account-retention sweep is implemented and verified locally. At the authorized rollout, verify that Cloudflare lists the 04:00 UTC trigger and review its first invocation. The main checkout is investigating CI. The hosted release artifact, four preview shard blobs, native setup timings and scheduled property results still need verification.
+M1 Esc menu is implemented in the Ship worktree. The menu moves the old front door into Settings, puts Workshop directly below Resume, pauses local play, and keeps the online match clock moving. The startup preference and `?menu=0` are documented in the webapp instructions. Back controls, same-canvas bot entry, standard Zustand startup persistence and the shared friend-code rules are committed in `1ff3a1a`.
 
-The first combined Worker from `d40d942` is live on the API hostname. The locally verified two-host release reached GitHub main at `bc47751`. The webapp custom domain serves static test Worker version `8b2f62ff-f3f9-4e83-92c4-6cdc5d0ba93d` with `noindex`. The user deferred live rollout and automatic releases while Ship stabilizes CI.
+The persistent checkout is `.claude/worktrees/ship` on `worktree-ship`, synced with GitHub main `45ab470`. The manual release is live on both production hostnames. Cloudflare lists the daily account-retention sweep at 04:00 UTC. Review its first invocation after 04:00 UTC on 2026-11-21. The main checkout is investigating CI. The hosted release artifact, four preview shard blobs, native setup timings and scheduled property results still need verification.
+
+Both production hostnames serve the split release with API Worker version `9a8a53a8-f4d8-481f-886a-5ac4a5a4d64f` and webapp Worker version `e2b165ba-867e-4a69-a419-6d12a8ba06bb`. The webapp retains `noindex`. Automated deployment stays off while Ship stabilizes CI.
 
 Ship fixed the M1 pickup-marker acceptance setup. The [handoff](HANDOFF.md#latest-ship-delivery) records the original failing criterion, screenshot evidence and retained-marker check.
 
@@ -55,6 +57,14 @@ server supplies Worker/DO/storage bindings; budget supplies operational limits; 
 - [ ] Measure infrastructure costs with server/AI runtime measurements before proposing free versus Workers Paid.
 
 ## Verification/latest delivery
+
+2026-11-22 GitHub sync from `45ab470`. The merged Ship tree passed `pnpm checks` with 4,121 tests and the existing audio skip, all 23 Engine properties, and all 68 affected production-preview criteria on the second run. The saved-weapon bot-round criterion timed out on the first run.
+
+2026-11-22 Esc menu review follow-ups. `pnpm checks` passed 4,035 tests with one existing skip. Production preview passed 221 of 222 on the first run, and the online hit-marker criterion passed all three isolated reruns. See the [review delivery and audit](HANDOFF.md#latest-ship-delivery).
+
+2026-11-22 Esc menu. The full managed preview passed 633 criteria. The final production build passed all 14 menu criteria after the focus correction. `pnpm checks` passed 4,033 tests with one existing skip. See the [delivery and audit](HANDOFF.md#latest-ship-delivery).
+
+2026-11-20 manual release: `pnpm checks` passed 4,013 tests on `0dbfa19` with one existing audio skip. The production build, both Worker dry runs, and all 67 affected room criteria passed. Live acceptance passed 610 of 611 criteria on the first run. The saved-weapon scenario timed out waiting for the bot round to end and passed all three isolated reruns. The D1 and Durable Object resource IDs were preserved. The [handoff](HANDOFF.md#latest-ship-delivery) records the production smoke checks and pending sign-in and cron verification.
 
 2026-11-20 account retention: the local scheduled invocation failed before wiring and passed twice afterward, leaving the unexpired fixture intact. The Wrangler and Alchemy schedules match. The ledger-erasure mutation failed the new regression. `pnpm checks` passed lint, formatting, strict types and 4,012 tests with one existing skip. The frontend compile and both Wrangler dry runs passed. Reviewed the root, API and infra instructions and audited the new folder and callers. Production trigger verification is pending.
 
