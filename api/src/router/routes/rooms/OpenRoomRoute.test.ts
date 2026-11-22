@@ -1,5 +1,5 @@
 import {openRoomRoute} from "@src/router/routes/rooms/OpenRoomRoute";
-import {isFriendCode} from "@src/router/routes/shared/friend-code/IsFriendCode";
+import {isFriendCode} from "@gunsmith/shared/online/friend-code/IsFriendCode";
 
 it("opens a private room and answers its friend code", async () => {
   const response = openRoomRoute(new Request("https://gunsmith.test/api/rooms", {method: "POST"}));

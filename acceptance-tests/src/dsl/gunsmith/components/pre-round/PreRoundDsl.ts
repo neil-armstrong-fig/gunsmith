@@ -4,7 +4,7 @@ import {PreRoundPlaywright} from "@src/dsl/gunsmith/components/pre-round/playwri
 import type {PreRoundReveal} from "@src/dsl/gunsmith/components/pre-round/types/PreRoundReveal";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
 
-/** The pre-round: the choosing of weapons over the dimmed arena before a match against the bot, and the front door that leads to it, reached as `gunsmith.preRound`. */
+/** The pre-round: the choosing of weapons over the dimmed arena before a match against the bot, and the Start bot game action that leads to it, reached as `gunsmith.preRound`. */
 export class PreRoundDsl {
   readonly arena: ArenaPreRoundDsl;
   private readonly preRound: PreRoundPlaywright;
@@ -14,21 +14,29 @@ export class PreRoundDsl {
     this.preRound = new PreRoundPlaywright(page);
   }
 
-  /** Whether the practice range offers "Fight the bot". */
-  async hasFightTheBot(): Promise<boolean> {
+  async pressBack(): Promise<void> {
     try {
-      return await this.preRound.hasFightTheBot();
+      await this.preRound.pressBack();
     } catch (error) {
-      throw new DslError("Failed to see whether Fight the bot is offered", error);
+      throw new DslError("Could not go back from the pre-round", error);
     }
   }
 
-  /** Presses "Fight the bot" on the practice range and waits for the pre-round to be on the screen. */
-  async fightTheBot(): Promise<void> {
+  /** Whether the practice range offers "Start bot game". */
+  async hasStartBotGame(): Promise<boolean> {
     try {
-      await this.preRound.fightTheBot();
+      return await this.preRound.hasStartBotGame();
     } catch (error) {
-      throw new DslError("Failed to press Fight the bot", error);
+      throw new DslError("Failed to see whether Start bot game is offered", error);
+    }
+  }
+
+  /** Presses "Start bot game" on the practice range and waits for the pre-round to be on the screen. */
+  async startBotGame(): Promise<void> {
+    try {
+      await this.preRound.startBotGame();
+    } catch (error) {
+      throw new DslError("Failed to press Start bot game", error);
     }
   }
 

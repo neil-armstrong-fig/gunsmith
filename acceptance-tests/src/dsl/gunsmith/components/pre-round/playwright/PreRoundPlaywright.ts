@@ -8,12 +8,16 @@ export class PreRoundPlaywright extends BasePage {
     super(page);
   }
 
-  async hasFightTheBot(): Promise<boolean> {
-    return await this.page.getByRole("button", {name: "Fight the bot"}).isVisible();
+  async pressBack(): Promise<void> {
+    await this.dialog().getByRole("button", {name: "Back", exact: true}).click();
   }
 
-  async fightTheBot(): Promise<void> {
-    await this.page.getByRole("button", {name: "Fight the bot"}).click();
+  async hasStartBotGame(): Promise<boolean> {
+    return await this.page.getByRole("button", {name: "Start bot game"}).isVisible();
+  }
+
+  async startBotGame(): Promise<void> {
+    await this.page.getByRole("button", {name: "Start bot game"}).click();
     await expect(this.dialog()).toBeVisible();
     await expect(this.page.getByTestId("arena")).toHaveAttribute("data-ready", "true");
   }

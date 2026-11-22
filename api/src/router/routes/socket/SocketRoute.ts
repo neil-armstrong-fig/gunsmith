@@ -1,5 +1,5 @@
 import {workerEnvironment} from "@src/env/WorkerEnvironment";
-import {isFriendCode} from "@src/router/routes/shared/friend-code/IsFriendCode";
+import {isFriendCode} from "@gunsmith/shared/online/friend-code/IsFriendCode";
 
 /**
  * `GET /api/rooms/<code>/socket` with a WebSocket upgrade: hands the request to the `Match` Durable Object named by the friend code,

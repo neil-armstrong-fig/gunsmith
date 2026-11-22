@@ -17,21 +17,23 @@ given("the practice range, with a weapon the player made and saved", () => {
     madeName = (await gunsmith.workshop.getResult()).name;
     await gunsmith.workshop.shelf.save();
     await gunsmith.workshop.close();
+    await gunsmith.menu.pressSettings();
   });
 
   when("the player looks at the practice range", () => {
-    then("Fight the bot is offered", async ({gunsmith}) => {
-      expect(await gunsmith.preRound.hasFightTheBot()).toBe(true);
+    then("Start bot game is offered", async ({gunsmith}) => {
+      expect(await gunsmith.preRound.hasStartBotGame()).toBe(true);
     });
   });
 
-  when("the player presses Fight the bot", () => {
+  when("the player presses Start bot game", () => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.preRound.fightTheBot();
+      await gunsmith.preRound.startBotGame();
     });
 
     then("the pre-round is open and the round has not begun", async ({gunsmith}) => {
       expect(await gunsmith.preRound.isOpen()).toBe(true);
+      expect(await gunsmith.menu.isOpen()).toBe(false);
       expect(await gunsmith.round.getElapsedSeconds()).toBe(0);
     });
 
