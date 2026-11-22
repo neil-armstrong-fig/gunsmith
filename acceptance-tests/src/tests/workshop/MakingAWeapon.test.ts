@@ -10,7 +10,7 @@ given("the workshop is open on the practice range", () => {
 
   when("the player writes a weapon and presses Make", () => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.workshop.typeThePrompt("a fast little submachine gun");
+      await gunsmith.workshop.pasteThePrompt("a fast little submachine gun");
       await gunsmith.workshop.make();
     });
 
@@ -57,7 +57,7 @@ given("the workshop is open on the practice range", () => {
     let longRangeRating = 0;
 
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.workshop.typeThePrompt("a fast little submachine gun");
+      await gunsmith.workshop.pasteThePrompt("a fast little submachine gun");
       await gunsmith.workshop.make();
       const fast = await gunsmith.workshop.getResult();
       fastShotsASecond = Number.parseFloat(fast.stats["Shots a second"] ?? "");
@@ -167,7 +167,7 @@ given("the workshop is open on the practice range", () => {
 
   when("the player makes a weapon, shuts the workshop and opens it again", () => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.workshop.typeThePrompt("a fast little submachine gun");
+      await gunsmith.workshop.pasteThePrompt("a fast little submachine gun");
       await gunsmith.workshop.make();
       await gunsmith.workshop.close();
       await gunsmith.workshop.open();

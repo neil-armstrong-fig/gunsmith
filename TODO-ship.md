@@ -6,7 +6,7 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 ## Resume here
 
-The persistent checkout is `.claude/worktrees/ship` on `worktree-ship`, synced to `9c81558`. The current slice simplifies `.github/workflows/ci.yml` to Checks, preview acceptance, deploy and deployed acceptance. After publication, verify the release artifact and all four preview shard blobs. Compare native setup timings on matching runner images. The next scheduled property run should also report all three suites and upload `property-tests-log`.
+The persistent checkout is `.claude/worktrees/ship` on `worktree-ship`, synced to `4f38a65`. The daily account-retention sweep is implemented and verified locally. At the authorized rollout, verify that Cloudflare lists the 04:00 UTC trigger and review its first invocation. The main checkout is investigating CI. The hosted release artifact, four preview shard blobs, native setup timings and scheduled property results still need verification.
 
 The first combined Worker from `d40d942` is live on the API hostname. The locally verified two-host release reached GitHub main at `bc47751`. The webapp custom domain serves static test Worker version `8b2f62ff-f3f9-4e83-92c4-6cdc5d0ba93d` with `noindex`. The user deferred live rollout and automatic releases while Ship stabilizes CI.
 
@@ -39,6 +39,7 @@ server supplies Worker/DO/storage bindings; budget supplies operational limits; 
 - [x] Budget request: enforce declarations below callers, including tests; reject module-level const arrow/function helpers, preserving nested const functions. Full cleanup, no baseline.
 - [x] Use the Worker manifest to bind `MATCHES`, `CREDITS`, `SPEND` and D1 in the deployed Worker. Retain the local `v1` and `v2` SQLite migrations. Alchemy manages deployed SQLite migrations.
 - [x] Include `ALERT_MAIL` and `ALERT_FROM_ADDRESS` in the deploy config. Deploy-time `ALERT_TO_ADDRESS` setup and binding verification happen during the authorized deploy.
+- [x] Add and locally verify the daily account-retention sweep.
 - [ ] Profile the next hosted sharded run against the failed [36-minute baseline](docs/agent-reference/Operations.md#ci-and-deployment). Record setup, build, test and report durations, retries, elapsed time and total runner minutes.
 - [x] Settle eval policy with the user and deliver free fake CI/root mechanics; see [policy](docs/agent-reference/EvalPolicy.md).
 - [ ] Receive AI-owned paid selector/guard/evidence implementation and reconciled opening spend before local paid activation.
@@ -54,6 +55,8 @@ server supplies Worker/DO/storage bindings; budget supplies operational limits; 
 - [ ] Measure infrastructure costs with server/AI runtime measurements before proposing free versus Workers Paid.
 
 ## Verification/latest delivery
+
+2026-11-20 account retention: the local scheduled invocation failed before wiring and passed twice afterward, leaving the unexpired fixture intact. The Wrangler and Alchemy schedules match. The ledger-erasure mutation failed the new regression. `pnpm checks` passed lint, formatting, strict types and 4,012 tests with one existing skip. The frontend compile and both Wrangler dry runs passed. Reviewed the root, API and infra instructions and audited the new folder and callers. Production trigger verification is pending.
 
 2026-11-20 CI stabilization: the pre-edit check found an unbounded native tool install. The revised step passed installed-tool, missing-tool and failed-APT probes. All 543 local production-preview criteria passed without retries. The four single-worker shards took 4.6, 6.3, 8.7 and 6.6 minutes in two waves, with a merged HTML report. The deadline probe failed with a valid partial blob. Workflow lint, `pnpm checks` (3,767 passed and one existing skip), both Wrangler dry runs and 275 fake evals passed. The next check is the hosted run after publication.
 

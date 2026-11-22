@@ -75,5 +75,5 @@ function eventsOf(changes: Partial<EventsRequest>): readonly CombatEvent[] | und
 }
 
 function turn(changes: Partial<FighterTurn> = {}): FighterTurn {
-  return {fighter: centred().player, fires: false, ...changes};
+  return {fighter: centred().player, fires: false, reloadStarted: false, ...changes};
 }
