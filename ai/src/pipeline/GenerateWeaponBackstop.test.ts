@@ -22,6 +22,8 @@ const TOO_STRONG = {
   magazineSize: 60,
   reloadSeconds: 0.5,
   startingReserve: 200,
+  visionDegrees: 130,
+  visionRange: 20,
 };
 
 it("is invalid, repaired once, drawn never, when balancing leaves a weapon over a limit both times", async () => {

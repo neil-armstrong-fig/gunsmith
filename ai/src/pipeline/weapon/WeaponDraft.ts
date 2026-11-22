@@ -5,7 +5,7 @@ import {WEAPON_LIMITS} from "@gunsmith/ai/pipeline/weapon/limits/WeaponLimits";
 const WEAPON_NAME_PATTERN = /^[\p{L}\p{N}][\p{L}\p{N} '.-]*$/u;
 
 /**
- * What a generated weapon is: a name and the six numbers `engine/`'s `Weapon` plays with, each between the floor and cap in
+ * What a generated weapon is: a name and the eight numbers `engine/`'s `Weapon` plays with (six stats and its vision), each between the floor and cap in
  * `WEAPON_LIMITS`. DRAFT, local to `ai/` until `build` freezes the real contract in `HANDOFF.md`. Strict, so a stray model field
  * is refused, not dropped. The limits bound each number alone; how strong the numbers are together (damage per second) is
  * `rate`'s to judge.
@@ -22,6 +22,8 @@ export const weaponDraftSchema = z
     magazineSize: z.number().int().min(WEAPON_LIMITS.magazineSize.min).max(WEAPON_LIMITS.magazineSize.max),
     reloadSeconds: z.number().min(WEAPON_LIMITS.reloadSeconds.min).max(WEAPON_LIMITS.reloadSeconds.max),
     startingReserve: z.number().int().min(WEAPON_LIMITS.startingReserve.min).max(WEAPON_LIMITS.startingReserve.max),
+    visionDegrees: z.number().min(WEAPON_LIMITS.visionDegrees.min).max(WEAPON_LIMITS.visionDegrees.max),
+    visionRange: z.number().min(WEAPON_LIMITS.visionRange.min).max(WEAPON_LIMITS.visionRange.max),
   })
   .strict();
 

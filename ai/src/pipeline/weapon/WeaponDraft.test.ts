@@ -9,6 +9,8 @@ const RIFLE: WeaponDraft = {
   magazineSize: 12,
   reloadSeconds: 1.5,
   startingReserve: 36,
+  visionDegrees: 90,
+  visionRange: 12,
 };
 
 it("accepts a weapon in range", () => {
@@ -24,6 +26,8 @@ it("accepts every stat at its floor", () => {
     magazineSize: 1,
     reloadSeconds: 0.5,
     startingReserve: 0,
+    visionDegrees: 50,
+    visionRange: 6,
   };
 
   expect(weaponDraftSchema.safeParse(floor).success).toBe(true);
@@ -38,6 +42,8 @@ it("accepts every stat at its cap", () => {
     magazineSize: 60,
     reloadSeconds: 5,
     startingReserve: 200,
+    visionDegrees: 130,
+    visionRange: 20,
   };
 
   expect(weaponDraftSchema.safeParse(cap).success).toBe(true);
@@ -49,6 +55,24 @@ it("refuses a damage above the cap", () => {
 
 it("refuses a fire interval below the floor", () => {
   expect(weaponDraftSchema.safeParse({...RIFLE, fireIntervalSeconds: 0.01}).success).toBe(false);
+});
+
+it("refuses a vision cone outside 50 to 130 degrees on either side", () => {
+  expect(weaponDraftSchema.safeParse({...RIFLE, visionDegrees: 49.9}).success).toBe(false);
+  expect(weaponDraftSchema.safeParse({...RIFLE, visionDegrees: 130.1}).success).toBe(false);
+});
+
+it("refuses a vision range outside 6 to 20 tiles on either side", () => {
+  expect(weaponDraftSchema.safeParse({...RIFLE, visionRange: 5.9}).success).toBe(false);
+  expect(weaponDraftSchema.safeParse({...RIFLE, visionRange: 20.1}).success).toBe(false);
+});
+
+it("refuses a weapon with no vision, because the model is asked for it like every other stat", () => {
+  const {visionDegrees: _degrees, ...withoutDegrees} = RIFLE;
+  const {visionRange: _range, ...withoutRange} = RIFLE;
+
+  expect(weaponDraftSchema.safeParse(withoutDegrees).success).toBe(false);
+  expect(weaponDraftSchema.safeParse(withoutRange).success).toBe(false);
 });
 
 it("refuses a magazine that is not a whole number of rounds", () => {

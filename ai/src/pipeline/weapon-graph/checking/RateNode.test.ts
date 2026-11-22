@@ -9,6 +9,8 @@ const RIFLE = {
   magazineSize: 12,
   reloadSeconds: 1.5,
   startingReserve: 36,
+  visionDegrees: 90,
+  visionRange: 12,
 };
 
 const TOO_STRONG = {
@@ -19,6 +21,8 @@ const TOO_STRONG = {
   magazineSize: 60,
   reloadSeconds: 0.5,
   startingReserve: 200,
+  visionDegrees: 130,
+  visionRange: 20,
 };
 
 it("passes a weapon inside both limits, noting only that it ran", () => {

@@ -9,6 +9,8 @@ const RIFLE = {
   magazineSize: 12,
   reloadSeconds: 1.5,
   startingReserve: 36,
+  visionDegrees: 90,
+  visionRange: 12,
 };
 
 const MAXIMUM = {
@@ -19,6 +21,8 @@ const MAXIMUM = {
   magazineSize: 60,
   reloadSeconds: 0.5,
   startingReserve: 200,
+  visionDegrees: 130,
+  visionRange: 20,
 };
 
 const NO_PREFERENCE = {favoured: [], sacrificed: []};
