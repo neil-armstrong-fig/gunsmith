@@ -22,7 +22,9 @@ import type {MatchSocket} from "@src/online/types/MatchSocket";
 import type {PreRoundFrame} from "@src/online/types/pre-round/PreRoundFrame";
 import type {Readiness} from "@src/online/types/Readiness";
 import type {SeatPick} from "@src/online/types/pre-round/SeatPick";
-import type {WeaponKeys} from "@src/online/types/pre-round/WeaponKeys";
+import type {ArenaChoice} from "@src/online/types/pre-round/ArenaChoice";
+import type {WeaponChoice} from "@src/online/types/pre-round/WeaponChoice";
+import type {RevealFrame} from "@src/online/types/RevealFrame";
 import type {SnapshotFrame} from "@src/online/types/SnapshotFrame";
 import {TICK_SECONDS} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/clock/TickSeconds";
 
@@ -58,6 +60,7 @@ export class OnlineMatch {
   private latest: World | undefined;
   private ready: Readiness | undefined;
   private choosing: PreRoundFrame | undefined;
+  private revealed: RevealFrame | undefined;
   private readonly snapshots = new SnapshotBuffer(SNAPSHOTS_KEPT);
   /** What the snapshots since the last `takeEvents` said happened to this player; kept until taken, so a frame that comes late loses none. */
   private eventsNotYetTaken: EventsOfSnapshots | undefined;
@@ -145,9 +148,14 @@ export class OnlineMatch {
     return this.choosing;
   }
 
-  /** Puts the built-in arena named `name` forward. It is not final until `lockInArena`, and the server ignores a name it does not know. */
-  chooseArena(name: string): void {
-    this.sendWhenOpen({kind: "choose", step: "arena", choice: {kind: "builtIn", name}});
+  /** The weapons both players carry into the match, as the server last said them (once, as the match begins); `undefined` before that. */
+  reveal(): RevealFrame | undefined {
+    return this.revealed;
+  }
+
+  /** Puts an arena forward, a built-in by name or one of this player's saved ones by id. It is not final until `lockInArena`, and the server ignores one it does not know or this player does not have. */
+  chooseArena(choice: ArenaChoice): void {
+    this.sendWhenOpen({kind: "choose", step: "arena", choice});
   }
 
   /** Locks in the arena put forward (the duel arena if none was): the other player's is then shown. */
@@ -155,13 +163,9 @@ export class OnlineMatch {
     this.sendWhenOpen({kind: "lockIn", step: "arena"});
   }
 
-  /** Puts two built-in weapons forward by their keys (slot 1, slot 2). They are not final until `lockInWeapons`, and the server ignores a key it does not know. */
-  chooseWeapons(keys: WeaponKeys): void {
-    this.sendWhenOpen({
-      kind: "choose",
-      step: "weapons",
-      choice: keys.map(key => ({kind: "builtIn", key})),
-    });
+  /** Puts two weapons forward (slot 1, slot 2), each a built-in by key or one of this player's saved ones by id. They are not final until `lockInWeapons`, and the server ignores a pair with one it does not know or this player does not have. */
+  chooseWeapons(choices: readonly [WeaponChoice, WeaponChoice]): void {
+    this.sendWhenOpen({kind: "choose", step: "weapons", choice: choices});
   }
 
   /** Locks in the weapons put forward (the rifle and the marksman rifle if none): the other player's are then shown. */
@@ -245,6 +249,9 @@ export class OnlineMatch {
     }
     if (message?.kind === "preRound") {
       this.choosing = message;
+    }
+    if (message?.kind === "reveal") {
+      this.revealed = message;
     }
     if (message?.kind === "snapshot" && this.arena) {
       this.choosing = undefined;

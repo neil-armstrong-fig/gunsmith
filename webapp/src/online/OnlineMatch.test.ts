@@ -502,7 +502,7 @@ it("shows what the server last said of the choosing, and stops once the match ha
 it("puts an arena forward by its name", () => {
   const {socket, match} = seatedMatch();
 
-  match.chooseArena("Fair duel");
+  match.chooseArena({kind: "builtIn", name: "Fair duel"});
 
   expect(socket.frames()).toEqual([{kind: "choose", step: "arena", choice: {kind: "builtIn", name: "Fair duel"}}]);
 });
@@ -518,7 +518,10 @@ it("locks in the arena it has chosen", () => {
 it("puts two built-in weapons forward by their keys, slot 1 then slot 2", () => {
   const {socket, match} = seatedMatch();
 
-  match.chooseWeapons(["submachine-gun", "rifle"]);
+  match.chooseWeapons([
+    {kind: "builtIn", key: "submachine-gun"},
+    {kind: "builtIn", key: "rifle"},
+  ]);
 
   expect(socket.frames()).toEqual([
     {
@@ -530,6 +533,57 @@ it("puts two built-in weapons forward by their keys, slot 1 then slot 2", () => 
       ],
     },
   ]);
+});
+
+it("puts a saved arena forward by its id, never its body", () => {
+  const {socket, match} = seatedMatch();
+
+  match.chooseArena({kind: "saved", id: "arena-1"});
+
+  expect(socket.frames()).toEqual([{kind: "choose", step: "arena", choice: {kind: "saved", id: "arena-1"}}]);
+});
+
+it("puts saved weapons forward by id, beside a built-in if it likes", () => {
+  const {socket, match} = seatedMatch();
+
+  match.chooseWeapons([
+    {kind: "saved", id: "weapon-1"},
+    {kind: "builtIn", key: "rifle"},
+  ]);
+
+  expect(socket.frames()).toEqual([
+    {
+      kind: "choose",
+      step: "weapons",
+      choice: [
+        {kind: "saved", id: "weapon-1"},
+        {kind: "builtIn", key: "rifle"},
+      ],
+    },
+  ]);
+});
+
+it("keeps the reveal the server sends as the match begins", () => {
+  const {socket, match} = seatedMatch();
+  const frame = {
+    kind: "reveal",
+    weapons: {
+      own: [
+        {kind: "builtIn", key: "rifle"},
+        {kind: "builtIn", key: "marksman-rifle"},
+      ],
+      opponent: [
+        {kind: "saved", weapon: {bulletDamage: 20}, appearance: {version: 1}},
+        {kind: "builtIn", key: "rifle"},
+      ],
+    },
+  };
+
+  expect(match.reveal()).toBeUndefined();
+
+  socket.receive(JSON.stringify(frame));
+
+  expect(match.reveal()).toEqual(frame);
 });
 
 it("locks in the weapons it has chosen", () => {
@@ -552,9 +606,12 @@ it("sends no choosing while the socket is not open", () => {
   const {socket, match} = seatedMatch();
   socket.readyState = 0;
 
-  match.chooseArena("Duel");
+  match.chooseArena({kind: "builtIn", name: "Duel"});
   match.lockInArena();
-  match.chooseWeapons(["rifle", "rifle"]);
+  match.chooseWeapons([
+    {kind: "builtIn", key: "rifle"},
+    {kind: "builtIn", key: "rifle"},
+  ]);
   match.lockInWeapons();
   match.pickArena({kind: "nothing"});
 

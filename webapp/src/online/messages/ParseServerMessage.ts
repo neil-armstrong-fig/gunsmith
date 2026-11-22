@@ -30,6 +30,9 @@ export function parseServerMessage(text: string): ServerMessage | undefined {
   if (kind === "preRound" && isPreRound(parsed)) {
     return parsed as ServerMessage;
   }
+  if (kind === "reveal" && isReveal(parsed)) {
+    return parsed as ServerMessage;
+  }
 
   return undefined;
 }
@@ -53,11 +56,70 @@ function isPreRound(frame: object): boolean {
     hasFlags(own, ["locked"]) &&
     hasFlags(opponent, ["locked", "picked"]) &&
     hasWeaponsStep(own) &&
-    hasWeaponsStep(opponent)
+    hasWeaponsStep(opponent) &&
+    hasArenaView(own) &&
+    hasArenaView(opponent)
   );
 }
 
-/** Whether `value` carries a weapons step: `locked` as a flag and, if it has them, `keys` as exactly two names. */
+/** The weapons both players carry: two on each side, each a built-in's key or a saved weapon with its numbers and drawing. */
+function isReveal(frame: object): boolean {
+  const weapons: unknown = Reflect.get(frame, "weapons");
+  if (typeof weapons !== "object" || weapons === null) {
+    return false;
+  }
+
+  return isRevealedPair(Reflect.get(weapons, "own")) && isRevealedPair(Reflect.get(weapons, "opponent"));
+}
+
+function isRevealedPair(value: unknown): boolean {
+  return Array.isArray(value) && value.length === 2 && value.every(isRevealedWeapon);
+}
+
+function isRevealedWeapon(value: unknown): boolean {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  const kind = Reflect.get(value, "kind");
+  if (kind === "builtIn") {
+    return typeof Reflect.get(value, "key") === "string";
+  }
+
+  return kind === "saved" && isRecord(Reflect.get(value, "weapon")) && isRecord(Reflect.get(value, "appearance"));
+}
+
+function isRecord(value: unknown): boolean {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/** Whether `value`, if it has an arena, has one the server could have sent: a built-in's name or a saved arena's name, with drawing rows if it has them. */
+function hasArenaView(value: unknown): boolean {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  const arena: unknown = Reflect.get(value, "arena");
+  if (arena === undefined) {
+    return true;
+  }
+  if (typeof arena !== "object" || arena === null || typeof Reflect.get(arena, "name") !== "string") {
+    return false;
+  }
+
+  const kind = Reflect.get(arena, "kind");
+  if (kind === "builtIn") {
+    return true;
+  }
+
+  const rows: unknown = Reflect.get(arena, "rows");
+
+  return (
+    kind === "saved" && (rows === undefined || (Array.isArray(rows) && rows.every(row => typeof row === "string")))
+  );
+}
+
+/** Whether `value` carries a weapons step: `locked` as a flag and, if it has them, `choices` as exactly two weapons, each a built-in's key or a saved weapon's name. */
 function hasWeaponsStep(value: unknown): boolean {
   if (typeof value !== "object" || value === null) {
     return false;
@@ -68,9 +130,23 @@ function hasWeaponsStep(value: unknown): boolean {
     return false;
   }
 
-  const keys: unknown = typeof weapons === "object" && weapons !== null ? Reflect.get(weapons, "keys") : undefined;
+  const choices: unknown =
+    typeof weapons === "object" && weapons !== null ? Reflect.get(weapons, "choices") : undefined;
 
-  return keys === undefined || (Array.isArray(keys) && keys.length === 2 && keys.every(key => typeof key === "string"));
+  return choices === undefined || (Array.isArray(choices) && choices.length === 2 && choices.every(isWeaponView));
+}
+
+function isWeaponView(value: unknown): boolean {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  const kind = Reflect.get(value, "kind");
+  if (kind === "builtIn") {
+    return typeof Reflect.get(value, "key") === "string";
+  }
+
+  return kind === "saved" && typeof Reflect.get(value, "name") === "string";
 }
 
 /** Whether `value` is an object whose named fields are all true or false. */
