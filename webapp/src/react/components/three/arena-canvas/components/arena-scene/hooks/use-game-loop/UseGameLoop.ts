@@ -1,11 +1,13 @@
 import {useFrame} from "@react-three/fiber";
 import {engine} from "@gunsmith/engine/Engine";
+import type {Point} from "@gunsmith/engine/geometry/types/Point";
 import {STATE_HOOK_NAME} from "@gunsmith/shared/state-hook/StateHookName";
 import {gameState} from "@src/store/game/selectors/game-state/GameState";
 import {useAppStore} from "@src/store/app/UseAppStore";
 import {usePreRoundStore} from "@src/store/pre-round/UsePreRoundStore";
 import {useGameStore} from "@src/store/game/UseGameStore";
 import {arenaPointAtPixel} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/pointer/ArenaPointAtPixel";
+import {hitPlacesOfStep} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/feedback/hit-places/HitPlacesOfStep";
 import {recordFeedbackCues} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/feedback/RecordFeedbackCues";
 import {fixedTicks} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/clock/FixedTicks";
 import {TICK_SECONDS} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/clock/TickSeconds";
@@ -79,15 +81,27 @@ export function useGameLoop(): void {
       }
 
       const shown = onlineMatch?.worldToShow(owed.leftoverSeconds);
+      const told = onlineMatch?.takeEvents();
+      if (shown && onlineMatch?.hasLostConnection()) {
+        sounds.stopRingDamage();
+        recordFeedbackCues({events: undefined, round: shown.round, hitPlaces: []});
+      } else if (shown && told) {
+        const {events, seconds, opponentVisible} = told;
+        const {round, opponent} = shown;
+        const hitPlaces: Point[] = [];
+        if (
+          opponentVisible &&
+          opponent &&
+          events.some(event => event.kind === "hitLanded" && event.on === "opponent")
+        ) {
+          hitPlaces.push(opponent.position);
+        }
+
+        sounds.afterTick({events, firing: trigger.isFiring(), round, seconds});
+        recordFeedbackCues({events, round, hitPlaces});
+      }
       if (shown) {
         useGameStore.getState().setWorld(shown);
-      }
-
-      // What the snapshots since the last frame said happened to this player (the server's events, not the browser's own: nothing is stepped
-      // here) goes to the sounds once, and only when a snapshot came: a frame with no news must not stop the ring loop the last one started.
-      const told = onlineMatch?.takeEvents();
-      if (shown && told) {
-        sounds.afterTick({events: told.events, firing: trigger.isFiring(), round: shown.round, seconds: told.seconds});
       }
 
       // The banner's "Next round" and "Play again" ask through the app store (the engine is not stepped here to start a round); the loop
@@ -134,15 +148,14 @@ export function useGameLoop(): void {
 
       const before = world;
       world = engine.step(world, input, TICK_SECONDS);
-      const {reloadRemainingSeconds} = world.player;
       sounds.afterTick({
         events: world.events,
         firing: input.firing,
         round: world.round,
         seconds: TICK_SECONDS,
-        reloadStarted: before.player.reloadRemainingSeconds === undefined && reloadRemainingSeconds !== undefined,
       });
-      recordFeedbackCues({before, after: world});
+      const hitPlaces = hitPlacesOfStep({before, after: world});
+      recordFeedbackCues({events: world.events, round: world.round, hitPlaces});
     }
 
     if (owed.ticks > 0) {

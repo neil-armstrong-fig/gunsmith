@@ -6,6 +6,8 @@ export interface FighterTurn {
   fighter: Player;
   /** Whether a shot leaves the weapon this step. The caller flies the bullets first, then lets it go and spends the round. */
   fires: boolean;
+  /** Whether the weapon in hand started a reload in this step. */
+  reloadStarted: boolean;
   /** Why a shot that was due did not leave: the magazine was empty. Absent when it fired or was only waiting. */
   refusal?: TriggerRefusal | undefined;
 }

@@ -112,14 +112,14 @@ jobs:
           if-no-files-found: error
 
   acceptance-tests:
-    name: Acceptance tests (${{ matrix.shard }}/4)
+    name: Acceptance tests (${{ matrix.shard }}/${{ strategy.job-total }})
     needs: checks
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4]
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -146,7 +146,7 @@ jobs:
       - name: Run acceptance shard
         # One worker leaves CPU for Chromium rendering and the local Worker. Playwright's
         # deadline leaves time to write and upload its blob before the job deadline.
-        run: pnpm acceptance-tests --shard=${{ matrix.shard }}/${{ strategy.job-total }} --workers=1 --global-timeout=1200000 --reporter=github,line,blob
+        run: pnpm acceptance-tests --shard=${{ matrix.shard }}/${{ strategy.job-total }} --workers=1 --retries=1 --global-timeout=1200000 --reporter=github,line,blob
         env:
           PREVIEW_ACCEPTANCE: "1"
           PREVIEW_API_MODE: local

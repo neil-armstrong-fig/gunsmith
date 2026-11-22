@@ -36,6 +36,7 @@ it("declares the API bindings and keeps the webapp assets off the API Worker", a
     const manifest = unstable_readConfig({config: workspacePath("api/wrangler.jsonc")});
 
     expect(apiWorker.name).toBe(manifest.name);
+    expect(manifest.triggers.crons).toEqual(["0 4 * * *"]);
     expect(cloudflare.Worker).toHaveBeenCalledExactlyOnceWith(
       "api",
       expect.objectContaining({
@@ -44,6 +45,7 @@ it("declares the API bindings and keeps the webapp assets off the API Worker", a
         compatibilityDate: manifest.compatibility_date,
         compatibilityFlags: manifest.compatibility_flags,
         url: false,
+        crons: manifest.triggers.crons,
         bindings: {
           ACCOUNT_DIGEST_KEY: expect.objectContaining({type: "secret"}),
           DB: apiDatabase,

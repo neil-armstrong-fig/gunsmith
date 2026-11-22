@@ -5,7 +5,6 @@ import {beforeEach, expect, given, then, when} from "@src/acceptance-criteria-ma
 // forfeits lose the match. The real limits are far too long to wait for, so each room here is made with short ones. The other player, who is
 // plainly there, keeps moving so that they are never the one who has gone quiet.
 const FORFEIT_WITHIN_SECONDS = 15;
-const KEEP_MOVING_SECONDS = 6;
 
 given("two browsers are in a private room that waits two seconds for a player to come back", () => {
   beforeEach(async ({gunsmith}) => {
@@ -42,18 +41,19 @@ given("two browsers are in a private room that waits two seconds for a player to
   });
 });
 
-// A player who is idle and never asks for the next round forfeits that too, a second idle time later: the second player is watched at a time
-// between the two, so this room waits four seconds and the watching lasts six.
-given("two browsers are in a private room that waits four seconds for a player to ask for something", () => {
+// A player who is idle and never asks for the next round forfeits that too, a second idle time later. The second player is watched between the
+// two, and not by a clock: they keep moving until the screen shows the round won, and read at once, so a machine that is slow to read cannot carry
+// the spec past the second forfeit (a fixed six seconds of moving did, in CI). Six seconds of idle time leaves the reading room to be slow.
+given("two browsers are in a private room that waits six seconds for a player to ask for something", () => {
   beforeEach(async ({gunsmith}) => {
-    const code = await gunsmith.room.createPrivateRoom({idleSeconds: 4});
+    const code = await gunsmith.room.createPrivateRoom({idleSeconds: 6});
 
     await gunsmith.room.joinWithASecondBrowser(code);
   });
 
   when("the first player stays but asks for nothing new while the second keeps moving", () => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.room.secondBrowser().room.keepMovingFor(KEEP_MOVING_SECONDS);
+      await gunsmith.room.secondBrowser().room.keepMovingUntilTheRoundIs("won", FORFEIT_WITHIN_SECONDS);
     });
 
     then("the second player has won the round", async ({gunsmith}) => {
@@ -76,10 +76,10 @@ given("two browsers are in a private room that waits four seconds for a player t
       beforeEach(async ({gunsmith}) => {
         const second = gunsmith.room.secondBrowser();
 
-        await second.room.keepMovingFor(KEEP_MOVING_SECONDS);
+        await second.room.keepMovingUntilTheRoundIs("won", FORFEIT_WITHIN_SECONDS);
         await second.round.getBannerMessage();
         await second.round.nextRound();
-        await second.room.keepMovingFor(KEEP_MOVING_SECONDS);
+        await second.room.keepMovingUntilPlayAgainIsOffered(FORFEIT_WITHIN_SECONDS);
       });
 
       then("the first player forfeits the next round too, and the second has won the match", async ({gunsmith}) => {

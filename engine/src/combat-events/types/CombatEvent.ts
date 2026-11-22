@@ -4,6 +4,7 @@ import type {FireRefusedEvent} from "@gunsmith/engine/combat-events/types/FireRe
 import type {HeardEvent} from "@gunsmith/engine/combat-events/types/HeardEvent";
 import type {HitLandedEvent} from "@gunsmith/engine/combat-events/types/HitLandedEvent";
 import type {PickupTakenEvent} from "@gunsmith/engine/combat-events/types/PickupTakenEvent";
+import type {ReloadStartedEvent} from "@gunsmith/engine/combat-events/types/ReloadStartedEvent";
 import type {ShotFiredEvent} from "@gunsmith/engine/combat-events/types/ShotFiredEvent";
 
 /**
@@ -11,4 +12,11 @@ import type {ShotFiredEvent} from "@gunsmith/engine/combat-events/types/ShotFire
  * the one thing it says of the other fighter out of sight is the direction of a shot (`HeardEvent`).
  */
 export type CombatEvent =
-  ShotFiredEvent | FootstepEvent | FireRefusedEvent | DamageTakenEvent | HitLandedEvent | PickupTakenEvent | HeardEvent;
+  | ShotFiredEvent
+  | FootstepEvent
+  | FireRefusedEvent
+  | DamageTakenEvent
+  | HitLandedEvent
+  | PickupTakenEvent
+  | ReloadStartedEvent
+  | HeardEvent;

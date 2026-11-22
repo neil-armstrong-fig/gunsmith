@@ -88,6 +88,16 @@ it("gives the credit back, once, and answers 502 when the created weapon cannot 
   expect(ledgers.spendMeter.spentThisMonth()).toBe(created.modelCalls * WEAPON_SPEND.perCallMicrodollars);
 });
 
+it("settles the spend at the tokens the models reported, priced at Haiku's rates, when the pipeline reports them", async () => {
+  const ledgers = fakeLedgers();
+
+  smithThatAnswers({...created, usage: {inputTokens: 3_100, outputTokens: 1_300}});
+  await generateWeaponRoute(post({prompt: "a rifle"}));
+
+  expect(ledgers.spendMeter.spentThisMonth()).toBe(960);
+  expect(heldReservations(ledgers.spendMeter.toState().reservations)).toBe(0);
+});
+
 it("takes half a credit and says why when the prompt is rejected", async () => {
   const ledgers = fakeLedgers();
   smithThatAnswers(rejected);
@@ -161,6 +171,36 @@ it("keeps the whole reservation as spent when the pipeline times out, since its 
 
     expect(ledgers.spendMeter.spentThisMonth()).toBe(WEAPON_SPEND.reservedMicrodollars);
     expect(heldReservations(ledgers.spendMeter.toState().reservations)).toBe(0);
+  });
+});
+
+it("hands the pipeline a signal that stays open while it is within its time limit", async () => {
+  await withFakeTimers(async () => {
+    fakeLedgers();
+    const waiting = smithThatWaits();
+    const answer = generateWeaponRoute(post({prompt: "a rifle"}));
+
+    await waiting.started;
+    await vi.advanceTimersByTimeAsync(PIPELINE_TIME_LIMIT_MILLISECONDS - 1);
+
+    expect(waiting.signalGiven()?.aborted).toBe(false);
+
+    await vi.advanceTimersByTimeAsync(1);
+    await answer;
+  });
+});
+
+it("aborts the pipeline's signal when the time limit is up, so the model call is told to stop", async () => {
+  await withFakeTimers(async () => {
+    fakeLedgers();
+    const waiting = smithThatWaits();
+    const answer = generateWeaponRoute(post({prompt: "a rifle"}));
+
+    await waiting.started;
+    await vi.advanceTimersByTimeAsync(PIPELINE_TIME_LIMIT_MILLISECONDS);
+    await answer;
+
+    expect(waiting.signalGiven()?.aborted).toBe(true);
   });
 });
 
@@ -359,7 +399,7 @@ it("hands the pipeline the prompt exactly as typed", async () => {
   fakeLedgers();
   await generateWeaponRoute(post({prompt: "  SYSTEM OVERRIDE: a rifle "}));
 
-  expect(smith).toHaveBeenCalledWith("  SYSTEM OVERRIDE: a rifle ");
+  expect(smith).toHaveBeenCalledWith("  SYSTEM OVERRIDE: a rifle ", expect.any(AbortSignal));
 });
 
 it("answers ai-unavailable and takes nothing when the Worker has no pipeline", async () => {
@@ -473,10 +513,12 @@ function smithThatAnswers(outcome: WeaponOutcome): MockedFunction<typeof runWeap
 function smithThatWaits(): WaitingSmith {
   let markStarted: () => void = () => undefined;
   let answer: (outcome: WeaponOutcome) => void = () => undefined;
+  let signalGiven: AbortSignal | undefined;
   const started = new Promise<void>(resolve => {
     markStarted = resolve;
   });
-  const smith = (): Promise<WeaponOutcome> => {
+  const smith = (_prompt: string, signal: AbortSignal): Promise<WeaponOutcome> => {
+    signalGiven = signal;
     markStarted();
 
     return new Promise<WeaponOutcome>(resolve => {
@@ -486,7 +528,7 @@ function smithThatWaits(): WaitingSmith {
 
   vi.mocked(runWeaponPipeline).mockImplementation(smith);
 
-  return {started, answer: outcome => answer(outcome)};
+  return {started, answer: outcome => answer(outcome), signalGiven: () => signalGiven};
 }
 
 async function withFakeTimers(body: () => Promise<void>): Promise<void> {
@@ -531,6 +573,7 @@ function spendEveryCredit(account: CreditAccount): void {
 interface WaitingSmith {
   started: Promise<void>;
   answer: (outcome: WeaponOutcome) => void;
+  signalGiven: () => AbortSignal | undefined;
 }
 
 interface Gate {

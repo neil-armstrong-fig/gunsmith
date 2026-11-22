@@ -14,12 +14,13 @@ const DEFAULT_SHAKE_PIXELS = 12;
 const THE_STUDYS_SHAKE_PIXELS = 2;
 const AIM_DISTANCE_TILES = 6;
 
-const DELAY_SECONDS = 3;
-const CLOSING_SECONDS = 6;
+// A third of the game's own ring, as in `TakingDamageOnTheScreen`, which says why.
+const DELAY_SECONDS = 1;
+const CLOSING_SECONDS = 2;
 const PLAYER_LEFT_OUTSIDE_SEED = 14;
-// The ring first hurts the player at about 7.5 s of game time (`TakingDamageOnTheScreen`). A shake lasts 100 ms, so the ring is watched in the same fine steps as a
+// The ring first hurts the player at about 2.5 s of game time (`TakingDamageOnTheScreen`). A shake lasts 100 ms, so the ring is watched in the same fine steps as a
 // bullet, from a little before it bites: stopped coarsely, the moment a shake started by the ring would be sampled is long past and nothing could show it.
-const BEFORE_THE_RING_BITES_SECONDS = 5;
+const BEFORE_THE_RING_BITES_SECONDS = 1.5;
 const RING_WATCH = {maxSeconds: 10, stepSeconds: 0.02};
 
 given("a duel, held still, with the player standing in the open", () => {
