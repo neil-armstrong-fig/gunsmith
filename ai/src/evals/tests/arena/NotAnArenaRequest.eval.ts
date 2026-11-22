@@ -18,6 +18,10 @@ given.inProgress(
           expect(arena.getModelCalls()).toBeLessThanOrEqual(1);
         });
 
+        thenExpect("the credit is not refunded, because the moderation call was made", () => {
+          expect(arena.wasRefunded()).toBe(false);
+        });
+
         expectDefaultPipelineBehaviour(arena);
       });
     });
@@ -35,6 +39,10 @@ given.inProgress(
 
           thenExpect("the rejection costs at most one model call (moderation)", () => {
             expect(arena.getModelCalls()).toBeLessThanOrEqual(1);
+          });
+
+          thenExpect("the credit is not refunded, because the moderation call was made", () => {
+            expect(arena.wasRefunded()).toBe(false);
           });
 
           expectDefaultPipelineBehaviour(arena);
@@ -57,6 +65,10 @@ given.inProgress(
             expect(arena.getModelCalls()).toBe(0);
           });
 
+          thenExpect("the credit is refunded, because no model was called and nothing was spent", () => {
+            expect(arena.wasRefunded()).toBe(true);
+          });
+
           expectDefaultPipelineBehaviour(arena);
         });
       },
@@ -72,6 +84,10 @@ given.inProgress(
 
         thenExpect("the rejection costs at most one model call (moderation)", () => {
           expect(arena.getModelCalls()).toBeLessThanOrEqual(1);
+        });
+
+        thenExpect("the credit is not refunded, because the moderation call was made", () => {
+          expect(arena.wasRefunded()).toBe(false);
         });
 
         expectDefaultPipelineBehaviour(arena);
@@ -98,11 +114,4 @@ function expectDefaultPipelineBehaviour(arena: ArenaDsl): void {
   thenExpect("whatever is asked, the pipeline spends at most three model calls", () => {
     expect(arena.getModelCalls()).toBeLessThanOrEqual(3);
   });
-
-  thenExpect(
-    "whatever is asked, the credit is refunded exactly when a built-in arena is given instead of the one asked for",
-    () => {
-      expect(arena.wasRefunded()).toBe(arena.getStatus() === "builtIn");
-    },
-  );
 }

@@ -88,7 +88,9 @@ given("the arena generator returns a built-in after an unsuccessful attempt", ()
     await gunsmith.workshop.make();
   });
 
-  then("the result explains that the arena is a fallback and the credit was refunded", async ({gunsmith}) => {
-    await expect.poll(() => gunsmith.workshop.arenas.getResultDescription()).toContain("Your credit is refunded.");
+  then("the result explains why a built-in arena was shown", async ({gunsmith}) => {
+    await expect
+      .poll(() => gunsmith.workshop.arenas.getResultDescription())
+      .toContain("We could not build a playable arena from that request, so here is one of ours.");
   });
 });

@@ -26,7 +26,7 @@ const arenaAnswer = z.object({
     .optional(),
 });
 const pausedAnswer = z.object({error: z.literal("ai-off")});
-const FALLBACK_REASON = "We could not build a playable arena, so here is a built-in arena. Your credit is refunded.";
+const FALLBACK_REASON = "We could not build a playable arena, so here is a built-in arena.";
 
 export async function makeAccountArena(prompt: string): Promise<WorkshopArena> {
   const response = await fetch(accountUrl("/api/arenas"), {

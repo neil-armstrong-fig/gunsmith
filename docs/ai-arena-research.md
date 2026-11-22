@@ -49,6 +49,105 @@ One throwaway script (deleted after the run), `withStructuredOutput(plainJsonSch
 - **Cost.** The schema is part of the input (1,686 tokens in for the small one, 2,424 for the large, so a bigger schema costs more input, about 740 tokens more for 18 more rows); an arena is $0.00035 to $0.00066, in the range of rows and shapes.
 - **Verdict.** Feasible and cheap. The open price is the fixed size (next section), plus a per-size-class cold start, not the cost or the schema's acceptance.
 
+## Large-arena diagnosis (2026-11-20, 12 real Haiku 5.5 first drafts, $0.0071 of the user's $0.05)
+
+Question: why did 3 of 4 large requests fall back, and would a coarse grid or strict rows fix it? A throwaway probe (deleted) called the generation step alone, with no moderation and no repair, and ran the validator on each first draft.
+
+| Request | Format | First drafts | Refused | Why |
+| --- | --- | --- | --- | --- |
+| "the largest arena allowed, 40 columns wide and 30 rows tall, with several walled rooms joined by doorways, rings of pillars, low cover blocks, and a raised platform reached by stairs" | shapes | 9 | **7** | about 120 tiles of floor sealed off, at the same places every time (column 14, rows 10 and 29): a room whose "doorway" is closed by another wall. One run also had 4 stray tiles. |
+| the same | rows | 1 | 1 | a row of 41 characters (a miscount) |
+| "a huge open battlefield, as wide and as tall as you may make it, scattered with cover" | shapes | 1 | 0 | none |
+| the same | rows | 1 | 0 | valid, but only 15 rows tall, not the "as tall as you may make it" asked for |
+
+- **The failure is a design fault, not a scale or counting one.** Shapes never miscounts, and the 40 by 30 drawing was well formed every time. The model draws walled rooms and then closes the way into them. A coarse grid would not change that, and strict rows would only remove the miscount, which shapes already avoids. So **neither candidate targets the large-arena gap**; the earlier "3 of 4" was a mix of this (shapes) and the miscount (rows).
+- **Not measured: the repair.** A request falls back only when the one repair fails too. Seven refusals were the same sentence about floor at one place; whether the repair opens a doorway is the number that decides the fall-back rate, and it is unmeasured. The repair is shown "N tiles of floor, starting at column 14, row 10, cannot be walked to" and the generation prompt never says that rooms need a doorway to the rest of the floor.
+- One sample of the plain request does not make a rate; the 8 runs of the hard request do (7 of 8).
+
+## Study: "AI parses, code generates" (web research, 2026-11-20, no model calls)
+
+The user's question: can the model's job shrink to understanding the request, with code making the arena, so that results improve a lot instead of being tuned forever? Evidence below is split by how well it was checked. **Read in full:** Co-DSL abstract, the MILP level-repair paper, LatticeWorld. **Search snippets only (PDFs would not parse):** "Constraint Is All You Need" (PCG Workshop 2025), the metageneration paper, MarioGPT, Word2World, the floor-plan work. Nothing found compares, under control, a model writing a tile grid against a model writing a spec that code expands, for a connectivity-guaranteed 2D arena. **The evidence supports the direction; it does not give us a number.**
+
+### What the literature says
+
+- **Models write tile grids badly and read them well.** The metageneration paper's survey of the field and the maze benchmarks agree: spatial counting and connectivity are weak points, so the work around them moves them out of the model. This matches our two failures (rows miscount, sealed rooms).
+- **The common pattern is "model writes a description, code or a solver builds the layout".** Co-DSL: the model states which spatial concepts hold (a concept graph) and a solver finds the layout. "Constraint Is All You Need": the model extracts constraints into a structured Game Level Description Language, an optimiser lays out the level, and agents play it to check; it reports 88% validity, in 3D, with an empirical not a formal guarantee. LatticeWorld: a fixed 32 by 32 symbol grid that a decoder expands (no accuracy numbers given). Floor plans: Graph2Plan and constraint-graph work build the plan from a room graph, and the adjacency-against-boundary trade-off is the known cost.
+- **Generate, then repair by code is the best-measured recipe.** Level repair by mixed-integer programming turned a GAN's 24.3% playable Zelda levels into 100% (0.13 s a level), by minimising the tiles it moves; it is agnostic to how the level was made. Word2World runs the same idea as plain checks (row sizes, A* path) on a model's tile grid.
+- **Solvers (ASP, SAT, WFC) guarantee validity but need formal constraints.** No source shows a model turning free text into an ASP or WFC specification reliably. WFC itself is weak at global properties such as playability.
+- **Fine-tuned models are not the answer either:** MarioGPT had about 31% solvable levels.
+- **Fairness work agrees with engine's plan:** designers rely on point symmetry, and the shooter-map work (ARENA, MAP-Elites) scores walkable area, symmetry and route length from the layout graph. Mirroring in code stays engine's finalisation step.
+
+### The options, ranked for this game
+
+1. **Code repair of what the model drew (the cheapest, aimed at the observed failure).** After shapes compile, code finds each cut-off region of floor and opens it with the shortest cut through the wall between it and the main floor (a breadth-first search over wall tiles; the MILP paper is the heavyweight form of the same idea). It costs no model call and would have fixed 7 of the 8 refusals above, which were all one sealed room each. Risks: it changes the model's design (a door the player did not ask for), and it must not defeat a request whose point is a closed layout ("cut in two by a wall nobody can cross"); the cap should be small (at most a few doors, never more than a share of the walls) and the arena says it was repaired.
+2. **A feature vocabulary instead of raw rectangles** ("AI parses, code generates" proper). The model chooses from named pieces and places them by meaning: `room` (code draws the walls and **must be given a door**, so a sealed room cannot be written), `pillar_ring`, `platform_with_stairs` (one piece, so the stair rule cannot be broken), `cover_scatter` (density), `wall_line`, a size and a symmetry flag. Connectivity and the stair rules hold by construction, the model's output is smaller, and the fine placement stays the model's. Cost: a new format and a code library, and less freedom than rectangles (the earlier doc called a pure menu "not what players asked for"; a vocabulary with positions and parameters is between the two).
+3. **A code-owned fallback instead of a built-in arena.** When the model's draft cannot be made valid, build an arena from the request's *parameters* (size, cover density, has-platform, has-rooms) with a seeded generator, so a failure still gives the player something of their own and the refund becomes rare. Lowest risk, no model change, but only a floor under the results, not a fix.
+4. **Constraint solver or WFC with the model supplying constraints** (Co-DSL, GLDL pattern). The most principled and the heaviest: a solver in a Worker bundle (ASP or SAT as WASM), a specification language, and no evidence a small model writes the constraints reliably. Not first.
+5. **Model writes generator code, executed by us.** Rejected: running model-written code in the Worker is a security and spend risk for no gain over option 2.
+6. **Rows or shapes with strict output, a coarse grid:** these fix counting, not design (measured above), so they stay as they are.
+
+### Proposed probes, cheapest first, with what would count as success
+
+Success is set before the first call so the work cannot drift: **on Haiku, at least 90% of 36 or more first-draft arenas (12 varied requests, 3 trials each) are playable with no model repair, at no more than the present cost (about $0.0005 an arena).**
+
+- **P0, free, offline (code only):** write option 1 as a throwaway on the 7 saved refused drafts (`scratchpad/large-probe-8.md`) and the validator's own examples; report how many it turns valid, how many tiles it changes, and what it does to the "cut in two" request. No model call.
+- **P1, about $0.005:** run the present repair on those same 7 first drafts, so there is a measured baseline for what the repair already achieves; without it P0 has nothing to beat.
+- **P2, about $0.015:** option 2's format on Haiku for the same 12 requests; compare first-draft validity with shapes on those requests (shapes's own first-draft rate on the 12 is the other half of the comparison, about $0.01).
+- **P3, free:** option 3's generator, checked by the validator on 1,000 seeded parameter sets; measures whether it always produces a playable arena.
+
+Total about $0.03 to $0.04 of the $0.05 the user allowed. The request set must include the cases that broke before (the two large ones, the platform with stairs, cut in two, a small box, pillars, cover) and at least four new ones that ask for a layout idea no probe has seen (a spiral, a cross, three rooms in a row, a bridge over a pit).
+
+### Probe results (2026-11-20, Haiku 5.5, $0.0447 of the user's $0.05; ledger $0.0766 to $0.1213)
+
+The probe code, every saved draft and the contact sheets are kept in the main checkout's `private-source/arena-probes-20261120/` (git-ignored; the probes were throwaway `*.eval.ts` files and are not in the repo). **P2 was run only in a lean form (the model draws no stairs and code places them); the full feature vocabulary (`room` with a required door, `pillar_ring`) was not built.**
+
+| Probe | Result |
+| --- | --- |
+| **P1** today's one model repair on 7 refused first drafts of the 40 by 30 request | **0 of 7** fixed: the model redraws the same sealed rooms. In the pipeline today that request falls back about 7 times in 8. |
+| **P0** code repair on those 8 drafts, then on 32 saved drafts (the 8 and 12 varied requests by 2) | raw 20 of 32 valid; after the repair 32 of 32. These drafts were used to build the repair, so this number is optimistic. |
+| **Held-out**, 12 new layouts by 3 trials (36 drafts a variant; trial 3 is a fresh sample after the last repair change), **standard shapes** (the model draws the stairs) | raw **27 of 36** valid; after the repair **36 of 36**. |
+| the same, **code places the stairs** (the model draws none) | raw 22 of 36; after the repair 36 of 36. |
+| **P3** seeded code-only generator (size, rooms with doors, pillars, cover, an optional platform) over 1,000 random parameter sets | raw 649 of 1000 valid; after the repair **973 of 1000**. The repair as first written gave 999; the pocket-filling added later lowered it, because walling in a pocket spends floor on crowded arenas. All failures are crowded parameter sets (open floor under 25%) or one pocket; a real generator would clamp its parameters. |
+
+The repair, as finally prototyped (a prototype of about 250 lines, no model call), runs on the compiled rows before engine's `validateArena`: (1) drop a stair that is illegal alone or read together; (2) a cut-off **raised** region gets a legal stair beside its edge, or is lowered a level if nowhere fits; (3) a cut-off **low-ground** region of at most 12 tiles or 3% of the floor is walled in; a larger one gets the cheapest path opened (a wall tile costs 1, a raised tile 2, found by a shortest-path search); (4) a rectangle with no area is dropped before the schema (the plus-sign draft had a 0 by 0 wall). Each step is re-checked by `arenaFrom` and the region count, and the engine validator stays the judge.
+
+What the probes show:
+
+- **The faults are of two kinds, each mechanically fixable, and the model's own repair fixed neither** (0 of 7). Sealed rooms and unreachable or illegal platforms were all the failures seen. The 40 by 30 request, which fell back about 7 times in 8, is valid every time after the repair.
+- **Validity does not decide between leaving the stairs to the model and to code: both reach 36 of 36.** My first write-up of the held-out run (21 of 24 against 24 of 24) was wrong; the two split-level failures were a gap in the prototype (a one-tile strip of low floor boxed in by a plateau), not a weakness of model-drawn stairs. Fixing the gap closed it.
+- **Fidelity favours the model's stairs.** On the countable requests: "two staircases" was drawn by the model 3 times in 3 and 0 in 3 when code placed the stairs; "stairs at each end" 3 of 3 drawn, 1 of 3 kept after the repair (it kept one stair where the model drew two), 0 of 3 with code stairs; "8 wide by 30 tall" 3 of 3 in both. Code-placed stairs also turn a request for several flights into one. So the hybrid is better: **keep the model's legal stairs, drop illegal ones, and add one only where a platform is unreachable.** (One step in the tested repair, "dropped 1 stair; added a stair", still replaces a stair the model drew wrongly with one code chose; a better version would move the model's stair, not replace it.)
+- **Shape fidelity is the open weakness and no repair addresses it.** "An arena shaped like a plus sign" came back as an open rectangle in 0 of 3 with its corners walled; "an L-shaped arena" had its big wall block in 1 of 3 (standard) and 2 of 3 (code stairs). The probes count playability, not whether the arena is what was asked for; a person has to judge that (contact sheet: `private-source/arena-probes-20261120/held-contact-sheet-both.html`, standard on top, code-stairs below).
+- **The success bar** (set before the run): 90% of 36 first drafts playable with no model repair, at no more than today's cost. Both variants met it with the repair (36 of 36 at about $0.0004 an arena, no repair call). The held-out prompts were looked at when the repair was fixed after trials 1 and 2, so trial 3 (fresh samples of the same 12 requests) is the cleanest figure, and a third request set would be cleaner still. One model, 12 requests.
+- **Intent trap:** the repair turns "an arena cut in two by a wall nobody can cross" into a playable arena with a door. The present spec (never an unplayable arena; a built-in and a refund otherwise) allows that; whether a door is what the player wanted is a product call.
+- **Not measured:** run time on a Worker (the prototype re-sorts a queue on every step; P3 ran about 1.3 ms an arena including generation and two validations), a weaker model, request types beyond 12, a person playing the repaired arenas.
+
+### Verdict
+
+**Best approach, validated on held-out data: keep shapes as the format, with the stairs left to the model, and repair the drawing in code before engine's `validateArena` judges it.** The model's own repair stays as the last resort (it fixed nothing in the one case measured, but may fix others, unmeasured). Rows, strict rows, a coarse grid and a full feature vocabulary are not needed to close the validity gap. Dropping the stair list gave no validity gain and cost fidelity.
+
+### Built (2026-11-20, the user's go; uncommitted)
+
+- **`engine/src/arena-repair/`** (the user chose engine, which owns arena legality): `repairArena(rows)` returns `{rows, edits}`. Its design changed in three ways while it was built, each from a test: a stair joins a platform only to floor that is part of the arena (a stair joining two cut-off pieces to each other was not progress and looped); **a cut-off piece is walled in only when it is a sliver (at most 12 tiles and a tenth of all the floor)**, because walling in the smaller half of a split arena left it under the 25% floor share, and a bigger piece is a room the model drew and gets a door; and **a platform is never cut through for a door** (a strip of floor beside a plateau is walled in instead of the plateau being lowered). The loop mends at most 100 pieces; a real drawing needs a few and a repair took 2 to 4 ms for a 40 by 30 arena with a sealed room (Node, a laptop). The worst case is unmeasured at this cap: a 40 by 30 drawing of nothing but faults took about 1 second when the cap was 200, and the cap was then halved, so about half a second is an extrapolation, not a measurement.
+- **`ai`**: `validateArenaDraft` runs it between the row-length check and `validateArena` and hands on the repaired drawing; a rectangle with no size is dropped from shapes before the schema (`check/validate/empty-rectangles/`).
+- **Credit rule (the user's decision, 2026-11-20): charge in proportion to what the request cost us.** A pre-check turn-away (no model call) is free; a moderation rejection stays at half a credit; a created arena is one credit; **a built-in fallback is half a credit** (it costs us about $0.00055, more than a created arena, so it is not refunded); our own failures stay refunded. `ArenaOutcome.refunded` is true exactly when `modelCalls` is 0. The routes and prices are server's and budget's (HANDOFF, `SessionDecisions.md`).
+- **End-to-end check on every saved real Haiku draft through the shipped `validateArenaDraft`: 104 of 104 valid** (the 24 base drafts, the 8 of the 40 by 30 request, and the held-out 36 standard and 36 code-stairs). The base set was used to build the repair; the held-out set is the clean figure, though the design changes above were made after seeing its first two trials.
+- Mutation proof on the final code: 20 engine mutants and 7 ai mutants killed by named tests (an earlier run found two equivalent guards, which the engine's own reading already made redundant, and they were deleted; one survivor, a stair test with a platform in the way, was fixed). Properties (3,000 cases a property): output keeps size and border, no cut-off piece left whenever the result is readable, a readable drawing stays readable, a one-piece drawing is unchanged, and the repair is finished after one pass.
+- **Paid run through the shipped pipeline (2026-11-20, 3 trials, $0.0192): 324 of 324 criteria pass and all 24 arena requests, both 40 by 30 requests and cut-in-two included, are made in two calls with no model repair and no fallback** (before the repair: the 40 by 30 request fell back about 7 times in 8). A created arena costs $0.00052 on average. The 40 by 30 arena has real rooms with doorways and a platform with a stair; the cut-in-two arena has its door.
+- **Not built:** the code-only generator as a fallback (changes the refund rule that budget and server settle on, and the user's rule now makes a built-in fallback chargeable, so it is a product question, not a decision for ai), shape fidelity (a "plus sign" still comes back as a rectangle), (the paid 3-trial run is done, above).
+
+### Sources
+
+- [Co-DSL: Human-LLM Co-design of Reusable Spatial Concepts for Layout Generation](https://arxiv.org/abs/2610.15290) (abstract read)
+- [Video Game Level Repair via Mixed Integer Linear Programming](https://arxiv.org/html/2010.06627) (read)
+- [LatticeWorld](https://arxiv.org/html/2509.05263v1) (read)
+- [Constraint Is All You Need: Optimization-Based 3D Level Generation with LLMs](https://www.pcgworkshop.com/archive/xu2025constraint.pdf) (snippet)
+- [Procedural Content Metageneration via Program Search and Continual Abstraction Discovery](https://arxiv.org/pdf/2608.17947) (snippet)
+- [Word2World](https://arxiv.org/pdf/2405.06686), [MarioGPT](https://arxiv.org/pdf/2302.05981) (snippets)
+- [Graph2Plan](https://www.researchgate.net/publication/343625455_Graph2Plan_learning_floorplan_generation_from_layout_graphs), [Generative Layout Modeling using Constraint Graphs](https://openaccess.thecvf.com/content/ICCV2021/papers/Para_Generative_Layout_Modeling_Using_Constraint_Graphs_ICCV_2021_paper.pdf), [LLM-Floor-plan](https://github.com/vencecai/LLM-Floor-plan) (snippets)
+- [Learning Local Constraints for Reinforcement-Learned Content Generators](https://arxiv.org/html/2605.13570) (WFC and global properties, snippet)
+- [ARENA: dynamic runtime map generation for multiplayer shooters](https://www.comp.nus.edu.sg/~bhojan/papers/ARENA-2014.pdf), [MAP-Elites for FPS maps](https://www.politesi.polimi.it/bitstream/10589/140194/3/An%20Online%20Framework%20for%20User-Based%20Analysis%20of%20Maps%20in%20First%20Person%20Shooters.pdf) (snippets)
+- [maze-bench technical report](https://github.com/hehee9/maze-bench/blob/main/TECHNICAL_REPORT.md), [Lost in Aggregation](https://arxiv.org/pdf/2606.22219) (snippets)
+
 ## Size classes, in plain words (for the user's decision, only if strict rows is chosen)
 
 Shapes needs no size classes: the model gives a width and a height and code draws. Strict rows is different: the schema must name every row and its width **before** the model answers, so the size has to be known first. Today a model picks any size from 8 to 40 wide and 5 to 30 tall (engine's `ARENA_LIMITS`, tunables for play); the built-ins are 20 by 12 and 21 by 13, the prompt defaults to about 20 by 12, and scenario fixtures are not held to the limits. Three ways to know the size first:

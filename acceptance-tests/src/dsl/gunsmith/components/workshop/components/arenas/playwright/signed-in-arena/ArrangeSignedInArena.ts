@@ -33,8 +33,7 @@ export async function arrangeSignedInArena(page: Page, generationPaused: boolean
         json: {
           status: "builtIn",
           arena: {...ARENA, name: "Built-in yard"},
-          reason:
-            "We could not build a playable arena from that request, so here is one of ours. Your credit is refunded.",
+          reason: "We could not build a playable arena from that request, so here is one of ours.",
         },
       });
       return;

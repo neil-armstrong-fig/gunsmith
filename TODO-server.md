@@ -54,7 +54,7 @@ Current milestone: M4; the project remains on M1. **Local Google setup is done (
 
 ## MVP priority
 
-- [ ] Coordinate with AI and Art on failure responses for unsuccessful weapon and arena generation or drawing. Pass through a player-readable reason and preserve the arena credit refund when no playable arena is produced. Built-ins remain available as explicit picks. User decision 2026-11-21.
+- [ ] Coordinate with AI and Art on failure responses for unsuccessful weapon and arena generation or drawing. Pass through a player-readable reason and preserve the current credit settlement rules. Built-ins remain available as explicit picks. User decision 2026-11-21.
 - [ ] Record every submitted weapon and arena prompt in private generation history, including attempts that produce no item. Today both routes write the prompt only when an item is created, regardless of shelf Save. Keep the outcome and available validation reason with the attempt so AI can diagnose failures. Set coverage for early refusals and apply the documented retention and account-deletion rules. Keep prompt text out of ordinary Worker logs. User follow-up 2026-11-22.
 
 Sign-in, verified account identity and the account library are built (2026-11-19); `DELETE /api/account` is built too; next is production adapter wiring. The generation deadline and Budget's reservation are integrated. Own the shared generation route changes and cancellation wiring after that merge. Own the authoritative pre-round and browser transport, including the online feedback hookup. Start with built-ins and agree the messages with Play. See [the shared priorities](TODO.md#mvp-integration-priorities) and [handoffs](HANDOFF.md#mvp-ownership-and-handoffs).

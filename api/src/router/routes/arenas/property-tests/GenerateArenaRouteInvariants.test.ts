@@ -13,10 +13,9 @@ import {runArenaPipeline} from "@src/router/routes/arenas/pipeline/RunArenaPipel
 
 /**
  * What must hold for any crowd of players asking at once, not only the few cases `GenerateArenaRoute.test.ts` writes down: every
- * request the pipeline ran was charged for what it turned out to be (an arena one credit, a rejection half, a built-in arena or a throw
+ * request the pipeline ran was charged for what it turned out to be (an arena one credit, a rejection after the moderation call and a built-in arena half, a turn-away before any model call or a throw
  * nothing), no account is ever charged below nothing or above its day's credits, and no reservation is left held. The global spend is
- * settled at what the requests that ran came to (a throw at its whole reservation; a built-in arena at its calls, though its credit
- * goes back), never passes the daily cap whatever room is left under it, and a request turned away for the cap costs its account
+ * settled at what the requests that ran came to (a throw at its whole reservation; a built-in arena at its calls, and half its credit), never passes the daily cap whatever room is left under it, and a request turned away for the cap costs its account
  * nothing. Deliberately outside `pnpm checks` (a fresh seed each run); `pnpm test:properties` runs it.
  */
 const RUNS = Number(process.env["PROPERTY_TEST_RUNS"] ?? 100);
@@ -131,7 +130,10 @@ function costOf(requests: readonly PlannedArenaRequest[], ran: ReadonlySet<numbe
     if (request.outcome.status === "created") {
       cost += 1;
     }
-    if (request.outcome.status === "rejected") {
+    if (request.outcome.status === "rejected" && !request.outcome.refunded) {
+      cost += 0.5;
+    }
+    if (request.outcome.status === "builtIn") {
       cost += 0.5;
     }
   });

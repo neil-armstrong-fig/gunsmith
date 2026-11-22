@@ -1,6 +1,6 @@
 # TODO: art
 
-**MVP audio checklist complete.** Art owns authored audio cues, playback integration with Play, and the listening review after weapon-specific shot synthesis. Checkout: `worktree-art`, last upstream commit merged `d8f9af6`.
+**MVP audio checklist complete.** Art owns authored audio cues, playback integration with Play, and the listening review after weapon-specific shot synthesis. Checkout: `worktree-art`, last upstream commit merged `f6cdd77`.
 
 ## Signed-in workshop
 
@@ -10,7 +10,7 @@ Art owns browser sign-in, workshop generation and trials, and the account shelf 
 - [ ] Extend to weapons after Engine's saved-weapon adapter and Server's hookup are available. Use Engine's interim vision rule. AI will add generated `visionDegrees` and `visionRange`.
 - [x] Saved arena rows preview the stored terrain on both the account and browser-local shelves after reload.
 - [x] A signed-in player sees that arena generation is paused and can still walk a saved arena.
-- [x] Show the reason and game-credit refund on the current arena fallback result.
+- [x] Show the API reason on the current arena fallback result.
 - [ ] When the generation contract changes, show why the requested weapon or arena failed, with the refund when applicable, and leave the workshop ready to retry. Keep built-ins available as explicit choices. [AI](TODO-ai.md#current-milestone-tasks) and [Server](TODO-server.md#mvp-priority) own the outcome and refund.
 - [ ] Next acceptance criterion: a signed-in player with no credits sees the credit refusal and can still walk their saved arena. Then cover the pending, rejection and timeout states. The guest built-in pre-round passed in the production suite.
 

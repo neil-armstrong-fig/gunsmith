@@ -18,7 +18,11 @@ function plannedOutcome(): fc.Arbitrary<PlannedOutcome> {
   return fc.oneof(
     {weight: 6, arbitrary: reporting({status: "created", weapon: {}, nodes: [], modelCalls: 3})},
     {weight: 1, arbitrary: reporting({status: "rejected", reason: "no", nodes: [], modelCalls: 1})},
-    {weight: 1, arbitrary: reporting({status: "invalid", reason: "none", nodes: [], modelCalls: 5})},
+    {weight: 1, arbitrary: reporting({status: "invalid", reason: "none", nodes: [], modelCalls: 3})},
+    {
+      weight: 1,
+      arbitrary: fc.constant<PlannedOutcome>({status: "rejected", reason: "too long", nodes: [], modelCalls: 0}),
+    },
     {weight: 1, arbitrary: fc.constant<PlannedOutcome>("throws")},
   );
 }
