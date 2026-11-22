@@ -69,6 +69,11 @@ export class ArenaPlaywright extends BasePage {
     return true;
   }
 
+  /** Whether the arena is being drawn every frame (`data-frameloop` is `always`), not held on its last frame. */
+  async isDrawing(): Promise<boolean> {
+    return (await this.page.getByTestId("arena").getAttribute("data-frameloop")) === "always";
+  }
+
   async getTerrainLook(pixelsPerTile: number): Promise<TerrainLook> {
     return await lookOfTerrain(this.page, pixelsPerTile);
   }

@@ -1,4 +1,5 @@
 import type {Page} from "@playwright/test";
+import type {RoundSnapshot} from "@gunsmith/shared/state-hook/types/RoundSnapshot";
 import {FrontDoorDsl} from "@src/dsl/gunsmith/components/room/components/front-door/FrontDoorDsl";
 import {RoomPlaywright} from "@src/dsl/gunsmith/components/room/playwright/RoomPlaywright";
 import type {ConnectionDelay} from "@src/dsl/gunsmith/components/room/playwright/wire/delayed-line/types/ConnectionDelay";
@@ -46,12 +47,24 @@ export class RoomDsl {
     }
   }
 
-  /** Keeps this browser's player asking for something new, walking to and fro, for `seconds`: they are plainly there. */
-  async keepMovingFor(seconds: number): Promise<void> {
+  /**
+   * Keeps this browser's player asking for something new, walking to and fro, until the round is `state` on their screen: they are plainly there.
+   * It stops at the moment the state is seen, not after a time, so a slow machine cannot carry it past the moment a spec means to read.
+   */
+  async keepMovingUntilTheRoundIs(state: RoundSnapshot, timeoutSeconds: number): Promise<void> {
     try {
-      await this.room.keepMovingFor(seconds);
+      await this.room.keepMovingUntilTheRoundIs(state, timeoutSeconds);
     } catch (error) {
-      throw new DslError(`Failed to keep moving for ${seconds} seconds`, error);
+      throw new DslError(`Failed to keep moving until the round was ${state}`, error);
+    }
+  }
+
+  /** As `keepMovingUntilTheRoundIs`, until the match is decided and the banner offers a fresh one ("Play again"). */
+  async keepMovingUntilPlayAgainIsOffered(timeoutSeconds: number): Promise<void> {
+    try {
+      await this.room.keepMovingUntilPlayAgainIsOffered(timeoutSeconds);
+    } catch (error) {
+      throw new DslError("Failed to keep moving until Play again was offered", error);
     }
   }
 
