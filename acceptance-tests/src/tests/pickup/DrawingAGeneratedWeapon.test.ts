@@ -13,8 +13,8 @@ import {beforeEach, expect, given, then, when} from "@src/acceptance-criteria-ma
 // background's, so neither says anything. The drawing is drawn with `toneMapped={false}`, so a flat fill reads exactly.
 //
 // Measured on a production build, the same every run, over a 33 by 33 grid with a gap of 0.025 tile: the lantern 38 blue and 24 pale grey, the stand-in 6 blue and
-// no pale grey, the old mint disc 424. The thresholds sit well away from those. (The stand-in's dark body is close to the dark floor, so only its muzzle is counted: a
-// readability note for art, not something this spec can fix.)
+// no pale grey, the old mint disc 424. The thresholds sit well away from those. (The stand-in's muzzle is what the colour counts see; its body is the `edge`
+// grey, which the last `given.each` reads against a clear tile of the same floor at 64 and 32 pixels per tile. It was the wall's dark, close to the lowest floor.)
 const SEED = 8;
 // One tile west of the seeded pickup, with the same floor art and lighting.
 const CLEAR_FLOOR = {x: 12.5, y: 6.5};
@@ -23,6 +23,13 @@ const LANTERN_BLUE_AT_LEAST = 25;
 const LANTERN_PALE_AT_LEAST = 15;
 const STAND_IN_BLUE_AT_LEAST = 3;
 const STAND_IN_BLUE_AT_MOST = 15;
+// The sparring arena is 20 by 12 tiles, so these windows fit it at 64 and at 32 pixels per tile.
+const WINDOWS = [
+  {width: 1280, height: 768, pixelsPerTile: 64},
+  {width: 640, height: 384, pixelsPerTile: 32},
+];
+// Measured on a production build at both scales: the stand-in's body reads at 1.0 of the places sampled, and read 0.03 (at 32) with the wall's dark for its body.
+const BODY_APART_AT_LEAST = 0.9;
 
 given("a sparring match whose weapon is drawn as art's lantern", () => {
   beforeEach(async ({gunsmith}) => {
@@ -119,3 +126,40 @@ given("a sparring match whose weapon's drawing the game refuses", () => {
     });
   });
 });
+
+given.each(
+  WINDOWS,
+  ({pixelsPerTile}) => `a sparring match whose weapon's drawing the game refuses, at ${pixelsPerTile} pixels per tile`,
+  ({width, height}) => {
+    beforeEach(async ({gunsmith}) => {
+      await gunsmith.resizeWindowTo({width, height});
+      await gunsmith.startSparringWithPickupDrawing({seed: SEED, drawing: "refused"});
+    });
+
+    when("the player faces the weapon and sees it", () => {
+      beforeEach(async ({gunsmith}) => {
+        const pickup = await gunsmith.pickup.get();
+        if (!pickup) {
+          throw new Error("No weapon lies in the arena to face.");
+        }
+
+        await gunsmith.player.aimAtTile(pickup);
+        await expect.poll(async () => (await gunsmith.pickup.get())?.visible).toBe(true);
+      });
+
+      then("the stand-in's body reads against the floor, not only its muzzle", async ({gunsmith}) => {
+        const pickup = await gunsmith.pickup.get();
+        if (!pickup) {
+          throw new Error("No weapon lies in the arena to read.");
+        }
+
+        await expect
+          .poll(async () => {
+            const {sampled, apartFromFloor} = await gunsmith.pickup.getBodyOnScreen(pickup, CLEAR_FLOOR);
+            return apartFromFloor / sampled;
+          })
+          .toBeGreaterThanOrEqual(BODY_APART_AT_LEAST);
+      });
+    });
+  },
+);

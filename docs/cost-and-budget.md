@@ -12,12 +12,38 @@ has a known weakness. Owners: `budget` for production AI spend/tracing, `ai` for
 | Global daily soft cap | **$1 a day** (paused until 00:00 UTC). The $20 month is the hard cap, so the AI may stop early in a month; accepted, tune after launch |
 | Alerts | 50%, 80%, 100% of the month |
 | Credits per player | 10 a day, reset 00:00 UTC |
-| Credit prices | weapon 1, arena 1, edit 1, rejected prompt 0.5, reuse free |
+| Credit prices | weapon 1, arena 1, edit 1, rejected prompt 0.5, reuse free; what is charged, and what is refunded, for each way a request ends: see **Credit rules** below |
 | Prompt limits | weapon 600 characters, arena 1,000 (about 150 and 250 tokens; rejected before any model call) |
 | Cost posture | Try the **free plan** first; accept **Workers Paid** with budgets and the kill switch if the spike says so |
 
 When the budget is exhausted: **AI off, game stays up.** New generation stops; the banner appears; the game runs on the saved
 library and the built-in weapon and arena pool; guests are unaffected.
+
+## Credit rules (the user, 2026-11-20): charge in proportion to what the request cost us
+
+Credits and dollars are two ledgers. The global dollar spend (the layers below) is **always settled at the model calls made**, whatever happens to the player's credit, so a credit refund never gives back our cost: it only gives the player a free retry, paid for by the shared daily cap. So a request is free to the player only when it cost us nothing (no model call), or failed through our fault. Anything that reached a model is charged at least the rejected price, 0.5. The user's words: "I still paid for the model usage, so what is there to refund? We only refund if the prompt is rejected before hitting the model", and no one is to add a massive spend. Costs are measured on Haiku 5.5 (below). Server and budget own the routes and the prices; both rules are applied by `ai` in `api/` (`CREDIT_PRICES.unusable` 0.5, the two generation routes).
+
+**Arenas (decided):**
+
+| What happened | Model calls | Cost to us | Credit charged | Before 2026-11-20 |
+| --- | --- | --- | --- | --- |
+| Length pre-check turn-away | 0 | $0 | **0** (refunded) | 0.5 |
+| Moderation rejection, or the moderation call itself failed | 1 | about $0.00015 | 0.5 | 0.5 |
+| Arena created, first try or after a repair | 2 or 3 | about $0.00034 to $0.00055 | 1 | 1 |
+| **Built-in fallback** (no usable arena after the repair) | 2 or 3 | about $0.00055 | **0.5** | 0 (refunded) |
+| Our failure: timeout, exception, result cannot be kept | any | up to the reservation | 0 (refunded) | 0 (refunded) |
+
+**Weapons (same principle, decided by the user's "make the changes", 2026-11-20):**
+
+| What happened | Model calls | Cost to us | Credit charged | Before 2026-11-20 |
+| --- | --- | --- | --- | --- |
+| Length pre-check turn-away | 0 | $0 | **0** (refunded) | 0.5 |
+| Moderation rejection, or the moderation call itself failed | 1 | about $0.00015 | 0.5 | 0.5 |
+| Weapon created (stats, then its drawing, with or without the stand-in) | 3 to 5 | about $0.001 | 1 | 1 |
+| **Invalid** (no valid weapon after the one repair; nothing is drawn) | 3 | about $0.0006 | **0.5** | 0 (refunded) |
+| Our failure: timeout, exception, result cannot be kept | any | up to the reservation | 0 (refunded) | 0 (refunded) |
+
+A failed moderation call stays at 0.5 (the user chose no change). The decision log is [SessionDecisions](agent-reference/SessionDecisions.md); the work to apply it is in [HANDOFF](../HANDOFF.md).
 
 ## The layers
 
@@ -180,6 +206,20 @@ Per request: a rejection or a pre-check turn-away costs $0.00015 or nothing; an 
 
 **Largest-arena probe (2026-11-19, `ai`, 1 trial each, two requests asking for the engine's 40 by 30 maximum; a throwaway spec, deleted).** Rows: generation 391 and 250 output tokens (about $0.00031 and $0.00021), each followed by a repair of 362 and 235 tokens; **both fell back to a built-in**; the two requests cost $0.00084 and $0.00067 and took 5.2 s and 3.6 s. Shapes: generation 744 and 593 tokens (about $0.00054 and $0.00044, 2.9 s and 2.3 s); the several-rooms request needed a 744-token repair and **fell back** ($0.00135, 6.3 s), the open battlefield was **created first time** ($0.00063, 3.1 s). **Large arenas stay inside `ARENA_SPEND`'s worst case:** the dearest request was 1,350 µ$ against the 2,300 µ$ three-call figure (generation 540 µ$ against 1,000, repair 700 against 1,150), so **the assumed prices are a fair upper bound for the largest arena and should not be lowered on the small-arena numbers above**; the typical arena costs far less. Quality: 3 of 4 large requests fell back (rows 2 of 2, shapes 1 of 2), so large arenas are where the model fails, whichever format; the slowest request was 6.3 s against the 30 s limit. Paid spend for the probe $0.0035; the turn's ledger total is $0.0309. The kept arenas are in `ai/src/evals/results/arenas-paid-large-{rows,shapes}-latest.html`.
 
+## Arenas with shapes and the code repair, measured 2026-11-20 (Haiku 5.5, arena and arena-submission specs, 3 trials, run by `ai` with the user's go, ceiling raised to $2)
+
+The arena specs (`AskingForAnArena`, `NotAnArenaRequest`, the three arena-submission specs) through the shipped pipeline: shapes format, the code repair (`engine/src/arena-repair/`), no hidden retries. 36 arena requests and 30 screening requests, 324 of 324 criteria passed, total **$0.0192** (the ledger moved $0.1213 to $0.1404). The call log (`paid-arena-calls-latest.jsonl`) gives, priced at the eval's Haiku constants (`HaikuCost.ts`):
+
+| Call | Calls | Cost (mean, largest) |
+| --- | --- | --- |
+| moderation | 33 | $0.000151, $0.000162 |
+| generate (shapes) | 24 | **$0.000367, $0.000599** |
+| repair by the model | **0** | no arena needed one |
+
+- **Every one of the 24 arena requests, the two 40 by 30 requests and the cut-in-two request included, was made in two calls (moderation and generation), with no model repair and no fallback.** Before the code repair the 40 by 30 request fell back about 7 times in 8. A created arena costs **$0.00052 on average (largest $0.00076)**, 2.4 s median (largest 3.8 s).
+- **Against `ARENA_SPEND` (budget's):** moderation 150 µ$ matches; **generation is assumed 1,000 µ$ and measured 367 on average (599 largest), about 2.7 times over** (shapes writes about twice the tokens rows did, which is why this is less over than the 5 times measured on rows). A created arena settles at 1,150 µ$ against about 520 measured. The 2,500 reservation still covers the worst case. The repair call's price is now unused: the model repair did not run.
+- Costs use the same per-token constants as before; the Console's usage page is the bill.
+
 ## Drawing on Haiku, tuned 2026-11-20 (Haiku 5.5, the appearance spec, run by `ai` with the user's go of up to $0.05)
 
 The 2026-11-19 re-measure had five "the model's own drawing" criteria red. The drawing now has its own call log (stage `draw`), so each call's tokens and time are recorded. Rerun at 3 trials, 33 drawings: **the red was one request, the jellyfish lantern with braided tentacles, which fell back to the stand-in in 1 of 3 trials.** The model drew polylines past the 64 by 64 canvas, and the repair, told the exact overshoot ("pull it in by 21"), drew them past it again (2 calls, 6,463 input and 2,000 output tokens, 6.9 s). The cause is the prompt, not the validator or the harness: it said to stay inside the canvas but not how far a long thin shape reaches. One sentence was added (every point of a polyline between 6 and 58, "curl it back before it reaches the edge").
@@ -292,7 +332,7 @@ need one), and nine weapon cases (seven reach generation, one is rejected by mod
 
 Findings: Haiku-only is affordable, roughly half a cent a run, so the local model is for speed and an unmetered loop, not
 because money forces it. It is not free at volume: 100 runs a day is about $14 a month, inside the $20 only if the game itself
-spends nothing, so the eval spend needs its own ceiling (the user's current one is $1 total) and result caching (a re-run with
+spends nothing, so the eval spend needs its own ceiling (the user's current one is $2 total, raised from $1 on 2026-11-20) and result caching (a re-run with
 the same model, prompt and case is free). An arena suite costs about twice as much a case (bigger prompt and output). The
 estimates use guessed token counts; replace them with measured usage once a paid run exists.
 

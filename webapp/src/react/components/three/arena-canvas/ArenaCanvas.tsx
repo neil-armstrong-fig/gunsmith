@@ -1,3 +1,4 @@
+import {scenarioOfPage} from "@src/game/scenario/ScenarioOfPage";
 import {Canvas} from "@react-three/fiber";
 import {ArenaScene} from "@src/react/components/three/arena-canvas/components/arena-scene/ArenaScene";
 import {useSpritesReady} from "@src/react/sprites/hooks/use-sprites-ready/UseSpritesReady";
@@ -29,7 +30,9 @@ export function ArenaCanvas(): JSX.Element {
   const [ready, setReady] = useState(false);
   const spritesReady = useSpritesReady();
   const workshopOpen = useAppStore(state => state.workshopOpen);
-  const frameloop = frameloopOf(workshopOpen);
+  const menuOpen = useAppStore(state => state.menuView !== undefined);
+  const paused = workshopOpen || (menuOpen && scenarioOfPage() !== "room");
+  const frameloop = frameloopOf(paused);
 
   return (
     <div
@@ -54,8 +57,8 @@ export function ArenaCanvas(): JSX.Element {
   );
 }
 
-function frameloopOf(workshopOpen: boolean): Frameloop {
-  if (workshopOpen) {
+function frameloopOf(paused: boolean): Frameloop {
+  if (paused) {
     return "demand";
   }
 

@@ -24,6 +24,31 @@ Current owners and consumer contracts are in [HANDOFF.md](../../HANDOFF.md). The
 - Stats and appearance use separate generation stages with one repair each and five calls at most. Invalid stats skip appearance; drawing failure retains stats and discloses a validated stand-in.
 - Visual identity must remain prompt-malleable but cannot change runtime code, hitboxes, visibility, rules or audio limits. Art fixtures are readability targets, not proof of new mechanics.
 
+## Generated arenas
+
+- **Credits follow what the request cost us (the user, 2026-11-20):** "I still paid for the model usage, so what is there to refund? We only refund if the prompt is rejected before hitting the model", and no one is to add a massive spend. Credits and dollars are separate ledgers: the global dollar spend is always settled at the model calls made, so a credit refund never refunds our cost, it only gives the player a free retry. So only a request that cost us nothing, or that failed through our fault, is free. Arena prices (10 credits a day; weapon and arena 1, rejected 0.5):
+
+| What happened | Model calls | Cost to us | Credit charged (new) | Was |
+| --- | --- | --- | --- | --- |
+| Length pre-check turn-away | 0 | $0 | **0** (refunded) | 0.5 |
+| Moderation rejection, or the moderation call itself failed | 1 | about $0.00015 | 0.5 | 0.5 |
+| Arena created, first try or after a repair | 2 or 3 | about $0.00034 to $0.00055 | 1 | 1 |
+| **Built-in fallback** | 2 or 3 | about $0.00055 | **0.5** | 0 (refunded) |
+| Our failure: timeout, exception, result cannot be kept | any | up to the reservation | 0 (refunded) | 0 (refunded) |
+
+  A built-in fallback is charged the rejected price, 0.5, because it costs us more than a created arena. A failed moderation call stays at 0.5 (the user chose no change). `ArenaOutcome.refunded` is true exactly when `modelCalls` is 0 (the pre-check); every other charge is the route's. Whether weapons follow the same rule is open.
+- **Weapons, the same principle (the user, 2026-11-20: "likely the same yes - about avoiding too many sneaky costs", then "make the changes"); applied by `ai` in `api/` at the user's go:** the weapon route refunds an `invalid` weapon today and charges 0.5 for any rejection. The weapon outcome has no `refunded` flag, so the route reads `status === "rejected" && modelCalls === 0`.
+
+| What happened | Model calls | Cost to us | Credit charged | Was |
+| --- | --- | --- | --- | --- |
+| Length pre-check turn-away | 0 | $0 | **0** (refunded) | 0.5 |
+| Moderation rejection, or the moderation call itself failed | 1 | about $0.00015 | 0.5 | 0.5 |
+| Weapon created (stats 2 calls, then its drawing, with or without the stand-in) | 3 to 5 | about $0.001 | 1 | 1 |
+| **Invalid: no valid weapon after the one repair** (nothing is drawn) | 3 | about $0.0006 | **0.5** | 0 (refunded) |
+| Our failure: timeout, exception, result cannot be kept | any | up to the reservation | 0 (refunded) | 0 (refunded) |
+
+- **Code repairs an arena before the validator judges it (the user, 2026-11-20; `engine/src/arena-repair/`):** the model's own repair fixed none of 7 sealed rooms on Haiku, code's fixed all of them. Stairs stay the model's to draw; code only drops an illegal one or adds one where a platform cannot be reached. Study: [ai-arena-research](../ai-arena-research.md).
+
 ## Proposals and unfinished decisions
 
 - Weighting strong pickups toward contested central space is a placement proposal, not a fixed spawn rule. Current local pickup placement uses seeded route fairness.

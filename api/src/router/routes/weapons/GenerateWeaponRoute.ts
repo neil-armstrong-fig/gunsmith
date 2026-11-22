@@ -17,8 +17,9 @@ import type {WeaponAnswer} from "@src/router/routes/weapons/types/WeaponAnswer";
  * has passed: the method, a pipeline to run, an account, a prompt, the global AI switch (`SPEND.status()`), then the account's credit
  * (**reserved before the pipeline runs, so two requests for the last credit cannot both run**) and the global spend (**reserved at the
  * worst case before the pipeline runs, so a burst cannot cross a cap**; refused, the credit is given back and AI is off until the cap's
- * period ends). The credit is then settled at what the request was (a weapon costs one credit, a rejected prompt half) or refunded in
- * full (no valid weapon, or the pipeline threw), and the spend at the model calls it made (`durable-objects/spend-ledger/estimate/`), or in full if the
+ * period ends). The credit is then settled at what the request was (a weapon costs one credit, a rejected prompt half, and so does a request
+ * that reached the model and gave no valid weapon: the model was used) or refunded in full (turned away before any model call, or the pipeline
+ * threw), and the spend at the model calls it made (`durable-objects/spend-ledger/estimate/`), or in full if the
  * pipeline threw or ran out of time (`shared/time-limit/`: 504 `generation-timed-out`), since its calls may have been billed. **A created weapon
  * is kept under an `id` the answer carries** (`shared/keep-result/`), so the library saves it by that id alone; if it cannot be kept the credit is
  * refunded and the answer is 502.
@@ -58,14 +59,24 @@ async function runAndSettle(reservation: CreditReservation): Promise<Response> {
 
     return Response.json({...answerOf(outcome), id});
   }
+  if (isTurnedAwayBeforeTheModel(outcome)) {
+    await credits.refund(key);
+
+    return Response.json(answerOf(outcome));
+  }
   if (outcome.status === "rejected") {
     await credits.settle(key, "rejected");
   }
   if (outcome.status === "invalid") {
-    await credits.refund(key);
+    await credits.settle(key, "unusable");
   }
 
   return Response.json(answerOf(outcome));
+}
+
+/** The one request that cost nothing: turned away before any model was called (the length pre-check). `WeaponOutcome` has no `refunded` flag, so the calls say so. */
+function isTurnedAwayBeforeTheModel(outcome: WeaponOutcome): boolean {
+  return outcome.status === "rejected" && outcome.modelCalls === 0;
 }
 
 function answerOf(outcome: WeaponOutcome): WeaponAnswer {

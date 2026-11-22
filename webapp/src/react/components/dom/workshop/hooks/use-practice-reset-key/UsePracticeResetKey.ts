@@ -14,10 +14,12 @@ const RESET_KEY = "KeyT";
  * resets.
  */
 export function usePracticeResetKey(): void {
-  usePressedKey(RESET_KEY, resetThePracticeRange, scenarioOfPage() === "practice");
+  usePressedKey(RESET_KEY, resetThePracticeRange);
 }
 
 function resetThePracticeRange(): void {
+  if (scenarioOfPage() !== "practice") return;
+
   const world = gameState();
   if (world.arena !== PRACTICE_ARENA) return;
 

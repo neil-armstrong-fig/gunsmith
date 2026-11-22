@@ -2,7 +2,9 @@ import type {Page} from "@playwright/test";
 import type {PickupSnapshot} from "@gunsmith/shared/state-hook/types/PickupSnapshot";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
 import {lookOfPickup} from "@src/dsl/gunsmith/components/pickup/playwright/look-of-pickup/LookOfPickup";
+import {lookOfPickupBody} from "@src/dsl/gunsmith/components/pickup/playwright/look-of-pickup/body/LookOfPickupBody";
 import {lookOfPickupMarker} from "@src/dsl/gunsmith/components/pickup/playwright/look-of-pickup/marker/LookOfPickupMarker";
+import type {PickupBodyLook} from "@src/dsl/gunsmith/components/pickup/types/PickupBodyLook";
 import type {PickupMarkerLook} from "@src/dsl/gunsmith/components/pickup/types/PickupMarkerLook";
 import type {Point} from "@src/dsl/gunsmith/types/Point";
 import type {PickupLook} from "@src/dsl/gunsmith/types/PickupLook";
@@ -27,6 +29,11 @@ export class PickupPlaywright extends BasePage {
     }
 
     return await lookOfPickup(this.page, {x: pickup.x, y: pickup.y});
+  }
+
+  /** Reads the middle of the weapon's body against a clear tile of the same floor in the same light. */
+  async getBodyOnScreen(centre: Point, clearFloor: Point): Promise<PickupBodyLook> {
+    return await lookOfPickupBody(this.page, centre, clearFloor);
   }
 
   /** Reads the marker against a clear tile in the same light, even after collection. */

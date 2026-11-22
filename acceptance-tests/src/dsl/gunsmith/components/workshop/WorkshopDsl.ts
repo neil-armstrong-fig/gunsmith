@@ -19,6 +19,14 @@ export class WorkshopDsl {
     this.workshop = new WorkshopPlaywright(page);
   }
 
+  async pressBack(): Promise<void> {
+    try {
+      await this.workshop.pressBack();
+    } catch (error) {
+      throw new DslError("Could not go back from the Workshop", error);
+    }
+  }
+
   /** Presses the workshop's key, as a player in the practice range would. */
   async open(): Promise<void> {
     try {

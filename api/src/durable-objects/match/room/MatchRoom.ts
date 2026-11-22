@@ -26,11 +26,15 @@ import {DEFAULT_PRE_ROUND_SECONDS} from "@src/durable-objects/match/pre-round/De
 import {PreRound} from "@src/durable-objects/match/pre-round/PreRound";
 import type {WeaponPair} from "@src/durable-objects/match/pre-round/types/WeaponPair";
 import type {PreRoundMessage} from "@src/durable-objects/match/pre-round/types/PreRoundMessage";
-import type {PreRoundAction} from "@src/durable-objects/match/messages/types/PreRoundAction";
+import type {PreRoundCommand} from "@src/durable-objects/match/messages/types/PreRoundCommand";
 import {DEFAULT_FORFEIT_LIMITS} from "@src/durable-objects/match/room/DefaultForfeitLimits";
 import {askChanged} from "@src/durable-objects/match/room/forfeit/AskChanged";
 import {worldWithWeapons} from "@src/durable-objects/match/room/weapons/WorldWithWeapons";
+import type {ChosenArena} from "@src/durable-objects/match/pre-round/types/ChosenArena";
+import type {ChosenWeapons} from "@src/durable-objects/match/pre-round/types/ChosenWeapons";
+import {revealFor} from "@src/durable-objects/match/room/reveal/RevealFor";
 import type {ArenaMessage} from "@src/durable-objects/match/room/types/ArenaMessage";
+import type {RevealMessage} from "@src/durable-objects/match/room/types/RevealMessage";
 import type {ForfeitLimits} from "@src/durable-objects/match/room/types/ForfeitLimits";
 import type {JoinedMessage} from "@src/durable-objects/match/room/types/JoinedMessage";
 import type {MatchRoomOptions} from "@src/durable-objects/match/room/types/MatchRoomOptions";
@@ -66,6 +70,7 @@ export class MatchRoom {
   private arenaRows: readonly string[] = DUEL_BUILT_IN_ARENA.rows;
   private arena: Arena = arenaFrom(DUEL_BUILT_IN_ARENA.rows);
   private arenaToTell: ArenaMessage | undefined;
+  private readonly revealsToTell: Partial<Record<Seat, RevealMessage>> = {};
   private weapons: Record<Seat, WeaponPair> = {first: DEFAULT_WEAPONS, second: DEFAULT_WEAPONS};
   private readonly preRound: PreRound;
   private readonly limits: ForfeitLimits;
@@ -173,15 +178,9 @@ export class MatchRoom {
    * What `seat` does while the room is choosing its arena (`PreRound` ignores it once decided). When it is the action that settles the
    * arena the match begins at once, in the arena decided.
    */
-  preRoundAction(seat: Seat, action: PreRoundAction): void {
-    if (action.kind === "chooseArena") {
-      this.preRound.chooseArena(seat, action.name);
-    }
+  preRoundAction(seat: Seat, action: PreRoundCommand): void {
     if (action.kind === "lockInArena") {
       this.preRound.lockInArena(seat);
-    }
-    if (action.kind === "chooseWeapons") {
-      this.preRound.chooseWeapons(seat, action.keys);
     }
     if (action.kind === "lockInWeapons") {
       this.preRound.lockInWeapons(seat);
@@ -190,6 +189,16 @@ export class MatchRoom {
       this.preRound.pickArena(seat, action.pick);
     }
     this.beginMatchIfDecided();
+  }
+
+  /** `seat` puts an arena forward (a built-in, or a saved one `Match` has already looked up and checked). A choice that cannot be taken is ignored. */
+  chooseArena(seat: Seat, choice: ChosenArena): void {
+    this.preRound.chooseArena(seat, choice);
+  }
+
+  /** `seat` puts two weapons forward, slot 1 then slot 2 (built-ins, or saved ones `Match` has already looked up and checked). A choice that cannot be taken is ignored. */
+  chooseWeapons(seat: Seat, chosen: ChosenWeapons): void {
+    this.preRound.chooseWeapons(seat, chosen);
   }
 
   /** What `seat` may be told while the room is choosing, or `undefined` once the match has begun or before the seat has sat. */
@@ -205,6 +214,14 @@ export class MatchRoom {
   takeArenaMessage(): ArenaMessage | undefined {
     const message = this.arenaToTell;
     this.arenaToTell = undefined;
+
+    return message;
+  }
+
+  /** The weapons each seat carries into the match, from `seat`'s side, once, the first time it is asked after the match has begun. */
+  takeRevealMessage(seat: Seat): RevealMessage | undefined {
+    const message = this.revealsToTell[seat];
+    delete this.revealsToTell[seat];
 
     return message;
   }
@@ -332,6 +349,9 @@ export class MatchRoom {
     this.arena = arenaFrom(outcome.arena.rows);
     this.arenaToTell = {kind: "arena", rows: outcome.arena.rows};
     this.weapons = outcome.weapons;
+    for (const seat of SEATS) {
+      this.revealsToTell[seat] = revealFor(seat, outcome.chosen);
+    }
     this.startRound(this.worldOfRound(startMatch()));
   }
 

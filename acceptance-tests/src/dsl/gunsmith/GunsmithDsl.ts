@@ -4,6 +4,7 @@ import {ArenaDsl} from "@src/dsl/gunsmith/components/arena/ArenaDsl";
 import {BulletsDsl} from "@src/dsl/gunsmith/components/bullets/BulletsDsl";
 import {CameraDsl} from "@src/dsl/gunsmith/components/camera/CameraDsl";
 import {DummiesDsl} from "@src/dsl/gunsmith/components/dummies/DummiesDsl";
+import {GameMenuDsl} from "@src/dsl/gunsmith/components/game-menu/GameMenuDsl";
 import {HudDsl} from "@src/dsl/gunsmith/components/hud/HudDsl";
 import {MatchDsl} from "@src/dsl/gunsmith/components/match/MatchDsl";
 import {DUEL_SEED} from "@src/dsl/gunsmith/duel/DuelSeed";
@@ -31,6 +32,7 @@ export class GunsmithDsl {
   private readonly gunsmith: GunsmithPlaywright;
 
   readonly arena: ArenaDsl;
+  readonly menu: GameMenuDsl;
   readonly player: PlayerDsl;
   readonly bullets: BulletsDsl;
   readonly camera: CameraDsl;
@@ -53,6 +55,7 @@ export class GunsmithDsl {
     this.gunsmith = new GunsmithPlaywright(page);
 
     this.arena = new ArenaDsl(page);
+    this.menu = new GameMenuDsl(page);
     this.player = new PlayerDsl(page);
     this.bullets = new BulletsDsl(page);
     this.camera = new CameraDsl(page);
@@ -142,7 +145,7 @@ export class GunsmithDsl {
     }
   }
 
-  /** Opens the duel as the practice range's "Fight the bot" does: the match waits behind the pre-round, where weapons are chosen, until the player starts it. */
+  /** Opens the duel as the practice range's "Start bot game" does: the match waits behind the pre-round, where weapons are chosen, until the player starts it. */
   async startDuelWithPreRound(): Promise<void> {
     try {
       await this.gunsmith.openDuelWithPreRound(DUEL_SEED);

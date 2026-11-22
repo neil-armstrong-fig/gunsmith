@@ -8,14 +8,19 @@ it("holds the choices about the game and nothing else, so adding state is a deli
   expect(Object.keys(useAppStore.getState()).sort()).toEqual([
     "askForNextRound",
     "closeWorkshop",
+    "menuView",
     "muted",
     "nextRoundAsked",
     "openWorkshop",
     "reconnecting",
     "reducedMotion",
+    "scenario",
     "setReconnecting",
+    "setShowMenuOnStartup",
     "setWaitingForOtherPlayer",
     "shakePixels",
+    "showMenu",
+    "showMenuOnStartup",
     "takeNextRoundAsk",
     "toggleMuted",
     "waitingForOtherPlayer",
@@ -88,4 +93,14 @@ it("starts with the workshop shut, opens it and shuts it again", () => {
   useAppStore.getState().closeWorkshop();
 
   expect(useAppStore.getState().workshopOpen).toBe(false);
+});
+
+it("persists only the startup preference even while a submenu and other app state are active", () => {
+  const {showMenu, setShowMenuOnStartup, toggleMuted} = useAppStore.getState();
+  showMenu("options");
+  setShowMenuOnStartup(false);
+  toggleMuted();
+
+  const {partialize} = useAppStore.persist.getOptions();
+  expect(partialize?.(useAppStore.getState())).toEqual({showMenuOnStartup: false});
 });

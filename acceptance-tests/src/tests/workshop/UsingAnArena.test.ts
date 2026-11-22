@@ -65,6 +65,19 @@ given("the arena workshop is open on the practice range", () => {
       expect(await gunsmith.workshop.arenas.getResultDescription()).toContain("16 × 8");
     });
 
+    then("the browser-local shelf previews the saved pillar and floor", async ({gunsmith}) => {
+      const [pillar, floor] = await gunsmith.workshop.arenas.getSavedArenaColours(
+        "Stand-in Pillar Yard",
+        {width: 16, height: 8},
+        [
+          {x: 4.5, y: 4.5},
+          {x: 5.5, y: 4.5},
+        ],
+      );
+      expect(floor?.green).toBe(43);
+      expect(pillar?.green).toBeLessThan(43);
+    });
+
     when("the player deletes the saved item", () => {
       beforeEach(async ({gunsmith}) => {
         await gunsmith.workshop.arenas.pressArenaAction("Delete");

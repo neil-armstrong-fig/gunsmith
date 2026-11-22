@@ -74,8 +74,9 @@ request's duration so these numbers come from play.
 | Too long                  | Count turns red and **Make stays off** until it fits; the text is kept                                                                                                      | none (see below) |
 | Making                    | The prompt, locked, a spinner and the stage, "usually a few seconds"                                                                                                        | reserved         |
 | Made                      | The result card (below)                                                                                                                                                     | spent            |
-| Turned away               | The reason in plain words from the pipeline, the text kept for editing                                                                                                      | 0.5              |
-| Timed out or failed       | "Used a built-in instead", which one, and "credit refunded"                                                                                                                 | refunded         |
+| Turned away               | The reason in plain words from the pipeline, the text kept for editing. A request the length check turns away before any model call is free (0)                                  | 0.5              |
+| Timed out or failed (our side)   | "Used a built-in instead", which one, and "credit refunded"                                                                                                                 | refunded         |
+| No usable result came out        | "We could not make that, so here is one of ours" (an arena), or "We could not make a valid weapon"; the text is kept for editing. It cost us a real model call, so it is **not** refunded (decided 2026-11-20, `docs/cost-and-budget.md`, Credit rules) | 0.5              |
 | AI off, or out of credits | Only **making** is paused, with a one-line why. Built-ins and **every saved weapon and arena** (generated ones included) still work: Use, Try it, Walk it and the pre-round | none             |
 
 ## The result card
