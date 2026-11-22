@@ -1,5 +1,6 @@
 import {SPEND_CAPS} from "@src/durable-objects/spend-ledger/meter/SpendCaps";
 import {SpendMeter} from "@src/durable-objects/spend-ledger/meter/SpendMeter";
+import type {SpendCaps} from "@src/durable-objects/spend-ledger/types/SpendCaps";
 
 const NOON = Date.UTC(2026, 10, 17, 12);
 const MIDNIGHT = Date.UTC(2026, 10, 18);
@@ -244,6 +245,66 @@ it("keeps its spend, its stop and its reserved requests when rebuilt from its sa
   expect(rebuilt.reserve("another", 1, MIDNIGHT)).toBe("reserved");
 });
 
+it("turns AI off at a lowered daily cap, as the shutdown drill needs", () => {
+  const meter = new SpendMeter(undefined, capsOf({dailyMicrodollars: 5_000}));
+  expect(meter.reserve("first", 3_000, NOON)).toBe("reserved");
+
+  expect(meter.reserve("crosses", 3_000, NOON)).toBe("paused");
+
+  expect(meter.status(NOON)).toEqual({on: false, returnsAt: MIDNIGHT});
+});
+
+it("reports AI off once spend reaches a lowered daily cap exactly", () => {
+  const meter = new SpendMeter(undefined, capsOf({dailyMicrodollars: 5_000}));
+
+  meter.reserve("exactly-the-cap", 5_000, NOON);
+
+  expect(meter.status(NOON)).toEqual({on: false, returnsAt: MIDNIGHT});
+});
+
+it("turns AI off until the first of the next month at a lowered monthly cap", () => {
+  const meter = new SpendMeter(undefined, capsOf({monthlyMicrodollars: 10_000}));
+  meter.reserve("first", 4_000, NOON);
+  meter.reserve("second", 4_000, NOON);
+
+  expect(meter.reserve("crosses", 4_000, NOON)).toBe("paused");
+
+  expect(meter.status(NOON)).toEqual({on: false, returnsAt: FIRST_OF_DECEMBER});
+});
+
+it("reports AI off from the start when a cap is zero", () => {
+  expect(new SpendMeter(undefined, capsOf({dailyMicrodollars: 0})).status(NOON)).toEqual({
+    on: false,
+    returnsAt: MIDNIGHT,
+  });
+  expect(new SpendMeter(undefined, capsOf({monthlyMicrodollars: 0})).status(NOON)).toEqual({
+    on: false,
+    returnsAt: FIRST_OF_DECEMBER,
+  });
+  expect(new SpendMeter(undefined, capsOf({dailyMicrodollars: 0})).reserve("any", 1, NOON)).toBe("paused");
+});
+
+it("measures the alerts against a lowered monthly cap, not the approved one", () => {
+  const meter = new SpendMeter(undefined, capsOf({monthlyMicrodollars: 10_000}));
+
+  meter.reserve("half", 5_000, NOON);
+  expect(meter.alertsDue()).toEqual([50]);
+
+  meter.reserve("most", 3_000, NOON);
+  expect(meter.alertsDue()).toEqual([50, 80]);
+
+  expect(meter.reserve("crosses", 3_000, NOON)).toBe("paused");
+  expect(meter.alertsDue()).toEqual([50, 80, 100]);
+});
+
+it("does not let a lowered daily cap change the monthly alerts", () => {
+  const meter = new SpendMeter(undefined, capsOf({dailyMicrodollars: 5_000}));
+
+  meter.reserve("all-the-day-allows", 5_000, NOON);
+
+  expect(meter.alertsDue()).toEqual([]);
+});
+
 interface Days {
   first: number;
   last: number;
@@ -258,4 +319,9 @@ function spendOnEachDay(meter: SpendMeter, microdollars: number, days: Days): vo
 
 function noonOnNovember(day: number): number {
   return Date.UTC(2026, 10, day, 12);
+}
+
+/** The approved ceilings with the given caps lowered. */
+function capsOf(lowered: Partial<SpendCaps>): SpendCaps {
+  return {...SPEND_CAPS, ...lowered};
 }

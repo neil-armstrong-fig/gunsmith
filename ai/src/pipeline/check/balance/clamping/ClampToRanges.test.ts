@@ -9,6 +9,8 @@ const RIFLE: WeaponDraft = {
   magazineSize: 12,
   reloadSeconds: 1.5,
   startingReserve: 36,
+  visionDegrees: 90,
+  visionRange: 12,
 };
 
 it("leaves a weapon whose stats are all inside their ranges as it is", () => {
@@ -24,6 +26,8 @@ it("brings a stat past the strong end of its range to that end", () => {
     magazineSize: 100,
     reloadSeconds: 0.01,
     startingReserve: 5000,
+    visionDegrees: 400,
+    visionRange: 90,
   });
 
   expect(clamped).toEqual({
@@ -34,6 +38,8 @@ it("brings a stat past the strong end of its range to that end", () => {
     magazineSize: 60,
     reloadSeconds: 0.5,
     startingReserve: 200,
+    visionDegrees: 130,
+    visionRange: 20,
   });
 });
 
@@ -46,6 +52,8 @@ it("brings a stat past the weak end of its range up to that end, so a weapon is 
     magazineSize: 0,
     reloadSeconds: 60,
     startingReserve: -4,
+    visionDegrees: 10,
+    visionRange: -2,
   });
 
   expect(clamped).toEqual({
@@ -56,6 +64,8 @@ it("brings a stat past the weak end of its range up to that end, so a weapon is 
     magazineSize: 1,
     reloadSeconds: 5,
     startingReserve: 0,
+    visionDegrees: 50,
+    visionRange: 6,
   });
 });
 

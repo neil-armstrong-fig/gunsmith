@@ -33,6 +33,8 @@ it("names every field of the weapon, so the model is shown what to fill", () => 
     "magazineSize",
     "reloadSeconds",
     "startingReserve",
+    "visionDegrees",
+    "visionRange",
     "preference",
   ]);
 });

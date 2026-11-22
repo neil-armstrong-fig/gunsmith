@@ -9,6 +9,8 @@ const RIFLE = {
   magazineSize: 12,
   reloadSeconds: 1.5,
   startingReserve: 36,
+  visionDegrees: 90,
+  visionRange: 12,
 };
 
 it("keeps a draft that parses, with the preference apart from the weapon, and clears the last refusal", () => {
