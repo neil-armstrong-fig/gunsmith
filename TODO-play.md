@@ -2,16 +2,7 @@
 
 **FOCUS ON MVP TASKS FIRST**
 
-Sessions are **Play** (Claude) and **Play 2** (Codex). Both follow the startup protocol in [TODO.md](TODO.md) and use this checklist.
-
-## Play 2 — signed-in workshop
-
-Play 2 owns the browser-side integration for signed-in workshop generation, trials and the account shelf. The starting points are the existing workshop components and stores, the workshop acceptance specs, and Server's generation and library contracts. The API returns item IDs and shelf limits. Pass saved IDs to Play for pre-round selection. [Server handoff](HANDOFF.md#active-reservations-and-requests).
-
-- [ ] First acceptance slice: use a deterministic signed-in API fixture to make an arena, preview and walk the returned terrain, save it by ID, reload the page, and walk the arena again from the account shelf. Watch the criterion fail against the stand-in before wiring the browser flow.
-- [ ] Extend the same flow to weapons and cover the making, credit, rejection, timeout and AI-off states. Verify guests can still use built-ins and signed-in players can access saved items while generation is paused.
-
-Play keeps onboarding, the M1 playtest, and the pre-round selection and reveal UI. Server keeps the endpoints, provider wiring, and room authority and transport. Play 2 can start with deterministic API fixtures while Server wires the provider. Coordinate shelf selectors and shared acceptance DSL changes with Play in [HANDOFF.md](HANDOFF.md#mvp-ownership-and-handoffs).
+Follow the startup protocol in [TODO.md](TODO.md). Art owns the [signed-in workshop](TODO-art.md#signed-in-workshop).
 
 ## Resume here
 
@@ -44,11 +35,11 @@ Combat feedback and inventory integration.
 
 **State after the first 2026-11-17 session (play, formerly build 1):** combat feedback slice 1, the empty-weapon click, is **delivered and committed** (`8acad87`; art's MP3 swap `2970f33` since). The user played it: audible but "a bit abrasive and loud"; tune later, once more sounds are in (gain or a swapped file, with art). What exists, so do not rebuild it: `engine/src/combat-events/` (`EventsOfStep({playerTurn})`, `World.events` for one step only, set on every `step` return, fireRefused for the player only); webapp `src/sound/` (`CombatSounds.afterTick({events, firing, round})` called after **every tick** in `use-game-loop/UseGameLoop.ts`, `empty-click/ClickLatch`, `web-audio/WebAudioOutput`: a sound is dropped, not queued, while the context is suspended), `src/assets/sounds/` (keys, URLs, files), `store/app/` (`muted`; **M** mutes, `?mute=1`), `use-game-loop/hooks/use-combat-sounds/`, a lint boundary for `sound/`, and the acceptance recorder `gunsmith.sound.getPlays(key)` (`SoundPlaywright`: wraps `fetch`, `decodeAudioData`, `AudioBufferSourceNode.start`; added by `GunsmithDsl.begin()`). Read `webapp/AGENTS.md` ("Sounds") and `acceptance-tests/AGENTS.md` ("Sound") before changing it. ****Slice 2 then went ahead: see 2a above.** Slice 4 will need `ArenaPointAtPixel` and the acceptance `ScreenPositionOfTile` to take the shake offset, and reduced motion (`prefers-reduced-motion`, `?reducedMotion=1`, in `store/app`). **Known gaps, plainly:** the audio context's wake-up on a first press is not proven by any spec (the test Chromium starts audio running whatever flag it is given); no spec covers a hold with no reserve (the engine test does); the build-2 loop priority (`useFrame(cb, -1)`, so drawing sees the current world) lives in a source worktree and must survive the merge of `UseGameLoop.ts`. **Open question for the user:** M has its own `keydown` listener (like `useWeaponKeys`); `useHeldKeys` was judged the wrong fit (a held state; a tap between frames would be lost). If they want less duplication, extract `usePressedKey(code, onPress)` for M and for R/1/2 (touches `useWeaponKeys`, so ask first). Other sessions may be live: check `ListAgents` and `git status` before touching `UseGameLoop.ts`, `HealthHud.tsx` or `Step.ts`. **Resume prompt:** "You are play, continue the TODO: combat feedback slice 2b. Read the instruction files, build the `store/feedback/` store the user chose, and write the acceptance spec first, watched red. Leave changes uncommitted."
 
-Current milestone: M1; the project remains on M1. Next failing test/check: none red. **Next action (2026-11-20):** the room's pre-round once server's messages exist, or the tutorial ([selection concept](docs/selection-concept/README.md)); the workshop (prompt, Make, card, Try it, refills, dummy fan, Save and both shelves) and the local pre-round (weapons, arena choice, pick, reveal) are done; the making states belong to Play 2. Held weapons are built (art); recoil and muzzle flash wait until after the MVP. Still open: the "opponent is away" notice (server asks), online combat feedback with server, `?scenario=cover` playtest, `sfx-death`, the M1 playtest checkpoint, and the intermittent `DrawingTheShots` hidden-shot spec (no owner).
+Current milestone: M1; the project remains on M1. Next failing test/check: none red. **Next action (2026-11-20):** the room's pre-round once server's messages exist, or the tutorial ([selection concept](docs/selection-concept/README.md)); the workshop (prompt, Make, card, Try it, refills, dummy fan, Save and both shelves) and the local pre-round (weapons, arena choice, pick, reveal) are done; Art owns the making states. Held weapons are built (art); recoil and muzzle flash wait until after the MVP. Still open: the "opponent is away" notice (server asks), online combat feedback with server, `?scenario=cover` playtest, `sfx-death`, the M1 playtest checkpoint, and the intermittent `DrawingTheShots` hidden-shot spec (no owner).
 
 ## MVP priority
 
-Play owns the first-time M1 playtest with Engine, the tutorial, and selection and reveal in the local and room pre-round. Play 2 connects the existing workshop and terrain preview to generation and the account shelf. Both sessions coordinate end-to-end acceptance for using a saved weapon and arena in a room. [Shared priorities](TODO.md#mvp-integration-priorities).
+Play owns the first-time M1 playtest with Engine, the tutorial, and selection and reveal in the local and room pre-round. Coordinate with Art on saved-item IDs and acceptance for using a saved weapon and arena in a room. [Shared priorities](TODO.md#mvp-integration-priorities).
 
 ## Ownership
 

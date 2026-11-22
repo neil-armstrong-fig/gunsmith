@@ -42,6 +42,12 @@ engine owns balancing/rating; server owns production adapter routing; budget sup
 
 ## Current milestone tasks
 
+- [ ] Retire automatic substitutes when generation or drawing fails for a requested weapon or arena. If the existing repair path cannot finish the requested item, return a failure with a specific, player-readable reason when available, such as disconnected floor or an illegal stair. Coordinate the outcome with Server and presentation with Art. User decision 2026-11-21.
+
+- [ ] Arena fallback regression from the 2026-11-21 manual test. Prompt: “A single "watchtower" on each end of the map that goes up to level three with no cover and is effectively a corrador up. The middle of the map has a cover block going through it with a single bridge in the middle that also goes up to level three and back down again”. The live workshop returned a built-in. A 25 × 13 hand-authored version with a continuous low-cover divider, one crossing and two-stage stairs to each tower and bridge passed Engine validation and fair starts. Use this prompt in the next authorized arena generation eval, comparing draft and repair validation before and after code-side repair. The existing production response supplies a generic fallback reason. Validation details are discarded when the graph returns. Coordinate a structured failure reason with [Server's generation history](TODO-server.md#mvp-priority).
+
+- [ ] Add generated `visionDegrees` and `visionRange` to the weapon result with Engine. Coordinate bounds, rating and compatibility with the saved-weapon adapter, then hand the contract to Server and Art.
+
 - [ ] Build the accepted bounded appearance renderer/schema consumer with engine, server and budget, then wire the real adapter, AI-off/refund/timeout fallbacks and built-in pool. art owns approved asset/manifest production and play owns runtime feedback integration.
 
 - [x] **Arena evaluator shares engine's validator (the user's decision, 2026-11-18): done.** `PlayableArena` judges with `validateArena`, as the pipeline does; `engine/` and `shared/` are shared resources for `webapp`, `api` and `ai`, and acceptance tests stay on `shared` only for now. Independence is from `ai/src`: with the pipeline's check removed the arena evals still fail through `playableArena` (mutation-proved). No hand-written oracle and no `shared/` arena contract.

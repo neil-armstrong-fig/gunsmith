@@ -1,4 +1,5 @@
 import {expect, type Locator, type Page} from "@playwright/test";
+import {arrangeSignedInArena} from "@src/dsl/gunsmith/components/workshop/components/arenas/playwright/signed-in-arena/ArrangeSignedInArena";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
 import type {Colour} from "@src/dsl/gunsmith/types/Colour";
 import type {Point} from "@src/dsl/gunsmith/types/Point";
@@ -7,6 +8,14 @@ import type {Size} from "@src/dsl/gunsmith/types/Size";
 export class ArenaWorkshopPlaywright extends BasePage {
   constructor(page: Page) {
     super(page);
+  }
+
+  async arrangeSignedInArena(generationPaused: boolean): Promise<void> {
+    await arrangeSignedInArena(this.page, generationPaused);
+  }
+
+  async getMakeError(): Promise<string> {
+    return await this.page.getByRole("dialog", {name: "Workshop"}).getByRole("alert").innerText();
   }
 
   async open(name?: string): Promise<void> {
@@ -26,6 +35,12 @@ export class ArenaWorkshopPlaywright extends BasePage {
       .getByRole("region", {name: "Saved arenas"})
       .getByTestId("saved-arena-prompt")
       .allTextContents();
+  }
+
+  async getSavedArenaColours(name: string, size: Size, points: Point[]): Promise<Colour[]> {
+    const shelf = this.page.getByRole("region", {name: "Saved arenas"});
+
+    return await this.coloursOf(shelf.getByRole("img", {name: `${name} arena layout`, exact: true}), size, points);
   }
 
   async getResultColours(name: string, size: Size, points: Point[]): Promise<Colour[]> {
