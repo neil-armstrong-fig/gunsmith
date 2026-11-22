@@ -1,5 +1,5 @@
-import {isFriendCode} from "@src/router/routes/shared/friend-code/IsFriendCode";
-import {makeFriendCode} from "@src/router/routes/shared/friend-code/MakeFriendCode";
+import {isFriendCode} from "@gunsmith/shared/online/friend-code/IsFriendCode";
+import {makeFriendCode} from "@src/router/routes/rooms/friend-code/MakeFriendCode";
 
 it("makes a code that has the shape of a friend code", () => {
   for (let attempt = 0; attempt < 50; attempt += 1) {

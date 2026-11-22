@@ -4,7 +4,7 @@ import type {CarriedWeapon} from "@gunsmith/engine/loadout/types/CarriedWeapon";
 import {SUBMACHINE_GUN} from "@gunsmith/engine/weapon/weapons/SubmachineGun";
 import {PRACTICE_ARENA} from "@src/game/practice/PracticeArena";
 import {PRACTICE_DUMMIES} from "@src/game/practice/PracticeDummies";
-import {worldWithFullAmmunition} from "@src/react/components/dom/workshop/hooks/full-ammunition/WorldWithFullAmmunition";
+import {worldWithFullAmmunition} from "@src/react/components/dom/workshop/full-ammunition/WorldWithFullAmmunition";
 import {expect, it} from "vitest";
 
 it("fills the magazine and the reserve of the weapon in hand", () => {

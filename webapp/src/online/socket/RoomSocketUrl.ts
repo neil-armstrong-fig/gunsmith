@@ -1,4 +1,5 @@
-import type {PageAddress} from "@src/online/socket/types/PageAddress";
+import {apiOriginOfPage} from "@src/online/api-origin/ApiOriginOfPage";
+import type {PageAddress} from "@src/online/types/PageAddress";
 import type {SocketAsk} from "@src/online/socket/types/SocketAsk";
 
 /**
@@ -24,14 +25,10 @@ export function roomSocketUrl(page: PageAddress, code: string, ask: SocketAsk = 
 
 function socketOrigin(page: PageAddress): string {
   if (page.protocol === "https:") {
-    if (page.host === "gunsmith.neilarmstrong.dev") {
-      return "wss://gunsmith-api.neilarmstrong.dev";
-    }
-
-    return `wss://${page.host}`;
+    return apiOriginOfPage(page, "wss:");
   }
 
-  return `ws://${page.host}`;
+  return apiOriginOfPage(page, "ws:");
 }
 
 function tokenField(token: string | undefined): string[] {

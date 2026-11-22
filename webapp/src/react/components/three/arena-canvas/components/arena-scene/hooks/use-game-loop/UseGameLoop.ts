@@ -1,11 +1,14 @@
 import {useFrame} from "@react-three/fiber";
 import {engine} from "@gunsmith/engine/Engine";
+import type {Input} from "@gunsmith/engine/game-loop/types/Input";
+import type {Point} from "@gunsmith/engine/geometry/types/Point";
 import {STATE_HOOK_NAME} from "@gunsmith/shared/state-hook/StateHookName";
 import {gameState} from "@src/store/game/selectors/game-state/GameState";
 import {useAppStore} from "@src/store/app/UseAppStore";
 import {usePreRoundStore} from "@src/store/pre-round/UsePreRoundStore";
 import {useGameStore} from "@src/store/game/UseGameStore";
 import {arenaPointAtPixel} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/pointer/ArenaPointAtPixel";
+import {hitPlacesOfStep} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/feedback/hit-places/HitPlacesOfStep";
 import {recordFeedbackCues} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/feedback/RecordFeedbackCues";
 import {fixedTicks} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/clock/FixedTicks";
 import {TICK_SECONDS} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/clock/TickSeconds";
@@ -22,6 +25,7 @@ import {useEffect, useRef} from "react";
 
 /** Lower runs earlier. Only a priority above zero changes how the scene is rendered (the callback then takes the rendering over), so a negative one is safe. */
 const GAME_LOOP_PRIORITY = -1;
+const MENU_INPUT: Input = {direction: {x: 0, y: 0}, firing: false, reload: false};
 
 /**
  * Runs the match held in the game store: every frame it plays however many fixed steps the time since the last one
@@ -52,12 +56,25 @@ export function useGameLoop(): void {
     };
   }, []);
 
+  useEffect(() => {
+    return useAppStore.subscribe((current, previous) => {
+      if (current.menuView === undefined || previous.menuView !== undefined) return;
+
+      trigger.clear();
+      weaponKeys.takeReload();
+      weaponKeys.takeSlot();
+      if (!roomPage) sounds.stopRingDamage();
+    });
+  }, [roomPage, sounds, trigger, weaponKeys]);
+
   // Priority -1, so the step runs before every drawing component's own `useFrame` (priority 0) and what they draw is the world as it now stands. At
   // the default priority the loop ran after them, because a child's effect subscribes before its parent's, and everything was drawn one step behind: 0.33 tile for a rifle bullet.
   useFrame(({size}, frameSeconds) => {
     const owed = fixedTicks(leftoverSecondsRef.current, frameSeconds);
     leftoverSecondsRef.current = owed.leftoverSeconds;
 
+    const appStore = useAppStore.getState();
+    const menuOpen = appStore.menuView !== undefined;
     const startOfFrame = gameState();
     const pixel = pointerRef.current;
     const aimAt = pixel && arenaPointAtPixel(pixel, startOfFrame.arena, size);
@@ -68,31 +85,46 @@ export function useGameLoop(): void {
     if (roomPage) {
       const onlineMatch = onlineMatchRef.current;
       for (let tick = 0; tick < owed.ticks; tick += 1) {
-        onlineMatch?.step({
-          direction: directionRef.current,
-          crouching: crouchingRef.current,
-          aimAt,
-          firing: trigger.isFiring(),
-          reload: weaponKeys.takeReload(),
-          switchTo: weaponKeys.takeSlot(),
-        });
+        if (menuOpen) {
+          onlineMatch?.step(MENU_INPUT);
+        } else {
+          onlineMatch?.step({
+            direction: directionRef.current,
+            crouching: crouchingRef.current,
+            aimAt,
+            firing: trigger.isFiring(),
+            reload: weaponKeys.takeReload(),
+            switchTo: weaponKeys.takeSlot(),
+          });
+        }
       }
 
       const shown = onlineMatch?.worldToShow(owed.leftoverSeconds);
+      const told = onlineMatch?.takeEvents();
+      if (shown && onlineMatch?.hasLostConnection()) {
+        sounds.stopRingDamage();
+        recordFeedbackCues({events: undefined, round: shown.round, hitPlaces: []});
+      } else if (shown && told) {
+        const {events, seconds, opponentVisible} = told;
+        const {round, opponent} = shown;
+        const hitPlaces: Point[] = [];
+        if (
+          opponentVisible &&
+          opponent &&
+          events.some(event => event.kind === "hitLanded" && event.on === "opponent")
+        ) {
+          hitPlaces.push(opponent.position);
+        }
+
+        sounds.afterTick({events, firing: !menuOpen && trigger.isFiring(), round, seconds});
+        recordFeedbackCues({events, round, hitPlaces});
+      }
       if (shown) {
         useGameStore.getState().setWorld(shown);
       }
 
-      // What the snapshots since the last frame said happened to this player (the server's events, not the browser's own: nothing is stepped
-      // here) goes to the sounds once, and only when a snapshot came: a frame with no news must not stop the ring loop the last one started.
-      const told = onlineMatch?.takeEvents();
-      if (shown && told) {
-        sounds.afterTick({events: told.events, firing: trigger.isFiring(), round: shown.round, seconds: told.seconds});
-      }
-
       // The banner's "Next round" and "Play again" ask through the app store (the engine is not stepped here to start a round); the loop
       // sends the ask once, and tells the store whether the server is now waiting for the other player, which the banner says.
-      const appStore = useAppStore.getState();
       if (appStore.takeNextRoundAsk()) {
         onlineMatch?.readyForNextRound();
       }
@@ -111,8 +143,8 @@ export function useGameLoop(): void {
       return;
     }
 
-    // The workshop is open over the practice range: the game waits. The steps this frame owed are dropped, not kept, so shutting it does not make up the time.
-    if (useAppStore.getState().workshopOpen) {
+    // A local overlay pauses play. Drop the owed ticks so time does not accumulate while the overlay is open.
+    if (appStore.workshopOpen || menuOpen) {
       return;
     }
 
@@ -134,15 +166,14 @@ export function useGameLoop(): void {
 
       const before = world;
       world = engine.step(world, input, TICK_SECONDS);
-      const {reloadRemainingSeconds} = world.player;
       sounds.afterTick({
         events: world.events,
         firing: input.firing,
         round: world.round,
         seconds: TICK_SECONDS,
-        reloadStarted: before.player.reloadRemainingSeconds === undefined && reloadRemainingSeconds !== undefined,
       });
-      recordFeedbackCues({before, after: world});
+      const hitPlaces = hitPlacesOfStep({before, after: world});
+      recordFeedbackCues({events: world.events, round: world.round, hitPlaces});
     }
 
     if (owed.ticks > 0) {

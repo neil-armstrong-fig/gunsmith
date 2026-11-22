@@ -1,9 +1,7 @@
 import {scenarioOfPage} from "@src/game/scenario/ScenarioOfPage";
-import {worldWithFullAmmunition} from "@src/react/components/dom/workshop/hooks/full-ammunition/WorldWithFullAmmunition";
+import {openPracticeWorkshop} from "@src/react/components/dom/workshop/entering/OpenPracticeWorkshop";
 import {usePressedKey} from "@src/react/hooks/use-pressed-key/UsePressedKey";
 import {useAppStore} from "@src/store/app/UseAppStore";
-import {useGameStore} from "@src/store/game/UseGameStore";
-import {gameState} from "@src/store/game/selectors/game-state/GameState";
 
 /** B opens the workshop. */
 const WORKSHOP_KEY = "KeyB";
@@ -15,10 +13,10 @@ const WORKSHOP_KEY = "KeyB";
  * held key's repeats do not open it again the moment Escape has shut it.
  */
 export function useWorkshopKey(): void {
-  usePressedKey(WORKSHOP_KEY, openWorkshopWithFullAmmunition, scenarioOfPage() === "practice");
-}
+  usePressedKey(WORKSHOP_KEY, () => {
+    if (scenarioOfPage() !== "practice") return;
 
-function openWorkshopWithFullAmmunition(): void {
-  useGameStore.getState().setWorld(worldWithFullAmmunition(gameState()));
-  useAppStore.getState().openWorkshop();
+    const {menuView, workshopOpen} = useAppStore.getState();
+    if (menuView === undefined && !workshopOpen) openPracticeWorkshop();
+  });
 }

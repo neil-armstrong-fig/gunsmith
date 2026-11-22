@@ -14,6 +14,7 @@ export async function buildApiWorker(apiDatabase: D1Database): ReturnType<typeof
     entrypoint: workspacePath("api/src/ApiWorker.ts"),
     compatibilityDate: "2026-11-01",
     compatibilityFlags: ["nodejs_compat"],
+    crons: ["0 4 * * *"],
     adopt: true,
     url: false,
     previewSubdomains: false,

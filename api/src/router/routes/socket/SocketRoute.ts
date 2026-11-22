@@ -1,6 +1,6 @@
 import {workerEnvironment} from "@src/env/WorkerEnvironment";
+import {isFriendCode} from "@gunsmith/shared/online/friend-code/IsFriendCode";
 import {accountOfRequest} from "@src/router/routes/shared/session/AccountOfRequest";
-import {isFriendCode} from "@src/router/routes/shared/friend-code/IsFriendCode";
 import {SEAT_ACCOUNT_HEADER} from "@src/seat-account/SeatAccountHeader";
 
 /**

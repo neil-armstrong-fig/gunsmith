@@ -13,7 +13,8 @@ import {pullTrigger} from "@gunsmith/engine/weapon/TriggerPull";
  * fighter crouches or stands as asked, walks (slower crouched), turns to the aim, and the trigger is judged. It does not fly any bullet or let one go: see `shootFighter`.
  */
 export function prepareFighter({arena, fighter, input, seconds}: PrepareFighterRequest): FighterTurn {
-  const ready = reloadWeapon(switchWeapon(fighter, input.switchTo), input.reload, seconds);
+  const switched = switchWeapon(fighter, input.switchTo);
+  const ready = reloadWeapon(switched, input.reload, seconds);
   const carriedWeapon = equippedWeapon(ready);
   const crouching = input.crouching === true;
   const position = movePlayer(arena, {position: ready.position, direction: input.direction, seconds, crouching});
@@ -30,6 +31,7 @@ export function prepareFighter({arena, fighter, input, seconds}: PrepareFighterR
   return {
     fighter: {...ready, position, aim, crouching, cooldownSeconds: trigger.cooldownSeconds},
     fires: trigger.fires,
+    reloadStarted: switched.reloadRemainingSeconds === undefined && ready.reloadRemainingSeconds !== undefined,
     refusal: trigger.refusal,
   };
 }

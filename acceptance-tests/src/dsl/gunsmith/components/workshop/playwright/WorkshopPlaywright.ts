@@ -10,9 +10,16 @@ const WORKSHOP_KEY = "KeyB";
 /** The key that stands the practice range's dummies up again and refills the weapons. */
 const RESET_KEY = "KeyT";
 
+/** Long enough for a sentence at a second a key. */
+const TYPING_TIMEOUT_MILLISECONDS = 30_000;
+
 export class WorkshopPlaywright extends BasePage {
   constructor(page: Page) {
     super(page);
+  }
+
+  async pressBack(): Promise<void> {
+    await this.page.getByRole("dialog", {name: "Workshop"}).getByRole("button", {name: "Back", exact: true}).click();
   }
 
   async open(): Promise<void> {
@@ -31,12 +38,12 @@ export class WorkshopPlaywright extends BasePage {
     return await this.page.getByRole("dialog", {name: "Workshop"}).isVisible();
   }
 
-  /** Key by key, as a person types, so every key the game listens for is pressed as well. */
+  /** Key by key, as a person types, so every key the game listens for is pressed as well. A machine with no graphics card has been seen to take a quarter of a second a key, so the five seconds an action is given are not enough for a sentence. */
   async typeThePrompt(text: string): Promise<void> {
-    await this.promptBox().pressSequentially(text);
+    await this.promptBox().pressSequentially(text, {timeout: TYPING_TIMEOUT_MILLISECONDS});
   }
 
-  /** All at once, as a paste would, for a text too long to type. */
+  /** All at once, as a paste would: for a text too long to type, and for a spec that is not about the game's keys, since a fill sends none. */
   async pasteThePrompt(text: string): Promise<void> {
     await this.promptBox().fill(text);
   }

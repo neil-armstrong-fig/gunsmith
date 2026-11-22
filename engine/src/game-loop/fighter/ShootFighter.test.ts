@@ -30,5 +30,5 @@ it("fires a bullet from a stair at the upper of the two levels it joins", () => 
 function turnAt(position: Point, fires: boolean): FighterTurn {
   const fighter = {...startingWorld(terraces).player, position, aim: {x: 1, y: 0}};
 
-  return {fighter, fires};
+  return {fighter, fires, reloadStarted: false};
 }

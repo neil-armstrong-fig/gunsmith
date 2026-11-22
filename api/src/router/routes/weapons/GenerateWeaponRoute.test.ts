@@ -88,6 +88,16 @@ it("gives the credit back, once, and answers 502 when the created weapon cannot 
   expect(ledgers.spendMeter.spentThisMonth()).toBe(created.modelCalls * WEAPON_SPEND.perCallMicrodollars);
 });
 
+it("settles the spend at the tokens the models reported, priced at Haiku's rates, when the pipeline reports them", async () => {
+  const ledgers = fakeLedgers();
+
+  smithThatAnswers({...created, usage: {inputTokens: 3_100, outputTokens: 1_300}});
+  await generateWeaponRoute(post({prompt: "a rifle"}));
+
+  expect(ledgers.spendMeter.spentThisMonth()).toBe(960);
+  expect(heldReservations(ledgers.spendMeter.toState().reservations)).toBe(0);
+});
+
 it("takes half a credit and says why when the prompt is rejected", async () => {
   const ledgers = fakeLedgers();
   smithThatAnswers(rejected);

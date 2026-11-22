@@ -1,4 +1,4 @@
-import {isFriendCode} from "@src/router/routes/shared/friend-code/IsFriendCode";
+import {isFriendCode} from "@gunsmith/shared/online/friend-code/IsFriendCode";
 
 it("accepts six letters and digits from the alphabet", () => {
   expect(isFriendCode("ABC234")).toBe(true);

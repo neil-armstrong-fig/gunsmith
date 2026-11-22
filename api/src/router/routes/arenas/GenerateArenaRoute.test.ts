@@ -258,6 +258,16 @@ it("settles the spend at the model calls the request made, whatever it came to",
   }
 });
 
+it("settles the spend at the tokens the models reported, priced at Haiku's rates, when the pipeline reports them", async () => {
+  const ledgers = fakeLedgers();
+
+  smithThatAnswers({...createdAfterRepair, usage: {inputTokens: 3_500, outputTokens: 500}});
+  await generateArenaRoute(post({prompt: "a maze"}));
+
+  expect(ledgers.spendMeter.spentThisMonth()).toBe(600);
+  expect(heldReservations(ledgers.spendMeter.toState().reservations)).toBe(0);
+});
+
 it("keeps the spend of a built-in arena, since the model was billed even though the credit goes back", async () => {
   const ledgers = fakeLedgers();
 
