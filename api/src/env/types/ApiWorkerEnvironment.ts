@@ -8,7 +8,7 @@ import type {SignInSettings} from "@src/router/routes/sign-in/types/SignInSettin
  * its budget alerts through `ALERT_MAIL` from `ALERT_FROM_ADDRESS` to `ALERT_TO_ADDRESS` (a secret: set with `wrangler secret put`,
  * never in git; unset, no alert is sent); the D1 database; the sign-in settings (`SignInSettings`: `ALLOWED_ORIGINS`,
  * `ALLOW_LOOPBACK_ORIGINS`, `LOGIN_LIMITER`, `GOOGLE_REDIRECT_URI`); and Google's OAuth client, both secrets (`wrangler secret put`, or
- * the root `.env.local` locally, passed by `pnpm api:dev`): unset, Google sign-in is off and every attempt returns signed out. `ACCOUNT_DIGEST_KEY` is a third secret: the key of the digest kept for a deleted account (`router/routes/shared/subject-digest/`); unset, `DELETE /api/account` answers 503 and removes nothing.
+ * the root `.env.local` locally, passed by `pnpm api:dev`): unset, Google sign-in is off and every attempt returns signed out. `ACCOUNT_DIGEST_KEY` is a third secret: the key of the digest kept for a deleted account (`router/routes/shared/subject-digest/`); unset, `DELETE /api/account` answers 503 and removes nothing. `ANTHROPIC_API_KEY` is a fourth secret, the key of the Claude models the weapon and arena routes call (each route's `pipeline/` folder): **setting it is what lets a request cost money**; unset (or empty), both routes answer 503 `ai-unavailable` and take no credit.
  * (`wrangler.jsonc` declares them; `infra/` will too.)
  */
 export interface ApiWorkerEnvironment extends SignInSettings {
@@ -21,5 +21,6 @@ export interface ApiWorkerEnvironment extends SignInSettings {
   DB: D1Database;
   GOOGLE_OAUTH_CLIENT_ID?: string;
   GOOGLE_OAUTH_CLIENT_SECRET?: string;
+  ANTHROPIC_API_KEY?: string;
   ACCOUNT_DIGEST_KEY?: string;
 }

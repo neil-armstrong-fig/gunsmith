@@ -148,13 +148,13 @@ What the code gives today, and what the design still needs:
   `{kind: "heard", sound, sector, loudness}` in the listener's own events: sector 0 is north and the rest follow clockwise, eight in all;
   loudness is the near, mid or far third of the sound's range. No place, no distance and **no level for each speaker**: the browser works
   out the ears from the sector and band (`webapp/src/sound/spatial/`), so the wire carries nothing finer than that. Walls do not muffle it;
-  a crouched fighter's footfalls are silent (their shots are not). **Not built:** loudness by weapon, a low-pass for sounds from behind, a
-  sound file for a shot or a footfall (art). A heard pickup in a room is built and specified (`TwoBrowsersFightingForTheWeapon`). Each seat is told its own events (`SeatView.events`): its own damage, the hits it
-  confirmed on a target it saw, its pickup, its refused trigger and the shots it heard; the room gathers every step of a tick
-  (`MatchRoom`), and the browser's `OnlineMatch` puts them on the first world it shows after the snapshot. The wire message `sound` in
-  the draft list above is not used: the heard shot rides in `events`. `TwoBrowsersHearingEachOther` reads the frames.
-- **Gap: effects.** Bullets are filtered by the same rule, but hit and hurt effects are not modelled in `World`; hidden
-  effects must be absent from the snapshot once they are.
+  A crouched fighter's footfalls are silent. The browser plays authored cues for shots, footfalls and pickups. Each seat's
+  `SeatView.events` carries its own reload start, damage and visible hit confirmations. The room gathers events across
+  every step of a tick and `OnlineMatch` hands each batch to playback and rendering once. Reload start carries only its
+  event kind. The game draws incoming damage feedback on the seat's own fighter. It marks the rendered opponent for an
+  outgoing hit only when the latest snapshot includes them and draws the mark while its place is in sight. `TwoBrowsersHearingEachOther`,
+  `TwoBrowsersHearingAReload` and `TwoBrowsersSeeingHits` cover the room cues.
+  `TwoBrowsersFightingForTheWeapon` covers the room pickup.
 - **The first acceptance scenario** is `TwoBrowsersHidingFromEachOther`: it reads the frames each browser *received*, not
   the state hook, because a client sent a hidden opponent and told to hide it would pass a hook check. It pins one wire
   proposal, `{kind: "snapshot", opponent?}` with `opponent` absent when unseen. Nothing moves to `shared/` until a second

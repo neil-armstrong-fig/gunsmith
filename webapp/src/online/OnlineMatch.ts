@@ -121,7 +121,7 @@ export class OnlineMatch {
 
   /**
    * What the snapshots that came since this was last called said happened to this player (damage, hits, a pickup, a shot or footfall
-   * heard) with the game time they cover, or `undefined` when none came: the sounds ask once a frame and play each event once. A
+   * heard) with the game time they cover, or `undefined` when none came: the loop takes them once for sounds and screen cues. A
    * frame that has no news must not be mistaken for a quiet snapshot, which is why a quiet one comes back with no events and a time.
    */
   takeEvents(): EventsOfSnapshots | undefined {
@@ -182,6 +182,11 @@ export class OnlineMatch {
   /** Whether the connection to the server is lost and being made again, after the match had begun: the player is told, and nothing is sent meanwhile. */
   isReconnecting(): boolean {
     return this.seated && this.socket.readyState === SOCKET_CONNECTING;
+  }
+
+  /** Whether an established room has lost its socket or is still waiting to be seated on the replacement. */
+  hasLostConnection(): boolean {
+    return this.seated && (this.socket.readyState !== SOCKET_OPEN || !this.seatedOnThisConnection);
   }
 
   close(): void {
@@ -271,6 +276,7 @@ export class OnlineMatch {
     this.arena = arenaFrom(message.arena);
     this.seated = true;
     this.seatedOnThisConnection = true;
+    this.eventsNotYetTaken = undefined;
     this.history = new InputHistory(HISTORY_STEPS);
     this.lastSent = undefined;
     this.lastSentStep = 0;
@@ -282,11 +288,15 @@ export class OnlineMatch {
   /** Adds a snapshot's events and the game time since the one before it (none for the first, and none when a new round turned the clock back) to those not yet taken. */
   private noteEvents(message: SnapshotFrame): void {
     const before = this.latest?.elapsedSeconds;
-    const seconds = Math.max(0, message.elapsedSeconds - (before ?? message.elapsedSeconds));
+    const elapsed = message.elapsedSeconds - (before ?? message.elapsedSeconds);
+    if (elapsed < 0) {
+      this.eventsNotYetTaken = undefined;
+    }
 
     this.eventsNotYetTaken = {
       events: [...(this.eventsNotYetTaken?.events ?? []), ...(message.events ?? [])],
-      seconds: (this.eventsNotYetTaken?.seconds ?? 0) + seconds,
+      seconds: (this.eventsNotYetTaken?.seconds ?? 0) + Math.max(0, elapsed),
+      opponentVisible: message.opponent !== undefined,
     };
   }
 
