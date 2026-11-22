@@ -16,6 +16,11 @@ export class FiringLatch {
     this.held = false;
   }
 
+  clear(): void {
+    this.held = false;
+    this.pending = false;
+  }
+
   isFiring(): boolean {
     return this.held || this.pending;
   }

@@ -6,6 +6,7 @@ given("a player is on the practice range", () => {
 
     beforeEach(async ({gunsmith}) => {
       roundsBefore = (await gunsmith.weapon.get()).rounds;
+      await gunsmith.menu.pressSettings();
       await gunsmith.references.open();
     });
 

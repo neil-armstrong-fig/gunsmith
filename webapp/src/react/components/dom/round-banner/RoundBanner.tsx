@@ -1,4 +1,5 @@
 import {decideMatch} from "@gunsmith/engine/match/DecideMatch";
+import {returnToMainMenu} from "@src/react/components/dom/game-menu/returning/ReturnToMainMenu";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import {nextRoundOfPage} from "@src/game/scenario/NextRoundOfPage";
 import {worldOfPage} from "@src/game/scenario/WorldOfPage";
@@ -74,6 +75,14 @@ export function RoundBanner(): JSX.Element | undefined {
           Play again
         </button>
       )}
+
+      <button
+        type="button"
+        className="rounded-md border border-gs-edge/50 px-4 py-2 text-sm font-semibold text-gs-ui-text hover:border-gs-team-blue focus-visible:outline-2 focus-visible:outline-gs-team-blue"
+        onClick={returnToMainMenu}
+      >
+        Back to main menu
+      </button>
     </div>
   );
 }

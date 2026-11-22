@@ -1,3 +1,6 @@
+import type {Scenario} from "@src/game/scenario/types/Scenario";
+import type {MenuView} from "@src/store/app/types/MenuView";
+
 /**
  * Everything the app store holds: what the player has chosen about the game around the match, not the match itself.
  * It holds sound and motion preferences, plus online round readiness and connection state. Menus, lobby, library and credits arrive here when a screen needs them.
@@ -10,6 +13,11 @@ export interface AppStore {
   /** How hard a hit shakes the camera at most, in screen pixels: 12 by default (the user's choice; art's study said 2), or what the page's query (`?shake=<pixels>`) asks; 0 is off. */
   shakePixels: number;
   toggleMuted: () => void;
+  scenario: Scenario;
+  menuView: MenuView | undefined;
+  showMenu: (view: MenuView | undefined) => void;
+  showMenuOnStartup: boolean;
+  setShowMenuOnStartup: (show: boolean) => void;
   /** Whether the workshop's panel is open over the practice range. While it is, the game waits: no time passes and the keys typed in it are not the game's. */
   workshopOpen: boolean;
   openWorkshop: () => void;
