@@ -8,4 +8,6 @@ export const WEAKEST_STATS: WeaponStats = {
   magazineSize: 1,
   reloadSeconds: 5,
   startingReserve: 0,
+  visionDegrees: 50,
+  visionRange: 6,
 };

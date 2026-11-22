@@ -1,6 +1,6 @@
 # TODO: art
 
-**MVP audio checklist complete.** Art owns authored audio cues, playback integration with Play, and the listening review after weapon-specific shot synthesis. Checkout: `worktree-art`, last upstream commit merged `f6cdd77`.
+**MVP audio checklist complete.** Art owns authored audio cues, playback integration with Play, and the listening review after weapon-specific shot synthesis. Checkout: `worktree-art`, last upstream commit merged `d05b1e0`.
 
 ## Resume next — private generation history
 
@@ -17,7 +17,7 @@ Start in `.claude/worktrees/art` (`worktree-art`). The signed-in arena workshop 
 Art owns browser sign-in, workshop generation and trials, and the account shelf in `.claude/worktrees/art` (`worktree-art`). Reuse the workshop components and existing previews. Server owns the API and persistence. Coordinate shared acceptance DSL and shelf selectors with Play in [HANDOFF.md](HANDOFF.md#mvp-ownership-and-handoffs) and hand Play server item IDs for room selection.
 
 - [x] `SavingAnArenaToTheAccount` makes an arena through a deterministic signed-in API fixture, previews and walks it, saves it by server ID, reloads, and walks it from the account shelf. All three criteria failed against the browser stand-in and passed after wiring.
-- [ ] Extend to weapons using Engine's saved-item parser (`2f5cb87`) and Server's pre-round hookup (`12bb794`). Use Engine's interim rifle vision. AI will add generated `visionDegrees` and `visionRange`.
+- [ ] Extend to weapons using Engine's saved-item parser (`2f5cb87`) and Server's pre-round hookup (`12bb794`). Use generated `visionDegrees` and `visionRange` from `21cc021`; Engine falls back to rifle vision for older saved weapons.
 - [x] Saved arena rows preview the stored terrain on both the account and browser-local shelves after reload.
 - [x] A signed-in player sees that arena generation is paused and can still walk a saved arena.
 - [x] Show the API reason on the current arena fallback result.

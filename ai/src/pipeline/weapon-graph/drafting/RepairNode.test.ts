@@ -10,6 +10,8 @@ const RIFLE = {
   magazineSize: 12,
   reloadSeconds: 1.5,
   startingReserve: 36,
+  visionDegrees: 90,
+  visionRange: 12,
 };
 
 it("asks the model again, shows it the first answer and the faults, and spends the one repair", async () => {
