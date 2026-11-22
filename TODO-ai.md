@@ -42,6 +42,8 @@ engine owns balancing/rating; server owns production adapter routing; budget sup
 
 ## Current milestone tasks
 
+- [ ] **Vision for a made weapon (engine, 2026-11-21, the user's instruction):** the weapon draft has only a name and six stats, so a saved weapon plays with the rifle's vision (`engine/src/library-items/ParseStoredWeapon.ts`). Add `visionDegrees` and `visionRange` to the draft, prompt and balance (engine owns the ranges and how vision is paid for in `power-rating`/`weapon-balance`; agree them with engine first), then engine reads them from the stored weapon instead of the rifle's. Related: the name limits in `WEAPON_LIMITS` could move to engine.
+
 - [ ] Build the accepted bounded appearance renderer/schema consumer with engine, server and budget, then wire the real adapter, AI-off/refund/timeout fallbacks and built-in pool. art owns approved asset/manifest production and play owns runtime feedback integration.
 
 - [x] **Arena evaluator shares engine's validator (the user's decision, 2026-11-18): done.** `PlayableArena` judges with `validateArena`, as the pipeline does; `engine/` and `shared/` are shared resources for `webapp`, `api` and `ai`, and acceptance tests stay on `shared` only for now. Independence is from `ai/src`: with the pipeline's check removed the arena evals still fail through `playableArena` (mutation-proved). No hand-written oracle and no `shared/` arena contract.
