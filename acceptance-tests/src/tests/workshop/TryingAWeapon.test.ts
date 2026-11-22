@@ -23,7 +23,7 @@ given("the workshop is open on the practice range", () => {
 
   when("the player makes a weapon", () => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.workshop.typeThePrompt(FAST_PROMPT);
+      await gunsmith.workshop.pasteThePrompt(FAST_PROMPT);
       await gunsmith.workshop.make();
     });
 
@@ -38,7 +38,7 @@ given("the workshop is open on the practice range", () => {
     let reserve = 0;
 
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.workshop.typeThePrompt(FAST_PROMPT);
+      await gunsmith.workshop.pasteThePrompt(FAST_PROMPT);
       await gunsmith.workshop.make();
 
       const result = await gunsmith.workshop.getResult();
@@ -123,7 +123,7 @@ given("the practice range, held still, with a weapon made and the workshop open"
     startX = (await gunsmith.player.getPosition()).x;
 
     await gunsmith.workshop.open();
-    await gunsmith.workshop.typeThePrompt(FAST_PROMPT);
+    await gunsmith.workshop.pasteThePrompt(FAST_PROMPT);
     await gunsmith.workshop.make();
   });
 

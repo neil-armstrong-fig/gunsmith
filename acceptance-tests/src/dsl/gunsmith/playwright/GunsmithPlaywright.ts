@@ -41,7 +41,7 @@ export class GunsmithPlaywright extends BasePage {
   }
 
   async open(): Promise<void> {
-    await this.page.goto("/");
+    await this.page.goto("/?menu=0");
     await this.waitForArena();
   }
 
@@ -56,7 +56,7 @@ export class GunsmithPlaywright extends BasePage {
     await this.openScenario(`duel&seed=${seed}`);
   }
 
-  /** Opens the duel behind its pre-round (`?preRound=1`), as the practice range's "Fight the bot" does. */
+  /** Opens the duel behind its pre-round (`?preRound=1`), as the practice range's "Start bot game" does. */
   async openDuelWithPreRound(seed: number): Promise<void> {
     await this.openScenario(`duel&seed=${seed}&preRound=1`);
   }
@@ -229,14 +229,14 @@ export class GunsmithPlaywright extends BasePage {
       await route.continue();
     });
 
-    await this.page.goto(`/?scenario=${scenario}`);
+    await this.page.goto(`/?menu=0&scenario=${scenario}`);
     await expect(this.page.getByTestId("arena")).toHaveAttribute("data-ready", "true");
   }
 
   private async openScenario(scenario: string): Promise<void> {
     const asked = this.askedFor.map(request => `&${request}`).join("");
 
-    await this.page.goto(`/?scenario=${scenario}${asked}`);
+    await this.page.goto(`/?menu=0&scenario=${scenario}${asked}`);
     await this.waitForArena();
   }
 

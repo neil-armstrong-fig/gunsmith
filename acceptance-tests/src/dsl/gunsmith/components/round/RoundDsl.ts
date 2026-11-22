@@ -11,6 +11,14 @@ export class RoundDsl {
     this.round = new RoundPlaywright(page);
   }
 
+  async backToMainMenu(): Promise<void> {
+    try {
+      await this.round.backToMainMenu();
+    } catch (error) {
+      throw new DslError("Could not go to the main menu from the round banner", error);
+    }
+  }
+
   /** Whether the round is still being fought, or has been won, lost or drawn. */
   async getState(): Promise<RoundSnapshot> {
     try {

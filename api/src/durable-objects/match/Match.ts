@@ -1,7 +1,10 @@
 import type {Seat} from "@gunsmith/engine/seat/types/Seat";
+import {resolveArenaChoice} from "@src/durable-objects/match/choices/ResolveArenaChoice";
+import {resolveWeaponChoices} from "@src/durable-objects/match/choices/ResolveWeaponChoices";
 import {parseForfeitLimits} from "@src/durable-objects/match/forfeit-limits/ParseForfeitLimits";
 import {parseInputMessage} from "@src/durable-objects/match/messages/ParseInputMessage";
 import {parsePreRoundMessage} from "@src/durable-objects/match/messages/ParsePreRoundMessage";
+import type {PreRoundAction} from "@src/durable-objects/match/messages/types/PreRoundAction";
 import {parseReadyMessage} from "@src/durable-objects/match/messages/ParseReadyMessage";
 import {parsePreRoundSeconds} from "@src/durable-objects/match/pre-round-seconds/ParsePreRoundSeconds";
 import {parseRingTiming} from "@src/durable-objects/match/ring-timing/ParseRingTiming";
@@ -9,6 +12,7 @@ import {MatchRoom} from "@src/durable-objects/match/room/MatchRoom";
 import {MATCH_TICK} from "@src/durable-objects/match/tick/MatchTick";
 import {parseStartSeed} from "@src/durable-objects/match/start-seed/ParseStartSeed";
 import {stepsOwed} from "@src/durable-objects/match/tick/StepsOwed";
+import {SEAT_ACCOUNT_HEADER} from "@src/seat-account/SeatAccountHeader";
 
 /** Nothing a player may send is as long as this: a longer frame is dropped unread. */
 const LONGEST_FRAME = 1024;
@@ -34,6 +38,10 @@ export class Match {
   private room = new MatchRoom();
   private opened = false;
   private readonly sockets = new Map<Seat, WebSocket>();
+  /** The account each seat's person is signed in as (`SEAT_ACCOUNT_HEADER`), for the seats whose person is signed in. */
+  private readonly accounts = new Map<Seat, string>();
+  /** What each seat's pre-round frames have still to do, so they take effect in the order they were sent even when one waits on the database. */
+  private readonly pending = new Map<Seat, Promise<void>>();
   private ticking: ReturnType<typeof setInterval> | undefined;
   private lastTickAt = 0;
   private leftoverSeconds = 0;
@@ -48,7 +56,7 @@ export class Match {
     server.accept();
 
     this.openRoom(request);
-    this.seat(server, this.tokenOf(request));
+    this.seat(server, this.tokenOf(request), request.headers.get(SEAT_ACCOUNT_HEADER) ?? undefined);
 
     return new Response(null, {status: 101, webSocket: client});
   }
@@ -85,7 +93,7 @@ export class Match {
     return token;
   }
 
-  private seat(socket: WebSocket, token: string | undefined): void {
+  private seat(socket: WebSocket, token: string | undefined, accountId: string | undefined): void {
     const seat = this.takeSeat(token);
     if (!seat) {
       socket.close(ROOM_FULL, "room-full");
@@ -95,6 +103,7 @@ export class Match {
 
     this.sockets.get(seat)?.close(REPLACED, "replaced");
     this.sockets.set(seat, socket);
+    this.rememberAccount(seat, accountId);
     socket.send(JSON.stringify(this.room.joinedMessage(seat)));
     socket.addEventListener("message", event => {
       this.listen(seat, socket, event.data);
@@ -103,6 +112,17 @@ export class Match {
       this.release(seat, socket);
     });
     this.startClock();
+  }
+
+  /** The seat's person is signed in as `accountId`, or is a guest: what the latest connection says replaces what an earlier one did. */
+  private rememberAccount(seat: Seat, accountId: string | undefined): void {
+    if (accountId) {
+      this.accounts.set(seat, accountId);
+
+      return;
+    }
+
+    this.accounts.delete(seat);
   }
 
   /** The seat `token` belongs to, else the next free one (a token that is not a seat's is an ordinary newcomer's). */
@@ -141,6 +161,40 @@ export class Match {
 
     const action = parsePreRoundMessage(data);
     if (action) {
+      this.afterEarlierFrames(seat, () => this.takePreRoundAction(seat, socket, action));
+    }
+  }
+
+  /** Runs `work` once the seat's earlier pre-round frames have finished, so a lock-in never overtakes the choice sent before it. A failure is logged closed and does not stop the frames after it. */
+  private afterEarlierFrames(seat: Seat, work: () => Promise<void>): void {
+    const earlier = this.pending.get(seat) ?? Promise.resolve();
+    this.pending.set(
+      seat,
+      earlier.then(work).catch(() => {
+        console.warn(JSON.stringify({event: "pre-round-frame-failed"}));
+      }),
+    );
+  }
+
+  /** What a seat's pre-round frame does: a choice is looked up first (a saved id is the account's own or nothing), anything else the room does at once. Nothing is done for a seat whose connection has moved on meanwhile. */
+  private async takePreRoundAction(seat: Seat, socket: WebSocket, action: PreRoundAction): Promise<void> {
+    if (action.kind === "chooseArena") {
+      const chosen = await resolveArenaChoice(this.accounts.get(seat), action.choice);
+      if (chosen && this.sockets.get(seat) === socket) {
+        this.room.chooseArena(seat, chosen);
+      }
+
+      return;
+    }
+    if (action.kind === "chooseWeapons") {
+      const chosen = await resolveWeaponChoices(this.accounts.get(seat), action.choices);
+      if (chosen && this.sockets.get(seat) === socket) {
+        this.room.chooseWeapons(seat, chosen);
+      }
+
+      return;
+    }
+    if (this.sockets.get(seat) === socket) {
       this.room.preRoundAction(seat, action);
     }
   }
@@ -176,12 +230,17 @@ export class Match {
     }, MATCH_TICK.snapshotIntervalMilliseconds);
   }
 
-  /** Tells each connection what its seat may know: the arena once, when the match begins, then the choosing while there is some, else its snapshot. */
+  /** Tells each connection what its seat may know: the arena and the reveal once, when the match begins, then the choosing while there is some, else its snapshot. */
   private sendSnapshots(): void {
     const arena = this.room.takeArenaMessage();
     for (const [seat, socket] of this.sockets) {
       if (arena) {
         socket.send(JSON.stringify(arena));
+      }
+
+      const reveal = this.room.takeRevealMessage(seat);
+      if (reveal) {
+        socket.send(JSON.stringify(reveal));
       }
 
       const frame = this.room.snapshotFor(seat) ?? this.room.preRoundFor(seat);

@@ -1,4 +1,4 @@
-import {makeFriendCode} from "@src/router/routes/shared/friend-code/MakeFriendCode";
+import {makeFriendCode} from "@src/router/routes/rooms/friend-code/MakeFriendCode";
 
 /** `POST /api/rooms`: opens a private room and answers its friend code (201). The room itself exists once its first player connects. */
 export function openRoomRoute(request: Request): Response {

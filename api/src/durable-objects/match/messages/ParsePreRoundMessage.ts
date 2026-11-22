@@ -1,10 +1,14 @@
 import type {PreRoundAction} from "@src/durable-objects/match/messages/types/PreRoundAction";
+import type {WeaponChoice} from "@src/durable-objects/match/messages/types/WeaponChoice";
 import type {SeatPick} from "@src/durable-objects/match/pre-round/types/SeatPick";
+
+/** No id of a saved item is longer than this (a UUID is 36): a longer one is not an id. */
+const LONGEST_ID = 64;
 
 /**
  * What a player's text frame asks of the pre-round, or `undefined` if it asks nothing the room understands: a `choose` or `lockIn` of the
  * arena step, a `choose` or `lockIn` of the weapons step, or a `pickArena`. Everything a client sends is `unknown` until here, and a choice
- * is only ever a built-in arena's name or two built-in weapons' keys (a saved item is refused until the room can check an account's library).
+ * is only ever a built-in's name or key or a saved item's id, never a body: whether the id is the account's own is for the room to check.
  */
 export function parsePreRoundMessage(text: string): PreRoundAction | undefined {
   const parsed = recordOf(text);
@@ -33,16 +37,26 @@ export function parsePreRoundMessage(text: string): PreRoundAction | undefined {
 }
 
 function chooseOf(choice: unknown): PreRoundAction | undefined {
-  if (!isRecord(choice) || Reflect.get(choice, "kind") !== "builtIn") {
+  if (!isRecord(choice)) {
     return undefined;
   }
 
-  const name = Reflect.get(choice, "name");
-  if (typeof name !== "string") {
+  const kind = Reflect.get(choice, "kind");
+  if (kind === "builtIn") {
+    const name = Reflect.get(choice, "name");
+    if (typeof name !== "string") {
+      return undefined;
+    }
+
+    return {kind: "chooseArena", choice: {kind: "builtIn", name}};
+  }
+
+  const id = savedIdOf(choice);
+  if (id === undefined) {
     return undefined;
   }
 
-  return {kind: "chooseArena", name};
+  return {kind: "chooseArena", choice: {kind: "saved", id}};
 }
 
 function chooseWeaponsOf(choice: unknown): PreRoundAction | undefined {
@@ -50,26 +64,49 @@ function chooseWeaponsOf(choice: unknown): PreRoundAction | undefined {
     return undefined;
   }
 
-  const first = builtInKeyOf(choice[0]);
-  const second = builtInKeyOf(choice[1]);
+  const first = weaponChoiceOf(choice[0]);
+  const second = weaponChoiceOf(choice[1]);
   if (first === undefined || second === undefined) {
     return undefined;
   }
 
-  return {kind: "chooseWeapons", keys: [first, second]};
+  return {kind: "chooseWeapons", choices: [first, second]};
 }
 
-function builtInKeyOf(choice: unknown): string | undefined {
-  if (!isRecord(choice) || Reflect.get(choice, "kind") !== "builtIn") {
+function weaponChoiceOf(choice: unknown): WeaponChoice | undefined {
+  if (!isRecord(choice)) {
     return undefined;
   }
 
-  const key = Reflect.get(choice, "key");
-  if (typeof key !== "string") {
+  if (Reflect.get(choice, "kind") === "builtIn") {
+    const key = Reflect.get(choice, "key");
+    if (typeof key !== "string") {
+      return undefined;
+    }
+
+    return {kind: "builtIn", key};
+  }
+
+  const id = savedIdOf(choice);
+  if (id === undefined) {
     return undefined;
   }
 
-  return key;
+  return {kind: "saved", id};
+}
+
+/** The `id` of a `{kind: "saved", id}` choice: a non-empty string no longer than an id is (a UUID is 36), else `undefined`. */
+function savedIdOf(choice: object): string | undefined {
+  if (Reflect.get(choice, "kind") !== "saved") {
+    return undefined;
+  }
+
+  const id = Reflect.get(choice, "id");
+  if (typeof id !== "string" || id.length === 0 || id.length > LONGEST_ID) {
+    return undefined;
+  }
+
+  return id;
 }
 
 function pickOf(pick: unknown): PreRoundAction | undefined {
