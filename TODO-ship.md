@@ -6,9 +6,9 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 ## Resume here
 
-M1 Esc menu is implemented in the Ship worktree. The menu moves the old front door into Settings, puts Workshop directly below Resume, pauses local play, and keeps the online match clock moving. The startup preference and `?menu=0` are documented in the webapp instructions. Back controls, same-canvas bot entry, standard Zustand startup persistence and the shared friend-code rules are ready for review in this worktree.
+M1 Esc menu is implemented in the Ship worktree. The menu moves the old front door into Settings, puts Workshop directly below Resume, pauses local play, and keeps the online match clock moving. The startup preference and `?menu=0` are documented in the webapp instructions. Back controls, same-canvas bot entry, standard Zustand startup persistence and the shared friend-code rules are committed in `1ff3a1a`.
 
-The persistent checkout is `.claude/worktrees/ship` on `worktree-ship`, synced with main `00b8dab` in merge `f907b70`. The manual release is live on both production hostnames. Cloudflare lists the daily account-retention sweep at 04:00 UTC. Review its first invocation after 04:00 UTC on 2026-11-21. The main checkout is investigating CI. The hosted release artifact, four preview shard blobs, native setup timings and scheduled property results still need verification.
+The persistent checkout is `.claude/worktrees/ship` on `worktree-ship`, synced with GitHub main `45ab470`. The manual release is live on both production hostnames. Cloudflare lists the daily account-retention sweep at 04:00 UTC. Review its first invocation after 04:00 UTC on 2026-11-21. The main checkout is investigating CI. The hosted release artifact, four preview shard blobs, native setup timings and scheduled property results still need verification.
 
 Both production hostnames serve the split release with API Worker version `9a8a53a8-f4d8-481f-886a-5ac4a5a4d64f` and webapp Worker version `e2b165ba-867e-4a69-a419-6d12a8ba06bb`. The webapp retains `noindex`. Automated deployment stays off while Ship stabilizes CI.
 
@@ -57,6 +57,8 @@ server supplies Worker/DO/storage bindings; budget supplies operational limits; 
 - [ ] Measure infrastructure costs with server/AI runtime measurements before proposing free versus Workers Paid.
 
 ## Verification/latest delivery
+
+2026-11-22 GitHub sync from `45ab470`. The merged Ship tree passed `pnpm checks` with 4,121 tests and the existing audio skip, all 23 Engine properties, and all 68 affected production-preview criteria on the second run. The saved-weapon bot-round criterion timed out on the first run.
 
 2026-11-22 Esc menu review follow-ups. `pnpm checks` passed 4,035 tests with one existing skip. Production preview passed 221 of 222 on the first run, and the online hit-marker criterion passed all three isolated reruns. See the [review delivery and audit](HANDOFF.md#latest-ship-delivery).
 
