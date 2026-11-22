@@ -24,6 +24,7 @@ it("makes the arena the model drew when it passes every check, with two model ca
     nodes: ["precheck", "moderation", "generate", "validate"],
     modelCalls: 2,
     usage: NO_TOKENS,
+    history: {pipelineVersion: "arena-v1", relevance: "accepted", codeEdits: 0, modelRepairs: 0},
   });
 });
 
@@ -37,6 +38,7 @@ it("repairs a refused arena once, checks the repair, and makes it when it passes
     nodes: ["precheck", "moderation", "generate", "validate", "repair", "validate"],
     modelCalls: 3,
     usage: NO_TOKENS,
+    history: {pipelineVersion: "arena-v1", relevance: "accepted", codeEdits: 0, modelRepairs: 1},
   });
 });
 
@@ -49,6 +51,7 @@ it("gives a built-in arena, refunding nothing, when the repair is refused too, w
   expect(outcome).toMatchObject({status: "builtIn", arena: BUILT_IN, refunded: false, modelCalls: 3});
   expect(outcome.nodes).toEqual(["precheck", "moderation", "generate", "validate", "repair", "validate", "fallback"]);
   expect(invoke).toHaveBeenCalledTimes(2);
+  expect(outcome.history).toMatchObject({relevance: "accepted", validationFailure: "unplayable-arena"});
 });
 
 it("makes an arena the model described in shapes, drawn into rows, when the format is shapes", async () => {
@@ -122,6 +125,7 @@ it("turns away a request that is not about an arena after one model call, and ne
     nodes: ["precheck", "moderation"],
     modelCalls: 1,
     usage: NO_TOKENS,
+    history: {pipelineVersion: "arena-v1", relevance: "irrelevant", codeEdits: 0, modelRepairs: 0},
   });
   expect(invoke).not.toHaveBeenCalled();
 });

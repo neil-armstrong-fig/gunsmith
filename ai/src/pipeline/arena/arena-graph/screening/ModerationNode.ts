@@ -1,3 +1,4 @@
+import {UNAVAILABLE_ARENA_VERDICT} from "@gunsmith/ai/pipeline/arena/prompt-screening/moderation/verdict/unavailable/UnavailableArenaVerdict";
 import type {BaseChatModel} from "@langchain/core/language_models/chat_models";
 import {arenaModerationJudge} from "@gunsmith/ai/pipeline/arena/prompt-screening/moderation/ArenaModerationJudge";
 import type {ArenaGraphStateValues} from "@gunsmith/ai/pipeline/arena/arena-graph/state/types/ArenaGraphStateValues";
@@ -10,8 +11,12 @@ export async function moderationNode(
 ): Promise<ArenaGraphUpdate> {
   const verdict = await arenaModerationJudge(state.prompt, moderator);
   if (!verdict.isArenaRequest) {
-    return {nodes: ["moderation"], modelCalls: 1, rejectionReason: verdict.reason};
+    if (verdict === UNAVAILABLE_ARENA_VERDICT) {
+      return {nodes: ["moderation"], modelCalls: 1, relevance: "unavailable", rejectionReason: verdict.reason};
+    }
+
+    return {nodes: ["moderation"], modelCalls: 1, relevance: "irrelevant", rejectionReason: verdict.reason};
   }
 
-  return {nodes: ["moderation"], modelCalls: 1};
+  return {nodes: ["moderation"], modelCalls: 1, relevance: "accepted"};
 }
