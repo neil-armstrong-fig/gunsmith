@@ -2,9 +2,10 @@ import type {Appearance} from "@gunsmith/shared/appearance/schema/Appearance";
 
 /**
  * The safe visual a weapon gets when its generated appearance cannot be made valid: a plain, readable, right-facing body block
- * with a muzzle, in neutral roles. A fresh copy each call. Cosmetic only (it never touches a stat), and the caller must say it
- * is a substitute at the reveal. DRAFT: the look is a placeholder for `art` to replace; what matters here is that it passes
- * `validateAppearance` and cannot be invisible.
+ * with a muzzle, in neutral roles. The body is the `edge` grey, not the `body` one: that is the wall's dark, which all but vanishes
+ * on the floor of the lowest level, and a weapon on the floor must be seen at 32 pixels a tile (the S4-1 finding). A fresh copy
+ * each call. Cosmetic only (it never touches a stat), and the caller must say it is a substitute at the reveal. DRAFT: the look
+ * is a placeholder for `art` to replace; what matters here is that it passes `validateAppearance` and cannot be invisible.
  */
 export function fallbackAppearance(): Appearance {
   return {
@@ -17,7 +18,7 @@ export function fallbackAppearance(): Appearance {
         y: 26,
         width: 40,
         height: 12,
-        fill: "body",
+        fill: "edge",
         stroke: "outline",
         strokeWidth: 2,
         opacity: 1,
