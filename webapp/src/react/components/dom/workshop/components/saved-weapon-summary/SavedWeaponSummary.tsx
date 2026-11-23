@@ -1,3 +1,4 @@
+import {weaponAppearances} from "@src/assets/weapon-drawings/appearances/WeaponAppearances";
 import {weaponPictureUrl} from "@src/assets/weapon-pictures/WeaponPictureUrl";
 import {ratingPercentOf} from "@src/react/components/dom/workshop/rating-percent/RatingPercentOf";
 import type {ShelfWeapon} from "@src/store/shelf/types/ShelfWeapon";
@@ -12,7 +13,7 @@ interface Props {
 export function SavedWeaponSummary({saved, compact = true, promptId}: Props): JSX.Element {
   const {weapon} = saved;
   const name = weapon.identity?.name ?? "Weapon";
-  const picture = weaponPictureUrl(weapon.identity?.key);
+  const picture = weaponPictureUrl(weapon.identity?.key, weaponAppearances.get(weapon));
 
   return (
     <div className="flex min-w-0 flex-1 items-start gap-3">

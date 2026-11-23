@@ -1,3 +1,4 @@
+import type {ArenaWorkshopSetup} from "@src/dsl/gunsmith/components/workshop/components/arenas/types/ArenaWorkshopSetup";
 import type {Page} from "@playwright/test";
 import {ArenaWorkshopPlaywright} from "@src/dsl/gunsmith/components/workshop/components/arenas/playwright/ArenaWorkshopPlaywright";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
@@ -12,9 +13,9 @@ export class ArenaWorkshopDsl {
     this.arenas = new ArenaWorkshopPlaywright(page);
   }
 
-  async arrangeSignedInArena(generationPaused = false): Promise<void> {
+  async arrangeSignedInArena(setup: ArenaWorkshopSetup = "ready"): Promise<void> {
     try {
-      await this.arenas.arrangeSignedInArena(generationPaused);
+      await this.arenas.arrangeSignedInArena(setup);
     } catch (error) {
       throw new DslError("Failed to arrange a signed-in arena workshop", error);
     }

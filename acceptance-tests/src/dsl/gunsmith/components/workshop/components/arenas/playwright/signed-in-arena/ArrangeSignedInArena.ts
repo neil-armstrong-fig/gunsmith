@@ -1,3 +1,4 @@
+import type {ArenaWorkshopSetup} from "@src/dsl/gunsmith/components/workshop/components/arenas/types/ArenaWorkshopSetup";
 import {expect, type Page} from "@playwright/test";
 
 const ID = "foundry-from-the-server";
@@ -18,12 +19,13 @@ const ARENA = {
   ],
 };
 
-export async function arrangeSignedInArena(page: Page, generationPaused: boolean): Promise<void> {
-  let saved = generationPaused;
+export async function arrangeSignedInArena(page: Page, setup: ArenaWorkshopSetup): Promise<void> {
+  let saved = setup !== "ready";
 
   await page.route("**/api/me", async route => {
     await route.fulfill({json: {signedIn: true, displayName: "Arena maker"}});
   });
+
   await page.route("**/api/arenas", async route => {
     expect(route.request().method()).toBe("POST");
     const request: unknown = route.request().postDataJSON();
@@ -40,13 +42,19 @@ export async function arrangeSignedInArena(page: Page, generationPaused: boolean
     }
 
     expect(request).toEqual({prompt: PROMPT});
-    if (generationPaused) {
+    if (setup === "paused") {
       await route.fulfill({status: 503, json: {error: "ai-off"}});
+      return;
+    }
+
+    if (setup === "no-credits") {
+      await route.fulfill({status: 402, json: {error: "no-credits"}});
       return;
     }
 
     await route.fulfill({json: {status: "created", id: ID, arena: ARENA}});
   });
+
   await page.route("**/api/library", async route => {
     if (route.request().method() === "POST") {
       expect(route.request().postDataJSON()).toEqual({id: ID});

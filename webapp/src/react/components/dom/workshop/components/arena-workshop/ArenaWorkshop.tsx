@@ -1,28 +1,23 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
-import {accountUrl} from "@src/account/AccountUrl";
 import {ArenaPreview} from "@src/react/components/dom/arena-preview/ArenaPreview";
 import {walkTheArena} from "@src/react/components/dom/workshop/arena-on-trial/WalkTheArena";
 import {ArenaPrompt} from "@src/react/components/dom/workshop/components/arena-workshop/components/arena-prompt/ArenaPrompt";
 import {ArenaResult} from "@src/react/components/dom/workshop/components/arena-workshop/components/arena-result/ArenaResult";
 import {ArenaShelf} from "@src/react/components/dom/workshop/components/arena-workshop/components/arena-shelf/ArenaShelf";
 import {SaveArena} from "@src/react/components/dom/workshop/components/arena-workshop/components/save-arena/SaveArena";
-import {SaveAccountArena} from "@src/react/components/dom/workshop/components/arena-workshop/components/save-account-arena/SaveAccountArena";
-import {useAccountArenaShelfStore} from "@src/store/shelf/arena/account/UseAccountArenaShelfStore";
+import {SaveAccountItem} from "@src/react/components/dom/workshop/components/save-account-item/SaveAccountItem";
+import {useAccountLibraryStore} from "@src/store/account-library/UseAccountLibraryStore";
 import {useArenaWorkshopStore} from "@src/store/workshop/arena/UseArenaWorkshopStore";
 import type {JSX} from "react";
-import {useEffect, useLayoutEffect, useRef} from "react";
+import {useLayoutEffect, useRef} from "react";
 
 const BUILT_INS = BUILT_IN_ARENAS.map(({name, rows}) => ({name, rows, arena: arenaFrom(rows)}));
 
 export function ArenaWorkshop(): JSX.Element {
   const result = useArenaWorkshopStore(state => state.result);
-  const session = useAccountArenaShelfStore(state => state.session);
+  const session = useAccountLibraryStore(state => state.session);
   const resultRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    void useAccountArenaShelfStore.getState().connect(accountUrl("/api/me"), accountUrl("/api/library"));
-  }, []);
 
   useLayoutEffect(() => {
     resultRef.current?.scrollIntoView({block: "nearest"});
@@ -84,7 +79,7 @@ export function ArenaWorkshop(): JSX.Element {
             )}
 
             {session === "signed-in" && result.accountItemId !== undefined && (
-              <SaveAccountArena key={result.accountItemId} id={result.accountItemId} />
+              <SaveAccountItem kind="arena" key={result.accountItemId} id={result.accountItemId} />
             )}
           </div>
         </ArenaResult>

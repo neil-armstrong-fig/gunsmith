@@ -9,6 +9,7 @@ export async function corruptAudioControl(run: ControlRun): Promise<void> {
   await page.route("**/encoded-audio/report.json", route =>
     route.fulfill({json: {files: [{key: "sfx-broken", format: "mp3", channels: 1, seconds: 0.1}]}}),
   );
+
   await page.route("**/sfx-broken.mp3", route => route.fulfill({body: "corrupt audio"}));
   const result = await verifyPage({page, address: run.address, expect: run.expect, timeoutMs: TIMEOUTS.controlMs});
   await page.close();

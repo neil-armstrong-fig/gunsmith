@@ -1,3 +1,4 @@
+import {generationFailureMessage} from "@src/account/generation/GenerationFailureMessage";
 import {ARENA_LIMITS} from "@gunsmith/engine/arena-limits/ArenaLimits";
 import {validateArena} from "@gunsmith/engine/arena-validation/ValidateArena";
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
@@ -25,7 +26,6 @@ const arenaAnswer = z.object({
     })
     .optional(),
 });
-const pausedAnswer = z.object({error: z.literal("ai-off")});
 const FALLBACK_REASON = "We could not build a playable arena, so here is a built-in arena.";
 
 export async function makeAccountArena(prompt: string): Promise<WorkshopArena> {
@@ -35,7 +35,7 @@ export async function makeAccountArena(prompt: string): Promise<WorkshopArena> {
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({prompt}),
   });
-  if (!response.ok) throw new Error(await failureMessage(response));
+  if (!response.ok) throw new Error(await generationFailureMessage(response, "arena"));
 
   const parsed = arenaAnswer.safeParse(await response.json());
   if (!parsed.success) throw new Error("The arena response was incomplete.");
@@ -56,18 +56,4 @@ export async function makeAccountArena(prompt: string): Promise<WorkshopArena> {
   }
 
   throw new Error("Could not make an arena.");
-}
-
-async function failureMessage(response: Response): Promise<string> {
-  if (response.status === 401) return "Sign in again to make an arena.";
-  if (response.status === 402) return "You’re out of credits.";
-  if (response.status === 504) return "Making the arena timed out.";
-  if (response.status === 503) {
-    const body: unknown = await response.json().catch(() => undefined);
-    if (pausedAnswer.safeParse(body).success) return "Arena generation is paused.";
-
-    return "Arena generation is unavailable.";
-  }
-
-  return "Could not make an arena.";
 }
