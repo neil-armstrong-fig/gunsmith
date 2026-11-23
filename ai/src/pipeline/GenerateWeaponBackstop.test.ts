@@ -54,6 +54,13 @@ it("is invalid, repaired once, drawn never, when balancing leaves a weapon over 
     ],
     modelCalls: 3,
     usage: NO_TOKENS,
+    history: {
+      pipelineVersion: "weapon-v1",
+      relevance: "accepted",
+      codeEdits: 0,
+      modelRepairs: 1,
+      validationFailure: "rating-out-of-bounds",
+    },
   });
   expect(generatorCall).toHaveBeenCalledTimes(2);
   expect(appearanceCall).not.toHaveBeenCalled();

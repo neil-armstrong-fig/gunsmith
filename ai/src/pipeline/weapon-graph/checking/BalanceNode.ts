@@ -1,6 +1,9 @@
 import {balanceWeaponDraft} from "@gunsmith/ai/pipeline/check/balance/BalanceWeaponDraft";
 import type {WeaponGraphStateValues} from "@gunsmith/ai/pipeline/weapon-graph/state/types/WeaponGraphStateValues";
 import type {WeaponGraphUpdate} from "@gunsmith/ai/pipeline/weapon-graph/state/types/WeaponGraphUpdate";
+import {weaponDraftSchema} from "@gunsmith/ai/pipeline/weapon/WeaponDraft";
+
+const WEAPON_FIELDS = weaponDraftSchema.keyof().options;
 
 /**
  * Brings the weapon inside the engine's limits by the player's preference (the engine's `balanceWeapon`, which never makes a stat
@@ -13,5 +16,8 @@ export function balanceNode(state: WeaponGraphStateValues): WeaponGraphUpdate {
     throw new Error("balance ran before validate had passed");
   }
 
-  return {weapon: balanceWeaponDraft(candidate.weapon, candidate.preference), nodes: ["balance"]};
+  const weapon = balanceWeaponDraft(candidate.weapon, candidate.preference);
+  const codeEdits = WEAPON_FIELDS.filter(field => candidate.weapon[field] !== weapon[field]).length;
+
+  return {weapon, nodes: ["balance"], codeEdits};
 }

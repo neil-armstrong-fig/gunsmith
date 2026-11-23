@@ -1,16 +1,17 @@
 # TODO: art
 
-**MVP audio checklist complete.** Art owns authored audio cues, playback integration with Play, and the listening review after weapon-specific shot synthesis. Checkout: `worktree-art`, last upstream commit merged `9ff4e85`.
+**MVP audio checklist complete.** Art owns authored audio cues, playback integration with Play, and the listening review after weapon-specific shot synthesis. Checkout: `worktree-art`, last upstream commit merged `08e9a25`.
 
-## Resume next — private generation history
+## Resume next — production privacy review and Make notice
 
-Start in `.claude/worktrees/art` (`worktree-art`). Coordinate the weapon history slice with Server and AI using [HANDOFF.md](HANDOFF.md#mvp-ownership-and-handoffs). Start with a failing local D1 route test for a signed-in weapon Make that succeeds after repair. Assert one weapon row with the pipeline version, repair counts and the prompt when privacy clears it. Agree the weapon diagnostics and production privacy check with AI. Use fake pipelines and keep public capture disabled.
+Start in `.claude/worktrees/art` (`worktree-art`). Local weapon and arena history use fake verdicts and real D1. Art owns the privacy design and Make notice copy, AI owns the production privacy check, the API follow-up covers history access and Ship owns notice placement. Review the checker with AI once its design is agreed. The first criterion should use synthetic personal information and verify that D1 retains the attempt metadata while omitting the original text. Keep public capture disabled through the assessments and notice review. [Handoff](HANDOFF.md#mvp-ownership-and-handoffs)
 
 - [x] Prove local arena history with fake verdicts and real D1. Both first tests failed on an empty history table before route wiring and passed afterward. The route records repaired and first-pass outcomes, omits text without clearance and counts built-in substitutes as failures. Internal reads enforce the 14-day cutoff, the daily sweep purges expired rows, and account deletion cascades. Capture remains limited to the test fixture.
 - [x] Record blocked arena requests, timeouts and pipeline exceptions in local D1. Store metadata for valid signed-in requests with closed failure reasons. Responses, refunds and spend settlement follow the existing route rules.
-- [ ] Extend history to weapon attempts. Keep it separate from the library for authenticated, well-formed Make requests. Record the item type, timestamp, pipeline version, first-pass success, repaired success, rejection, blocked request or failure. Capture a structured failure stage and reason, count code and model repairs, and classify a substitute as a failed generation. Keep the existing credit rules.
-- [ ] Store verbatim text only when the judge accepts the prompt as a relevant weapon or arena request and a separate privacy check clears it. Keep outcome metadata when the prompt is rejected, has not been judged, or is flagged for identifiable or sensitive information. Keep prompt text out of ordinary logs.
-- [ ] Start with 14-day retention, hide expired records from review, purge through the daily Worker sweep, and erase with the account. Restrict access to authorised maintainers and support access, objection and erasure requests. Internal pipeline tuning is the purpose.
+- [x] Record signed-in weapon attempts separately from the library in local D1. Outcomes include first-pass success, repaired success and success with fallback for a generated weapon delivered with a built-in drawing. Count code edits and model repairs, record closed failure reasons and preserve the existing credit rules.
+- [x] Enforce relevance and independent privacy clearance before storing verbatim text in local D1. Keep outcome metadata for rejected, unjudged and privacy-denied text. History write failures emit a closed event.
+- [x] Apply the existing 14-day history cutoff, daily sweep and account deletion to both item kinds.
+- [ ] Review the production privacy check, restrict review to authorised maintainers and set up access, objection and erasure requests. Internal pipeline tuning is the purpose.
 - [ ] Art owns the [privacy design](docs/privacy-and-data.md) and the upfront Make notice copy. Hand the copy to Ship for placement while Ship owns the shared workshop controls. Explain the tuning purpose, retention, rights, and separate storage of prompts attached to generated items. Public text collection stays off until the legitimate interests and children's impact assessments support it and the notice is live. The game may be used by minors. Verify with fake models and local D1 before rollout. [Server history TODO](TODO-server.md#mvp-priority) · [AI diagnostics TODO](TODO-ai.md#current-milestone-tasks).
 
 ## Signed-in workshop handoff
@@ -123,6 +124,8 @@ Art owns the audio entries. The remaining entries follow the handoff above.
 - [ ] Case-study diagrams: pipeline, cost safeguards and eval loop.
 
 ## Verification/latest delivery
+
+2026-11-23, local weapon generation history. The first D1 route test failed on the empty history table. Mutating fallback classification and privacy clearance made exactly their two weapon-history checks fail. With both restored, `pnpm checks` passed lint, formatting, type checks and 4,323 tests with one existing audio skip. All 22 API properties and 291 fake eval criteria passed. Reviewed root, API and AI instructions and the Engine reference, including a folder and caller audit. Verified on `08e9a25`. GitHub main advanced to `f999695` during the slice with coordination documentation only.
 
 2026-11-22, blocked and interrupted arena history. The initial AI-off and timeout checks failed on missing D1 rows. Suppressing the completed write path for refusals and interruptions made exactly six history checks fail. With the implementation restored, 82 focused route and D1 tests, 22 API properties and `pnpm checks` passed. The repository gate ran 4,285 tests with one existing audio skip on Node 26.13.1. The standards review covered root, API and AI instructions and the Engine reference, with a folder and caller audit.
 

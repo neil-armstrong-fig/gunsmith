@@ -1,3 +1,8 @@
+import {WEAPON_PIPELINE_VERSION} from "@gunsmith/ai/pipeline/weapon-graph/history/WeaponPipelineVersion";
+import {historyRequestOf} from "@src/router/routes/shared/generation-history/HistoryRequestOf";
+import {recordGenerationAttempt} from "@src/router/routes/shared/generation-history/RecordGenerationAttempt";
+import type {GenerationHistoryRequest} from "@src/router/routes/shared/generation-history/types/GenerationHistoryRequest";
+import {weaponAttemptOutcome} from "@src/router/routes/weapons/history/WeaponAttemptOutcome";
 import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
 import {settledWeaponSpend} from "@src/durable-objects/spend-ledger/estimate/weapon/SettledWeaponSpend";
 import {WEAPON_SPEND} from "@src/durable-objects/spend-ledger/estimate/weapon/WeaponSpend";
@@ -25,19 +30,28 @@ import type {WeaponAnswer} from "@src/router/routes/weapons/types/WeaponAnswer";
  * refunded and the answer is 502.
  */
 export async function generateWeaponRoute(request: Request): Promise<Response> {
+  const historyRequest = historyRequestOf(request, {kind: "weapon", pipelineVersion: WEAPON_PIPELINE_VERSION});
   const reservation = await reserveCredit(request, {
     pipelineAvailable: isWeaponPipelineAvailable(),
     kind: "weapon",
     reservedMicrodollars: WEAPON_SPEND.reservedMicrodollars,
+    trackBlockedAttempt: historyRequest !== undefined,
   });
   if ("response" in reservation) {
+    if (historyRequest && reservation.blockedAttempt) {
+      await recordGenerationAttempt(historyRequest, reservation.blockedAttempt);
+    }
+
     return reservation.response;
   }
 
-  return await runAndSettle(reservation);
+  return await runAndSettle(reservation, historyRequest);
 }
 
-async function runAndSettle(reservation: CreditReservation): Promise<Response> {
+async function runAndSettle(
+  reservation: CreditReservation,
+  historyRequest: GenerationHistoryRequest | undefined,
+): Promise<Response> {
   const {credits, spend, key, prompt} = reservation;
   let outcome: WeaponOutcome;
   try {
@@ -46,9 +60,33 @@ async function runAndSettle(reservation: CreditReservation): Promise<Response> {
     await spend.settle(key, WEAPON_SPEND.reservedMicrodollars);
     await credits.refund(key);
 
-    return failureAnswer(error);
+    const response = failureAnswer(error);
+    if (historyRequest) {
+      await recordGenerationAttempt(historyRequest, {
+        accountId: reservation.accountId,
+        key,
+        reason: response.status === 504 ? "generation-timed-out" : "generation-failed",
+      });
+    }
+
+    return response;
   }
 
+  const response = await settleOutcome(reservation, outcome);
+  const diagnostics = outcome.history;
+  if (historyRequest && diagnostics) {
+    await recordGenerationAttempt(historyRequest, {
+      reservation,
+      diagnostics,
+      classification: weaponAttemptOutcome(outcome, diagnostics, response),
+    });
+  }
+
+  return response;
+}
+
+async function settleOutcome(reservation: CreditReservation, outcome: WeaponOutcome): Promise<Response> {
+  const {credits, spend, key} = reservation;
   await spend.settle(key, settledWeaponSpend(outcome));
   if (outcome.status === "created") {
     const id = await keepCreatedResult(reservation, "weapon", {weapon: outcome.weapon, appearance: outcome.appearance});

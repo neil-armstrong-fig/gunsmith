@@ -39,7 +39,7 @@ Saved items are private; library limits are per account and never expire.
 
 ## Private generation history
 
-The local arena test flow records attempt outcomes separately from generated items. The purpose is internal pipeline tuning. A row contains the account ID, item kind, attempt time, pipeline version, repair counts and any structured failure reason. It includes the original prompt only when the relevance judge approves it and an independent privacy check clears it. Rejected, unjudged and privacy-flagged text is omitted. Ordinary logs contain closed application events.
+The local weapon and arena tests record attempt outcomes separately from generated items. The purpose is internal pipeline tuning. A row contains the account ID, item kind, attempt time, pipeline version, repair counts and any structured failure reason. It includes the original prompt only when the relevance judge approves it and an independent privacy check clears it. Rejected, unjudged and privacy-flagged text is omitted. Ordinary logs contain closed application events. A generated weapon delivered with a built-in drawing records success with fallback. A built-in arena substitute records a failed generation.
 
 Internal reads exclude attempts at 14 days. The daily Worker sweep removes expired rows, and account deletion removes that account’s history immediately. Before public capture, restrict review to authorized maintainers and put access, objection and erasure requests through the published privacy contact. Public prompt collection stays disabled until the legitimate interests and children’s impact assessments support it and the notice is live. The deployed privacy notice will need the verified contact and rights instructions.
 

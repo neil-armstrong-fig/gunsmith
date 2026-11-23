@@ -1,3 +1,4 @@
+import {UNAVAILABLE_VERDICT} from "@gunsmith/ai/pipeline/prompt-screening/moderation/verdict/unavailable/UnavailableVerdict";
 import type {BaseChatModel} from "@langchain/core/language_models/chat_models";
 import {moderationJudge} from "@gunsmith/ai/pipeline/prompt-screening/moderation/ModerationJudge";
 import type {WeaponGraphStateValues} from "@gunsmith/ai/pipeline/weapon-graph/state/types/WeaponGraphStateValues";
@@ -10,8 +11,12 @@ export async function moderationNode(
 ): Promise<WeaponGraphUpdate> {
   const verdict = await moderationJudge(state.prompt, moderator);
   if (!verdict.isWeaponRequest) {
-    return {nodes: ["moderation"], modelCalls: 1, rejectionReason: verdict.reason};
+    if (verdict === UNAVAILABLE_VERDICT) {
+      return {nodes: ["moderation"], modelCalls: 1, relevance: "unavailable", rejectionReason: verdict.reason};
+    }
+
+    return {nodes: ["moderation"], modelCalls: 1, relevance: "irrelevant", rejectionReason: verdict.reason};
   }
 
-  return {nodes: ["moderation"], modelCalls: 1};
+  return {nodes: ["moderation"], modelCalls: 1, relevance: "accepted"};
 }

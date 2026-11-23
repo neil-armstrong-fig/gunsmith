@@ -3,7 +3,7 @@ import type {ArenaOutcome} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcome"
 import {generationAttemptsOfAccount} from "@src/accounts/generation-attempts-of-account/GenerationAttemptsOfAccount";
 import {removeAccount} from "@src/accounts/remove-account/RemoveAccount";
 import {insertUser} from "@src/accounts/testing/local-database/InsertUser";
-import {arenaHistoryPrivacyCheck} from "@src/router/routes/arenas/history/privacy/ArenaHistoryPrivacyCheck";
+import {generationHistoryPrivacyCheck} from "@src/router/routes/shared/generation-history/privacy/GenerationHistoryPrivacyCheck";
 import {rowsOf} from "@src/accounts/testing/local-database/RowsOf";
 import {useLocalDatabase} from "@src/accounts/testing/local-database/UseLocalDatabase";
 import {DAILY_CREDITS} from "@src/durable-objects/credit-ledger/account/DailyCredits";
@@ -22,10 +22,10 @@ vi.unmock("@src/accounts/find-or-create-account/FindOrCreateAccount");
 vi.unmock("@src/accounts/keep-generated-item/KeepGeneratedItem");
 vi.unmock("@src/accounts/remove-account/RemoveAccount");
 
-vi.mock("@src/router/routes/arenas/history/privacy/ArenaHistoryPrivacyCheck");
+vi.mock("@src/router/routes/shared/generation-history/privacy/GenerationHistoryPrivacyCheck");
 
 beforeEach(() => {
-  vi.mocked(arenaHistoryPrivacyCheck).mockReturnValue(async () => true);
+  vi.mocked(generationHistoryPrivacyCheck).mockReturnValue(async () => true);
 });
 
 const emptyDatabase = useLocalDatabase();
@@ -44,7 +44,7 @@ it("records an AI-off refusal without judging the prompt or reserving a credit",
   const {account, cookie} = await signInPlayer();
   const ledgers = fakeLedgers({aiOn: false, returnsAt: 1_800_000_000_000});
   const privacyCheck = vi.fn();
-  vi.mocked(arenaHistoryPrivacyCheck).mockReturnValue(privacyCheck);
+  vi.mocked(generationHistoryPrivacyCheck).mockReturnValue(privacyCheck);
 
   const response = await makeArena(prompt, cookie);
 
@@ -230,7 +230,7 @@ it("omits text when the privacy check denies it or cannot complete", async () =>
     .fn<(text: string) => Promise<boolean>>()
     .mockResolvedValueOnce(false)
     .mockRejectedValueOnce(new Error("synthetic failure"));
-  vi.mocked(arenaHistoryPrivacyCheck).mockReturnValue(privacyCheck);
+  vi.mocked(generationHistoryPrivacyCheck).mockReturnValue(privacyCheck);
 
   expect((await makeArena(prompt)).status).toBe(200);
   expect((await makeArena(prompt)).status).toBe(200);
@@ -297,7 +297,7 @@ it("deletes account history and prevents an in-flight attempt recreating it afte
   await makeArena(prompt, cookie);
   await makeArena(prompt, otherPlayer.cookie);
   expect(await generationAttemptsOfAccount(account.id, new Date())).toHaveLength(1);
-  vi.mocked(arenaHistoryPrivacyCheck).mockReturnValue(async () => {
+  vi.mocked(generationHistoryPrivacyCheck).mockReturnValue(async () => {
     await removeAccount(account.id, {subjectDigest: async () => "test-digest", keepUntil: new Date()});
     await insertUser(database, account.id);
 
@@ -312,10 +312,10 @@ it("deletes account history and prevents an in-flight attempt recreating it afte
 
 it("captures zero history rows when the default gate is closed", async () => {
   const database = await emptyDatabase();
-  const actual = await vi.importActual<Record<"arenaHistoryPrivacyCheck", typeof arenaHistoryPrivacyCheck>>(
-    "@src/router/routes/arenas/history/privacy/ArenaHistoryPrivacyCheck",
+  const actual = await vi.importActual<Record<"generationHistoryPrivacyCheck", typeof generationHistoryPrivacyCheck>>(
+    "@src/router/routes/shared/generation-history/privacy/GenerationHistoryPrivacyCheck",
   );
-  vi.mocked(arenaHistoryPrivacyCheck).mockImplementation(actual.arenaHistoryPrivacyCheck);
+  vi.mocked(generationHistoryPrivacyCheck).mockImplementation(actual.generationHistoryPrivacyCheck);
   vi.mocked(runArenaPipeline).mockResolvedValue(repairedArena);
 
   expect((await makeArena(prompt)).status).toBe(200);

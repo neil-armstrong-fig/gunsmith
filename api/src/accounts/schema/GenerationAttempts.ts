@@ -13,7 +13,7 @@ export const generationAttempts = sqliteTable(
     createdAt: integer("created_at", {mode: "timestamp"}).notNull(),
     pipelineVersion: text("pipeline_version").notNull(),
     outcome: text("outcome", {
-      enum: ["first-pass-success", "repaired-success", "rejected", "blocked", "failed"],
+      enum: ["first-pass-success", "repaired-success", "success-with-fallback", "rejected", "blocked", "failed"],
     }).notNull(),
     codeEdits: integer("code_edits").notNull(),
     modelRepairs: integer("model_repairs").notNull(),

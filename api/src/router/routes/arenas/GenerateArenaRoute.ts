@@ -1,7 +1,8 @@
-import {arenaHistoryPrivacyCheck} from "@src/router/routes/arenas/history/privacy/ArenaHistoryPrivacyCheck";
-import {recordArenaAttempt} from "@src/router/routes/arenas/history/recording/RecordArenaAttempt";
-import type {ArenaHistoryRequest} from "@src/router/routes/arenas/history/types/ArenaHistoryRequest";
-import {sessionTokenFrom} from "@src/router/routes/shared/session/SessionTokenFrom";
+import {ARENA_PIPELINE_VERSION} from "@gunsmith/ai/pipeline/arena/history/ArenaPipelineVersion";
+import {arenaAttemptOutcome} from "@src/router/routes/arenas/history/ArenaAttemptOutcome";
+import {historyRequestOf} from "@src/router/routes/shared/generation-history/HistoryRequestOf";
+import {recordGenerationAttempt} from "@src/router/routes/shared/generation-history/RecordGenerationAttempt";
+import type {GenerationHistoryRequest} from "@src/router/routes/shared/generation-history/types/GenerationHistoryRequest";
 import type {ArenaOutcome} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcome";
 import {ARENA_SPEND} from "@src/durable-objects/spend-ledger/estimate/arena/ArenaSpend";
 import {settledArenaSpend} from "@src/durable-objects/spend-ledger/estimate/arena/SettledArenaSpend";
@@ -11,7 +12,6 @@ import {keepCreatedResult} from "@src/router/routes/shared/keep-result/KeepCreat
 import {reserveCredit} from "@src/router/routes/shared/ReserveCredit";
 import type {CreditReservation} from "@src/router/routes/shared/types/CreditReservation";
 import {failureAnswer} from "@src/router/routes/shared/time-limit/FailureAnswer";
-import {PipelineTimedOut} from "@src/router/routes/shared/time-limit/PipelineTimedOut";
 import {PIPELINE_TIME_LIMIT_MILLISECONDS} from "@src/router/routes/shared/time-limit/PipelineTimeLimit";
 import {withTimeLimit} from "@src/router/routes/shared/time-limit/WithTimeLimit";
 import type {ArenaAnswer} from "@src/router/routes/arenas/types/ArenaAnswer";
@@ -28,7 +28,7 @@ import type {ArenaAnswer} from "@src/router/routes/arenas/types/ArenaAnswer";
  * cannot be kept the credit is refunded and the answer is 502.
  */
 export async function generateArenaRoute(request: Request): Promise<Response> {
-  const historyRequest = historyRequestOf(request);
+  const historyRequest = historyRequestOf(request, {kind: "arena", pipelineVersion: ARENA_PIPELINE_VERSION});
   const reservation = await reserveCredit(request, {
     pipelineAvailable: isArenaPipelineAvailable(),
     kind: "arena",
@@ -37,7 +37,7 @@ export async function generateArenaRoute(request: Request): Promise<Response> {
   });
   if ("response" in reservation) {
     if (historyRequest && reservation.blockedAttempt) {
-      await recordArenaAttempt(historyRequest, reservation.blockedAttempt);
+      await recordGenerationAttempt(historyRequest, reservation.blockedAttempt);
     }
 
     return reservation.response;
@@ -46,19 +46,9 @@ export async function generateArenaRoute(request: Request): Promise<Response> {
   return await runAndSettle(reservation, historyRequest);
 }
 
-function historyRequestOf(request: Request): ArenaHistoryRequest | undefined {
-  const privacyCheck = arenaHistoryPrivacyCheck();
-  if (!privacyCheck) return undefined;
-
-  const token = sessionTokenFrom(request.headers.get("Cookie") ?? undefined);
-  if (!token) return undefined;
-
-  return {privacyCheck, token, createdAt: new Date()};
-}
-
 async function runAndSettle(
   reservation: CreditReservation,
-  historyRequest: ArenaHistoryRequest | undefined,
+  historyRequest: GenerationHistoryRequest | undefined,
 ): Promise<Response> {
   const {credits, spend, key, prompt} = reservation;
   let outcome: ArenaOutcome;
@@ -67,29 +57,29 @@ async function runAndSettle(
   } catch (error) {
     await spend.settle(key, ARENA_SPEND.reservedMicrodollars);
     await credits.refund(key);
+    const response = failureAnswer(error);
     if (historyRequest) {
-      await recordArenaAttempt(historyRequest, {
+      await recordGenerationAttempt(historyRequest, {
         accountId: reservation.accountId,
         key,
-        reason: pipelineFailureReason(error),
+        reason: response.status === 504 ? "generation-timed-out" : "generation-failed",
       });
     }
 
-    return failureAnswer(error);
+    return response;
   }
 
   const response = await settleOutcome(reservation, outcome);
-  if (historyRequest) {
-    await recordArenaAttempt(historyRequest, {reservation, outcome, response});
+  const diagnostics = outcome.history;
+  if (historyRequest && diagnostics) {
+    await recordGenerationAttempt(historyRequest, {
+      reservation,
+      diagnostics,
+      classification: arenaAttemptOutcome(outcome.status, diagnostics, response),
+    });
   }
 
   return response;
-}
-
-function pipelineFailureReason(error: unknown): "generation-timed-out" | "generation-failed" {
-  if (error instanceof PipelineTimedOut) return "generation-timed-out";
-
-  return "generation-failed";
 }
 
 async function settleOutcome(reservation: CreditReservation, outcome: ArenaOutcome): Promise<Response> {
