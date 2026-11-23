@@ -1,3 +1,5 @@
+import type {WeaponWorkshopSetup} from "@src/dsl/gunsmith/components/workshop/types/WeaponWorkshopSetup";
+import {arrangeSignedInWeapon} from "@src/dsl/gunsmith/components/workshop/playwright/signed-in-weapon/ArrangeSignedInWeapon";
 import type {Locator, Page} from "@playwright/test";
 import type {PowerMeter} from "@src/dsl/gunsmith/components/workshop/types/PowerMeter";
 import type {PromptCount} from "@src/dsl/gunsmith/components/workshop/types/PromptCount";
@@ -14,8 +16,29 @@ const RESET_KEY = "KeyT";
 const TYPING_TIMEOUT_MILLISECONDS = 30_000;
 
 export class WorkshopPlaywright extends BasePage {
+  private releasePendingWeapon?: () => void;
+
   constructor(page: Page) {
     super(page);
+  }
+
+  async chooseBuiltInWeapon(name: string): Promise<void> {
+    await this.page.getByRole("group", {name: "Built-in weapons"}).getByRole("button", {name, exact: true}).click();
+  }
+
+  async arrangeSignedInWeapon(setup: WeaponWorkshopSetup): Promise<void> {
+    this.releasePendingWeapon = await arrangeSignedInWeapon(this.page, setup);
+  }
+
+  releaseWeaponMake(): void {
+    this.releasePendingWeapon?.();
+  }
+
+  async getWeaponMakeError(): Promise<string | undefined> {
+    const message = this.page.getByTestId("weapon-make-error");
+    if (!(await message.isVisible())) return undefined;
+
+    return await message.innerText();
   }
 
   async pressBack(): Promise<void> {
@@ -79,7 +102,7 @@ export class WorkshopPlaywright extends BasePage {
   }
 
   async canMake(): Promise<boolean> {
-    return await this.page.getByRole("button", {name: "Make"}).isEnabled();
+    return await this.page.getByRole("button", {name: /^(Make|Making…)$/}).isEnabled();
   }
 
   async hasResult(): Promise<boolean> {

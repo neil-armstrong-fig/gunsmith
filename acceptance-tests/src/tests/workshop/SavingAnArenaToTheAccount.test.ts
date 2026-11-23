@@ -56,7 +56,7 @@ given("a signed-in player makes an arena in the workshop", () => {
 
 given("a signed-in player has a saved arena while generation is paused", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.workshop.arenas.arrangeSignedInArena(true);
+    await gunsmith.workshop.arenas.arrangeSignedInArena("paused");
     await gunsmith.workshop.open();
     await gunsmith.workshop.arenas.open();
     await gunsmith.workshop.pasteThePrompt("a wide industrial yard");
@@ -92,5 +92,21 @@ given("the arena generator returns a built-in after an unsuccessful attempt", ()
     await expect
       .poll(() => gunsmith.workshop.arenas.getResultDescription())
       .toContain("We could not build a playable arena from that request, so here is one of ours.");
+  });
+});
+
+given("a signed-in player has a saved arena and no credits", () => {
+  beforeEach(async ({gunsmith}) => {
+    await gunsmith.workshop.arenas.arrangeSignedInArena("no-credits");
+    await gunsmith.workshop.open();
+    await gunsmith.workshop.arenas.open();
+    await gunsmith.workshop.pasteThePrompt("a wide industrial yard");
+    await gunsmith.workshop.make();
+    await expect.poll(() => gunsmith.workshop.arenas.getMakeError()).toBe("You’re out of credits.");
+    await gunsmith.workshop.arenas.pressArenaAction("Walk it");
+  });
+
+  then("the saved arena is still playable", async ({gunsmith}) => {
+    expect(await gunsmith.arena.getSizeInTiles()).toEqual({width: 12, height: 9});
   });
 });

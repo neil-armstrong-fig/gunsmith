@@ -4,21 +4,30 @@
 
 Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only relevant dependencies.
 
-## Resume here
+## Resume here — signed-in workshop delivered
+
+Ship is in `.claude/worktrees/ship` (`worktree-ship`), synced with GitHub main at `7aec03a`. Art owns private generation history and privacy requirements, Server owns the HTTP contracts, and Play owns the room UI.
+
+- [x] Make, try, save by server ID, reload and retry a generated weapon from the account shelf. Carry its vision and appearance into the practice range. Older saved weapons use rifle vision. Keep the guest browser-local workshop.
+- [x] Cover pending generation, credit refusal, rejection, invalid results, timeout, retry and the full account shelf. Keep built-ins selectable and saved arenas playable with no credits.
+- [x] Hand the account shelf selector and server item IDs to Play in [HANDOFF.md](HANDOFF.md#latest-ship-delivery).
+- [ ] Next check the hosted preview shard timings and release artifact after publication. Continue the production sign-in and account-retention verification in the release checklist.
+
+## Release and menu resume
 
 M1 Esc menu is implemented in the Ship worktree. The menu moves the old front door into Settings, puts Workshop directly below Resume, pauses local play, and keeps the online match clock moving. The startup preference and `?menu=0` are documented in the webapp instructions. Back controls, same-canvas bot entry, standard Zustand startup persistence and the shared friend-code rules are committed in `1ff3a1a`.
 
-The persistent checkout is `.claude/worktrees/ship` on `worktree-ship`, synced with GitHub main `45ab470`. The manual release is live on both production hostnames. Cloudflare lists the daily account-retention sweep at 04:00 UTC. Review its first invocation after 04:00 UTC on 2026-11-21. The main checkout is investigating CI. The hosted release artifact, four preview shard blobs, native setup timings and scheduled property results still need verification.
+The manual release is live on both production hostnames. Cloudflare lists the daily account-retention sweep at 04:00 UTC. Review its first invocation after 04:00 UTC on 2026-11-21. The main checkout is investigating CI. The hosted release artifact, four preview shard blobs, native setup timings and scheduled property results still need verification.
 
 Both production hostnames serve the split release with API Worker version `9a8a53a8-f4d8-481f-886a-5ac4a5a4d64f` and webapp Worker version `e2b165ba-867e-4a69-a419-6d12a8ba06bb`. The webapp retains `noindex`. Automated deployment stays off while Ship stabilizes CI.
 
 Ship fixed the M1 pickup-marker acceptance setup. The [handoff](HANDOFF.md#latest-ship-delivery) records the original failing criterion, screenshot evidence and retained-marker check.
 
-Production HUD wiring awaits AI and Engine's weapon-to-appearance association. When it lands, the first criterion should show that a generated weapon keeps its HUD drawing from creation through equip. Hosted CI runs; timing and release evidence live in [Operations](docs/agent-reference/Operations.md#ci-and-deployment). AI owns paid selector/guard/evidence and opening spend reconciliation.
+The workshop trial HUD now carries the generated weapon's drawing. Hosted CI runs; timing and release evidence live in [Operations](docs/agent-reference/Operations.md#ci-and-deployment). AI owns paid selector/guard/evidence and opening spend reconciliation.
 
 ## MVP priority
 
-Own release verification for the hosted private-room MVP. Collect Worker, auth and library requirements from Server and spend and alert bindings from Budget. Prepare hosted CI and deployment around those consumers. Run live acceptance and record the release evidence once authorized, with Budget owning the shutdown drill. See [the shared priorities](TODO.md#mvp-integration-priorities) and [handoffs](HANDOFF.md#mvp-ownership-and-handoffs).
+Continue release verification for the hosted private-room MVP. Collect Worker, auth and library requirements from Server and spend and alert bindings from Budget. Prepare hosted CI and deployment around those consumers. Run live acceptance and record the release evidence once authorized, with Budget owning the shutdown drill. See [the shared priorities](TODO.md#mvp-integration-priorities) and [handoffs](HANDOFF.md#mvp-ownership-and-handoffs).
 
 ## Ownership
 
@@ -57,6 +66,8 @@ server supplies Worker/DO/storage bindings; budget supplies operational limits; 
 - [ ] Measure infrastructure costs with server/AI runtime measurements before proposing free versus Workers Paid.
 
 ## Verification/latest delivery
+
+2026-11-22 signed-in workshop. All 12 new production-preview criteria passed. `pnpm checks` passed 4,278 tests with the existing slow audio skip. Properties passed 67/67 and fake evals passed 291/291. The final preview passed 217/219 on its first run. Held-clock movement passed all three isolated reruns, and the existing bot-round timeout also reproduced on the clean baseline. See the [handoff and audit](HANDOFF.md#latest-ship-delivery).
 
 2026-11-22 GitHub sync from `45ab470`. The merged Ship tree passed `pnpm checks` with 4,121 tests and the existing audio skip, all 23 Engine properties, and all 68 affected production-preview criteria on the second run. The saved-weapon bot-round criterion timed out on the first run.
 

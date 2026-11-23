@@ -1,3 +1,5 @@
+import type {Weapon} from "@gunsmith/engine/weapon/types/Weapon";
+import {weaponAppearances} from "@src/assets/weapon-drawings/appearances/WeaponAppearances";
 import {weaponDrawingOfPage} from "@src/game/scenario/weapon-drawing/WeaponDrawingOfPage";
 import {InventorySlot} from "@src/react/components/dom/ammo-hud/components/inventory-slot/InventorySlot";
 import {selectAmmoReadout} from "@src/store/game/selectors/select-ammo-readout/SelectAmmoReadout";
@@ -10,6 +12,9 @@ import {useShallow} from "zustand/react/shallow";
  */
 export function AmmoHud(): JSX.Element {
   const ammo = useGameStore(useShallow(selectAmmoReadout));
+  const [first, second] = useGameStore(
+    useShallow(state => [state.world.player.loadout[0]?.weapon, state.world.player.loadout[1]?.weapon]),
+  );
   const segments = Array.from({length: ammo.magazineSize}, (_, index) => index);
 
   return (
@@ -39,7 +44,7 @@ export function AmmoHud(): JSX.Element {
           slot={1}
           name={ammo.firstName}
           iconKey={ammo.firstIconKey}
-          appearance={weaponDrawingOfPage(ammo.firstIconKey)}
+          appearance={appearanceOf(first)}
           selected={ammo.slot === 1}
         />
 
@@ -47,7 +52,7 @@ export function AmmoHud(): JSX.Element {
           slot={2}
           name={ammo.secondName}
           iconKey={ammo.secondIconKey}
-          appearance={weaponDrawingOfPage(ammo.secondIconKey)}
+          appearance={appearanceOf(second)}
           selected={ammo.slot === 2}
         />
       </ul>
@@ -75,4 +80,10 @@ export function AmmoHud(): JSX.Element {
       </div>
     </div>
   );
+}
+
+function appearanceOf(weapon: Weapon | undefined): unknown {
+  if (!weapon) return undefined;
+
+  return weaponAppearances.get(weapon) ?? weaponDrawingOfPage(weapon.identity?.key);
 }
