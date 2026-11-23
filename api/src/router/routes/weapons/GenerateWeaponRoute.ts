@@ -30,8 +30,8 @@ export async function generateWeaponRoute(request: Request): Promise<Response> {
     kind: "weapon",
     reservedMicrodollars: WEAPON_SPEND.reservedMicrodollars,
   });
-  if (reservation instanceof Response) {
-    return reservation;
+  if ("response" in reservation) {
+    return reservation.response;
   }
 
   return await runAndSettle(reservation);

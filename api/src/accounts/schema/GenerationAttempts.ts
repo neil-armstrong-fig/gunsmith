@@ -12,10 +12,14 @@ export const generationAttempts = sqliteTable(
     kind: text("kind", {enum: ITEM_KINDS}).notNull(),
     createdAt: integer("created_at", {mode: "timestamp"}).notNull(),
     pipelineVersion: text("pipeline_version").notNull(),
-    outcome: text("outcome", {enum: ["first-pass-success", "repaired-success", "rejected", "failed"]}).notNull(),
+    outcome: text("outcome", {
+      enum: ["first-pass-success", "repaired-success", "rejected", "blocked", "failed"],
+    }).notNull(),
     codeEdits: integer("code_edits").notNull(),
     modelRepairs: integer("model_repairs").notNull(),
-    failureStage: text("failure_stage", {enum: ["precheck", "moderation", "validation", "storage"]}),
+    failureStage: text("failure_stage", {
+      enum: ["precheck", "moderation", "validation", "storage", "availability", "spend", "credit", "pipeline"],
+    }),
     failureReason: text("failure_reason"),
     prompt: text("prompt"),
   },
