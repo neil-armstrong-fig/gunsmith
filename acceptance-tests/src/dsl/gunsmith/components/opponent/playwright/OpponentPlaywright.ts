@@ -72,6 +72,27 @@ export class OpponentPlaywright extends BasePage {
     });
   }
 
+  /**
+   * Runs a held game (`holdTheGame`) in steps of `watch.stepSeconds` until the player's view hides the opponent (`visible` false), and stops there.
+   * Throws if it is still seen after `watch.maxSeconds` of the game's time.
+   */
+  async runUntilHidden(watch: HurtWatch): Promise<void> {
+    await runHeldUntil(this.page, {
+      watch,
+      what: "The player losing sight of the opponent",
+      isDone: async () => !(await this.get()).visible,
+    });
+  }
+
+  /** Runs a held game until the player's view shows the opponent (`visible` true), and stops there. Throws if it is still hidden after `watch.maxSeconds`. */
+  async runUntilSeen(watch: HurtWatch): Promise<void> {
+    await runHeldUntil(this.page, {
+      watch,
+      what: "The player seeing the opponent",
+      isDone: async () => (await this.get()).visible,
+    });
+  }
+
   /** Waits until the opponent has less health than `health`. */
   async waitForHealthBelow(health: number): Promise<void> {
     await this.waitForGameState(({opponent}) => opponent !== undefined && opponent.health < health);

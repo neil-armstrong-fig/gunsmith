@@ -69,6 +69,24 @@ export class OpponentDsl {
     }
   }
 
+  /** Runs a held game, in steps of `stepSeconds`, until the player no longer sees the opponent (it is out of sight, not fallen), and holds it there. Fails if it is still seen after `maxSeconds`. */
+  async runUntilHidden(request: HurtWatch): Promise<void> {
+    try {
+      await this.opponent.runUntilHidden(request);
+    } catch (error) {
+      throw new DslError("Failed to run the game until the player lost sight of the opponent", error);
+    }
+  }
+
+  /** Runs a held game, in steps of `stepSeconds`, until the player sees the opponent, and holds it there. Fails if it is still hidden after `maxSeconds`. */
+  async runUntilSeen(request: HurtWatch): Promise<void> {
+    try {
+      await this.opponent.runUntilSeen(request);
+    } catch (error) {
+      throw new DslError("Failed to run the game until the player saw the opponent", error);
+    }
+  }
+
   /** Waits until the opponent has less health than `health`. */
   async waitForHealthBelow(health: number): Promise<void> {
     try {

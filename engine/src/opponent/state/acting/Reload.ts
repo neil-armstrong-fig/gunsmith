@@ -1,3 +1,4 @@
+import {coverBesideTarget} from "@gunsmith/engine/cover/CoverBesideTarget";
 import {equippedWeapon} from "@gunsmith/engine/loadout/EquippedWeapon";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
 import {findCover} from "@gunsmith/engine/opponent/state/acting/reload/cover/FindCover";
@@ -13,7 +14,8 @@ import type {StateAct} from "@gunsmith/engine/opponent/types/StateAct";
 /**
  * Reloading: the magazine is empty. It asks for a reload every step (asking again mid-reload changes nothing), and
  * while the player can see it, it makes for the nearest cover it can walk to (round by a stair where there is a drop, `routeWaypoint`),
- * or circles in the open when there is none. Out of the player's sight it reloads where it stands. A weapon with no rounds and no reserve cannot
+ * or circles in the open when there is none. A cover block already beside it on the line to the player is cover enough: it crouches
+ * and holds still there. Out of the player's sight it reloads where it stands. A weapon with no rounds and no reserve cannot
  * be reloaded, so it asks for its other weapon instead. It never fires. Leaving is `chooseState`'s business: once the
  * magazine has rounds again.
  */
@@ -26,6 +28,7 @@ export function actReload(brain: OpponentBrain, context: OpponentContext): State
       direction: direction(planned, context),
       aimAt: aimedAt(planned, context),
       firing: false,
+      crouching: isDucking(planned, context),
       reload: fallback === undefined,
       switchTo: fallback,
     },
@@ -34,7 +37,7 @@ export function actReload(brain: OpponentBrain, context: OpponentContext): State
 }
 
 function plan(brain: OpponentBrain, context: OpponentContext): OpponentBrain {
-  if (!context.sees) {
+  if (!context.sees || isDucking(brain, context)) {
     return brain;
   }
 
@@ -81,9 +84,23 @@ function direction(brain: OpponentBrain, context: OpponentContext): Point {
   if (brain.goal) {
     return walkToward(opponent.position, routeWaypoint(context.arena, opponent.position, brain.goal));
   }
+
+  if (isDucking(brain, context)) {
+    return {x: 0, y: 0};
+  }
+
   if (sees) {
     return strafeDirection({from: opponent.position, to: target.position, side: brain.strafeSide});
   }
 
   return {x: 0, y: 0};
+}
+
+/** Whether it crouches where it stands: the player sees it, it has no other cover to walk to, and a cover block stands beside it on the line to them. */
+function isDucking(brain: OpponentBrain, context: OpponentContext): boolean {
+  if (!context.sees || brain.goal) {
+    return false;
+  }
+
+  return coverBesideTarget(context.arena, context.target.position, context.opponent.position);
 }
