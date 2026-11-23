@@ -11,6 +11,7 @@ import {keepCreatedResult} from "@src/router/routes/shared/keep-result/KeepCreat
 import {reserveCredit} from "@src/router/routes/shared/ReserveCredit";
 import type {CreditReservation} from "@src/router/routes/shared/types/CreditReservation";
 import {failureAnswer} from "@src/router/routes/shared/time-limit/FailureAnswer";
+import {PipelineTimedOut} from "@src/router/routes/shared/time-limit/PipelineTimedOut";
 import {PIPELINE_TIME_LIMIT_MILLISECONDS} from "@src/router/routes/shared/time-limit/PipelineTimeLimit";
 import {withTimeLimit} from "@src/router/routes/shared/time-limit/WithTimeLimit";
 import type {ArenaAnswer} from "@src/router/routes/arenas/types/ArenaAnswer";
@@ -32,9 +33,14 @@ export async function generateArenaRoute(request: Request): Promise<Response> {
     pipelineAvailable: isArenaPipelineAvailable(),
     kind: "arena",
     reservedMicrodollars: ARENA_SPEND.reservedMicrodollars,
+    trackBlockedAttempt: historyRequest !== undefined,
   });
-  if (reservation instanceof Response) {
-    return reservation;
+  if ("response" in reservation) {
+    if (historyRequest && reservation.blockedAttempt) {
+      await recordArenaAttempt(historyRequest, reservation.blockedAttempt);
+    }
+
+    return reservation.response;
   }
 
   return await runAndSettle(reservation, historyRequest);
@@ -61,6 +67,13 @@ async function runAndSettle(
   } catch (error) {
     await spend.settle(key, ARENA_SPEND.reservedMicrodollars);
     await credits.refund(key);
+    if (historyRequest) {
+      await recordArenaAttempt(historyRequest, {
+        accountId: reservation.accountId,
+        key,
+        reason: pipelineFailureReason(error),
+      });
+    }
 
     return failureAnswer(error);
   }
@@ -71,6 +84,12 @@ async function runAndSettle(
   }
 
   return response;
+}
+
+function pipelineFailureReason(error: unknown): "generation-timed-out" | "generation-failed" {
+  if (error instanceof PipelineTimedOut) return "generation-timed-out";
+
+  return "generation-failed";
 }
 
 async function settleOutcome(reservation: CreditReservation, outcome: ArenaOutcome): Promise<Response> {

@@ -1,6 +1,6 @@
 import type {ArenaHistoryDiagnostics} from "@gunsmith/ai/pipeline/arena/types/ArenaHistoryDiagnostics";
 import type {ArenaOutcomeStatus} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcomeStatus";
-import type {AttemptOutcome} from "@src/router/routes/arenas/history/recording/outcome/types/AttemptOutcome";
+import type {AttemptOutcome} from "@src/router/routes/arenas/history/recording/types/AttemptOutcome";
 
 export function arenaAttemptOutcome(
   status: ArenaOutcomeStatus,

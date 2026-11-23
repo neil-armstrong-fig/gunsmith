@@ -1,7 +1,6 @@
 import type {ArenaGraphStateValues} from "@gunsmith/ai/pipeline/arena/arena-graph/state/types/ArenaGraphStateValues";
+import {ARENA_PIPELINE_VERSION} from "@gunsmith/ai/pipeline/arena/history/ArenaPipelineVersion";
 import type {ArenaHistoryDiagnostics} from "@gunsmith/ai/pipeline/arena/types/ArenaHistoryDiagnostics";
-
-const ARENA_PIPELINE_VERSION = "arena-v1";
 
 export function arenaHistoryOf(state: ArenaGraphStateValues): ArenaHistoryDiagnostics {
   const diagnostics: ArenaHistoryDiagnostics = {
