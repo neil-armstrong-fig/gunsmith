@@ -1,3 +1,4 @@
+import type {WeaponHistoryDiagnostics} from "@gunsmith/ai/pipeline/types/WeaponHistoryDiagnostics";
 import {Annotation} from "@langchain/langgraph";
 import type {AppearanceOutcome} from "@gunsmith/ai/pipeline/appearance/types/AppearanceOutcome";
 import type {ValidatedWeapon} from "@gunsmith/ai/pipeline/weapon-graph/state/types/ValidatedWeapon";
@@ -14,6 +15,10 @@ export const WeaponGraphState = Annotation.Root({
   prompt: Annotation<string>(),
   /** Why the request was turned away (too long, or not a weapon request), in words a player may see. Set at most once, and it ends the run. */
   rejectionReason: Annotation<string | undefined>(),
+  /** The moderation verdict for internal history. */
+  relevance: Annotation<WeaponHistoryDiagnostics["relevance"] | undefined>(),
+  /** Stats adjusted by code across the balance passes. */
+  codeEdits: Annotation<number>({reducer: (current, update) => current + update, default: () => 0}),
   /** What the model wrote, `unknown` until `validate` has parsed it. */
   draft: Annotation<unknown>(),
   /** The draft once it has parsed: the weapon as written and the player's preference, for `balance`. */

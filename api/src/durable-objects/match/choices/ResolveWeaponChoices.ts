@@ -1,12 +1,15 @@
+import {parseStoredWeapon} from "@gunsmith/engine/library-items/ParseStoredWeapon";
+import {appearanceSchema} from "@gunsmith/shared/appearance/schema/Appearance";
+import {fieldOfPayload} from "@src/durable-objects/match/choices/saved-item/FieldOfPayload";
+import {findSavedItem} from "@src/durable-objects/match/choices/saved-item/FindSavedItem";
 import type {WeaponChoice} from "@src/durable-objects/match/messages/types/WeaponChoice";
 import type {ChosenWeapon} from "@src/durable-objects/match/pre-round/types/ChosenWeapon";
 import type {ChosenWeapons} from "@src/durable-objects/match/pre-round/types/ChosenWeapons";
 
 /**
  * The two weapons a seat named, ready for the room, or `undefined` when either cannot be taken (the whole pair is refused, so a seat
- * is never left with half of what it asked for): a built-in as it is, a saved one looked up among the account's own and checked. A guest
- * has no library. Saved weapons are not readable until the engine's stored-weapon parser reaches this branch (HANDOFF), so for now a
- * saved choice is refused for everyone.
+ * is never left with half of what it asked for): a built-in as it is, a saved one looked up among the account's own and checked by the
+ * engine's stored-weapon parser and the appearance schema. A guest has no library.
  */
 export async function resolveWeaponChoices(
   accountId: string | undefined,
@@ -32,5 +35,16 @@ async function resolveWeaponChoice(
     return undefined;
   }
 
-  return await Promise.resolve(undefined);
+  const item = await findSavedItem(accountId, choice.id, "weapon");
+  if (!item) {
+    return undefined;
+  }
+
+  const weapon = parseStoredWeapon(fieldOfPayload(item.payload, "weapon"));
+  const appearance = appearanceSchema.safeParse(fieldOfPayload(item.payload, "appearance"));
+  if (!weapon || !appearance.success) {
+    return undefined;
+  }
+
+  return {kind: "saved", id: item.id, weapon, appearance: appearance.data};
 }

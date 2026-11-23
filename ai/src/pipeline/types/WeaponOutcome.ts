@@ -1,3 +1,4 @@
+import type {WeaponHistoryDiagnostics} from "@gunsmith/ai/pipeline/types/WeaponHistoryDiagnostics";
 import type {ModelUsage} from "@gunsmith/ai/pipeline/types/ModelUsage";
 import type {WeaponOutcomeStatus} from "@gunsmith/ai/pipeline/types/WeaponOutcomeStatus";
 import type {AppearanceOutcome} from "@gunsmith/ai/pipeline/appearance/types/AppearanceOutcome";
@@ -26,4 +27,5 @@ export interface WeaponOutcome {
    * optional in the type until the consumers' own outcome literals carry it (HANDOFF, 2026-11-19).
    */
   usage?: ModelUsage;
+  history?: WeaponHistoryDiagnostics;
 }

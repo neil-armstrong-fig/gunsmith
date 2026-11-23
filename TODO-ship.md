@@ -6,7 +6,7 @@ Model: **Codex**. Follow the startup protocol in [TODO.md](TODO.md); read only r
 
 ## Resume here — signed-in workshop delivered
 
-Ship is in `.claude/worktrees/ship` (`worktree-ship`), synced with GitHub main at `7aec03a`. Art owns private generation history and privacy requirements, Server owns the HTTP contracts, and Play owns the room UI.
+Ship is in `.claude/worktrees/ship` (`worktree-ship`), synced with GitHub main at `18c8e62`. Art owns private generation history and privacy requirements, Server owns the HTTP contracts, and Play owns the room UI.
 
 - [x] Make, try, save by server ID, reload and retry a generated weapon from the account shelf. Carry its vision and appearance into the practice range. Older saved weapons use rifle vision. Keep the guest browser-local workshop.
 - [x] Cover pending generation, credit refusal, rejection, invalid results, timeout, retry and the full account shelf. Keep built-ins selectable and saved arenas playable with no credits.
