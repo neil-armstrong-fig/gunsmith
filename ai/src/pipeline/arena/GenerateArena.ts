@@ -1,3 +1,4 @@
+import {arenaHistoryOf} from "@gunsmith/ai/pipeline/arena/history/ArenaHistoryOf";
 import {RequestUsage} from "@gunsmith/ai/pipeline/usage/RequestUsage";
 import {createArenaGraph} from "@gunsmith/ai/pipeline/arena/arena-graph/CreateArenaGraph";
 import {arenaOutcomeFromState} from "@gunsmith/ai/pipeline/arena/arena-graph/outcome/ArenaOutcomeFromState";
@@ -20,5 +21,5 @@ export async function generateArena(
   const requestUsage = new RequestUsage();
   const endState = await arenaGraph.invoke({prompt: input.prompt}, {signal: input.signal, callbacks: [requestUsage]});
 
-  return {...arenaOutcomeFromState(endState), usage: requestUsage.total()};
+  return {...arenaOutcomeFromState(endState), usage: requestUsage.total(), history: arenaHistoryOf(endState)};
 }

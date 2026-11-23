@@ -1,20 +1,30 @@
 # TODO: art
 
-**MVP audio checklist complete.** Art owns authored audio cues, playback integration with Play, and the listening review after weapon-specific shot synthesis. Checkout: `worktree-art`, last upstream commit merged `f6cdd77`.
+**MVP audio checklist complete.** Art owns authored audio cues, playback integration with Play, and the listening review after weapon-specific shot synthesis. Checkout: `worktree-art`, last upstream commit merged `d05b1e0`.
+
+## Resume next — private generation history
+
+Start in `.claude/worktrees/art` (`worktree-art`). The signed-in arena workshop is on GitHub main at the validated sync `2829a0a`. The local arena history slice uses the Server and AI contract in [HANDOFF.md](HANDOFF.md#mvp-ownership-and-handoffs). Next, agree a production privacy check with AI and add failing route tests for blocked requests, timeouts and weapon attempts with Server.
+
+- [x] Prove local arena history with fake verdicts and real D1. Both first tests failed on an empty history table before route wiring and passed afterward. The route records repaired and first-pass outcomes, omits text without clearance and counts built-in substitutes as failures. Internal reads enforce the 14-day cutoff, the daily sweep purges expired rows, and account deletion cascades. Capture remains limited to the test fixture.
+- [ ] Extend to weapons and the other attempt outcomes. Keep a private history separate from the library for authenticated, well-formed Make requests. Record the item type, timestamp, pipeline version, first-pass success, repaired success, rejection, blocked request or failure. Capture a structured failure stage and reason, count code and model repairs, and classify a substitute as a failed generation. Keep the existing credit rules.
+- [ ] Store verbatim text only when the judge accepts the prompt as a relevant weapon or arena request and a separate privacy check clears it. Keep outcome metadata when the prompt is rejected, has not been judged, or is flagged for identifiable or sensitive information. Keep prompt text out of ordinary logs.
+- [ ] Start with 14-day retention, hide expired records from review, purge through the daily Worker sweep, and erase with the account. Restrict access to authorised maintainers and support access, objection and erasure requests. Internal pipeline tuning is the purpose.
+- [ ] Art adds an upfront notice beside Make and updates the [privacy design](docs/privacy-and-data.md). Explain the tuning purpose, retention, rights, and separate storage of prompts attached to generated items. Public text collection stays off until the legitimate interests and children's impact assessments support it and the notice is live. The game may be used by minors. Verify with fake models and local D1 before rollout. [Server history TODO](TODO-server.md#mvp-priority) · [AI diagnostics TODO](TODO-ai.md#current-milestone-tasks).
 
 ## Signed-in workshop
 
 Art owns browser sign-in, workshop generation and trials, and the account shelf in `.claude/worktrees/art` (`worktree-art`). Reuse the workshop components and existing previews. Server owns the API and persistence. Coordinate shared acceptance DSL and shelf selectors with Play in [HANDOFF.md](HANDOFF.md#mvp-ownership-and-handoffs) and hand Play server item IDs for room selection.
 
 - [x] `SavingAnArenaToTheAccount` makes an arena through a deterministic signed-in API fixture, previews and walks it, saves it by server ID, reloads, and walks it from the account shelf. All three criteria failed against the browser stand-in and passed after wiring.
-- [ ] Extend to weapons after Engine's saved-weapon adapter and Server's hookup are available. Use Engine's interim vision rule. AI will add generated `visionDegrees` and `visionRange`.
+- [ ] Extend to weapons using Engine's saved-item parser (`2f5cb87`) and Server's pre-round hookup (`12bb794`). Use generated `visionDegrees` and `visionRange` from `21cc021`; Engine falls back to rifle vision for older saved weapons.
 - [x] Saved arena rows preview the stored terrain on both the account and browser-local shelves after reload.
 - [x] A signed-in player sees that arena generation is paused and can still walk a saved arena.
 - [x] Show the API reason on the current arena fallback result.
 - [ ] When the generation contract changes, show why the requested weapon or arena failed, with the refund when applicable, and leave the workshop ready to retry. Keep built-ins available as explicit choices. [AI](TODO-ai.md#current-milestone-tasks) and [Server](TODO-server.md#mvp-priority) own the outcome and refund.
 - [ ] Next acceptance criterion: a signed-in player with no credits sees the credit refusal and can still walk their saved arena. Then cover the pending, rejection and timeout states. The guest built-in pre-round passed in the production suite.
 
-Engine's built-in list `00ff548` is merged in Art at `83837d6`. It supplies the two pre-round consumers while Engine works on saved-weapon parsing and server wiring.
+Engine's built-in list `00ff548`, the saved-item parser and Server's pre-round hookup are on GitHub main.
 
 ## Handoff
 
@@ -111,6 +121,12 @@ Art owns the audio entries. The remaining entries follow the handoff above.
 - [ ] Case-study diagrams: pipeline, cost safeguards and eval loop.
 
 ## Verification/latest delivery
+
+2026-11-22, prompt feedback diagnosis. Root `AGENTS.md` points to `diagnose-generation-prompt`. Its offline checker passed eight cases and the focused arena fixture eval passed all 42 criteria. The history insert uses Drizzle’s query builder and the 41 focused arena route and local D1 tests passed, including the deletion race.
+
+2026-11-22, private arena Make history. The two first route checks failed against the empty migrated history table before wiring and passed afterward. The seven local D1 criteria pass. Two mutations made only the intended privacy-denial and expiry-boundary checks fail. `pnpm checks` passed lint, formatting, type checks and 4,195 tests with one existing audio skip. Fake evals passed 291/291 and API properties passed 22/22. Re-read root, API, AI and the Engine reference and audited folders and callers. Verified from Art’s base `2829a0a`. GitHub main advanced to `e235754` during the slice and its coordination edits overlap this worktree.
+
+2026-11-22, workshop sync. The merge at `2fd8ebb` passed `pnpm checks`, 60 properties and 59 focused Chromium criteria. GitHub then advanced to `f6cdd77`. The final merge `2829a0a` follows the server's updated credit rules and shows the arena fallback reason without a refund claim. `pnpm checks` passed 4,188 tests with one existing audio skip. All 65 properties, 291 fake evals and 36 focused Chromium criteria passed. Reviewed the conflicting instructions and audited the folders and callers for the workshop fixture and fallback adapter.
 
 2026-11-21, arena fallback explanation. The browser criterion failed when the workshop hid the API reason and passed when the result showed it. All 28 focused production Chromium criteria passed. `pnpm checks` passed lint, formatting, strict types and 4,019 tests with one existing slow audio skip. Reviewed root, Webapp, React and acceptance instructions and audited touched folders and callers. The change to the substitution policy is queued above.
 
