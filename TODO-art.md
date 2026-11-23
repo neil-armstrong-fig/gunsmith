@@ -1,6 +1,6 @@
 # TODO: art
 
-**MVP audio checklist complete.** Art owns authored audio cues, playback integration with Play, and the listening review after weapon-specific shot synthesis. Checkout: `worktree-art`, last upstream commit merged `08e9a25`.
+**MVP audio checklist complete.** Art owns authored audio cues, playback integration with Play, and the listening review after weapon-specific shot synthesis. Checkout: `worktree-art`, last upstream commit merged `f999695`.
 
 ## Resume next — production privacy review and Make notice
 
