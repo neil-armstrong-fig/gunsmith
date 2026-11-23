@@ -16,6 +16,8 @@ export const weaponDraftReplySchema = z.looseObject({
   magazineSize: z.number().optional().describe("rounds in the magazine, a whole number"),
   reloadSeconds: z.number().optional().describe("seconds a reload takes"),
   startingReserve: z.number().optional().describe("spare rounds at the start, a whole number"),
+  visionDegrees: z.number().optional().describe("how wide the cone the holder sees in detail is, in degrees"),
+  visionRange: z.number().optional().describe("how far the holder sees in detail, in tiles"),
   preference: z
     .object({
       favoured: z.array(z.string()).optional().describe("the stats the request wants high"),

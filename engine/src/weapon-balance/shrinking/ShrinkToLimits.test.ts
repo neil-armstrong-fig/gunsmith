@@ -5,7 +5,16 @@ import {powerRatingOf} from "@gunsmith/engine/power-rating/PowerRatingOf";
 import {withinLimits} from "@gunsmith/engine/weapon-balance/limits/WithinLimits";
 import type {StatNumbers} from "@gunsmith/engine/power-rating/types/StatNumbers";
 
-const ALL_ONE: StatNumbers = {damage: 1, fireRate: 1, bulletSpeed: 1, magazineSize: 1, reloadSpeed: 1, reserve: 1};
+const ALL_ONE: StatNumbers = {
+  damage: 1,
+  fireRate: 1,
+  bulletSpeed: 1,
+  magazineSize: 1,
+  reloadSpeed: 1,
+  reserve: 1,
+  visionCone: 1,
+  visionRange: 1,
+};
 // Every stat at 0.66 is a power rating of 0.66, over the 0.65 budget, and 118 damage a second, under the cap: only the budget is over.
 const JUST_OVER_BUDGET: StatNumbers = {
   damage: 0.66,
@@ -14,8 +23,10 @@ const JUST_OVER_BUDGET: StatNumbers = {
   magazineSize: 0.66,
   reloadSpeed: 0.66,
   reserve: 0.66,
+  visionCone: 0.66,
+  visionRange: 0.66,
 };
-const EVEN: StatNumbers = {damage: 1, fireRate: 1, bulletSpeed: 1, magazineSize: 1, reloadSpeed: 1, reserve: 1};
+const EVEN: StatNumbers = ALL_ONE;
 
 it("hands back goodness that is already within the limits unchanged", () => {
   const modest: StatNumbers = {
@@ -25,6 +36,8 @@ it("hands back goodness that is already within the limits unchanged", () => {
     magazineSize: 0.4,
     reloadSpeed: 0.4,
     reserve: 0.4,
+    visionCone: 0.4,
+    visionRange: 0.4,
   };
 
   expect(shrinkToLimits(modest, EVEN)).toEqual(modest);
@@ -53,6 +66,15 @@ it("takes the budget first, so a weapon the budget alone brings inside the damag
   expect(shrunk.fireRate).toBeCloseTo(shrunk.reserve, 9);
 });
 
+it("takes the budget from the two vision stats as it does from the rest", () => {
+  const shrunk = shrinkToLimits(JUST_OVER_BUDGET, EVEN);
+
+  expect(shrunk.visionCone).toBeLessThan(JUST_OVER_BUDGET.visionCone);
+  expect(shrunk.visionRange).toBeLessThan(JUST_OVER_BUDGET.visionRange);
+  expect(shrunk.visionCone).toBeCloseTo(shrunk.damage, 9);
+  expect(shrunk.visionRange).toBeCloseTo(shrunk.damage, 9);
+});
+
 it("shrinks a stat with a bigger weight more", () => {
   const shrunk = shrinkToLimits(ALL_ONE, {...EVEN, damage: 3, reserve: 0.25});
 
@@ -68,6 +90,8 @@ it("still gets inside the limits when every stat has a small weight, which needs
     magazineSize: 0.25,
     reloadSpeed: 0.25,
     reserve: 0.25,
+    visionCone: 0.25,
+    visionRange: 0.25,
   };
 
   expect(withinLimits(statsAt(shrinkToLimits(ALL_ONE, favouredEverywhere)))).toBe(true);
@@ -89,6 +113,8 @@ it("shrinks for the damage-per-second cap when the power rating is already low e
     magazineSize: 0,
     reloadSpeed: 0,
     reserve: 0,
+    visionCone: 0,
+    visionRange: 0,
   };
 
   expect(withinLimits(statsAt(quickAndHard))).toBe(false);
@@ -108,6 +134,8 @@ it("takes the damage cap from damage and fire rate only, and leaves every other 
     magazineSize: 0.3,
     reloadSpeed: 0.3,
     reserve: 0.3,
+    visionCone: 0.3,
+    visionRange: 0.3,
   };
 
   const shrunk = shrinkToLimits(quickAndHard, EVEN);
@@ -116,6 +144,8 @@ it("takes the damage cap from damage and fire rate only, and leaves every other 
   expect(shrunk.magazineSize).toBe(0.3);
   expect(shrunk.reloadSpeed).toBe(0.3);
   expect(shrunk.reserve).toBe(0.3);
+  expect(shrunk.visionCone).toBe(0.3);
+  expect(shrunk.visionRange).toBe(0.3);
   expect(shrunk.damage).toBeLessThan(1);
   expect(shrunk.fireRate).toBeLessThan(0.7);
 });
@@ -128,6 +158,8 @@ it("takes the damage cap from the stat the player would sacrifice before the one
     magazineSize: 0.3,
     reloadSpeed: 0.3,
     reserve: 0.3,
+    visionCone: 0.3,
+    visionRange: 0.3,
   };
 
   const favouringDamage = shrinkToLimits(quickAndHard, {...EVEN, damage: 0.25, fireRate: 3});

@@ -5,7 +5,7 @@ import {arenaGraphStateOf} from "@gunsmith/ai/pipeline/arena/arena-graph/testing
 it("lets an arena request through, noting the one model call it cost", async () => {
   const update = await moderationNode(arenaGraphStateOf(), moderatorSaying(true, "pillars"));
 
-  expect(update).toEqual({nodes: ["moderation"], modelCalls: 1});
+  expect(update).toEqual({nodes: ["moderation"], modelCalls: 1, relevance: "accepted"});
 });
 
 it("turns away a request that is not about an arena, with the moderator's reason", async () => {
@@ -14,7 +14,12 @@ it("turns away a request that is not about an arena, with the moderator's reason
     moderatorSaying(false, "That is a recipe."),
   );
 
-  expect(update).toEqual({nodes: ["moderation"], modelCalls: 1, rejectionReason: "That is a recipe."});
+  expect(update).toEqual({
+    nodes: ["moderation"],
+    modelCalls: 1,
+    relevance: "irrelevant",
+    rejectionReason: "That is a recipe.",
+  });
 });
 
 it("turns away a request when the judge cannot be read, as the closed verdict says", async () => {

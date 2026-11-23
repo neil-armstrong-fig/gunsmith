@@ -63,6 +63,10 @@ it("ends every number inside its range", () => {
       expect(balanced.reloadSeconds).toBeLessThanOrEqual(5);
       expect(balanced.startingReserve).toBeGreaterThanOrEqual(0);
       expect(balanced.startingReserve).toBeLessThanOrEqual(200);
+      expect(balanced.visionDegrees).toBeGreaterThanOrEqual(50);
+      expect(balanced.visionDegrees).toBeLessThanOrEqual(130);
+      expect(balanced.visionRange).toBeGreaterThanOrEqual(6);
+      expect(balanced.visionRange).toBeLessThanOrEqual(20);
     }),
     {numRuns: RUNS},
   );
@@ -139,6 +143,8 @@ function weaponStats(): fc.Arbitrary<WeaponStats> {
     magazineSize: fc.integer({min: 1, max: 60}),
     reloadSeconds: fc.double({min: 0.5, max: 5, noNaN: true}),
     startingReserve: fc.integer({min: 0, max: 200}),
+    visionDegrees: fc.double({min: 50, max: 130, noNaN: true}),
+    visionRange: fc.double({min: 6, max: 20, noNaN: true}),
   });
 }
 
@@ -177,5 +183,7 @@ function strengthsOf(stats: WeaponStats): Record<StatName, number> {
     magazineSize: stats.magazineSize,
     reloadSpeed: 1 / stats.reloadSeconds,
     reserve: stats.startingReserve,
+    visionCone: stats.visionDegrees,
+    visionRange: stats.visionRange,
   };
 }

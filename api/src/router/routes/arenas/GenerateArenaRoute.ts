@@ -1,3 +1,7 @@
+import {arenaHistoryPrivacyCheck} from "@src/router/routes/arenas/history/privacy/ArenaHistoryPrivacyCheck";
+import {recordArenaAttempt} from "@src/router/routes/arenas/history/recording/RecordArenaAttempt";
+import type {ArenaHistoryRequest} from "@src/router/routes/arenas/history/types/ArenaHistoryRequest";
+import {sessionTokenFrom} from "@src/router/routes/shared/session/SessionTokenFrom";
 import type {ArenaOutcome} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcome";
 import {ARENA_SPEND} from "@src/durable-objects/spend-ledger/estimate/arena/ArenaSpend";
 import {settledArenaSpend} from "@src/durable-objects/spend-ledger/estimate/arena/SettledArenaSpend";
@@ -23,6 +27,7 @@ import type {ArenaAnswer} from "@src/router/routes/arenas/types/ArenaAnswer";
  * cannot be kept the credit is refunded and the answer is 502.
  */
 export async function generateArenaRoute(request: Request): Promise<Response> {
+  const historyRequest = historyRequestOf(request);
   const reservation = await reserveCredit(request, {
     pipelineAvailable: isArenaPipelineAvailable(),
     kind: "arena",
@@ -32,10 +37,23 @@ export async function generateArenaRoute(request: Request): Promise<Response> {
     return reservation;
   }
 
-  return await runAndSettle(reservation);
+  return await runAndSettle(reservation, historyRequest);
 }
 
-async function runAndSettle(reservation: CreditReservation): Promise<Response> {
+function historyRequestOf(request: Request): ArenaHistoryRequest | undefined {
+  const privacyCheck = arenaHistoryPrivacyCheck();
+  if (!privacyCheck) return undefined;
+
+  const token = sessionTokenFrom(request.headers.get("Cookie") ?? undefined);
+  if (!token) return undefined;
+
+  return {privacyCheck, token, createdAt: new Date()};
+}
+
+async function runAndSettle(
+  reservation: CreditReservation,
+  historyRequest: ArenaHistoryRequest | undefined,
+): Promise<Response> {
   const {credits, spend, key, prompt} = reservation;
   let outcome: ArenaOutcome;
   try {
@@ -47,6 +65,16 @@ async function runAndSettle(reservation: CreditReservation): Promise<Response> {
     return failureAnswer(error);
   }
 
+  const response = await settleOutcome(reservation, outcome);
+  if (historyRequest) {
+    await recordArenaAttempt(historyRequest, {reservation, outcome, response});
+  }
+
+  return response;
+}
+
+async function settleOutcome(reservation: CreditReservation, outcome: ArenaOutcome): Promise<Response> {
+  const {credits, spend, key} = reservation;
   await spend.settle(key, settledArenaSpend(outcome));
   if (outcome.status === "created") {
     const id = await keepCreatedResult(reservation, "arena", {arena: outcome.arena});

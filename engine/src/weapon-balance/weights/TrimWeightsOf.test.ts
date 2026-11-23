@@ -8,6 +8,8 @@ it("weighs every stat the same when there is no preference", () => {
     magazineSize: 1,
     reloadSpeed: 1,
     reserve: 1,
+    visionCone: 1,
+    visionRange: 1,
   });
 });
 
@@ -31,4 +33,13 @@ it("leaves the stats a preference does not name at the neutral weight", () => {
   expect(weights.bulletSpeed).toBe(1);
   expect(weights.magazineSize).toBe(1);
   expect(weights.reloadSpeed).toBe(1);
+  expect(weights.visionCone).toBe(1);
+  expect(weights.visionRange).toBe(1);
+});
+
+it("weighs the two vision stats on their own, so a player can favour the range and give up the cone", () => {
+  const weights = trimWeightsOf({favoured: ["visionRange"], sacrificed: ["visionCone"]});
+
+  expect(weights.visionRange).toBeLessThan(weights.damage);
+  expect(weights.visionCone).toBeGreaterThan(weights.damage);
 });

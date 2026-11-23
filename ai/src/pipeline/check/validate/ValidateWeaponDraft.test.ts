@@ -8,6 +8,8 @@ const RIFLE = {
   magazineSize: 12,
   reloadSeconds: 1.5,
   startingReserve: 36,
+  visionDegrees: 90,
+  visionRange: 12,
 };
 
 it("returns the weapon when the answer fits the schema, with no preference when the model gave none", () => {
@@ -46,6 +48,10 @@ it.each([
   ["reloadSeconds", 30],
   ["startingReserve", 5000],
   ["startingReserve", -4],
+  ["visionDegrees", 400],
+  ["visionDegrees", 10],
+  ["visionRange", 90],
+  ["visionRange", -2],
 ])("accepts %s of %s, past its range, and hands it on as written for the balancer to bring in", (field, value) => {
   const weapon = {...RIFLE, [field]: value};
 
@@ -95,6 +101,8 @@ it("names the fields that are missing", () => {
     "magazineSize",
     "reloadSeconds",
     "startingReserve",
+    "visionDegrees",
+    "visionRange",
   ]);
 });
 
