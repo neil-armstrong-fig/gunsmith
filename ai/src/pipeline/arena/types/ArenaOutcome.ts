@@ -1,3 +1,4 @@
+import type {ArenaHistoryDiagnostics} from "@gunsmith/ai/pipeline/arena/types/ArenaHistoryDiagnostics";
 import type {ModelUsage} from "@gunsmith/ai/pipeline/types/ModelUsage";
 import type {ArenaOutcomeStatus} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcomeStatus";
 
@@ -19,4 +20,5 @@ export interface ArenaOutcome {
    * until the consumers' own outcome literals carry it (HANDOFF, 2026-11-19).
    */
   usage?: ModelUsage;
+  history?: ArenaHistoryDiagnostics;
 }

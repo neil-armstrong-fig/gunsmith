@@ -1,3 +1,5 @@
+import type {ArenaRelevance} from "@gunsmith/ai/pipeline/arena/types/ArenaRelevance";
+import type {ArenaValidationFailure} from "@gunsmith/ai/pipeline/arena/check/validate/types/ArenaValidationFailure";
 import {Annotation} from "@langchain/langgraph";
 import type {ArenaDrawing} from "@gunsmith/ai/pipeline/arena/types/ArenaDrawing";
 
@@ -18,6 +20,9 @@ export const ArenaGraphState = Annotation.Root({
   arena: Annotation<ArenaDrawing | undefined>(),
   /** What the last check refused the draft for; empty when it passed. Handed to `repair`. */
   errors: Annotation<string[]>({reducer: (_current, update) => update, default: () => []}),
+  relevance: Annotation<ArenaRelevance | undefined>(),
+  validationFailure: Annotation<ArenaValidationFailure | undefined>(),
+  codeEdits: Annotation<number>({reducer: (current, update) => current + update, default: () => 0}),
   /** Whether the one repair has been spent. */
   repaired: Annotation<boolean>({reducer: (_current, update) => update, default: () => false}),
   /** The built-in arena given when the model's could not be used, with why; set only by `fallback`. */

@@ -40,6 +40,7 @@ it("rejects a request the moderator says is not about a weapon, after one model 
   expect(outcome).toEqual({
     status: "rejected",
     reason: "That is a recipe.",
+    history: {pipelineVersion: "weapon-v1", relevance: "irrelevant", codeEdits: 0, modelRepairs: 0},
     nodes: ["precheck", "moderation"],
     modelCalls: 1,
     usage: NO_TOKENS,
@@ -107,6 +108,7 @@ it("creates the weapon the generator wrote when it is valid and within the cap, 
       usage: {inputTokens: 0, outputTokens: 0},
     },
     nodes: [...STATS_NODES, ...DRAWING_NODES],
+    history: {pipelineVersion: "weapon-v1", relevance: "accepted", codeEdits: 0, modelRepairs: 0},
     modelCalls: 3,
     usage: NO_TOKENS,
   });
@@ -329,6 +331,13 @@ it("is invalid, with no weapon and no drawing, when the repaired weapon still fa
     status: "invalid",
     reason: "We could not build a valid weapon from that request. Try describing it differently.",
     nodes: ["precheck", "moderation", "generate", "validate", "repair", "validate"],
+    history: {
+      pipelineVersion: "weapon-v1",
+      relevance: "accepted",
+      codeEdits: 0,
+      modelRepairs: 1,
+      validationFailure: "invalid-draft",
+    },
     modelCalls: 3,
     usage: NO_TOKENS,
   });
@@ -372,6 +381,7 @@ it("rejects an empty prompt with a reason the player can read", async () => {
   expect(outcome).toEqual({
     status: "rejected",
     reason: "Describe the weapon you want.",
+    history: {pipelineVersion: "weapon-v1", relevance: "not-judged", codeEdits: 0, modelRepairs: 0},
     nodes: ["precheck"],
     modelCalls: 0,
     usage: NO_TOKENS,
