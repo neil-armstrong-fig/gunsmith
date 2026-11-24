@@ -1,5 +1,8 @@
+import type {CreditKind} from "@src/durable-objects/credit-ledger/types/CreditKind";
 import {workerEnvironment} from "@src/env/WorkerEnvironment";
 import {parsePromptRequest} from "@src/router/routes/shared/prompt-request/ParsePromptRequest";
+import {parseStyleRequest} from "@src/router/routes/shared/prompt-request/ParseStyleRequest";
+import type {StyleRequest} from "@src/router/routes/shared/prompt-request/types/StyleRequest";
 import type {CreditReservation} from "@src/router/routes/shared/types/CreditReservation";
 import {accountOfRequest} from "@src/router/routes/shared/session/AccountOfRequest";
 import type {ReserveCreditAsk} from "@src/router/routes/shared/types/ReserveCreditAsk";
@@ -9,7 +12,7 @@ import type {ReserveCreditAsk} from "@src/router/routes/shared/types/ReserveCred
  * (503 `ai-unavailable`), a signed-in player (401: the session cookie, never a header a caller could write), a prompt (400), the global AI switch (503 `ai-off`), then the account's credit, **reserved
  * before the pipeline runs, so two requests for the last credit cannot both run** (402 `no-credits`), then, when the route gave an
  * estimate, the global spend at that worst case (**so a burst cannot cross a cap**; a `paused` spend refunds the credit and answers
- * 503 `ai-off` with `returnsAt`). Answers the refusal as a `Response`, or the reservation to run the pipeline under. The route then
+ * 503 `ai-off` with `returnsAt`). An arena request may also name a `style` (`blue` or `red`), which is read with the prompt: one that is neither is a 400 too, before anything is taken. Answers the refusal as a `Response`, or the reservation to run the pipeline under. The route then
  * settles it at what the request was, or refunds it.
  */
 export async function reserveCredit(
@@ -28,8 +31,14 @@ export async function reserveCredit(
     return Response.json({error: "account-required"}, {status: 401});
   }
 
-  const prompt = parsePromptRequest(await request.text());
+  const body = await request.text();
+  const prompt = parsePromptRequest(body);
   if (prompt === undefined) {
+    return Response.json({error: "bad-request"}, {status: 400});
+  }
+
+  const styleRequest = styleRequestOf(body, kind);
+  if (!styleRequest.valid) {
     return Response.json({error: "bad-request"}, {status: 400});
   }
 
@@ -56,5 +65,14 @@ export async function reserveCredit(
     }
   }
 
-  return {credits, spend, accountId: account.id, key, prompt};
+  return {credits, spend, accountId: account.id, key, prompt, style: styleRequest.style};
+}
+
+/** Only an arena has a style; a weapon request's `style`, if a client sends one, is not read. */
+function styleRequestOf(body: string, kind: CreditKind): StyleRequest {
+  if (kind !== "arena") {
+    return {valid: true, style: undefined};
+  }
+
+  return parseStyleRequest(body);
 }

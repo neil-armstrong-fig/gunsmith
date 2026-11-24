@@ -1,3 +1,4 @@
+import type {ArenaStyle} from "@gunsmith/shared/arena-style/ArenaStyle";
 import type {CreditLedger} from "@src/durable-objects/credit-ledger/CreditLedger";
 import type {SpendLedger} from "@src/durable-objects/spend-ledger/SpendLedger";
 
@@ -11,4 +12,6 @@ export interface CreditReservation {
   accountId: string;
   key: string;
   prompt: string;
+  /** The style an arena request named (`blue` or `red`); absent for a weapon and for an arena that named none. */
+  style?: ArenaStyle;
 }

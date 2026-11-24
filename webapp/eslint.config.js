@@ -18,8 +18,9 @@ const gameStoreMayImport = "^(?!zustand$|zustand/|@gunsmith/engine(?:/|$)|@src/g
 // The feedback store (`src/store/feedback/`) is smaller still: Zustand and its own folder, no engine and no world.
 const feedbackStoreMayImport = "^(?!zustand$|zustand/|@src/store/feedback/|\\./).+$";
 
-// The workshop store (`src/store/workshop/`) holds what is written and the weapon last made: Zustand, the engine's types and its own folder.
-const workshopStoreMayImport = "^(?!zustand$|zustand/|@gunsmith/engine(?:/|$)|@src/store/workshop/|\\./).+$";
+// The workshop store (`src/store/workshop/`) holds what is written and the weapon last made: Zustand, the engine's types, the arena styles and its own folder.
+const workshopStoreMayImport =
+  "^(?!zustand$|zustand/|@gunsmith/engine(?:/|$)|@gunsmith/shared/arena-style/|@src/store/workshop/|\\./).+$";
 
 // The shelf store (`src/store/shelf/`) holds the saved weapons and keeps them in the browser's storage: Zustand, zod (to read what the browser kept), the engine and its own folder.
 const shelfStoreMayImport = "^(?!zustand$|zustand/|zod$|@gunsmith/engine(?:/|$)|@src/store/shelf/|\\./).+$";
@@ -211,12 +212,12 @@ export default [
     files: ["src/store/workshop/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": restrictedImports({
-        allowedPackages: ["@gunsmith/engine"],
+        allowedPackages: ["@gunsmith/engine", "@gunsmith/shared"],
         patterns: [
           {
             regex: workshopStoreMayImport,
             message:
-              "The workshop store may import only zustand, the engine's types and its own folder: it holds what is written and the weapon last made.",
+              "The workshop store may import only zustand, the engine's types, the arena styles and its own folder: it holds what is written and the weapon last made.",
           },
         ],
       }),

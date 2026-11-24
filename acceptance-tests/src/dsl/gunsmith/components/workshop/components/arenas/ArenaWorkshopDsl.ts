@@ -20,6 +20,38 @@ export class ArenaWorkshopDsl {
     }
   }
 
+  async chooseStyle(name: string): Promise<void> {
+    try {
+      await this.arenas.chooseStyle(name);
+    } catch (error) {
+      throw new DslError(`Failed to choose the ${name} style in the arena workshop`, error);
+    }
+  }
+
+  async getPromptBorderColour(): Promise<string> {
+    try {
+      return await this.arenas.getPromptBorderColour();
+    } catch (error) {
+      throw new DslError("Failed to read the border of the arena prompt", error);
+    }
+  }
+
+  async pressStyleWord(word: string): Promise<void> {
+    try {
+      await this.arenas.pressStyleWord(word);
+    } catch (error) {
+      throw new DslError(`Failed to press the word ${word} in the style switch`, error);
+    }
+  }
+
+  async isStyleChosen(name: string): Promise<boolean> {
+    try {
+      return await this.arenas.isStyleChosen(name);
+    } catch (error) {
+      throw new DslError(`Failed to read whether the ${name} style is chosen`, error);
+    }
+  }
+
   async pressArenaAction(name: string, index = 0): Promise<void> {
     try {
       await this.arenas.pressArenaAction(name, index);

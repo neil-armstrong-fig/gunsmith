@@ -2,6 +2,7 @@ import {BaseChatModel} from "@langchain/core/language_models/chat_models";
 import {AIMessageChunk} from "@langchain/core/messages";
 import type {BaseMessage} from "@langchain/core/messages";
 import type {ChatResult} from "@langchain/core/outputs";
+import {FAKE_LARGE_ARENA_REPLY} from "@evals/eval-criteria-mapping/setups/arena/fake/models/reply/FakeLargeArenaReply";
 import {FAKE_ARENA_REPLY} from "@evals/eval-criteria-mapping/setups/arena/fake/models/reply/FakeArenaReply";
 
 // The one request the arena specs expect the fake model to get wrong in a way code can mend (`AskingForAnArena`, "cut in two"), word for
@@ -54,6 +55,9 @@ const COVER_REPLY = {
   ],
 };
 
+// A request that asks for a huge or a vast arena, or the full 40 tiles, gets a large one, so the specs that check size can tell the pipeline kept the size asked.
+const LARGE_REQUEST = /\b(huge|vast|40)\b/;
+
 const REQUEST_BLOCK = /^<request>\n([\s\S]*)\n<\/request>$/;
 
 /**
@@ -96,6 +100,10 @@ export class ArenaGenerationFakeModel extends BaseChatModel {
 
     if (requests.includes(COVER_REQUEST)) {
       return COVER_REPLY;
+    }
+
+    if (requests.some(request => request !== undefined && LARGE_REQUEST.test(request))) {
+      return FAKE_LARGE_ARENA_REPLY;
     }
 
     return FAKE_ARENA_REPLY;

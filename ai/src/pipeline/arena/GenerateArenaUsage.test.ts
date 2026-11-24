@@ -52,6 +52,7 @@ function dependenciesWhere(scenario: UsageScenario): ArenaPipelineDependencies {
   const dependencies: ArenaPipelineDependencies = {
     moderator: new FakeListChatModel({responses: [JSON.stringify(verdict)]}),
     generator: new FakeListChatModel({responses: scenario.generatorSays.map(reply => JSON.stringify(reply))}),
+    format: "rows",
     builtInArenas: [GOOD],
   };
   reportUsage(dependencies.moderator, MODERATION);

@@ -423,6 +423,15 @@ it("refuses a request with no account, asking nothing", async () => {
   expect(ledgers.calls).toEqual([]);
 });
 
+it("makes a weapon whatever a style field says, since only an arena has a style", async () => {
+  smithThatAnswers(created);
+
+  fakeLedgers();
+  const response = await generateWeaponRoute(post({prompt: "a hum-rifle", style: "green"}));
+
+  expect(response.status).toBe(200);
+});
+
 it("refuses a body that is not a weapon request, asking nothing", async () => {
   for (const body of ["not json", "[]", "{}", '{"prompt":3}', '{"prompt":"  "}']) {
     const ledgers = fakeLedgers();

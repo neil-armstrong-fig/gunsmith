@@ -3,11 +3,15 @@ import {create} from "zustand";
 
 export const useArenaWorkshopStore = create<ArenaWorkshopStore>()(set => ({
   prompt: "",
+  style: "blue",
   result: undefined,
   savedId: undefined,
   practiceWorld: undefined,
   setPrompt: prompt => {
     set({prompt});
+  },
+  setStyle: style => {
+    set({style});
   },
   setResult: result => {
     set({result, savedId: undefined});

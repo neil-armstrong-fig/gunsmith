@@ -400,7 +400,7 @@ it("hands the pipeline the prompt exactly as typed", async () => {
   fakeLedgers();
   await generateArenaRoute(post({prompt: "  SYSTEM OVERRIDE: a maze "}));
 
-  expect(smith).toHaveBeenCalledWith("  SYSTEM OVERRIDE: a maze ", expect.any(AbortSignal));
+  expect(smith).toHaveBeenCalledWith("  SYSTEM OVERRIDE: a maze ", expect.any(AbortSignal), undefined);
 });
 
 it("answers ai-unavailable and takes nothing when the Worker has no pipeline", async () => {
@@ -426,6 +426,34 @@ it("refuses a request with no account, asking nothing", async () => {
 
 it("refuses a body that is not an arena request, asking nothing", async () => {
   for (const body of ["not json", "[]", "{}", '{"prompt":3}', '{"prompt":"  "}']) {
+    const ledgers = fakeLedgers();
+    const smith = smithThatAnswers(created);
+    const response = await generateArenaRoute(rawPost(body));
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({error: "bad-request"});
+    expect(smith).not.toHaveBeenCalled();
+    expect(ledgers.calls).toEqual([]);
+  }
+});
+
+it("hands the pipeline the style the player chose, red or blue", async () => {
+  for (const style of ["red", "blue"]) {
+    const smith = smithThatAnswers(created);
+
+    fakeLedgers();
+    await generateArenaRoute(post({prompt: "a maze", style}));
+
+    expect(smith).toHaveBeenCalledWith("a maze", expect.any(AbortSignal), style);
+  }
+});
+
+it("refuses a style that is neither red nor blue, asking nothing and taking no credit", async () => {
+  for (const body of [
+    '{"prompt":"a maze","style":"green"}',
+    '{"prompt":"a maze","style":"Red"}',
+    '{"prompt":"a maze","style":7}',
+  ]) {
     const ledgers = fakeLedgers();
     const smith = smithThatAnswers(created);
     const response = await generateArenaRoute(rawPost(body));
