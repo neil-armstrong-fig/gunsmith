@@ -19,75 +19,56 @@ it("reads a seat locking in its arena", () => {
   expect(parsePreRoundMessage('{"kind":"lockIn","step":"arena"}')).toEqual({kind: "lockInArena"});
 });
 
-it("reads a seat choosing two built-in weapons, slot 1 then slot 2", () => {
-  const text =
-    '{"kind":"choose","step":"weapons","choice":[{"kind":"builtIn","key":"submachine-gun"},{"kind":"builtIn","key":"rifle"}]}';
+it("reads a seat choosing a built-in weapon for a slot", () => {
+  const text = '{"kind":"choose","step":"weapon","slot":2,"choice":{"kind":"builtIn","key":"submachine-gun"}}';
 
   expect(parsePreRoundMessage(text)).toEqual({
-    kind: "chooseWeapons",
-    choices: [
-      {kind: "builtIn", key: "submachine-gun"},
-      {kind: "builtIn", key: "rifle"},
-    ],
+    kind: "chooseWeapon",
+    slot: 2,
+    choice: {kind: "builtIn", key: "submachine-gun"},
   });
 });
 
-it("reads a seat choosing saved weapons by id, alone or beside a built-in", () => {
-  const text =
-    '{"kind":"choose","step":"weapons","choice":[{"kind":"saved","id":"weapon-1"},{"kind":"builtIn","key":"rifle"}]}';
-  const both =
-    '{"kind":"choose","step":"weapons","choice":[{"kind":"saved","id":"weapon-1"},{"kind":"saved","id":"weapon-2"}]}';
+it("reads a seat choosing a saved weapon by id", () => {
+  const text = '{"kind":"choose","step":"weapon","slot":1,"choice":{"kind":"saved","id":"weapon-1"}}';
 
-  expect(parsePreRoundMessage(text)).toEqual({
-    kind: "chooseWeapons",
-    choices: [
-      {kind: "saved", id: "weapon-1"},
-      {kind: "builtIn", key: "rifle"},
-    ],
-  });
-  expect(parsePreRoundMessage(both)).toEqual({
-    kind: "chooseWeapons",
-    choices: [
-      {kind: "saved", id: "weapon-1"},
-      {kind: "saved", id: "weapon-2"},
-    ],
-  });
+  expect(parsePreRoundMessage(text)).toEqual({kind: "chooseWeapon", slot: 1, choice: {kind: "saved", id: "weapon-1"}});
 });
 
-it("reads a seat locking in its weapons", () => {
-  expect(parsePreRoundMessage('{"kind":"lockIn","step":"weapons"}')).toEqual({kind: "lockInWeapons"});
+it("reads a seat locking in the weapon in a slot", () => {
+  expect(parsePreRoundMessage('{"kind":"lockIn","step":"weapon","slot":1}')).toEqual({kind: "lockInWeapon", slot: 1});
+  expect(parsePreRoundMessage('{"kind":"lockIn","step":"weapon","slot":2}')).toEqual({kind: "lockInWeapon", slot: 2});
 });
 
-it("does not take weapons that are not exactly two choices, each a built-in key or a saved id", () => {
-  const one = '{"kind":"choose","step":"weapons","choice":[{"kind":"builtIn","key":"rifle"}]}';
-  const three =
-    '{"kind":"choose","step":"weapons","choice":[{"kind":"builtIn","key":"a"},{"kind":"builtIn","key":"b"},{"kind":"builtIn","key":"c"}]}';
-  const savedWithoutId =
-    '{"kind":"choose","step":"weapons","choice":[{"kind":"builtIn","key":"rifle"},{"kind":"saved"}]}';
-  const savedWithNumber =
-    '{"kind":"choose","step":"weapons","choice":[{"kind":"builtIn","key":"rifle"},{"kind":"saved","id":7}]}';
-  const savedWithEmptyId =
-    '{"kind":"choose","step":"weapons","choice":[{"kind":"builtIn","key":"rifle"},{"kind":"saved","id":""}]}';
-  const savedWithLongId = `{"kind":"choose","step":"weapons","choice":[{"kind":"builtIn","key":"rifle"},{"kind":"saved","id":"${"x".repeat(65)}"}]}`;
-  const number =
-    '{"kind":"choose","step":"weapons","choice":[{"kind":"builtIn","key":"rifle"},{"kind":"builtIn","key":7}]}';
+it("does not take a weapon for a slot that is not 1 or 2, or with none", () => {
+  const choice = '"choice":{"kind":"builtIn","key":"rifle"}';
 
-  expect(parsePreRoundMessage(one)).toBeUndefined();
-  expect(parsePreRoundMessage(three)).toBeUndefined();
-  expect(parsePreRoundMessage(savedWithoutId)).toBeUndefined();
-  expect(parsePreRoundMessage(savedWithNumber)).toBeUndefined();
-  expect(parsePreRoundMessage(savedWithEmptyId)).toBeUndefined();
-  expect(parsePreRoundMessage(savedWithLongId)).toBeUndefined();
-  expect(
-    parsePreRoundMessage(
-      '{"kind":"choose","step":"weapons","choice":[{"kind":"builtIn","key":"rifle"},{"kind":"saved","key":"rifle"}]}',
-    ),
-  ).toBeUndefined();
-  expect(parsePreRoundMessage(number)).toBeUndefined();
-  expect(
-    parsePreRoundMessage('{"kind":"choose","step":"weapons","choice":{"kind":"builtIn","key":"rifle"}}'),
-  ).toBeUndefined();
-  expect(parsePreRoundMessage('{"kind":"choose","step":"weapons"}')).toBeUndefined();
+  expect(parsePreRoundMessage(`{"kind":"choose","step":"weapon","slot":3,${choice}}`)).toBeUndefined();
+  expect(parsePreRoundMessage(`{"kind":"choose","step":"weapon","slot":"1",${choice}}`)).toBeUndefined();
+  expect(parsePreRoundMessage(`{"kind":"choose","step":"weapon",${choice}}`)).toBeUndefined();
+  expect(parsePreRoundMessage('{"kind":"lockIn","step":"weapon","slot":0}')).toBeUndefined();
+  expect(parsePreRoundMessage('{"kind":"lockIn","step":"weapon"}')).toBeUndefined();
+});
+
+it("does not take the old pair of weapons: weapons are chosen one at a time", () => {
+  const pair =
+    '{"kind":"choose","step":"weapons","choice":[{"kind":"builtIn","key":"rifle"},{"kind":"builtIn","key":"rifle"}]}';
+
+  expect(parsePreRoundMessage(pair)).toBeUndefined();
+  expect(parsePreRoundMessage('{"kind":"lockIn","step":"weapons"}')).toBeUndefined();
+});
+
+it("does not take a weapon that is not a built-in key or a saved id", () => {
+  const at = (choice: string): string => `{"kind":"choose","step":"weapon","slot":1,"choice":${choice}}`;
+
+  expect(parsePreRoundMessage(at('{"kind":"saved"}'))).toBeUndefined();
+  expect(parsePreRoundMessage(at('{"kind":"saved","id":7}'))).toBeUndefined();
+  expect(parsePreRoundMessage(at('{"kind":"saved","id":""}'))).toBeUndefined();
+  expect(parsePreRoundMessage(at(`{"kind":"saved","id":"${"x".repeat(65)}"}`))).toBeUndefined();
+  expect(parsePreRoundMessage(at('{"kind":"saved","key":"rifle"}'))).toBeUndefined();
+  expect(parsePreRoundMessage(at('{"kind":"builtIn","key":7}'))).toBeUndefined();
+  expect(parsePreRoundMessage(at('[{"kind":"builtIn","key":"rifle"}]'))).toBeUndefined();
+  expect(parsePreRoundMessage('{"kind":"choose","step":"weapon","slot":1}')).toBeUndefined();
 });
 
 it("reads a pick of one of the two arenas", () => {

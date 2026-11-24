@@ -15,6 +15,7 @@ import {TICK_SECONDS} from "@src/react/components/three/arena-canvas/components/
 import {snapshotOf} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/state-hook/SnapshotOf";
 import {roomOfPage} from "@src/online/RoomOfPage";
 import {useOnlineMatch} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/hooks/use-online-match/UseOnlineMatch";
+import {useRoomPreRound} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/hooks/use-room-pre-round/UseRoomPreRound";
 import {useCrouchKey} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/hooks/use-crouch-key/UseCrouchKey";
 import {useCombatSounds} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/hooks/use-combat-sounds/UseCombatSounds";
 import {useFiring} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/hooks/use-firing/UseFiring";
@@ -46,6 +47,7 @@ export function useGameLoop(): void {
   const weaponKeys = useWeaponKeys();
   const sounds = useCombatSounds();
   const onlineMatchRef = useOnlineMatch();
+  const roomPreRound = useRoomPreRound();
   const roomPage = roomOfPage() !== undefined;
 
   useEffect(() => {
@@ -98,6 +100,8 @@ export function useGameLoop(): void {
           });
         }
       }
+
+      roomPreRound.afterFrame({onlineMatch, frameSeconds});
 
       const shown = onlineMatch?.worldToShow(owed.leftoverSeconds);
       const told = onlineMatch?.takeEvents();

@@ -1,5 +1,7 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
+import {advanceBullets} from "@gunsmith/engine/bullet/AdvanceBullets";
+import type {Bullet} from "@gunsmith/engine/bullet/types/Bullet";
 import type {Input} from "@gunsmith/engine/game-loop/types/Input";
 import type {World} from "@gunsmith/engine/game-loop/types/World";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
@@ -24,6 +26,7 @@ import type {Readiness} from "@src/online/types/Readiness";
 import type {SeatPick} from "@src/online/types/pre-round/SeatPick";
 import type {ArenaChoice} from "@src/online/types/pre-round/ArenaChoice";
 import type {WeaponChoice} from "@src/online/types/pre-round/WeaponChoice";
+import type {WeaponSlot} from "@src/online/types/pre-round/WeaponSlot";
 import type {RevealFrame} from "@src/online/types/RevealFrame";
 import type {SnapshotFrame} from "@src/online/types/SnapshotFrame";
 import {TICK_SECONDS} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/clock/TickSeconds";
@@ -44,6 +47,12 @@ const INTERPOLATION_DELAY_SECONDS = 0.1;
 /** How many snapshots are kept to blend the other fighter between. */
 const SNAPSHOTS_KEPT = 10;
 
+/**
+ * The longest a bullet is flown on past the newest snapshot, in seconds, so a late snapshot cannot send one far from where the server last
+ * said it was. A bullet is drawn on from there every frame, as the fighters are, instead of standing still between snapshots. A tunable.
+ */
+const MOST_BULLET_FLIGHT_SECONDS = 0.1;
+
 const NO_OFFSET: Point = {x: 0, y: 0};
 
 /**
@@ -51,6 +60,8 @@ const NO_OFFSET: Point = {x: 0, y: 0};
  * - **Own fighter, predicted.** Each fixed step (`step`) the player's input is sent when it changes (plus a heartbeat) and played at once
  *   on the browser's own copy of the fighter, so walking does not wait for the server. Each snapshot says how far the server has played the
  *   inputs (`ack`); the inputs after that are played again on top of its word, and a small disagreement is eased out, a large one corrected at once.
+ * - **Bullets, flown on.** A bullet is drawn on from where the newest snapshot has it, every frame, as far as the browser's own clock has moved since
+ *   the snapshot came (never past a wall, and for no more than `MOST_BULLET_FLIGHT_SECONDS`), so shots move as smoothly as the fighters, not once a snapshot.
  * - **Other fighter, interpolated.** Drawn about a tenth of a second behind the newest snapshot, blended between two, and only as the
  *   server told of them: a fighter it did not send is simply not in the world.
  * The loop asks for the world to show each frame (`worldToShow`).
@@ -71,7 +82,10 @@ export class OnlineMatch {
   private lastSent: Input | undefined;
   private lastSentStep = 0;
   private clockSeconds = 0;
+  /** The browser's clock when the newest snapshot came, which the bullets in it are flown on from. */
+  private snapshotArrivedAtSeconds = 0;
   private seated = false;
+  private seatTaken: "first" | "second" | undefined;
   private seatedOnThisConnection = false;
 
   /** `seatTokens` keeps the token the server gives this browser's seat, when there is somewhere to keep it, so a reload gets the seat back. */
@@ -109,14 +123,16 @@ export class OnlineMatch {
       return undefined;
     }
 
+    const nowSeconds = this.clockSeconds + leftoverSeconds;
     const shownAt = this.renderClock.at({
-      now: this.clockSeconds + leftoverSeconds,
+      now: nowSeconds,
       newestElapsedSeconds: newest.elapsedSeconds,
     });
 
     return {
       ...latest,
       player: this.shownPlayer(latest.player),
+      bullets: this.shownBullets(latest.bullets, nowSeconds),
       opponent: opponentAt(this.snapshots.all, shownAt),
       events: undefined,
     };
@@ -163,19 +179,24 @@ export class OnlineMatch {
     this.sendWhenOpen({kind: "lockIn", step: "arena"});
   }
 
-  /** Puts two weapons forward (slot 1, slot 2), each a built-in by key or one of this player's saved ones by id. They are not final until `lockInWeapons`, and the server ignores a pair with one it does not know or this player does not have. */
-  chooseWeapons(choices: readonly [WeaponChoice, WeaponChoice]): void {
-    this.sendWhenOpen({kind: "choose", step: "weapons", choice: choices});
+  /** Puts the weapon for `slot` forward, a built-in by key or one of this player's saved ones by id. It is not final until `lockInWeapon`, and the server ignores one it does not know, one this player does not have, and a second weapon before the first is locked in. */
+  chooseWeapon(slot: WeaponSlot, choice: WeaponChoice): void {
+    this.sendWhenOpen({kind: "choose", step: "weapon", slot, choice});
   }
 
-  /** Locks in the weapons put forward (the rifle and the marksman rifle if none): the other player's are then shown. */
-  lockInWeapons(): void {
-    this.sendWhenOpen({kind: "lockIn", step: "weapons"});
+  /** Locks in the weapon put forward for `slot` (the rifle for slot 1 and the marksman rifle for slot 2 if none): the other player's weapon in that slot is then shown, once they have locked in theirs. Slot 2 can only be locked in after slot 1. */
+  lockInWeapon(slot: WeaponSlot): void {
+    this.sendWhenOpen({kind: "lockIn", step: "weapon", slot});
   }
 
   /** Votes, when both arenas are shown and differ, for one of them, for random, or for nothing. */
   pickArena(pick: SeatPick): void {
     this.sendWhenOpen({kind: "pickArena", pick});
+  }
+
+  /** The seat the server gave this browser, once it has: the first or the second. */
+  seat(): "first" | "second" | undefined {
+    return this.seatTaken;
   }
 
   /** Whether this player has asked to go on and the server is waiting for the other player to ask too. */
@@ -227,6 +248,17 @@ export class OnlineMatch {
     }
 
     this.predicted = replayInputs({arena, player: this.predicted, inputs: [input]});
+  }
+
+  /** `told` flown on by the time the browser's clock has moved since the snapshot that had them came, never past a wall. */
+  private shownBullets(told: readonly Bullet[], nowSeconds: number): readonly Bullet[] {
+    const arena = this.arena;
+    const seconds = Math.min(MOST_BULLET_FLIGHT_SECONDS, nowSeconds - this.snapshotArrivedAtSeconds);
+    if (!arena || told.length === 0 || seconds <= 0) {
+      return told;
+    }
+
+    return advanceBullets(arena, {bullets: told, dummies: [], seconds}).bullets;
   }
 
   private shownPlayer(told: Player): Player {
@@ -282,6 +314,7 @@ export class OnlineMatch {
   private takeSeat(message: JoinedFrame): void {
     this.arena = arenaFrom(message.arena);
     this.seated = true;
+    this.seatTaken = message.seat;
     this.seatedOnThisConnection = true;
     this.eventsNotYetTaken = undefined;
     this.history = new InputHistory(HISTORY_STEPS);
@@ -310,6 +343,7 @@ export class OnlineMatch {
   private takeSnapshot(arena: Arena, message: SnapshotFrame): void {
     this.noteEvents(message);
     this.latest = worldOfSeatView(arena, message);
+    this.snapshotArrivedAtSeconds = this.clockSeconds;
     this.ready = message.ready;
     this.snapshots.add({
       elapsedSeconds: message.elapsedSeconds,

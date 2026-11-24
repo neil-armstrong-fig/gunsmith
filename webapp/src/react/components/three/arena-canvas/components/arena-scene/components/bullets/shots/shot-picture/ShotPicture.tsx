@@ -17,7 +17,7 @@ export function ShotPicture({spriteKey, picture}: Props): JSX.Element {
     <>
       <planeGeometry args={[width, height]} />
 
-      <meshBasicMaterial map={picture} transparent toneMapped={false} />
+      <meshBasicMaterial map={picture} transparent depthWrite={false} toneMapped={false} />
     </>
   );
 }

@@ -7,7 +7,15 @@ import type {SocketAsk} from "@src/online/socket/types/SocketAsk";
  * (`parseForfeitLimits`), how long the two seats have to choose (`parsePreRoundSeconds`), the seed its rounds start from (`parseStartSeed`)
  * and how its ring runs (`parseRingTiming`). Tuning seams, like `?lag=`.
  */
-const PASSED_ON = ["reconnectSeconds", "idleSeconds", "preRoundSeconds", "startSeed", "ringDelay", "ringClosing"];
+const PASSED_ON = [
+  "reconnectSeconds",
+  "idleSeconds",
+  "preRoundSeconds",
+  "revealSeconds",
+  "startSeed",
+  "ringDelay",
+  "ringClosing",
+];
 
 /**
  * The deployed webapp connects directly to the API Worker. Local pages use Vite's WebSocket proxy. `ask.token` is the secret the room gave this browser's seat, shown to get the seat back; `ask.search` is

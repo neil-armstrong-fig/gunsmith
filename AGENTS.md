@@ -187,8 +187,8 @@ Prettier owns formatting (`pnpm format`). What it won't tell you:
 - Prefer a named `export function` over `export default`.
 - **Strict TypeScript; no `any`** (use `unknown` and narrow), and no non-null `!` without a comment saying why.
 
-`webapp/src/react/AGENTS.md` has the two rules this doesn't cover — components are the one place
-"declare below callers" doesn't apply, and JSX has its own layout conventions.
+`webapp/src/react/AGENTS.md` has the rules this doesn't cover: one component per file (a private `Row` or `Option` in its
+parent's file is a second component), the one place "declare below callers" doesn't apply, and JSX's layout conventions.
 
 ## Import boundaries
 

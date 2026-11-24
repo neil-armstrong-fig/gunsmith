@@ -7,7 +7,7 @@ import {DEFAULT_WEAPONS} from "@src/durable-objects/match/pre-round/weapons/Defa
 
 /** The two weapons a seat carries: what it chose, or the defaults if it chose none. A built-in key the room does not know (`chooseWeapons` never lets one in) is the rifle. */
 export function weaponPairOf(chosen: ChosenWeapons | undefined): WeaponPair {
-  const [first, second] = chosen ?? DEFAULT_WEAPONS;
+  const [first, second] = chosen ?? [DEFAULT_WEAPONS[1], DEFAULT_WEAPONS[2]];
 
   return {first: weaponOf(first), second: weaponOf(second)};
 }
