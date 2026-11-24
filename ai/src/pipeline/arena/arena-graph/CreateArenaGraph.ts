@@ -27,7 +27,7 @@ export function createArenaGraph(arenaPipelineDependencies: ArenaPipelineDepende
     .addNode("precheck", precheckNode)
     .addNode("moderation", state => moderationNode(state, arenaPipelineDependencies.moderator))
     .addNode("generate", state => generateNode(state, arenaPipelineDependencies.generator, format))
-    .addNode("validate", validateNode)
+    .addNode("validate", state => validateNode(state, format))
     .addNode("repair", state => repairNode(state, arenaPipelineDependencies.generator, format))
     .addNode("fallback", state => fallbackNode(state, arenaPipelineDependencies.builtInArenas))
     .addEdge(START, "precheck")

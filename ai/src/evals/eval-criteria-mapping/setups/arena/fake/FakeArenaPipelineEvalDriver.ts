@@ -14,6 +14,8 @@ export class FakeArenaPipelineEvalDriver extends ArenaPipelineEvalDriver {
     return {
       generator: new ArenaGenerationFakeModel(),
       moderator: new ArenaModerationFakeModel(),
+      // The canned generator answers in rows, so the graph must ask for rows; the default format would read them as shapes.
+      format: "rows",
       builtInArenas: BUILT_IN_ARENAS,
     };
   }

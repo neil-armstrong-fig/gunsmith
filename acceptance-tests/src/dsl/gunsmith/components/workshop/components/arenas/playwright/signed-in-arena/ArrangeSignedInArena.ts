@@ -30,7 +30,7 @@ export async function arrangeSignedInArena(page: Page, setup: ArenaWorkshopSetup
     expect(route.request().method()).toBe("POST");
     const request: unknown = route.request().postDataJSON();
     if (typeof request === "object" && request !== null && "prompt" in request && request.prompt === FALLBACK_PROMPT) {
-      expect(request).toEqual({prompt: FALLBACK_PROMPT});
+      expect(request).toEqual({prompt: FALLBACK_PROMPT, style: "blue"});
       await route.fulfill({
         json: {
           status: "builtIn",
@@ -41,7 +41,7 @@ export async function arrangeSignedInArena(page: Page, setup: ArenaWorkshopSetup
       return;
     }
 
-    expect(request).toEqual({prompt: PROMPT});
+    expect(request).toEqual({prompt: PROMPT, style: "blue"});
     if (setup === "paused") {
       await route.fulfill({status: 503, json: {error: "ai-off"}});
       return;

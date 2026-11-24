@@ -148,6 +148,55 @@ What the probes show:
 - [ARENA: dynamic runtime map generation for multiplayer shooters](https://www.comp.nus.edu.sg/~bhojan/papers/ARENA-2014.pdf), [MAP-Elites for FPS maps](https://www.politesi.polimi.it/bitstream/10589/140194/3/An%20Online%20Framework%20for%20User-Based%20Analysis%20of%20Maps%20in%20First%20Person%20Shooters.pdf) (snippets)
 - [maze-bench technical report](https://github.com/hehee9/maze-bench/blob/main/TECHNICAL_REPORT.md), [Lost in Aggregation](https://arxiv.org/pdf/2606.22219) (snippets)
 
+## Size classes, in plain words (closed 2026-11-23: strict rows was dropped, so there are none)
+
+Shapes needs no size classes: the model gives a width and a height and code draws. Strict rows is different: the schema must name every row and its width **before** the model answers, so the size has to be known first. Today a model picks any size from 8 to 40 wide and 5 to 30 tall (engine's `ARENA_LIMITS`, tunables for play); the built-ins are 20 by 12 and 21 by 13, the prompt defaults to about 20 by 12, and scenario fixtures are not held to the limits. Three ways to know the size first:
+
+1. **Code offers a few classes** (for example small 16 by 10, medium 20 by 12, large 30 by 20) and the request or the UI picks one. A product decision for play and engine, and it costs a cold start per class.
+2. **A first cheap model call picks the size.** One more call, which breaks the three-call contract (budget, server).
+3. **Strict only at the default size** (20 by 12), and shapes for anything else. No product change, two paths to maintain.
+
+Engine also has an open fairness item that interacts: online rooms start the second fighter at a fixed place and a generated, asymmetric arena has no fair-start fallback, so size classes should be decided together with the symmetric finalisation. None of this blocks the default of shapes.
+
+## Comparison on Haiku 5.5 (2026-11-22, 3 trials, the same requests for every format, $0.06 in all)
+
+Specs `ArenaFormatResearchSmall` (6 requests at about 20 by 12) and `ArenaFormatResearchLarge` (5 requests, two asking outright for 40 by 30), one format per run (`EVAL_ARENA_FORMAT`). Each trial is a real request: moderation, generation and at most one repair. "Created" means the model's own arena was given (no built-in fallback); "own design" means it is not a built-in drawn again.
+
+| Format                  | Small: created | Large: created                | Cost per created arena | Latency (median) | Notes                                                                                                                                                            |
+| ----------------------- | -------------- | ----------------------------- | ---------------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `shapes` (default)      | 17 of 18       | 14 of 15                      | $0.00057               | 2.6 s / 3.0 s    | the one small fallback was two rooms and a corridor; the one large fallback was "the full 40 by 30 in several rooms"; large arenas came out 36 to 40 by 20 to 24 |
+| `strictRows`            | 15 of 18       | n/a (20 by 12 only)           | $0.00070               | 3.2 s            | widths exact by construction; **the stairs-platform request fell back 3 of 3** (a design fault the pattern cannot stop); the others 3 of 3                       |
+| `coarseShapes`          | n/a            | **6 of 15**                   | $0.00216               | 4.5 s            | worse than shapes: the model often drew a small arena and the several-rooms request fell back 3 of 3                                                             |
+| `editBuiltIn` (2 bases) | 18 of 18       | n/a (the base fixes the size) | **$0.00051**           | 2.6 s            | one repair; its plus sign and corridor arenas were their own layouts (it clears the base), none a copy; cheapest because the answer is a few rectangles          |
+
+(The call-log summary showed 17 for `editBuiltIn` because the kept-arenas file missed one repaired arena; the spec's criteria say 18.)
+
+What it says:
+
+- **Large arenas are not a gap for `shapes` on these requests** (14 of 15, against the 1 of 4 of 2026-11-19, which asked for rooms and a battlefield outright); only "several rooms, full size" still fails. The coarse-grid idea did not help and was deleted.
+- **Strict rows removes the one fault it targets (ragged rows) and nothing else**; on Haiku shapes already has none, and strict rows is fixed at one size. Not worth the size-class decision: **the parked size-class question is closed, no size classes**.
+- **`editBuiltIn` is the strongest small-arena result so far** (18 of 18, cheapest, fastest) but it is one sample of 18 against two bases, each request answered as a change to Duel or Fair duel; the contact sheets should be looked at for sameness before it is trusted (kept arenas are in the run archive, not yet reviewed by the user). Its size is the base's (20 by 12 or 21 by 13), so it cannot make a large arena.
+
+## Decided (the user, 2026-11-23)
+
+1. **`shapes` stays the default.**
+2. **`editBuiltIn` is kept, not adopted.** Its code stays behind `ARENA_FORMATS` (`format/edit-built-in/`, with `ArenaFormatResearchSmall` to run it, `EVAL_ARENA_FORMAT=editBuiltIn`). **Profile it again when the built-in pool is bigger**: the 18 of 18 is against two bases, and the open question is whether 10 to 12 bases give variety or make the model copy (a base list of 12 arenas drawn out is about 1,200 input tokens, about $0.00012 a call). Growing the pool is engine's: a request in HANDOFF when the user wants it. Its arenas from this run are in `private-source/eval-results/20261123-013337-00b8dab-uncommitted/arenas-paid.html`.
+4. **Both kept formats are offered to the player as a style (the user, 2026-11-23): Blue is `shapes`, Red is `editBuiltIn`**, named for a colour so the name says nothing about the method. A request may carry `style` (`blue` or `red`); absent, the default is shapes. Red keeps a built-in's standard size, so it cannot make a large arena, and there is no fall back to Blue (a fourth model call). The webapp's arena workshop has the choice; its Make is still a stand-in, so the real Make sends `style` when it is wired.
+3. **`strictRows` and `coarseShapes` are deleted** (code, prompts, tests and the strict-output flag); the table above is what was learned. Strict tool use itself works on Haiku (the probe of 2026-11-20 above), so a later format with a fixed shape can use it again. Size classes are not needed.
+
+## Sources
+
+- [Co-DSL: Human-LLM Co-design of Reusable Spatial Concepts for Layout Generation](https://arxiv.org/abs/2610.15290) (abstract read)
+- [Video Game Level Repair via Mixed Integer Linear Programming](https://arxiv.org/html/2010.06627) (read)
+- [LatticeWorld](https://arxiv.org/html/2509.05263v1) (read)
+- [Constraint Is All You Need: Optimization-Based 3D Level Generation with LLMs](https://www.pcgworkshop.com/archive/xu2025constraint.pdf) (snippet)
+- [Procedural Content Metageneration via Program Search and Continual Abstraction Discovery](https://arxiv.org/pdf/2608.17947) (snippet)
+- [Word2World](https://arxiv.org/pdf/2405.06686), [MarioGPT](https://arxiv.org/pdf/2302.05981) (snippets)
+- [Graph2Plan](https://www.researchgate.net/publication/343625455_Graph2Plan_learning_floorplan_generation_from_layout_graphs), [Generative Layout Modeling using Constraint Graphs](https://openaccess.thecvf.com/content/ICCV2021/papers/Para_Generative_Layout_Modeling_Using_Constraint_Graphs_ICCV_2021_paper.pdf), [LLM-Floor-plan](https://github.com/vencecai/LLM-Floor-plan) (snippets)
+- [Learning Local Constraints for Reinforcement-Learned Content Generators](https://arxiv.org/html/2605.13570) (WFC and global properties, snippet)
+- [ARENA: dynamic runtime map generation for multiplayer shooters](https://www.comp.nus.edu.sg/~bhojan/papers/ARENA-2014.pdf), [MAP-Elites for FPS maps](https://www.politesi.polimi.it/bitstream/10589/140194/3/An%20Online%20Framework%20for%20User-Based%20Analysis%20of%20Maps%20in%20First%20Person%20Shooters.pdf) (snippets)
+- [maze-bench technical report](https://github.com/hehee9/maze-bench/blob/main/TECHNICAL_REPORT.md), [Lost in Aggregation](https://arxiv.org/pdf/2606.22219) (snippets)
+
 ## Size classes, in plain words (for the user's decision, only if strict rows is chosen)
 
 Shapes needs no size classes: the model gives a width and a height and code draws. Strict rows is different: the schema must name every row and its width **before** the model answers, so the size has to be known first. Today a model picks any size from 8 to 40 wide and 5 to 30 tall (engine's `ARENA_LIMITS`, tunables for play); the built-ins are 20 by 12 and 21 by 13, the prompt defaults to about 20 by 12, and scenario fixtures are not held to the limits. Three ways to know the size first:

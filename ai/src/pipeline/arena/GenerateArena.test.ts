@@ -1,4 +1,5 @@
 import {FakeListChatModel} from "@langchain/core/utils/testing";
+import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
 import {generateArena} from "@gunsmith/ai/pipeline/arena/GenerateArena";
 import type {ArenaPipelineDependencies} from "@gunsmith/ai/pipeline/arena/types/ArenaPipelineDependencies";
 
@@ -10,6 +11,7 @@ const OTHER_GOOD = {name: "Pillar Room", rows: ["##########", "#..#..#..#", "#..
 // Nearly all wall: not a fault the repair of drawings can mend (it makes no floor), so the model has to be asked again.
 const BAD = {name: "Solid Block", rows: ["##########", "#...######", "##########", "##########", "##########"]};
 const BUILT_IN = {name: "Open Room", rows: ["##########", "#........#", "#........#", "#........#", "##########"]};
+const DUEL_NAME = BUILT_IN_ARENAS[0]?.name;
 const ARENA_REQUEST = {isArenaRequest: true, reason: "pillars"};
 const TOO_WIDE_SHAPES = {name: "Wide Room", width: 10, height: 5, walls: [{x: 8, y: 1, width: 4, height: 1}]};
 const FIXED_SHAPES = {name: "Wide Room", width: 10, height: 5};
@@ -101,6 +103,44 @@ it("asks for rows on the first call and again on the repair when the format is r
   for (const [messages] of calls.mock.calls) {
     expect(JSON.stringify(messages)).toContain("the arena drawn as a list of text rows");
   }
+});
+
+it("asks for shapes, first and on the repair, for the blue style, whatever format the dependencies name", async () => {
+  const dependencies = dependenciesWith([TOO_WIDE_SHAPES, FIXED_SHAPES]);
+  const calls = vi.spyOn(dependencies.generator, "invoke");
+
+  const outcome = await generateArena({prompt: "a wide room", style: "blue"}, dependencies);
+
+  expect(outcome).toMatchObject({status: "created", modelCalls: 3});
+  expect(calls).toHaveBeenCalledTimes(2);
+  for (const [messages] of calls.mock.calls) {
+    expect(JSON.stringify(messages)).toContain("walls: a list of wall rectangles");
+  }
+});
+
+it("asks for an edit of a built-in arena, first and on the repair, for the red style, and makes the edited arena", async () => {
+  const dependencies = dependenciesWith([
+    {name: "Nowhere", base: "Moon Base"},
+    {name: "Duel Plus", base: DUEL_NAME},
+  ]);
+  const calls = vi.spyOn(dependencies.generator, "invoke");
+
+  const outcome = await generateArena({prompt: "a duel with more walls", style: "red"}, dependencies);
+
+  expect(outcome).toMatchObject({status: "created", modelCalls: 3, arena: {name: "Duel Plus"}});
+  expect(calls).toHaveBeenCalledTimes(2);
+  for (const [messages] of calls.mock.calls) {
+    expect(JSON.stringify(messages)).toContain("the name of the arena you start from");
+  }
+});
+
+it("keeps to the format the dependencies name when no style is asked for", async () => {
+  const dependencies = dependenciesWith([GOOD]);
+  const calls = vi.spyOn(dependencies.generator, "invoke");
+
+  await generateArena({prompt: "a plain room"}, dependencies);
+
+  expect(JSON.stringify(calls.mock.calls[0]?.[0])).toContain("the arena drawn as a list of text rows");
 });
 
 it("falls back when the model gives no answer at all, both times", async () => {

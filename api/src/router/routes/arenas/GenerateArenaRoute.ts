@@ -17,7 +17,7 @@ import {withTimeLimit} from "@src/router/routes/shared/time-limit/WithTimeLimit"
 import type {ArenaAnswer} from "@src/router/routes/arenas/types/ArenaAnswer";
 
 /**
- * `POST /api/arenas` with `{prompt}` from a signed-in player (the session cookie names the account that pays): turns the words into an arena through the
+ * `POST /api/arenas` with `{prompt}` (and optionally `style`: `blue` or `red`) from a signed-in player (the session cookie names the account that pays): turns the words into an arena through the
  * pipeline it is handed, with the same credit and spend rules around the call as `GenerateWeaponRoute`: the credit, then the global
  * spend at its worst case (`ARENA_SPEND`), are reserved before the pipeline runs. The credit is settled at what the request was (an
  * arena costs one credit, a rejected prompt half, and so does a built-in arena, given when no playable one could be made: the model
@@ -50,10 +50,10 @@ async function runAndSettle(
   reservation: CreditReservation,
   historyRequest: GenerationHistoryRequest | undefined,
 ): Promise<Response> {
-  const {credits, spend, key, prompt} = reservation;
+  const {credits, spend, key, prompt, style} = reservation;
   let outcome: ArenaOutcome;
   try {
-    outcome = await withTimeLimit(signal => runArenaPipeline(prompt, signal), PIPELINE_TIME_LIMIT_MILLISECONDS);
+    outcome = await withTimeLimit(signal => runArenaPipeline(prompt, signal, style), PIPELINE_TIME_LIMIT_MILLISECONDS);
   } catch (error) {
     await spend.settle(key, ARENA_SPEND.reservedMicrodollars);
     await credits.refund(key);

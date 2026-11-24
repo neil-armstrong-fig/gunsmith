@@ -3,6 +3,7 @@ import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
 import {ArenaPreview} from "@src/react/components/dom/arena-preview/ArenaPreview";
 import {walkTheArena} from "@src/react/components/dom/workshop/arena-on-trial/WalkTheArena";
 import {ArenaPrompt} from "@src/react/components/dom/workshop/components/arena-workshop/components/arena-prompt/ArenaPrompt";
+import {ArenaStyleChoice} from "@src/react/components/dom/workshop/components/arena-workshop/components/arena-style-choice/ArenaStyleChoice";
 import {ArenaResult} from "@src/react/components/dom/workshop/components/arena-workshop/components/arena-result/ArenaResult";
 import {ArenaShelf} from "@src/react/components/dom/workshop/components/arena-workshop/components/arena-shelf/ArenaShelf";
 import {SaveArena} from "@src/react/components/dom/workshop/components/arena-workshop/components/save-arena/SaveArena";
@@ -25,6 +26,8 @@ export function ArenaWorkshop(): JSX.Element {
 
   return (
     <div className="flex flex-col gap-3">
+      <ArenaStyleChoice />
+
       <ArenaPrompt />
 
       <section aria-label="Built-in arenas">

@@ -48,6 +48,18 @@ it("runs the AI pipeline on the prompt and the signal, with models built from th
   );
 });
 
+it("hands the AI pipeline the style the player chose", async () => {
+  workerEnvironment.ANTHROPIC_API_KEY = "sk-test-key";
+  const signal = new AbortController().signal;
+
+  await runArenaPipeline("a maze", signal, "red");
+
+  expect(generateArena).toHaveBeenCalledWith(
+    {prompt: "a maze", signal, style: "red"},
+    {...models, builtInArenas: BUILT_IN_ARENAS},
+  );
+});
+
 it("builds its models for each request, reading the key where it is used", async () => {
   workerEnvironment.ANTHROPIC_API_KEY = "sk-first-key";
   await runArenaPipeline("a maze", new AbortController().signal);

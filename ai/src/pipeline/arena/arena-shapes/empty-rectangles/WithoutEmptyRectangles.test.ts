@@ -1,4 +1,4 @@
-import {withoutEmptyRectangles} from "@gunsmith/ai/pipeline/arena/check/validate/empty-rectangles/WithoutEmptyRectangles";
+import {withoutEmptyRectangles} from "@gunsmith/ai/pipeline/arena/arena-shapes/empty-rectangles/WithoutEmptyRectangles";
 
 it("drops a wall, cover block or platform of no width or no height, and keeps the rest in order", () => {
   const kept = {x: 1, y: 1, width: 2, height: 1};

@@ -4,6 +4,7 @@ import {validateArena} from "@gunsmith/engine/arena-validation/ValidateArena";
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import {accountUrl} from "@src/account/AccountUrl";
 import type {WorkshopArena} from "@src/store/workshop/arena/types/WorkshopArena";
+import type {ArenaStyle} from "@gunsmith/shared/arena-style/ArenaStyle";
 import {z} from "zod";
 
 const arenaAnswer = z.object({
@@ -28,12 +29,13 @@ const arenaAnswer = z.object({
 });
 const FALLBACK_REASON = "We could not build a playable arena, so here is a built-in arena.";
 
-export async function makeAccountArena(prompt: string): Promise<WorkshopArena> {
+/** Asks the server for an arena in the style the player chose (`blue` or `red`), with the words they wrote. */
+export async function makeAccountArena(prompt: string, style: ArenaStyle): Promise<WorkshopArena> {
   const response = await fetch(accountUrl("/api/arenas"), {
     method: "POST",
     credentials: "include",
     headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({prompt}),
+    body: JSON.stringify({prompt, style}),
   });
   if (!response.ok) throw new Error(await generationFailureMessage(response, "arena"));
 

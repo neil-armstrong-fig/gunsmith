@@ -1,4 +1,4 @@
-import {compileArenaShapes} from "@gunsmith/ai/pipeline/arena/arena-shapes/CompileArenaShapes";
+import {compileArenaShapes} from "@gunsmith/ai/pipeline/arena/arena-shapes/compile/CompileArenaShapes";
 import type {ArenaShapes} from "@gunsmith/ai/pipeline/arena/arena-shapes/draft/ArenaShapesDraft";
 
 const ROOM: ArenaShapes = {name: "Room", width: 8, height: 5};

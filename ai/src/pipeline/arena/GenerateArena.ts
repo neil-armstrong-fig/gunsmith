@@ -1,5 +1,6 @@
 import {arenaHistoryOf} from "@gunsmith/ai/pipeline/arena/history/ArenaHistoryOf";
 import {RequestUsage} from "@gunsmith/ai/pipeline/usage/RequestUsage";
+import {formatOfStyle} from "@gunsmith/ai/pipeline/arena/arena-drafting/format/FormatOfStyle";
 import {createArenaGraph} from "@gunsmith/ai/pipeline/arena/arena-graph/CreateArenaGraph";
 import {arenaOutcomeFromState} from "@gunsmith/ai/pipeline/arena/arena-graph/outcome/ArenaOutcomeFromState";
 import type {ArenaOutcome} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcome";
@@ -17,9 +18,21 @@ export async function generateArena(
   input: GenerateArenaInput,
   arenaPipelineDependencies: ArenaPipelineDependencies,
 ): Promise<ArenaOutcome> {
-  const arenaGraph = createArenaGraph(arenaPipelineDependencies);
+  const arenaGraph = createArenaGraph(dependenciesFor(input, arenaPipelineDependencies));
   const requestUsage = new RequestUsage();
   const endState = await arenaGraph.invoke({prompt: input.prompt}, {signal: input.signal, callbacks: [requestUsage]});
 
   return {...arenaOutcomeFromState(endState), usage: requestUsage.total(), history: arenaHistoryOf(endState)};
+}
+
+/** The dependencies with the format the player's style asks for; one value, so the first try and the repair ask in the same format. */
+function dependenciesFor(
+  input: GenerateArenaInput,
+  dependencies: ArenaPipelineDependencies,
+): ArenaPipelineDependencies {
+  if (input.style === undefined) {
+    return dependencies;
+  }
+
+  return {...dependencies, format: formatOfStyle(input.style)};
 }

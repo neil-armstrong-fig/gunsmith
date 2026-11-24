@@ -1,12 +1,14 @@
 import type {ArenaPipelineDriver} from "@evals/dsl/arena/types/ArenaPipelineDriver";
 import type {ArenaEvaluator} from "@evals/dsl/arena/pipeline/types/ArenaEvaluator";
 import {arenaGiven} from "@evals/dsl/arena/pipeline/evaluators/outcome/ArenaGiven";
+import {arenaIsItsOwn} from "@evals/dsl/arena/pipeline/evaluators/outcome/ArenaIsItsOwn";
 import {arenaKeepsCover} from "@evals/dsl/arena/pipeline/evaluators/outcome/ArenaKeepsCover";
 import {arenaNodePath} from "@evals/dsl/arena/pipeline/evaluators/outcome/ArenaNodePath";
 import {playableArena} from "@evals/dsl/arena/pipeline/evaluators/playable/PlayableArena";
 import {arenaNoPromptLeak} from "@evals/dsl/arena/pipeline/evaluators/player-visible/ArenaNoPromptLeak";
 import {failuresOf} from "@evals/dsl/shared/checks/FailuresOf";
 import type {ArenaOutcome} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcome";
+import type {ArenaSize} from "@gunsmith/ai/pipeline/arena/arena-shapes/types/ArenaSize";
 import type {ArenaOutcomeStatus} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcomeStatus";
 
 /**
@@ -50,6 +52,20 @@ export class ArenaPipeline {
 
   coverProblems(): string[] {
     return this.problemsOf([arenaKeepsCover]);
+  }
+
+  ownArenaProblems(): string[] {
+    return this.problemsOf([arenaIsItsOwn]);
+  }
+
+  /** How many tiles wide and tall the arena the player was given is, read from its drawing, or nothing when no drawing was given. */
+  sizeOfTheAnswer(): ArenaSize | undefined {
+    const {arena} = this.theAnswer();
+    if (typeof arena !== "object" || arena === null || !("rows" in arena) || !Array.isArray(arena.rows)) {
+      return undefined;
+    }
+
+    return {width: String(arena.rows[0]).length, height: arena.rows.length};
   }
 
   safeToShowProblems(): string[] {
