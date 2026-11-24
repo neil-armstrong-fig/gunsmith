@@ -1,3 +1,8 @@
+import {ARENA_PIPELINE_VERSION} from "@gunsmith/ai/pipeline/arena/history/ArenaPipelineVersion";
+import {arenaAttemptOutcome} from "@src/router/routes/arenas/history/ArenaAttemptOutcome";
+import {historyRequestOf} from "@src/router/routes/shared/generation-history/HistoryRequestOf";
+import {recordGenerationAttempt} from "@src/router/routes/shared/generation-history/RecordGenerationAttempt";
+import type {GenerationHistoryRequest} from "@src/router/routes/shared/generation-history/types/GenerationHistoryRequest";
 import type {ArenaOutcome} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcome";
 import {ARENA_SPEND} from "@src/durable-objects/spend-ledger/estimate/arena/ArenaSpend";
 import {settledArenaSpend} from "@src/durable-objects/spend-ledger/estimate/arena/SettledArenaSpend";
@@ -23,19 +28,28 @@ import type {ArenaAnswer} from "@src/router/routes/arenas/types/ArenaAnswer";
  * cannot be kept the credit is refunded and the answer is 502.
  */
 export async function generateArenaRoute(request: Request): Promise<Response> {
+  const historyRequest = historyRequestOf(request, {kind: "arena", pipelineVersion: ARENA_PIPELINE_VERSION});
   const reservation = await reserveCredit(request, {
     pipelineAvailable: isArenaPipelineAvailable(),
     kind: "arena",
     reservedMicrodollars: ARENA_SPEND.reservedMicrodollars,
+    trackBlockedAttempt: historyRequest !== undefined,
   });
-  if (reservation instanceof Response) {
-    return reservation;
+  if ("response" in reservation) {
+    if (historyRequest && reservation.blockedAttempt) {
+      await recordGenerationAttempt(historyRequest, reservation.blockedAttempt);
+    }
+
+    return reservation.response;
   }
 
-  return await runAndSettle(reservation);
+  return await runAndSettle(reservation, historyRequest);
 }
 
-async function runAndSettle(reservation: CreditReservation): Promise<Response> {
+async function runAndSettle(
+  reservation: CreditReservation,
+  historyRequest: GenerationHistoryRequest | undefined,
+): Promise<Response> {
   const {credits, spend, key, prompt} = reservation;
   let outcome: ArenaOutcome;
   try {
@@ -43,10 +57,33 @@ async function runAndSettle(reservation: CreditReservation): Promise<Response> {
   } catch (error) {
     await spend.settle(key, ARENA_SPEND.reservedMicrodollars);
     await credits.refund(key);
+    const response = failureAnswer(error);
+    if (historyRequest) {
+      await recordGenerationAttempt(historyRequest, {
+        accountId: reservation.accountId,
+        key,
+        reason: response.status === 504 ? "generation-timed-out" : "generation-failed",
+      });
+    }
 
-    return failureAnswer(error);
+    return response;
   }
 
+  const response = await settleOutcome(reservation, outcome);
+  const diagnostics = outcome.history;
+  if (historyRequest && diagnostics) {
+    await recordGenerationAttempt(historyRequest, {
+      reservation,
+      diagnostics,
+      classification: arenaAttemptOutcome(outcome.status, diagnostics, response),
+    });
+  }
+
+  return response;
+}
+
+async function settleOutcome(reservation: CreditReservation, outcome: ArenaOutcome): Promise<Response> {
+  const {credits, spend, key} = reservation;
   await spend.settle(key, settledArenaSpend(outcome));
   if (outcome.status === "created") {
     const id = await keepCreatedResult(reservation, "arena", {arena: outcome.arena});

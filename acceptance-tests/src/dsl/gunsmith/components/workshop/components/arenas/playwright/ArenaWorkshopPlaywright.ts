@@ -1,3 +1,4 @@
+import type {ArenaWorkshopSetup} from "@src/dsl/gunsmith/components/workshop/components/arenas/types/ArenaWorkshopSetup";
 import {expect, type Locator, type Page} from "@playwright/test";
 import {arrangeSignedInArena} from "@src/dsl/gunsmith/components/workshop/components/arenas/playwright/signed-in-arena/ArrangeSignedInArena";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
@@ -10,8 +11,8 @@ export class ArenaWorkshopPlaywright extends BasePage {
     super(page);
   }
 
-  async arrangeSignedInArena(generationPaused: boolean): Promise<void> {
-    await arrangeSignedInArena(this.page, generationPaused);
+  async arrangeSignedInArena(setup: ArenaWorkshopSetup): Promise<void> {
+    await arrangeSignedInArena(this.page, setup);
   }
 
   async getMakeError(): Promise<string> {

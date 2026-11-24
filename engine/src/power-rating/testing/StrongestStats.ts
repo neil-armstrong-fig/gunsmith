@@ -8,4 +8,6 @@ export const STRONGEST_STATS: WeaponStats = {
   magazineSize: 60,
   reloadSeconds: 0.5,
   startingReserve: 200,
+  visionDegrees: 130,
+  visionRange: 20,
 };

@@ -5,6 +5,8 @@ export function weaponGraphStateOf(overrides: Partial<WeaponGraphStateValues> = 
   return {
     prompt: "a rifle",
     rejectionReason: undefined,
+    relevance: undefined,
+    codeEdits: 0,
     draft: undefined,
     candidate: undefined,
     weapon: undefined,

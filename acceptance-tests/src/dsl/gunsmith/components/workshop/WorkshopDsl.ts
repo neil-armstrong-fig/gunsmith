@@ -1,3 +1,4 @@
+import type {WeaponWorkshopSetup} from "@src/dsl/gunsmith/components/workshop/types/WeaponWorkshopSetup";
 import type {Page} from "@playwright/test";
 import {ArenaWorkshopDsl} from "@src/dsl/gunsmith/components/workshop/components/arenas/ArenaWorkshopDsl";
 import {ShelfDsl} from "@src/dsl/gunsmith/components/workshop/components/shelf/ShelfDsl";
@@ -17,6 +18,38 @@ export class WorkshopDsl {
     this.arenas = new ArenaWorkshopDsl(page);
     this.shelf = new ShelfDsl(page);
     this.workshop = new WorkshopPlaywright(page);
+  }
+
+  async chooseBuiltInWeapon(name: string): Promise<void> {
+    try {
+      await this.workshop.chooseBuiltInWeapon(name);
+    } catch (error) {
+      throw new DslError("Failed to choose a built-in weapon", error);
+    }
+  }
+
+  async arrangeSignedInWeapon(setup: WeaponWorkshopSetup = "empty"): Promise<void> {
+    try {
+      await this.workshop.arrangeSignedInWeapon(setup);
+    } catch (error) {
+      throw new DslError("Failed to arrange a signed-in weapon workshop", error);
+    }
+  }
+
+  releaseWeaponMake(): void {
+    try {
+      this.workshop.releaseWeaponMake();
+    } catch (error) {
+      throw new DslError("Failed to release the pending weapon request", error);
+    }
+  }
+
+  async getWeaponMakeError(): Promise<string | undefined> {
+    try {
+      return await this.workshop.getWeaponMakeError();
+    } catch (error) {
+      throw new DslError("Failed to read the weapon generation message", error);
+    }
   }
 
   async pressBack(): Promise<void> {

@@ -1,11 +1,13 @@
+import {parseStoredArena} from "@gunsmith/engine/library-items/ParseStoredArena";
 import type {ArenaChoice} from "@src/durable-objects/match/messages/types/ArenaChoice";
+import {fieldOfPayload} from "@src/durable-objects/match/choices/saved-item/FieldOfPayload";
+import {findSavedItem} from "@src/durable-objects/match/choices/saved-item/FindSavedItem";
 import type {ChosenArena} from "@src/durable-objects/match/pre-round/types/ChosenArena";
 
 /**
- * The arena a seat named, ready for the room: a built-in as it is, or one of the account's own saved arenas looked up and checked.
- * `undefined` when it cannot be taken: a guest has no library, and a saved arena that is not the account's own, or not one the engine
- * would play, is no arena. Saved arenas are not readable until the engine's stored-arena parser reaches this branch (HANDOFF), so for now
- * a saved choice is refused for everyone.
+ * The arena a seat named, ready for the room: a built-in as it is, or one of the account's own saved arenas looked up on its shelf
+ * and checked by the engine's stored-arena parser. `undefined` when it cannot be taken: a guest has no library, and a saved arena
+ * that is not the account's own (or not saved, or not an arena) or not one the engine would play is no arena.
  */
 export async function resolveArenaChoice(
   accountId: string | undefined,
@@ -18,5 +20,15 @@ export async function resolveArenaChoice(
     return undefined;
   }
 
-  return await Promise.resolve(undefined);
+  const item = await findSavedItem(accountId, choice.id, "arena");
+  if (!item) {
+    return undefined;
+  }
+
+  const stored = parseStoredArena(fieldOfPayload(item.payload, "arena"));
+  if (!stored) {
+    return undefined;
+  }
+
+  return {kind: "saved", id: item.id, arena: {name: stored.name, rows: stored.rows}};
 }

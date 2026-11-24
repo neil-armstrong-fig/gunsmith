@@ -1,3 +1,4 @@
+import {eraseExpiredGenerationAttempts} from "@src/account-retention/EraseExpiredGenerationAttempts";
 import {eraseExpiredCredits} from "@src/account-retention/EraseExpiredCredits";
 import type {ApiWorkerEnvironment} from "@src/env/types/ApiWorkerEnvironment";
 import {handleApiRequest} from "@src/router/HandleApiRequest";
@@ -8,7 +9,8 @@ export default {
     return await handleApiRequest(request);
   },
   async scheduled(controller): Promise<void> {
-    await eraseExpiredCredits(new Date(controller.scheduledTime));
+    const now = new Date(controller.scheduledTime);
+    await Promise.all([eraseExpiredCredits(now), eraseExpiredGenerationAttempts(now)]);
   },
 } satisfies ExportedHandler<ApiWorkerEnvironment>;
 

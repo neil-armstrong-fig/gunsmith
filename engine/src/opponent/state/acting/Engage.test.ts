@@ -1,4 +1,5 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
+import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
 import {equippedWeapon} from "@gunsmith/engine/loadout/EquippedWeapon";
@@ -104,6 +105,59 @@ it("gives the same answer for the same brain and context", () => {
   expect(actEngage(engaging(), contextWith(IN_BAND))).toEqual(actEngage(engaging(), contextWith(IN_BAND)));
 });
 
+it("ducks while it rests between bursts, holding still, when a cover block stands beside it on the line to the player", () => {
+  const act = actEngage(
+    engaging({fireRemainingSeconds: 0, restRemainingSeconds: 0.5}),
+    contextWith(IN_BAND, {arena: hallWithABlockBesideIt()}),
+  );
+
+  expect(act.input.crouching).toBe(true);
+  expect(act.input.firing).toBe(false);
+  expect(act.input.direction).toEqual({x: 0, y: 0});
+});
+
+it("stands to fire, even with a cover block beside it, because a crouched shooter's bullets stop at the block", () => {
+  const act = actEngage(engaging(), contextWith(IN_BAND, {arena: hallWithABlockBesideIt()}));
+
+  expect(act.input.firing).toBe(true);
+  expect(act.input.crouching).toBe(false);
+});
+
+it("stands while it waits out its reaction time, even with a cover block beside it", () => {
+  const act = actEngage(
+    engaging({reactionRemainingSeconds: 0.3}),
+    contextWith(IN_BAND, {arena: hallWithABlockBesideIt()}),
+  );
+
+  expect(act.input.crouching).toBe(false);
+});
+
+it("stands through its rest when there is no cover block beside it", () => {
+  const act = actEngage(engaging({fireRemainingSeconds: 0, restRemainingSeconds: 0.5}), contextWith(IN_BAND));
+
+  expect(act.input.crouching).toBe(false);
+  expect(Math.abs(act.input.direction.y)).toBeCloseTo(DIFFICULTY.speedShare, 9);
+});
+
+it("stands through its rest when the cover block is not on the line to the player", () => {
+  const playerToTheNorth = {x: HERE.x, y: HERE.y + 4};
+  const act = actEngage(
+    engaging({fireRemainingSeconds: 0, restRemainingSeconds: 0.5}),
+    contextWith(playerToTheNorth, {arena: hallWithABlockBesideIt()}),
+  );
+
+  expect(act.input.crouching).toBe(false);
+});
+
+it("counts its rest down while it is ducked", () => {
+  const act = actEngage(
+    engaging({fireRemainingSeconds: 0, restRemainingSeconds: 0.5}),
+    contextWith(IN_BAND, {arena: hallWithABlockBesideIt()}),
+  );
+
+  expect(act.brain.restRemainingSeconds).toBeCloseTo(0.5 - TICK, 9);
+});
+
 function contextWith(playerAt: Point, overrides: Partial<OpponentContext> = {}): OpponentContext {
   const world = startingWorld(hall, [], HERE);
   if (!world.opponent) {
@@ -129,4 +183,17 @@ function engaging(overrides: Partial<OpponentBrain> = {}): OpponentBrain {
     strafeRemainingSeconds: 1.5,
     ...overrides,
   };
+}
+
+// The hall with a cover block, two tiles tall so that it is the same whichever way the drawing's rows run, one tile east of the opponent's tile.
+function hallWithABlockBesideIt(): Arena {
+  const rows = Array.from({length: 10}, (_, row) => {
+    if (row === 4 || row === 5) {
+      return "#.....c......................#";
+    }
+
+    return "#............................#";
+  });
+
+  return arenaFrom(["##############################", ...rows, "##############################"]);
 }

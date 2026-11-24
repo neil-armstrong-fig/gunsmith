@@ -1,3 +1,4 @@
+import type {Appearance} from "@gunsmith/shared/appearance/schema/Appearance";
 import {useEffect, useSyncExternalStore} from "react";
 import {APPEARANCE_LIMITS} from "@gunsmith/shared/appearance/schema/AppearanceLimits";
 import {SPRITE_MANIFEST} from "@src/assets/sprites/SpriteManifest";
@@ -24,8 +25,11 @@ const GENERATED_SPRITE: SpriteEntry = {
 };
 
 /** Resolve one drawing per weapon, independent of where it will be placed. */
-export function useWeaponDrawing(weaponKey: string | undefined): WeaponDrawing | undefined {
-  const appearance = weaponDrawingOfPage(weaponKey);
+export function useWeaponDrawing(
+  weaponKey: string | undefined,
+  accountAppearance?: Appearance,
+): WeaponDrawing | undefined {
+  const appearance = accountAppearance ?? weaponDrawingOfPage(weaponKey);
   const spriteKey = weaponKey && AUTHORED_SPRITES.get(weaponKey);
 
   useEffect(() => {

@@ -4,7 +4,7 @@ import {validateArenaDraft} from "@gunsmith/ai/pipeline/arena/check/validate/Val
 const ROWS = ["##########", "#........#", "#........#", "#........#", "##########"];
 
 it("accepts a walled room and hands back the arena as written", () => {
-  expect(validateArenaDraft(draftWith({}))).toEqual({ok: true, arena: {name: "Plain Room", rows: ROWS}});
+  expect(validateArenaDraft(draftWith({}))).toEqual({ok: true, codeEdits: 0, arena: {name: "Plain Room", rows: ROWS}});
 });
 
 it("accepts an arena whose raised platform is reached by a stair", () => {
@@ -15,7 +15,7 @@ it("accepts an arena whose raised platform is reached by a stair", () => {
 
 it("accepts every arena in engine's built-in pool, as a built-in must", () => {
   for (const arena of BUILT_IN_ARENAS) {
-    expect(validateArenaDraft(arena), arena.name).toEqual({ok: true, arena});
+    expect(validateArenaDraft(arena), arena.name).toEqual({ok: true, codeEdits: 0, arena});
   }
 });
 
@@ -32,6 +32,7 @@ it("repairs a cover block that cuts the floor in two by cutting one block away, 
 
   expect(validation.ok).toBe(true);
   if (validation.ok) {
+    expect(validation.codeEdits).toBe(1);
     expect(columnOf(validation.arena.rows, 4)).toHaveLength(1);
     expect(validation.arena.rows.join("").replaceAll(/[^c]/g, "")).toHaveLength(2);
   }
@@ -48,7 +49,7 @@ it("refuses ragged rows by naming the row that is the wrong length, so the repai
 it("accepts an arena written as shapes, and hands back the drawing the shapes make", () => {
   const shapes = {name: "Plain Room", width: 10, height: 5};
 
-  expect(validateArenaDraft(shapes)).toEqual({ok: true, arena: {name: "Plain Room", rows: ROWS}});
+  expect(validateArenaDraft(shapes)).toEqual({ok: true, codeEdits: 0, arena: {name: "Plain Room", rows: ROWS}});
 });
 
 it("draws shapes before it checks the arena, so a wall across the floor is repaired as a drawing's would be", () => {
@@ -65,7 +66,7 @@ it("draws shapes before it checks the arena, so a wall across the floor is repai
 it("drops a rectangle with no size from shapes instead of refusing it, as a stat past its range is clamped", () => {
   const shapes = {name: "Plain Room", width: 10, height: 5, walls: [{x: 0, y: 0, width: 0, height: 0}]};
 
-  expect(validateArenaDraft(shapes)).toEqual({ok: true, arena: {name: "Plain Room", rows: ROWS}});
+  expect(validateArenaDraft(shapes)).toEqual({ok: true, codeEdits: 0, arena: {name: "Plain Room", rows: ROWS}});
 });
 
 it("refuses a shape that reaches past the arena with the sentence naming it", () => {
@@ -123,7 +124,11 @@ it("refuses a character the engine does not read", () => {
 it("draws a stair with no landing as floor, where it would refuse it with the engine's words", () => {
   const rows = ["##########", "#........#", "#.......>#", "#........#", "##########"];
 
-  expect(validateArenaDraft(draftWith({rows}))).toEqual({ok: true, arena: {name: "Plain Room", rows: ROWS}});
+  expect(validateArenaDraft(draftWith({rows}))).toEqual({
+    ok: true,
+    codeEdits: 1,
+    arena: {name: "Plain Room", rows: ROWS},
+  });
 });
 
 it("refuses an arena of walls only", () => {

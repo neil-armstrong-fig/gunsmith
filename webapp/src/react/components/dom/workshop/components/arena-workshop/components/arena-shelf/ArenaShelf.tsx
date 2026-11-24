@@ -1,6 +1,6 @@
 import {accountUrl} from "@src/account/AccountUrl";
 import {ArenaShelfItem} from "@src/react/components/dom/workshop/components/arena-workshop/components/arena-shelf/components/arena-shelf-item/ArenaShelfItem";
-import {useAccountArenaShelfStore} from "@src/store/shelf/arena/account/UseAccountArenaShelfStore";
+import {useAccountLibraryStore} from "@src/store/account-library/UseAccountLibraryStore";
 import {ARENA_SHELF_LIMIT} from "@src/store/shelf/arena/limits/ArenaShelfLimit";
 import {useArenaShelfStore} from "@src/store/shelf/arena/UseArenaShelfStore";
 import type {JSX} from "react";
@@ -8,10 +8,10 @@ import {useState} from "react";
 
 export function ArenaShelf(): JSX.Element {
   const localArenas = useArenaShelfStore(state => state.arenas);
-  const session = useAccountArenaShelfStore(state => state.session);
-  const accountArenas = useAccountArenaShelfStore(state => state.arenas);
-  const accountLimit = useAccountArenaShelfStore(state => state.limit);
-  const loadError = useAccountArenaShelfStore(state => state.error);
+  const session = useAccountLibraryStore(state => state.session);
+  const accountArenas = useAccountLibraryStore(state => state.arenas);
+  const accountLimit = useAccountLibraryStore(state => state.arenaLimit);
+  const loadError = useAccountLibraryStore(state => state.error);
   const [removing, setRemoving] = useState(false);
   const [deleteError, setDeleteError] = useState<string>();
 
@@ -23,6 +23,24 @@ export function ArenaShelf(): JSX.Element {
     "signed-in": {arenas: accountArenas, limit: accountLimit},
   };
   const {arenas, limit} = shelves[session];
+
+  const remove = async (id: string): Promise<void> => {
+    if (!signedIn) {
+      useArenaShelfStore.getState().remove(id);
+      return;
+    }
+
+    setRemoving(true);
+    setDeleteError(undefined);
+    const url = accountUrl("/api/library");
+    try {
+      await useAccountLibraryStore.getState().remove(url, id);
+    } catch {
+      setDeleteError("Could not delete the saved arena.");
+    } finally {
+      setRemoving(false);
+    }
+  };
 
   return (
     <section aria-label="Saved arenas" className="flex flex-col gap-2">
@@ -51,7 +69,7 @@ export function ArenaShelf(): JSX.Element {
             type="button"
             className="underline"
             onClick={() => {
-              void useAccountArenaShelfStore.getState().reload(accountUrl("/api/library"));
+              void useAccountLibraryStore.getState().reload(accountUrl("/api/library"));
             }}
           >
             Retry
@@ -66,25 +84,4 @@ export function ArenaShelf(): JSX.Element {
       )}
     </section>
   );
-
-  async function remove(id: string): Promise<void> {
-    if (!signedIn) {
-      useArenaShelfStore.getState().remove(id);
-      return;
-    }
-
-    setRemoving(true);
-    setDeleteError(undefined);
-    const url = accountUrl("/api/library");
-    try {
-      const response = await fetch(`${url}/${encodeURIComponent(id)}`, {method: "DELETE", credentials: "include"});
-      if (!response.ok) throw new Error();
-
-      await useAccountArenaShelfStore.getState().reload(url);
-    } catch {
-      setDeleteError("Could not delete the saved arena.");
-    } finally {
-      setRemoving(false);
-    }
-  }
 }

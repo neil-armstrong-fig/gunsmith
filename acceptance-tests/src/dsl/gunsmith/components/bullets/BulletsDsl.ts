@@ -2,6 +2,7 @@ import type {Page} from "@playwright/test";
 import type {BulletSnapshot} from "@gunsmith/shared/state-hook/types/BulletSnapshot";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
 import {BulletsPlaywright} from "@src/dsl/gunsmith/components/bullets/playwright/BulletsPlaywright";
+import type {HurtWatch} from "@src/dsl/gunsmith/types/HurtWatch";
 import type {Point} from "@src/dsl/gunsmith/types/Point";
 import type {ShotLook} from "@src/dsl/gunsmith/types/ShotLook";
 
@@ -46,6 +47,15 @@ export class BulletsDsl {
       return await this.bullets.count();
     } catch (error) {
       throw new DslError("Failed to count the bullets in the air", error);
+    }
+  }
+
+  /** Runs a held game, in steps of `stepSeconds`, until no shot is in the air, and holds it there, so the screen shows the floor with nothing flying over it. Fails if one still is after `maxSeconds`. */
+  async runUntilNoneInTheAir(request: HurtWatch): Promise<void> {
+    try {
+      await this.bullets.runUntilNoneInTheAir(request);
+    } catch (error) {
+      throw new DslError("Failed to run the game until the air was clear of shots", error);
     }
   }
 

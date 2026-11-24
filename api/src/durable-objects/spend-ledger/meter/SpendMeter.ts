@@ -3,6 +3,7 @@ import {nextUtcMonthStart} from "@src/durable-objects/spend-ledger/meter/periods
 import {utcMonth} from "@src/durable-objects/spend-ledger/meter/periods/UtcMonth";
 import {SPEND_CAPS} from "@src/durable-objects/spend-ledger/meter/SpendCaps";
 import type {AiStatus} from "@src/durable-objects/spend-ledger/types/AiStatus";
+import type {SpendCaps} from "@src/durable-objects/spend-ledger/types/SpendCaps";
 import type {SpendMeterState} from "@src/durable-objects/spend-ledger/types/SpendMeterState";
 import type {SpendOutcome} from "@src/durable-objects/spend-ledger/types/SpendOutcome";
 import {utcDay} from "@src/durable-objects/shared/utc/UtcDay";
@@ -14,17 +15,20 @@ const ALERT_PERCENTS: readonly number[] = [50, 80, 100];
 const FULL_BUDGET_PERCENT = 100;
 
 /**
- * The global AI spend, in microdollars, against the $1 a day and $20 a month caps. A request reserves its estimated cost before the
- * model is called and settles at the real cost after, so a burst cannot overshoot a cap by the cost of everything in flight. A request
- * that would cross a cap is refused and turns AI off until the cap's period ends; a month's stop outlasts a day's.
+ * The global AI spend, in microdollars, against its caps: the approved $1 a day and $20 a month (`SPEND_CAPS`), or lower ones the caller
+ * passes (`caps/SpendCapsFrom`). A request reserves its estimated cost before the model is called and settles at the real cost after, so a
+ * burst cannot overshoot a cap by the cost of everything in flight. A request that would cross a cap is refused and turns AI off until the
+ * cap's period ends; a month's stop outlasts a day's.
  *
  * **Every method is synchronous on purpose**, as `CreditAccount`: the Durable Object runs one request at a time, so no `await` may
  * come between a read and its write. The Durable Object (`spend-ledger/SpendLedger.ts`) saves `toState()` after each call.
  */
 export class SpendMeter {
   private readonly state: SpendMeterState;
+  private readonly caps: SpendCaps;
 
-  constructor(saved?: SpendMeterState) {
+  constructor(saved?: SpendMeterState, caps: SpendCaps = SPEND_CAPS) {
+    this.caps = caps;
     this.state = structuredClone(
       saved ?? {
         day: NOTHING_YET,
@@ -51,12 +55,12 @@ export class SpendMeter {
       return "paused";
     }
 
-    if (this.state.monthlyMicrodollars + microdollars > SPEND_CAPS.monthlyMicrodollars) {
+    if (this.state.monthlyMicrodollars + microdollars > this.caps.monthlyMicrodollars) {
       this.state.monthlyStopped = true;
       return "paused";
     }
 
-    if (this.state.dailyMicrodollars + microdollars > SPEND_CAPS.dailyMicrodollars) {
+    if (this.state.dailyMicrodollars + microdollars > this.caps.dailyMicrodollars) {
       this.state.dailyStopped = true;
       return "paused";
     }
@@ -91,11 +95,11 @@ export class SpendMeter {
   status(now: number): AiStatus {
     this.startNewPeriods(now);
 
-    if (this.state.monthlyStopped || this.state.monthlyMicrodollars >= SPEND_CAPS.monthlyMicrodollars) {
+    if (this.state.monthlyStopped || this.state.monthlyMicrodollars >= this.caps.monthlyMicrodollars) {
       return {on: false, returnsAt: nextUtcMonthStart(now)};
     }
 
-    if (this.state.dailyStopped || this.state.dailyMicrodollars >= SPEND_CAPS.dailyMicrodollars) {
+    if (this.state.dailyStopped || this.state.dailyMicrodollars >= this.caps.dailyMicrodollars) {
       return {on: false, returnsAt: nextUtcMidnight(now)};
     }
 
@@ -134,7 +138,7 @@ export class SpendMeter {
       return true;
     }
 
-    return this.state.monthlyMicrodollars * 100 >= SPEND_CAPS.monthlyMicrodollars * percent;
+    return this.state.monthlyMicrodollars * 100 >= this.caps.monthlyMicrodollars * percent;
   }
 
   private startNewPeriods(now: number): void {

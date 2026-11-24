@@ -1,3 +1,5 @@
+import type {Appearance} from "@gunsmith/shared/appearance/schema/Appearance";
+import {appearanceSvg} from "@src/assets/weapon-drawings/svg/AppearanceSvg";
 import {spriteUrl} from "@src/assets/sprites/SpriteUrl";
 import type {SpriteKey} from "@src/assets/sprites/types/SpriteKey";
 
@@ -7,8 +9,12 @@ const AUTHORED_PICTURES = new Map<string, SpriteKey>([
   ["submachine-gun", "sprite-submachine-gun"],
 ]);
 
-/** The address of the picture a weapon is drawn with on a card, found by the weapon's identity key, or nothing when art has not drawn it. */
-export function weaponPictureUrl(identityKey: string | undefined): string | undefined {
+/** The weapon's picture on a card, from its generated appearance or the authored sprite for its identity. */
+export function weaponPictureUrl(identityKey: string | undefined, appearance?: Appearance): string | undefined {
+  if (appearance) {
+    return `data:image/svg+xml,${encodeURIComponent(appearanceSvg(appearance, ["structural", "fine"]))}`;
+  }
+
   const spriteKey = identityKey && AUTHORED_PICTURES.get(identityKey);
   if (!spriteKey) {
     return undefined;

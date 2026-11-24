@@ -76,6 +76,25 @@ describe("in a room with a pillar", () => {
     expect(sheltered.brain).toBe(act.brain);
   });
 
+  it("stands up to walk when the state had it crouched, since a crouched walk is too slow to outrun the edge", () => {
+    const sheltered = shelterFromRing(actWith({crouching: true}), contextAt({x: 22.5, y: 3}, {sees: true}));
+
+    expect(sheltered.input.crouching).toBe(false);
+    expect(sheltered.input.direction.x).toBeLessThan(0);
+  });
+
+  it("stands up to walk when it does not see the player either", () => {
+    const sheltered = shelterFromRing(actWith({crouching: true}), contextAt({x: 22.5, y: 3}, {sees: false}));
+
+    expect(sheltered.input.crouching).toBe(false);
+  });
+
+  it("leaves a crouch alone while it is safely inside the ring", () => {
+    const act = actWith({crouching: true});
+
+    expect(shelterFromRing(act, contextAt({x: 12.5, y: 3})).input.crouching).toBe(true);
+  });
+
   it("looks where it walks when it does not see the player", () => {
     const sheltered = shelterFromRing(actWith(), contextAt({x: 22.5, y: 3}, {sees: false}));
 

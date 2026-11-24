@@ -9,6 +9,8 @@ const RIFLE = {
   magazineSize: 12,
   reloadSeconds: 1.5,
   startingReserve: 36,
+  visionDegrees: 90,
+  visionRange: 12,
 };
 
 const MAXIMUM = {
@@ -19,6 +21,8 @@ const MAXIMUM = {
   magazineSize: 60,
   reloadSeconds: 0.5,
   startingReserve: 200,
+  visionDegrees: 130,
+  visionRange: 20,
 };
 
 const NO_PREFERENCE = {favoured: [], sacrificed: []};
@@ -26,7 +30,7 @@ const NO_PREFERENCE = {favoured: [], sacrificed: []};
 it("leaves a weapon that is already inside the limits as it was", () => {
   const update = balanceNode(weaponGraphStateOf({candidate: {weapon: RIFLE, preference: NO_PREFERENCE}}));
 
-  expect(update).toEqual({weapon: RIFLE, nodes: ["balance"]});
+  expect(update).toEqual({weapon: RIFLE, codeEdits: 0, nodes: ["balance"]});
 });
 
 it("brings a weapon over the limits inside them instead of refusing it", () => {
@@ -34,6 +38,14 @@ it("brings a weapon over the limits inside them instead of refusing it", () => {
 
   expect(update.nodes).toEqual(["balance"]);
   expect(update.weapon?.bulletDamage).toBeLessThan(100);
+});
+
+it("counts one edit when code brings the vision range down to its cap", () => {
+  const weapon = {...RIFLE, visionRange: 21};
+  const update = balanceNode(weaponGraphStateOf({candidate: {weapon, preference: NO_PREFERENCE}}));
+
+  expect(update.weapon).toEqual({...RIFLE, visionRange: 20});
+  expect(update).toHaveProperty("codeEdits", 1);
 });
 
 it("balances by the player's preference", () => {

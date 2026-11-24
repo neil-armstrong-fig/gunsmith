@@ -22,6 +22,14 @@ export class ShelfDsl {
   }
 
   /** Whether the result card offers a Save that can be pressed. */
+  async getSaveError(): Promise<string | undefined> {
+    try {
+      return await this.shelf.getSaveError();
+    } catch (error) {
+      throw new DslError("Failed to read the Save message", error);
+    }
+  }
+
   async canSave(): Promise<boolean> {
     try {
       return await this.shelf.canSave();

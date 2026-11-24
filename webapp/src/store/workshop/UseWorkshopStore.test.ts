@@ -6,11 +6,17 @@ beforeEach(() => {
   useWorkshopStore.setState(useWorkshopStore.getInitialState(), true);
 });
 
-it("holds the prompt, the last weapon, the words that made it and the shelf id it is saved under, and nothing else, so adding state is a deliberate edit", () => {
+it("holds the prompt, result, shelf references and Make status", () => {
   expect(Object.keys(useWorkshopStore.getState()).sort()).toEqual([
+    "accountItemId",
     "madeFromPrompt",
+    "makeError",
+    "making",
     "prompt",
     "savedId",
+    "setAccountWeapon",
+    "setMakeError",
+    "setMaking",
     "setPrompt",
     "setSavedId",
     "setWeapon",

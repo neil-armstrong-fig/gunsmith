@@ -11,6 +11,8 @@ const RIFLE: WeaponDraft = {
   magazineSize: 12,
   reloadSeconds: 1.5,
   startingReserve: 36,
+  visionDegrees: 90,
+  visionRange: 12,
 };
 
 const MAXIMUM: WeaponDraft = {
@@ -21,6 +23,8 @@ const MAXIMUM: WeaponDraft = {
   magazineSize: 60,
   reloadSeconds: 0.5,
   startingReserve: 200,
+  visionDegrees: 130,
+  visionRange: 20,
 };
 
 const NO_PREFERENCE = {favoured: [], sacrificed: []};
@@ -63,4 +67,20 @@ it("brings a stat past its range to the end of the range, then balances: a magaz
 
 it("brings a stat that is too weak up to the floor, so a weapon that deals 0 damage deals 1", () => {
   expect(balanceWeaponDraft({...RIFLE, bulletDamage: 0}, NO_PREFERENCE)).toEqual({...RIFLE, bulletDamage: 1});
+});
+
+it("follows a preference for vision: a favoured range ends longer and a sacrificed cone narrower than with no preference", () => {
+  const neutral = balanceWeaponDraft(MAXIMUM, NO_PREFERENCE);
+  const favouring = balanceWeaponDraft(MAXIMUM, {favoured: ["visionRange"], sacrificed: []});
+  const sacrificing = balanceWeaponDraft(MAXIMUM, {favoured: [], sacrificed: ["visionCone"]});
+
+  expect(favouring.visionRange).toBeGreaterThan(neutral.visionRange);
+  expect(sacrificing.visionDegrees).toBeLessThan(neutral.visionDegrees);
+});
+
+it("brings a vision past its range back to the end of it, as it does every stat", () => {
+  const balanced = balanceWeaponDraft({...RIFLE, visionDegrees: 400, visionRange: 90}, NO_PREFERENCE);
+
+  expect(balanced.visionDegrees).toBe(130);
+  expect(balanced.visionRange).toBe(20);
 });

@@ -11,4 +11,6 @@ export const STAT_RANGES: WeaponStatRanges = {
   magazineSize: {min: 1, max: 60},
   reloadSeconds: {min: 0.5, max: 5},
   startingReserve: {min: 0, max: 200},
+  visionDegrees: {min: 50, max: 130},
+  visionRange: {min: 6, max: 20},
 };
