@@ -22,16 +22,22 @@ it("refuses a base that is not a built-in arena, naming the ones there are", () 
   expect(reading).toEqual({
     ok: false,
     errors: [expect.stringContaining(BUILT_IN_ARENAS.map(arena => `"${arena.name}"`).join(", "))],
+    reason: "invalid-draft",
   });
 });
 
 it("refuses a reply with no base, naming the field", () => {
-  expect(readArenaEdit({name: "No Start"})).toEqual({ok: false, errors: [expect.stringMatching(/^base: /)]});
+  expect(readArenaEdit({name: "No Start"})).toEqual({
+    ok: false,
+    errors: [expect.stringMatching(/^base: /)],
+    reason: "invalid-draft",
+  });
 });
 
 it("refuses a size, because the base fixes it", () => {
   expect(readArenaEdit({name: "Big", base: DUEL?.name, width: 40})).toEqual({
     ok: false,
     errors: [expect.stringMatching(/width/)],
+    reason: "invalid-draft",
   });
 });

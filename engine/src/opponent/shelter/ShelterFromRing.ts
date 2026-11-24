@@ -11,7 +11,7 @@ import {radiusOfRing} from "@gunsmith/engine/ring/RadiusOfRing";
 /**
  * Keeps the opponent inside the closing ring. Once the ring has started to close, an opponent nearer the edge than
  * `ringMargin` (or beyond it) walks to the ring's centre (round a wall if one is in the way) instead of where its state sent it, so the edge never catches it.
- * It still fires, reloads and keeps its aim on the player while it sees them; when it does not, it looks where it walks. Before the
+ * It stands up to walk (a crouched walk is too slow to outrun the edge). It still fires, reloads and keeps its aim on the player while it sees them; when it does not, it looks where it walks. Before the
  * ring closes, or in a round with no ring, the state's act is returned as it came. The state's brain is never touched.
  */
 export function shelterFromRing(act: StateAct, context: OpponentContext): StateAct {
@@ -29,10 +29,10 @@ export function shelterFromRing(act: StateAct, context: OpponentContext): StateA
   const direction = walkToward(opponent.position, waypoint);
 
   if (sees) {
-    return {...act, input: {...act.input, direction}};
+    return {...act, input: {...act.input, direction, crouching: false}};
   }
 
-  return {...act, input: {...act.input, direction, aimAt: waypoint}};
+  return {...act, input: {...act.input, direction, crouching: false, aimAt: waypoint}};
 }
 
 /** By the stair when the way to the centre needs one, and otherwise as it has always gone: straight, or round a pillar. */

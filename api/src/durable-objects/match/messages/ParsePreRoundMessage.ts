@@ -1,5 +1,6 @@
 import type {PreRoundAction} from "@src/durable-objects/match/messages/types/PreRoundAction";
 import type {WeaponChoice} from "@src/durable-objects/match/messages/types/WeaponChoice";
+import type {WeaponSlot} from "@src/durable-objects/match/pre-round/types/WeaponSlot";
 import type {SeatPick} from "@src/durable-objects/match/pre-round/types/SeatPick";
 
 /** No id of a saved item is longer than this (a UUID is 36): a longer one is not an id. */
@@ -7,7 +8,7 @@ const LONGEST_ID = 64;
 
 /**
  * What a player's text frame asks of the pre-round, or `undefined` if it asks nothing the room understands: a `choose` or `lockIn` of the
- * arena step, a `choose` or `lockIn` of the weapons step, or a `pickArena`. Everything a client sends is `unknown` until here, and a choice
+ * arena step, a `choose` or `lockIn` of one weapon slot, or a `pickArena`. Everything a client sends is `unknown` until here, and a choice
  * is only ever a built-in's name or key or a saved item's id, never a body: whether the id is the account's own is for the room to check.
  */
 export function parsePreRoundMessage(text: string): PreRoundAction | undefined {
@@ -23,11 +24,11 @@ export function parsePreRoundMessage(text: string): PreRoundAction | undefined {
   if (kind === "lockIn" && Reflect.get(parsed, "step") === "arena") {
     return {kind: "lockInArena"};
   }
-  if (kind === "choose" && Reflect.get(parsed, "step") === "weapons") {
-    return chooseWeaponsOf(Reflect.get(parsed, "choice"));
+  if (kind === "choose" && Reflect.get(parsed, "step") === "weapon") {
+    return chooseWeaponOf(Reflect.get(parsed, "slot"), Reflect.get(parsed, "choice"));
   }
-  if (kind === "lockIn" && Reflect.get(parsed, "step") === "weapons") {
-    return {kind: "lockInWeapons"};
+  if (kind === "lockIn" && Reflect.get(parsed, "step") === "weapon") {
+    return lockInWeaponOf(Reflect.get(parsed, "slot"));
   }
   if (kind === "pickArena") {
     return pickOf(Reflect.get(parsed, "pick"));
@@ -59,18 +60,31 @@ function chooseOf(choice: unknown): PreRoundAction | undefined {
   return {kind: "chooseArena", choice: {kind: "saved", id}};
 }
 
-function chooseWeaponsOf(choice: unknown): PreRoundAction | undefined {
-  if (!Array.isArray(choice) || choice.length !== 2) {
+function chooseWeaponOf(slot: unknown, choice: unknown): PreRoundAction | undefined {
+  const weaponSlot = weaponSlotOf(slot);
+  const weaponChoice = weaponChoiceOf(choice);
+  if (weaponSlot === undefined || weaponChoice === undefined) {
     return undefined;
   }
 
-  const first = weaponChoiceOf(choice[0]);
-  const second = weaponChoiceOf(choice[1]);
-  if (first === undefined || second === undefined) {
+  return {kind: "chooseWeapon", slot: weaponSlot, choice: weaponChoice};
+}
+
+function lockInWeaponOf(slot: unknown): PreRoundAction | undefined {
+  const weaponSlot = weaponSlotOf(slot);
+  if (weaponSlot === undefined) {
     return undefined;
   }
 
-  return {kind: "chooseWeapons", choices: [first, second]};
+  return {kind: "lockInWeapon", slot: weaponSlot};
+}
+
+function weaponSlotOf(slot: unknown): WeaponSlot | undefined {
+  if (slot === 1 || slot === 2) {
+    return slot;
+  }
+
+  return undefined;
 }
 
 function weaponChoiceOf(choice: unknown): WeaponChoice | undefined {

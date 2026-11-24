@@ -32,6 +32,7 @@ it("says what is wrong with a shapes reply it cannot read", () => {
   expect(draftingKitOf("shapes").read({name: "No Size"})).toEqual({
     ok: false,
     errors: [expect.stringMatching(/^width: /), expect.stringMatching(/^height: /)],
+    reason: "invalid-draft",
   });
 });
 

@@ -23,6 +23,8 @@ export function balanceWeapon({stats, preference}: BalanceRequest): WeaponStats 
       magazineSize: stats.magazineSize,
       reloadSeconds: stats.reloadSeconds,
       startingReserve: stats.startingReserve,
+      visionDegrees: stats.visionDegrees,
+      visionRange: stats.visionRange,
     };
   }
 

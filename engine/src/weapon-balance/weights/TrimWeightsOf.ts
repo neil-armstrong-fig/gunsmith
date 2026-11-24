@@ -12,6 +12,8 @@ export function trimWeightsOf(preference: StatPreference): StatNumbers {
     magazineSize: weightOf("magazineSize", preference),
     reloadSpeed: weightOf("reloadSpeed", preference),
     reserve: weightOf("reserve", preference),
+    visionCone: weightOf("visionCone", preference),
+    visionRange: weightOf("visionRange", preference),
   };
 }
 

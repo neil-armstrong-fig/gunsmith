@@ -8,4 +8,6 @@ export interface OwnPreRound {
   locked: boolean;
   pick?: SeatPick;
   weapons: WeaponsOfSeat;
+  /** While the decided arena and weapons are shown: whether this seat has asked to begin the match. Absent before then. */
+  ready?: boolean;
 }

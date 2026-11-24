@@ -5,4 +5,6 @@ export interface WorkshopArena {
   name: string;
   rows: readonly string[];
   madeFromPrompt?: string;
+  accountItemId?: string;
+  fallbackReason?: string;
 }

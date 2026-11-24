@@ -37,6 +37,16 @@ storage and controls described here are not implemented by the research delivery
 
 Saved items are private; library limits are per account and never expire.
 
+## Private generation history
+
+The local weapon and arena tests record attempt outcomes separately from generated items. The purpose is internal pipeline tuning. A row contains the account ID, item kind, attempt time, pipeline version, repair counts and any structured failure reason. It includes the original prompt only when the relevance judge approves it and an independent privacy check clears it. Rejected, unjudged and privacy-flagged text is omitted. Ordinary logs contain closed application events. A generated weapon delivered with a built-in drawing records success with fallback. A built-in arena substitute records a failed generation.
+
+Internal reads exclude attempts at 14 days. The daily Worker sweep removes expired rows, and account deletion removes that account’s history immediately. Before public capture, restrict review to authorized maintainers and put access, objection and erasure requests through the published privacy contact. Public prompt collection stays disabled until the legitimate interests and children’s impact assessments support it and the notice is live. The deployed privacy notice will need the verified contact and rights instructions.
+
+Draft notice for signed-in Make, for use once collection is approved:
+
+> Your prompt goes to an AI provider to make your item. We use private records of Make attempts for internal tuning. Those records are available for 14 days and a daily cleanup deletes expired records. We keep the text in that history only if the request is relevant and clears a privacy check. Prompts attached to generated items are stored separately so you can reuse them. See our privacy notice to request access or deletion, or to object to the use of your data.
+
 ## Recordings and evidence (planned)
 
 Bounded Durable Object journals export to private R2 storage; D1 holds metadata.

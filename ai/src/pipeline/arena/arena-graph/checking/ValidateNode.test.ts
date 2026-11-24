@@ -6,7 +6,7 @@ const GOOD = {name: "Plain Room", rows: ["##########", "#........#", "#........#
 it("keeps a draft that passes as the arena and clears the last refusal", () => {
   const update = validateNode(arenaGraphStateOf({draft: GOOD, errors: ["old fault"]}), "rows");
 
-  expect(update).toEqual({arena: GOOD, errors: [], nodes: ["validate"]});
+  expect(update).toEqual({arena: GOOD, errors: [], codeEdits: 0, nodes: ["validate"]});
 });
 
 it("refuses a draft with a sentence for each fault and keeps no arena", () => {

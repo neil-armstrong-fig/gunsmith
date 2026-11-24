@@ -4,6 +4,7 @@ import type {Cursor} from "@src/dsl/gunsmith/components/arena/types/Cursor";
 import type {CursorPicture} from "@src/dsl/gunsmith/components/arena/types/CursorPicture";
 import type {CursorPlace} from "@src/dsl/gunsmith/components/arena/types/CursorPlace";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
+import {brightnessShare} from "@src/dsl/gunsmith/components/arena/playwright/shade/BrightnessShare";
 import {lookOfTerrain} from "@src/dsl/gunsmith/components/arena/playwright/terrain/LookOfTerrain";
 import type {TerrainLook} from "@src/dsl/gunsmith/components/arena/types/TerrainLook";
 import {coloursAtTiles} from "@src/dsl/gunsmith/playwright/screen/ColoursAtTiles";
@@ -21,6 +22,11 @@ const BACKDROP_INSET_PIXELS = 10;
 export class ArenaPlaywright extends BasePage {
   constructor(page: Page) {
     super(page);
+  }
+
+  /** How bright the floor shows at `place` as a share of the floor at `clearFloor`, in the same screenshot. */
+  async getFloorBrightnessAt(place: Point, clearFloor: Point): Promise<number> {
+    return await brightnessShare(this.page, place, clearFloor);
   }
 
   /** The mouse cursor the browser shows when the mouse is over `place`. */

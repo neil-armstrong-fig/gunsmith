@@ -10,8 +10,13 @@ import type {ArenaGraphUpdate} from "@gunsmith/ai/pipeline/arena/arena-graph/sta
 export function validateNode(state: ArenaGraphStateValues, format: ArenaFormat): ArenaGraphUpdate {
   const validation = validateArenaDraft(state.draft, format);
   if (!validation.ok) {
-    return {errors: validation.errors, nodes: ["validate"]};
+    return {
+      errors: validation.errors,
+      nodes: ["validate"],
+      codeEdits: validation.codeEdits,
+      validationFailure: validation.reason,
+    };
   }
 
-  return {arena: validation.arena, errors: [], nodes: ["validate"]};
+  return {arena: validation.arena, errors: [], nodes: ["validate"], codeEdits: validation.codeEdits};
 }

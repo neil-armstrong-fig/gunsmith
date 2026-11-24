@@ -94,11 +94,10 @@ it("reads what the server says about the choosing", () => {
       locked: true,
       pick: {kind: "arena", seat: "second"},
       weapons: {
-        choices: [
-          {kind: "builtIn", key: "rifle"},
-          {kind: "builtIn", key: "marksman-rifle"},
+        slots: [
+          {locked: true, choice: {kind: "builtIn", key: "rifle"}},
+          {locked: true, choice: {kind: "builtIn", key: "marksman-rifle"}},
         ],
-        locked: true,
       },
     },
     opponent: {
@@ -106,11 +105,7 @@ it("reads what the server says about the choosing", () => {
       picked: false,
       arena: {kind: "saved", name: "Little room", rows: ["###", "#.#", "###"]},
       weapons: {
-        choices: [
-          {kind: "saved", name: "Sparky"},
-          {kind: "builtIn", key: "rifle"},
-        ],
-        locked: true,
+        slots: [{locked: true, choice: {kind: "saved", name: "Sparky"}}, {locked: false}],
       },
     },
     how: "coin",
@@ -120,37 +115,52 @@ it("reads what the server says about the choosing", () => {
 });
 
 it("reads the choosing of a seat on its own, with no clock and no opponent arena", () => {
+  expect(parseServerMessage(JSON.stringify(ALONE))).toEqual(ALONE);
+});
+
+it("reads the reveal stage, with who has asked to begin", () => {
   const frame = {
-    kind: "preRound",
-    stage: "choosing",
-    own: {locked: false, weapons: {locked: false}},
-    opponent: {locked: false, picked: false, weapons: {locked: false}},
+    ...ALONE,
+    stage: "revealing",
+    secondsLeft: 30,
+    own: {...ALONE.own, ready: true},
+    opponent: {...ALONE.opponent, ready: false},
+    how: "same",
   };
 
   expect(parseServerMessage(JSON.stringify(frame))).toEqual(frame);
 });
 
 it("refuses a choosing frame that is not what the server sends", () => {
-  const frame = {
-    kind: "preRound",
-    stage: "choosing",
-    own: {locked: false, weapons: {locked: false}},
-    opponent: {locked: false, picked: false, weapons: {locked: false}},
-  };
+  const frame = ALONE;
+  const slots = (...locked: boolean[]): object => ({slots: locked.map(flag => ({locked: flag}))});
 
   expect(parseServerMessage(JSON.stringify({...frame, stage: "later"}))).toBeUndefined();
-  expect(parseServerMessage(JSON.stringify({...frame, own: {locked: "no", weapons: {locked: false}}}))).toBeUndefined();
   expect(
-    parseServerMessage(JSON.stringify({...frame, opponent: {locked: false, weapons: {locked: false}}})),
+    parseServerMessage(JSON.stringify({...frame, own: {locked: "no", weapons: slots(false, false)}})),
+  ).toBeUndefined();
+  expect(
+    parseServerMessage(JSON.stringify({...frame, opponent: {locked: false, weapons: slots(false, false)}})),
   ).toBeUndefined();
   expect(parseServerMessage(JSON.stringify({...frame, own: {locked: false}}))).toBeUndefined();
   expect(parseServerMessage(JSON.stringify({...frame, opponent: {locked: false, picked: false}}))).toBeUndefined();
-  expect(parseServerMessage(JSON.stringify({...frame, own: {locked: false, weapons: {locked: "no"}}}))).toBeUndefined();
+  expect(
+    parseServerMessage(JSON.stringify({...frame, own: {locked: false, weapons: {locked: false}}})),
+  ).toBeUndefined();
+  expect(parseServerMessage(JSON.stringify({...frame, own: {locked: false, weapons: slots(false)}}))).toBeUndefined();
+  expect(
+    parseServerMessage(JSON.stringify({...frame, own: {locked: false, weapons: slots(false, false, false)}})),
+  ).toBeUndefined();
+  expect(
+    parseServerMessage(
+      JSON.stringify({...frame, own: {locked: false, weapons: {slots: [{locked: "no"}, {locked: false}]}}}),
+    ),
+  ).toBeUndefined();
   expect(
     parseServerMessage(
       JSON.stringify({
         ...frame,
-        own: {locked: false, weapons: {locked: true, choices: [{kind: "builtIn", key: "rifle"}]}},
+        own: {locked: false, weapons: {slots: [{locked: true, choice: {kind: "builtIn", key: 3}}, {locked: false}]}},
       }),
     ),
   ).toBeUndefined();
@@ -158,50 +168,40 @@ it("refuses a choosing frame that is not what the server sends", () => {
     parseServerMessage(
       JSON.stringify({
         ...frame,
-        own: {
-          locked: false,
-          weapons: {
-            locked: true,
-            choices: [
-              {kind: "builtIn", key: "rifle"},
-              {kind: "builtIn", key: 3},
-            ],
-          },
+        own: {locked: false, weapons: {slots: [{locked: true, choice: {kind: "saved"}}, {locked: false}]}},
+      }),
+    ),
+  ).toBeUndefined();
+  expect(
+    parseServerMessage(
+      JSON.stringify({...frame, own: {locked: false, arena: {kind: "saved", name: 7}, weapons: slots(false, false)}}),
+    ),
+  ).toBeUndefined();
+  expect(
+    parseServerMessage(JSON.stringify({...frame, own: {locked: false, arena: "Duel", weapons: slots(false, false)}})),
+  ).toBeUndefined();
+  expect(
+    parseServerMessage(
+      JSON.stringify({
+        ...frame,
+        opponent: {
+          locked: true,
+          picked: false,
+          arena: {kind: "saved", name: "A", rows: [1]},
+          weapons: slots(false, false),
         },
       }),
     ),
   ).toBeUndefined();
-  expect(
-    parseServerMessage(
-      JSON.stringify({
-        ...frame,
-        own: {locked: false, weapons: {locked: true, choices: [{kind: "builtIn", key: "rifle"}, {kind: "saved"}]}},
-      }),
-    ),
-  ).toBeUndefined();
-  expect(
-    parseServerMessage(
-      JSON.stringify({...frame, own: {locked: false, arena: {kind: "saved", name: 7}, weapons: {locked: false}}}),
-    ),
-  ).toBeUndefined();
-  expect(
-    parseServerMessage(JSON.stringify({...frame, own: {locked: false, arena: "Duel", weapons: {locked: false}}})),
-  ).toBeUndefined();
-  expect(
-    parseServerMessage(
-      JSON.stringify({
-        ...frame,
-        opponent: {locked: true, picked: false, arena: {kind: "saved", name: "A", rows: [1]}, weapons: {locked: false}},
-      }),
-    ),
-  ).toBeUndefined();
+  expect(parseServerMessage(JSON.stringify({...frame, own: {...frame.own, ready: "yes"}}))).toBeUndefined();
   expect(parseServerMessage(JSON.stringify({...frame, secondsLeft: "soon"}))).toBeUndefined();
   expect(parseServerMessage(JSON.stringify({...frame, own: null}))).toBeUndefined();
 });
 
-it("reads the one frame that reveals both players' weapons as the match begins, a saved one with its numbers and drawing", () => {
+it("reads the one frame that reveals the arena and both players' weapons, a saved one with its numbers and drawing", () => {
   const frame = {
     kind: "reveal",
+    arena: {name: "Duel", rows: ["###", "#.#", "###"]},
     weapons: {
       own: [
         {kind: "builtIn", key: "rifle"},
@@ -220,6 +220,7 @@ it("reads the one frame that reveals both players' weapons as the match begins, 
 it("refuses a reveal that is not two weapons on each side, each a built-in key or a saved weapon with its drawing", () => {
   const frame = {
     kind: "reveal",
+    arena: {name: "Duel", rows: ["###"]},
     weapons: {
       own: [
         {kind: "builtIn", key: "rifle"},
@@ -243,4 +244,14 @@ it("refuses a reveal that is not two weapons on each side, each a built-in key o
   ).toBeUndefined();
   expect(parseServerMessage(JSON.stringify({...frame, weapons: {own: frame.weapons.own}}))).toBeUndefined();
   expect(parseServerMessage(JSON.stringify({kind: "reveal"}))).toBeUndefined();
+  expect(parseServerMessage(JSON.stringify({...frame, arena: undefined}))).toBeUndefined();
+  expect(parseServerMessage(JSON.stringify({...frame, arena: {name: "Duel", rows: [1]}}))).toBeUndefined();
+  expect(parseServerMessage(JSON.stringify({...frame, arena: {rows: ["###"]}}))).toBeUndefined();
 });
+
+const ALONE = {
+  kind: "preRound",
+  stage: "choosing",
+  own: {locked: false, weapons: {slots: [{locked: false}, {locked: false}]}},
+  opponent: {locked: false, picked: false, weapons: {slots: [{locked: false}, {locked: false}]}},
+};

@@ -89,6 +89,32 @@ it("circles in the open when there is nowhere to hide, rather than standing stil
   expect(act.input.direction.x).toBeCloseTo(0, 9);
 });
 
+it("crouches and holds still where it is when a cover block stands beside it against the player, and looks for no other cover", () => {
+  const act = actReload(reloading(), contextIn(coverBesideHere()));
+
+  expect(act.input.crouching).toBe(true);
+  expect(act.input.direction).toEqual({x: 0, y: 0});
+  expect(act.input.reload).toBe(true);
+  expect(act.input.firing).toBe(false);
+  expect(act.brain.goal).toBeUndefined();
+  expect(act.brain.seed).toBe(1);
+});
+
+it("keeps walking to the cover it has already chosen rather than crouching on the way", () => {
+  const act = actReload(reloading({goal: {x: 1.5, y: 4.5}}), contextIn(coverBesideHere()));
+
+  expect(act.input.crouching).toBe(false);
+  expect(act.input.direction.x).toBeLessThan(0);
+});
+
+it("does not crouch in the open", () => {
+  expect(actReload(reloading(), contextIn(open)).input.crouching).toBe(false);
+});
+
+it("does not crouch when it cannot see the player", () => {
+  expect(actReload(reloading(), contextIn(coverBesideHere(), {sees: false})).input.crouching).toBe(false);
+});
+
 it("reloads where it stands, without looking for cover, when it cannot see the player", () => {
   const act = actReload(reloading(), contextIn(blocked, {sees: false}));
 
@@ -188,4 +214,11 @@ function emptied(opponent: Player, slots: readonly number[]): Player {
   });
 
   return {...opponent, loadout};
+}
+
+// The open room with a cover block in the tile east of the opponent, across every floor row so that it is the same whichever way the drawing's rows run.
+function coverBesideHere(): Arena {
+  const row = "#...c........#";
+
+  return arenaFrom(["##############", row, row, row, row, "##############"]);
 }

@@ -1,3 +1,6 @@
+import {BuiltInWeaponChoices} from "@src/react/components/dom/workshop/components/built-in-weapon-choices/BuiltInWeaponChoices";
+import {accountUrl} from "@src/account/AccountUrl";
+import {useAccountLibraryStore} from "@src/store/account-library/UseAccountLibraryStore";
 import {returnToPractice} from "@src/react/components/dom/workshop/arena-on-trial/ReturnToPractice";
 import {ArenaWorkshop} from "@src/react/components/dom/workshop/components/arena-workshop/ArenaWorkshop";
 import {WeaponCard} from "@src/react/components/dom/workshop/components/weapon-card/WeaponCard";
@@ -26,6 +29,7 @@ export function Workshop(): JSX.Element | undefined {
   useEffect(() => {
     if (open) {
       panelRef.current?.focus();
+      void useAccountLibraryStore.getState().connect(accountUrl("/api/me"), accountUrl("/api/library"));
     }
   }, [open]);
 
@@ -104,6 +108,8 @@ export function Workshop(): JSX.Element | undefined {
         {!showArenas && (
           <>
             <WeaponPrompt />
+
+            <BuiltInWeaponChoices />
 
             <WeaponCard />
 

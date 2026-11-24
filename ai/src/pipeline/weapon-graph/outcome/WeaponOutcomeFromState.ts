@@ -1,3 +1,5 @@
+import type {WeaponHistoryDiagnostics} from "@gunsmith/ai/pipeline/types/WeaponHistoryDiagnostics";
+import {WEAPON_PIPELINE_VERSION} from "@gunsmith/ai/pipeline/weapon-graph/history/WeaponPipelineVersion";
 import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
 import type {WeaponGraphStateValues} from "@gunsmith/ai/pipeline/weapon-graph/state/types/WeaponGraphStateValues";
 
@@ -10,8 +12,15 @@ const INVALID_WEAPON_REASON = "We could not build a valid weapon from that reque
  * never handed on, because only a drawn weapon is created.
  */
 export function weaponOutcomeFromState(state: WeaponGraphStateValues): WeaponOutcome {
+  const history = historyOf(state);
   if (state.rejectionReason !== undefined) {
-    return {status: "rejected", reason: state.rejectionReason, nodes: state.nodes, modelCalls: state.modelCalls};
+    return {
+      status: "rejected",
+      reason: state.rejectionReason,
+      nodes: state.nodes,
+      modelCalls: state.modelCalls,
+      history,
+    };
   }
 
   if (state.appearance) {
@@ -21,8 +30,32 @@ export function weaponOutcomeFromState(state: WeaponGraphStateValues): WeaponOut
       appearance: state.appearance,
       nodes: state.nodes,
       modelCalls: state.modelCalls,
+      history,
     };
   }
 
-  return {status: "invalid", reason: INVALID_WEAPON_REASON, nodes: state.nodes, modelCalls: state.modelCalls};
+  return {
+    status: "invalid",
+    reason: INVALID_WEAPON_REASON,
+    nodes: state.nodes,
+    modelCalls: state.modelCalls,
+    history: {...history, validationFailure: validationFailureOf(state)},
+  };
+}
+
+function historyOf(state: WeaponGraphStateValues): WeaponHistoryDiagnostics {
+  return {
+    pipelineVersion: WEAPON_PIPELINE_VERSION,
+    relevance: state.relevance ?? "not-judged",
+    codeEdits: state.codeEdits + (state.appearance?.changes.length ?? 0),
+    modelRepairs: state.nodes.filter(node => node === "repair" || node === "appearance.repair").length,
+  };
+}
+
+function validationFailureOf(
+  state: WeaponGraphStateValues,
+): NonNullable<WeaponHistoryDiagnostics["validationFailure"]> {
+  if (state.nodes.at(-1) === "rate") return "rating-out-of-bounds";
+
+  return "invalid-draft";
 }

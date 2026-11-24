@@ -3,7 +3,9 @@ import {STATE_HOOK_NAME} from "@gunsmith/shared/state-hook/StateHookName";
 import type {GameStateSnapshot} from "@gunsmith/shared/state-hook/types/GameStateSnapshot";
 import type {BulletSnapshot} from "@gunsmith/shared/state-hook/types/BulletSnapshot";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
+import {runHeldUntil} from "@src/dsl/gunsmith/playwright/hold/RunHeldUntil";
 import {lookOfShot} from "@src/dsl/gunsmith/playwright/look/look-of-shot/LookOfShot";
+import type {HurtWatch} from "@src/dsl/gunsmith/types/HurtWatch";
 import type {Point} from "@src/dsl/gunsmith/types/Point";
 import type {ShotLook} from "@src/dsl/gunsmith/types/ShotLook";
 
@@ -81,6 +83,15 @@ export class BulletsPlaywright extends BasePage {
     const {bullets} = await this.readGameState();
 
     return bullets.length;
+  }
+
+  /** Runs a held game (`holdTheGame`) in steps of `watch.stepSeconds` until no shot is in the air, and stops there. Throws if one still is after `watch.maxSeconds` of the game's time. */
+  async runUntilNoneInTheAir(watch: HurtWatch): Promise<void> {
+    await runHeldUntil(this.page, {
+      watch,
+      what: "The air clearing of shots",
+      isDone: async () => (await this.count()) === 0,
+    });
   }
 
   /** The shots in the air right now, with whose each is and which way it flies. */

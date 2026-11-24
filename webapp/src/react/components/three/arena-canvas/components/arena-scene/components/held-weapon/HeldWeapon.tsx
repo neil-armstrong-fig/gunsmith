@@ -1,3 +1,4 @@
+import {weaponAppearances} from "@src/assets/weapon-drawings/appearances/WeaponAppearances";
 import {useFrame} from "@react-three/fiber";
 import type {Shooter} from "@gunsmith/engine/bullet/types/Shooter";
 import {equippedWeapon} from "@gunsmith/engine/loadout/EquippedWeapon";
@@ -28,15 +29,15 @@ export function HeldWeapon({fighter, standingSprite, crouchedSprite}: Props): JS
   const gripRef = useRef<Group>(null);
   const standing = useSprite(standingSprite);
   const crouched = useSprite(crouchedSprite ?? standingSprite);
-  const weaponKey = useGameStore(state => {
+  const weapon = useGameStore(state => {
     const holder = state.world[fighter];
     if (!holder) {
       return undefined;
     }
 
-    return equippedWeapon(holder).weapon.identity?.key;
+    return equippedWeapon(holder).weapon;
   });
-  const drawing = useWeaponDrawing(weaponKey);
+  const drawing = useWeaponDrawing(weapon?.identity?.key, weapon && weaponAppearances.get(weapon));
   const {pixelsPerTile} = SPRITE_MANIFEST[standingSprite];
 
   useFrame(() => {

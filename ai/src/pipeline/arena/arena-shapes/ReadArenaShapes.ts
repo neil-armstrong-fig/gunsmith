@@ -9,12 +9,12 @@ import type {ArenaReading} from "@gunsmith/ai/pipeline/arena/arena-drafting/form
 export function readArenaShapes(reply: unknown): ArenaReading {
   const shapes = arenaShapesDraftSchema.safeParse(withoutEmptyRectangles(reply));
   if (!shapes.success) {
-    return {ok: false, errors: schemaErrors(shapes.error.issues)};
+    return {ok: false, errors: schemaErrors(shapes.error.issues), reason: "invalid-draft"};
   }
 
   const compiled = compileArenaShapes(shapes.data);
   if (!compiled.ok) {
-    return {ok: false, errors: compiled.errors.map(sentenceOf)};
+    return {ok: false, errors: compiled.errors.map(sentenceOf), reason: "invalid-shapes"};
   }
 
   return {ok: true, drawing: compiled.drawing};

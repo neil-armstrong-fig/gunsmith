@@ -27,7 +27,7 @@ const MAX_PROBLEMS_LISTED = 5;
 export function validateArenaDraft(candidate: unknown, format: ArenaFormat): ArenaValidation {
   const reading = draftingKitOf(format).read(candidate);
   if (!reading.ok) {
-    return {ok: false, errors: reading.errors};
+    return {ok: false, errors: reading.errors, reason: reading.reason, codeEdits: 0};
   }
 
   return validateDrawing(reading.drawing);
@@ -36,26 +36,27 @@ export function validateArenaDraft(candidate: unknown, format: ArenaFormat): Are
 function validateDrawing(candidate: unknown): ArenaValidation {
   const parsed = arenaDraftSchema.safeParse(candidate);
   if (!parsed.success) {
-    return {ok: false, errors: schemaErrors(parsed.error.issues)};
+    return {ok: false, errors: schemaErrors(parsed.error.issues), reason: "invalid-draft", codeEdits: 0};
   }
 
   const raggedRows = rowLengthProblems(parsed.data.rows);
   if (raggedRows.length > 0) {
-    return {ok: false, errors: raggedRows};
+    return {ok: false, errors: raggedRows, reason: "ragged-rows", codeEdits: 0};
   }
 
-  const repaired = repairArena(parsed.data.rows).rows;
-  const arena = read(repaired);
+  const {rows, edits} = repairArena(parsed.data.rows);
+  const codeEdits = edits.length;
+  const arena = read(rows);
   if (typeof arena === "string") {
-    return {ok: false, errors: [sentenceOf(arena)]};
+    return {ok: false, errors: [sentenceOf(arena)], reason: "invalid-tiles", codeEdits};
   }
 
   const problems = validateArena(arena).map(problem => problem.reason);
   if (problems.length > 0) {
-    return {ok: false, errors: firstProblemsOf(problems)};
+    return {ok: false, errors: firstProblemsOf(problems), reason: "unplayable-arena", codeEdits};
   }
 
-  return {ok: true, arena: {...parsed.data, rows: repaired}};
+  return {ok: true, arena: {...parsed.data, rows}, codeEdits};
 }
 
 /** The first few problems, each shortened, and one sentence counting the rest, so a drawing with hundreds cannot flood the repair. */

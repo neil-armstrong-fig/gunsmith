@@ -9,6 +9,8 @@ interface Props {
   placeholder?: string;
   /** The box's border width and colour, when the caller has a colour of its own to show (the arena's style); the plain edge border when absent. */
   borderClassName?: string;
+  making?: boolean;
+  waiting?: boolean;
   onPromptChange: (prompt: string) => void;
   onMake: () => void;
 }
@@ -20,6 +22,8 @@ export function WorkshopPrompt({
   limit,
   placeholder,
   borderClassName,
+  making,
+  waiting,
   onPromptChange,
   onMake,
 }: Props): JSX.Element {
@@ -50,11 +54,12 @@ export function WorkshopPrompt({
 
         <button
           type="button"
-          disabled={!readout.canMake}
+          disabled={!readout.canMake || making || waiting}
           className="rounded-md bg-gs-team-blue px-5 py-2 font-semibold text-gs-background disabled:opacity-40"
           onClick={onMake}
         >
-          Make
+          {making && "Making…"}
+          {!making && "Make"}
         </button>
       </div>
     </div>

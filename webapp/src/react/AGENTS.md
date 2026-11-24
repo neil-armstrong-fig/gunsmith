@@ -8,7 +8,12 @@ holds the two things the root `AGENTS.md` points here for, and the JSX conventio
   **Never a second component in a file**, not even a private one only that file uses (a `Side` or a `Row` under its
   parent's `Props`): it goes in `<parent folder>/components/<name>/<Name>.tsx` with its own `Props`. A file holds one
   component and its plain helper functions. Inline a component only where extracting it would be actively misleading,
-  and say why in a comment.
+  and say why in a comment. **Before finishing, check every `.tsx` you touched:** `grep -cE '^(export )?function [A-Z]' <file>`
+  must say 1 (a plain helper is lowercase). Lint cannot see this one.
+- **A component that chooses between branches keeps only the choosing.** A branch with more than a few elements, or its own
+  state, is a child, and the parent holds the conditionals (`{locked && <ArenaLockedIn />}` then `{!locked && <ArenaChoosing />}`)
+  with the detail in the children. A child reads what it needs from the store or its own hook and takes a prop only for what
+  the parent alone knows (a list item, a slot). **Never pass a value down only for a deeper component to read (prop tunnelling).**
 - **A component's props interface is called `Props` and is not exported.** It stays in the component's file.
 - **A blank line between sibling JSX elements**, in the DOM and in a react-three-fiber tree. The `<circleGeometry>` and
   the `<meshBasicMaterial>` inside a `<mesh>` are siblings, and so are three `<span>`s in a row. Two elements pressed

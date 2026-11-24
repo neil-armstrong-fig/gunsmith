@@ -1,3 +1,6 @@
+import {SaveAccountItem} from "@src/react/components/dom/workshop/components/save-account-item/SaveAccountItem";
+import {useAccountLibraryStore} from "@src/store/account-library/UseAccountLibraryStore";
+import {weaponAppearances} from "@src/assets/weapon-drawings/appearances/WeaponAppearances";
 import {weaponPictureUrl} from "@src/assets/weapon-pictures/WeaponPictureUrl";
 import {SaveWeapon} from "@src/react/components/dom/workshop/components/weapon-card/components/save-weapon/SaveWeapon";
 import {StatRow} from "@src/react/components/dom/workshop/components/weapon-card/components/stat-row/StatRow";
@@ -13,12 +16,14 @@ import type {JSX} from "react";
  */
 export function WeaponCard(): JSX.Element | undefined {
   const weapon = useWorkshopStore(state => state.weapon);
+  const accountItemId = useWorkshopStore(state => state.accountItemId);
+  const session = useAccountLibraryStore(state => state.session);
   if (!weapon) {
     return undefined;
   }
 
   const name = weapon.identity?.name ?? "Weapon";
-  const picture = weaponPictureUrl(weapon.identity?.key);
+  const picture = weaponPictureUrl(weapon.identity?.key, weaponAppearances.get(weapon));
   const rating = ratingPercentOf(weapon);
 
   return (
@@ -80,7 +85,11 @@ export function WeaponCard(): JSX.Element | undefined {
           Try it
         </button>
 
-        <SaveWeapon weapon={weapon} />
+        {session === "guest" && accountItemId === undefined && <SaveWeapon weapon={weapon} />}
+
+        {session === "signed-in" && accountItemId !== undefined && (
+          <SaveAccountItem kind="weapon" key={accountItemId} id={accountItemId} />
+        )}
       </div>
 
       <ul className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,14rem),1fr))] gap-x-5">

@@ -1,3 +1,4 @@
+import type {ArenaWorkshopSetup} from "@src/dsl/gunsmith/components/workshop/components/arenas/types/ArenaWorkshopSetup";
 import type {Page} from "@playwright/test";
 import {ArenaWorkshopPlaywright} from "@src/dsl/gunsmith/components/workshop/components/arenas/playwright/ArenaWorkshopPlaywright";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
@@ -10,6 +11,22 @@ export class ArenaWorkshopDsl {
 
   constructor(page: Page) {
     this.arenas = new ArenaWorkshopPlaywright(page);
+  }
+
+  async arrangeSignedInArena(setup: ArenaWorkshopSetup = "ready"): Promise<void> {
+    try {
+      await this.arenas.arrangeSignedInArena(setup);
+    } catch (error) {
+      throw new DslError("Failed to arrange a signed-in arena workshop", error);
+    }
+  }
+
+  async getMakeError(): Promise<string> {
+    try {
+      return await this.arenas.getMakeError();
+    } catch (error) {
+      throw new DslError("Failed to read the arena generation error", error);
+    }
   }
 
   async open(name?: string): Promise<void> {
@@ -65,6 +82,14 @@ export class ArenaWorkshopDsl {
       return await this.arenas.getSavedArenaPrompts();
     } catch (error) {
       throw new DslError("Failed to read the saved arena prompts", error);
+    }
+  }
+
+  async getSavedArenaColours(name: string, size: Size, points: Point[]): Promise<Colour[]> {
+    try {
+      return await this.arenas.getSavedArenaColours(name, size, points);
+    } catch (error) {
+      throw new DslError("Failed to see the saved arena drawing", error);
     }
   }
 

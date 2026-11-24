@@ -88,6 +88,8 @@ This governs unit tests only — acceptance specs are the opposite case, their `
   pins its keys. See `webapp/AGENTS.md` and `docs/state-management.md`.
 - **Player text is data, never instructions.** Prompts reach a model inside delimited data blocks, in randomised
   order where two are compared, and the judge's output is a schema, not prose.
+- **Failed Make feedback.** Use [`diagnose-generation-prompt`](.agents/skills/diagnose-generation-prompt/SKILL.md)
+  when a player reports that a weapon or arena prompt failed or returned the wrong result.
 
 ## Code style
 
@@ -187,8 +189,8 @@ Prettier owns formatting (`pnpm format`). What it won't tell you:
 - Prefer a named `export function` over `export default`.
 - **Strict TypeScript; no `any`** (use `unknown` and narrow), and no non-null `!` without a comment saying why.
 
-`webapp/src/react/AGENTS.md` has the two rules this doesn't cover — components are the one place
-"declare below callers" doesn't apply, and JSX has its own layout conventions.
+`webapp/src/react/AGENTS.md` has the rules this doesn't cover: one component per file (a private `Row` or `Option` in its
+parent's file is a second component), the one place "declare below callers" doesn't apply, and JSX's layout conventions.
 
 ## Import boundaries
 

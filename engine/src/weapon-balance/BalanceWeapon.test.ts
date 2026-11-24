@@ -54,6 +54,39 @@ it("takes something off every stat of a weapon with everything at its maximum wh
   expect(balanced.magazineSize).toBeLessThan(STRONGEST_STATS.magazineSize);
   expect(balanced.reloadSeconds).toBeGreaterThan(STRONGEST_STATS.reloadSeconds);
   expect(balanced.startingReserve).toBeLessThan(STRONGEST_STATS.startingReserve);
+  expect(balanced.visionDegrees).toBeLessThan(STRONGEST_STATS.visionDegrees);
+  expect(balanced.visionRange).toBeLessThan(STRONGEST_STATS.visionRange);
+});
+
+it("leaves a weapon with the widest and longest vision as it is when its power rating allows it", () => {
+  const farSeeing: WeaponStats = {...RIFLE_STATS, visionDegrees: 130, visionRange: 20};
+
+  expect(powerRatingOf(farSeeing)).toBeLessThan(POWER_BUDGET);
+  expect(balanceWeapon({stats: farSeeing, preference: NO_PREFERENCE})).toEqual(farSeeing);
+});
+
+it("keeps a favoured vision range longer than it would be with no preference", () => {
+  const neutral = balanceWeapon({stats: STRONGEST_STATS, preference: NO_PREFERENCE});
+  const favouring = balanceWeapon({stats: STRONGEST_STATS, preference: {favoured: ["visionRange"], sacrificed: []}});
+
+  expect(favouring.visionRange).toBeGreaterThan(neutral.visionRange);
+});
+
+it("narrows a sacrificed vision cone more than it would with no preference, and leaves the vision range wider", () => {
+  const neutral = balanceWeapon({stats: STRONGEST_STATS, preference: NO_PREFERENCE});
+  const sacrificing = balanceWeapon({stats: STRONGEST_STATS, preference: {favoured: [], sacrificed: ["visionCone"]}});
+
+  expect(sacrificing.visionDegrees).toBeLessThan(neutral.visionDegrees);
+  expect(sacrificing.visionRange).toBeGreaterThan(neutral.visionRange);
+});
+
+it("makes sight cost something: a weapon that gives up its vision keeps more damage than one that wants all of it", () => {
+  const nearSighted: WeaponStats = {...STRONGEST_STATS, visionDegrees: 50, visionRange: 6};
+  const farSighted = balanceWeapon({stats: STRONGEST_STATS, preference: NO_PREFERENCE});
+
+  expect(balanceWeapon({stats: nearSighted, preference: NO_PREFERENCE}).bulletDamage).toBeGreaterThan(
+    farSighted.bulletDamage,
+  );
 });
 
 it("keeps a favoured stat higher than it would be with no preference", () => {
@@ -107,7 +140,16 @@ it("gives a favoured stat the cost of the cap last: favoured damage keeps more o
 
 it("still brings a weapon inside the limits when the player favours every stat", () => {
   const everything: StatPreference = {
-    favoured: ["damage", "fireRate", "bulletSpeed", "magazineSize", "reloadSpeed", "reserve"],
+    favoured: [
+      "damage",
+      "fireRate",
+      "bulletSpeed",
+      "magazineSize",
+      "reloadSpeed",
+      "reserve",
+      "visionCone",
+      "visionRange",
+    ],
     sacrificed: [],
   };
 

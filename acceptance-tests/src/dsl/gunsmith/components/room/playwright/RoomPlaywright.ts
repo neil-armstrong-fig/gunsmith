@@ -8,6 +8,8 @@ import {fastestMovement} from "@src/dsl/gunsmith/components/room/playwright/wire
 import {largestJump} from "@src/dsl/gunsmith/components/room/playwright/wire/movement/LargestJump";
 import type {PositionSample} from "@src/dsl/gunsmith/components/room/playwright/wire/movement/types/PositionSample";
 import type {ShownSamples} from "@src/dsl/gunsmith/components/room/playwright/wire/movement/types/ShownSamples";
+import {isRevealFrame} from "@src/dsl/gunsmith/components/room/playwright/wire/IsRevealFrame";
+import {preRoundsOfFrames} from "@src/dsl/gunsmith/components/room/playwright/wire/PreRoundsOfFrames";
 import {isJoinedFrame} from "@src/dsl/gunsmith/components/room/playwright/wire/IsJoinedFrame";
 import {isSnapshotFrame} from "@src/dsl/gunsmith/components/room/playwright/wire/IsSnapshotFrame";
 import {snapshotsOfFrames} from "@src/dsl/gunsmith/components/room/playwright/wire/SnapshotsOfFrames";
@@ -406,6 +408,37 @@ export class RoomPlaywright extends BasePage {
     const distance = await this.distanceFromTheServersPlayer();
 
     return distance !== undefined && distance < AGREE_WITHIN_TILES;
+  }
+
+  /** Whether any frame of the choosing before the match has reached this browser: without it, a choosing that told nothing proves nothing. */
+  hasReceivedPreRounds(): boolean {
+    return preRoundsOfFrames(this.framesReceived).length > 0;
+  }
+
+  /** Whether any frame sent to this browser has named the other seat's weapon in `slot`. The server must not until both seats have locked in that slot. */
+  hasBeenToldTheOpponentsWeapon(slot: number): boolean {
+    return preRoundsOfFrames(this.framesReceived).some(preRound => {
+      if (slot === 1) {
+        return preRound.opponentFirstWeaponShown;
+      }
+
+      return preRound.opponentSecondWeaponShown;
+    });
+  }
+
+  /** Whether any frame sent to this browser has shown the other seat's arena. The server must not until both seats have locked in their arena. */
+  hasBeenToldTheOpponentsArena(): boolean {
+    return preRoundsOfFrames(this.framesReceived).some(preRound => preRound.opponentArenaShown);
+  }
+
+  /** Whether the server has sent this browser the reveal of what was decided. */
+  hasBeenToldTheReveal(): boolean {
+    return this.framesReceived.some(isRevealFrame);
+  }
+
+  /** Waits until the server has seated this browser again after it lost its connection or left: the frame that seats it comes once on every connection. */
+  async waitToBeSeatedAgain(): Promise<void> {
+    await expect.poll(() => this.framesReceived.slice(this.framesBeforeLosing).some(isJoinedFrame)).toBe(true);
   }
 
   /** Whether any snapshot has reached this browser: without it, a snapshot with nobody in it proves nothing. */

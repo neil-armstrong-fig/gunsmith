@@ -9,10 +9,14 @@ export interface ArenaWorkshopStore {
   result: WorkshopArena | undefined;
   savedId: string | undefined;
   practiceWorld: World | undefined;
+  making: boolean;
+  makeError: string | undefined;
   setPrompt: (prompt: string) => void;
   setStyle: (style: ArenaStyle) => void;
   setResult: (result: WorkshopArena) => void;
   setSavedId: (id: string) => void;
   iterate: (result: WorkshopArena, savedId: string) => void;
   setPracticeWorld: (world: World | undefined) => void;
+  setMaking: (making: boolean) => void;
+  setMakeError: (makeError: string | undefined) => void;
 }

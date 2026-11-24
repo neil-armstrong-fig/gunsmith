@@ -1,7 +1,9 @@
-import type {WeaponView} from "@src/online/types/pre-round/WeaponView";
+import type {WeaponSlotView} from "@src/online/types/pre-round/WeaponSlotView";
 
-/** The weapons step for a seat, as the server says it: the pair put forward (the other seat's only once both are locked in) and whether it is locked in. */
+/**
+ * The weapons step for a seat, as the server says it, slot 1 then slot 2. This seat's own weapon shows as soon as it is put forward; the other
+ * seat's weapon in a slot only once **both** have locked in that slot, so the other's first weapon appears when this seat has locked in its own.
+ */
 export interface WeaponsOfSeat {
-  choices?: readonly [WeaponView, WeaponView];
-  locked: boolean;
+  slots: readonly [WeaponSlotView, WeaponSlotView];
 }

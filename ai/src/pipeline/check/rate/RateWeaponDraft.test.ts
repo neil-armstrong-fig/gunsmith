@@ -9,6 +9,8 @@ const RIFLE: WeaponDraft = {
   magazineSize: 12,
   reloadSeconds: 1.5,
   startingReserve: 36,
+  visionDegrees: 90,
+  visionRange: 12,
 };
 
 it("rates a weapon by the damage it deals in a second", () => {
@@ -55,6 +57,8 @@ it("refuses a weapon over the power budget even when it is inside the damage cap
     magazineSize: 15,
     reloadSeconds: 1.1,
     startingReserve: 132,
+    visionDegrees: 103.3,
+    visionRange: 15.3,
   };
 
   const rating = rateWeaponDraft(strongEverywhere);
@@ -62,6 +66,21 @@ it("refuses a weapon over the power budget even when it is inside the damage cap
   expect(rating.ok).toBe(false);
   expect(rating.ok ? "" : rating.errors[0]).toContain("power rating");
   expect(rating.ok ? "" : rating.errors[0]).toContain("0.65");
+});
+
+it("counts the weapon's vision in the power rating: the same stats are inside the budget with the rifle's vision and over it with the widest and longest", () => {
+  const nearTheBudget = {
+    ...RIFLE,
+    bulletDamage: 19.9,
+    fireIntervalSeconds: 0.19,
+    bulletSpeed: 40.7,
+    magazineSize: 14,
+    reloadSeconds: 1.12,
+    startingReserve: 130,
+  };
+
+  expect(rateWeaponDraft(nearTheBudget).ok).toBe(true);
+  expect(rateWeaponDraft({...nearTheBudget, visionDegrees: 130, visionRange: 20}).ok).toBe(false);
 });
 
 it("names the damage cap first when a weapon is over both limits", () => {
@@ -73,6 +92,8 @@ it("names the damage cap first when a weapon is over both limits", () => {
     magazineSize: 60,
     reloadSeconds: 0.5,
     startingReserve: 200,
+    visionDegrees: 130,
+    visionRange: 20,
   });
 
   expect(rating.ok ? [] : rating.errors).toHaveLength(2);

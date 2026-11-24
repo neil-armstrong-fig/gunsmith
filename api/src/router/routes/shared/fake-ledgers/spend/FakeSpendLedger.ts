@@ -11,7 +11,7 @@ import type {FakeSpendLedger} from "@src/router/routes/shared/fake-ledgers/spend
  * `status`, `spend:reserve` or `spend:settle`.
  */
 export function fakeSpendLedger(calls: string[], options: FakeLedgersOptions): FakeSpendLedger {
-  const spendMeter = new SpendMeter();
+  const spendMeter = new SpendMeter(undefined, options.caps);
 
   const stub = (): unknown => ({
     status: async (): Promise<AiStatus> => {

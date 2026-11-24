@@ -9,7 +9,7 @@ import type {ArenaReading} from "@gunsmith/ai/pipeline/arena/arena-drafting/form
 export function readArenaEdit(reply: unknown): ArenaReading {
   const parsed = arenaEditDraftSchema.safeParse(reply);
   if (!parsed.success) {
-    return {ok: false, errors: schemaErrors(parsed.error.issues)};
+    return {ok: false, errors: schemaErrors(parsed.error.issues), reason: "invalid-draft"};
   }
 
   const {base: baseName, ...changes} = parsed.data;
@@ -20,12 +20,13 @@ export function readArenaEdit(reply: unknown): ArenaReading {
     return {
       ok: false,
       errors: [sentenceOf(`base: there is no built-in arena called "${baseName}": use one of ${names}.`)],
+      reason: "invalid-draft",
     };
   }
 
   const edited = applyArenaEdit(base.rows, changes);
   if (!edited.ok) {
-    return {ok: false, errors: edited.errors.map(sentenceOf)};
+    return {ok: false, errors: edited.errors.map(sentenceOf), reason: "invalid-shapes"};
   }
 
   return {ok: true, drawing: edited.drawing};

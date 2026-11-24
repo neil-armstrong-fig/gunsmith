@@ -1,3 +1,4 @@
+import {coverBesideTarget} from "@gunsmith/engine/cover/CoverBesideTarget";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
 import {equippedWeapon} from "@gunsmith/engine/loadout/EquippedWeapon";
 import {aimErrorFor} from "@gunsmith/engine/opponent/state/acting/engage/aim/AimErrorFor";
@@ -5,10 +6,11 @@ import {missedAimPoint} from "@gunsmith/engine/opponent/state/acting/engage/aim/
 import {advanceBurst} from "@gunsmith/engine/opponent/state/acting/engage/AdvanceBurst";
 import {advanceStrafe} from "@gunsmith/engine/opponent/state/acting/engage/AdvanceStrafe";
 import {engageDirection} from "@gunsmith/engine/opponent/state/acting/engage/EngageDirection";
+import type {BurstAdvance} from "@gunsmith/engine/opponent/state/acting/engage/types/BurstAdvance";
+import type {HeadingRequest} from "@gunsmith/engine/opponent/state/acting/engage/types/HeadingRequest";
 import type {OpponentBrain} from "@gunsmith/engine/opponent/types/OpponentBrain";
 import type {OpponentContext} from "@gunsmith/engine/opponent/types/OpponentContext";
 import type {StateAct} from "@gunsmith/engine/opponent/types/StateAct";
-import type {StrafeSide} from "@gunsmith/engine/opponent/types/StrafeSide";
 
 /**
  * Engaging: it has the player in sight. It stands and turns to face them while it waits out its reaction time, then holds
@@ -24,20 +26,36 @@ export function actEngage(brain: OpponentBrain, context: OpponentContext): State
   });
   const error = aimErrorFor({seenSeconds: burst.brain.seenSeconds, roll: burst.brain.aimRoll});
 
+  const ducking = isDucking(burst, context);
+
   return {
     input: {
-      direction: heading(brain, context, burst.brain.strafeSide),
+      direction: heading({brain, context, side: burst.brain.strafeSide, ducking}),
       aimAt: missedAimPoint(opponent.position, target.position, error),
       firing: burst.firing,
+      crouching: ducking,
       reload: false,
     },
     brain: burst.brain,
   };
 }
 
-/** Where it walks: nowhere while it waits out its reaction time, then the way `engageDirection` says. */
-function heading(brain: OpponentBrain, context: OpponentContext, side: StrafeSide): Point {
-  if (!walking(brain)) {
+/**
+ * Whether it ducks this step: it is resting between bursts (its reaction time is over and the trigger is up) with a cover block
+ * beside it on the line to the player, which hides a crouched fighter from them and shields them from a bullet. It stands for its
+ * reaction time and for every shot, since a crouched shooter's bullets are stopped by the block it hides behind.
+ */
+function isDucking(burst: BurstAdvance, context: OpponentContext): boolean {
+  if (burst.firing || burst.brain.reactionRemainingSeconds > 0) {
+    return false;
+  }
+
+  return coverBesideTarget(context.arena, context.target.position, context.opponent.position);
+}
+
+/** Where it walks: nowhere while it waits out its reaction time or ducks, then the way `engageDirection` says. */
+function heading({brain, context, side, ducking}: HeadingRequest): Point {
+  if (ducking || !walking(brain)) {
     return {x: 0, y: 0};
   }
 

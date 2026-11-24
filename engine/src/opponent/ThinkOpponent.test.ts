@@ -26,6 +26,16 @@ const coverBesidePlayer = arenaFrom([
   "#......................#",
   "########################",
 ]);
+// The opponent starts at (16.5, 3.5), with a cover block at (15, 3) right beside it, between it and the player at (12.5, 3.5).
+const coverBesideOpponent = arenaFrom([
+  "########################",
+  "#......................#",
+  "#......................#",
+  "#..............c.......#",
+  "#......................#",
+  "#......................#",
+  "########################",
+]);
 const wallInTheMiddle = arenaFrom([
   "########################",
   "#..........#...........#",
@@ -276,6 +286,25 @@ it("keeps wandering when nothing has hurt it and a wall hides the player", () =>
 });
 
 // The player stands at the middle of the arena's centre tile; the opponent four tiles east of that, or where it is told.
+it("keeps engaging a player it sees only from where it stands up, while it is ducked behind its own cover", () => {
+  const world = duel(1, coverBesideOpponent);
+  if (!world.opponent || !world.opponentBrain) {
+    throw new Error("The world has no opponent.");
+  }
+  const resting = {
+    ...world.opponentBrain,
+    state: "engage" as const,
+    reactionRemainingSeconds: 0,
+    restRemainingSeconds: 0.5,
+  };
+  const ducked = {...world, opponent: {...world.opponent, crouching: true}, opponentBrain: resting};
+
+  const decision = thinkOpponent(ducked, TICK);
+
+  expect(decision.brain?.state).toBe("engage");
+  expect(decision.input.crouching).toBe(true);
+});
+
 function duel(seed = 1, arena = room, opponentAt = {x: 16.5, y: 3.5}): World {
   return giveOpponentBrain(startingWorld(arena, [], opponentAt), seed);
 }

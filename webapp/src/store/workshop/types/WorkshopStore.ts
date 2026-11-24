@@ -14,10 +14,16 @@ export interface WorkshopStore {
   madeFromPrompt: string;
   /** The id the card's weapon is saved under on the shelf, or nothing when it is not saved. Cleared by a new Make. The card is saved only while the shelf still has this id. */
   savedId: string | undefined;
+  accountItemId: string | undefined;
+  making: boolean;
+  makeError: string | undefined;
+  setAccountWeapon: (result: WeaponToIterate) => void;
+  setMaking: (making: boolean) => void;
+  setMakeError: (makeError: string | undefined) => void;
   setPrompt: (prompt: string) => void;
   /** Makes `weapon` the card's: it is made from the words now in the box, and is not saved. */
   setWeapon: (weapon: Weapon) => void;
   setSavedId: (id: string | undefined) => void;
   /** Brings a saved weapon back to iterate on: its words in the box and as the words it was made from, its weapon on the card, saved under its id. */
-  showSavedWeapon: (saved: WeaponToIterate) => void;
+  showSavedWeapon: (saved: WeaponToIterate, isAccount?: boolean) => void;
 }

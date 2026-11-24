@@ -1,9 +1,10 @@
 import {DurableObject} from "cloudflare:workers";
 import {deliverAlertEmail} from "@src/durable-objects/spend-ledger/alerts/email/DeliverAlertEmail";
 import {sendDueAlerts} from "@src/durable-objects/spend-ledger/alerts/SendDueAlerts";
-import {SPEND_CAPS} from "@src/durable-objects/spend-ledger/meter/SpendCaps";
+import {spendCapsFrom} from "@src/durable-objects/spend-ledger/caps/SpendCapsFrom";
 import {SpendMeter} from "@src/durable-objects/spend-ledger/meter/SpendMeter";
 import type {AiStatus} from "@src/durable-objects/spend-ledger/types/AiStatus";
+import type {SpendCaps} from "@src/durable-objects/spend-ledger/types/SpendCaps";
 import type {SpendMeterState} from "@src/durable-objects/spend-ledger/types/SpendMeterState";
 import type {SpendOutcome} from "@src/durable-objects/spend-ledger/types/SpendOutcome";
 import type {ApiWorkerEnvironment} from "@src/env/types/ApiWorkerEnvironment";
@@ -19,6 +20,10 @@ const METER_KEY = "meter";
  * The 50/80/100 percent budget alerts are emailed from `alarm()`. A spend that makes one due schedules the alarm after its own change is
  * saved; the alarm sends each due alert and marks it sent only once it has gone (`sendDueAlerts`), so a failed send throws, the runtime
  * retries the alarm, and the alert stays due until it is delivered. With no `ALERT_TO_ADDRESS` set, nothing is scheduled or sent.
+ *
+ * The caps are the approved ceilings (`meter/SpendCaps`), which the optional vars `DAILY_SPEND_CAP_MICRODOLLARS` and
+ * `MONTHLY_SPEND_CAP_MICRODOLLARS` can only lower (`caps/SpendCapsFrom`), so the shutdown drill can set a tiny budget on a running Worker.
+ * They are read at each call, so the meter is rebuilt with them.
  */
 export class SpendLedger extends DurableObject<ApiWorkerEnvironment> {
   async reserve(key: string, microdollars: number): Promise<SpendOutcome> {
@@ -57,7 +62,7 @@ export class SpendLedger extends DurableObject<ApiWorkerEnvironment> {
         return deliverAlertEmail(this.env.ALERT_MAIL, {
           percent,
           spentMicrodollars,
-          capMicrodollars: SPEND_CAPS.monthlyMicrodollars,
+          capMicrodollars: this.caps().monthlyMicrodollars,
           fromAddress: this.env.ALERT_FROM_ADDRESS,
           toAddress,
           messageId: crypto.randomUUID(),
@@ -69,6 +74,14 @@ export class SpendLedger extends DurableObject<ApiWorkerEnvironment> {
           meter.markAlertSent(percent);
         });
       },
+    });
+  }
+
+  /** The caps in force: the approved ceilings, lowered by `DAILY_SPEND_CAP_MICRODOLLARS` and `MONTHLY_SPEND_CAP_MICRODOLLARS` when set (the shutdown drill). */
+  private caps(): SpendCaps {
+    return spendCapsFrom({
+      daily: this.env.DAILY_SPEND_CAP_MICRODOLLARS,
+      monthly: this.env.MONTHLY_SPEND_CAP_MICRODOLLARS,
     });
   }
 
@@ -89,7 +102,7 @@ export class SpendLedger extends DurableObject<ApiWorkerEnvironment> {
   }
 
   private change<Result>(use: (meter: SpendMeter) => Result): Result {
-    const meter = new SpendMeter(this.ctx.storage.kv.get<SpendMeterState>(METER_KEY));
+    const meter = new SpendMeter(this.ctx.storage.kv.get<SpendMeterState>(METER_KEY), this.caps());
     const result = use(meter);
     this.ctx.storage.kv.put(METER_KEY, meter.toState());
 

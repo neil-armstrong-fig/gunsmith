@@ -13,6 +13,8 @@ const RIFLE = {
   magazineSize: 12,
   reloadSeconds: 1.5,
   startingReserve: 36,
+  visionDegrees: 90,
+  visionRange: 12,
 };
 
 it("starts no stage after the request is cancelled, and never answers as if it had finished", async () => {

@@ -7,6 +7,8 @@ import {ArenaStyleChoice} from "@src/react/components/dom/workshop/components/ar
 import {ArenaResult} from "@src/react/components/dom/workshop/components/arena-workshop/components/arena-result/ArenaResult";
 import {ArenaShelf} from "@src/react/components/dom/workshop/components/arena-workshop/components/arena-shelf/ArenaShelf";
 import {SaveArena} from "@src/react/components/dom/workshop/components/arena-workshop/components/save-arena/SaveArena";
+import {SaveAccountItem} from "@src/react/components/dom/workshop/components/save-account-item/SaveAccountItem";
+import {useAccountLibraryStore} from "@src/store/account-library/UseAccountLibraryStore";
 import {useArenaWorkshopStore} from "@src/store/workshop/arena/UseArenaWorkshopStore";
 import type {JSX} from "react";
 import {useLayoutEffect, useRef} from "react";
@@ -15,6 +17,7 @@ const BUILT_INS = BUILT_IN_ARENAS.map(({name, rows}) => ({name, rows, arena: are
 
 export function ArenaWorkshop(): JSX.Element {
   const result = useArenaWorkshopStore(state => state.result);
+  const session = useAccountLibraryStore(state => state.session);
   const resultRef = useRef<HTMLElement>(null);
 
   useLayoutEffect(() => {
@@ -57,6 +60,12 @@ export function ArenaWorkshop(): JSX.Element {
 
       {result && (
         <ArenaResult ref={resultRef} arena={result.arena} name={result.name}>
+          {result.fallbackReason && (
+            <p role="status" className="mt-2 text-sm text-gs-ui-muted">
+              {result.fallbackReason}
+            </p>
+          )}
+
           <div className="mt-2 flex flex-wrap items-start gap-2">
             <button
               type="button"
@@ -68,7 +77,13 @@ export function ArenaWorkshop(): JSX.Element {
               Walk it
             </button>
 
-            {result.madeFromPrompt !== undefined && <SaveArena result={result} prompt={result.madeFromPrompt} />}
+            {session === "guest" && result.madeFromPrompt !== undefined && (
+              <SaveArena result={result} prompt={result.madeFromPrompt} />
+            )}
+
+            {session === "signed-in" && result.accountItemId !== undefined && (
+              <SaveAccountItem kind="arena" key={result.accountItemId} id={result.accountItemId} />
+            )}
           </div>
         </ArenaResult>
       )}

@@ -16,6 +16,15 @@ export class ArenaDsl {
     this.arena = new ArenaPlaywright(page);
   }
 
+  /** How bright the floor shows at `place` as a share of the floor at `clearFloor`, read from one screenshot: 1 is as bright, 0.8 is a fifth darker. */
+  async getFloorBrightnessAt(place: Point, clearFloor: Point): Promise<number> {
+    try {
+      return await this.arena.getFloorBrightnessAt(place, clearFloor);
+    } catch (error) {
+      throw new DslError("Failed to read how bright the floor shows", error);
+    }
+  }
+
   /** How big the arena is drawn on screen, in pixels. */
   async getSizeOnScreen(): Promise<Size> {
     try {

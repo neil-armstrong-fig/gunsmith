@@ -22,7 +22,7 @@ it("is false for a weapon over the damage-per-second cap even when its power rat
 });
 
 it("is false for a weapon over the power budget even when it is well under the damage-per-second cap", () => {
-  // Every stat about two thirds of the way from weakest to strongest: a rating of about 0.66 and 116 damage a second.
+  // Every stat, vision included, about two thirds of the way from weakest to strongest: a rating of about 0.66 and 116 damage a second.
   const justOverBudget = {
     bulletDamage: 20.9,
     fireIntervalSeconds: 0.18,
@@ -30,6 +30,8 @@ it("is false for a weapon over the power budget even when it is well under the d
     magazineSize: 15,
     reloadSeconds: 1.1,
     startingReserve: 132,
+    visionDegrees: 103.3,
+    visionRange: 15.3,
   };
 
   expect(withinLimits(justOverBudget)).toBe(false);

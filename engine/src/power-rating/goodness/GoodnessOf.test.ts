@@ -53,6 +53,14 @@ it("puts a reserve of 100 half way between 0 and 200", () => {
   expect(goodnessOf({...WEAKEST_STATS, startingReserve: 100}).reserve).toBeCloseTo(0.5, 9);
 });
 
+it("puts a vision cone of 90 degrees half way between 50 and 130", () => {
+  expect(goodnessOf({...WEAKEST_STATS, visionDegrees: 90}).visionCone).toBeCloseTo(0.5, 9);
+});
+
+it("puts a vision range of 13 tiles half way between 6 and 20", () => {
+  expect(goodnessOf({...WEAKEST_STATS, visionRange: 13}).visionRange).toBeCloseTo(0.5, 9);
+});
+
 it("keeps a value past its range at 0 or 1, so a stray number cannot rate off the scale", () => {
   const goodness = goodnessOf({...STRONGEST_STATS, bulletDamage: 5000, startingReserve: 9999, reloadSeconds: 0.01});
 
@@ -61,4 +69,12 @@ it("keeps a value past its range at 0 or 1, so a stray number cannot rate off th
   expect(goodness.reloadSpeed).toBe(1);
   expect(goodnessOf({...WEAKEST_STATS, bulletDamage: 0.1, bulletSpeed: -3}).damage).toBe(0);
   expect(goodnessOf({...WEAKEST_STATS, bulletSpeed: -3}).bulletSpeed).toBe(0);
+  expect(goodnessOf({...STRONGEST_STATS, visionDegrees: 400, visionRange: 90})).toMatchObject({
+    visionCone: 1,
+    visionRange: 1,
+  });
+  expect(goodnessOf({...WEAKEST_STATS, visionDegrees: 10, visionRange: -2})).toMatchObject({
+    visionCone: 0,
+    visionRange: 0,
+  });
 });

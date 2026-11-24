@@ -9,4 +9,5 @@ export interface ReserveCreditAsk {
   pipelineAvailable: boolean;
   kind: CreditKind;
   reservedMicrodollars?: number;
+  trackBlockedAttempt?: boolean;
 }

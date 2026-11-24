@@ -13,6 +13,13 @@ export class ShelfPlaywright extends BasePage {
     await this.card().getByRole("button", {name: "Save", exact: true}).click();
   }
 
+  async getSaveError(): Promise<string | undefined> {
+    const error = this.card().getByRole("alert");
+    if (!(await error.isVisible())) return undefined;
+
+    return await error.innerText();
+  }
+
   async canSave(): Promise<boolean> {
     const save = this.card().getByRole("button", {name: "Save", exact: true});
 
