@@ -4,6 +4,7 @@ import {RoomPreRoundDsl} from "@src/dsl/gunsmith/components/room/components/pre-
 import {RoomEntryDsl} from "@src/dsl/gunsmith/components/room/components/room-entry/RoomEntryDsl";
 import {RoomPlaywright} from "@src/dsl/gunsmith/components/room/playwright/RoomPlaywright";
 import type {ConnectionDelay} from "@src/dsl/gunsmith/components/room/playwright/wire/delayed-line/types/ConnectionDelay";
+import type {SentChoice} from "@src/dsl/gunsmith/components/room/playwright/wire/types/SentChoice";
 import type {RoomLimits} from "@src/dsl/gunsmith/components/room/types/RoomLimits";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
 import type {GunsmithDsl} from "@src/dsl/gunsmith/GunsmithDsl";
@@ -356,6 +357,15 @@ export class RoomDsl {
       return this.room.hasBeenToldTheOpponentsArena();
     } catch (error) {
       throw new DslError("Failed to read whether the other player's arena has been sent", error);
+    }
+  }
+
+  /** What this browser has put forward in the choosing, in the order it sent it: each weapon with its slot and the arena, a built-in or a saved item. */
+  getChoicesSent(): readonly SentChoice[] {
+    try {
+      return this.room.getChoicesSent();
+    } catch (error) {
+      throw new DslError("Failed to read what the page put forward in the choosing", error);
     }
   }
 

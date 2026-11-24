@@ -1,6 +1,9 @@
 import type {Locator, Page} from "@playwright/test";
 import {expect} from "@playwright/test";
+import {arrangeSignedInPlayer} from "@src/dsl/gunsmith/components/room/components/pre-round/playwright/signed-in-player/ArrangeSignedInPlayer";
 import type {ArenaPick} from "@src/dsl/gunsmith/components/room/components/pre-round/types/ArenaPick";
+import type {LibraryContents} from "@src/dsl/gunsmith/components/room/components/pre-round/types/LibraryContents";
+import type {SavedItemIds} from "@src/dsl/gunsmith/components/room/components/pre-round/types/SavedItemIds";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
 
 /** The buttons of the arena pick, by what each says. */
@@ -14,6 +17,11 @@ const PICK_BUTTONS: Record<ArenaPick, string> = {
 export class RoomPreRoundPlaywright extends BasePage {
   constructor(page: Page) {
     super(page);
+  }
+
+  /** Makes this page's player a signed-in one whose library holds `library`. Call it before the room is opened, since the page asks when it loads. */
+  async arrangeSignedInPlayer(library: LibraryContents): Promise<SavedItemIds> {
+    return await arrangeSignedInPlayer(this.page, library);
   }
 
   /** Waits until the room's choosing is on the screen. */

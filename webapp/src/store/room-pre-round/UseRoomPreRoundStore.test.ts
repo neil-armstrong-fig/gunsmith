@@ -56,15 +56,18 @@ it("takes a readout that says something new", () => {
 it("holds each want on its own: a weapon for each slot, an arena, a pick and the ask to start", () => {
   const store = useRoomPreRoundStore.getState();
 
-  store.wantWeapon(1, "submachine-gun");
-  useRoomPreRoundStore.getState().wantWeapon(2, "rifle");
-  useRoomPreRoundStore.getState().wantArena("Fair duel");
+  store.wantWeapon(1, {kind: "builtIn", key: "submachine-gun"});
+  useRoomPreRoundStore.getState().wantWeapon(2, {kind: "saved", id: "weapon-from-the-library"});
+  useRoomPreRoundStore.getState().wantArena({kind: "saved", id: "arena-from-the-library"});
   useRoomPreRoundStore.getState().wantPick("theirs");
   useRoomPreRoundStore.getState().wantToStart();
 
   expect(useRoomPreRoundStore.getState().wants).toEqual({
-    weapons: ["submachine-gun", "rifle"],
-    arena: "Fair duel",
+    weapons: [
+      {kind: "builtIn", key: "submachine-gun"},
+      {kind: "saved", id: "weapon-from-the-library"},
+    ],
+    arena: {kind: "saved", id: "arena-from-the-library"},
     pick: "theirs",
     start: true,
   });
@@ -72,10 +75,10 @@ it("holds each want on its own: a weapon for each slot, an arena, a pick and the
 
 it("forgets what was wanted once the pre-round is over, and keeps it while it goes on", () => {
   useRoomPreRoundStore.getState().setReadout(readout);
-  useRoomPreRoundStore.getState().wantWeapon(1, "rifle");
+  useRoomPreRoundStore.getState().wantWeapon(1, {kind: "builtIn", key: "rifle"});
 
   useRoomPreRoundStore.getState().setReadout({...readout, secondsLeft: 12});
-  expect(useRoomPreRoundStore.getState().wants.weapons[0]).toBe("rifle");
+  expect(useRoomPreRoundStore.getState().wants.weapons[0]).toEqual({kind: "builtIn", key: "rifle"});
 
   useRoomPreRoundStore.getState().setReadout(undefined);
 

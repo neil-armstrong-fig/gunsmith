@@ -1,6 +1,8 @@
 import type {Page} from "@playwright/test";
 import {RoomPreRoundPlaywright} from "@src/dsl/gunsmith/components/room/components/pre-round/playwright/RoomPreRoundPlaywright";
 import type {ArenaPick} from "@src/dsl/gunsmith/components/room/components/pre-round/types/ArenaPick";
+import type {LibraryContents} from "@src/dsl/gunsmith/components/room/components/pre-round/types/LibraryContents";
+import type {SavedItemIds} from "@src/dsl/gunsmith/components/room/components/pre-round/types/SavedItemIds";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
 
 /**
@@ -14,6 +16,19 @@ export class RoomPreRoundDsl {
 
   constructor(page: Page) {
     this.preRound = new RoomPreRoundPlaywright(page);
+  }
+
+  /**
+   * Makes this browser's player a signed-in one whose library holds `library` (two saved weapons and an arena unless it says nothing is saved), before
+   * the room is opened, and answers the ids its saved items have. The room's server sees no session, so it refuses the saved ids: read what the
+   * page offered and sent, not what was played.
+   */
+  async arrangeSignedInPlayer(library: LibraryContents = "two saved weapons and an arena"): Promise<SavedItemIds> {
+    try {
+      return await this.preRound.arrangeSignedInPlayer(library);
+    } catch (error) {
+      throw new DslError("Failed to make the player signed in with a library", error);
+    }
   }
 
   /** Waits until the room's choosing is on the screen. */
