@@ -17,6 +17,7 @@ import {correctionOffset} from "@src/online/prediction/correction/CorrectionOffs
 import {fadedOffset} from "@src/online/prediction/correction/FadedOffset";
 import {InputHistory} from "@src/online/prediction/history/InputHistory";
 import {replayInputs} from "@src/online/prediction/replay/ReplayInputs";
+import {RevealedDrawings} from "@src/online/revealed-drawings/RevealedDrawings";
 import type {InputAck} from "@gunsmith/shared/online/types/InputAck";
 import type {SeatTokenKeeper} from "@src/online/seat-token/SeatTokenKeeper";
 import type {JoinedFrame} from "@src/online/types/JoinedFrame";
@@ -72,6 +73,8 @@ export class OnlineMatch {
   private ready: Readiness | undefined;
   private choosing: PreRoundFrame | undefined;
   private revealed: RevealFrame | undefined;
+  /** The saved weapons' drawings the reveal sent, given to the weapons of each snapshot as it comes. */
+  private revealedDrawings: RevealedDrawings | undefined;
   private readonly snapshots = new SnapshotBuffer(SNAPSHOTS_KEPT);
   /** What the snapshots since the last `takeEvents` said happened to this player; kept until taken, so a frame that comes late loses none. */
   private eventsNotYetTaken: EventsOfSnapshots | undefined;
@@ -289,6 +292,7 @@ export class OnlineMatch {
     }
     if (message?.kind === "reveal") {
       this.revealed = message;
+      this.revealedDrawings = new RevealedDrawings(message);
     }
     if (message?.kind === "snapshot" && this.arena) {
       this.choosing = undefined;
@@ -341,6 +345,7 @@ export class OnlineMatch {
   }
 
   private takeSnapshot(arena: Arena, message: SnapshotFrame): void {
+    this.revealedDrawings?.noteOn(message);
     this.noteEvents(message);
     this.latest = worldOfSeatView(arena, message);
     this.snapshotArrivedAtSeconds = this.clockSeconds;

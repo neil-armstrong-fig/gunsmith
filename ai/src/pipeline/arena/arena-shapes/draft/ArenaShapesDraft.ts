@@ -24,7 +24,8 @@ const stairSchema = z
  * An arena as shapes, the second way a model may be asked to describe one (the first is the drawing's rows): a size and lists of
  * rectangles and stair tiles, which code draws into the same rows (`compileArenaShapes`). A model counts characters in a row badly
  * and tiles in a rectangle well, so the format has no row to get the wrong length. Coordinates count tiles from the top-left corner
- * (0, 0): `x` towards the east, `y` towards the south. DRAFT, local to `ai/`. Strict, so a stray model field is refused, not
+ * (0, 0): `x` towards the east, `y` towards the south. `floor`, for an arena whose outline is not a rectangle (a plus sign, an L), lists
+ * the rectangles of its open area, and every tile outside them is wall. DRAFT, local to `ai/`. Strict, so a stray model field is refused, not
  * dropped. The name is checked by `arenaDraftSchema` once the shapes are drawn.
  */
 export const arenaShapesDraftSchema = z
@@ -36,6 +37,7 @@ export const arenaShapesDraftSchema = z
     covers: z.array(rectangleSchema.strict()).max(RECTANGLE_LIMIT).optional(),
     platforms: z.array(platformSchema).max(RECTANGLE_LIMIT).optional(),
     stairs: z.array(stairSchema).max(RECTANGLE_LIMIT).optional(),
+    floor: z.array(rectangleSchema.strict()).max(RECTANGLE_LIMIT).optional(),
   })
   .strict();
 

@@ -109,6 +109,15 @@ export class ArenaDsl implements TrialDsl<ArenaDsl> {
     }
   }
 
+  /** How many of the four corners of the arena given are walled in, or nothing when none was given. The spec states how many the shape asked for has. */
+  getWalledCorners(): number | undefined {
+    try {
+      return this.pipeline.walledCornersOfTheAnswer();
+    } catch (error) {
+      throw new DslError("Expected to read the walled corners of the arena given", error);
+    }
+  }
+
   /** What makes what the player is shown unsafe, if anything: an arena the engine would not play, or a leaked prompt. */
   getSafeToShowProblems(): string[] {
     try {

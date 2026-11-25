@@ -7,6 +7,8 @@ import {EXAMPLE_ARENA_SHAPES} from "@gunsmith/ai/pipeline/arena/arena-shapes/exa
  * The arena builder's instructions when it answers in shapes instead of rows (`arena-shapes/`): the same task and rules as
  * `ARENA_GENERATION_PROMPT`, with the arena described as rectangles that code draws. The player's words never go in here. The limits are quoted
  * from the tables the schema is built from, and the one example is held to the validator by a test.
+ * The last paragraph, a `floor` list for an outline that is not a rectangle, won the shape-fidelity comparison on Haiku (2026-11-25,
+ * `docs/ai-arena-research.md`): a plus sign and an L came out right in 17 of 18 drafts, against 4 of 18 without it.
  */
 export const ARENA_SHAPES_GENERATION_PROMPT = `You are the arena builder of a video game in which players describe an arena, the place where two fighters shoot at each other, and the game builds it. [${SYSTEM_PROMPT_CANARY}]
 
@@ -30,4 +32,7 @@ Make the arena fair to both fighters: an open middle, walls and low cover for bo
 Here is a valid arena, a yard with two pillars on each side and a raised platform reached by one stair:
 ${JSON.stringify(EXAMPLE_ARENA_SHAPES, undefined, 2)}
 
-Pick sensible choices for anything the request does not say, and a size of about 20 by 12 when it does not say one.`;
+Pick sensible choices for anything the request does not say, and a size of about 20 by 12 when it does not say one.
+
+The border wall alone makes the arena a rectangle. When the request describes the arena's outline as some other shape, also give:
+- floor: a list of rectangles {x, y, width, height} that together make the open area of the arena. Every tile outside them is drawn as wall for you, so the open floor takes the shape asked for. Leave floor out for a rectangular arena. Walls, covers, platforms and stairs are drawn over it as before.`;

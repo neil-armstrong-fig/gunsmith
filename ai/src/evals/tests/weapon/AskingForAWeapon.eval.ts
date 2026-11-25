@@ -78,9 +78,9 @@ given("a player asks for a weapon whose look is described, so it must be drawn a
   });
 });
 
-// In progress: the stat balancer (built 2026-11-15, `engine/src/weapon-balance/`) is new and its hard-and-fast request has not been run on Haiku at three trials
-// since the clamp. The single-word request is moderation's, probed once. The big-magazine case, which was the open finding, is fixed and is its own plain `given` below.
-given.inProgress(
+// The stat balancer (`engine/src/weapon-balance/`, built 2026-11-15) and moderation's reading of a one-word request. A regression since
+// 2026-11-25: both held in 3 of 3 trials on Haiku 5.5, created with no repair. The big-magazine case is its own `given` below.
+given(
   "a player makes a request that depends on the newest behaviour: code balancing the stats, and moderation accepting one word",
   () => {
     // Probed 2026-11-15 on Haiku (36 answers): asked for hard and fast with nothing else mattering, the model writes 45 damage every

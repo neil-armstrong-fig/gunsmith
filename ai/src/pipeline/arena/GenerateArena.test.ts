@@ -146,6 +146,25 @@ it("asks for an edit of a built-in arena, first and on the repair, for the red s
   }
 });
 
+it("asks for shapes with a floor list, first and on the repair, and walls what lies outside the floor", async () => {
+  const tooWide = {name: "Corner Room", width: 8, height: 5, floor: [{x: 1, y: 1, width: 9, height: 3}]};
+  const fixed = {name: "Corner Room", width: 8, height: 5, floor: [{x: 1, y: 1, width: 5, height: 3}]};
+  const dependencies = {...dependenciesWith([tooWide, fixed]), format: "shapes"} as const;
+  const calls = vi.spyOn(dependencies.generator, "invoke");
+
+  const outcome = await generateArena({prompt: "a corner room"}, dependencies);
+
+  expect(outcome).toMatchObject({
+    status: "created",
+    modelCalls: 3,
+    arena: {rows: ["########", "#.....##", "#.....##", "#.....##", "########"]},
+  });
+  expect(calls).toHaveBeenCalledTimes(2);
+  for (const [messages] of calls.mock.calls) {
+    expect(JSON.stringify(messages)).toContain("floor: a list of rectangles");
+  }
+});
+
 it("keeps to the format the dependencies name when no style is asked for", async () => {
   const dependencies = dependenciesWith([GOOD]);
   const calls = vi.spyOn(dependencies.generator, "invoke");

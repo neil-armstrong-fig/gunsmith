@@ -21,6 +21,8 @@ export class RoomDsl {
   private readonly room: RoomPlaywright;
   private second: GunsmithDsl | undefined;
   private stranger: GunsmithDsl | undefined;
+  /** Whether this player's first weapon is a saved one (`arrangeASavedWeaponForThisPlayer`), so a second browser is told of it as the opponent's. */
+  private savedWeaponArranged = false;
 
   constructor(
     page: Page,
@@ -76,9 +78,12 @@ export class RoomDsl {
   /** Opens a second browser, with a session of its own, in the room `code` names. It is reached as `secondBrowser()`. */
   async joinWithASecondBrowser(code: string): Promise<void> {
     try {
-      await this.room.openSecondBrowser(code, secondPage => {
+      await this.room.openSecondBrowser(code, async secondPage => {
         this.second = this.makeGunsmith(secondPage);
         this.second.room.startWatching();
+        if (this.savedWeaponArranged) {
+          await this.second.room.arrangeASavedWeaponForTheOpponent();
+        }
       });
       await this.secondBrowser().room.waitForTheMatch();
     } catch (error) {
@@ -108,9 +113,12 @@ export class RoomDsl {
    */
   async joinWithASecondBrowserToChoose(code: string): Promise<void> {
     try {
-      await this.room.openSecondBrowser(code, secondPage => {
+      await this.room.openSecondBrowser(code, async secondPage => {
         this.second = this.makeGunsmith(secondPage);
         this.second.room.startWatching();
+        if (this.savedWeaponArranged) {
+          await this.second.room.arrangeASavedWeaponForTheOpponent();
+        }
       });
       await this.secondBrowser().room.preRound.waitToBeChoosing();
     } catch (error) {
@@ -234,6 +242,29 @@ export class RoomDsl {
       return this.second;
     } catch (error) {
       throw new DslError("Failed to get the game as the second browser sees it", error);
+    }
+  }
+
+  /**
+   * Has this player lock in a saved weapon (the rifle's numbers, a mint drawing) for slot 1, as a signed-in player would. The local Worker
+   * sees no session and refuses saved ids, so the frames each browser is given are rewritten to say so, the reveal and every snapshot:
+   * this browser's as its own, and a second browser's, when it joins, as the opponent's. Say it before `createPrivateRoom`.
+   */
+  async arrangeASavedWeaponForThisPlayer(): Promise<void> {
+    try {
+      this.savedWeaponArranged = true;
+      await this.room.carryASavedWeaponFirst("player");
+    } catch (error) {
+      throw new DslError("Failed to arrange a saved weapon for this player", error);
+    }
+  }
+
+  /** Has the other player's slot 1 be the saved weapon of `arrangeASavedWeaponForThisPlayer`, in the frames this browser is given. Said before its page opens. */
+  async arrangeASavedWeaponForTheOpponent(): Promise<void> {
+    try {
+      await this.room.carryASavedWeaponFirst("opponent");
+    } catch (error) {
+      throw new DslError("Failed to arrange a saved weapon for the opponent", error);
     }
   }
 

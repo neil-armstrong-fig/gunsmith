@@ -116,7 +116,7 @@ check does is a bug in one of the two. Every `when` states its own expectation i
 ## Commands
 
 `pnpm --filter @gunsmith/ai checks` (the gate), `... evals:fake`, `... evals:local`, `... evals:paid`, `... dev` (Agent Server and Studio).
-Environment for the evals: `EVAL_TIER` (`fake`, `local`, `paid`), `EVAL_ARENA_FORMAT` (`shapes` by default or `rows`; the local and paid arena drivers), `EVAL_TRIALS` (runs per case; default 3 local for weapons, 1 for drawings, 1 otherwise),
+Environment for the evals: `EVAL_TIER` (`fake`, `local`, `paid`), `EVAL_ARENA_FORMAT` (`shapes` by default, `rows` or `editBuiltIn`; the local and paid arena drivers), `EVAL_TRIALS` (runs per case; default 3 local for weapons, 1 for drawings, 1 otherwise),
 `EVAL_KEEP_DRAWINGS` and `EVAL_KEEP_ARENAS` (keep every drawing, or every arena, of the run in `src/evals/results/drawings-<tier>-latest.json` or `arenas-<tier>-latest.json` and a page to look at, `.html`; **on by default for the local tier** (the user, 2026-11-18), off for the fake and paid tiers; `1` forces it on, `0` off),
 `EVAL_GATE=regression` (only `regression` cases fail the run; what CI will use).
 **Archive (the user, 2026-11-18):** every `evals:*` run also keeps its results for good in the **main checkout's** `private-source/eval-results/<YYYYMMDD-HHMMSS>-<commit>[-uncommitted]/`
