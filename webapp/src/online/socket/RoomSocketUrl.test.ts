@@ -70,3 +70,9 @@ it("passes on how long the two seats have to choose, and keeps a nought, which m
     "ws://h/api/rooms/ABC234/socket?preRoundSeconds=0",
   );
 });
+
+it("passes on how long the decided arena and weapons are shown, and keeps a nought, which means none", () => {
+  expect(roomSocketUrl({protocol: "http:", host: "h"}, "ABC234", {search: "?room=ABC234&revealSeconds=0"})).toBe(
+    "ws://h/api/rooms/ABC234/socket?revealSeconds=0",
+  );
+});

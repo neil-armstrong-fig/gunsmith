@@ -9,6 +9,10 @@ import {largestJump} from "@src/dsl/gunsmith/components/room/playwright/wire/mov
 import type {PositionSample} from "@src/dsl/gunsmith/components/room/playwright/wire/movement/types/PositionSample";
 import type {ShownSamples} from "@src/dsl/gunsmith/components/room/playwright/wire/movement/types/ShownSamples";
 import {arenasOfferedInFrames} from "@src/dsl/gunsmith/components/room/playwright/wire/ArenasOfferedInFrames";
+import {isRevealFrame} from "@src/dsl/gunsmith/components/room/playwright/wire/IsRevealFrame";
+import {preRoundsOfFrames} from "@src/dsl/gunsmith/components/room/playwright/wire/PreRoundsOfFrames";
+import {choicesOfSentFrames} from "@src/dsl/gunsmith/components/room/playwright/wire/ChoicesOfSentFrames";
+import type {SentChoice} from "@src/dsl/gunsmith/components/room/playwright/wire/types/SentChoice";
 import {isJoinedFrame} from "@src/dsl/gunsmith/components/room/playwright/wire/IsJoinedFrame";
 import {isSnapshotFrame} from "@src/dsl/gunsmith/components/room/playwright/wire/IsSnapshotFrame";
 import {snapshotsOfFrames} from "@src/dsl/gunsmith/components/room/playwright/wire/SnapshotsOfFrames";
@@ -45,6 +49,9 @@ interface NewBrowser {
 export class RoomPlaywright extends BasePage {
   /** The text frames this browser has been sent over its WebSockets, in order. What it was told, not what it chose to draw. */
   private readonly framesReceived: string[] = [];
+
+  /** The text frames this browser has sent over its WebSockets, in order. What the page chose to say, not what the server made of it. */
+  private readonly framesSent: string[] = [];
 
   /** The context of the second browser: its own storage and its own session, never a second page of this one. */
   private secondContext: BrowserContext | undefined;
@@ -84,9 +91,14 @@ export class RoomPlaywright extends BasePage {
     super(page);
   }
 
-  /** Starts keeping every text frame this page's WebSockets receive, from before the page opens. */
+  /** Starts keeping every text frame this page's WebSockets receive and send, from before the page opens. */
   startWatching(): void {
     this.page.on("websocket", socket => {
+      socket.on("framesent", ({payload}) => {
+        if (typeof payload === "string") {
+          this.framesSent.push(payload);
+        }
+      });
       socket.on("framereceived", ({payload}) => {
         if (typeof payload === "string" && !this.routed) {
           this.framesReceived.push(payload);
@@ -409,6 +421,42 @@ export class RoomPlaywright extends BasePage {
     return distance !== undefined && distance < AGREE_WITHIN_TILES;
   }
 
+  /** What this page has put forward in the choosing, in the order it sent it: each weapon and the arena, a built-in or a saved item. */
+  getChoicesSent(): readonly SentChoice[] {
+    return choicesOfSentFrames(this.framesSent);
+  }
+
+  /** Whether any frame of the choosing before the match has reached this browser: without it, a choosing that told nothing proves nothing. */
+  hasReceivedPreRounds(): boolean {
+    return preRoundsOfFrames(this.framesReceived).length > 0;
+  }
+
+  /** Whether any frame sent to this browser has named the other seat's weapon in `slot`. The server must not until both seats have locked in that slot. */
+  hasBeenToldTheOpponentsWeapon(slot: number): boolean {
+    return preRoundsOfFrames(this.framesReceived).some(preRound => {
+      if (slot === 1) {
+        return preRound.opponentFirstWeaponShown;
+      }
+
+      return preRound.opponentSecondWeaponShown;
+    });
+  }
+
+  /** Whether any frame sent to this browser has shown the other seat's arena. The server must not until both seats have locked in their arena. */
+  hasBeenToldTheOpponentsArena(): boolean {
+    return preRoundsOfFrames(this.framesReceived).some(preRound => preRound.opponentArenaShown);
+  }
+
+  /** Whether the server has sent this browser the reveal of what was decided. */
+  hasBeenToldTheReveal(): boolean {
+    return this.framesReceived.some(isRevealFrame);
+  }
+
+  /** Waits until the server has seated this browser again after it lost its connection or left: the frame that seats it comes once on every connection. */
+  async waitToBeSeatedAgain(): Promise<void> {
+    await expect.poll(() => this.framesReceived.slice(this.framesBeforeLosing).some(isJoinedFrame)).toBe(true);
+  }
+
   /** Whether any snapshot has reached this browser: without it, a snapshot with nobody in it proves nothing. */
   hasReceivedSnapshots(): boolean {
     return snapshotsOfFrames(this.framesReceived).length > 0;
@@ -496,11 +544,6 @@ export class RoomPlaywright extends BasePage {
   /** The built-in arenas the room offers this browser while choosing, from the latest pre-round frame it was sent; `undefined` before one comes. */
   getArenasOffered(): readonly string[] | undefined {
     return arenasOfferedInFrames(this.framesReceived);
-  }
-
-  /** Waits until the server has sent this browser the room's choosing, which it does from the moment it is seated until the match begins. */
-  async waitForTheChoosing(): Promise<void> {
-    await expect.poll(() => this.getArenasOffered()).toBeDefined();
   }
 
   /** Whether the latest snapshot sent to this browser holds the weapon lying in the arena. */

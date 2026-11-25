@@ -1,0 +1,16 @@
+import type {RevealReadout} from "@src/game/room-pre-round/types/RevealReadout";
+import type {RoomStage} from "@src/game/room-pre-round/types/RoomStage";
+import type {SeatReadout} from "@src/game/room-pre-round/types/SeatReadout";
+
+/** What the server says of the room's pre-round, as far as the screen needs it, written by the loop whenever it changes. */
+export interface RoomPreRoundReadout {
+  stage: RoomStage;
+  /** The whole seconds left (to choose, then to look at what was decided), or nothing while the other player has not sat: the clock starts at their seat. */
+  secondsLeft: number | undefined;
+  own: SeatReadout;
+  opponent: SeatReadout;
+  /** How the arena was settled, once it was. */
+  how: string | undefined;
+  /** What was decided, once the server has said it. */
+  reveal: RevealReadout | undefined;
+}

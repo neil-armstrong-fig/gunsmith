@@ -18,8 +18,9 @@ const gameStoreMayImport = "^(?!zustand$|zustand/|@gunsmith/engine(?:/|$)|@src/g
 // The feedback store (`src/store/feedback/`) is smaller still: Zustand and its own folder, no engine and no world.
 const feedbackStoreMayImport = "^(?!zustand$|zustand/|@src/store/feedback/|\\./).+$";
 
-// The workshop store (`src/store/workshop/`) holds what is written and the weapon last made: Zustand, the engine's types and its own folder.
-const workshopStoreMayImport = "^(?!zustand$|zustand/|@gunsmith/engine(?:/|$)|@src/store/workshop/|\\./).+$";
+// The workshop store (`src/store/workshop/`) holds what is written and the weapon last made: Zustand, the engine's types, the arena styles and its own folder.
+const workshopStoreMayImport =
+  "^(?!zustand$|zustand/|@gunsmith/engine(?:/|$)|@gunsmith/shared/arena-style/|@src/store/workshop/|\\./).+$";
 
 // The shelf store (`src/store/shelf/`) holds the saved weapons and keeps them in the browser's storage: Zustand, zod (to read what the browser kept), the engine and its own folder.
 const shelfStoreMayImport = "^(?!zustand$|zustand/|zod$|@gunsmith/engine(?:/|$)|@src/store/shelf/|\\./).+$";
@@ -27,6 +28,10 @@ const shelfStoreMayImport = "^(?!zustand$|zustand/|zod$|@gunsmith/engine(?:/|$)|
 // The pre-round store (`src/store/pre-round/`) holds where the pre-round stands and the weapons locked in: Zustand, the engine's types (and its weapons in a test), the page's ask for it, the picks' type and its own folder.
 const preRoundStoreMayImport =
   "^(?!zustand$|@gunsmith/engine(?:/|$)|@src/game/pre-round/|@src/store/pre-round/|\\./).+$";
+
+// The room's pre-round store (`src/store/room-pre-round/`) holds what the server last said of it and what the player locked in: Zustand, the engine's types, the plain types in `game/room-pre-round/` and its own folder, nothing of the online code (the loop turns a frame into the readout first).
+const roomPreRoundStoreMayImport =
+  "^(?!zustand$|@gunsmith/engine(?:/|$)|@src/game/room-pre-round/|@src/store/room-pre-round/|\\./).+$";
 
 // The pre-round's memory (`src/store/pre-round-choices/`) holds the ids of what was last chosen and keeps them in the browser's storage: Zustand, zod (to read what the browser kept) and its own folder.
 const preRoundChoicesStoreMayImport = "^(?!zustand$|zustand/|zod$|@src/store/pre-round-choices/|\\./).+$";
@@ -175,6 +180,22 @@ export default [
     },
   },
   {
+    // The room's pre-round store holds the server's readout and what the player locked in, and nothing else. After the store block above.
+    files: ["src/store/room-pre-round/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": restrictedImports({
+        allowedPackages: ["@gunsmith/engine"],
+        patterns: [
+          {
+            regex: roomPreRoundStoreMayImport,
+            message:
+              "The room's pre-round store may import only zustand, the engine, game/room-pre-round and its own folder: it holds what the server said of the pre-round, already turned into a readout, and what the player locked in.",
+          },
+        ],
+      }),
+    },
+  },
+  {
     // The pre-round's memory holds three ids and keeps them in the browser's storage. After the store block above.
     files: ["src/store/pre-round-choices/**/*.{ts,tsx}"],
     rules: {
@@ -211,12 +232,12 @@ export default [
     files: ["src/store/workshop/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": restrictedImports({
-        allowedPackages: ["@gunsmith/engine"],
+        allowedPackages: ["@gunsmith/engine", "@gunsmith/shared"],
         patterns: [
           {
             regex: workshopStoreMayImport,
             message:
-              "The workshop store may import only zustand, the engine's types and its own folder: it holds what is written and the weapon last made.",
+              "The workshop store may import only zustand, the engine's types, the arena styles and its own folder: it holds what is written and the weapon last made.",
           },
         ],
       }),

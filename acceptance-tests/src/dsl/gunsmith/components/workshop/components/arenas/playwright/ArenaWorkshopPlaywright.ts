@@ -27,6 +27,29 @@ export class ArenaWorkshopPlaywright extends BasePage {
     }
   }
 
+  async chooseStyle(name: string): Promise<void> {
+    if ((await this.isStyleChosen(name)) === false) {
+      await this.styleSwitch().click();
+    }
+  }
+
+  async getPromptBorderColour(): Promise<string> {
+    return await this.page
+      .getByRole("dialog", {name: "Workshop"})
+      .getByLabel("Describe your arena")
+      .evaluate(element => getComputedStyle(element).borderTopColor);
+  }
+
+  async pressStyleWord(word: string): Promise<void> {
+    await this.styleSwitch().getByText(word, {exact: true}).click();
+  }
+
+  async isStyleChosen(name: string): Promise<boolean> {
+    const isRed = await this.styleSwitch().isChecked();
+
+    return isRed === (name === "Red");
+  }
+
   async pressArenaAction(name: string, index: number): Promise<void> {
     await this.page.getByRole("dialog", {name: "Workshop"}).getByRole("button", {name, exact: true}).nth(index).click();
   }
@@ -81,6 +104,14 @@ export class ArenaWorkshopPlaywright extends BasePage {
 
   async getResultDescription(): Promise<string> {
     return await this.result().innerText();
+  }
+
+  async hasResult(): Promise<boolean> {
+    return (await this.result().count()) > 0;
+  }
+
+  private styleSwitch(): Locator {
+    return this.page.getByRole("switch", {name: "Generation Engine"});
   }
 
   private result(): Locator {

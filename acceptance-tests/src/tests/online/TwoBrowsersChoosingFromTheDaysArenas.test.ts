@@ -8,7 +8,7 @@ given("a private room that gives its players time to choose", () => {
   beforeEach(async ({gunsmith}) => {
     const code = await gunsmith.room.createPrivateRoom({preRoundSeconds: 60});
 
-    await gunsmith.room.waitForTheChoosing();
+    await gunsmith.room.preRound.waitToBeChoosing();
     await gunsmith.room.joinWithASecondBrowserToChoose(code);
   });
 

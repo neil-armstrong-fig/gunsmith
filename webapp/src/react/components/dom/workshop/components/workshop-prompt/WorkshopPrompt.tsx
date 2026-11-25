@@ -7,6 +7,8 @@ interface Props {
   prompt: string;
   limit: number;
   placeholder?: string;
+  /** The box's border width and colour, when the caller has a colour of its own to show (the arena's style); the plain edge border when absent. */
+  borderClassName?: string;
   making?: boolean;
   waiting?: boolean;
   onPromptChange: (prompt: string) => void;
@@ -19,6 +21,7 @@ export function WorkshopPrompt({
   prompt,
   limit,
   placeholder,
+  borderClassName,
   making,
   waiting,
   onPromptChange,
@@ -38,7 +41,7 @@ export function WorkshopPrompt({
         value={prompt}
         placeholder={placeholder}
         aria-invalid={readout.over}
-        className="w-full resize-none rounded-md border border-gs-edge/40 bg-gs-background px-3 py-2 text-gs-ui-text aria-[invalid=true]:border-gs-ring"
+        className={`w-full resize-none rounded-md ${borderClassName ?? "border border-gs-edge/40"} bg-gs-background px-3 py-2 text-gs-ui-text aria-[invalid=true]:border-gs-ring`}
         onChange={event => {
           onPromptChange(event.target.value);
         }}

@@ -2,6 +2,9 @@ import {beforeEach, expect, given, then, when} from "@src/acceptance-criteria-ma
 
 const PILLAR_PROMPT = "a yard with one pillar";
 const RAISED_PROMPT = "a raised platform with stairs";
+// The team blue (#62b5ff) and the ring red (#ff5b62) as the browser reports a border colour.
+const BLUE_BORDER = "rgb(98, 181, 255)";
+const RED_BORDER = "rgb(255, 91, 98)";
 
 given("the arena workshop is open on the practice range", () => {
   beforeEach(async ({gunsmith}) => {
@@ -137,3 +140,69 @@ given("the arena workshop is open on the practice range", () => {
     });
   });
 });
+
+given(
+  "the player opens the arena workshop, where an arena is made in the Blue style or the Red style, chosen with a switch",
+  () => {
+    beforeEach(async ({gunsmith}) => {
+      await gunsmith.workshop.open();
+      await gunsmith.workshop.arenas.open();
+    });
+
+    then("Blue is chosen until the player picks another style, and Red is not", async ({gunsmith}) => {
+      expect(await gunsmith.workshop.arenas.isStyleChosen("Blue")).toBe(true);
+      expect(await gunsmith.workshop.arenas.isStyleChosen("Red")).toBe(false);
+    });
+
+    then("the box the arena is described in has a blue border", async ({gunsmith}) => {
+      expect(await gunsmith.workshop.arenas.getPromptBorderColour()).toBe(BLUE_BORDER);
+    });
+
+    when("the player presses the word Blue", () => {
+      beforeEach(async ({gunsmith}) => {
+        await gunsmith.workshop.arenas.pressStyleWord("Blue");
+      });
+
+      then("the switch is toggled to Red", async ({gunsmith}) => {
+        expect(await gunsmith.workshop.arenas.isStyleChosen("Red")).toBe(true);
+      });
+    });
+
+    when("the player chooses Red", () => {
+      beforeEach(async ({gunsmith}) => {
+        await gunsmith.workshop.arenas.chooseStyle("Red");
+      });
+
+      then("Red is chosen and Blue is not", async ({gunsmith}) => {
+        expect(await gunsmith.workshop.arenas.isStyleChosen("Red")).toBe(true);
+        expect(await gunsmith.workshop.arenas.isStyleChosen("Blue")).toBe(false);
+      });
+
+      then("the box the arena is described in has a red border", async ({gunsmith}) => {
+        expect(await gunsmith.workshop.arenas.getPromptBorderColour()).toBe(RED_BORDER);
+      });
+
+      when("the player presses the word Red", () => {
+        beforeEach(async ({gunsmith}) => {
+          await gunsmith.workshop.arenas.pressStyleWord("Red");
+        });
+
+        then("the switch is toggled back to Blue", async ({gunsmith}) => {
+          expect(await gunsmith.workshop.arenas.isStyleChosen("Blue")).toBe(true);
+        });
+      });
+
+      when("the player shuts the workshop and opens it again", () => {
+        beforeEach(async ({gunsmith}) => {
+          await gunsmith.workshop.close();
+          await gunsmith.workshop.open();
+          await gunsmith.workshop.arenas.open();
+        });
+
+        then("Red is still chosen", async ({gunsmith}) => {
+          expect(await gunsmith.workshop.arenas.isStyleChosen("Red")).toBe(true);
+        });
+      });
+    });
+  },
+);

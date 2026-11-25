@@ -2,7 +2,6 @@ import {createArenaModels} from "@gunsmith/ai/adapter/CreateArenaModels";
 import type {ArenaModels} from "@gunsmith/ai/adapter/types/ArenaModels";
 import {generateArena} from "@gunsmith/ai/pipeline/arena/GenerateArena";
 import type {ArenaOutcome} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcome";
-import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
 import {workerEnvironment} from "@src/env/WorkerEnvironment";
 import {isArenaPipelineAvailable} from "@src/router/routes/arenas/pipeline/IsArenaPipelineAvailable";
 import {runArenaPipeline} from "@src/router/routes/arenas/pipeline/RunArenaPipeline";
@@ -34,7 +33,7 @@ it("is not available when the model key is empty", () => {
   expect(isArenaPipelineAvailable()).toBe(false);
 });
 
-it("runs the AI pipeline on the prompt and the signal, with models built from the Worker's key and the engine's built-in arenas", async () => {
+it("runs the AI pipeline on the prompt and the signal, with models built from the Worker's key", async () => {
   workerEnvironment.ANTHROPIC_API_KEY = "sk-test-key";
   const signal = new AbortController().signal;
 
@@ -42,10 +41,16 @@ it("runs the AI pipeline on the prompt and the signal, with models built from th
 
   expect(answer).toBe(outcome);
   expect(createArenaModels).toHaveBeenCalledWith({apiKey: "sk-test-key"});
-  expect(generateArena).toHaveBeenCalledWith(
-    {prompt: "  a maze ", signal},
-    {...models, builtInArenas: BUILT_IN_ARENAS},
-  );
+  expect(generateArena).toHaveBeenCalledWith({prompt: "  a maze ", signal}, models);
+});
+
+it("hands the AI pipeline the style the player chose", async () => {
+  workerEnvironment.ANTHROPIC_API_KEY = "sk-test-key";
+  const signal = new AbortController().signal;
+
+  await runArenaPipeline("a maze", signal, "red");
+
+  expect(generateArena).toHaveBeenCalledWith({prompt: "a maze", signal, style: "red"}, models);
 });
 
 it("builds its models for each request, reading the key where it is used", async () => {

@@ -9,7 +9,7 @@ export function arenaHistoryOf(state: ArenaGraphStateValues): ArenaHistoryDiagno
     codeEdits: state.codeEdits,
     modelRepairs: state.nodes.filter(node => node === "repair").length,
   };
-  if (state.builtIn !== undefined && state.validationFailure !== undefined) {
+  if (state.errors.length > 0 && state.validationFailure !== undefined) {
     diagnostics.validationFailure = state.validationFailure;
   }
 

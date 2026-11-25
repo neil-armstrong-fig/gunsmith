@@ -2,12 +2,13 @@ import type {Seat} from "@gunsmith/engine/seat/types/Seat";
 import {countArenaPlay} from "@src/accounts/count-arena-play/CountArenaPlay";
 import {arenasOfToday} from "@src/durable-objects/match/arenas-of-today/ArenasOfToday";
 import {resolveArenaChoice} from "@src/durable-objects/match/choices/ResolveArenaChoice";
-import {resolveWeaponChoices} from "@src/durable-objects/match/choices/ResolveWeaponChoices";
+import {resolveWeaponChoice} from "@src/durable-objects/match/choices/ResolveWeaponChoice";
 import {parseForfeitLimits} from "@src/durable-objects/match/forfeit-limits/ParseForfeitLimits";
 import {parseInputMessage} from "@src/durable-objects/match/messages/ParseInputMessage";
 import {parsePreRoundMessage} from "@src/durable-objects/match/messages/ParsePreRoundMessage";
 import type {PreRoundAction} from "@src/durable-objects/match/messages/types/PreRoundAction";
 import {parseReadyMessage} from "@src/durable-objects/match/messages/ParseReadyMessage";
+import {parseRevealSeconds} from "@src/durable-objects/match/reveal-seconds/ParseRevealSeconds";
 import {parsePreRoundSeconds} from "@src/durable-objects/match/pre-round-seconds/ParsePreRoundSeconds";
 import {parseRingTiming} from "@src/durable-objects/match/ring-timing/ParseRingTiming";
 import {MatchRoom} from "@src/durable-objects/match/room/MatchRoom";
@@ -68,7 +69,7 @@ export class Match {
 
   /**
    * The room's first connection sets how long it waits for a person (`?reconnectSeconds=`, `?idleSeconds=`, only ever shorter than the real
-   * limits: `parseForfeitLimits`), how long the two seats have to choose (`?preRoundSeconds=`, `parsePreRoundSeconds`, `0` for none) and may
+   * limits: `parseForfeitLimits`), how long the two seats have to choose (`?preRoundSeconds=`, `parsePreRoundSeconds`, `0` for none), how long the decided arena and weapons are shown before the match begins (`?revealSeconds=`, `parseRevealSeconds`, `0` for none) and may
    * pin the seed its rounds start from (`?startSeed=`, `parseStartSeed`, a spec's seam) and
    * may bring the ring sooner or faster (`?ringDelay=`, `?ringClosing=`, `parseRingTiming`); later
    * connections' say is ignored, so a seat's person cannot shorten the other's time.
@@ -84,6 +85,7 @@ export class Match {
       limits: parseForfeitLimits(search),
       makeSeed: parseStartSeed(search),
       preRoundSeconds: parsePreRoundSeconds(search),
+      revealSeconds: parseRevealSeconds(search),
       ringTiming: parseRingTiming(search),
     });
     this.arenasOffered = this.offerTheDaysArenas();
@@ -216,10 +218,10 @@ export class Match {
 
       return;
     }
-    if (action.kind === "chooseWeapons") {
-      const chosen = await resolveWeaponChoices(this.accounts.get(seat), action.choices);
+    if (action.kind === "chooseWeapon") {
+      const chosen = await resolveWeaponChoice(this.accounts.get(seat), action.choice);
       if (chosen && this.sockets.get(seat) === socket) {
-        this.room.chooseWeapons(seat, chosen);
+        this.room.chooseWeapon(seat, action.slot, chosen);
       }
 
       return;
@@ -263,8 +265,8 @@ export class Match {
   /** Tells each connection what its seat may know: the arena and the reveal once, when the match begins, then the choosing while there is some, else its snapshot. */
   private sendSnapshots(): void {
     this.countArenaPlayed();
-    const arena = this.room.takeArenaMessage();
     for (const [seat, socket] of this.sockets) {
+      const arena = this.room.takeArenaMessage(seat);
       if (arena) {
         socket.send(JSON.stringify(arena));
       }

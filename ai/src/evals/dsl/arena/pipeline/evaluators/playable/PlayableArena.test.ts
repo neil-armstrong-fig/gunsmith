@@ -67,3 +67,11 @@ it("passes a rejected request that gave no arena", () => {
 it("fails a rejected request that gave an arena", () => {
   expect(playableArena(passingArenaInput({status: "rejected"})).score).toBe(0);
 });
+
+it("passes an invalid request that gave no arena", () => {
+  expect(playableArena(passingArenaInput({status: "invalid", arena: undefined})).score).toBe(1);
+});
+
+it("fails an invalid request that still gave an arena", () => {
+  expect(playableArena(passingArenaInput({status: "invalid"})).score).toBe(0);
+});

@@ -1,8 +1,10 @@
 import type {Page} from "@playwright/test";
 import type {RoundSnapshot} from "@gunsmith/shared/state-hook/types/RoundSnapshot";
+import {RoomPreRoundDsl} from "@src/dsl/gunsmith/components/room/components/pre-round/RoomPreRoundDsl";
 import {RoomEntryDsl} from "@src/dsl/gunsmith/components/room/components/room-entry/RoomEntryDsl";
 import {RoomPlaywright} from "@src/dsl/gunsmith/components/room/playwright/RoomPlaywright";
 import type {ConnectionDelay} from "@src/dsl/gunsmith/components/room/playwright/wire/delayed-line/types/ConnectionDelay";
+import type {SentChoice} from "@src/dsl/gunsmith/components/room/playwright/wire/types/SentChoice";
 import type {RoomLimits} from "@src/dsl/gunsmith/components/room/types/RoomLimits";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
 import type {GunsmithDsl} from "@src/dsl/gunsmith/GunsmithDsl";
@@ -14,6 +16,8 @@ type MakeGunsmith = (page: Page) => GunsmithDsl;
 export class RoomDsl {
   /** How a player reaches a room from the practice range: make one, or type a friend code in. */
   readonly entry: RoomEntryDsl;
+  /** What the room's choosing and reveal show before the match. */
+  readonly preRound: RoomPreRoundDsl;
   private readonly room: RoomPlaywright;
   private second: GunsmithDsl | undefined;
   private stranger: GunsmithDsl | undefined;
@@ -23,6 +27,7 @@ export class RoomDsl {
     private readonly makeGunsmith: MakeGunsmith,
   ) {
     this.entry = new RoomEntryDsl(page);
+    this.preRound = new RoomPreRoundDsl(page);
     this.room = new RoomPlaywright(page);
   }
 
@@ -81,19 +86,6 @@ export class RoomDsl {
     }
   }
 
-  /** As `joinWithASecondBrowser`, for a room that gives its players time to choose: it waits for the second browser to be sent the choosing, not the match. */
-  async joinWithASecondBrowserToChoose(code: string): Promise<void> {
-    try {
-      await this.room.openSecondBrowser(code, secondPage => {
-        this.second = this.makeGunsmith(secondPage);
-        this.second.room.startWatching();
-      });
-      await this.secondBrowser().room.waitForTheChoosing();
-    } catch (error) {
-      throw new DslError(`Failed to join room ${code} with a second browser to choose`, error);
-    }
-  }
-
   /**
    * Opens a second browser, with a session of its own, on the practice range with `limits` on its address, as this browser's practice range
    * has them. It is reached as `secondBrowser()`, and its `room.entry` types the friend code in.
@@ -107,6 +99,22 @@ export class RoomDsl {
       await this.secondBrowser().room.entry.openThePracticeRange(limits);
     } catch (error) {
       throw new DslError("Failed to open a second browser on the practice range", error);
+    }
+  }
+
+  /**
+   * Opens a second browser, with a session of its own, in the room `code` names, and waits until its choosing is on the screen. A room with
+   * time to choose sends no match until both have chosen, so `joinWithASecondBrowser`, which waits for the match, would wait for ever.
+   */
+  async joinWithASecondBrowserToChoose(code: string): Promise<void> {
+    try {
+      await this.room.openSecondBrowser(code, secondPage => {
+        this.second = this.makeGunsmith(secondPage);
+        this.second.room.startWatching();
+      });
+      await this.secondBrowser().room.preRound.waitToBeChoosing();
+    } catch (error) {
+      throw new DslError(`Failed to join room ${code} with a second browser to choose`, error);
     }
   }
 
@@ -316,6 +324,60 @@ export class RoomDsl {
     }
   }
 
+  /** Waits until the server has seated this browser again after it lost its connection or left, which is before any match is sent. */
+  async waitToBeSeatedAgain(): Promise<void> {
+    try {
+      await this.room.waitToBeSeatedAgain();
+    } catch (error) {
+      throw new DslError("Failed to wait to be seated again", error);
+    }
+  }
+
+  /** Whether the server has sent this browser any frame of the choosing before the match yet. */
+  hasReceivedPreRounds(): boolean {
+    try {
+      return this.room.hasReceivedPreRounds();
+    } catch (error) {
+      throw new DslError("Failed to read whether frames of the choosing have arrived", error);
+    }
+  }
+
+  /** Whether the server has named this browser the other player's weapon in `slot`: it must not until both have locked in that slot. */
+  hasBeenToldTheOpponentsWeapon(slot: number): boolean {
+    try {
+      return this.room.hasBeenToldTheOpponentsWeapon(slot);
+    } catch (error) {
+      throw new DslError(`Failed to read whether the other player's weapon ${slot} has been sent`, error);
+    }
+  }
+
+  /** Whether the server has shown this browser the other player's arena: it must not until both have locked in their arena. */
+  hasBeenToldTheOpponentsArena(): boolean {
+    try {
+      return this.room.hasBeenToldTheOpponentsArena();
+    } catch (error) {
+      throw new DslError("Failed to read whether the other player's arena has been sent", error);
+    }
+  }
+
+  /** What this browser has put forward in the choosing, in the order it sent it: each weapon with its slot and the arena, a built-in or a saved item. */
+  getChoicesSent(): readonly SentChoice[] {
+    try {
+      return this.room.getChoicesSent();
+    } catch (error) {
+      throw new DslError("Failed to read what the page put forward in the choosing", error);
+    }
+  }
+
+  /** Whether the server has sent this browser the reveal of what was decided. */
+  hasBeenToldTheReveal(): boolean {
+    try {
+      return this.room.hasBeenToldTheReveal();
+    } catch (error) {
+      throw new DslError("Failed to read whether the reveal has been sent", error);
+    }
+  }
+
   /** Whether the server has sent this browser any snapshot yet. */
   /** The built-in arenas the room offers this player today, as the server last told it while choosing; `undefined` before it has. */
   getArenasOffered(): readonly string[] | undefined {
@@ -323,15 +385,6 @@ export class RoomDsl {
       return this.room.getArenasOffered();
     } catch (error) {
       throw new DslError("Failed to read the arenas the room offers", error);
-    }
-  }
-
-  /** Waits until the server has sent this browser the room's choosing. */
-  async waitForTheChoosing(): Promise<void> {
-    try {
-      await this.room.waitForTheChoosing();
-    } catch (error) {
-      throw new DslError("Failed to see the room's choosing", error);
     }
   }
 

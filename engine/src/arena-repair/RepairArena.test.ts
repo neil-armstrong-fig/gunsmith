@@ -97,6 +97,44 @@ it("joins a second level to the first with a stair, as it does a first level to 
   expect(validateArena(arenaFrom(repaired.rows))).toEqual([]);
 });
 
+it("gives a second level that stands on the ground a landing and two stairs, and keeps it at level two", () => {
+  const rows = ["##########", "#........#", "#22......#", "#22......#", "#........#", "##########"];
+
+  const repaired = repairArena(rows);
+
+  expect(repaired.edits).toEqual([{kind: "landingAdded", tiles: 3}]);
+  expect(repaired.rows.join("").replaceAll(/[^2]/g, "")).toBe("2222");
+  expect(repaired.rows.join("").replaceAll(/[^1]/g, "")).toBe("1");
+  expect(arrowsIn(repaired.rows)).toBe(2);
+  expect(validateArena(arenaFrom(repaired.rows))).toEqual([]);
+});
+
+// Haiku 5.5's draft of the user's watchtower request (2026-11-24): each tower is drawn at level two with no stair at all. Before landings,
+// both were lowered to level one, so the player never got the height asked for.
+it("keeps both watchtowers of a real draft at level two, giving each a landing, and lowers nothing", () => {
+  const rows = [
+    "########################",
+    "#......................#",
+    "#......................#",
+    "#.........cccc.........#",
+    "#22..................22#",
+    "#22......111111......22#",
+    "#22......111111......22#",
+    "#22..................22#",
+    "#.........cccc.........#",
+    "#......................#",
+    "#......................#",
+    "########################",
+  ];
+
+  const repaired = repairArena(rows);
+
+  expect(repaired.edits.map(edit => edit.kind)).not.toContain("platformLowered");
+  expect(repaired.edits.filter(edit => edit.kind === "landingAdded")).toHaveLength(2);
+  expect(repaired.rows.join("").replaceAll(/[^2]/g, "")).toHaveLength(16);
+  expect(validateArena(arenaFrom(repaired.rows))).toEqual([]);
+});
+
 it("lowers a second level a level at a time, until nothing is raised, when nothing can reach it", () => {
   const rows = ["#######", "#.....#", "#.###.#", "#.#2#.#", "#.###.#", "#.....#", "#######"];
 

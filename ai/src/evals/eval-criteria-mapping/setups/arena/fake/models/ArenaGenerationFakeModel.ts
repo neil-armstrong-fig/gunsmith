@@ -2,6 +2,7 @@ import {BaseChatModel} from "@langchain/core/language_models/chat_models";
 import {AIMessageChunk} from "@langchain/core/messages";
 import type {BaseMessage} from "@langchain/core/messages";
 import type {ChatResult} from "@langchain/core/outputs";
+import {FAKE_LARGE_ARENA_REPLY} from "@evals/eval-criteria-mapping/setups/arena/fake/models/reply/FakeLargeArenaReply";
 import {FAKE_ARENA_REPLY} from "@evals/eval-criteria-mapping/setups/arena/fake/models/reply/FakeArenaReply";
 
 // The one request the arena specs expect the fake model to get wrong in a way code can mend (`AskingForAnArena`, "cut in two"), word for
@@ -22,8 +23,8 @@ const CUT_IN_TWO_REPLY = {
 };
 
 // The one request the arena specs expect the fake model to get wrong in a way code cannot mend (`AskingForAnArena`, "almost nothing but
-// solid wall"), word for word, on every try, repair included: there is no floor to join and none to make, so the pipeline must fall back
-// to a built-in arena. This is what keeps that path covered.
+// solid wall"), word for word, on every try, repair included: there is no floor to join and none to make, so the request must end invalid,
+// with no arena and a reason (no built-in arena is given in its place, the user, 2026-11-21). This is what keeps that path covered.
 const UNREPAIRABLE_REQUEST = "an arena that is almost nothing but solid wall";
 
 const UNREPAIRABLE_REPLY = {
@@ -53,6 +54,33 @@ const COVER_REPLY = {
     "####################",
   ],
 };
+
+// The user's watchtower request (`AskingForAnArena`, 2026-11-21), word for word, answered with Haiku 5.5's own first draft of it (2026-11-24):
+// each tower drawn at level two straight on the ground, with no stair, which code's repair once lowered to level one. Engine's repair now
+// gives each a landing between two stairs, so the spec's height criterion proves that path end to end on the fake tier.
+const WATCHTOWER_REQUEST =
+  'A single "watchtower" on each end of the map that goes up to level three with no cover and is effectively a corrador up. The middle of the map has a cover block going through it with a single bridge in the middle that also goes up to level three and back down again';
+
+const WATCHTOWER_REPLY = {
+  name: "Watchtower Crossing",
+  rows: [
+    "########################",
+    "#......................#",
+    "#......................#",
+    "#.........cccc.........#",
+    "#22..................22#",
+    "#22......111111......22#",
+    "#22......111111......22#",
+    "#22..................22#",
+    "#.........cccc.........#",
+    "#......................#",
+    "#......................#",
+    "########################",
+  ],
+};
+
+// A request that asks for a huge or a vast arena, or the full 40 tiles, gets a large one, so the specs that check size can tell the pipeline kept the size asked.
+const LARGE_REQUEST = /\b(huge|vast|40)\b/;
 
 const REQUEST_BLOCK = /^<request>\n([\s\S]*)\n<\/request>$/;
 
@@ -94,8 +122,16 @@ export class ArenaGenerationFakeModel extends BaseChatModel {
       return UNREPAIRABLE_REPLY;
     }
 
+    if (requests.includes(WATCHTOWER_REQUEST)) {
+      return WATCHTOWER_REPLY;
+    }
+
     if (requests.includes(COVER_REQUEST)) {
       return COVER_REPLY;
+    }
+
+    if (requests.some(request => request !== undefined && LARGE_REQUEST.test(request))) {
+      return FAKE_LARGE_ARENA_REPLY;
     }
 
     return FAKE_ARENA_REPLY;

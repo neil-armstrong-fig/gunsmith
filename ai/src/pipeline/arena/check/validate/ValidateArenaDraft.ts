@@ -1,79 +1,80 @@
-import type {z} from "zod";
 import {validateArena} from "@gunsmith/engine/arena-validation/ValidateArena";
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import {arenaDraftSchema} from "@gunsmith/ai/pipeline/arena/check/validate/draft/ArenaDraft";
-import {rowLengthProblems} from "@gunsmith/ai/pipeline/arena/check/validate/row-lengths/RowLengthProblems";
+import type {ArenaProblemKind} from "@gunsmith/engine/arena-validation/types/ArenaProblemKind";
 import {repairArena} from "@gunsmith/engine/arena-repair/RepairArena";
-import {withoutEmptyRectangles} from "@gunsmith/ai/pipeline/arena/check/validate/empty-rectangles/WithoutEmptyRectangles";
-import {compileArenaShapes} from "@gunsmith/ai/pipeline/arena/arena-shapes/CompileArenaShapes";
-import {arenaShapesDraftSchema} from "@gunsmith/ai/pipeline/arena/arena-shapes/draft/ArenaShapesDraft";
+import {rowLengthProblems} from "@gunsmith/ai/pipeline/arena/check/validate/row-lengths/RowLengthProblems";
+import {draftingKitOf} from "@gunsmith/ai/pipeline/arena/arena-drafting/format/DraftingKitOf";
+import type {ArenaFormat} from "@gunsmith/ai/pipeline/arena/arena-drafting/format/ArenaFormat";
+import {schemaErrors} from "@gunsmith/ai/pipeline/arena/check/validate/sentences/SchemaErrors";
+import {sentenceOf} from "@gunsmith/ai/pipeline/arena/check/validate/sentences/SentenceOf";
 import type {ArenaValidation} from "@gunsmith/ai/pipeline/arena/check/validate/types/ArenaValidation";
-
-const MAX_ERROR_LENGTH = 160;
 
 // Engine's validator reports each cut-off piece of floor on its own, and a speckled drawing (the schema allows 30 rows of 40) could have
 // hundreds, every one of them sent to the repair call. The first few are enough to show the model what is wrong.
 const MAX_PROBLEMS_LISTED = 5;
 
 /**
- * Parses what the model wrote as an arena, as a drawing's rows or as shapes (drawn into rows first, after any rectangle with no size is
- * dropped), in five steps that each stop the next: zod (the name and the drawing's size and shape), then the lengths of the rows (named,
- * row by row, because engine's own refusal does not say which row), then engine's repair of the faults a model draws most often (`repairArena`:
- * an illegal stair, a platform nobody can reach, a piece of floor cut off), which asks the model for nothing and changes a drawing that has none
- * of them not at all, then the engine's own reading of the repaired drawing (`arenaFrom`, which refuses an unknown character and rows of unequal
- * length; a cover block, `c`, is a legal character), then the engine's playability rules (`validateArena`, which treats a
- * cover block as a wall) on what is left. The arena handed back is the repaired drawing. A refusal names the problems found in the step it stopped at
+ * Parses what the model wrote as an arena, in the format it was asked for (never guessed from the answer: `draftingKitOf(format).read`
+ * turns a shapes reply into a drawing, as a rows reply already is one), in five steps that each stop the next: zod (the name and the drawing's size and shape),
+ * then the lengths of the rows (named, row by row, because engine's own refusal does not say which row), then engine's repair of the faults a model draws most often
+ * (`repairArena`: an illegal stair, a platform nobody can reach, a piece of floor cut off), which asks the model for nothing and changes a drawing that has none of them not at all,
+ * then the engine's own reading of the repaired drawing (`arenaFrom`, which refuses an unknown character and rows of unequal length; a cover block, `c`, is a legal character),
+ * then the engine's playability rules (`validateArena`, which treats a cover block as a wall) on what is left. The arena handed back is the repaired drawing. A refusal names the problems found in the step it stopped at
  * (the first few, then a count of the rest), each shortened, because `repair` shows them to the model and some of the words in them
  * (a stray field's name) came from the model, or through it from the player.
  */
-export function validateArenaDraft(candidate: unknown): ArenaValidation {
-  if (!isShapes(candidate)) {
-    return validateDrawing(candidate);
+export function validateArenaDraft(candidate: unknown, format: ArenaFormat): ArenaValidation {
+  const reading = draftingKitOf(format).read(candidate);
+  if (!reading.ok) {
+    return {ok: false, errors: reading.errors, reason: reading.reason, problemKinds: [], codeEdits: 0};
   }
 
-  const shapes = arenaShapesDraftSchema.safeParse(withoutEmptyRectangles(candidate));
-  if (!shapes.success) {
-    return {ok: false, errors: schemaErrors(shapes.error.issues), reason: "invalid-draft", codeEdits: 0};
-  }
-
-  const compiled = compileArenaShapes(shapes.data);
-  if (!compiled.ok) {
-    return {ok: false, errors: compiled.errors.map(sentenceOf), reason: "invalid-shapes", codeEdits: 0};
-  }
-
-  return validateDrawing(compiled.drawing);
-}
-
-/** An answer with a size and no rows is shapes (`arena-shapes/`); anything else is read as a drawing, and refused if it is not one. */
-function isShapes(candidate: unknown): boolean {
-  return typeof candidate === "object" && candidate !== null && !("rows" in candidate) && "width" in candidate;
+  return validateDrawing(reading.drawing);
 }
 
 function validateDrawing(candidate: unknown): ArenaValidation {
   const parsed = arenaDraftSchema.safeParse(candidate);
   if (!parsed.success) {
-    return {ok: false, errors: schemaErrors(parsed.error.issues), reason: "invalid-draft", codeEdits: 0};
+    return {
+      ok: false,
+      errors: schemaErrors(parsed.error.issues),
+      reason: "invalid-draft",
+      problemKinds: [],
+      codeEdits: 0,
+    };
   }
 
   const raggedRows = rowLengthProblems(parsed.data.rows);
   if (raggedRows.length > 0) {
-    return {ok: false, errors: raggedRows, reason: "ragged-rows", codeEdits: 0};
+    return {ok: false, errors: raggedRows, reason: "ragged-rows", problemKinds: [], codeEdits: 0};
   }
 
   const {rows, edits} = repairArena(parsed.data.rows);
   const codeEdits = edits.length;
   const arena = read(rows);
   if (typeof arena === "string") {
-    return {ok: false, errors: [sentenceOf(arena)], reason: "invalid-tiles", codeEdits};
+    return {ok: false, errors: [sentenceOf(arena)], reason: "invalid-tiles", problemKinds: [], codeEdits};
   }
 
-  const problems = validateArena(arena).map(problem => problem.reason);
+  const problems = validateArena(arena);
   if (problems.length > 0) {
-    return {ok: false, errors: firstProblemsOf(problems), reason: "unplayable-arena", codeEdits};
+    return {
+      ok: false,
+      errors: firstProblemsOf(problems.map(problem => problem.reason)),
+      reason: "unplayable-arena",
+      problemKinds: kindsOf(problems.map(problem => problem.kind)),
+      codeEdits,
+    };
   }
 
   return {ok: true, arena: {...parsed.data, rows}, codeEdits};
+}
+
+/** Each kind of fault once, in the order the validator found them, so a hundred cut-off pieces of floor name one kind. */
+function kindsOf(kinds: readonly ArenaProblemKind[]): ArenaProblemKind[] {
+  return [...new Set(kinds)];
 }
 
 /** The first few problems, each shortened, and one sentence counting the rest, so a drawing with hundreds cannot flood the repair. */
@@ -87,18 +88,6 @@ function firstProblemsOf(problems: readonly string[]): string[] {
   return [...listed, `And ${unlisted} more of the same kind.`];
 }
 
-/**
- * A sentence for each fault the schema found. Where a value is the wrong type, that is the only fault said about it: the length
- * limits zod goes on to apply to it (a string told it is too big for an array) would only mislead the model reading the repair.
- */
-function schemaErrors(issues: readonly z.core.$ZodIssue[]): string[] {
-  const wrongTypeAt = new Set(issues.filter(issue => issue.code === "invalid_type").map(issue => whereOf(issue.path)));
-
-  return issues
-    .filter(issue => issue.code === "invalid_type" || !wrongTypeAt.has(whereOf(issue.path)))
-    .map(issue => sentenceOf(`${whereOf(issue.path)}: ${issue.message}`));
-}
-
 /** The arena the engine reads off the rows, or the engine's own words for why it cannot. */
 function read(rows: readonly string[]): Arena | string {
   try {
@@ -110,16 +99,4 @@ function read(rows: readonly string[]): Arena | string {
 
     return String(error);
   }
-}
-
-function whereOf(path: PropertyKey[]): string {
-  if (path.length === 0) {
-    return "arena";
-  }
-
-  return path.map(String).join(".");
-}
-
-function sentenceOf(text: string): string {
-  return text.slice(0, MAX_ERROR_LENGTH);
 }

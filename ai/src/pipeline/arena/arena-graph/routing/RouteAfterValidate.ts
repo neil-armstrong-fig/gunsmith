@@ -3,8 +3,8 @@ import type {ArenaGraphStateValues} from "@gunsmith/ai/pipeline/arena/arena-grap
 
 /**
  * The way on from `validate`: to the end if the draft passed (the arena is made); to the one repair if it was refused and the repair
- * is still to spend; and to the built-in arena if it refused a repaired draft, so a draft is repaired once and never twice, and
- * a request that was asked for properly always ends with an arena.
+ * is still to spend; and to the end again if it refused a repaired draft, so a draft is repaired once and never twice, and nothing is
+ * given in its place: the outcome tells the player why (the user, 2026-11-21).
  */
 export function routeAfterValidate(state: ArenaGraphStateValues): string {
   if (state.errors.length === 0) {
@@ -12,7 +12,7 @@ export function routeAfterValidate(state: ArenaGraphStateValues): string {
   }
 
   if (state.repaired) {
-    return "fallback";
+    return END;
   }
 
   return "repair";

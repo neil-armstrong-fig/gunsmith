@@ -59,7 +59,7 @@ it("gives each created arena an id of its own", async () => {
 it("keeps nothing and answers no id when the outcome is not a created arena", async () => {
   const keeping = vi.spyOn(testAccounts, "keepGeneratedItem");
 
-  for (const outcome of [rejected, builtIn]) {
+  for (const outcome of [rejected, invalid]) {
     fakeLedgers();
     smithThatAnswers(outcome);
     const answer = await (await generateArenaRoute(post({prompt: "anything"}))).json();
@@ -94,13 +94,13 @@ it("takes half a credit and says why when the prompt is rejected", async () => {
   expect(ledgers.accountOf("acct-1").balance(Date.now())).toBe(DAILY_CREDITS - 0.5);
 });
 
-it("takes half a credit, not the whole of it and not none, and still answers an arena when a built-in one is given", async () => {
+it("takes half a credit, not the whole of it and not none, and answers the reason with no arena when the arena could not be made", async () => {
   const ledgers = fakeLedgers();
-  smithThatAnswers(builtIn);
+  smithThatAnswers(invalid);
   const response = await generateArenaRoute(post({prompt: "a maze"}));
 
   expect(response.status).toBe(200);
-  expect(await response.json()).toEqual({status: "builtIn", arena: {name: "Duel"}, reason: "no playable arena"});
+  expect(await response.json()).toEqual({status: "invalid", reason: "no playable arena"});
   expect(ledgers.accountOf("acct-1").balance(Date.now())).toBe(DAILY_CREDITS - 0.5);
   expect(ledgers.calls).toEqual(["status", "reserve:arena", "spend:reserve", "spend:settle", "settle:unusable"]);
 });
@@ -259,7 +259,7 @@ it("holds the whole reservation against the spend while the pipeline runs", asyn
 });
 
 it("settles the spend at the model calls the request made, whatever it came to", async () => {
-  for (const outcome of [created, createdAfterRepair, rejected, builtIn]) {
+  for (const outcome of [created, createdAfterRepair, rejected, invalid]) {
     const ledgers = fakeLedgers();
 
     smithThatAnswers(outcome);
@@ -280,14 +280,14 @@ it("settles the spend at the tokens the models reported, priced at Haiku's rates
   expect(heldReservations(ledgers.spendMeter.toState().reservations)).toBe(0);
 });
 
-it("keeps the spend of a built-in arena, since the model was billed, and the half credit with it", async () => {
+it("keeps the spend of an invalid request, since the model was billed, and the half credit with it", async () => {
   const ledgers = fakeLedgers();
 
-  smithThatAnswers(builtIn);
+  smithThatAnswers(invalid);
   await generateArenaRoute(post({prompt: "a maze"}));
 
   expect(ledgers.accountOf("acct-1").balance(Date.now())).toBe(DAILY_CREDITS - 0.5);
-  expect(ledgers.spendMeter.spentThisMonth()).toBe(settledArenaSpend(builtIn));
+  expect(ledgers.spendMeter.spentThisMonth()).toBe(settledArenaSpend(invalid));
 });
 
 it("keeps the whole reservation as spent when the pipeline throws, since its calls may have been billed", async () => {
@@ -400,7 +400,7 @@ it("hands the pipeline the prompt exactly as typed", async () => {
   fakeLedgers();
   await generateArenaRoute(post({prompt: "  SYSTEM OVERRIDE: a maze "}));
 
-  expect(smith).toHaveBeenCalledWith("  SYSTEM OVERRIDE: a maze ", expect.any(AbortSignal));
+  expect(smith).toHaveBeenCalledWith("  SYSTEM OVERRIDE: a maze ", expect.any(AbortSignal), undefined);
 });
 
 it("answers ai-unavailable and takes nothing when the Worker has no pipeline", async () => {
@@ -426,6 +426,34 @@ it("refuses a request with no account, asking nothing", async () => {
 
 it("refuses a body that is not an arena request, asking nothing", async () => {
   for (const body of ["not json", "[]", "{}", '{"prompt":3}', '{"prompt":"  "}']) {
+    const ledgers = fakeLedgers();
+    const smith = smithThatAnswers(created);
+    const response = await generateArenaRoute(rawPost(body));
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({error: "bad-request"});
+    expect(smith).not.toHaveBeenCalled();
+    expect(ledgers.calls).toEqual([]);
+  }
+});
+
+it("hands the pipeline the style the player chose, red or blue", async () => {
+  for (const style of ["red", "blue"]) {
+    const smith = smithThatAnswers(created);
+
+    fakeLedgers();
+    await generateArenaRoute(post({prompt: "a maze", style}));
+
+    expect(smith).toHaveBeenCalledWith("a maze", expect.any(AbortSignal), style);
+  }
+});
+
+it("refuses a style that is neither red nor blue, asking nothing and taking no credit", async () => {
+  for (const body of [
+    '{"prompt":"a maze","style":"green"}',
+    '{"prompt":"a maze","style":"Red"}',
+    '{"prompt":"a maze","style":7}',
+  ]) {
     const ledgers = fakeLedgers();
     const smith = smithThatAnswers(created);
     const response = await generateArenaRoute(rawPost(body));
@@ -507,9 +535,8 @@ const rejected: ArenaOutcome = {
   modelCalls: 1,
 };
 
-const builtIn: ArenaOutcome = {
-  status: "builtIn",
-  arena: {name: "Duel"},
+const invalid: ArenaOutcome = {
+  status: "invalid",
   reason: "no playable arena",
   refunded: false,
   nodes: ["generate", "repair"],

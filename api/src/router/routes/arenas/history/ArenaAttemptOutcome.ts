@@ -7,7 +7,7 @@ export function arenaAttemptOutcome(
   diagnostics: ArenaHistoryDiagnostics,
   response: Response,
 ): AttemptOutcome {
-  if (status === "builtIn") {
+  if (status === "invalid") {
     return {
       outcome: "failed",
       failureStage: "validation",

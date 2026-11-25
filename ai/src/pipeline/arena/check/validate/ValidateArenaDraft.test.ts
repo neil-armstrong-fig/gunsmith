@@ -1,34 +1,39 @@
 import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
+import type {ArenaFormat} from "@gunsmith/ai/pipeline/arena/arena-drafting/format/ArenaFormat";
 import {validateArenaDraft} from "@gunsmith/ai/pipeline/arena/check/validate/ValidateArenaDraft";
 
 const ROWS = ["##########", "#........#", "#........#", "#........#", "##########"];
 
 it("accepts a walled room and hands back the arena as written", () => {
-  expect(validateArenaDraft(draftWith({}))).toEqual({ok: true, codeEdits: 0, arena: {name: "Plain Room", rows: ROWS}});
+  expect(validateArenaDraft(draftWith({}), "rows")).toEqual({
+    ok: true,
+    codeEdits: 0,
+    arena: {name: "Plain Room", rows: ROWS},
+  });
 });
 
 it("accepts an arena whose raised platform is reached by a stair", () => {
   const rows = ["##########", "#........#", "#...>11..#", "#...#11..#", "##########"];
 
-  expect(validateArenaDraft(draftWith({rows})).ok).toBe(true);
+  expect(validateArenaDraft(draftWith({rows}), "rows").ok).toBe(true);
 });
 
 it("accepts every arena in engine's built-in pool, as a built-in must", () => {
   for (const arena of BUILT_IN_ARENAS) {
-    expect(validateArenaDraft(arena), arena.name).toEqual({ok: true, codeEdits: 0, arena});
+    expect(validateArenaDraft(arena, "rows"), arena.name).toEqual({ok: true, codeEdits: 0, arena});
   }
 });
 
 it("accepts a low cover block (c) in the middle of the floor, which engine plays as a wall that is low", () => {
   const rows = [...ROWS.slice(0, 2), "#...c....#", ...ROWS.slice(3)];
 
-  expect(validateArenaDraft(draftWith({rows})).ok).toBe(true);
+  expect(validateArenaDraft(draftWith({rows}), "rows").ok).toBe(true);
 });
 
 it("repairs a cover block that cuts the floor in two by cutting one block away, where it would refuse it as a wall", () => {
   const rows = ["#########", "#...c...#", "#...c...#", "#...c...#", "#########"];
 
-  const validation = validateArenaDraft(draftWith({rows}));
+  const validation = validateArenaDraft(draftWith({rows}), "rows");
 
   expect(validation.ok).toBe(true);
   if (validation.ok) {
@@ -49,13 +54,17 @@ it("refuses ragged rows by naming the row that is the wrong length, so the repai
 it("accepts an arena written as shapes, and hands back the drawing the shapes make", () => {
   const shapes = {name: "Plain Room", width: 10, height: 5};
 
-  expect(validateArenaDraft(shapes)).toEqual({ok: true, codeEdits: 0, arena: {name: "Plain Room", rows: ROWS}});
+  expect(validateArenaDraft(shapes, "shapes")).toEqual({
+    ok: true,
+    codeEdits: 0,
+    arena: {name: "Plain Room", rows: ROWS},
+  });
 });
 
 it("draws shapes before it checks the arena, so a wall across the floor is repaired as a drawing's would be", () => {
   const shapes = {name: "Cut", width: 10, height: 5, walls: [{x: 5, y: 1, width: 1, height: 3}]};
 
-  const validation = validateArenaDraft(shapes);
+  const validation = validateArenaDraft(shapes, "shapes");
 
   expect(validation.ok).toBe(true);
   if (validation.ok) {
@@ -66,23 +75,37 @@ it("draws shapes before it checks the arena, so a wall across the floor is repai
 it("drops a rectangle with no size from shapes instead of refusing it, as a stat past its range is clamped", () => {
   const shapes = {name: "Plain Room", width: 10, height: 5, walls: [{x: 0, y: 0, width: 0, height: 0}]};
 
-  expect(validateArenaDraft(shapes)).toEqual({ok: true, codeEdits: 0, arena: {name: "Plain Room", rows: ROWS}});
+  expect(validateArenaDraft(shapes, "shapes")).toEqual({
+    ok: true,
+    codeEdits: 0,
+    arena: {name: "Plain Room", rows: ROWS},
+  });
 });
 
 it("refuses a shape that reaches past the arena with the sentence naming it", () => {
   const shapes = {name: "Wide", width: 10, height: 5, walls: [{x: 8, y: 1, width: 4, height: 1}]};
 
-  expect(errorsOf(shapes)).toEqual([expect.stringMatching(/^walls\[0\] reaches column 11 but the arena is 10 wide/)]);
+  expect(errorsOf(shapes, "shapes")).toEqual([
+    expect.stringMatching(/^walls\[0\] reaches column 11 but the arena is 10 wide/),
+  ]);
 });
 
 it("refuses a stray field in shapes, as it does in a drawing", () => {
   const shapes = {name: "Plain Room", width: 10, height: 5, ceiling: "glass"};
 
-  expect(errorsOf(shapes)).toEqual([expect.stringMatching(/ceiling/)]);
+  expect(errorsOf(shapes, "shapes")).toEqual([expect.stringMatching(/ceiling/)]);
 });
 
 it("refuses a size outside the limits, naming the field", () => {
-  expect(errorsOf({name: "Tiny", width: 3, height: 5})).toEqual([expect.stringMatching(/^width: /)]);
+  expect(errorsOf({name: "Tiny", width: 3, height: 5}, "shapes")).toEqual([expect.stringMatching(/^width: /)]);
+});
+
+it("reads an answer in the format it was asked for and never guesses: shapes handed in as rows are refused, naming rows", () => {
+  expect(errorsOf({name: "Plain Room", width: 10, height: 5})[0]).toMatch(/^rows: /);
+});
+
+it("reads shapes only as shapes: a drawing's rows handed in as shapes are refused, naming the size", () => {
+  expect(errorsOf(draftWith({}), "shapes")).toEqual(expect.arrayContaining([expect.stringMatching(/^width: /)]));
 });
 
 it("refuses an answer that is not an object, naming the arena", () => {
@@ -124,7 +147,7 @@ it("refuses a character the engine does not read", () => {
 it("draws a stair with no landing as floor, where it would refuse it with the engine's words", () => {
   const rows = ["##########", "#........#", "#.......>#", "#........#", "##########"];
 
-  expect(validateArenaDraft(draftWith({rows}))).toEqual({
+  expect(validateArenaDraft(draftWith({rows}), "rows")).toEqual({
     ok: true,
     codeEdits: 1,
     arena: {name: "Plain Room", rows: ROWS},
@@ -152,7 +175,7 @@ it("opens a door through a wall that cuts the floor in two, however big the part
     [small, 4],
     [big, 9],
   ] as const) {
-    const opened = validateArenaDraft(draftWith({rows}));
+    const opened = validateArenaDraft(draftWith({rows}), "rows");
 
     expect(opened.ok).toBe(true);
     if (opened.ok) {
@@ -165,7 +188,7 @@ it("opens a door through a wall that cuts the floor in two, however big the part
 it("gives a platform with no stair up to it one, where it would refuse it", () => {
   const rows = ["##########", "#........#", "#...#11..#", "#...#11..#", "##########"];
 
-  const validation = validateArenaDraft(draftWith({rows}));
+  const validation = validateArenaDraft(draftWith({rows}), "rows");
 
   expect(validation.ok).toBe(true);
   if (validation.ok) {
@@ -178,6 +201,33 @@ it("still refuses an arena that is nearly all wall, because no repair can make f
   const rows = ["##########", "#...######", "##########", "##########", "##########"];
 
   expect(errorsOf(draftWith({rows}))).toContainEqual(expect.stringMatching(/^Open floor is only 3 of 50 tiles/));
+});
+
+it("names the kind of every fault an unplayable arena has, so the player can be told in words of ours", () => {
+  const noFloor = ["##########", "##########", "##########", "##########", "##########"];
+  const nearlyAllWall = ["##########", "#...######", "##########", "##########", "##########"];
+
+  expect(problemKindsOf(draftWith({rows: noFloor}))).toEqual(["noFloor"]);
+  expect(problemKindsOf(draftWith({rows: nearlyAllWall}))).toContain("tooWalled");
+});
+
+it("names each kind once, in the order found, however many pieces of floor are cut off", () => {
+  const row = `#${".#".repeat(19)}#`;
+  const rows = Array.from({length: 30}, (_, index) => {
+    if (index % 2 === 0) {
+      return "#".repeat(40);
+    }
+
+    return row;
+  });
+
+  expect(problemKindsOf(draftWith({rows}))).toEqual(["disconnected", "noStartingPlaces", "tooWalled"]);
+});
+
+it("names no kind for a refusal that is not about playability, such as ragged rows", () => {
+  const rows = ["##########", "#........#", "#.......#", "#........#", "##########"];
+
+  expect(problemKindsOf(draftWith({rows}))).toEqual([]);
 });
 
 it("lists the first few problems and counts the rest, when a drawing has more faults than a repair will mend", () => {
@@ -214,8 +264,17 @@ function columnOf(rows: readonly string[], column: number): string {
     .replaceAll(/[^.]/g, "");
 }
 
-function errorsOf(candidate: unknown): string[] {
-  const validation = validateArenaDraft(candidate);
+function problemKindsOf(candidate: unknown, format: ArenaFormat = "rows"): readonly string[] {
+  const validation = validateArenaDraft(candidate, format);
+  if (validation.ok) {
+    throw new Error("expected the draft to be refused");
+  }
+
+  return validation.problemKinds;
+}
+
+function errorsOf(candidate: unknown, format: ArenaFormat = "rows"): string[] {
+  const validation = validateArenaDraft(candidate, format);
   if (validation.ok) {
     throw new Error("expected the draft to be refused");
   }

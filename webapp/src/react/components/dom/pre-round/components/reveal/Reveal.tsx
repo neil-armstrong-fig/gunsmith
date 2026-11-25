@@ -1,7 +1,7 @@
 import type {Weapon} from "@gunsmith/engine/weapon/types/Weapon";
-import {ArenaReveal} from "@src/react/components/dom/pre-round/components/reveal/components/arena-reveal/ArenaReveal";
-import {Side} from "@src/react/components/dom/pre-round/components/reveal/components/side/Side";
-import type {SlotWeapon} from "@src/react/components/dom/pre-round/components/reveal/types/SlotWeapon";
+import {ArenaReveal} from "@src/react/components/dom/pre-round/components/arena-reveal/ArenaReveal";
+import {Side} from "@src/react/components/dom/pre-round/components/side/Side";
+import type {SlotWeapon} from "@src/react/components/dom/pre-round/components/side/types/SlotWeapon";
 import {startTheMatch} from "@src/react/components/dom/pre-round/components/reveal/start-match/StartTheMatch";
 import {gameState} from "@src/store/game/selectors/game-state/GameState";
 import {usePreRoundStore} from "@src/store/pre-round/UsePreRoundStore";
@@ -25,7 +25,7 @@ export function Reveal(): JSX.Element | undefined {
         <Side testId="reveal-opponent" title="The bot" weapons={inSlots(opponent)} />
       </div>
 
-      <ArenaReveal />
+      <ArenaReveal arena={arena} />
 
       <button
         type="button"

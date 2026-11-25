@@ -1,6 +1,5 @@
 import type {ArenaPipelineDependencies} from "@gunsmith/ai/pipeline/arena/types/ArenaPipelineDependencies";
 import {parseArenaFormat} from "@gunsmith/ai/pipeline/arena/arena-drafting/format/ParseArenaFormat";
-import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
 import {createLocalChatModel} from "@evals/eval-criteria-mapping/environment/tier/local/CreateLocalChatModel";
 import {ArenaPipelineEvalDriver} from "@evals/eval-criteria-mapping/setups/arena/shared/ArenaPipelineEvalDriver";
 
@@ -22,7 +21,6 @@ export class LocalArenaPipelineEvalDriver extends ArenaPipelineEvalDriver {
       generator: createLocalChatModel({temperature: 0, numPredict: 1500}),
       moderator: createLocalChatModel({temperature: 0, numPredict: 100}),
       format: parseArenaFormat(process.env.EVAL_ARENA_FORMAT),
-      builtInArenas: BUILT_IN_ARENAS,
     };
   }
 }

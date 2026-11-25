@@ -133,7 +133,7 @@ function costOf(requests: readonly PlannedArenaRequest[], ran: ReadonlySet<numbe
     if (request.outcome.status === "rejected" && !request.outcome.refunded) {
       cost += 0.5;
     }
-    if (request.outcome.status === "builtIn") {
+    if (request.outcome.status === "invalid") {
       cost += 0.5;
     }
   });

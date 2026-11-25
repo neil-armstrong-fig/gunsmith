@@ -25,8 +25,8 @@ it("begins the match on the duel arena once both seats have locked in having cho
 
   room.preRoundAction("first", {kind: "lockInArena"});
   room.preRoundAction("second", {kind: "lockInArena"});
-  room.preRoundAction("first", {kind: "lockInWeapons"});
-  room.preRoundAction("second", {kind: "lockInWeapons"});
+  lockInBothWeapons(room, "first");
+  lockInBothWeapons(room, "second");
 
   expect(room.snapshotFor("first")).toBeDefined();
   expect(room.preRoundFor("first")).toBeUndefined();
@@ -40,8 +40,9 @@ it("plays in the arena both seats put forward, and says so once so the browsers 
   lockInArena(room, "second", FAIR_DUEL_BUILT_IN_ARENA.name);
 
   expect(room.joinedMessage("second").arena).toEqual(FAIR_DUEL_BUILT_IN_ARENA.rows);
-  expect(room.takeArenaMessage()).toEqual({kind: "arena", rows: FAIR_DUEL_BUILT_IN_ARENA.rows});
-  expect(room.takeArenaMessage()).toBeUndefined();
+  expect(room.takeArenaMessage("first")).toEqual({kind: "arena", rows: FAIR_DUEL_BUILT_IN_ARENA.rows});
+  expect(room.takeArenaMessage("first")).toBeUndefined();
+  expect(room.takeArenaMessage("second")).toEqual({kind: "arena", rows: FAIR_DUEL_BUILT_IN_ARENA.rows});
 });
 
 it("starts the fighters in the arena decided, on the places the fair start gives it", () => {
@@ -75,13 +76,13 @@ it("waits for both seats' weapons before it begins the match, though the arena i
 
   room.preRoundAction("first", {kind: "lockInArena"});
   room.preRoundAction("second", {kind: "lockInArena"});
-  room.preRoundAction("first", {kind: "lockInWeapons"});
+  lockInBothWeapons(room, "first");
 
   expect(room.snapshotFor("first")).toBeUndefined();
   expect(room.preRoundFor("first")).toMatchObject({
     stage: "choosing",
-    own: {weapons: {locked: true}},
-    opponent: {weapons: {locked: false}},
+    own: {weapons: {slots: [{locked: true}, {locked: true}]}},
+    opponent: {weapons: {slots: [{locked: false}, {locked: false}]}},
   });
 });
 
@@ -130,20 +131,31 @@ it("carries each seat's weapons into the next round", () => {
   expect(weaponsOf(room, "second")).toEqual([MARKSMAN_RIFLE, SUBMACHINE_GUN]);
 });
 
-it("tells a seat the other's weapons only once both have locked in theirs", () => {
+it("tells a seat the other's first weapon once both have locked in their first, and the second once both have locked in their second", () => {
   const room = twoSeatedRoom();
   lockInWeapons(room, "second", ["submachine-gun", "rifle"]);
 
   expect(JSON.stringify(room.preRoundFor("first"))).not.toContain("submachine-gun");
-  room.preRoundAction("first", {kind: "lockInWeapons"});
+  room.preRoundAction("first", {kind: "lockInWeapon", slot: 1});
 
   expect(room.preRoundFor("first")?.opponent.weapons).toEqual({
-    locked: true,
-    choices: [
-      {kind: "builtIn", key: "submachine-gun"},
-      {kind: "builtIn", key: "rifle"},
-    ],
+    slots: [{locked: true, choice: {kind: "builtIn", key: "submachine-gun"}}, {locked: true}],
   });
+
+  room.preRoundAction("first", {kind: "lockInWeapon", slot: 2});
+
+  expect(room.preRoundFor("first")?.opponent.weapons.slots[1]).toEqual({
+    locked: true,
+    choice: {kind: "builtIn", key: "rifle"},
+  });
+});
+
+it("does not let a seat lock in its second weapon before its first", () => {
+  const room = twoSeatedRoom();
+
+  room.preRoundAction("first", {kind: "lockInWeapon", slot: 2});
+
+  expect(room.preRoundFor("first")?.own.weapons).toEqual({slots: [{locked: false}, {locked: false}]});
 });
 
 it("lets a seat on its own choose and lock in for as long as it likes", () => {
@@ -224,11 +236,10 @@ it("ignores a pre-round action once the match has begun", () => {
   expect(room.joinedMessage("first").arena).toEqual(DUEL_BUILT_IN_ARENA.rows);
 });
 
-it("sends each seat one reveal when the match begins: both pairs of weapons, the other's saved one with its numbers and drawing", () => {
+it("sends each seat one reveal when the pre-round decides: the arena and both pairs of weapons, the other's saved one with its numbers and drawing", () => {
   const room = twoSeatedRoom();
   const sparky = savedWeapon("weapon-secret-1", "Sparky");
-  room.chooseWeapons("first", [sparky, {kind: "builtIn", key: "rifle"}]);
-  room.preRoundAction("first", {kind: "lockInWeapons"});
+  lockInChosen(room, "first", [sparky, {kind: "builtIn", key: "rifle"}]);
   lockInWeapons(room, "second", ["submachine-gun", "marksman-rifle"]);
   lockInArena(room, "first", DUEL_BUILT_IN_ARENA.name);
   lockInArena(room, "second", DUEL_BUILT_IN_ARENA.name);
@@ -237,6 +248,7 @@ it("sends each seat one reveal when the match begins: both pairs of weapons, the
 
   expect(forSecond).toEqual({
     kind: "reveal",
+    arena: {name: DUEL_BUILT_IN_ARENA.name, rows: DUEL_BUILT_IN_ARENA.rows},
     weapons: {
       own: [
         {kind: "builtIn", key: "submachine-gun"},
@@ -267,15 +279,14 @@ it("sends a reveal once to each seat, and none before the match begins", () => {
 it("plays a saved weapon in the match, and a saved arena as the arena", () => {
   const room = twoSeatedRoom();
   const sparky = savedWeapon("weapon-1", "Sparky");
-  room.chooseWeapons("first", [sparky, {kind: "builtIn", key: "rifle"}]);
-  room.preRoundAction("first", {kind: "lockInWeapons"});
+  lockInChosen(room, "first", [sparky, {kind: "builtIn", key: "rifle"}]);
   room.chooseArena("first", {kind: "saved", id: "arena-1", arena: {name: "Little room", rows: littleRoom()}});
   room.preRoundAction("first", {kind: "lockInArena"});
   room.chooseArena("second", {kind: "saved", id: "arena-1", arena: {name: "Little room", rows: littleRoom()}});
   room.preRoundAction("second", {kind: "lockInArena"});
-  room.preRoundAction("second", {kind: "lockInWeapons"});
+  lockInBothWeapons(room, "second");
 
-  expect(room.takeArenaMessage()).toEqual({kind: "arena", rows: littleRoom()});
+  expect(room.takeArenaMessage("first")).toEqual({kind: "arena", rows: littleRoom()});
   expect(weaponsOf(room, "first")?.[0]).toEqual(weaponNamed("Sparky"));
 });
 
@@ -287,8 +298,8 @@ it("offers the seats the day's arenas once it is told them, and plays the first 
 
   room.preRoundAction("first", {kind: "lockInArena"});
   room.preRoundAction("second", {kind: "lockInArena"});
-  room.preRoundAction("first", {kind: "lockInWeapons"});
-  room.preRoundAction("second", {kind: "lockInWeapons"});
+  lockInBothWeapons(room, "first");
+  lockInBothWeapons(room, "second");
 
   expect(room.takeArenaPlayed()).toBe("Keep");
 });
@@ -299,10 +310,10 @@ it("says nothing of a match played on a saved arena: only the built-in arenas ar
   room.preRoundAction("first", {kind: "lockInArena"});
   room.chooseArena("second", {kind: "saved", id: "arena-1", arena: {name: "Little room", rows: littleRoom()}});
   room.preRoundAction("second", {kind: "lockInArena"});
-  room.preRoundAction("first", {kind: "lockInWeapons"});
-  room.preRoundAction("second", {kind: "lockInWeapons"});
+  lockInBothWeapons(room, "first");
+  lockInBothWeapons(room, "second");
 
-  expect(room.takeArenaMessage()).toEqual({kind: "arena", rows: littleRoom()});
+  expect(room.takeArenaMessage("first")).toEqual({kind: "arena", rows: littleRoom()});
   expect(room.takeArenaPlayed()).toBeUndefined();
 });
 
@@ -317,11 +328,99 @@ it("says nothing of a saved arena named like a built-in one", () => {
   room.preRoundAction("first", {kind: "lockInArena"});
   room.chooseArena("second", duelLookalike);
   room.preRoundAction("second", {kind: "lockInArena"});
-  room.preRoundAction("first", {kind: "lockInWeapons"});
-  room.preRoundAction("second", {kind: "lockInWeapons"});
+  lockInBothWeapons(room, "first");
+  lockInBothWeapons(room, "second");
 
   expect(room.takeArenaPlayed()).toBeUndefined();
 });
+
+it("holds a decided pre-round for the reveal: the arena and weapons are told at once, the match begins when the time is up", () => {
+  const room = revealingRoom();
+
+  expect(room.snapshotFor("first")).toBeUndefined();
+  expect(room.preRoundFor("first")).toMatchObject({stage: "revealing", secondsLeft: 30, how: "same"});
+  expect(room.joinedMessage("first").arena).toEqual(DUEL_BUILT_IN_ARENA.rows);
+  expect(room.takeArenaMessage("first")).toEqual({kind: "arena", rows: DUEL_BUILT_IN_ARENA.rows});
+  expect(room.takeRevealMessage("first")).toMatchObject({kind: "reveal"});
+
+  room.tick(29 * STEPS_IN_A_SECOND);
+  expect(room.snapshotFor("first")).toBeUndefined();
+  room.tick(STEPS_IN_A_SECOND);
+
+  expect(room.snapshotFor("first")).toBeDefined();
+  expect(room.preRoundFor("first")).toBeUndefined();
+});
+
+it("begins the match from the reveal when both seats have asked to, and not when only one has", () => {
+  const room = revealingRoom();
+
+  room.ready("first");
+
+  expect(room.snapshotFor("first")).toBeUndefined();
+  expect(room.preRoundFor("second")?.opponent).toMatchObject({ready: true});
+
+  room.ready("second");
+
+  expect(room.snapshotFor("first")).toBeDefined();
+});
+
+it("starts the forfeit clocks only when the match begins, however long the reveal was", () => {
+  const room = new MatchRoom({preRoundSeconds: 0, revealSeconds: 30, limits: {reconnectSeconds: 5, idleSeconds: 5}});
+  room.join();
+  room.join();
+
+  room.tick(29 * STEPS_IN_A_SECOND);
+  room.tick(STEPS_IN_A_SECOND);
+
+  expect(room.snapshotFor("first")?.round).toBe("playing");
+});
+
+it("tells a seat that comes back during the reveal the arena and the reveal again", () => {
+  const room = revealingRoom();
+  const token = room.joinedMessage("first").token;
+  room.takeArenaMessage("first");
+  room.takeRevealMessage("first");
+  room.leave("first");
+
+  expect(room.reconnect(token)).toBe("first");
+
+  expect(room.takeArenaMessage("first")).toEqual({kind: "arena", rows: DUEL_BUILT_IN_ARENA.rows});
+  expect(room.takeRevealMessage("first")).toMatchObject({kind: "reveal"});
+  expect(room.takeRevealMessage("first")).toBeUndefined();
+});
+
+it("ignores a go-on before the pre-round is decided", () => {
+  const room = new MatchRoom({revealSeconds: 30});
+  room.join();
+  room.join();
+
+  room.ready("first");
+  room.ready("second");
+  lockInArena(room, "first", DUEL_BUILT_IN_ARENA.name);
+  lockInArena(room, "second", DUEL_BUILT_IN_ARENA.name);
+
+  expect(room.snapshotFor("first")).toBeUndefined();
+});
+
+it("counts a built-in arena as played only once the match begins, after the reveal", () => {
+  const room = revealingRoom();
+
+  expect(room.takeArenaPlayed()).toBeUndefined();
+
+  room.tick(30 * STEPS_IN_A_SECOND);
+
+  expect(room.takeArenaPlayed()).toBe(DUEL_BUILT_IN_ARENA.name);
+});
+
+function revealingRoom(): MatchRoom {
+  const room = new MatchRoom({revealSeconds: 30});
+  room.join();
+  room.join();
+  lockInArena(room, "first", DUEL_BUILT_IN_ARENA.name);
+  lockInArena(room, "second", DUEL_BUILT_IN_ARENA.name);
+
+  return room;
+}
 
 function twoSeatedRoom(limits = {reconnectSeconds: 30, idleSeconds: 60}): MatchRoom {
   const room = new MatchRoom({limits});
@@ -340,11 +439,18 @@ function stayActive(room: MatchRoom, seat: Seat, seconds: number): void {
 }
 
 function lockInWeapons(room: MatchRoom, seat: Seat, keys: readonly [string, string]): void {
-  room.chooseWeapons(seat, [
+  lockInChosen(room, seat, [
     {kind: "builtIn", key: keys[0]},
     {kind: "builtIn", key: keys[1]},
   ]);
-  room.preRoundAction(seat, {kind: "lockInWeapons"});
+}
+
+/** The seat puts its first weapon forward and locks it in, then its second: the second can only be taken once the first is locked. */
+function lockInChosen(room: MatchRoom, seat: Seat, chosen: readonly [ChosenWeapon, ChosenWeapon]): void {
+  room.chooseWeapon(seat, 1, chosen[0]);
+  room.preRoundAction(seat, {kind: "lockInWeapon", slot: 1});
+  room.chooseWeapon(seat, 2, chosen[1]);
+  room.preRoundAction(seat, {kind: "lockInWeapon", slot: 2});
 }
 
 function weaponsOf(room: MatchRoom, seat: Seat): Weapon[] | undefined {
@@ -355,7 +461,12 @@ function weaponsOf(room: MatchRoom, seat: Seat): Weapon[] | undefined {
 function lockInArena(room: MatchRoom, seat: Seat, name: string): void {
   room.chooseArena(seat, {kind: "builtIn", name});
   room.preRoundAction(seat, {kind: "lockInArena"});
-  room.preRoundAction(seat, {kind: "lockInWeapons"});
+  lockInBothWeapons(room, seat);
+}
+
+function lockInBothWeapons(room: MatchRoom, seat: Seat): void {
+  room.preRoundAction(seat, {kind: "lockInWeapon", slot: 1});
+  room.preRoundAction(seat, {kind: "lockInWeapon", slot: 2});
 }
 
 function savedWeapon(id: string, name: string): ChosenWeapon {

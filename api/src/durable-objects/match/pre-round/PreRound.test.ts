@@ -11,14 +11,14 @@ import {fallbackAppearance} from "@gunsmith/shared/appearance/fallback/FallbackA
 import {PreRound} from "@src/durable-objects/match/pre-round/PreRound";
 import type {ChosenArena} from "@src/durable-objects/match/pre-round/types/ChosenArena";
 import type {ChosenWeapon} from "@src/durable-objects/match/pre-round/types/ChosenWeapon";
-import type {ChosenWeapons} from "@src/durable-objects/match/pre-round/types/ChosenWeapons";
 
 const DUEL = DUEL_BUILT_IN_ARENA.name;
 const FAIR_DUEL = FAIR_DUEL_BUILT_IN_ARENA.name;
 const DEFAULT_WEAPONS = {first: RIFLE, second: MARKSMAN_RIFLE};
-const BUILT_IN_RIFLE = {kind: "builtIn", key: "rifle"};
-const BUILT_IN_MARKSMAN_RIFLE = {kind: "builtIn", key: "marksman-rifle"};
-const BUILT_IN_SUBMACHINE_GUN = {kind: "builtIn", key: "submachine-gun"};
+const BUILT_IN_RIFLE: ChosenWeapon = {kind: "builtIn", key: "rifle"};
+const BUILT_IN_MARKSMAN_RIFLE: ChosenWeapon = {kind: "builtIn", key: "marksman-rifle"};
+const BUILT_IN_SUBMACHINE_GUN: ChosenWeapon = {kind: "builtIn", key: "submachine-gun"};
+const NOTHING_LOCKED = {slots: [{locked: false}, {locked: false}]};
 const DAYS_ARENAS = ["Cover yard", "Pinwheel", "Slalom", "Keep", "Labyrinth"];
 
 it("decides on the duel arena when both seats lock in having chosen nothing", () => {
@@ -113,7 +113,7 @@ it("does not show a seat the other's arena until both are locked in", () => {
   preRound.lockInArena("first");
   const after = preRound.viewOf("first");
 
-  expect(before.opponent).toEqual({locked: true, picked: false, weapons: {locked: false}});
+  expect(before.opponent).toEqual({locked: true, picked: false, weapons: NOTHING_LOCKED});
   expect(after.opponent.arena).toEqual({kind: "builtIn", name: FAIR_DUEL});
 });
 
@@ -239,11 +239,11 @@ it("forgets everything a seat chose when it is released, and nothing of the othe
 
   preRound.release("first");
 
-  expect(preRound.viewOf("first").own).toEqual({locked: false, weapons: {locked: false}});
+  expect(preRound.viewOf("first").own).toEqual({locked: false, weapons: NOTHING_LOCKED});
   expect(preRound.viewOf("second").own).toEqual({
     arena: {kind: "builtIn", name: DUEL},
     locked: false,
-    weapons: {locked: false},
+    weapons: NOTHING_LOCKED,
   });
 });
 
@@ -262,92 +262,195 @@ it("plays the weapons each seat locked in, each in its own slot", () => {
   preRound.lockInArena("first");
   preRound.lockInArena("second");
 
-  preRound.chooseWeapons("first", builtInWeapons("submachine-gun", "rifle"));
-  preRound.lockInWeapons("first");
-  preRound.lockInWeapons("second");
+  putForward(preRound, "first", ["submachine-gun", "rifle"]);
+  lockInWeapons(preRound, "first");
+  lockInWeapons(preRound, "second");
 
   expect(preRound.outcome()?.weapons).toEqual({first: {first: SUBMACHINE_GUN, second: RIFLE}, second: DEFAULT_WEAPONS});
 });
 
-it("lets a seat that chooses no weapons have the rifle and the marksman rifle", () => {
+it("is not decided while a seat has locked in only its first weapon", () => {
+  const preRound = new PreRound(60, () => 1);
+  preRound.lockInArena("first");
+  preRound.lockInArena("second");
+
+  preRound.lockInWeapon("first", 1);
+  preRound.lockInWeapon("second", 1);
+  preRound.lockInWeapon("first", 2);
+
+  expect(preRound.outcome()).toBeUndefined();
+});
+
+it("lets a seat that chooses no weapon have the rifle in slot 1 and the marksman rifle in slot 2", () => {
   const preRound = new PreRound(60, () => 1);
 
-  preRound.lockInWeapons("first");
+  lockInWeapons(preRound, "first");
 
   expect(preRound.viewOf("first").own.weapons).toEqual({
-    choices: [BUILT_IN_RIFLE, BUILT_IN_MARKSMAN_RIFLE],
-    locked: true,
+    slots: [
+      {locked: true, choice: BUILT_IN_RIFLE},
+      {locked: true, choice: BUILT_IN_MARKSMAN_RIFLE},
+    ],
   });
 });
 
-it("ignores weapons that are not built in, and a pair with one that is not", () => {
+it("ignores a weapon that is not built in", () => {
   const preRound = new PreRound(60, () => 1);
 
-  preRound.chooseWeapons("first", builtInWeapons("rifle", "no-such-weapon"));
-  preRound.chooseWeapons("first", builtInWeapons("no-such-weapon", "rifle"));
+  preRound.chooseWeapon("first", 1, {kind: "builtIn", key: "no-such-weapon"});
 
-  expect(preRound.viewOf("first").own.weapons).toEqual({locked: false});
+  expect(preRound.viewOf("first").own.weapons).toEqual(NOTHING_LOCKED);
 });
 
-it("keeps locked-in weapons: they cannot be changed", () => {
+it("keeps a locked-in weapon: it cannot be changed, while the other slot can still be chosen", () => {
   const preRound = new PreRound(60, () => 1);
-  preRound.chooseWeapons("first", builtInWeapons("submachine-gun", "submachine-gun"));
-  preRound.lockInWeapons("first");
+  preRound.chooseWeapon("first", 1, BUILT_IN_SUBMACHINE_GUN);
+  preRound.lockInWeapon("first", 1);
 
-  preRound.chooseWeapons("first", builtInWeapons("rifle", "rifle"));
+  preRound.chooseWeapon("first", 1, BUILT_IN_RIFLE);
+  preRound.chooseWeapon("first", 2, BUILT_IN_RIFLE);
 
   expect(preRound.viewOf("first").own.weapons).toEqual({
-    choices: [BUILT_IN_SUBMACHINE_GUN, BUILT_IN_SUBMACHINE_GUN],
-    locked: true,
+    slots: [
+      {locked: true, choice: BUILT_IN_SUBMACHINE_GUN},
+      {locked: false, choice: BUILT_IN_RIFLE},
+    ],
   });
 });
 
-it("shows a seat the other's weapons only once both seats have locked in their weapons", () => {
+it("does not let a seat choose or lock in its second weapon before its first is locked in", () => {
   const preRound = new PreRound(60, () => 1);
-  preRound.chooseWeapons("second", builtInWeapons("submachine-gun", "rifle"));
-  preRound.lockInWeapons("second");
+
+  preRound.chooseWeapon("first", 2, BUILT_IN_SUBMACHINE_GUN);
+  preRound.lockInWeapon("first", 2);
+
+  expect(preRound.viewOf("first").own.weapons).toEqual(NOTHING_LOCKED);
+
+  preRound.lockInWeapon("first", 1);
+  preRound.chooseWeapon("first", 2, BUILT_IN_SUBMACHINE_GUN);
+  preRound.lockInWeapon("first", 2);
+
+  expect(preRound.viewOf("first").own.weapons.slots[1]).toEqual({locked: true, choice: BUILT_IN_SUBMACHINE_GUN});
+});
+
+it("shows a seat the other's first weapon only once both seats have locked in their first, and says nothing of the second", () => {
+  const preRound = new PreRound(60, () => 1);
+  putForward(preRound, "second", ["submachine-gun", "rifle"]);
+  preRound.lockInWeapon("second", 1);
 
   const before = preRound.viewOf("first");
-  preRound.lockInWeapons("first");
+  preRound.lockInWeapon("first", 1);
   const after = preRound.viewOf("first");
 
-  expect(before.opponent.weapons).toEqual({locked: true});
+  expect(before.opponent.weapons).toEqual({slots: [{locked: true}, {locked: false}]});
   expect(JSON.stringify(before)).not.toContain("submachine-gun");
-  expect(after.opponent.weapons).toEqual({locked: true, choices: [BUILT_IN_SUBMACHINE_GUN, BUILT_IN_RIFLE]});
+  expect(after.opponent.weapons).toEqual({slots: [{locked: true, choice: BUILT_IN_SUBMACHINE_GUN}, {locked: false}]});
+  expect(JSON.stringify(after.opponent)).not.toContain('"rifle"');
+});
+
+it("shows the other's second weapon only once both seats have locked in their second", () => {
+  const preRound = new PreRound(60, () => 1);
+  putForward(preRound, "second", ["submachine-gun", "rifle"]);
+  preRound.lockInWeapon("second", 1);
+  preRound.lockInWeapon("second", 2);
+  preRound.lockInWeapon("first", 1);
+
+  const before = preRound.viewOf("first").opponent.weapons.slots[1];
+  preRound.lockInWeapon("first", 2);
+  const after = preRound.viewOf("first").opponent.weapons.slots[1];
+
+  expect(before).toEqual({locked: true});
+  expect(after).toEqual({locked: true, choice: BUILT_IN_RIFLE});
 });
 
 it("keeps a seat's weapons draft to itself", () => {
   const preRound = new PreRound(60, () => 1);
 
-  preRound.chooseWeapons("second", builtInWeapons("submachine-gun", "rifle"));
+  putForward(preRound, "second", ["submachine-gun", "rifle"]);
 
   expect(JSON.stringify(preRound.viewOf("first"))).not.toContain("submachine-gun");
 });
 
-it("gives a seat that has not locked in its weapons the defaults when the time runs out, whatever it had in mind", () => {
+it("gives a seat that has not locked in a weapon the default for that slot when the time runs out, whatever it had in mind", () => {
   const preRound = new PreRound(60, () => 1);
   choose(preRound, "first", DUEL);
-  preRound.chooseWeapons("second", builtInWeapons("submachine-gun", "submachine-gun"));
+  putForward(preRound, "second", ["submachine-gun", "submachine-gun"]);
+  preRound.lockInWeapon("second", 1);
   preRound.lockInArena("second");
   preRound.startClock();
 
   preRound.tick(60);
 
   expect(preRound.viewOf("second").own.weapons).toEqual({
-    choices: [BUILT_IN_RIFLE, BUILT_IN_MARKSMAN_RIFLE],
-    locked: true,
+    slots: [
+      {locked: true, choice: BUILT_IN_SUBMACHINE_GUN},
+      {locked: true, choice: BUILT_IN_MARKSMAN_RIFLE},
+    ],
   });
-  expect(preRound.outcome()?.weapons.second).toEqual(DEFAULT_WEAPONS);
+  expect(preRound.outcome()?.weapons.second).toEqual({first: SUBMACHINE_GUN, second: MARKSMAN_RIFLE});
 });
 
 it("forgets the weapons a seat chose when it is released", () => {
   const preRound = new PreRound(60, () => 1);
-  preRound.chooseWeapons("first", builtInWeapons("submachine-gun", "rifle"));
-  preRound.lockInWeapons("first");
+  putForward(preRound, "first", ["submachine-gun", "rifle"]);
+  lockInWeapons(preRound, "first");
 
   preRound.release("first");
 
-  expect(preRound.viewOf("first").own.weapons).toEqual({locked: false});
+  expect(preRound.viewOf("first").own.weapons).toEqual(NOTHING_LOCKED);
+});
+
+it("holds a decided pre-round for the reveal, counting down, and begins when the time is up", () => {
+  const preRound = new PreRound(60, () => 1, 30);
+  choose(preRound, "first", DUEL);
+  choose(preRound, "second", DUEL);
+
+  expect(preRound.viewOf("first")).toMatchObject({stage: "revealing", secondsLeft: 30});
+  expect(preRound.revealOver()).toBe(false);
+
+  preRound.tick(10);
+
+  expect(preRound.viewOf("first")).toMatchObject({stage: "revealing", secondsLeft: 20});
+
+  preRound.tick(20);
+
+  expect(preRound.revealOver()).toBe(true);
+});
+
+it("ends the reveal when both seats have asked to go on, and not when only one has", () => {
+  const preRound = new PreRound(60, () => 1, 30);
+  choose(preRound, "first", DUEL);
+  choose(preRound, "second", DUEL);
+
+  preRound.ready("first");
+
+  expect(preRound.revealOver()).toBe(false);
+  expect(preRound.viewOf("second").opponent).toMatchObject({ready: true});
+  expect(preRound.viewOf("first").own).toMatchObject({ready: true});
+
+  preRound.ready("second");
+
+  expect(preRound.revealOver()).toBe(true);
+});
+
+it("has no reveal to hold when it is allowed none", () => {
+  const preRound = new PreRound(60, () => 1);
+  choose(preRound, "first", DUEL);
+  choose(preRound, "second", DUEL);
+
+  expect(preRound.revealOver()).toBe(true);
+  expect(preRound.viewOf("first").stage).toBe("decided");
+});
+
+it("ignores a go-on before it has decided", () => {
+  const preRound = new PreRound(60, () => 1, 30);
+
+  preRound.ready("first");
+  preRound.ready("second");
+  choose(preRound, "first", DUEL);
+  choose(preRound, "second", DUEL);
+
+  expect(preRound.revealOver()).toBe(false);
 });
 
 it("plays a saved arena a seat put forward when the other puts forward the same one, by id", () => {
@@ -411,10 +514,10 @@ it("never tells either seat the id of a saved arena or weapon", () => {
   const preRound = new PreRound(60, () => 1);
   chooseSaved(preRound, "first", savedArena("arena-secret-1", "Little room"));
   chooseSaved(preRound, "second", savedArena("arena-secret-2", "Big room"));
-  preRound.chooseWeapons("first", [savedWeapon("weapon-secret-1", "Sparky"), savedWeapon("weapon-secret-2", "Zap")]);
-  preRound.chooseWeapons("second", [savedWeapon("weapon-secret-3", "Boomer"), savedWeapon("weapon-secret-4", "Thud")]);
-  preRound.lockInWeapons("first");
-  preRound.lockInWeapons("second");
+  preRound.chooseWeapon("first", 1, savedWeapon("weapon-secret-1", "Sparky"));
+  preRound.chooseWeapon("second", 1, savedWeapon("weapon-secret-3", "Boomer"));
+  lockInWeapons(preRound, "first");
+  lockInWeapons(preRound, "second");
 
   for (const seat of ["first", "second"] as const) {
     expect(JSON.stringify(preRound.viewOf(seat))).not.toContain("secret");
@@ -427,34 +530,36 @@ it("plays the saved weapons a seat locked in, each in its own slot, beside a bui
   preRound.lockInArena("first");
   preRound.lockInArena("second");
 
-  preRound.chooseWeapons("first", [sparky, {kind: "builtIn", key: "rifle"}]);
-  preRound.lockInWeapons("first");
-  preRound.lockInWeapons("second");
+  preRound.chooseWeapon("first", 1, sparky);
+  preRound.lockInWeapon("first", 1);
+  preRound.chooseWeapon("first", 2, {kind: "builtIn", key: "rifle"});
+  lockInWeapons(preRound, "first");
+  lockInWeapons(preRound, "second");
 
   expect(preRound.outcome()?.weapons.first).toEqual({first: weaponNamed("Sparky"), second: RIFLE});
   expect(preRound.outcome()?.chosen.first).toEqual([sparky, {kind: "builtIn", key: "rifle"}]);
 });
 
-it("tells a seat a saved weapon by its name, its own at once and the other's only once both have locked in", () => {
+it("tells a seat a saved weapon by its name, its own at once and the other's only once both have locked in that slot", () => {
   const preRound = new PreRound(60, () => 1);
-  preRound.chooseWeapons("second", [savedWeapon("weapon-1", "Sparky"), {kind: "builtIn", key: "rifle"}]);
-  preRound.lockInWeapons("second");
+  preRound.chooseWeapon("second", 1, savedWeapon("weapon-1", "Sparky"));
+  preRound.lockInWeapon("second", 1);
 
-  const own = preRound.viewOf("second").own.weapons;
-  const before = preRound.viewOf("first").opponent.weapons;
-  preRound.lockInWeapons("first");
-  const after = preRound.viewOf("first").opponent.weapons;
+  const own = preRound.viewOf("second").own.weapons.slots[0];
+  const before = preRound.viewOf("first").opponent.weapons.slots[0];
+  preRound.lockInWeapon("first", 1);
+  const after = preRound.viewOf("first").opponent.weapons.slots[0];
 
-  expect(own.choices).toEqual([{kind: "saved", name: "Sparky"}, BUILT_IN_RIFLE]);
+  expect(own.choice).toEqual({kind: "saved", name: "Sparky"});
   expect(before).toEqual({locked: true});
-  expect(after.choices).toEqual([{kind: "saved", name: "Sparky"}, BUILT_IN_RIFLE]);
+  expect(after.choice).toEqual({kind: "saved", name: "Sparky"});
 });
 
 it("never sends a saved weapon's numbers or drawing in the pre-round view", () => {
   const preRound = new PreRound(60, () => 1);
-  preRound.chooseWeapons("second", [savedWeapon("weapon-1", "Sparky"), savedWeapon("weapon-2", "Zap")]);
-  preRound.lockInWeapons("second");
-  preRound.lockInWeapons("first");
+  preRound.chooseWeapon("second", 1, savedWeapon("weapon-1", "Sparky"));
+  lockInWeapons(preRound, "second");
+  lockInWeapons(preRound, "first");
 
   const view = JSON.stringify(preRound.viewOf("first"));
 
@@ -526,24 +631,29 @@ function withoutTheDaysArenas(key: string, value: unknown): unknown {
 function choose(preRound: PreRound, seat: Seat, arena: string): void {
   preRound.chooseArena(seat, builtInArena(arena));
   preRound.lockInArena(seat);
-  preRound.lockInWeapons(seat);
+  lockInWeapons(preRound, seat);
 }
 
 function builtInArena(name: string): ChosenArena {
   return {kind: "builtIn", name};
 }
 
-function builtInWeapons(first: string, second: string): ChosenWeapons {
-  return [
-    {kind: "builtIn", key: first},
-    {kind: "builtIn", key: second},
-  ];
+/** The seat puts these built-in weapons forward, slot 1 then slot 2, locking nothing in: the second can only be put forward once the first is locked, so a test locks it first when it needs the second. */
+function putForward(preRound: PreRound, seat: Seat, keys: readonly [string, string]): void {
+  preRound.chooseWeapon(seat, 1, {kind: "builtIn", key: keys[0]});
+  preRound.lockInWeapon(seat, 1);
+  preRound.chooseWeapon(seat, 2, {kind: "builtIn", key: keys[1]});
 }
 
 function chooseSaved(preRound: PreRound, seat: Seat, arena: ChosenArena): void {
   preRound.chooseArena(seat, arena);
   preRound.lockInArena(seat);
-  preRound.lockInWeapons(seat);
+  lockInWeapons(preRound, seat);
+}
+
+function lockInWeapons(preRound: PreRound, seat: Seat): void {
+  preRound.lockInWeapon(seat, 1);
+  preRound.lockInWeapon(seat, 2);
 }
 
 function savedArena(id: string, name: string): ChosenArena {

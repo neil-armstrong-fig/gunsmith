@@ -46,6 +46,6 @@ function fakeDependencies(): ArenaPipelineDependencies {
   return {
     generator: new FakeListChatModel({responses: [JSON.stringify(ROOM)]}),
     moderator: new FakeListChatModel({responses: [JSON.stringify({isArenaRequest: true, reason: "a room"})]}),
-    builtInArenas: [ROOM],
+    format: "rows",
   };
 }

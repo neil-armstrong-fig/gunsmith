@@ -33,10 +33,10 @@ Current owners and consumer contracts are in [HANDOFF.md](../../HANDOFF.md). The
 | Length pre-check turn-away | 0 | $0 | **0** (refunded) | 0.5 |
 | Moderation rejection, or the moderation call itself failed | 1 | about $0.00015 | 0.5 | 0.5 |
 | Arena created, first try or after a repair | 2 or 3 | about $0.00034 to $0.00055 | 1 | 1 |
-| **Built-in fallback** | 2 or 3 | about $0.00055 | **0.5** | 0 (refunded) |
+| **Invalid arena** (no playable arena after the one repair; no built-in is given, 2026-11-21) | 2 or 3 | about $0.00055 | **0.5** | 0 (refunded) |
 | Our failure: timeout, exception, result cannot be kept | any | up to the reservation | 0 (refunded) | 0 (refunded) |
 
-  A built-in fallback is charged the rejected price, 0.5, because it costs us more than a created arena. A failed moderation call stays at 0.5 (the user chose no change). `ArenaOutcome.refunded` is true exactly when `modelCalls` is 0 (the pre-check); every other charge is the route's. Whether weapons follow the same rule is open.
+  An invalid arena (which ended as a built-in fallback until 2026-11-24) is charged the rejected price, 0.5, because it costs us more than a created arena. A failed moderation call stays at 0.5 (the user chose no change). `ArenaOutcome.refunded` is true exactly when `modelCalls` is 0 (the pre-check); every other charge is the route's. Whether weapons follow the same rule is open.
 - **Weapons, the same principle (the user, 2026-11-20: "likely the same yes - about avoiding too many sneaky costs", then "make the changes"); applied by `ai` in `api/` at the user's go:** the weapon route refunds an `invalid` weapon today and charges 0.5 for any rejection. The weapon outcome has no `refunded` flag, so the route reads `status === "rejected" && modelCalls === 0`.
 
 | What happened | Model calls | Cost to us | Credit charged | Was |

@@ -22,6 +22,13 @@ interface Props {
 const MOST_SHOTS_DRAWN = 64;
 
 /**
+ * The mesh itself stands at depth 0 (each shot is placed at 1 in its own matrix), so left to depth order it would be drawn before the vision veil
+ * (at 0.9) and its whole picture, transparent corners too, would keep the veil off the floor under it: a lit square round every shot outside the
+ * cone. A render order past the veil's draws the shots on top of it.
+ */
+const AFTER_THE_VISION_VEIL = 1;
+
+/**
  * Every bullet of one side in the air that the player sees (the opponent's only inside the cone), drawn from art's picture of a shot with its tip on the bullet and lying
  * along the way it flies. A small gold disc shows until the picture has loaded, or if it could not.
  */
@@ -62,6 +69,7 @@ export function Shots({shooter}: Props): JSX.Element {
       ref={meshRef}
       args={[undefined, undefined, MOST_SHOTS_DRAWN]}
       frustumCulled={false}
+      renderOrder={AFTER_THE_VISION_VEIL}
     >
       {picture && <ShotPicture spriteKey={spriteKey} picture={picture} />}
 

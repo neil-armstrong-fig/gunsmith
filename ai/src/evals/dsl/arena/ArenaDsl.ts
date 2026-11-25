@@ -2,6 +2,7 @@ import {DslError} from "@evals/dsl/shared/errors/DslError";
 import type {TrialDsl} from "@evals/dsl/shared/types/TrialDsl";
 import type {ArenaPipelineDriver} from "@evals/dsl/arena/types/ArenaPipelineDriver";
 import {ArenaPipeline} from "@evals/dsl/arena/pipeline/ArenaPipeline";
+import type {ArenaSize} from "@gunsmith/ai/pipeline/arena/arena-shapes/types/ArenaSize";
 import type {ArenaOutcomeStatus} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcomeStatus";
 
 /**
@@ -36,7 +37,7 @@ export class ArenaDsl implements TrialDsl<ArenaDsl> {
     }
   }
 
-  /** How the request ended: an arena created, the request rejected or a built-in arena given. The reading of one trial, so the spec states what it expects. */
+  /** How the request ended: an arena created, the request rejected, or no arena made and a reason given (invalid). The reading of one trial, so the spec states what it expects. */
   getStatus(): ArenaOutcomeStatus {
     try {
       return this.pipeline.statusOfTheAnswer();
@@ -63,12 +64,12 @@ export class ArenaDsl implements TrialDsl<ArenaDsl> {
     }
   }
 
-  /** Why no arena was given to play, if none was: a request asked for properly never ends with nothing, the model's own arena or a built-in one. */
-  getArenaGivenProblems(): string[] {
+  /** Why the request was not answered honestly, if it was not: a request asked for properly ends with the model's own arena, or with no arena and a reason the player can read, never with nothing and never with a substitute. */
+  getArenaAnsweredProblems(): string[] {
     try {
-      return this.pipeline.arenaGivenProblems();
+      return this.pipeline.arenaAnsweredProblems();
     } catch (error) {
-      throw new DslError("Expected to read whether an arena was given", error);
+      throw new DslError("Expected to read whether the request was answered", error);
     }
   }
 
@@ -78,6 +79,33 @@ export class ArenaDsl implements TrialDsl<ArenaDsl> {
       return this.pipeline.coverProblems();
     } catch (error) {
       throw new DslError("Expected to read the cover in the arena given", error);
+    }
+  }
+
+  /** Why the arena given is a built-in arena drawn again (a copy of what the model was shown), if it is: the request asked for the model's own. */
+  getOwnArenaProblems(): string[] {
+    try {
+      return this.pipeline.ownArenaProblems();
+    } catch (error) {
+      throw new DslError("Expected to read whether the arena given is the model's own", error);
+    }
+  }
+
+  /** How many tiles wide and tall the arena given is, or nothing when none was given. The spec states the size it expects. */
+  getSize(): ArenaSize | undefined {
+    try {
+      return this.pipeline.sizeOfTheAnswer();
+    } catch (error) {
+      throw new DslError("Expected to read the size of the arena given", error);
+    }
+  }
+
+  /** The highest level of raised floor in the arena given (0 for low ground only), or nothing when none was given. The spec states the height it expects. */
+  getHighestLevel(): number | undefined {
+    try {
+      return this.pipeline.highestLevelOfTheAnswer();
+    } catch (error) {
+      throw new DslError("Expected to read the highest level of the arena given", error);
     }
   }
 

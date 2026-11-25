@@ -1,3 +1,4 @@
+import type {Bullet} from "@gunsmith/engine/bullet/types/Bullet";
 import type {Input} from "@gunsmith/engine/game-loop/types/Input";
 import type {World} from "@gunsmith/engine/game-loop/types/World";
 import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
@@ -362,6 +363,49 @@ it("holds the other fighter where the newest snapshot has them while the next is
   expect(resumed).toBeLessThan(9.3);
 });
 
+it("shows a bullet where the newest snapshot has it the moment it arrives", () => {
+  const {socket, match} = seatedMatch();
+  socket.receive(snapshotText({world: {...QUIET, bullets: [shotAt(3)]}}));
+
+  expect(match.worldToShow(0)?.bullets[0]?.position.x).toBeCloseTo(3, 6);
+});
+
+it("flies a bullet on every frame between snapshots, as the browser's own clock moves, not once a snapshot", () => {
+  const {socket, match} = seatedMatch();
+  socket.receive(snapshotText({world: {...QUIET, bullets: [shotAt(3)]}}));
+  steps(match, 3, IDLE);
+
+  // Three steps of 1/60 s at 10 tiles a second.
+  expect(match.worldToShow(0)?.bullets[0]?.position.x).toBeCloseTo(3.5, 6);
+  expect(match.worldToShow(STEP_SECONDS / 2)?.bullets[0]?.position.x).toBeCloseTo(3.5 + 10 * (STEP_SECONDS / 2), 6);
+});
+
+it("puts a bullet on the newest snapshot's word when the next one comes, not on top of where it flew", () => {
+  const {socket, match} = seatedMatch();
+  socket.receive(snapshotText({world: {...QUIET, bullets: [shotAt(3)]}}));
+  steps(match, 3, IDLE);
+  socket.receive(snapshotText({world: {...QUIET, bullets: [shotAt(3.6)]}, elapsedSeconds: 0.05}));
+
+  expect(match.worldToShow(0)?.bullets[0]?.position.x).toBeCloseTo(3.6, 6);
+});
+
+it("ends a bullet's flight at the wall it reaches between snapshots", () => {
+  const {socket, match} = seatedMatch();
+  socket.receive(snapshotText({world: {...QUIET, bullets: [shotAt(10.7)]}}));
+  steps(match, 3, IDLE);
+
+  expect(match.worldToShow(0)?.bullets).toEqual([]);
+});
+
+it("does not fly a bullet on for long when the next snapshot is late", () => {
+  const {socket, match} = seatedMatch();
+  socket.receive(snapshotText({world: {...QUIET, bullets: [shotAt(3)]}}));
+  steps(match, 60, IDLE);
+
+  // A second has passed, but a bullet is only taken a tenth of a second past what the server last said.
+  expect(match.worldToShow(0)?.bullets[0]?.position.x).toBeCloseTo(4, 6);
+});
+
 it("draws nobody for a fighter the server did not send", () => {
   const {socket, match} = seatedMatch();
   const server = startingWorld(arenaFrom(ROWS), [], {x: 8.5, y: 2.5});
@@ -512,6 +556,17 @@ it("plays on the arena the server says was decided, in place of the one it was s
   expect(match.worldToShow(0)?.arena).toEqual(arenaFrom(OTHER_ROWS));
 });
 
+it("knows its seat once the server has seated it, and not before", () => {
+  const socket = new FakeSocket();
+  const match = new OnlineMatch(socket);
+
+  expect(match.seat()).toBeUndefined();
+
+  socket.receive(JOINED);
+
+  expect(match.seat()).toBe("first");
+});
+
 it("has nothing to show of the choosing until the server says something about it", () => {
   const {match} = seatedMatch();
 
@@ -524,8 +579,8 @@ it("shows what the server last said of the choosing, and stops once the match ha
     kind: "preRound",
     stage: "choosing",
     builtInArenas: ["Duel", "Keep", "Slalom", "Pinwheel", "Catwalk"],
-    own: {locked: false, weapons: {locked: false}},
-    opponent: {locked: true, picked: false, weapons: {locked: false}},
+    own: {locked: false, weapons: {slots: [{locked: false}, {locked: false}]}},
+    opponent: {locked: true, picked: false, weapons: {slots: [{locked: true}, {locked: false}]}},
   };
 
   socket.receive(JSON.stringify(frame));
@@ -551,23 +606,13 @@ it("locks in the arena it has chosen", () => {
   expect(socket.frames()).toEqual([{kind: "lockIn", step: "arena"}]);
 });
 
-it("puts two built-in weapons forward by their keys, slot 1 then slot 2", () => {
+it("puts a built-in weapon forward for a slot, by its key", () => {
   const {socket, match} = seatedMatch();
 
-  match.chooseWeapons([
-    {kind: "builtIn", key: "submachine-gun"},
-    {kind: "builtIn", key: "rifle"},
-  ]);
+  match.chooseWeapon(2, {kind: "builtIn", key: "submachine-gun"});
 
   expect(socket.frames()).toEqual([
-    {
-      kind: "choose",
-      step: "weapons",
-      choice: [
-        {kind: "builtIn", key: "submachine-gun"},
-        {kind: "builtIn", key: "rifle"},
-      ],
-    },
+    {kind: "choose", step: "weapon", slot: 2, choice: {kind: "builtIn", key: "submachine-gun"}},
   ]);
 });
 
@@ -579,30 +624,19 @@ it("puts a saved arena forward by its id, never its body", () => {
   expect(socket.frames()).toEqual([{kind: "choose", step: "arena", choice: {kind: "saved", id: "arena-1"}}]);
 });
 
-it("puts saved weapons forward by id, beside a built-in if it likes", () => {
+it("puts a saved weapon forward by its id, never its body", () => {
   const {socket, match} = seatedMatch();
 
-  match.chooseWeapons([
-    {kind: "saved", id: "weapon-1"},
-    {kind: "builtIn", key: "rifle"},
-  ]);
+  match.chooseWeapon(1, {kind: "saved", id: "weapon-1"});
 
-  expect(socket.frames()).toEqual([
-    {
-      kind: "choose",
-      step: "weapons",
-      choice: [
-        {kind: "saved", id: "weapon-1"},
-        {kind: "builtIn", key: "rifle"},
-      ],
-    },
-  ]);
+  expect(socket.frames()).toEqual([{kind: "choose", step: "weapon", slot: 1, choice: {kind: "saved", id: "weapon-1"}}]);
 });
 
 it("keeps the reveal the server sends as the match begins", () => {
   const {socket, match} = seatedMatch();
   const frame = {
     kind: "reveal",
+    arena: {name: "Duel", rows: ["###"]},
     weapons: {
       own: [
         {kind: "builtIn", key: "rifle"},
@@ -622,12 +656,16 @@ it("keeps the reveal the server sends as the match begins", () => {
   expect(match.reveal()).toEqual(frame);
 });
 
-it("locks in the weapons it has chosen", () => {
+it("locks in the weapon it has chosen for a slot", () => {
   const {socket, match} = seatedMatch();
 
-  match.lockInWeapons();
+  match.lockInWeapon(1);
+  match.lockInWeapon(2);
 
-  expect(socket.frames()).toEqual([{kind: "lockIn", step: "weapons"}]);
+  expect(socket.frames()).toEqual([
+    {kind: "lockIn", step: "weapon", slot: 1},
+    {kind: "lockIn", step: "weapon", slot: 2},
+  ]);
 });
 
 it("picks between the two arenas shown", () => {
@@ -644,15 +682,25 @@ it("sends no choosing while the socket is not open", () => {
 
   match.chooseArena({kind: "builtIn", name: "Duel"});
   match.lockInArena();
-  match.chooseWeapons([
-    {kind: "builtIn", key: "rifle"},
-    {kind: "builtIn", key: "rifle"},
-  ]);
-  match.lockInWeapons();
+  match.chooseWeapon(1, {kind: "builtIn", key: "rifle"});
+  match.lockInWeapon(1);
   match.pickArena({kind: "nothing"});
 
   expect(socket.frames()).toEqual([]);
 });
+
+/** The player's bullet flying east along the middle of the arena at 10 tiles a second, from `x`. */
+function shotAt(x: number): Bullet {
+  return {
+    position: {x, y: 2.5},
+    direction: {x: 1, y: 0},
+    damage: 10,
+    speed: 10,
+    shooter: "player",
+    level: 0,
+    crouching: false,
+  };
+}
 
 function snapshotText(request: SnapshotRequest = {}): string {
   const world = request.world ?? startingWorld(arenaFrom(ROWS), [], {x: 8.5, y: 2.5});
