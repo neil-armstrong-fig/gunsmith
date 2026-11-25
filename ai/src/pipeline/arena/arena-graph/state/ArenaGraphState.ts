@@ -1,5 +1,6 @@
 import type {ArenaRelevance} from "@gunsmith/ai/pipeline/arena/types/ArenaRelevance";
 import type {ArenaValidationFailure} from "@gunsmith/ai/pipeline/arena/check/validate/types/ArenaValidationFailure";
+import type {ArenaProblemKind} from "@gunsmith/engine/arena-validation/types/ArenaProblemKind";
 import {Annotation} from "@langchain/langgraph";
 import type {ArenaDrawing} from "@gunsmith/ai/pipeline/arena/types/ArenaDrawing";
 
@@ -22,11 +23,11 @@ export const ArenaGraphState = Annotation.Root({
   errors: Annotation<string[]>({reducer: (_current, update) => update, default: () => []}),
   relevance: Annotation<ArenaRelevance | undefined>(),
   validationFailure: Annotation<ArenaValidationFailure | undefined>(),
+  /** The kinds of fault the last check found in an arena it read but could not accept; empty for any other refusal. Overwritten by each check, so the last one's are what is told. */
+  problemKinds: Annotation<ArenaProblemKind[]>({reducer: (_current, update) => update, default: () => []}),
   codeEdits: Annotation<number>({reducer: (current, update) => current + update, default: () => 0}),
   /** Whether the one repair has been spent. */
   repaired: Annotation<boolean>({reducer: (_current, update) => update, default: () => false}),
-  /** The built-in arena given when the model's could not be used, with why; set only by `fallback`. */
-  builtIn: Annotation<ArenaDrawing | undefined>(),
   /** The nodes that ran, in order; each node adds its own name. */
   nodes: Annotation<string[]>({reducer: (current, update) => current.concat(update), default: () => []}),
   /** Model calls made so far, added up across the nodes. */

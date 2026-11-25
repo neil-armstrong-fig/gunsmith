@@ -1,11 +1,9 @@
 import type {BaseChatModel} from "@langchain/core/language_models/chat_models";
 import type {ArenaFormat} from "@gunsmith/ai/pipeline/arena/arena-drafting/format/ArenaFormat";
-import type {ArenaDrawing} from "@gunsmith/ai/pipeline/arena/types/ArenaDrawing";
 
 /**
- * What the arena pipeline is handed and never builds: the models, and the built-in arenas it falls back to. Tests and evals pass a
- * fake, a local model or a paid one; the Worker passes the real one. The built-ins are injected until engine owns one list of them
- * (requested in `HANDOFF.md`); they meet the same checks as a generated arena.
+ * What the arena pipeline is handed and never builds: the models. Tests and evals pass a fake, a local model or a paid one; the Worker
+ * passes the real one. There are no built-in arenas to give when the model's cannot be used: the outcome says why instead.
  */
 export interface ArenaPipelineDependencies {
   /** The strong model that writes the arena. */
@@ -14,6 +12,4 @@ export interface ArenaPipelineDependencies {
   moderator: BaseChatModel;
   /** How the generator is asked to describe an arena: the drawing's rows or shapes; shapes (`DEFAULT_ARENA_FORMAT`) when absent. The answer is checked the same either way. */
   format?: ArenaFormat;
-  /** The arenas to give when the model's cannot be used. Never empty. */
-  builtInArenas: readonly ArenaDrawing[];
 }

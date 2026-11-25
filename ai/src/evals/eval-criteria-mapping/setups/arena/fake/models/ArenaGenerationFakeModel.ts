@@ -23,8 +23,8 @@ const CUT_IN_TWO_REPLY = {
 };
 
 // The one request the arena specs expect the fake model to get wrong in a way code cannot mend (`AskingForAnArena`, "almost nothing but
-// solid wall"), word for word, on every try, repair included: there is no floor to join and none to make, so the pipeline must fall back
-// to a built-in arena. This is what keeps that path covered.
+// solid wall"), word for word, on every try, repair included: there is no floor to join and none to make, so the request must end invalid,
+// with no arena and a reason (no built-in arena is given in its place, the user, 2026-11-21). This is what keeps that path covered.
 const UNREPAIRABLE_REQUEST = "an arena that is almost nothing but solid wall";
 
 const UNREPAIRABLE_REPLY = {
@@ -52,6 +52,30 @@ const COVER_REPLY = {
     "#...cc........cc...#",
     "#..................#",
     "####################",
+  ],
+};
+
+// The user's watchtower request (`AskingForAnArena`, 2026-11-21), word for word, answered with Haiku 5.5's own first draft of it (2026-11-24):
+// each tower drawn at level two straight on the ground, with no stair, which code's repair once lowered to level one. Engine's repair now
+// gives each a landing between two stairs, so the spec's height criterion proves that path end to end on the fake tier.
+const WATCHTOWER_REQUEST =
+  'A single "watchtower" on each end of the map that goes up to level three with no cover and is effectively a corrador up. The middle of the map has a cover block going through it with a single bridge in the middle that also goes up to level three and back down again';
+
+const WATCHTOWER_REPLY = {
+  name: "Watchtower Crossing",
+  rows: [
+    "########################",
+    "#......................#",
+    "#......................#",
+    "#.........cccc.........#",
+    "#22..................22#",
+    "#22......111111......22#",
+    "#22......111111......22#",
+    "#22..................22#",
+    "#.........cccc.........#",
+    "#......................#",
+    "#......................#",
+    "########################",
   ],
 };
 
@@ -96,6 +120,10 @@ export class ArenaGenerationFakeModel extends BaseChatModel {
 
     if (requests.includes(UNREPAIRABLE_REQUEST)) {
       return UNREPAIRABLE_REPLY;
+    }
+
+    if (requests.includes(WATCHTOWER_REQUEST)) {
+      return WATCHTOWER_REPLY;
     }
 
     if (requests.includes(COVER_REQUEST)) {

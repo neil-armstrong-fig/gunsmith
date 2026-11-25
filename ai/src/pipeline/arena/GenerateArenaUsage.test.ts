@@ -17,10 +17,10 @@ it("adds up the tokens of moderation and generation, each counted once", async (
   expect(outcome.usage).toEqual({inputTokens: 300, outputTokens: 60});
 });
 
-it("counts the repair's tokens as well, even when the arena is then replaced by a built-in", async () => {
+it("counts the repair's tokens as well, even when the request then ends invalid", async () => {
   const outcome = await generateArena({prompt: "a room"}, dependenciesWhere({generatorSays: [BAD, BAD]}));
 
-  expect(outcome.status).toBe("builtIn");
+  expect(outcome.status).toBe("invalid");
   expect(outcome.modelCalls).toBe(3);
   expect(outcome.usage).toEqual({inputTokens: 500, outputTokens: 110});
 });
@@ -53,7 +53,6 @@ function dependenciesWhere(scenario: UsageScenario): ArenaPipelineDependencies {
     moderator: new FakeListChatModel({responses: [JSON.stringify(verdict)]}),
     generator: new FakeListChatModel({responses: scenario.generatorSays.map(reply => JSON.stringify(reply))}),
     format: "rows",
-    builtInArenas: [GOOD],
   };
   reportUsage(dependencies.moderator, MODERATION);
   reportUsage(dependencies.generator, DRAWING);

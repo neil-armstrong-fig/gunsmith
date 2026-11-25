@@ -7,13 +7,13 @@ import type {EvalScore} from "@evals/dsl/shared/types/EvalScore";
 const KEY = "playableArena";
 
 /**
- * An arena the player is given can be played: a request turned away gives none, and any other gives drawing rows the engine's
+ * An arena the player is given can be played: a request turned away, or called invalid, gives none, and any other gives drawing rows the engine's
  * `arenaFrom` accepts (so its stairs are legal) and its `validateArena` finds nothing wrong with. The pipeline's own check calls the
  * same validator (the user's decision, 2026-11-18: `engine/` is a shared resource), so what this still catches is a pipeline that
  * stops checking or hands back something other than what it checked, not a fault in the engine's rules.
  */
 export function playableArena({outcome}: ArenaEvalInput): EvalScore {
-  if (outcome.status === "rejected") {
+  if (outcome.status === "rejected" || outcome.status === "invalid") {
     return noArenaScore(outcome.arena);
   }
 
@@ -35,7 +35,7 @@ function noArenaScore(arena: unknown): EvalScore {
     return {key: KEY, score: 1};
   }
 
-  return {key: KEY, score: 0, comment: "a request that was turned away must not give an arena"};
+  return {key: KEY, score: 0, comment: "a request that was turned away or is invalid must not give an arena"};
 }
 
 /** The rows of a `{name, rows}` drawing, or `undefined` when it is not one: the outcome's arena is `unknown` until read. */

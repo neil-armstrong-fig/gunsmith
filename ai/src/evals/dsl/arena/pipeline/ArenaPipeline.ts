@@ -1,6 +1,6 @@
 import type {ArenaPipelineDriver} from "@evals/dsl/arena/types/ArenaPipelineDriver";
 import type {ArenaEvaluator} from "@evals/dsl/arena/pipeline/types/ArenaEvaluator";
-import {arenaGiven} from "@evals/dsl/arena/pipeline/evaluators/outcome/ArenaGiven";
+import {arenaAnswered} from "@evals/dsl/arena/pipeline/evaluators/outcome/ArenaAnswered";
 import {arenaIsItsOwn} from "@evals/dsl/arena/pipeline/evaluators/outcome/ArenaIsItsOwn";
 import {arenaKeepsCover} from "@evals/dsl/arena/pipeline/evaluators/outcome/ArenaKeepsCover";
 import {arenaNodePath} from "@evals/dsl/arena/pipeline/evaluators/outcome/ArenaNodePath";
@@ -31,7 +31,7 @@ export class ArenaPipeline {
     this.answered = await this.driver.run(prompt);
   }
 
-  /** How the request ended: an arena created, the request rejected, or a built-in arena given. */
+  /** How the request ended: an arena created, the request rejected, or no arena made and a reason given (invalid). */
   statusOfTheAnswer(): ArenaOutcomeStatus {
     return this.theAnswer().status;
   }
@@ -46,8 +46,8 @@ export class ArenaPipeline {
     return this.theAnswer().refunded;
   }
 
-  arenaGivenProblems(): string[] {
-    return this.problemsOf([arenaGiven]);
+  arenaAnsweredProblems(): string[] {
+    return this.problemsOf([arenaAnswered]);
   }
 
   coverProblems(): string[] {
@@ -66,6 +66,18 @@ export class ArenaPipeline {
     }
 
     return {width: String(arena.rows[0]).length, height: arena.rows.length};
+  }
+
+  /** The highest level of raised floor in the arena the player was given, read from its drawing (0 for low ground only), or nothing when no drawing was given. */
+  highestLevelOfTheAnswer(): number | undefined {
+    const {arena} = this.theAnswer();
+    if (typeof arena !== "object" || arena === null || !("rows" in arena) || !Array.isArray(arena.rows)) {
+      return undefined;
+    }
+
+    const levels = arena.rows.join("").match(/[12]/g) ?? [];
+
+    return Math.max(0, ...levels.map(Number));
   }
 
   safeToShowProblems(): string[] {

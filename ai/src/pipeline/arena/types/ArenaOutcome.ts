@@ -5,9 +5,9 @@ import type {ArenaOutcomeStatus} from "@gunsmith/ai/pipeline/arena/types/ArenaOu
 /** The result of an arena request. DRAFT, local to `ai/` until engine and server freeze the real arena contract in `HANDOFF.md`. */
 export interface ArenaOutcome {
   status: ArenaOutcomeStatus;
-  /** `unknown` on purpose: whoever reads an arena (the game, an evaluator) parses it again rather than trusting the type. A built-in arena is given on `builtIn`, and none on `rejected`. */
+  /** `unknown` on purpose: whoever reads an arena (the game, an evaluator) parses it again rather than trusting the type. None on `rejected` or `invalid`. */
   arena?: unknown;
-  /** Why a request was rejected or fell back to a built-in arena, in words a player may see. */
+  /** Why a request was rejected or came out invalid, in words a player may see: sentences of ours, never the model's or the validator's. */
   reason?: string;
   /** The credit goes back: true exactly when the request was turned away before any model was called (`modelCalls` is 0). A request that reached the model is paid for, whatever came of it. */
   refunded: boolean;

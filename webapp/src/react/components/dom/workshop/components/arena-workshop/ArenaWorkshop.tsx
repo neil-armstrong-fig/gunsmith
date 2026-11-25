@@ -60,12 +60,6 @@ export function ArenaWorkshop(): JSX.Element {
 
       {result && (
         <ArenaResult ref={resultRef} arena={result.arena} name={result.name}>
-          {result.fallbackReason && (
-            <p role="status" className="mt-2 text-sm text-gs-ui-muted">
-              {result.fallbackReason}
-            </p>
-          )}
-
           <div className="mt-2 flex flex-wrap items-start gap-2">
             <button
               type="button"

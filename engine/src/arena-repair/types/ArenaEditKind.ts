@@ -2,6 +2,7 @@
 export const ARENA_EDIT_KINDS = [
   "stairDropped",
   "stairAdded",
+  "landingAdded",
   "platformLowered",
   "pocketWalled",
   "doorOpened",

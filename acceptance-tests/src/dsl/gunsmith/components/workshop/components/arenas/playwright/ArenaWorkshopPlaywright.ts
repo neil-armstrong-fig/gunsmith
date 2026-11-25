@@ -106,6 +106,10 @@ export class ArenaWorkshopPlaywright extends BasePage {
     return await this.result().innerText();
   }
 
+  async hasResult(): Promise<boolean> {
+    return (await this.result().count()) > 0;
+  }
+
   private styleSwitch(): Locator {
     return this.page.getByRole("switch", {name: "Generation Engine"});
   }

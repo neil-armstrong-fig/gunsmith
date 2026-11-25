@@ -79,7 +79,7 @@ given("a signed-in player has a saved arena while generation is paused", () => {
   });
 });
 
-given("the arena generator returns a built-in after an unsuccessful attempt", () => {
+given("the arena generator cannot build the arena asked for, and gives nothing in its place", () => {
   beforeEach(async ({gunsmith}) => {
     await gunsmith.workshop.arenas.arrangeSignedInArena();
     await gunsmith.workshop.open();
@@ -88,10 +88,17 @@ given("the arena generator returns a built-in after an unsuccessful attempt", ()
     await gunsmith.workshop.make();
   });
 
-  then("the result explains why a built-in arena was shown", async ({gunsmith}) => {
+  then("the player is told why, in the generator's own reason", async ({gunsmith}) => {
     await expect
-      .poll(() => gunsmith.workshop.arenas.getResultDescription())
-      .toContain("We could not build a playable arena from that request, so here is one of ours.");
+      .poll(() => gunsmith.workshop.arenas.getMakeError())
+      .toBe(
+        "We could not build a playable arena from that request: part of the floor could not be reached from the rest. Ask for a doorway through every wall and stairs up to every raised area.",
+      );
+  });
+
+  then("no arena is shown as the result", async ({gunsmith}) => {
+    await expect.poll(() => gunsmith.workshop.arenas.getMakeError()).not.toBe("");
+    expect(await gunsmith.workshop.arenas.hasResult()).toBe(false);
   });
 });
 

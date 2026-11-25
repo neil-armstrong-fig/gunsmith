@@ -20,9 +20,9 @@ import type {ArenaAnswer} from "@src/router/routes/arenas/types/ArenaAnswer";
  * `POST /api/arenas` with `{prompt}` (and optionally `style`: `blue` or `red`) from a signed-in player (the session cookie names the account that pays): turns the words into an arena through the
  * pipeline it is handed, with the same credit and spend rules around the call as `GenerateWeaponRoute`: the credit, then the global
  * spend at its worst case (`ARENA_SPEND`), are reserved before the pipeline runs. The credit is settled at what the request was (an
- * arena costs one credit, a rejected prompt half, and so does a built-in arena, given when no playable one could be made: the model
+ * arena costs one credit, a rejected prompt half, and so does an invalid request, which ends with a reason and no arena when none could be made: the model
  * was used) or refunded in full: when the pipeline threw (502), or when the request was turned away before any model call
- * (`outcome.refunded`, which `ai` sets exactly then). The spend is settled at the model calls the outcome made, `builtIn` included
+ * (`outcome.refunded`, which `ai` sets exactly then). The spend is settled at the model calls the outcome made, `invalid` included
  * (the model was billed), or at the whole reservation if the pipeline threw or timed out (504).
  * **A created arena is kept under an `id` the answer carries** (`shared/keep-result/`), so the library saves it by that id alone; if it
  * cannot be kept the credit is refunded and the answer is 502.
@@ -102,7 +102,7 @@ async function settleOutcome(reservation: CreditReservation, outcome: ArenaOutco
   if (outcome.status === "rejected") {
     await credits.settle(key, "rejected");
   }
-  if (outcome.status === "builtIn") {
+  if (outcome.status === "invalid") {
     await credits.settle(key, "unusable");
   }
 

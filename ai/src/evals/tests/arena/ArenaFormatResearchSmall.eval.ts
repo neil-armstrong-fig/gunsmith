@@ -48,7 +48,7 @@ given.inProgress(
         eachTrial(weaponSmith.arena, arena => {
           beforeAll(() => arena.ask(request.prompt));
 
-          thenExpect("the model's own arena is created, not a built-in fallback", () => {
+          thenExpect("the model's own arena is created", () => {
             expect(arena.getStatus()).toBe("created");
           });
 
@@ -82,10 +82,7 @@ function expectDefaultPipelineBehaviour(arena: ArenaDsl): void {
     expect(arena.getModelCalls()).toBeLessThanOrEqual(3);
   });
 
-  thenExpect(
-    "whatever is asked, the credit is refunded exactly when a built-in arena is given instead of the one asked for",
-    () => {
-      expect(arena.wasRefunded()).toBe(arena.getStatus() === "builtIn");
-    },
-  );
+  thenExpect("whatever is asked, the credit is not refunded, because the model was called", () => {
+    expect(arena.wasRefunded()).toBe(false);
+  });
 }
