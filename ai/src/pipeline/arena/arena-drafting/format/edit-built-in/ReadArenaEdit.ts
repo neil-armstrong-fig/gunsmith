@@ -15,11 +15,12 @@ export function readArenaEdit(reply: unknown): ArenaReading {
   const {base: baseName, ...changes} = parsed.data;
   const base = BUILT_IN_ARENAS.find(arena => arena.name === baseName);
   if (base === undefined) {
+    // Only the model's words are cut: the names are code's, and the repair needs every one of them (twenty since 2026-11-24).
     const names = BUILT_IN_ARENAS.map(arena => `"${arena.name}"`).join(", ");
 
     return {
       ok: false,
-      errors: [sentenceOf(`base: there is no built-in arena called "${baseName}": use one of ${names}.`)],
+      errors: [`base: there is no built-in arena called "${sentenceOf(baseName)}": use one of ${names}.`],
       reason: "invalid-draft",
     };
   }

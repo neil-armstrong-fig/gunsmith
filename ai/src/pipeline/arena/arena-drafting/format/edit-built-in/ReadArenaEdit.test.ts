@@ -26,6 +26,15 @@ it("refuses a base that is not a built-in arena, naming the ones there are", () 
   });
 });
 
+it("cuts a long base name the model wrote, but never the list of built-in arenas", () => {
+  const reading = readArenaEdit({name: "Nowhere", base: "x".repeat(500)});
+
+  const errors = reading.ok ? [] : reading.errors;
+
+  expect(errors.join(" ")).not.toContain("x".repeat(161));
+  expect(errors.join(" ")).toContain(`"${BUILT_IN_ARENAS.at(-1)?.name}"`);
+});
+
 it("refuses a reply with no base, naming the field", () => {
   expect(readArenaEdit({name: "No Start"})).toEqual({
     ok: false,
