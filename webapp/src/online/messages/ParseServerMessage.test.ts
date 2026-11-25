@@ -88,6 +88,7 @@ it("reads what the server says about the choosing", () => {
   const frame = {
     kind: "preRound",
     stage: "picking",
+    builtInArenas: ["Duel", "Keep", "Slalom", "Pinwheel", "Catwalk"],
     secondsLeft: 42,
     own: {
       arena: {kind: "builtIn", name: "Duel"},
@@ -129,6 +130,16 @@ it("reads the reveal stage, with who has asked to begin", () => {
   };
 
   expect(parseServerMessage(JSON.stringify(frame))).toEqual(frame);
+});
+
+it("refuses a choosing frame without the day's built-in arenas as a list of names", () => {
+  const {builtInArenas, ...frame} = ALONE;
+
+  expect(builtInArenas).toHaveLength(5);
+
+  expect(parseServerMessage(JSON.stringify(frame))).toBeUndefined();
+  expect(parseServerMessage(JSON.stringify({...frame, builtInArenas: "Duel"}))).toBeUndefined();
+  expect(parseServerMessage(JSON.stringify({...frame, builtInArenas: ["Duel", 3]}))).toBeUndefined();
 });
 
 it("refuses a choosing frame that is not what the server sends", () => {
@@ -252,6 +263,7 @@ it("refuses a reveal that is not two weapons on each side, each a built-in key o
 const ALONE = {
   kind: "preRound",
   stage: "choosing",
+  builtInArenas: ["Duel", "Keep", "Slalom", "Pinwheel", "Catwalk"],
   own: {locked: false, weapons: {slots: [{locked: false}, {locked: false}]}},
   opponent: {locked: false, picked: false, weapons: {slots: [{locked: false}, {locked: false}]}},
 };

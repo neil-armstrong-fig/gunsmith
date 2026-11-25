@@ -36,6 +36,15 @@ export function WeaponPrompt(): JSX.Element {
 
   return (
     <>
+      {session === "guest" && (
+        <a
+          className="text-sm text-gs-team-blue underline"
+          href={accountUrl(`/api/auth/google?return=${encodeURIComponent(window.location.href)}`)}
+        >
+          Sign in with Google to make and save weapons to your account
+        </a>
+      )}
+
       <WorkshopPrompt
         id="workshop-weapon-prompt"
         label="Describe your weapon"
@@ -48,15 +57,6 @@ export function WeaponPrompt(): JSX.Element {
           void make();
         }}
       />
-
-      {session === "guest" && (
-        <a
-          className="text-sm text-gs-team-blue underline"
-          href={accountUrl(`/api/auth/google?return=${encodeURIComponent(window.location.href)}`)}
-        >
-          Sign in with Google to make and save weapons to your account
-        </a>
-      )}
 
       {error && (
         <p role="alert" data-testid="weapon-make-error" className="text-sm text-gs-ring">

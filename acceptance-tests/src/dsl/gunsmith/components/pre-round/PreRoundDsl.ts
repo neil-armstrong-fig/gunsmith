@@ -3,6 +3,7 @@ import {ArenaPreRoundDsl} from "@src/dsl/gunsmith/components/pre-round/component
 import {PreRoundPlaywright} from "@src/dsl/gunsmith/components/pre-round/playwright/PreRoundPlaywright";
 import type {PreRoundReveal} from "@src/dsl/gunsmith/components/pre-round/types/PreRoundReveal";
 import type {RevealNumbers} from "@src/dsl/gunsmith/components/pre-round/types/RevealNumbers";
+import type {RevealPictures} from "@src/dsl/gunsmith/components/pre-round/types/RevealPictures";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
 
 /** The pre-round: the choosing of weapons over the dimmed arena before a match against the bot, and the Start bot game action that leads to it, reached as `gunsmith.preRound`. */
@@ -110,6 +111,15 @@ export class PreRoundDsl {
       return await this.preRound.getRevealNumbers();
     } catch (error) {
       throw new DslError("Failed to read the reveal's numbers", error);
+    }
+  }
+
+  /** Which picture the reveal shows for each weapon on each side: a drawing made from its appearance, an authored sprite, or none. */
+  async getRevealPictures(): Promise<RevealPictures> {
+    try {
+      return await this.preRound.getRevealPictures();
+    } catch (error) {
+      throw new DslError("Failed to read the reveal's pictures", error);
     }
   }
 

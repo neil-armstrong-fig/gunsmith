@@ -578,6 +578,7 @@ it("shows what the server last said of the choosing, and stops once the match ha
   const frame = {
     kind: "preRound",
     stage: "choosing",
+    builtInArenas: ["Duel", "Keep", "Slalom", "Pinwheel", "Catwalk"],
     own: {locked: false, weapons: {slots: [{locked: false}, {locked: false}]}},
     opponent: {locked: true, picked: false, weapons: {slots: [{locked: true}, {locked: false}]}},
   };

@@ -8,6 +8,7 @@ import {fastestMovement} from "@src/dsl/gunsmith/components/room/playwright/wire
 import {largestJump} from "@src/dsl/gunsmith/components/room/playwright/wire/movement/LargestJump";
 import type {PositionSample} from "@src/dsl/gunsmith/components/room/playwright/wire/movement/types/PositionSample";
 import type {ShownSamples} from "@src/dsl/gunsmith/components/room/playwright/wire/movement/types/ShownSamples";
+import {arenasOfferedInFrames} from "@src/dsl/gunsmith/components/room/playwright/wire/ArenasOfferedInFrames";
 import {isRevealFrame} from "@src/dsl/gunsmith/components/room/playwright/wire/IsRevealFrame";
 import {preRoundsOfFrames} from "@src/dsl/gunsmith/components/room/playwright/wire/PreRoundsOfFrames";
 import {choicesOfSentFrames} from "@src/dsl/gunsmith/components/room/playwright/wire/ChoicesOfSentFrames";
@@ -15,6 +16,8 @@ import type {SentChoice} from "@src/dsl/gunsmith/components/room/playwright/wire
 import {isJoinedFrame} from "@src/dsl/gunsmith/components/room/playwright/wire/IsJoinedFrame";
 import {isSnapshotFrame} from "@src/dsl/gunsmith/components/room/playwright/wire/IsSnapshotFrame";
 import {snapshotsOfFrames} from "@src/dsl/gunsmith/components/room/playwright/wire/SnapshotsOfFrames";
+import {withSavedWeapon} from "@src/dsl/gunsmith/components/room/playwright/wire/saved-weapon/WithSavedWeapon";
+import type {SavedWeaponHolder} from "@src/dsl/gunsmith/components/room/playwright/wire/saved-weapon/types/SavedWeaponHolder";
 import {addressOfRoom} from "@src/dsl/gunsmith/components/room/playwright/address/AddressOfRoom";
 import {RoundPlaywright} from "@src/dsl/gunsmith/components/round/playwright/RoundPlaywright";
 import type {RoundSnapshot} from "@gunsmith/shared/state-hook/types/RoundSnapshot";
@@ -85,6 +88,9 @@ export class RoomPlaywright extends BasePage {
 
   /** The route hands the page one snapshot in this many. */
   private snapshotsPerHandover = 1;
+
+  /** Whose fighter the route makes carry a saved weapon in slot 1 (`carryASavedWeaponFirst`), if anyone's. */
+  private savedWeaponHolder: SavedWeaponHolder | undefined;
 
   constructor(page: Page) {
     super(page);
@@ -213,7 +219,7 @@ export class RoomPlaywright extends BasePage {
    * Opens a second browser, in a context of its own, and takes it into the room `code` names. `beforeOpening` is handed its
    * page first, so a recorder can be attached before anything is sent to it.
    */
-  async openSecondBrowser(code: string, beforeOpening: (secondPage: Page) => void): Promise<void> {
+  async openSecondBrowser(code: string, beforeOpening: (secondPage: Page) => Promise<void>): Promise<void> {
     this.secondContext = await this.openBrowserBeside(code, beforeOpening);
   }
 
@@ -240,9 +246,9 @@ export class RoomPlaywright extends BasePage {
     await socket.waitForEvent("close");
   }
 
-  private async openBrowserBeside(code: string, beforeOpening: (page: Page) => void): Promise<BrowserContext> {
+  private async openBrowserBeside(code: string, beforeOpening: (page: Page) => Promise<void>): Promise<BrowserContext> {
     const {context, page} = await this.newBrowserBeside();
-    beforeOpening(page);
+    await beforeOpening(page);
     await this.enterRoom(page, code);
 
     return context;
@@ -341,6 +347,16 @@ export class RoomPlaywright extends BasePage {
    */
   async receiveOnlyEveryNthSnapshot(n: number): Promise<void> {
     this.snapshotsPerHandover = n;
+    await this.routeTheConnection();
+  }
+
+  /**
+   * Makes the frames this browser is given say that `holder` locked in a saved weapon (a mint drawing) for slot 1, from the next page it
+   * opens: the reveal names it and the snapshots carry its key and name. The local Worker sees no session and refuses saved ids, so this
+   * stands in for a signed-in seat. Call it before `createPrivateRoom`, like `slowTheConnectionBy`.
+   */
+  async carryASavedWeaponFirst(holder: SavedWeaponHolder): Promise<void> {
+    this.savedWeaponHolder = holder;
     await this.routeTheConnection();
   }
 
@@ -490,7 +506,8 @@ export class RoomPlaywright extends BasePage {
       pageSide.onMessage(frame => {
         toServer.send(frame, delayed => serverSide.send(delayed));
       });
-      serverSide.onMessage(frame => {
+      serverSide.onMessage(sent => {
+        const frame = this.asHandedOver(sent);
         if (typeof frame === "string" && isSnapshotFrame(frame)) {
           snapshots += 1;
           if ((snapshots - 1) % this.snapshotsPerHandover !== 0) {
@@ -506,6 +523,15 @@ export class RoomPlaywright extends BasePage {
         });
       });
     });
+  }
+
+  /** A frame from the server as the route hands it to the page: with the saved weapon in it, when one is being carried. */
+  private asHandedOver(frame: string | Buffer): string | Buffer {
+    if (!this.savedWeaponHolder || typeof frame !== "string") {
+      return frame;
+    }
+
+    return withSavedWeapon(frame, this.savedWeaponHolder);
   }
 
   private async shownSamples(): Promise<ShownSamples> {
@@ -538,6 +564,11 @@ export class RoomPlaywright extends BasePage {
     const snapshots = snapshotsOfFrames(this.framesReceived);
 
     return snapshots.at(-1)?.opponent !== undefined;
+  }
+
+  /** The built-in arenas the room offers this browser while choosing, from the latest pre-round frame it was sent; `undefined` before one comes. */
+  getArenasOffered(): readonly string[] | undefined {
+    return arenasOfferedInFrames(this.framesReceived);
   }
 
   /** Whether the latest snapshot sent to this browser holds the weapon lying in the arena. */

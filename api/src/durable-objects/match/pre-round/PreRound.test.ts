@@ -1,3 +1,4 @@
+import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
 import {DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/DuelBuiltInArena";
 import {FAIR_DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/FairDuelBuiltInArena";
 import {MARKSMAN_RIFLE} from "@gunsmith/engine/weapon/weapons/MarksmanRifle";
@@ -18,6 +19,7 @@ const BUILT_IN_RIFLE: ChosenWeapon = {kind: "builtIn", key: "rifle"};
 const BUILT_IN_MARKSMAN_RIFLE: ChosenWeapon = {kind: "builtIn", key: "marksman-rifle"};
 const BUILT_IN_SUBMACHINE_GUN: ChosenWeapon = {kind: "builtIn", key: "submachine-gun"};
 const NOTHING_LOCKED = {slots: [{locked: false}, {locked: false}]};
+const DAYS_ARENAS = ["Cover yard", "Pinwheel", "Slalom", "Keep", "Labyrinth"];
 
 it("decides on the duel arena when both seats lock in having chosen nothing", () => {
   const preRound = new PreRound(60, () => 1);
@@ -123,8 +125,8 @@ it("tells a seat only whether the other has locked in, not what they chose, whil
   preRound.lockInArena("second");
   const locked = preRound.viewOf("first");
 
-  expect(JSON.stringify(drafting)).not.toContain(FAIR_DUEL);
-  expect(JSON.stringify(locked)).not.toContain(FAIR_DUEL);
+  expect(JSON.stringify(drafting, withoutTheDaysArenas)).not.toContain(FAIR_DUEL);
+  expect(JSON.stringify(locked, withoutTheDaysArenas)).not.toContain(FAIR_DUEL);
   expect(drafting.opponent.locked).toBe(false);
   expect(locked.opponent.locked).toBe(true);
 });
@@ -566,6 +568,66 @@ it("never sends a saved weapon's numbers or drawing in the pre-round view", () =
 });
 
 /** The seat puts `arena` forward and locks in both steps: that arena, and the default weapons. */
+it("offers every built-in arena until it is told the day's", () => {
+  const preRound = new PreRound(60, () => 1);
+
+  expect(preRound.viewOf("first").builtInArenas).toEqual(BUILT_IN_ARENAS.map(({name}) => name));
+});
+
+it("offers only the day's arenas once it is told them, to both seats", () => {
+  const preRound = new PreRound(60, () => 1);
+
+  preRound.offerArenas(DAYS_ARENAS);
+
+  expect(preRound.viewOf("first").builtInArenas).toEqual(DAYS_ARENAS);
+  expect(preRound.viewOf("second").builtInArenas).toEqual(DAYS_ARENAS);
+});
+
+it("ignores a built-in arena that is not one of the day's", () => {
+  const preRound = new PreRound(60, () => 1);
+  preRound.offerArenas(DAYS_ARENAS);
+
+  preRound.chooseArena("first", builtInArena(DUEL));
+
+  expect(preRound.viewOf("first").own.arena).toBeUndefined();
+});
+
+it("takes a built-in arena that is one of the day's", () => {
+  const preRound = new PreRound(60, () => 1);
+  preRound.offerArenas(DAYS_ARENAS);
+
+  preRound.chooseArena("first", builtInArena("Slalom"));
+
+  expect(preRound.viewOf("first").own.arena).toEqual({kind: "builtIn", name: "Slalom"});
+});
+
+it("takes a seat's own saved arena whatever the day's are", () => {
+  const preRound = new PreRound(60, () => 1);
+  preRound.offerArenas(DAYS_ARENAS);
+
+  preRound.chooseArena("first", savedArena("arena-1", "Little room"));
+
+  expect(preRound.viewOf("first").own.arena).toEqual({kind: "saved", name: "Little room"});
+});
+
+it("gives a seat that locks in having chosen nothing the first of the day's arenas", () => {
+  const preRound = new PreRound(60, () => 1);
+  preRound.offerArenas(DAYS_ARENAS);
+
+  preRound.lockInArena("first");
+
+  expect(preRound.viewOf("first").own.arena).toEqual({kind: "builtIn", name: "Cover yard"});
+});
+
+/** Leaves out the day's arenas, which name every arena either seat could choose, so a search of the rest finds what was chosen. */
+function withoutTheDaysArenas(key: string, value: unknown): unknown {
+  if (key === "builtInArenas") {
+    return undefined;
+  }
+
+  return value;
+}
+
 function choose(preRound: PreRound, seat: Seat, arena: string): void {
   preRound.chooseArena(seat, builtInArena(arena));
   preRound.lockInArena(seat);

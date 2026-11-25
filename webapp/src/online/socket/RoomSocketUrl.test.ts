@@ -76,3 +76,9 @@ it("passes on how long the decided arena and weapons are shown, and keeps a noug
     "ws://h/api/rooms/ABC234/socket?revealSeconds=0",
   );
 });
+
+it("passes on a room that offers every arena instead of the day's", () => {
+  expect(roomSocketUrl({protocol: "http:", host: "h"}, "ABC234", {search: "?room=ABC234&arenaRotation=off"})).toBe(
+    "ws://h/api/rooms/ABC234/socket?arenaRotation=off",
+  );
+});

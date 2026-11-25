@@ -11,9 +11,11 @@ interface Props {
   arena: Arena;
   name: string;
   startingPlaces?: StartingPlaces;
+  /** One of a list of arenas: drawn once and kept as a picture, rather than kept as a live canvas (see `ArenaPreviewCanvas`). */
+  isScreenshot?: boolean;
 }
 
-export function ArenaPreview({arena, name, startingPlaces}: Props): JSX.Element {
+export function ArenaPreview({arena, name, startingPlaces, isScreenshot = false}: Props): JSX.Element {
   const captionId = useId();
   const examplePlaces = useMemo(() => {
     if (startingPlaces) return undefined;
@@ -30,6 +32,7 @@ export function ArenaPreview({arena, name, startingPlaces}: Props): JSX.Element 
         name={name}
         descriptionId={places && captionId}
         places={places}
+        isScreenshot={isScreenshot}
       />
 
       {places && (

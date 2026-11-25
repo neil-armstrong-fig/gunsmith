@@ -1,6 +1,8 @@
 import type {Locator, Page} from "@playwright/test";
 import {expect} from "@playwright/test";
 import type {PreRoundReveal} from "@src/dsl/gunsmith/components/pre-round/types/PreRoundReveal";
+import type {RevealPicture} from "@src/dsl/gunsmith/components/pre-round/types/RevealPicture";
+import type {RevealPictures} from "@src/dsl/gunsmith/components/pre-round/types/RevealPictures";
 import type {RevealNumbers} from "@src/dsl/gunsmith/components/pre-round/types/RevealNumbers";
 import type {RevealedWeaponNumbers} from "@src/dsl/gunsmith/components/pre-round/types/RevealedWeaponNumbers";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
@@ -66,9 +68,42 @@ export class PreRoundPlaywright extends BasePage {
     };
   }
 
+  async getRevealPictures(): Promise<RevealPictures> {
+    await expect(this.page.getByTestId("reveal")).toBeVisible();
+
+    return {
+      yours: await this.picturesOfSide("reveal-yours"),
+      opponent: await this.picturesOfSide("reveal-opponent"),
+    };
+  }
+
   async startTheMatch(): Promise<void> {
     await this.dialog().getByRole("button", {name: "Start the match"}).click();
     await expect(this.dialog()).toBeHidden();
+  }
+
+  private async picturesOfSide(testId: string): Promise<RevealPicture[]> {
+    const pictures: RevealPicture[] = [];
+    for (const weapon of await this.page.getByTestId(testId).getByTestId("reveal-weapon").all()) {
+      pictures.push(await this.pictureOfWeapon(weapon));
+    }
+
+    return pictures;
+  }
+
+  /** A drawing is made in the page from the weapon's appearance, as an SVG `data:` address; an authored sprite is a file. */
+  private async pictureOfWeapon(weapon: Locator): Promise<RevealPicture> {
+    const picture = weapon.getByTestId("weapon-picture");
+    if ((await picture.count()) === 0) {
+      return "none";
+    }
+
+    const address = (await picture.getAttribute("src")) ?? "";
+    if (address.startsWith("data:image/svg+xml")) {
+      return "drawing";
+    }
+
+    return "sprite";
   }
 
   private async numbersOfSide(testId: string): Promise<RevealedWeaponNumbers[]> {

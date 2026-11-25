@@ -38,6 +38,15 @@ export function ArenaPrompt(): JSX.Element {
 
   return (
     <>
+      {session === "guest" && (
+        <a
+          className="text-sm text-gs-team-blue underline"
+          href={accountUrl(`/api/auth/google?return=${encodeURIComponent(window.location.href)}`)}
+        >
+          Sign in with Google to make and save arenas
+        </a>
+      )}
+
       <WorkshopPrompt
         id="workshop-arena-prompt"
         label="Describe your arena"
@@ -52,15 +61,6 @@ export function ArenaPrompt(): JSX.Element {
           void make();
         }}
       />
-
-      {session === "guest" && (
-        <a
-          className="text-sm text-gs-team-blue underline"
-          href={accountUrl(`/api/auth/google?return=${encodeURIComponent(window.location.href)}`)}
-        >
-          Sign in with Google to make and save arenas
-        </a>
-      )}
 
       {error && (
         <p role="alert" className="text-sm text-gs-ring">

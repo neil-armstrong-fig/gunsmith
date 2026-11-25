@@ -2,6 +2,28 @@ import {beforeEach, expect, given, then, when} from "@src/acceptance-criteria-ma
 
 const DUEL = {name: "Duel", size: {width: 20, height: 12}};
 const FAIR_DUEL = {name: "Fair duel", size: {width: 21, height: 13}};
+const BUILT_IN_NAMES = [
+  DUEL.name,
+  FAIR_DUEL.name,
+  "Cover yard",
+  "Crossroads",
+  "Twin ridges",
+  "Watchtower",
+  "Tower of death",
+  "Pinwheel",
+  "Catwalk",
+  "Switchback",
+  "Ziggurat",
+  "Shooting gallery",
+  "Cellblock",
+  "Stepping stones",
+  "Hourglass",
+  "Ridgeline",
+  "Colonnade",
+  "Slalom",
+  "Keep",
+  "Labyrinth",
+];
 
 // Against a player who stands still the opponent has won a round within 9.4 game seconds on every one of 40 seeds measured
 // in the engine, so fifteen is the longest this spec waits for a round to be lost.
@@ -14,7 +36,7 @@ given("the pre-round is open", () => {
 
   when("the player looks at the choosing", () => {
     then("the arena choices are the built-in arenas", async ({gunsmith}) => {
-      expect(await gunsmith.preRound.arena.getChoices()).toEqual([DUEL.name, FAIR_DUEL.name]);
+      expect(await gunsmith.preRound.arena.getChoices()).toEqual(BUILT_IN_NAMES);
     });
 
     then("the Duel is chosen to begin with, and a preview of it is shown", async ({gunsmith}) => {
@@ -93,14 +115,14 @@ given("the player has saved an arena the workshop made", () => {
     then("the built-ins come first and then the saved arena", async ({gunsmith}) => {
       const choices = await gunsmith.preRound.arena.getChoices();
 
-      expect(choices.slice(0, 2)).toEqual([DUEL.name, FAIR_DUEL.name]);
-      expect(choices).toHaveLength(3);
+      expect(choices.slice(0, BUILT_IN_NAMES.length)).toEqual(BUILT_IN_NAMES);
+      expect(choices).toHaveLength(BUILT_IN_NAMES.length + 1);
     });
   });
 
   when("the player chooses the saved arena, locks in and starts the match", () => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.preRound.arena.choose((await gunsmith.preRound.arena.getChoices())[2] ?? "");
+      await gunsmith.preRound.arena.choose((await gunsmith.preRound.arena.getChoices())[BUILT_IN_NAMES.length] ?? "");
       await gunsmith.preRound.lockIn();
       await gunsmith.preRound.startTheMatch();
     });
@@ -118,7 +140,7 @@ given("the player has saved an arena the workshop made", () => {
     let savedName = "";
 
     beforeEach(async ({gunsmith}) => {
-      savedName = (await gunsmith.preRound.arena.getChoices())[2] ?? "";
+      savedName = (await gunsmith.preRound.arena.getChoices())[BUILT_IN_NAMES.length] ?? "";
       await gunsmith.preRound.arena.choose(savedName);
       await gunsmith.preRound.lockIn();
       await gunsmith.startDuelWithPreRound();

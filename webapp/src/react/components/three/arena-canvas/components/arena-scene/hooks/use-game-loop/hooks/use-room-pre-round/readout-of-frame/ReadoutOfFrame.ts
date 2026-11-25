@@ -19,6 +19,7 @@ export function readoutOfFrame({frame, reveal}: ReadoutRequest): RoomPreRoundRea
   return {
     stage: frame.stage,
     secondsLeft: wholeSecondsOf(frame.secondsLeft),
+    builtInArenas: frame.builtInArenas,
     how: frame.how,
     reveal: revealOf(frame, reveal),
     own: ownReadoutOf(frame.own),

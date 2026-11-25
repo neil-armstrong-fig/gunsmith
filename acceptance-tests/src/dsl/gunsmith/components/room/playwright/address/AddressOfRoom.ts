@@ -8,7 +8,8 @@ const START_SEED = 21;
  * (`?reconnectSeconds=`, `?idleSeconds=`); a limit left out is left off, so the room keeps its own. The time to choose
  * (`?preRoundSeconds=`) and the time the decided arena and weapons are shown (`?revealSeconds=`) are always shown and are **none** unless a spec is about them, so a room begins its match as the second player
  * sits, as it did before there was a pre-round. The start seed is always shown (`?startSeed=`), so no spec depends on a draw: the room's
- * real starts are random. A spec about the ring shows its timing (`?ringDelay=`, `?ringClosing=`); one that is not meets the real ring,
+ * real starts are random. The room offers every built-in arena (`?arenaRotation=off`) unless a spec is about the day's five, so a room
+ * with no time to choose is on the Duel whatever the date, and spec runs never count towards the day's arenas. A spec about the ring shows its timing (`?ringDelay=`, `?ringClosing=`); one that is not meets the real ring,
  * which starts after 45 seconds.
  */
 export function addressOfRoom(code: string, limits: RoomLimits = {}): string {
@@ -23,6 +24,9 @@ export function addressOfRoom(code: string, limits: RoomLimits = {}): string {
   search.set("preRoundSeconds", String(limits.preRoundSeconds ?? 0));
   search.set("revealSeconds", String(limits.revealSeconds ?? 0));
   search.set("startSeed", String(limits.startSeed ?? START_SEED));
+  if (!limits.daysArenas) {
+    search.set("arenaRotation", "off");
+  }
   if (limits.ringDelaySeconds !== undefined) {
     search.set("ringDelay", String(limits.ringDelaySeconds));
   }
