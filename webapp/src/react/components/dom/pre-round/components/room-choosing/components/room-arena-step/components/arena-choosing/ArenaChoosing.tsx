@@ -8,19 +8,19 @@ import {useRoomPreRoundStore} from "@src/store/room-pre-round/UseRoomPreRoundSto
 import type {JSX} from "react";
 import {useMemo, useState} from "react";
 
-const DUEL_ID = "built-in:Duel";
-
 /**
- * The arena step before the player has locked in: the built-in arenas to put forward, then the arenas saved in the player's account library (none for
- * a guest), a preview of the one chosen, and **Lock in arena**, which waits (is disabled) once the player has asked for it until the server says it
- * is locked in. Beginning on what the player locked in last time when that is still offered. A saved arena is put forward by its library id.
+ * The arena step before the player has locked in: the built-in arenas the room offers today, then the arenas saved in the player's account library
+ * (none for a guest), a preview of the one chosen, and **Lock in arena**, which waits (is disabled) once the player has asked for it until the server says it
+ * is locked in. Beginning on what the player locked in last time when that is still offered, else on the first of the day's arenas (the room's
+ * own default). A saved arena is put forward by its library id.
  */
 export function ArenaChoosing(): JSX.Element | undefined {
   const wanted = useRoomPreRoundStore(state => state.wants.arena);
   const savedArenas = useAccountLibraryStore(state => state.arenas);
-  const choices = useMemo(() => arenaChoicesOf(savedArenas), [savedArenas]);
+  const offered = useRoomPreRoundStore(state => state.readout?.builtInArenas);
+  const choices = useMemo(() => arenaChoicesOf(savedArenas, offered), [savedArenas, offered]);
   const [chosenId, setChosenId] = useState(() => usePreRoundChoicesStore.getState().arenaId);
-  const chosen = chosenChoiceOf(choices, chosenId, DUEL_ID);
+  const chosen = chosenChoiceOf(choices, chosenId, `built-in:${offered?.[0]}`);
 
   if (!chosen) {
     return undefined;

@@ -5,6 +5,7 @@ import {sameReadout} from "@src/store/room-pre-round/same-readout/SameReadout";
 const readout: RoomPreRoundReadout = {
   stage: "choosing",
   secondsLeft: 30,
+  builtInArenas: ["Duel", "Fair duel"],
   own: seat(),
   opponent: seat(),
   how: undefined,
@@ -12,7 +13,9 @@ const readout: RoomPreRoundReadout = {
 };
 
 it("says two readouts of the same content are the same", () => {
-  expect(sameReadout(readout, {...readout, own: seat(), opponent: seat()})).toBe(true);
+  expect(sameReadout(readout, {...readout, own: seat(), opponent: seat(), builtInArenas: ["Duel", "Fair duel"]})).toBe(
+    true,
+  );
 });
 
 it("says two absent readouts are the same, and an absent one is not a present one", () => {
@@ -26,6 +29,8 @@ it("sees a change in each thing a readout says", () => {
   expect(sameReadout(readout, {...readout, secondsLeft: 29})).toBe(false);
   expect(sameReadout(readout, {...readout, secondsLeft: undefined})).toBe(false);
   expect(sameReadout(readout, {...readout, how: "coin"})).toBe(false);
+  expect(sameReadout(readout, {...readout, builtInArenas: ["Duel", "Keep"]})).toBe(false);
+  expect(sameReadout(readout, {...readout, builtInArenas: ["Duel"]})).toBe(false);
 });
 
 it("sees a change in either seat: a lock, a weapon shown, an arena, a pick, a go-on", () => {

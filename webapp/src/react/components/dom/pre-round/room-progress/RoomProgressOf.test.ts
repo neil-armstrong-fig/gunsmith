@@ -14,6 +14,7 @@ const seat = {
 const readout: RoomPreRoundReadout = {
   stage: "choosing",
   secondsLeft: 30,
+  builtInArenas: ["Duel", "Fair duel"],
   own: seat,
   opponent: seat,
   how: undefined,

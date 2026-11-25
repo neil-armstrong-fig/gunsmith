@@ -1,5 +1,6 @@
 import type {Seat} from "@gunsmith/engine/seat/types/Seat";
 import {countArenaPlay} from "@src/accounts/count-arena-play/CountArenaPlay";
+import {parseArenaRotation} from "@src/durable-objects/match/arena-rotation/ParseArenaRotation";
 import {arenasOfToday} from "@src/durable-objects/match/arenas-of-today/ArenasOfToday";
 import {resolveArenaChoice} from "@src/durable-objects/match/choices/ResolveArenaChoice";
 import {resolveWeaponChoice} from "@src/durable-objects/match/choices/ResolveWeaponChoice";
@@ -71,7 +72,8 @@ export class Match {
    * The room's first connection sets how long it waits for a person (`?reconnectSeconds=`, `?idleSeconds=`, only ever shorter than the real
    * limits: `parseForfeitLimits`), how long the two seats have to choose (`?preRoundSeconds=`, `parsePreRoundSeconds`, `0` for none), how long the decided arena and weapons are shown before the match begins (`?revealSeconds=`, `parseRevealSeconds`, `0` for none) and may
    * pin the seed its rounds start from (`?startSeed=`, `parseStartSeed`, a spec's seam) and
-   * may bring the ring sooner or faster (`?ringDelay=`, `?ringClosing=`, `parseRingTiming`); later
+   * may bring the ring sooner or faster (`?ringDelay=`, `?ringClosing=`, `parseRingTiming`) and may offer every built-in arena instead
+   * of the day's, counting no plays (`?arenaRotation=off`, `parseArenaRotation`, a spec's seam); later
    * connections' say is ignored, so a seat's person cannot shorten the other's time.
    */
   private openRoom(request: Request): void {
@@ -81,14 +83,19 @@ export class Match {
 
     this.opened = true;
     const search = new URL(request.url).searchParams;
+    const arenaRotation = parseArenaRotation(search);
     this.room = new MatchRoom({
+      arenaRotation,
       limits: parseForfeitLimits(search),
       makeSeed: parseStartSeed(search),
       preRoundSeconds: parsePreRoundSeconds(search),
       revealSeconds: parseRevealSeconds(search),
       ringTiming: parseRingTiming(search),
     });
-    this.arenasOffered = this.offerTheDaysArenas();
+
+    if (arenaRotation) {
+      this.arenasOffered = this.offerTheDaysArenas();
+    }
   }
 
   /** Tells the room the built-in arenas it offers today. Should the plays not be read, it offers every one, and the failure is logged closed. */

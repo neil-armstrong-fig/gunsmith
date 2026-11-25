@@ -46,3 +46,14 @@ it("tells a saved arena named like a built-in from the built-in", () => {
 
   expect(new Set(choices.map(choice => choice.id)).size).toBe(BUILT_IN_NAMES.length + 1);
 });
+
+it("offers only the built-in arenas named, in the order named, then the saved ones, when a room offers only some", () => {
+  const choices = arenaChoicesOf([POND], ["Keep", "Duel", "Slalom"]);
+
+  expect(choices.map(choice => choice.name)).toEqual(["Keep", "Duel", "Slalom", "Pond"]);
+  expect(choices[0]?.id).toBe("built-in:Keep");
+});
+
+it("leaves out a name that is not a built-in arena", () => {
+  expect(arenaChoicesOf([], ["Duel", "Nowhere"]).map(choice => choice.name)).toEqual(["Duel"]);
+});

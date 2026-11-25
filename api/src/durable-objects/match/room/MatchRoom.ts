@@ -83,6 +83,7 @@ export class MatchRoom {
   private readonly makeToken: () => string;
   private readonly makeSeed: SeedMaker;
   private readonly ringTiming: RingTiming;
+  private readonly countsPlays: boolean;
   private readonly seated: Seat[] = [];
   private readonly tokens: Record<Seat, string> = {first: "", second: ""};
   private readonly asked: Record<Seat, Input> = {first: NOTHING_ASKED, second: NOTHING_ASKED};
@@ -101,6 +102,7 @@ export class MatchRoom {
     this.makeToken = options.makeToken ?? (() => crypto.randomUUID());
     this.makeSeed = options.makeSeed ?? (() => crypto.getRandomValues(new Uint32Array(1))[0] ?? 0);
     this.ringTiming = options.ringTiming ?? DEFAULT_RING_TIMING;
+    this.countsPlays = options.arenaRotation ?? true;
     this.preRound = new PreRound(
       options.preRoundSeconds ?? DEFAULT_PRE_ROUND_SECONDS,
       this.makeSeed,
@@ -210,9 +212,14 @@ export class MatchRoom {
   /**
    * The built-in arena a match has just begun on, once, so `Match` can count the play (the day's arenas are worked out from them): said
    * as the first match begins and again as a fresh match does after one is decided, never for the next round of a match, and never for
-   * a saved arena, even one named like a built-in.
+   * a saved arena, even one named like a built-in. A room that offers every arena (`arenaRotation` false) says nothing: it is not playing
+   * the day's arenas.
    */
   takeArenaPlayed(): string | undefined {
+    if (!this.countsPlays) {
+      return undefined;
+    }
+
     const played = this.arenaPlayedToTell;
     this.arenaPlayedToTell = undefined;
 

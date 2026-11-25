@@ -791,7 +791,6 @@ it("forfeits no round once the match is decided, whoever stays quiet", () => {
   expect(room.snapshotFor("first")?.round).toBe("won");
 });
 
-/** Where the two fighters start in the duel arena for `seed`: the first seat's, then the second's. */
 it("says once that a match began on a built-in arena, so the day's plays can be counted", () => {
   const room = startedRoom();
 
@@ -824,6 +823,16 @@ it("says again when a fresh match begins after one is decided", () => {
   expect(room.takeArenaPlayed()).toBe(DUEL_BUILT_IN_ARENA.name);
 });
 
+it("says nothing of a match begun in a room that offers every arena, so a spec's rooms never feed the day's arenas", () => {
+  const room = new MatchRoom({arenaRotation: false, preRoundSeconds: 0, ringTiming: A_RING_THAT_NEVER_CLOSES});
+  room.join();
+  room.join();
+
+  expect(room.snapshotFor("first")).toBeDefined();
+  expect(room.takeArenaPlayed()).toBeUndefined();
+});
+
+/** Where the two fighters start in the duel arena for `seed`: the first seat's, then the second's. */
 function startsOfSeed(seed: number): Point[] {
   const world = fairStart(DUEL_ARENA, seed);
   if (!world?.opponent) {

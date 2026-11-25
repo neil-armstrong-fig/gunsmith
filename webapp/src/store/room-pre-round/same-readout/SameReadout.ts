@@ -13,6 +13,7 @@ export function sameReadout(first: RoomPreRoundReadout | undefined, second: Room
   return (
     first.stage === second.stage &&
     first.secondsLeft === second.secondsLeft &&
+    first.builtInArenas.join("\n") === second.builtInArenas.join("\n") &&
     first.how === second.how &&
     first.reveal === second.reveal &&
     sameSeat(first.own, second.own) &&
