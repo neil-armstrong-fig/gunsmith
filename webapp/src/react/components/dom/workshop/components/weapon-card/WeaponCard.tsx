@@ -4,8 +4,8 @@ import {weaponAppearances} from "@src/assets/weapon-drawings/appearances/WeaponA
 import {weaponPictureUrl} from "@src/assets/weapon-pictures/WeaponPictureUrl";
 import {SaveWeapon} from "@src/react/components/dom/workshop/components/weapon-card/components/save-weapon/SaveWeapon";
 import {StatRow} from "@src/react/components/dom/workshop/components/weapon-card/components/stat-row/StatRow";
-import {statRowsOf} from "@src/react/components/dom/workshop/components/weapon-card/stat-rows/StatRowsOf";
-import {ratingPercentOf} from "@src/react/components/dom/workshop/rating-percent/RatingPercentOf";
+import {statRowsOf} from "@src/react/components/dom/weapon-numbers/StatRowsOf";
+import {ratingPercentOf} from "@src/react/components/dom/weapon-numbers/RatingPercentOf";
 import {tryOnTheRange} from "@src/react/components/dom/workshop/weapon-on-trial/TryOnTheRange";
 import {useWorkshopStore} from "@src/store/workshop/UseWorkshopStore";
 import type {JSX} from "react";

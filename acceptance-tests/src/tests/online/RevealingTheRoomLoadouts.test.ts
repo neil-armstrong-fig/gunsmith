@@ -5,6 +5,7 @@ import {beforeEach, expect, given, then, when} from "@src/acceptance-criteria-ma
 // with real time for it.
 const SECONDS_TO_REVEAL = 60;
 const SECONDS_TO_REVEAL_QUICKLY = 4;
+const STAT_LABELS = ["Damage", "Shots a second", "Magazine", "Reserve", "Reload", "Vision"];
 
 given("a private room whose players have chosen everything and are shown the reveal", () => {
   beforeEach(async ({gunsmith}) => {
@@ -36,6 +37,29 @@ given("a private room whose players have chosen everything and are shown the rev
       yours: ["Rifle", "Rifle"],
       opponent: ["Submachine gun", "Marksman rifle"],
     });
+  });
+
+  then(
+    "each sees every weapon's power rating and stats, and the other's numbers as the other sees their own",
+    async ({gunsmith}) => {
+      const first = await gunsmith.preRound.getRevealNumbers();
+      const second = await gunsmith.room.secondBrowser().preRound.getRevealNumbers();
+
+      expect(first.opponent).toEqual(second.yours);
+      expect(second.opponent).toEqual(first.yours);
+      for (const weapon of [...first.yours, ...first.opponent]) {
+        expect(Object.keys(weapon.stats)).toEqual(STAT_LABELS);
+        expect(weapon.rating).toBeGreaterThanOrEqual(0);
+        expect(weapon.rating).toBeLessThanOrEqual(100);
+      }
+    },
+  );
+
+  then("weapons that differ show different numbers", async ({gunsmith}) => {
+    const {yours, opponent} = await gunsmith.preRound.getRevealNumbers();
+
+    expect(yours[0]?.stats).not.toEqual(yours[1]?.stats);
+    expect(yours[0]?.stats).not.toEqual(opponent[0]?.stats);
   });
 
   then("both are shown the arena the match is played on", async ({gunsmith}) => {

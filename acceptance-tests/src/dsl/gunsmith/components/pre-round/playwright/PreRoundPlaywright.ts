@@ -1,6 +1,8 @@
 import type {Locator, Page} from "@playwright/test";
 import {expect} from "@playwright/test";
 import type {PreRoundReveal} from "@src/dsl/gunsmith/components/pre-round/types/PreRoundReveal";
+import type {RevealNumbers} from "@src/dsl/gunsmith/components/pre-round/types/RevealNumbers";
+import type {RevealedWeaponNumbers} from "@src/dsl/gunsmith/components/pre-round/types/RevealedWeaponNumbers";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
 
 export class PreRoundPlaywright extends BasePage {
@@ -50,14 +52,47 @@ export class PreRoundPlaywright extends BasePage {
     await expect(this.page.getByTestId("reveal")).toBeVisible();
 
     return {
-      yours: await this.page.getByTestId("reveal-yours").getByTestId("reveal-weapon").allInnerTexts(),
-      opponent: await this.page.getByTestId("reveal-opponent").getByTestId("reveal-weapon").allInnerTexts(),
+      yours: await this.page.getByTestId("reveal-yours").getByTestId("reveal-weapon-name").allInnerTexts(),
+      opponent: await this.page.getByTestId("reveal-opponent").getByTestId("reveal-weapon-name").allInnerTexts(),
+    };
+  }
+
+  async getRevealNumbers(): Promise<RevealNumbers> {
+    await expect(this.page.getByTestId("reveal")).toBeVisible();
+
+    return {
+      yours: await this.numbersOfSide("reveal-yours"),
+      opponent: await this.numbersOfSide("reveal-opponent"),
     };
   }
 
   async startTheMatch(): Promise<void> {
     await this.dialog().getByRole("button", {name: "Start the match"}).click();
     await expect(this.dialog()).toBeHidden();
+  }
+
+  private async numbersOfSide(testId: string): Promise<RevealedWeaponNumbers[]> {
+    const numbers: RevealedWeaponNumbers[] = [];
+    for (const weapon of await this.page.getByTestId(testId).getByTestId("reveal-weapon").all()) {
+      numbers.push(await this.numbersOfWeapon(weapon));
+    }
+
+    return numbers;
+  }
+
+  private async numbersOfWeapon(weapon: Locator): Promise<RevealedWeaponNumbers> {
+    const stats: Record<string, string> = {};
+    for (const row of await weapon.getByTestId("reveal-stat").all()) {
+      stats[(await row.getByTestId("reveal-stat-label").innerText()).trim()] = (
+        await row.getByTestId("reveal-stat-value").innerText()
+      ).trim();
+    }
+
+    return {
+      name: (await weapon.getByTestId("reveal-weapon-name").innerText()).trim(),
+      rating: Number.parseInt(await weapon.getByTestId("reveal-weapon-rating").innerText(), 10),
+      stats,
+    };
   }
 
   private dialog(): Locator {

@@ -1,6 +1,6 @@
 import {weaponAppearances} from "@src/assets/weapon-drawings/appearances/WeaponAppearances";
 import {weaponPictureUrl} from "@src/assets/weapon-pictures/WeaponPictureUrl";
-import {ratingPercentOf} from "@src/react/components/dom/workshop/rating-percent/RatingPercentOf";
+import {ratingPercentOf} from "@src/react/components/dom/weapon-numbers/RatingPercentOf";
 import type {ShelfWeapon} from "@src/store/shelf/types/ShelfWeapon";
 import type {JSX} from "react";
 

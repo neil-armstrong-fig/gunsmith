@@ -1,5 +1,5 @@
 import {RIFLE} from "@gunsmith/engine/weapon/weapons/Rifle";
-import {statRowsOf} from "@src/react/components/dom/workshop/components/weapon-card/stat-rows/StatRowsOf";
+import {statRowsOf} from "@src/react/components/dom/weapon-numbers/StatRowsOf";
 
 it("lists the rifle's numbers in plain words", () => {
   expect(statRowsOf(RIFLE)).toEqual([

@@ -1,7 +1,7 @@
 import type {Weapon} from "@gunsmith/engine/weapon/types/Weapon";
-import type {StatRow} from "@src/react/components/dom/workshop/components/weapon-card/stat-rows/types/StatRow";
+import type {StatRow} from "@src/react/components/dom/weapon-numbers/types/StatRow";
 
-/** The lines of a weapon's card, in plain words: what it takes off, how often it fires, how much it holds, how long it reloads and how far it sees. */
+/** A weapon's stats as the workshop's card and the reveal print them, in plain words: what it takes off, how often it fires, how much it holds, how long it reloads and how far it sees. */
 export function statRowsOf(weapon: Weapon): readonly StatRow[] {
   return [
     {label: "Damage", value: `${weapon.bulletDamage}`},
