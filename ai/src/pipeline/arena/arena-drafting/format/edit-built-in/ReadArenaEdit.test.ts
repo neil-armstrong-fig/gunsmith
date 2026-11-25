@@ -41,3 +41,11 @@ it("refuses a size, because the base fixes it", () => {
     reason: "invalid-draft",
   });
 });
+
+it("refuses a floor outline, because the base fixes the arena's outline too", () => {
+  expect(readArenaEdit({name: "Corner", base: DUEL?.name, floor: [{x: 1, y: 1, width: 3, height: 3}]})).toEqual({
+    ok: false,
+    errors: [expect.stringMatching(/floor/)],
+    reason: "invalid-draft",
+  });
+});

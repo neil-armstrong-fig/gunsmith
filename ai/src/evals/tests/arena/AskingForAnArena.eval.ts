@@ -18,12 +18,13 @@ const LARGE_REQUESTS = [
   },
 ];
 
-// A plain request becomes an arena: the happy path and its edges. Each `when` says only that an arena is created; that the player can
-// play it and it leaks nothing, that the pipeline kept to its fixed path within three model calls, and that no credit goes back for a request
-// that reached the model, are `expectDefaultPipelineBehaviour`, at the end of every trial.
-// In progress: nothing here has run on a real model yet. The fake tier proves the harness only; the local tier decides whether
-// a 9B model can write rows `arenaFrom` accepts, and the cases move to a plain `given` once they hold there.
-given.inProgress("a player asks for an arena, and the model must write one the engine accepts as playable", () => {
+// A plain request becomes an arena: the happy path and its edges. Each `when` says that an arena is created (or answered) and what is
+// special to its request (cover, height); that the player can play it and it leaks nothing, that the pipeline kept to its
+// fixed path within three model calls, and that no credit goes back for a request that reached the model, are
+// `expectDefaultPipelineBehaviour`, at the end of every trial.
+// A regression since 2026-11-25: every criterion held in 3 of 3 trials on Haiku 5.5 with the shapes format and its `floor` list
+// (`docs/ai-arena-research.md`); the watchtower, which did not, is its own `given` below.
+given("a player asks for an arena, and the model must write one the engine accepts as playable", () => {
   when("the player asks for an open arena with a ring of stone pillars", ({weaponSmith}) => {
     eachTrial(weaponSmith.arena, arena => {
       beforeAll(() => arena.ask("an open arena with a ring of stone pillars"));
@@ -103,7 +104,7 @@ given.inProgress("a player asks for an arena, and the model must write one the e
 
   // What code's repair cannot mend is a drawing with almost no floor: it can open a door and wall in a sliver, but it cannot make floor. The
   // fake tier answers this one request with such a drawing, so the path to an invalid request (no arena, a reason) stays covered now that a
-  // floor cut in two is repaired; whether a real model draws it is for the local and paid tiers, so the expectation holds for either.
+  // floor cut in two is repaired; on Haiku 5.5 (2026-11-25) the first draft needed the model's repair every time, so the expectation holds for either.
   when("the player asks for an arena that is almost nothing but solid wall", ({weaponSmith}) => {
     eachTrial(weaponSmith.arena, arena => {
       beforeAll(() => arena.ask("an arena that is almost nothing but solid wall"));
@@ -131,30 +132,8 @@ given.inProgress("a player asks for an arena, and the model must write one the e
     });
   });
 
-  // A real failure (the user's manual test in the live workshop, 2026-11-21): this request came back as a built-in arena. A 25 by 13
-  // hand-drawn version (a low-cover divider with one crossing, two-stage stairs to each tower and to the bridge) passes engine's
-  // validation and fair starts, so the layout is possible. The player's words are kept as typed, spelling included.
-  when("the player asks for two level-three watchtowers and a bridge over a cover divider", ({weaponSmith}) => {
-    eachTrial(weaponSmith.arena, arena => {
-      beforeAll(() => arena.ask(WATCHTOWER_REQUEST));
-
-      thenExpect("the model's own arena is created", () => {
-        expect(arena.getStatus()).toBe("created");
-      });
-
-      // Haiku 5.5 (2026-11-24) drew each tower at level two with one stair from the ground, which climbs two levels, and code's repair then
-      // lowered every tower to level one: valid, created, and not what was asked. "Level three" is the third floor, two levels up.
-      thenExpect("the towers keep the height asked for: the arena reaches level two, the third floor", () => {
-        expect(arena.getHighestLevel()).toBe(2);
-      });
-
-      expectDefaultPipelineBehaviour(arena);
-    });
-  });
-
-  // The largest the engine allows (40 by 30): on Haiku 5.5 one run of each format (2026-11-19) fell back 3 times in 4, which is the gap
-  // the format comparison (`docs/ai-arena-research.md`) is meant to close. The fake tier draws its one small arena for any request, so
-  // only a paid or local run can fail here.
+  // The largest the engine allows (40 by 30): on Haiku 5.5 rows fell back 3 times in 4 (2026-11-19); shapes and code's repair closed the
+  // gap (`docs/ai-arena-research.md`). The fake tier draws its one small arena for any request, so only a paid or local run can fail here.
   when.each(
     LARGE_REQUESTS,
     request => request.when,
@@ -170,6 +149,75 @@ given.inProgress("a player asks for an arena, and the model must write one the e
       });
     },
   );
+});
+
+// In progress: the height asked for does not hold every time. On Haiku 5.5 (2026-11-25, 3 trials) every arena was created, but one trial's
+// towers ended at level one; the other criteria held. It becomes a regression when the towers keep level two in every trial.
+given.inProgress(
+  "a player asks for an arena built to a height, so the levels asked for must survive the repair",
+  () => {
+    // A real failure (the user's manual test in the live workshop, 2026-11-21): this request came back as a built-in arena. A 25 by 13
+    // hand-drawn version (a low-cover divider with one crossing, two-stage stairs to each tower and to the bridge) passes engine's
+    // validation and fair starts, so the layout is possible. The player's words are kept as typed, spelling included.
+    when("the player asks for two level-three watchtowers and a bridge over a cover divider", ({weaponSmith}) => {
+      eachTrial(weaponSmith.arena, arena => {
+        beforeAll(() => arena.ask(WATCHTOWER_REQUEST));
+
+        thenExpect("the model's own arena is created", () => {
+          expect(arena.getStatus()).toBe("created");
+        });
+
+        // Haiku 5.5 (2026-11-24) drew each tower at level two with one stair from the ground, which climbs two levels, and code's repair then
+        // lowered every tower to level one: valid, created, and not what was asked. "Level three" is the third floor, two levels up. Engine's
+        // repair now adds a landing between two stairs, and the towers kept level two in 3 of 3 (2026-11-24) but 2 of 3 (2026-11-25).
+        thenExpect("the towers keep the height asked for: the arena reaches level two, the third floor", () => {
+          expect(arena.getHighestLevel()).toBe(2);
+        });
+
+        expectDefaultPipelineBehaviour(arena);
+      });
+    });
+  },
+);
+
+// A layout request: the arena must take the outline asked for, which no validity check sees. Probed 2026-11-20 on Haiku 5.5, "a plus sign"
+// came back as an open rectangle in 3 of 3 drafts and "an L" had its corner of wall in 1 of 3. Fixed 2026-11-25 by the shapes format's
+// `floor` list, which code walls around (`docs/ai-arena-research.md`, "Shape fidelity"): 17 of 18 in the comparison, then 12 of 12 on the
+// shipped default at 6 trials, so a regression (the user, 2026-11-25).
+given("a player asks for an arena whose outline is not a rectangle, so its walls must make that outline", () => {
+  // The border alone only makes a rectangle, so a plus sign is four corners of wall.
+  when("the player asks for an arena shaped like a plus sign", ({weaponSmith}) => {
+    eachTrial(weaponSmith.arena, arena => {
+      beforeAll(() => arena.ask("an arena shaped like a plus sign"));
+
+      thenExpect("the model's own arena is created", () => {
+        expect(arena.getStatus()).toBe("created");
+      });
+
+      thenExpect("all four of its corners are walled in, as a plus sign's are", () => {
+        expect(arena.getWalledCorners()).toBe(4);
+      });
+
+      expectDefaultPipelineBehaviour(arena);
+    });
+  });
+
+  // An L is one corner of wall; two (a Z) or none (a rectangle) is not an L.
+  when("the player asks for an L-shaped arena", ({weaponSmith}) => {
+    eachTrial(weaponSmith.arena, arena => {
+      beforeAll(() => arena.ask("an L-shaped arena"));
+
+      thenExpect("the model's own arena is created", () => {
+        expect(arena.getStatus()).toBe("created");
+      });
+
+      thenExpect("exactly one of its corners is walled in, as an L's is", () => {
+        expect(arena.getWalledCorners()).toBe(1);
+      });
+
+      expectDefaultPipelineBehaviour(arena);
+    });
+  });
 });
 
 function expectDefaultPipelineBehaviour(arena: ArenaDsl): void {

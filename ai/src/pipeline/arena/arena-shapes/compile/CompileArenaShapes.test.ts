@@ -55,6 +55,52 @@ it("lets a wall be drawn over a platform, and never lets any shape break the bor
   expect(compiled).toMatchObject({drawing: {rows: ["########", "#222222#", "#22#222#", "#222222#", "########"]}});
 });
 
+it("walls every tile outside the floor rectangles, when it has them, so the open floor takes their shape", () => {
+  const compiled = compileArenaShapes({
+    ...ROOM,
+    floor: [
+      {x: 1, y: 1, width: 3, height: 3},
+      {x: 4, y: 2, width: 3, height: 2},
+    ],
+  });
+
+  expect(compiled).toMatchObject({drawing: {rows: ["########", "#...####", "#......#", "#......#", "########"]}});
+});
+
+it("draws the whole rectangle as floor when the floor list is empty, as with none", () => {
+  expect(compileArenaShapes({...ROOM, floor: []})).toEqual(compileArenaShapes(ROOM));
+});
+
+it("draws the other shapes over the floor outline, a platform outside it included, and keeps the border", () => {
+  const compiled = compileArenaShapes({
+    ...ROOM,
+    floor: [{x: 0, y: 0, width: 5, height: 5}],
+    covers: [{x: 2, y: 2, width: 2, height: 1}],
+    platforms: [{x: 6, y: 2, width: 1, height: 1, level: 1}],
+  });
+
+  expect(compiled).toMatchObject({drawing: {rows: ["########", "#....###", "#.cc.#1#", "#....###", "########"]}});
+});
+
+it("walls in cover that lies outside the floor outline, where no fighter could reach it", () => {
+  const compiled = compileArenaShapes({
+    ...ROOM,
+    floor: [{x: 1, y: 1, width: 3, height: 2}],
+    covers: [{x: 2, y: 2, width: 4, height: 2}],
+  });
+
+  expect(compiled).toMatchObject({drawing: {rows: ["########", "#...####", "#.cc####", "########", "########"]}});
+});
+
+it("refuses a floor rectangle that reaches past the arena, naming it", () => {
+  const compiled = compileArenaShapes({...ROOM, floor: [{x: 5, y: 1, width: 4, height: 2}]});
+
+  expect(compiled).toEqual({
+    ok: false,
+    errors: ["floor[0] reaches column 8 but the arena is 8 wide (columns 0 to 7): make it end at column 7 or sooner."],
+  });
+});
+
 it("refuses a shape that reaches past the arena, naming the shape, its edge and the arena's size", () => {
   const compiled = compileArenaShapes({...ROOM, walls: [{x: 6, y: 1, width: 4, height: 1}]});
 
