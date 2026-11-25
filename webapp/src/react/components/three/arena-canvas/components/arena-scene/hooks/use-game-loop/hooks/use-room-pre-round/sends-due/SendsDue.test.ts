@@ -1,6 +1,8 @@
 import type {RoomPreRoundReadout} from "@src/game/room-pre-round/types/RoomPreRoundReadout";
 import type {RoomWants} from "@src/game/room-pre-round/types/RoomWants";
 import type {SeatReadout} from "@src/game/room-pre-round/types/SeatReadout";
+import type {WantedArena} from "@src/game/room-pre-round/types/WantedArena";
+import type {WantedWeapon} from "@src/game/room-pre-round/types/WantedWeapon";
 import {sendsDue} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/hooks/use-room-pre-round/sends-due/SendsDue";
 
 interface SeatFlags {
@@ -13,6 +15,12 @@ interface SeatFlags {
 
 const LONG_AGO = 100;
 const frameSeconds = 0.016;
+const rifle: WantedWeapon = {kind: "builtIn", key: "rifle"};
+const submachineGun: WantedWeapon = {kind: "builtIn", key: "submachine-gun"};
+const savedWeapon: WantedWeapon = {kind: "saved", id: "weapon-from-the-library"};
+const duel: WantedArena = {kind: "builtIn", name: "Duel"};
+const fairDuel: WantedArena = {kind: "builtIn", name: "Fair duel"};
+const savedArena: WantedArena = {kind: "saved", id: "arena-from-the-library"};
 const nothingWanted: RoomWants = {weapons: [undefined, undefined], arena: undefined, pick: undefined, start: false};
 const nothingHeld: RoomPreRoundReadout = {
   stage: "choosing",
@@ -30,45 +38,62 @@ it("sends nothing when nothing is wanted", () => {
 });
 
 it("sends the first weapon at once when it is wanted and the server does not hold it", () => {
-  const wants = {...nothingWanted, weapons: ["submachine-gun", undefined] as const};
+  const wants = {...nothingWanted, weapons: [submachineGun, undefined] as const};
 
   const due = sendsDue({readout: nothingHeld, wants, secondsSinceSend: LONG_AGO, frameSeconds});
 
-  expect(due.actions).toEqual([{kind: "weapon", slot: 1, key: "submachine-gun"}]);
+  expect(due.actions).toEqual([{kind: "weapon", slot: 1, weapon: submachineGun}]);
   expect(due.secondsSinceSend).toBe(0);
 });
 
 it("does not send the second weapon until the server says the first is locked in", () => {
-  const wants = {...nothingWanted, weapons: ["submachine-gun", "rifle"] as const};
+  const wants = {...nothingWanted, weapons: [submachineGun, rifle] as const};
 
   expect(sendsDue({readout: nothingHeld, wants, secondsSinceSend: LONG_AGO, frameSeconds}).actions).toEqual([
-    {kind: "weapon", slot: 1, key: "submachine-gun"},
+    {kind: "weapon", slot: 1, weapon: submachineGun},
   ]);
 
   const firstHeld = {...nothingHeld, own: seat({firstLocked: true})};
 
   expect(sendsDue({readout: firstHeld, wants, secondsSinceSend: LONG_AGO, frameSeconds}).actions).toEqual([
-    {kind: "weapon", slot: 2, key: "rifle"},
+    {kind: "weapon", slot: 2, weapon: rifle},
   ]);
 });
 
 it("sends nothing of a weapon the server already holds", () => {
-  const wants = {...nothingWanted, weapons: ["rifle", "rifle"] as const};
+  const wants = {...nothingWanted, weapons: [rifle, rifle] as const};
   const held = {...nothingHeld, own: seat({firstLocked: true, secondLocked: true})};
 
   expect(sendsDue({readout: held, wants, secondsSinceSend: LONG_AGO, frameSeconds}).actions).toEqual([]);
 });
 
 it("sends the arena when it is wanted and the server does not hold it, and not once it does", () => {
-  const wants = {...nothingWanted, arena: "Fair duel"};
+  const wants = {...nothingWanted, arena: fairDuel};
 
   expect(sendsDue({readout: nothingHeld, wants, secondsSinceSend: LONG_AGO, frameSeconds}).actions).toEqual([
-    {kind: "arena", name: "Fair duel"},
+    {kind: "arena", arena: fairDuel},
   ]);
 
   const held = {...nothingHeld, own: seat({arenaLocked: true})};
 
   expect(sendsDue({readout: held, wants, secondsSinceSend: LONG_AGO, frameSeconds}).actions).toEqual([]);
+});
+
+it("sends a saved weapon by its library id for its own slot, as it stands", () => {
+  const wants = {...nothingWanted, weapons: [rifle, savedWeapon] as const};
+  const firstHeld = {...nothingHeld, own: seat({firstLocked: true})};
+
+  expect(sendsDue({readout: firstHeld, wants, secondsSinceSend: LONG_AGO, frameSeconds}).actions).toEqual([
+    {kind: "weapon", slot: 2, weapon: {kind: "saved", id: "weapon-from-the-library"}},
+  ]);
+});
+
+it("sends a saved arena by its library id", () => {
+  const wants = {...nothingWanted, arena: savedArena};
+
+  expect(sendsDue({readout: nothingHeld, wants, secondsSinceSend: LONG_AGO, frameSeconds}).actions).toEqual([
+    {kind: "arena", arena: {kind: "saved", id: "arena-from-the-library"}},
+  ]);
 });
 
 it("sends the pick only while the server is asking for one, and not once it holds it", () => {
@@ -100,7 +125,7 @@ it("sends the ask to begin the match only while the decided arena and weapons ar
 });
 
 it("does not send again while the last send may still be on its way, and counts the time", () => {
-  const wants = {...nothingWanted, weapons: ["rifle", undefined] as const};
+  const wants = {...nothingWanted, weapons: [rifle, undefined] as const};
 
   const due = sendsDue({readout: nothingHeld, wants, secondsSinceSend: 0, frameSeconds});
 
@@ -109,7 +134,7 @@ it("does not send again while the last send may still be on its way, and counts 
 });
 
 it("sends again once the wait is over and the server still holds nothing, as it must for a seat made new by a reconnection", () => {
-  const wants = {...nothingWanted, weapons: ["rifle", undefined] as const};
+  const wants = {...nothingWanted, weapons: [rifle, undefined] as const};
   let due = sendsDue({readout: nothingHeld, wants, secondsSinceSend: LONG_AGO, frameSeconds});
   expect(due.actions).toHaveLength(1);
 
@@ -127,12 +152,12 @@ it("sends at once the first time something is wanted after nothing was, however 
 
   const due = sendsDue({
     readout: nothingHeld,
-    wants: {...nothingWanted, arena: "Duel"},
+    wants: {...nothingWanted, arena: duel},
     secondsSinceSend: settled.secondsSinceSend,
     frameSeconds,
   });
 
-  expect(due.actions).toEqual([{kind: "arena", name: "Duel"}]);
+  expect(due.actions).toEqual([{kind: "arena", arena: duel}]);
 });
 
 function seat(flags: Partial<SeatFlags>): SeatReadout {

@@ -22,18 +22,18 @@ export const useRoomPreRoundStore = create<RoomPreRoundStore>()((set, get) => ({
 
     set({readout});
   },
-  wantWeapon: (slot, key) => {
+  wantWeapon: (slot, weapon) => {
     const [first, second] = get().wants.weapons;
     if (slot === 1) {
-      set({wants: {...get().wants, weapons: [key, second]}});
+      set({wants: {...get().wants, weapons: [weapon, second]}});
 
       return;
     }
 
-    set({wants: {...get().wants, weapons: [first, key]}});
+    set({wants: {...get().wants, weapons: [first, weapon]}});
   },
-  wantArena: name => {
-    set({wants: {...get().wants, arena: name}});
+  wantArena: arena => {
+    set({wants: {...get().wants, arena}});
   },
   wantPick: pick => {
     set({wants: {...get().wants, pick}});

@@ -31,15 +31,15 @@ function actionsDue({readout, wants}: Pick<SendsDueRequest, "readout" | "wants">
   const [first, second] = wants.weapons;
 
   if (first !== undefined && !own.slots[0].locked) {
-    actions.push({kind: "weapon", slot: 1, key: first});
+    actions.push({kind: "weapon", slot: 1, weapon: first});
   }
 
   if (second !== undefined && own.slots[0].locked && !own.slots[1].locked) {
-    actions.push({kind: "weapon", slot: 2, key: second});
+    actions.push({kind: "weapon", slot: 2, weapon: second});
   }
 
   if (wants.arena !== undefined && !own.arenaLocked) {
-    actions.push({kind: "arena", name: wants.arena});
+    actions.push({kind: "arena", arena: wants.arena});
   }
 
   if (wants.pick !== undefined && readout.stage === "picking" && !own.picked) {

@@ -54,14 +54,14 @@ export function useRoomPreRound(): RoomPreRound {
 
 function send(onlineMatch: OnlineMatch, action: DueAction): void {
   if (action.kind === "weapon") {
-    onlineMatch.chooseWeapon(action.slot, {kind: "builtIn", key: action.key});
+    onlineMatch.chooseWeapon(action.slot, action.weapon);
     onlineMatch.lockInWeapon(action.slot);
 
     return;
   }
 
   if (action.kind === "arena") {
-    onlineMatch.chooseArena({kind: "builtIn", name: action.name});
+    onlineMatch.chooseArena(action.arena);
     onlineMatch.lockInArena();
 
     return;
