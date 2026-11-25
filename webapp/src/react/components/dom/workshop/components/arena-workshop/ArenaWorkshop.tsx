@@ -49,7 +49,7 @@ export function ArenaWorkshop(): JSX.Element {
                 {builtIn.name}
               </button>
 
-              <ArenaPreview arena={builtIn.arena} name={builtIn.name} />
+              <ArenaPreview arena={builtIn.arena} name={builtIn.name} isScreenshot />
             </div>
           ))}
         </div>

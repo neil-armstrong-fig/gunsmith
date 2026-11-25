@@ -792,6 +792,38 @@ it("forfeits no round once the match is decided, whoever stays quiet", () => {
 });
 
 /** Where the two fighters start in the duel arena for `seed`: the first seat's, then the second's. */
+it("says once that a match began on a built-in arena, so the day's plays can be counted", () => {
+  const room = startedRoom();
+
+  expect(room.takeArenaPlayed()).toBe(DUEL_BUILT_IN_ARENA.name);
+  expect(room.takeArenaPlayed()).toBeUndefined();
+});
+
+it("says nothing when the next round of the same match begins", () => {
+  const room = startedRoom();
+  room.takeArenaPlayed();
+  winRound(room, "first");
+
+  room.ready("first");
+  room.ready("second");
+
+  expect(room.takeArenaPlayed()).toBeUndefined();
+});
+
+it("says again when a fresh match begins after one is decided", () => {
+  const room = startedRoom();
+  room.takeArenaPlayed();
+  winRound(room, "first");
+  room.ready("first");
+  room.ready("second");
+  winRound(room, "first");
+
+  room.ready("first");
+  room.ready("second");
+
+  expect(room.takeArenaPlayed()).toBe(DUEL_BUILT_IN_ARENA.name);
+});
+
 function startsOfSeed(seed: number): Point[] {
   const world = fairStart(DUEL_ARENA, seed);
   if (!world?.opponent) {

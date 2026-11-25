@@ -81,6 +81,19 @@ export class RoomDsl {
     }
   }
 
+  /** As `joinWithASecondBrowser`, for a room that gives its players time to choose: it waits for the second browser to be sent the choosing, not the match. */
+  async joinWithASecondBrowserToChoose(code: string): Promise<void> {
+    try {
+      await this.room.openSecondBrowser(code, secondPage => {
+        this.second = this.makeGunsmith(secondPage);
+        this.second.room.startWatching();
+      });
+      await this.secondBrowser().room.waitForTheChoosing();
+    } catch (error) {
+      throw new DslError(`Failed to join room ${code} with a second browser to choose`, error);
+    }
+  }
+
   /**
    * Opens a second browser, with a session of its own, on the practice range with `limits` on its address, as this browser's practice range
    * has them. It is reached as `secondBrowser()`, and its `room.entry` types the friend code in.
@@ -304,6 +317,24 @@ export class RoomDsl {
   }
 
   /** Whether the server has sent this browser any snapshot yet. */
+  /** The built-in arenas the room offers this player today, as the server last told it while choosing; `undefined` before it has. */
+  getArenasOffered(): readonly string[] | undefined {
+    try {
+      return this.room.getArenasOffered();
+    } catch (error) {
+      throw new DslError("Failed to read the arenas the room offers", error);
+    }
+  }
+
+  /** Waits until the server has sent this browser the room's choosing. */
+  async waitForTheChoosing(): Promise<void> {
+    try {
+      await this.room.waitForTheChoosing();
+    } catch (error) {
+      throw new DslError("Failed to see the room's choosing", error);
+    }
+  }
+
   hasReceivedSnapshots(): boolean {
     try {
       return this.room.hasReceivedSnapshots();

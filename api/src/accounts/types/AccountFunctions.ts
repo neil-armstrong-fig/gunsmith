@@ -1,5 +1,7 @@
 import type {accountOfSession} from "@src/accounts/account-of-session/AccountOfSession";
+import type {arenaPlaysSince} from "@src/accounts/arena-plays-since/ArenaPlaysSince";
 import type {claimDeletedAccountId} from "@src/accounts/claim-deleted-account-id/ClaimDeletedAccountId";
+import type {countArenaPlay} from "@src/accounts/count-arena-play/CountArenaPlay";
 import type {createSession} from "@src/accounts/create-session/CreateSession";
 import type {deleteSession} from "@src/accounts/delete-session/DeleteSession";
 import type {findOrCreateAccount} from "@src/accounts/find-or-create-account/FindOrCreateAccount";
@@ -23,4 +25,6 @@ export interface AccountFunctions {
   savedItemsOfAccount: typeof savedItemsOfAccount;
   saveItem: typeof saveItem;
   unsaveItem: typeof unsaveItem;
+  countArenaPlay: typeof countArenaPlay;
+  arenaPlaysSince: typeof arenaPlaysSince;
 }

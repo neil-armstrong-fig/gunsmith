@@ -47,12 +47,15 @@ function isArena(frame: object): boolean {
 function isPreRound(frame: object): boolean {
   const stage: unknown = Reflect.get(frame, "stage");
   const secondsLeft: unknown = Reflect.get(frame, "secondsLeft");
+  const builtInArenas: unknown = Reflect.get(frame, "builtInArenas");
   const own: unknown = Reflect.get(frame, "own");
   const opponent: unknown = Reflect.get(frame, "opponent");
 
   return (
     PRE_ROUND_STAGES.some(known => known === stage) &&
     (secondsLeft === undefined || typeof secondsLeft === "number") &&
+    Array.isArray(builtInArenas) &&
+    builtInArenas.every(name => typeof name === "string") &&
     hasFlags(own, ["locked"]) &&
     hasFlags(opponent, ["locked", "picked"]) &&
     hasWeaponsStep(own) &&
