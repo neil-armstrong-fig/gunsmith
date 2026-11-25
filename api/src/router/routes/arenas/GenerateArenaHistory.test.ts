@@ -241,12 +241,13 @@ it("omits text when the privacy check denies it or cannot complete", async () =>
   ]);
 });
 
-it("classifies a built-in substitute as a failed generation and preserves its half-credit charge", async () => {
+it("classifies an invalid request as a failed generation and preserves its half-credit charge", async () => {
   await emptyDatabase();
   const {account, cookie} = await signInPlayer();
   vi.mocked(runArenaPipeline).mockResolvedValue({
     ...repairedArena,
-    status: "builtIn",
+    arena: undefined,
+    status: "invalid",
     reason: "We could not build that arena.",
     history: {...repairedArena.history, validationFailure: "ragged-rows"},
   });
@@ -254,11 +255,7 @@ it("classifies a built-in substitute as a failed generation and preserves its ha
 
   const response = await makeArena(prompt, cookie);
 
-  expect(await response.json()).toEqual({
-    status: "builtIn",
-    arena: {name: "Raised yard"},
-    reason: "We could not build that arena.",
-  });
+  expect(await response.json()).toEqual({status: "invalid", reason: "We could not build that arena."});
   expect(ledgers.calls).toContain("settle:unusable");
   expect(await generationAttemptsOfAccount(account.id, new Date())).toEqual([
     expect.objectContaining({outcome: "failed", failureStage: "validation", failureReason: "ragged-rows"}),

@@ -14,6 +14,6 @@ it("sends a refused draft to the one repair", () => {
   expect(routeAfterValidate(arenaGraphStateOf({errors: ["rows: too few"]}))).toBe("repair");
 });
 
-it("sends a refused repaired draft to the built-in arena, never to a second repair", () => {
-  expect(routeAfterValidate(arenaGraphStateOf({errors: ["rows: too few"], repaired: true}))).toBe("fallback");
+it("ends the run for a refused repaired draft, never sending it to a second repair or to a substitute", () => {
+  expect(routeAfterValidate(arenaGraphStateOf({errors: ["rows: too few"], repaired: true}))).toBe(END);
 });

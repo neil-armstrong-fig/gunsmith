@@ -6,5 +6,4 @@ export interface WorkshopArena {
   rows: readonly string[];
   madeFromPrompt?: string;
   accountItemId?: string;
-  fallbackReason?: string;
 }

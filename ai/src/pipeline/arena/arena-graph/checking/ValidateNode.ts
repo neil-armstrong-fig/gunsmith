@@ -15,6 +15,7 @@ export function validateNode(state: ArenaGraphStateValues, format: ArenaFormat):
       nodes: ["validate"],
       codeEdits: validation.codeEdits,
       validationFailure: validation.reason,
+      problemKinds: validation.problemKinds,
     };
   }
 

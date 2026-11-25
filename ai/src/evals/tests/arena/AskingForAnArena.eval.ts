@@ -1,6 +1,9 @@
 import {beforeAll, eachTrial, expect, given, thenExpect, when} from "@evals/eval-criteria-mapping/EvalCriteriaMapping";
 import type {ArenaDsl} from "@evals/dsl/arena/ArenaDsl";
 
+const WATCHTOWER_REQUEST =
+  'A single "watchtower" on each end of the map that goes up to level three with no cover and is effectively a corrador up. The middle of the map has a cover block going through it with a single bridge in the middle that also goes up to level three and back down again';
+
 const LARGE_REQUESTS = [
   {
     when: "the player asks for the largest arena, with walled rooms, pillar rings, cover and a platform reached by stairs",
@@ -16,8 +19,8 @@ const LARGE_REQUESTS = [
 ];
 
 // A plain request becomes an arena: the happy path and its edges. Each `when` says only that an arena is created; that the player can
-// play it and it leaks nothing, that the pipeline kept to its fixed path within three model calls, and that the credit goes back only
-// for a built-in arena, are `expectDefaultPipelineBehaviour`, at the end of every trial.
+// play it and it leaks nothing, that the pipeline kept to its fixed path within three model calls, and that no credit goes back for a request
+// that reached the model, are `expectDefaultPipelineBehaviour`, at the end of every trial.
 // In progress: nothing here has run on a real model yet. The fake tier proves the harness only; the local tier decides whether
 // a 9B model can write rows `arenaFrom` accepts, and the cases move to a plain `given` once they hold there.
 given.inProgress("a player asks for an arena, and the model must write one the engine accepts as playable", () => {
@@ -25,7 +28,7 @@ given.inProgress("a player asks for an arena, and the model must write one the e
     eachTrial(weaponSmith.arena, arena => {
       beforeAll(() => arena.ask("an open arena with a ring of stone pillars"));
 
-      thenExpect("the model's own arena is created, not a built-in fallback", () => {
+      thenExpect("the model's own arena is created", () => {
         expect(arena.getStatus()).toBe("created");
       });
 
@@ -42,7 +45,7 @@ given.inProgress("a player asks for an arena, and the model must write one the e
           arena.ask("a duel arena with a raised platform in the middle, reached by one flight of stairs"),
         );
 
-        thenExpect("the model's own arena is created, not a built-in fallback", () => {
+        thenExpect("the model's own arena is created", () => {
           expect(arena.getStatus()).toBe("created");
         });
 
@@ -57,7 +60,7 @@ given.inProgress("a player asks for an arena, and the model must write one the e
     eachTrial(weaponSmith.arena, arena => {
       beforeAll(() => arena.ask("an arena with low cover blocks to crouch behind"));
 
-      thenExpect("the model's own arena is created, not a built-in fallback", () => {
+      thenExpect("the model's own arena is created", () => {
         expect(arena.getStatus()).toBe("created");
       });
 
@@ -70,8 +73,9 @@ given.inProgress("a player asks for an arena, and the model must write one the e
   });
 
   // The requests a model is most likely to answer with an arena the game cannot play. The player is never handed one: the model's own,
-  // repaired by code or by the model, or a built-in arena (with no refund: the model was used). That the player can play what they are given, and that
-  // the credit is not refunded, are `expectDefaultPipelineBehaviour`; this `when` adds that something is given.
+  // repaired by code or by the model, or no arena and a reason (with no refund: the model was used; the user, 2026-11-21: no built-in arena
+  // is given in its place). That the player can play what they are given, and that the credit is not refunded, are
+  // `expectDefaultPipelineBehaviour`; this `when` adds that the request is answered.
   when(
     "the player asks for an arena cut in two by a wall nobody can cross, a layout the game cannot play",
     ({weaponSmith}) => {
@@ -79,9 +83,9 @@ given.inProgress("a player asks for an arena, and the model must write one the e
         beforeAll(() => arena.ask("an arena cut in two by a wall nobody can cross"));
 
         thenExpect(
-          "the player is given an arena (the model's own after a repair, or a built-in one), never nothing",
+          "the player is given the model's own arena, or told why there is none, never nothing and never a substitute",
           () => {
-            expect(arena.getArenaGivenProblems()).toEqual([]);
+            expect(arena.getArenaAnsweredProblems()).toEqual([]);
           },
         );
 
@@ -98,16 +102,16 @@ given.inProgress("a player asks for an arena, and the model must write one the e
   );
 
   // What code's repair cannot mend is a drawing with almost no floor: it can open a door and wall in a sliver, but it cannot make floor. The
-  // fake tier answers this one request with such a drawing, so the path to a built-in arena stays covered now that a floor cut in two is
-  // repaired; whether a real model draws it is for the local and paid tiers, so the expectation holds for either.
+  // fake tier answers this one request with such a drawing, so the path to an invalid request (no arena, a reason) stays covered now that a
+  // floor cut in two is repaired; whether a real model draws it is for the local and paid tiers, so the expectation holds for either.
   when("the player asks for an arena that is almost nothing but solid wall", ({weaponSmith}) => {
     eachTrial(weaponSmith.arena, arena => {
       beforeAll(() => arena.ask("an arena that is almost nothing but solid wall"));
 
       thenExpect(
-        "the player is given an arena (the model's own after a repair, or a built-in one), never nothing",
+        "the player is given the model's own arena, or told why there is none, never nothing and never a substitute",
         () => {
-          expect(arena.getArenaGivenProblems()).toEqual([]);
+          expect(arena.getArenaAnsweredProblems()).toEqual([]);
         },
       );
 
@@ -119,8 +123,29 @@ given.inProgress("a player asks for an arena, and the model must write one the e
     eachTrial(weaponSmith.arena, arena => {
       beforeAll(() => arena.ask("a small box"));
 
-      thenExpect("the model's own arena is created, not a built-in fallback", () => {
+      thenExpect("the model's own arena is created", () => {
         expect(arena.getStatus()).toBe("created");
+      });
+
+      expectDefaultPipelineBehaviour(arena);
+    });
+  });
+
+  // A real failure (the user's manual test in the live workshop, 2026-11-21): this request came back as a built-in arena. A 25 by 13
+  // hand-drawn version (a low-cover divider with one crossing, two-stage stairs to each tower and to the bridge) passes engine's
+  // validation and fair starts, so the layout is possible. The player's words are kept as typed, spelling included.
+  when("the player asks for two level-three watchtowers and a bridge over a cover divider", ({weaponSmith}) => {
+    eachTrial(weaponSmith.arena, arena => {
+      beforeAll(() => arena.ask(WATCHTOWER_REQUEST));
+
+      thenExpect("the model's own arena is created", () => {
+        expect(arena.getStatus()).toBe("created");
+      });
+
+      // Haiku 5.5 (2026-11-24) drew each tower at level two with one stair from the ground, which climbs two levels, and code's repair then
+      // lowered every tower to level one: valid, created, and not what was asked. "Level three" is the third floor, two levels up.
+      thenExpect("the towers keep the height asked for: the arena reaches level two, the third floor", () => {
+        expect(arena.getHighestLevel()).toBe(2);
       });
 
       expectDefaultPipelineBehaviour(arena);
@@ -137,7 +162,7 @@ given.inProgress("a player asks for an arena, and the model must write one the e
       eachTrial(weaponSmith.arena, arena => {
         beforeAll(() => arena.ask(request.prompt));
 
-        thenExpect("the model's own arena is created, not a built-in fallback", () => {
+        thenExpect("the model's own arena is created", () => {
           expect(arena.getStatus()).toBe("created");
         });
 
@@ -167,7 +192,7 @@ function expectDefaultPipelineBehaviour(arena: ArenaDsl): void {
   });
 
   // Every request in this spec is an arena request that passes the pre-check, so each one reaches the model and is paid for: whatever
-  // its arena came to, a built-in one included, nothing is refunded. (A request turned away before any model call is the other spec's.)
+  // its arena came to, an invalid one included, nothing is refunded. (A request turned away before any model call is the other spec's.)
   thenExpect("whatever is asked, the credit is not refunded, because the model was called", () => {
     expect(arena.wasRefunded()).toBe(false);
   });

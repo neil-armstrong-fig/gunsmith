@@ -125,6 +125,14 @@ export class ArenaWorkshopDsl {
     }
   }
 
+  async hasResult(): Promise<boolean> {
+    try {
+      return await this.arenas.hasResult();
+    } catch (error) {
+      throw new DslError("Failed to read whether an arena result is shown", error);
+    }
+  }
+
   async getResultDescription(): Promise<string> {
     try {
       return await this.arenas.getResultDescription();

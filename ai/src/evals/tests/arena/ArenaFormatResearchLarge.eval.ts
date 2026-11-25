@@ -3,7 +3,7 @@ import type {ArenaDsl} from "@evals/dsl/arena/ArenaDsl";
 
 // RESEARCH (2026-11-22, `docs/ai-arena-research.md`): the requests an arena format is tried on when the player asks for a large arena,
 // one format per run (`EVAL_ARENA_FORMAT=shapes`; an edit of a built-in cannot be large, and the coarse grid that tried to close the gap
-// was dropped, it did worse), the same requests and trials for each so a later format pairs. 3 of 4 large requests fell back to a built-in
+// was dropped, it did worse), the same requests and trials for each so a later format pairs. 3 of 4 large requests fell back to a built-in arena (then; now they end invalid)
 // arena on Haiku (2026-11-19), 1 of 15 with shapes (2026-11-23), the gap this was to close. A large arena must also BE large: without the
 // size criterion a format that can only draw a small arena would pass by ignoring the request. Not a regression guard, so in progress.
 const LARGE_REQUESTS = [
@@ -43,7 +43,7 @@ given.inProgress("a player asks for a large arena, whichever format the model an
       eachTrial(weaponSmith.arena, arena => {
         beforeAll(() => arena.ask(request.prompt));
 
-        thenExpect("the model's own arena is created, not a built-in fallback", () => {
+        thenExpect("the model's own arena is created", () => {
           expect(arena.getStatus()).toBe("created");
         });
 
@@ -80,10 +80,7 @@ function expectDefaultPipelineBehaviour(arena: ArenaDsl): void {
     expect(arena.getModelCalls()).toBeLessThanOrEqual(3);
   });
 
-  thenExpect(
-    "whatever is asked, the credit is refunded exactly when a built-in arena is given instead of the one asked for",
-    () => {
-      expect(arena.wasRefunded()).toBe(arena.getStatus() === "builtIn");
-    },
-  );
+  thenExpect("whatever is asked, the credit is not refunded, because the model was called", () => {
+    expect(arena.wasRefunded()).toBe(false);
+  });
 }

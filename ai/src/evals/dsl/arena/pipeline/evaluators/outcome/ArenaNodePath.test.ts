@@ -31,28 +31,24 @@ it("fails a created arena whose last word was not a validation", () => {
   expect(arenaNodePath(passingArenaInput({nodes})).comment).toContain("must end with validate");
 });
 
-it("fails a created arena that fell back", () => {
+it("passes an invalid request after one repair did not help", () => {
+  const nodes = ["precheck", "moderation", "generate", "validate", "repair", "validate"];
+
+  expect(arenaNodePath(passingArenaInput({status: "invalid", nodes})).score).toBe(1);
+});
+
+it("fails an invalid request given up without any repair", () => {
+  const nodes = ["precheck", "moderation", "generate", "validate"];
+
+  expect(arenaNodePath(passingArenaInput({status: "invalid", nodes})).comment).toContain("only after one repair");
+});
+
+it("fails an invalid request whose run did not end with the validation of the repair", () => {
   const nodes = ["precheck", "moderation", "generate", "validate", "repair", "validate", "fallback"];
 
-  expect(arenaNodePath(passingArenaInput({nodes})).comment).toContain("must not fall back");
-});
-
-it("passes a built-in arena given after one repair did not help", () => {
-  const nodes = ["precheck", "moderation", "generate", "validate", "repair", "validate", "fallback"];
-
-  expect(arenaNodePath(passingArenaInput({status: "builtIn", nodes})).score).toBe(1);
-});
-
-it("fails a built-in arena given without any repair", () => {
-  const nodes = ["precheck", "moderation", "generate", "validate", "fallback"];
-
-  expect(arenaNodePath(passingArenaInput({status: "builtIn", nodes})).comment).toContain("only after one repair");
-});
-
-it("fails a built-in arena whose run did not end with fallback", () => {
-  const nodes = ["precheck", "moderation", "generate", "validate", "fallback", "repair", "validate"];
-
-  expect(arenaNodePath(passingArenaInput({status: "builtIn", nodes})).comment).toContain("end the run with fallback");
+  expect(arenaNodePath(passingArenaInput({status: "invalid", nodes})).comment).toContain(
+    "end the run with the validation",
+  );
 });
 
 it("passes a request turned away by the pre-check", () => {

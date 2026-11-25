@@ -2,6 +2,7 @@ import {validateArena} from "@gunsmith/engine/arena-validation/ValidateArena";
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import {arenaDraftSchema} from "@gunsmith/ai/pipeline/arena/check/validate/draft/ArenaDraft";
+import type {ArenaProblemKind} from "@gunsmith/engine/arena-validation/types/ArenaProblemKind";
 import {repairArena} from "@gunsmith/engine/arena-repair/RepairArena";
 import {rowLengthProblems} from "@gunsmith/ai/pipeline/arena/check/validate/row-lengths/RowLengthProblems";
 import {draftingKitOf} from "@gunsmith/ai/pipeline/arena/arena-drafting/format/DraftingKitOf";
@@ -27,7 +28,7 @@ const MAX_PROBLEMS_LISTED = 5;
 export function validateArenaDraft(candidate: unknown, format: ArenaFormat): ArenaValidation {
   const reading = draftingKitOf(format).read(candidate);
   if (!reading.ok) {
-    return {ok: false, errors: reading.errors, reason: reading.reason, codeEdits: 0};
+    return {ok: false, errors: reading.errors, reason: reading.reason, problemKinds: [], codeEdits: 0};
   }
 
   return validateDrawing(reading.drawing);
@@ -36,27 +37,44 @@ export function validateArenaDraft(candidate: unknown, format: ArenaFormat): Are
 function validateDrawing(candidate: unknown): ArenaValidation {
   const parsed = arenaDraftSchema.safeParse(candidate);
   if (!parsed.success) {
-    return {ok: false, errors: schemaErrors(parsed.error.issues), reason: "invalid-draft", codeEdits: 0};
+    return {
+      ok: false,
+      errors: schemaErrors(parsed.error.issues),
+      reason: "invalid-draft",
+      problemKinds: [],
+      codeEdits: 0,
+    };
   }
 
   const raggedRows = rowLengthProblems(parsed.data.rows);
   if (raggedRows.length > 0) {
-    return {ok: false, errors: raggedRows, reason: "ragged-rows", codeEdits: 0};
+    return {ok: false, errors: raggedRows, reason: "ragged-rows", problemKinds: [], codeEdits: 0};
   }
 
   const {rows, edits} = repairArena(parsed.data.rows);
   const codeEdits = edits.length;
   const arena = read(rows);
   if (typeof arena === "string") {
-    return {ok: false, errors: [sentenceOf(arena)], reason: "invalid-tiles", codeEdits};
+    return {ok: false, errors: [sentenceOf(arena)], reason: "invalid-tiles", problemKinds: [], codeEdits};
   }
 
-  const problems = validateArena(arena).map(problem => problem.reason);
+  const problems = validateArena(arena);
   if (problems.length > 0) {
-    return {ok: false, errors: firstProblemsOf(problems), reason: "unplayable-arena", codeEdits};
+    return {
+      ok: false,
+      errors: firstProblemsOf(problems.map(problem => problem.reason)),
+      reason: "unplayable-arena",
+      problemKinds: kindsOf(problems.map(problem => problem.kind)),
+      codeEdits,
+    };
   }
 
   return {ok: true, arena: {...parsed.data, rows}, codeEdits};
+}
+
+/** Each kind of fault once, in the order the validator found them, so a hundred cut-off pieces of floor name one kind. */
+function kindsOf(kinds: readonly ArenaProblemKind[]): ArenaProblemKind[] {
+  return [...new Set(kinds)];
 }
 
 /** The first few problems, each shortened, and one sentence counting the rest, so a drawing with hundreds cannot flood the repair. */

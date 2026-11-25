@@ -12,7 +12,7 @@ export function arenaGraphStateOf(overrides: Partial<ArenaGraphStateValues> = {}
     relevance: undefined,
     validationFailure: undefined,
     codeEdits: 0,
-    builtIn: undefined,
+    problemKinds: [],
     nodes: [],
     modelCalls: 0,
     ...overrides,

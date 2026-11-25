@@ -203,6 +203,33 @@ it("still refuses an arena that is nearly all wall, because no repair can make f
   expect(errorsOf(draftWith({rows}))).toContainEqual(expect.stringMatching(/^Open floor is only 3 of 50 tiles/));
 });
 
+it("names the kind of every fault an unplayable arena has, so the player can be told in words of ours", () => {
+  const noFloor = ["##########", "##########", "##########", "##########", "##########"];
+  const nearlyAllWall = ["##########", "#...######", "##########", "##########", "##########"];
+
+  expect(problemKindsOf(draftWith({rows: noFloor}))).toEqual(["noFloor"]);
+  expect(problemKindsOf(draftWith({rows: nearlyAllWall}))).toContain("tooWalled");
+});
+
+it("names each kind once, in the order found, however many pieces of floor are cut off", () => {
+  const row = `#${".#".repeat(19)}#`;
+  const rows = Array.from({length: 30}, (_, index) => {
+    if (index % 2 === 0) {
+      return "#".repeat(40);
+    }
+
+    return row;
+  });
+
+  expect(problemKindsOf(draftWith({rows}))).toEqual(["disconnected", "noStartingPlaces", "tooWalled"]);
+});
+
+it("names no kind for a refusal that is not about playability, such as ragged rows", () => {
+  const rows = ["##########", "#........#", "#.......#", "#........#", "##########"];
+
+  expect(problemKindsOf(draftWith({rows}))).toEqual([]);
+});
+
 it("lists the first few problems and counts the rest, when a drawing has more faults than a repair will mend", () => {
   const row = `#${".#".repeat(19)}#`;
   const rows = Array.from({length: 30}, (_, index) => {
@@ -235,6 +262,15 @@ function columnOf(rows: readonly string[], column: number): string {
     .map(row => row[column])
     .join("")
     .replaceAll(/[^.]/g, "");
+}
+
+function problemKindsOf(candidate: unknown, format: ArenaFormat = "rows"): readonly string[] {
+  const validation = validateArenaDraft(candidate, format);
+  if (validation.ok) {
+    throw new Error("expected the draft to be refused");
+  }
+
+  return validation.problemKinds;
 }
 
 function errorsOf(candidate: unknown, format: ArenaFormat = "rows"): string[] {

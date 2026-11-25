@@ -34,7 +34,7 @@ function plannedArenaOutcome(): fc.Arbitrary<PlannedArenaOutcome> {
     {
       weight: 1,
       arbitrary: fc.constantFrom(2, 3).chain(modelCalls => {
-        return reporting({status: "builtIn", arena: {}, reason: "none", refunded: false, nodes: [], modelCalls});
+        return reporting({status: "invalid", reason: "none", refunded: false, nodes: [], modelCalls});
       }),
     },
     {

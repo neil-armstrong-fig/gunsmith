@@ -8,7 +8,7 @@ import type {ArenaStyle} from "@gunsmith/shared/arena-style/ArenaStyle";
 import {z} from "zod";
 
 const arenaAnswer = z.object({
-  status: z.enum(["created", "builtIn", "rejected", "invalid"]),
+  status: z.enum(["created", "rejected", "invalid"]),
   id: z.string().min(1).optional(),
   reason: z.string().optional(),
   arena: z
@@ -27,7 +27,6 @@ const arenaAnswer = z.object({
     })
     .optional(),
 });
-const FALLBACK_REASON = "We could not build a playable arena, so here is a built-in arena.";
 
 /** Asks the server for an arena in the style the player chose (`blue` or `red`), with the words they wrote. */
 export async function makeAccountArena(prompt: string, style: ArenaStyle): Promise<WorkshopArena> {
@@ -51,10 +50,6 @@ export async function makeAccountArena(prompt: string, style: ArenaStyle): Promi
 
   if (answer.status === "created" && answer.id) {
     return {name, rows, arena, accountItemId: answer.id, madeFromPrompt: prompt};
-  }
-
-  if (answer.status === "builtIn") {
-    return {name, rows, arena, fallbackReason: answer.reason ?? FALLBACK_REASON};
   }
 
   throw new Error("Could not make an arena.");

@@ -1,5 +1,4 @@
 import type {ArenaPipelineDependencies} from "@gunsmith/ai/pipeline/arena/types/ArenaPipelineDependencies";
-import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
 import {ArenaGenerationFakeModel} from "@evals/eval-criteria-mapping/setups/arena/fake/models/ArenaGenerationFakeModel";
 import {ArenaModerationFakeModel} from "@evals/eval-criteria-mapping/setups/arena/fake/ArenaModerationFakeModel";
 import {ArenaPipelineEvalDriver} from "@evals/eval-criteria-mapping/setups/arena/shared/ArenaPipelineEvalDriver";
@@ -16,7 +15,6 @@ export class FakeArenaPipelineEvalDriver extends ArenaPipelineEvalDriver {
       moderator: new ArenaModerationFakeModel(),
       // The canned generator answers in rows, so the graph must ask for rows; the default format would read them as shapes.
       format: "rows",
-      builtInArenas: BUILT_IN_ARENAS,
     };
   }
 }

@@ -33,9 +33,9 @@ export async function arrangeSignedInArena(page: Page, setup: ArenaWorkshopSetup
       expect(request).toEqual({prompt: FALLBACK_PROMPT, style: "blue"});
       await route.fulfill({
         json: {
-          status: "builtIn",
-          arena: {...ARENA, name: "Built-in yard"},
-          reason: "We could not build a playable arena from that request, so here is one of ours.",
+          status: "invalid",
+          reason:
+            "We could not build a playable arena from that request: part of the floor could not be reached from the rest. Ask for a doorway through every wall and stairs up to every raised area.",
         },
       });
       return;
