@@ -9,12 +9,14 @@ const LONGEST_LOSS_SECONDS = 15;
 
 given("the practice range, with a weapon the player made and saved", () => {
   let madeName = "";
+  let madeRating = 0;
+  let madeStats: Readonly<Record<string, string>> = {};
 
   beforeEach(async ({gunsmith}) => {
     await gunsmith.workshop.open();
     await gunsmith.workshop.pasteThePrompt(FAST_PROMPT);
     await gunsmith.workshop.make();
-    madeName = (await gunsmith.workshop.getResult()).name;
+    ({name: madeName, rating: madeRating, stats: madeStats} = await gunsmith.workshop.getResult());
     await gunsmith.workshop.shelf.save();
     await gunsmith.workshop.close();
     await gunsmith.menu.pressSettings();
@@ -60,6 +62,18 @@ given("the practice range, with a weapon the player made and saved", () => {
         });
         expect(await gunsmith.round.getElapsedSeconds()).toBe(0);
       });
+
+      then(
+        "the reveal shows the saved weapon's rating and stats as the workshop's card did, and the bot's weapons as its own",
+        async ({gunsmith}) => {
+          const {yours, opponent} = await gunsmith.preRound.getRevealNumbers();
+
+          expect(yours[0]).toEqual({name: madeName, rating: madeRating, stats: madeStats});
+          expect(yours[1]).toEqual(opponent[1]);
+          expect(opponent[0]?.stats).not.toEqual(opponent[1]?.stats);
+          expect(opponent[0]?.stats).not.toEqual(yours[0]?.stats);
+        },
+      );
 
       when("the player starts the match", () => {
         beforeEach(async ({gunsmith}) => {
