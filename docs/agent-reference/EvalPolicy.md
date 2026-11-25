@@ -35,10 +35,10 @@ This independent check does not change the gameplay or property release gates.
 - Preserve pipeline repair limits, disable hidden model/SDK retries, and report
   budget/provider/truncation failures distinctly from model-quality failures.
 
-The newly integrated arena evals have no paid tier. Exclude them from paid
-selection until AI supplies that tier and the user reviews its costs. They run
-in the free harness now. Recount paid scenarios before enabling the new runner;
-the earlier planning inventory predates arena integration.
+The arena evals have had a paid tier since 2026-11-19 (an arena request costs
+about $0.0005 to $0.0008 on Haiku 5.5) and follow the same three-trial rule.
+Recount paid scenarios before enabling the new runner; the earlier planning
+inventory predates arena integration and the 2026-11-25 promotions.
 
 ## Budget activation — blocked on reconciliation and implementation
 
@@ -61,8 +61,10 @@ balance. The user offered API Console logs: November Cost and Usage CSVs scoped
 to Gunsmith can reconcile spend; they cannot recover generated samples. Do not
 initialize at zero or print credentials/billing details.
 
-Historical usage suggests about $0.03 per three-trial regression run and $0.08
-per full baseline, excluding the new arena suite. These are estimates, not
+After the 2026-11-25 promotions (arena, rejection and drawing specs became
+regressions), a three-trial regression run is estimated at about $0.075 from
+that day's batches (arena $0.018, weapon about $0.031, drawing $0.025), under
+the $0.10 limit but close to it. These are estimates, not
 reservations or bills. Re-measure after activation; the provider bill is the
 accounting authority. Current pricing: [Anthropic pricing](https://platform.claude.com/docs/en/about-claude/pricing).
 

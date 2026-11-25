@@ -79,15 +79,59 @@ const WATCHTOWER_REPLY = {
   ],
 };
 
+// The two layout requests (`AskingForAnArena`, a plus sign and an L), word for word, answered with the shape asked for, walls filling the
+// corners outside it: the canned arena is an open rectangle, so the specs' walled-corner criteria would fail on the fake tier whatever the
+// pipeline did. Whether a real model walls the corners in is for the local and paid tiers.
+const PLUS_SIGN_REQUEST = "an arena shaped like a plus sign";
+
+const PLUS_SIGN_REPLY = {
+  name: "Plus Sign",
+  rows: [
+    "####################",
+    "#######......#######",
+    "#######......#######",
+    "#######......#######",
+    "#..................#",
+    "#..................#",
+    "#..................#",
+    "#..................#",
+    "#######......#######",
+    "#######......#######",
+    "#######......#######",
+    "####################",
+  ],
+};
+
+const L_SHAPE_REQUEST = "an L-shaped arena";
+
+const L_SHAPE_REPLY = {
+  name: "The L",
+  rows: [
+    "####################",
+    "#.........##########",
+    "#.........##########",
+    "#.........##########",
+    "#.........##########",
+    "#.........##########",
+    "#..................#",
+    "#..................#",
+    "#..................#",
+    "#..................#",
+    "#..................#",
+    "####################",
+  ],
+};
+
 // A request that asks for a huge or a vast arena, or the full 40 tiles, gets a large one, so the specs that check size can tell the pipeline kept the size asked.
 const LARGE_REQUEST = /\b(huge|vast|40)\b/;
 
 const REQUEST_BLOCK = /^<request>\n([\s\S]*)\n<\/request>$/;
 
 /**
- * The fake tier's arena generator: a chat model that answers the generation function call like a real one. It draws a valid arena for
- * every request but three: an arena with cover blocks for the cover request, a floor cut in two for the cut-in-two request (which code mends), and, for the
- * solid-wall request, an arena with almost no floor on every try, repair included (which code cannot). Test-only.
+ * The fake tier's arena generator: a chat model that answers the generation function call like a real one. It draws one valid arena for
+ * any request, except for the requests named above: the shape asked for (a plus sign, an L), cover blocks, Haiku's own watchtower draft, a
+ * large arena, a floor cut in two (which code mends) and, for the solid-wall request, an arena with almost no floor on every try, repair
+ * included (which code cannot). Test-only.
  */
 export class ArenaGenerationFakeModel extends BaseChatModel {
   constructor() {
@@ -124,6 +168,14 @@ export class ArenaGenerationFakeModel extends BaseChatModel {
 
     if (requests.includes(WATCHTOWER_REQUEST)) {
       return WATCHTOWER_REPLY;
+    }
+
+    if (requests.includes(PLUS_SIGN_REQUEST)) {
+      return PLUS_SIGN_REPLY;
+    }
+
+    if (requests.includes(L_SHAPE_REQUEST)) {
+      return L_SHAPE_REPLY;
     }
 
     if (requests.includes(COVER_REQUEST)) {

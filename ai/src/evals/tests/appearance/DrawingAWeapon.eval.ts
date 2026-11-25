@@ -4,11 +4,9 @@ import type {AppearanceDsl} from "@evals/dsl/appearance/AppearanceDsl";
 // What a weapon looks like is drawn by the model from the player's words and judged by code: a drawing that passes every rule is
 // shown, one that does not is repaired once, and if that fails too the plain stand-in is shown and says so. What holds whatever is
 // asked (safe to show, a stand-in never passed off as the model's own, a fixed path within two calls) is `expectDefaultPipelineBehaviour`,
-// at the end of every trial. The `then`s here are the hills to climb: measured 2026-11-13 on `qwen3.5:9b`, most first drawings were refused
-// (shapes a unit or two outside the canvas, other kinds' fields on every shape), so the whole feature is in progress for now.
-// Whether a drawing looks like what was asked for is for a person to judge, from the contact sheet; nothing here claims it.
-// In progress: drawing is the least finished feature. The user judged the contact sheet "really good" (2026-11-14) and 35 of 36 drawings were valid
-// first time on Haiku 5.5, but the drawing is not wired into the weapon pipeline yet and its call budget is not settled, so none of this gates.
+// at the end of every trial. Whether a drawing looks like what was asked for is for a person to judge, from the contact sheet; nothing here
+// claims it. The drawing is a step of the weapon graph (`weapon-graph/drawing/`, five model calls at most). A regression since 2026-11-25:
+// every criterion held in 3 of 3 trials on Haiku 5.5 (the user judged its contact sheet "really good", 2026-11-14).
 const ODDITIES = [
   {
     when: "the player asks for a rubber duck cannon that bounces angry little ducks around corners",
@@ -66,7 +64,7 @@ const AWKWARD_REQUESTS = [
   },
 ];
 
-given.inProgress(
+given(
   "a player describes how their weapon should look, and the model must draw it from those words instead of the plain stand-in",
   () => {
     when.each(

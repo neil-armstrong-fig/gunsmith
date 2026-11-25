@@ -9,6 +9,7 @@ export function outsideTheArena(size: ArenaSize, shapes: ShapesToCheck): string[
 
   const lists = [
     ["clears", shapes.clears],
+    ["floor", shapes.floor],
     ["walls", shapes.walls],
     ["covers", shapes.covers],
     ["platforms", shapes.platforms],
