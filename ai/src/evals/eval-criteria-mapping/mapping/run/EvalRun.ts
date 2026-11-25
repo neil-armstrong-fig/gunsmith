@@ -57,7 +57,7 @@ export class EvalRun {
     if (!this.tookTrials) {
       throw new Error(
         'Run each trial of this `when` in a scope of its own: `when("…", ({weaponSmith}) => {eachTrial(weaponSmith.weapon, weapon => {…})})`, ' +
-          "or with `weaponSmith.appearance`, `weaponSmith.arena` or `weaponSmith.arenaSubmission`. Without one it asks nothing.",
+          "or with `weaponSmith.appearance` or `weaponSmith.arena`. Without one it asks nothing.",
       );
     }
   }

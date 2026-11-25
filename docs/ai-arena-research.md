@@ -228,6 +228,22 @@ The user's live-workshop prompt of 2026-11-21 (two level-three watchtowers, a co
 **Both built (the user, 2026-11-24; two eval runs and a second probe, $0.0063, ledger $0.1483).** The spec reads `getHighestLevel()` and expects 2; the fake tier answers the watchtower request with Haiku's own raw draft, so it proves engine's fix end to end (with the landing switched off it reads 1). **B, engine (`stairs/AddLanding`):** with the repair alone, 3 of 3 Haiku trials kept both towers at level 2 (4 or 5 code edits each). **A, the prompts:** a rule line teaching a level-1 landing between two stairs (shapes: with coordinates; rows: `.>1>2`), each held by a test to a climb the validator accepts with no code edit. **A had no measured effect:** 0 of 3 raw drafts drew a landing (the second probe; the towers are still drawn at level 2 with none or one stair), and the 3-trial eval with A and B reached level 2 in 2 of 3. The one miss is a model that drew nothing tall: the second probe also had a draft with no shapes at all, an empty box that is valid and created; only the height criterion catches it. Engine's landing is doing the work; the prompt line cost about 130 input tokens a request. **Decided (the user, 2026-11-24): keep the engine fix only; the prompt line and its tests are removed.**
 
 
+## The watchtower probe, 2026-11-25 (Haiku 5.5, shapes, 6 first drafts, $0.0022, ledger $0.2981)
+
+The watchtower case held in 2 of 3 on 2026-11-25. A throwaway probe (deleted; drafts in the main checkout's
+`private-source/watchtower-probe-20261125/`) kept six first drafts raw, compiled and repaired by engine's `repairArena`. **4 of 6 kept
+level 2** (engine's landing did the work in three of them), so about 75% over the 12 drafts and trials since 2026-11-24. The two misses have
+different causes, and neither is a repair bug:
+
+- **The model drew nothing tall** (1 of 6): a flat arena, as on 2026-11-24. No code can restore what was not drawn, and the user ruled out
+  a code refusal.
+- **The model drew a tower too small to climb** (1 of 6): a 3 by 4 level-1 block with a 1 by 2 level-2 top, so the level-1 ring around the
+  top is one tile thick. A stair onto level 2 needs level-1 floor behind it in line and no raised floor beside it, and no tile of that ring
+  has both, so `addStair` correctly finds no place, `addLanding` (level 2 on the ground only) does not apply, and the repair lowers the
+  top. A code fix would be an engine design change (grow a platform whose top cannot be climbed), not a bug fix.
+
+The case stays `given.inProgress`. A prompt sentence about stairs already had no measured effect (2026-11-24).
+
 ## Shape fidelity, 2026-11-25 (built and run on Haiku 5.5, the user's go of $0.08; spent $0.0625, ledger $0.2109)
 
 A layout request is valid and created but not what was asked: "an arena shaped like a plus sign" came back as an open rectangle in 3 of 3 shapes drafts and "an L-shaped arena" had its wall block in 1 of 3 (the probe of 2026-11-20 above). No validity check can see it, so the evals now read it: `getWalledCorners()` counts the corners whose block inside the border (a sixth of the inner width by a sixth of the inner height) is at least nine tenths wall; a plus sign has 4, an L exactly 1. A quarter-size block was tried first and read a plus with thick arms (corners 3 tiles wide) as 0, so the size was settled before any run; every one of the ~25 arenas kept from earlier paid and local runs (none a layout request) reads 0.

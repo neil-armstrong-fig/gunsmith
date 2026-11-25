@@ -7,9 +7,6 @@ import {PaidAppearanceEvalDriver} from "@evals/eval-criteria-mapping/setups/appe
 import {FakeArenaPipelineEvalDriver} from "@evals/eval-criteria-mapping/setups/arena/fake/FakeArenaPipelineEvalDriver";
 import {LocalArenaPipelineEvalDriver} from "@evals/eval-criteria-mapping/setups/arena/local/LocalArenaPipelineEvalDriver";
 import {PaidArenaPipelineEvalDriver} from "@evals/eval-criteria-mapping/setups/arena/paid/PaidArenaPipelineEvalDriver";
-import {FakeArenaSubmissionEvalDriver} from "@evals/eval-criteria-mapping/setups/arena-submission/fake/FakeArenaSubmissionEvalDriver";
-import {LocalArenaSubmissionEvalDriver} from "@evals/eval-criteria-mapping/setups/arena-submission/local/LocalArenaSubmissionEvalDriver";
-import {PaidArenaSubmissionEvalDriver} from "@evals/eval-criteria-mapping/setups/arena-submission/paid/PaidArenaSubmissionEvalDriver";
 import {FakeWeaponPipelineEvalDriver} from "@evals/eval-criteria-mapping/setups/weapon/fake/FakeWeaponPipelineEvalDriver";
 import {LocalWeaponPipelineEvalDriver} from "@evals/eval-criteria-mapping/setups/weapon/local/LocalWeaponPipelineEvalDriver";
 import {PaidWeaponPipelineEvalDriver} from "@evals/eval-criteria-mapping/setups/weapon/paid/PaidWeaponPipelineEvalDriver";
@@ -24,7 +21,6 @@ export function createEvalDrivers(tier: EvalTier, requestedTrials: string | unde
       weapon: new FakeWeaponPipelineEvalDriver(requestedTrials),
       appearance: new FakeAppearanceEvalDriver(requestedTrials),
       arena: new FakeArenaPipelineEvalDriver(requestedTrials),
-      arenaSubmission: new FakeArenaSubmissionEvalDriver(requestedTrials),
     };
   }
 
@@ -33,7 +29,6 @@ export function createEvalDrivers(tier: EvalTier, requestedTrials: string | unde
       weapon: new LocalWeaponPipelineEvalDriver(requestedTrials),
       appearance: new LocalAppearanceEvalDriver(requestedTrials),
       arena: new LocalArenaPipelineEvalDriver(requestedTrials),
-      arenaSubmission: new LocalArenaSubmissionEvalDriver(requestedTrials),
     };
   }
 
@@ -42,7 +37,6 @@ export function createEvalDrivers(tier: EvalTier, requestedTrials: string | unde
       weapon: new PaidWeaponPipelineEvalDriver(requestedTrials),
       appearance: new PaidAppearanceEvalDriver(requestedTrials),
       arena: new PaidArenaPipelineEvalDriver(requestedTrials),
-      arenaSubmission: new PaidArenaSubmissionEvalDriver(requestedTrials),
     };
   }
 

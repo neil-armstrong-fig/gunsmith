@@ -1,6 +1,5 @@
 import {AppearanceDsl} from "@evals/dsl/appearance/AppearanceDsl";
 import {ArenaDsl} from "@evals/dsl/arena/ArenaDsl";
-import {ArenaSubmissionDsl} from "@evals/dsl/arena-submission/ArenaSubmissionDsl";
 import {WeaponDsl} from "@evals/dsl/weapon/WeaponDsl";
 import type {EvalDrivers} from "@evals/dsl/types/EvalDrivers";
 
@@ -13,12 +12,10 @@ export class WeaponSmithDsl {
   readonly weapon: WeaponDsl;
   readonly appearance: AppearanceDsl;
   readonly arena: ArenaDsl;
-  readonly arenaSubmission: ArenaSubmissionDsl;
 
   constructor(drivers: EvalDrivers) {
     this.weapon = new WeaponDsl(drivers.weapon);
     this.appearance = new AppearanceDsl(drivers.appearance);
     this.arena = new ArenaDsl(drivers.arena);
-    this.arenaSubmission = new ArenaSubmissionDsl(drivers.arenaSubmission);
   }
 }

@@ -13,6 +13,6 @@ export interface PaidRequestOptions<Outcome> {
   logFile: string;
   /** What the request makes ("the weapon", "the arena"), for the words a failed run ends with. */
   subject: string;
-  /** The stage of a call that ran in no graph node (a screening makes only moderation calls), when the pipeline is not a graph. */
+  /** The stage of a call that ran in no graph node (the appearance drawing's are all `draw`), when the pipeline is not a graph. */
   defaultStage?: string;
 }
