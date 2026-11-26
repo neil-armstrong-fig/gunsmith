@@ -9,7 +9,9 @@ import {PIPELINE_TIME_LIMIT_MILLISECONDS} from "@src/router/routes/shared/time-l
 import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
 import {rowsOf} from "@src/accounts/testing/local-database/RowsOf";
 import {useLocalDatabase} from "@src/accounts/testing/local-database/UseLocalDatabase";
-import {generationHistoryPrivacyCheck} from "@src/router/routes/shared/generation-history/privacy/GenerationHistoryPrivacyCheck";
+import {workerEnvironment} from "@src/env/WorkerEnvironment";
+import {generationHistoryRedaction} from "@src/router/routes/shared/generation-history/privacy/GenerationHistoryRedaction";
+import type {GenerationHistoryRedaction} from "@src/router/routes/shared/generation-history/types/GenerationHistoryRedaction";
 import {signInPlayer} from "@src/router/routes/shared/fake-accounts/SignInPlayer";
 import {fakeLedgers} from "@src/router/routes/shared/fake-ledgers/FakeLedgers";
 import {generateWeaponRoute} from "@src/router/routes/weapons/GenerateWeaponRoute";
@@ -20,7 +22,7 @@ vi.unmock("@src/accounts/create-session/CreateSession");
 vi.unmock("@src/accounts/find-or-create-account/FindOrCreateAccount");
 vi.unmock("@src/accounts/keep-generated-item/KeepGeneratedItem");
 vi.unmock("@src/accounts/remove-account/RemoveAccount");
-vi.mock("@src/router/routes/shared/generation-history/privacy/GenerationHistoryPrivacyCheck");
+vi.mock("@src/router/routes/shared/generation-history/privacy/GenerationHistoryRedaction", {spy: true});
 
 const emptyDatabase = useLocalDatabase();
 const prompt = "  A rifle for the arena.\n";
@@ -33,10 +35,10 @@ const repairedWeapon = {
 } satisfies WeaponOutcome;
 
 beforeEach(() => {
-  vi.mocked(generationHistoryPrivacyCheck).mockReturnValue(async () => true);
+  workerEnvironment.GENERATION_HISTORY_CAPTURE = "true";
 });
 
-it("records the original privacy-cleared prompt once when making a weapon succeeds after repair", async () => {
+it("records the original prompt once when making a weapon succeeds after repair", async () => {
   const database = await emptyDatabase();
   const {cookie} = await signInPlayer();
   fakeLedgers();
@@ -55,6 +57,32 @@ it("records the original privacy-cleared prompt once when making a weapon succee
       kind: "weapon",
       outcome: "repaired-success",
       prompt,
+      pipeline_version: "weapon-v1",
+      code_edits: 2,
+      model_repairs: 1,
+    },
+  ]);
+});
+
+it("keeps the attempt and replaces the personal details in its prompt", async () => {
+  const database = await emptyDatabase();
+  const {cookie} = await signInPlayer();
+  fakeLedgers();
+  vi.mocked(runWeaponPipeline).mockResolvedValue(repairedWeapon);
+
+  expect((await makeWeapon(cookie, "A pistol engraved with jane.doe@example.com, call +44 7700 900123")).status).toBe(
+    200,
+  );
+  expect(
+    await rowsOf(
+      database,
+      "SELECT kind, outcome, prompt, pipeline_version, code_edits, model_repairs FROM generation_attempts",
+    ),
+  ).toEqual([
+    {
+      kind: "weapon",
+      outcome: "repaired-success",
+      prompt: "A pistol engraved with [email], call [phone]",
       pipeline_version: "weapon-v1",
       code_edits: 2,
       model_repairs: 1,
@@ -97,42 +125,34 @@ it("records a stored weapon with a built-in drawing as success with fallback and
   expect(await rowsOf(database, "SELECT model_repairs FROM generation_attempts")).toEqual([{model_repairs: 2}]);
 });
 
-it.each(["denied", "unavailable"] as const)(
-  "records first-pass success without prompt text when privacy is %s",
-  async verdict => {
-    const database = await emptyDatabase();
-    const {cookie} = await signInPlayer();
-    fakeLedgers();
-    const privacyCheck = vi
-      .fn<NonNullable<ReturnType<typeof generationHistoryPrivacyCheck>>>()
-      .mockResolvedValue(false);
-    if (verdict === "unavailable") {
-      privacyCheck.mockRejectedValue(new Error(prompt));
-    }
-    vi.mocked(generationHistoryPrivacyCheck).mockReturnValue(privacyCheck);
-    vi.mocked(runWeaponPipeline).mockResolvedValue({
-      ...repairedWeapon,
-      history: {...repairedWeapon.history, codeEdits: 0, modelRepairs: 0},
-    });
+it("records first-pass success without prompt text when redaction fails", async () => {
+  const database = await emptyDatabase();
+  const {cookie} = await signInPlayer();
+  fakeLedgers();
+  const redaction = vi.fn<GenerationHistoryRedaction>(() => {
+    throw new Error(prompt);
+  });
+  vi.mocked(generationHistoryRedaction).mockReturnValueOnce(redaction);
+  vi.mocked(runWeaponPipeline).mockResolvedValue({
+    ...repairedWeapon,
+    history: {...repairedWeapon.history, codeEdits: 0, modelRepairs: 0},
+  });
 
-    expect((await makeWeapon(cookie)).status).toBe(200);
-    expect(privacyCheck).toHaveBeenCalledExactlyOnceWith(prompt);
-    expect(await attemptResults(database)).toEqual([
-      {outcome: "first-pass-success", prompt: null, failure_stage: null, failure_reason: null},
-    ]);
-  },
-);
+  expect((await makeWeapon(cookie)).status).toBe(200);
+  expect(redaction).toHaveBeenCalledExactlyOnceWith(prompt);
+  expect(await attemptResults(database)).toEqual([
+    {outcome: "first-pass-success", prompt: null, failure_stage: null, failure_reason: null},
+  ]);
+});
 
 it.each([
   {relevance: "not-judged", stage: "precheck", reason: "precheck-refused", calls: 0},
   {relevance: "irrelevant", stage: "moderation", reason: "irrelevant", calls: 1},
   {relevance: "unavailable", stage: "moderation", reason: "unavailable", calls: 1},
-] as const)("records a rejected weapon request with relevance $relevance and no prompt", async example => {
+] as const)("records a rejected weapon request with relevance $relevance and its prompt", async example => {
   const database = await emptyDatabase();
   const {account, cookie} = await signInPlayer();
   const ledgers = fakeLedgers();
-  const privacyCheck = vi.fn();
-  vi.mocked(generationHistoryPrivacyCheck).mockReturnValue(privacyCheck);
   vi.mocked(runWeaponPipeline).mockResolvedValue({
     status: "rejected",
     reason: "synthetic refusal",
@@ -145,9 +165,8 @@ it.each([
 
   expect(await response.json()).toEqual({status: "rejected", reason: "synthetic refusal"});
   expect(ledgers.accountOf(account.id).balance(Date.now())).toBe(DAILY_CREDITS - example.calls * 0.5);
-  expect(privacyCheck).not.toHaveBeenCalled();
   expect(await attemptResults(database)).toEqual([
-    {outcome: "rejected", prompt: null, failure_stage: example.stage, failure_reason: example.reason},
+    {outcome: "rejected", prompt, failure_stage: example.stage, failure_reason: example.reason},
   ]);
 });
 
@@ -155,13 +174,13 @@ it("records AI-off as a blocked attempt without keeping the unjudged prompt", as
   const database = await emptyDatabase();
   const {cookie} = await signInPlayer();
   const ledgers = fakeLedgers({aiOn: false});
-  const privacyCheck = vi.fn();
-  vi.mocked(generationHistoryPrivacyCheck).mockReturnValue(privacyCheck);
+  const redaction = vi.fn<GenerationHistoryRedaction>();
+  vi.mocked(generationHistoryRedaction).mockReturnValueOnce(redaction);
 
   expect((await makeWeapon(cookie)).status).toBe(503);
   expect(ledgers.calls).toEqual(["status"]);
   expect(runWeaponPipeline).not.toHaveBeenCalled();
-  expect(privacyCheck).not.toHaveBeenCalled();
+  expect(redaction).not.toHaveBeenCalled();
   expect(await attemptResults(database)).toEqual([
     {outcome: "blocked", prompt: null, failure_stage: "spend", failure_reason: "ai-off"},
   ]);
@@ -277,11 +296,12 @@ it("erases weapon history with the account and refuses a late write from its del
   expect((await makeWeapon(cookie)).status).toBe(200);
   expect(await attemptResults(database)).toHaveLength(1);
 
-  vi.mocked(generationHistoryPrivacyCheck).mockReturnValue(async () => {
+  const keepGenerationAttempt = history.keepGenerationAttempt;
+  vi.spyOn(history, "keepGenerationAttempt").mockImplementationOnce(async (...write) => {
     await removeAccount(account.id, {subjectDigest: async () => "test-digest", keepUntil: new Date()});
     await insertUser(database, account.id);
 
-    return true;
+    return await keepGenerationAttempt(...write);
   });
 
   expect((await makeWeapon(cookie)).status).toBe(200);
@@ -292,19 +312,19 @@ it("writes no weapon history when capture is disabled", async () => {
   const database = await emptyDatabase();
   const {cookie} = await signInPlayer();
   fakeLedgers();
-  vi.mocked(generationHistoryPrivacyCheck).mockReturnValue(undefined);
+  Reflect.deleteProperty(workerEnvironment, "GENERATION_HISTORY_CAPTURE");
   vi.mocked(runWeaponPipeline).mockResolvedValue(repairedWeapon);
 
   expect((await makeWeapon(cookie)).status).toBe(200);
   expect(await attemptResults(database)).toEqual([]);
 });
 
-async function makeWeapon(cookie: string): Promise<Response> {
+async function makeWeapon(cookie: string, text = prompt): Promise<Response> {
   return await generateWeaponRoute(
     new Request("https://gunsmith.test/api/weapons", {
       method: "POST",
       headers: {Cookie: cookie},
-      body: JSON.stringify({prompt}),
+      body: JSON.stringify({prompt: text}),
     }),
   );
 }
