@@ -107,6 +107,41 @@ it("keeps walking to the cover it has already chosen rather than crouching on th
   expect(act.input.direction.x).toBeLessThan(0);
 });
 
+it("crouches and holds still once it has reached the cover block it walked to", () => {
+  const act = actReload(reloading({goal: {x: HERE.x + 0.1, y: HERE.y}}), contextIn(coverBesideHere()));
+
+  expect(act.input.crouching).toBe(true);
+  expect(act.input.direction).toEqual({x: 0, y: 0});
+});
+
+it("moves on when the player flanks the cover block it reached, which then no longer hides it", () => {
+  const reached = {x: HERE.x + 0.1, y: HERE.y};
+  const flanker = {x: HERE.x + 1, y: HERE.y + 3};
+  const act = actReload(reloading({goal: reached}), flankedContext(oneBlockEastOfHere(), flanker));
+
+  expect(act.input.crouching).toBe(false);
+  expect(act.brain.goal).not.toEqual(reached);
+  expect(Math.hypot(act.input.direction.x, act.input.direction.y)).toBeGreaterThan(0);
+});
+
+it("moves on when the player flanks the wall it hid behind", () => {
+  const reached = {x: HERE.x + 0.1, y: HERE.y};
+  const flanker = {x: HERE.x, y: 1.5};
+  expect(hasClearLine(solidTilesOf(blocked), PLAYER, reached)).toBe(false);
+  expect(hasClearLine(solidTilesOf(blocked), flanker, reached)).toBe(true);
+
+  const act = actReload(reloading({goal: reached}), flankedContext(blocked, flanker));
+
+  expect(act.brain.goal).not.toEqual(reached);
+  expect(Math.hypot(act.input.direction.x, act.input.direction.y)).toBeGreaterThan(0);
+});
+
+it("does not crouch on reaching cover that no block makes", () => {
+  const act = actReload(reloading({goal: {x: HERE.x + 0.1, y: HERE.y}}), contextIn(blocked));
+
+  expect(act.input.crouching).toBe(false);
+});
+
 it("does not crouch in the open", () => {
   expect(actReload(reloading(), contextIn(open)).input.crouching).toBe(false);
 });
@@ -168,6 +203,12 @@ it("walks to cover on a platform by way of the stair, not straight at it across 
   expect(act.input.direction.y).toBeCloseTo(DIFFICULTY.speedShare, 9);
 });
 
+function flankedContext(arena: Arena, flanker: Point): OpponentContext {
+  const context = contextIn(arena);
+
+  return {...context, target: {...context.target, position: flanker}};
+}
+
 function contextIn(arena: Arena, overrides: Partial<OpponentContext> = {}, dry = true): OpponentContext {
   const world = startingWorld(arena, [], HERE);
   if (!world.opponent) {
@@ -221,4 +262,11 @@ function coverBesideHere(): Arena {
   const row = "#...c........#";
 
   return arenaFrom(["##############", row, row, row, row, "##############"]);
+}
+
+// An open room with one cover block, in the tile east of the opponent, in the middle row, so that it is the same whichever way the drawing's rows run.
+function oneBlockEastOfHere(): Arena {
+  const open = "#............#";
+
+  return arenaFrom(["##############", open, open, open, "#...c........#", open, open, open, "##############"]);
 }

@@ -12,6 +12,7 @@ import {startingWorld} from "@gunsmith/engine/game-loop/StartingWorld";
 import {step} from "@gunsmith/engine/game-loop/Step";
 import type {Input} from "@gunsmith/engine/game-loop/types/Input";
 import type {World} from "@gunsmith/engine/game-loop/types/World";
+import {visibleToPlayer} from "@gunsmith/engine/vision/VisibleToPlayer";
 import {PLAYER_HEALTH} from "@gunsmith/engine/health/PlayerHealth";
 import {startMatch} from "@gunsmith/engine/match/StartMatch";
 import type {Pickup} from "@gunsmith/engine/pickup/types/Pickup";
@@ -41,7 +42,11 @@ import {TERRACED_OPPONENT} from "@src/game/terraced/TerracedOpponent";
 import {COVER_HALL_ARENA} from "@src/game/cover-hall/CoverHallArena";
 import {COVER_HALL_OPPONENT} from "@src/game/cover-hall/CoverHallOpponent";
 import {COVER_HALL_PLAYER} from "@src/game/cover-hall/CoverHallPlayer";
+import {coverRunWorld} from "@src/game/cover-run/CoverRunWorld";
 import {worldOfScenario} from "@src/game/scenario/WorldOfScenario";
+
+const TICK = 1 / 60;
+const STANDING: Input = {direction: {x: 0, y: 0}, firing: false, reload: false};
 
 describe("the practice range, the room, the duel and sparring", () => {
   it("makes the practice range with its dummies and no opponent", () => {
@@ -181,8 +186,6 @@ describe("the cover arena", () => {
 describe("the cover hall", () => {
   // Ten floor tiles in one row, numbered from 0 at the west end: cover at tiles 2 and 7, so each fighter has two tiles (0 and 1, 8 and 9) behind theirs.
   const FIRST_FLOOR_COLUMN = 1;
-  const TICK = 1 / 60;
-  const STANDING: Input = {direction: {x: 0, y: 0}, firing: false, reload: false};
 
   it("is a hall one tile wide and ten tiles long, with a cover block at its third and its eighth tile and nothing else in the way", () => {
     const row = Array.from({length: 12}, (_, column) => column);
@@ -243,6 +246,37 @@ describe("the cover hall", () => {
 
     return later;
   }
+});
+
+describe("the cover run", () => {
+  it("opens the cover run from the seed", () => {
+    expect(worldOfScenario("cover-run", 3)).toEqual(coverRunWorld(3));
+  });
+
+  it("stands the opponent in the player's view, with an empty magazine, two tiles past the one block", () => {
+    const world = coverRunWorld(1);
+    const carried = world.opponent?.loadout[world.opponent.equippedIndex];
+
+    expect(visibleToPlayer(world).opponent).toBe(true);
+    expect(carried?.rounds).toBe(0);
+    expect(carried?.reserve).toBeGreaterThan(0);
+    expect(world.ring).toBeUndefined();
+    expect(world.match).toBeUndefined();
+    expect(world.pickup).toBeUndefined();
+  });
+
+  it("has an opponent that runs to the block and drops out of a standing player's view while it reloads", () => {
+    let world = coverRunWorld(1);
+    let hiddenWhileReloading = false;
+    for (let tick = 0; tick < 2 * 60 && !hiddenWhileReloading; tick += 1) {
+      world = step(world, STANDING, TICK);
+      hiddenWhileReloading = !visibleToPlayer(world).opponent && world.opponentBrain?.state === "reload";
+    }
+
+    expect(hiddenWhileReloading).toBe(true);
+    expect(world.opponent?.position.x).toBeGreaterThan(11);
+    expect(world.opponent?.position.x).toBeLessThan(12);
+  });
 });
 
 describe("the heights arena", () => {
