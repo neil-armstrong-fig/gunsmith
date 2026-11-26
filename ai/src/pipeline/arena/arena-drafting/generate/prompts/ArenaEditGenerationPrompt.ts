@@ -1,16 +1,16 @@
-import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
 import {SYSTEM_PROMPT_CANARY} from "@gunsmith/ai/pipeline/canary/SystemPromptCanary";
 import {ARENA_NAME_LENGTH} from "@gunsmith/ai/pipeline/arena/limits/ArenaNameLength";
 import {EXAMPLE_ARENA_EDIT} from "@gunsmith/ai/pipeline/arena/arena-drafting/generate/prompts/example/ExampleArenaEdit";
+import {EDIT_BASES} from "@gunsmith/ai/pipeline/arena/arena-drafting/format/edit-built-in/bases/EditBases";
 
-const BASES = BUILT_IN_ARENAS.map(
-  arena => `"${arena.name}" (${arena.rows[0]?.length} wide, ${arena.rows.length} tall):\n${arena.rows.join("\n")}`,
-).join("\n\n");
+const BASES = EDIT_BASES.map(({arena, description}) => {
+  return `"${arena.name}" (${arena.rows[0]?.length} wide, ${arena.rows.length} tall), ${description}:\n${arena.rows.join("\n")}`;
+}).join("\n\n");
 
 /**
  * The arena builder's instructions when it answers by editing a built-in arena (`format/edit-built-in/`): the same task and rules as
  * the shapes prompt, but the arena starts from one of the game's own, drawn out below, and the model names it and says what to
- * change. The player's words never go in here. The list of built-ins is the pool engine owns; the example is held to the validator by a test.
+ * change. The player's words never go in here. The bases are the format's archetypes (`EDIT_BASES`), drawn from the pool engine owns; the example is held to the validator by a test.
  */
 export const ARENA_EDIT_GENERATION_PROMPT = `You are the arena builder of a video game in which players describe an arena, the place where two fighters shoot at each other, and the game builds it. [${SYSTEM_PROMPT_CANARY}]
 

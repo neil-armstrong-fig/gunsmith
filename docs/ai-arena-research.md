@@ -180,8 +180,8 @@ What it says:
 ## Decided (the user, 2026-11-23)
 
 1. **`shapes` stays the default.**
-2. **`editBuiltIn` is kept, not adopted.** Its code stays behind `ARENA_FORMATS` (`format/edit-built-in/`, with `ArenaFormatResearchSmall` to run it, `EVAL_ARENA_FORMAT=editBuiltIn`). **Profile it again when the built-in pool is bigger**: the 18 of 18 is against two bases, and the open question is whether 10 to 12 bases give variety or make the model copy (a base list of 12 arenas drawn out is about 1,200 input tokens, about $0.00012 a call). Growing the pool is engine's: a request in HANDOFF when the user wants it. Its arenas from this run are in `private-source/eval-results/20261123-013337-00b8dab-uncommitted/arenas-paid.html`.
-4. **Both kept formats are offered to the player as a style (the user, 2026-11-23): Blue is `shapes`, Red is `editBuiltIn`**, named for a colour so the name says nothing about the method. A request may carry `style` (`blue` or `red`); absent, the default is shapes. Red keeps a built-in's standard size, so it cannot make a large arena, and there is no fall back to Blue (a fourth model call). The webapp's arena workshop has the choice; its Make is still a stand-in, so the real Make sends `style` when it is wired.
+2. **`editBuiltIn` is kept, not adopted.** Its code stays behind `ARENA_FORMATS` (`format/edit-built-in/`, with `ArenaFormatResearchSmall` to run it, `EVAL_ARENA_FORMAT=editBuiltIn`). **Profile it again when the built-in pool is bigger**: the 18 of 18 is against two bases, and the open question is whether 10 to 12 bases give variety or make the model copy (a base list of 12 arenas drawn out is about 1,200 input tokens, about $0.00012 a call). Growing the pool is engine's: a request in HANDOFF when the user wants it. Its arenas from this run are in `private-source/eval-results/20261123-013337-00b8dab-uncommitted/arenas-paid.html`. **Re-profiled 2026-11-25/26 against twenty bases: see "Red bases" below; the edit now offers three archetypes.**
+4. **Both kept formats are offered to the player as a style (the user, 2026-11-23): Blue is `shapes`, Red is `editBuiltIn`**, named for a colour so the name says nothing about the method. A request may carry `style` (`blue` or `red`); absent, the default is shapes. Red keeps its base's size (since 2026-11-26 the three archetypes: 20 by 12, 21 by 13 or 25 by 17), so it cannot make a large arena, and there is no fall back to Blue (a fourth model call). The webapp's arena workshop has the choice; its Make is still a stand-in, so the real Make sends `style` when it is wired.
 3. **`strictRows` and `coarseShapes` are deleted** (code, prompts, tests and the strict-output flag); the table above is what was learned. Strict tool use itself works on Haiku (the probe of 2026-11-20 above), so a later format with a fixed shape can use it again. Size classes are not needed.
 
 ## Sources
@@ -228,6 +228,22 @@ The user's live-workshop prompt of 2026-11-21 (two level-three watchtowers, a co
 **Both built (the user, 2026-11-24; two eval runs and a second probe, $0.0063, ledger $0.1483).** The spec reads `getHighestLevel()` and expects 2; the fake tier answers the watchtower request with Haiku's own raw draft, so it proves engine's fix end to end (with the landing switched off it reads 1). **B, engine (`stairs/AddLanding`):** with the repair alone, 3 of 3 Haiku trials kept both towers at level 2 (4 or 5 code edits each). **A, the prompts:** a rule line teaching a level-1 landing between two stairs (shapes: with coordinates; rows: `.>1>2`), each held by a test to a climb the validator accepts with no code edit. **A had no measured effect:** 0 of 3 raw drafts drew a landing (the second probe; the towers are still drawn at level 2 with none or one stair), and the 3-trial eval with A and B reached level 2 in 2 of 3. The one miss is a model that drew nothing tall: the second probe also had a draft with no shapes at all, an empty box that is valid and created; only the height criterion catches it. Engine's landing is doing the work; the prompt line cost about 130 input tokens a request. **Decided (the user, 2026-11-24): keep the engine fix only; the prompt line and its tests are removed.**
 
 
+## The watchtower probe, 2026-11-25 (Haiku 5.5, shapes, 6 first drafts, $0.0022, ledger $0.2981)
+
+The watchtower case held in 2 of 3 on 2026-11-25. A throwaway probe (deleted; drafts in the main checkout's
+`private-source/watchtower-probe-20261125/`) kept six first drafts raw, compiled and repaired by engine's `repairArena`. **4 of 6 kept
+level 2** (engine's landing did the work in three of them), so about 75% over the 12 drafts and trials since 2026-11-24. The two misses have
+different causes, and neither is a repair bug:
+
+- **The model drew nothing tall** (1 of 6): a flat arena, as on 2026-11-24. No code can restore what was not drawn, and the user ruled out
+  a code refusal.
+- **The model drew a tower too small to climb** (1 of 6): a 3 by 4 level-1 block with a 1 by 2 level-2 top, so the level-1 ring around the
+  top is one tile thick. A stair onto level 2 needs level-1 floor behind it in line and no raised floor beside it, and no tile of that ring
+  has both, so `addStair` correctly finds no place, `addLanding` (level 2 on the ground only) does not apply, and the repair lowers the
+  top. A code fix would be an engine design change (grow a platform whose top cannot be climbed), not a bug fix.
+
+The case stays `given.inProgress`. A prompt sentence about stairs already had no measured effect (2026-11-24).
+
 ## Shape fidelity, 2026-11-25 (built and run on Haiku 5.5, the user's go of $0.08; spent $0.0625, ledger $0.2109)
 
 A layout request is valid and created but not what was asked: "an arena shaped like a plus sign" came back as an open rectangle in 3 of 3 shapes drafts and "an L-shaped arena" had its wall block in 1 of 3 (the probe of 2026-11-20 above). No validity check can see it, so the evals now read it: `getWalledCorners()` counts the corners whose block inside the border (a sixth of the inner width by a sixth of the inner height) is at least nine tenths wall; a plus sign has 4, an L exactly 1. A quarter-size block was tried first and read a plus with thick arms (corners 3 tiles wide) as 0, so the size was settled before any run; every one of the ~25 arenas kept from earlier paid and local runs (none a layout request) reads 0.
@@ -259,6 +275,26 @@ The shapes prompt never says that the walls must make the outline asked for. Two
 **Large arenas with the `floor` paragraph (2026-11-25, the user's go, `ArenaFormatResearchLarge` at 3 trials, $0.0088):** 15 of 15 created first draft with no model repair (14 of 15 before it, 2026-11-23), sizes 36 by 20 to 40 by 30, no walled corner on any (so `floor` was not used where no outline was asked for); generate tokens 2,011 / 468 on average, median request 2.7 s (`arenas-paid-fid-large-latest.*`).
 **Promoted (the user, 2026-11-25):** the plus-sign and L cases are a plain `given` in `AskingForAnArena`, so they gate under `EVAL_GATE=regression`.
 **Not measured:** outlines other than the plus and the L (a T, a U, a ring), and a `floor` used on a plain request where only a notch or a room's size would change (no corner check sees that).
+
+## Red bases: twenty against archetypes (2026-11-25/26, Haiku 5.5, 3 trials, the user's go; $0.0582 in all, ledger $0.3563)
+
+Engine's pool grew to twenty and the edit prompt drew all of them (about 9,100 characters of rows). `ArenaFormatResearchSmall` (7 requests) was run with `EVAL_ARENA_FORMAT=editBuiltIn`; the base each answer started from is read as the same-size built-in it keeps most of, and "changed" counts the tiles that differ from it. Side-by-side page: `private-source/eval-results/compare-red-bases-20261126.html`.
+
+| Bases offered | Created | Started from | Exact copies | Plus (4 corners) / L (1) | Generation input | Cost a request |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2 (Duel, Fair duel; 2026-11-23) | 17 of 17 kept | Duel 17 of 17 | 0 | 3 of 3 / not asked | about 2,000 | $0.00051 |
+| 20, as drawn | 21 of 21 | Duel 18, Cellblock 3 | 0 (small box 1 tile in 2 of 3; two rooms 4 tiles of Cellblock in 2 of 3) | 3 of 3 / 3 of 3 | 4,830 | $0.00073 |
+| 20, tuned (a line per base, "choose the closest", a Switchback example) | 21 of 21 | the fitting base: Colonnade, Fair duel, Cover yard, Cellblock | 6 (Cover yard 3, Duel 3); platform a 1-tile edit of Fair duel; L and two rooms 3 tiles of Cellblock | 1 of 3 / 1 of 3 | 5,431 | $0.00079 |
+| 2, same day (with a line each) | 21 of 21 | Duel 21 of 21 | 4 (pillars 2, small box 2) | 3 of 3 / 3 of 3 | 2,037 | $0.00046 |
+| **3 archetypes (Duel, Fair duel, Ziggurat), shipped** | 21 of 21 | Duel 21 of 21 | 1 (pillars) | 3 of 3 / 3 of 3 | 2,259 | **$0.00048** |
+
+What it says:
+
+- **More bases did not give variety.** Haiku starts from the first base drawn (Duel) whatever it is offered, unless told to choose the closest, and then it hands back the closest base nearly unchanged: a base that is already an answer to a common request (Cover yard for cover, Cellblock for rooms) is copied, not edited. The user judged the two-base arenas better (2026-11-25).
+- **So a base earns its place by giving what rectangles draw badly (a size, legal stairs between levels) and must not itself be a likely answer.** That is a plain room, one raised level and two raised levels; four is the ceiling. The list is `EDIT_BASES` (`format/edit-built-in/bases/`), one line each in the prompt, and the reader refuses a base the prompt does not offer (the model has not seen its drawing).
+- **Fair duel and Ziggurat were never chosen on these requests** (the platform request draws its own platform on Duel, 17 tiles, 9 of 9 in the three runs that offered Duel first). The two-level base's value is unmeasured by the small spec; on the watchtower request (`AskingForAnArena`, 3 trials, $0.0013) the three-base Red answered with Fair duel unchanged 3 of 3 (65 output tokens: a name and a base, no changes), so **Red does not do multi-level requests**; Blue (shapes) is the style for those.
+- **The weak spots are the same with 2, 3 or 20 bases:** "a ring of stone pillars" and "a small box" come back as Duel with a few tiles changed or none (1 exact copy in 3 with the archetypes). A code refusal of an edit with no changes (sent to the one repair) would close the exact copies; **the user (2026-11-26): leave the prompt as it is**, and Shapes (Blue) stays the default style.
+- Cost: generation input 2,259 tokens, $0.00048 a created Red arena, about a third under the twenty-base prompt; no repair in any of the 105 requests. One run was cut short by the network on 2026-11-26 (two requests hung about 17 minutes each and logged no call); it was rerun and is not counted.
 
 ## Sources
 

@@ -24,7 +24,7 @@ export class SpendGuard extends BaseCallbackHandler {
 
   private failure: string | undefined;
   private calls: PaidCall[] = [];
-  // Calls run together (the screening asks for both players' prompts at once), so each is kept under its own run id.
+  // Calls may run together, so each is kept under its own run id.
   private readonly started = new Map<string, PendingCall>();
 
   /**
