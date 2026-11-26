@@ -53,6 +53,10 @@ it("asks for the cover hall when the query says so", () => {
   expect(scenarioFromSearch("?scenario=cover-hall")).toBe("cover-hall");
 });
 
+it("asks for the cover run when the query says so", () => {
+  expect(scenarioFromSearch("?scenario=cover-run")).toBe("cover-run");
+});
+
 it("asks for the mutual knockout when the query says so", () => {
   expect(scenarioFromSearch("?scenario=mutual-knockout")).toBe("mutual-knockout");
 });

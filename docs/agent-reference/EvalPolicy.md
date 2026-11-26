@@ -43,7 +43,7 @@ inventory predates arena integration and the 2026-11-25 promotions.
 ## Budget activation — blocked on reconciliation and implementation
 
 The user replaces the former $1 lifetime allowance with **$5 per UTC month**,
-with **$0.10 per regression run** and **$0.25 per full baseline**. This is policy
+with **$0.15 per regression run** (raised from $0.10 by the user on 2026-11-25, when the attack specs became regressions) and **$0.25 per full baseline**. This is policy
 authorization, not permission to run the old unsafe guard. No paid calls until
 the new guard is implemented and the opening balance is reconciled.
 
@@ -64,7 +64,9 @@ initialize at zero or print credentials/billing details.
 After the 2026-11-25 promotions (arena, rejection and drawing specs became
 regressions), a three-trial regression run is estimated at about $0.075 from
 that day's batches (arena $0.018, weapon about $0.031, drawing $0.025), under
-the $0.10 limit but close to it. These are estimates, not
+the $0.10 limit then in force. The attack specs (`TryingToBreakTheSmith`, `TryingToBreakTheArenaSmith`)
+became regressions the same day and add about $0.033 a three-trial run (measured: $0.0325 for both, the in-progress inflation case
+included), so a regression run is now about $0.108, under the $0.15 limit. These are estimates, not
 reservations or bills. Re-measure after activation; the provider bill is the
 accounting authority. Current pricing: [Anthropic pricing](https://platform.claude.com/docs/en/about-claude/pricing).
 

@@ -3,9 +3,9 @@ import {beforeEach, expect, given, then, when} from "@src/acceptance-criteria-ma
 // A signed-in player's saved weapons and arenas can be taken into a private room: the choosing offers them after the built-ins, and what the page
 // puts forward is the item's id from the account's library, never its name or its body (the server looks the id up among that account's saved items).
 // These specs read what the page offered and what it sent. The room's server sees no session here, so it refuses the saved ids; that refusal
-// is the server's own tests', and a saved item played end to end waits for a way to sign a seat in locally.
+// is the server's own tests', and a saved item played end to end waits for a way to sign a seat in locally. The room offers every built-in
+// arena, not the day's five (`addressOfRoom`'s default), so the Duel and the Fair duel are always there to choose.
 const BUILT_IN_WEAPONS = ["Rifle", "Marksman rifle", "Submachine gun"];
-const BUILT_IN_ARENAS = ["Duel", "Fair duel"];
 const FIRST_SAVED_WEAPON = "Mint Coil";
 const SECOND_SAVED_WEAPON = "Ember Lance";
 const SAVED_ARENA = "Foundry";
@@ -68,7 +68,9 @@ given("a private room, for a signed-in player whose library holds two saved weap
       then(
         "the arena is chosen from the built-ins and then their saved arena, the Duel to begin with",
         async ({gunsmith}) => {
-          await expect.poll(() => gunsmith.preRound.arena.getChoices()).toEqual([...BUILT_IN_ARENAS, SAVED_ARENA]);
+          await expect
+            .poll(() => gunsmith.preRound.arena.getChoices())
+            .toEqual([...(gunsmith.room.getArenasOffered() ?? []), SAVED_ARENA]);
           expect(await gunsmith.preRound.arena.getChosen()).toBe("Duel");
         },
       );

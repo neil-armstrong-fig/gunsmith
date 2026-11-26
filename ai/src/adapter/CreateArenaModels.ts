@@ -8,7 +8,7 @@ import {createHaikuChatModel} from "@gunsmith/ai/adapter/haiku/CreateHaikuChatMo
 const ARENA_MODERATION_MAX_TOKENS = 2000;
 const ARENA_GENERATION_MAX_TOKENS = 4000;
 
-/** The two models the arena pipeline and the arena-submission screening are handed: the one that draws and the one that judges. */
+/** The two models the arena pipeline is handed: the one that draws and the one that judges. */
 export function createArenaModels(options: AnthropicModelOptions): ArenaModels {
   return {
     generator: createHaikuChatModel({...options, maxTokens: ARENA_GENERATION_MAX_TOKENS}),

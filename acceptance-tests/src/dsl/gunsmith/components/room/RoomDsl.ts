@@ -410,6 +410,15 @@ export class RoomDsl {
   }
 
   /** Whether the server has sent this browser any snapshot yet. */
+  /** The built-in arenas the room offers this player today, as the server last told it while choosing; `undefined` before it has. */
+  getArenasOffered(): readonly string[] | undefined {
+    try {
+      return this.room.getArenasOffered();
+    } catch (error) {
+      throw new DslError("Failed to read the arenas the room offers", error);
+    }
+  }
+
   hasReceivedSnapshots(): boolean {
     try {
       return this.room.hasReceivedSnapshots();

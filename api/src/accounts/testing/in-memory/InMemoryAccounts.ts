@@ -1,3 +1,4 @@
+import type {ArenaPlays} from "@gunsmith/engine/arena-rotation/types/ArenaPlays";
 import type {AccountRemoval} from "@src/accounts/types/AccountRemoval";
 import type {Account} from "@src/accounts/types/Account";
 import {limitOfKind} from "@src/accounts/limit-of-kind/LimitOfKind";
@@ -35,6 +36,7 @@ export class InMemoryAccounts {
   private sessions: NewSession[] = [];
   private items: StoredItem[] = [];
   private kept = new Map<string, KeptRecord>();
+  private arenaPlays: ArenaPlays[] = [];
 
   findOrCreateAccount = async (googleSub: string, newAccount: NewAccount): Promise<Account> => {
     const existing = this.accounts.find(account => account.googleSub === googleSub);
@@ -140,11 +142,27 @@ export class InMemoryAccounts {
     return true;
   };
 
+  countArenaPlay = async (arena: string, day: number): Promise<void> => {
+    const row = this.arenaPlays.find(held => held.arena === arena && held.day === day);
+    if (row) {
+      row.count += 1;
+
+      return;
+    }
+
+    this.arenaPlays.push({arena, day, count: 1});
+  };
+
+  arenaPlaysSince = async (day: number): Promise<ArenaPlays[]> => {
+    return this.arenaPlays.filter(row => row.day >= day).map(row => ({...row}));
+  };
+
   reset = (): void => {
     this.accounts = [];
     this.sessions = [];
     this.items = [];
     this.kept = new Map();
+    this.arenaPlays = [];
   };
 
   private shelfOf(userId: string): SavedShelfItem[] {

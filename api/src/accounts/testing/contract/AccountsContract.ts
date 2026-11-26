@@ -1,3 +1,4 @@
+import type {ArenaPlays} from "@gunsmith/engine/arena-rotation/types/ArenaPlays";
 import type {AccountRemoval} from "@src/accounts/types/AccountRemoval";
 import type {AccountFunctions} from "@src/accounts/types/AccountFunctions";
 import type {ItemKind} from "@src/accounts/types/ItemKind";
@@ -366,6 +367,42 @@ export function accountsContract(makeAccounts: () => Promise<AccountFunctions>):
 
     async function save(id: string, userId: string, now: Date): Promise<SaveItemResult> {
       return await accounts.saveItem({id, userId, now, limits: LIMITS});
+    }
+  });
+
+  describe("the plays of each arena", () => {
+    it("counts every match begun on an arena on a day", async () => {
+      await accounts.countArenaPlay("Keep", 20_000);
+      await accounts.countArenaPlay("Keep", 20_000);
+
+      expect(await accounts.arenaPlaysSince(20_000)).toEqual([{arena: "Keep", day: 20_000, count: 2}]);
+    });
+
+    it("keeps another arena's plays and another day's apart", async () => {
+      await accounts.countArenaPlay("Keep", 20_000);
+      await accounts.countArenaPlay("Slalom", 20_000);
+      await accounts.countArenaPlay("Keep", 20_001);
+
+      expect(sortedByDayAndArena(await accounts.arenaPlaysSince(20_000))).toEqual([
+        {arena: "Keep", day: 20_000, count: 1},
+        {arena: "Slalom", day: 20_000, count: 1},
+        {arena: "Keep", day: 20_001, count: 1},
+      ]);
+    });
+
+    it("reads the plays from the day asked for on, and none before it", async () => {
+      await accounts.countArenaPlay("Keep", 19_999);
+      await accounts.countArenaPlay("Slalom", 20_000);
+
+      expect(await accounts.arenaPlaysSince(20_000)).toEqual([{arena: "Slalom", day: 20_000, count: 1}]);
+    });
+
+    it("reads nothing when nothing has been played", async () => {
+      expect(await accounts.arenaPlaysSince(0)).toEqual([]);
+    });
+
+    function sortedByDayAndArena(plays: readonly ArenaPlays[]): ArenaPlays[] {
+      return [...plays].sort((first, second) => first.day - second.day || first.arena.localeCompare(second.arena));
     }
   });
 }

@@ -318,6 +318,19 @@ export class GunsmithDsl {
   }
 
   /**
+   * Opens the cover run: open low ground with one low cover block and nothing else that hides anyone. The player stands facing east;
+   * the opponent stands eight tiles east of them on the same row, two tiles past the block, with an empty magazine, so it reloads first.
+   * One round, no score, no ring; the opponent's choices are drawn from `seed`.
+   */
+  async startCoverRun(seed: number): Promise<void> {
+    try {
+      await this.gunsmith.openCoverRun(seed);
+    } catch (error) {
+      throw new DslError(`Failed to open the cover run with seed ${seed}`, error);
+    }
+  }
+
+  /**
    * Opens the mutual knockout: the duel's first round of a match, the opponent standing unarmed, and one shot in the air from each fighter at the
    * other, each landing in the first step and each enough to bring its target down, so both fall together and the round is drawn.
    */

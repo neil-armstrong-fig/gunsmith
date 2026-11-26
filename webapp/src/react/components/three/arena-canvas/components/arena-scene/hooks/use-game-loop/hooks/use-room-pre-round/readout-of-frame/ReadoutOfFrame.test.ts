@@ -10,6 +10,7 @@ import type {RevealReadout} from "@src/game/room-pre-round/types/RevealReadout";
 const alone: PreRoundFrame = {
   kind: "preRound",
   stage: "choosing",
+  builtInArenas: ["Duel", "Keep", "Slalom", "Pinwheel", "Catwalk"],
   own: {locked: false, weapons: {slots: [{locked: false}, {locked: false}]}},
   opponent: {locked: false, picked: false, weapons: {slots: [{locked: false}, {locked: false}]}},
 };
@@ -18,11 +19,24 @@ it("says there is no clock while the other player has not sat, and nothing locke
   expect(readoutOfFrame({frame: alone, reveal: undefined})).toEqual({
     stage: "choosing",
     secondsLeft: undefined,
+    builtInArenas: ["Duel", "Keep", "Slalom", "Pinwheel", "Catwalk"],
     how: undefined,
     reveal: undefined,
     own: seatOf({}),
     opponent: seatOf({}),
   });
+});
+
+it("offers the built-in arenas the room offers, in the room's order", () => {
+  const frame: PreRoundFrame = {...alone, builtInArenas: ["Watchtower", "Hourglass", "Keep", "Duel", "Slalom"]};
+
+  expect(readoutOfFrame({frame, reveal: undefined}).builtInArenas).toEqual([
+    "Watchtower",
+    "Hourglass",
+    "Keep",
+    "Duel",
+    "Slalom",
+  ]);
 });
 
 it("rounds the clock up to a whole second, so a clock that has not run out never says 0", () => {

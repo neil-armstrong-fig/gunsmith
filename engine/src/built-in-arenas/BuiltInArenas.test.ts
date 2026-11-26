@@ -1,10 +1,13 @@
+import {chooseStartingPlaces} from "@gunsmith/engine/arena-symmetry/ChooseStartingPlaces";
 import {isHalfTurnSymmetric} from "@gunsmith/engine/arena-symmetry/IsHalfTurnSymmetric";
 import {ARENA_LIMITS} from "@gunsmith/engine/arena-limits/ArenaLimits";
 import {validateArena} from "@gunsmith/engine/arena-validation/ValidateArena";
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
+import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 
 const NAMES = BUILT_IN_ARENAS.map(builtIn => builtIn.name);
+const SEEDS = [1, 2, 3, 4, 5, 6, 7, 8];
 
 it("has at least one arena, because ai falls back to the pool and a pool of none gives it nothing", () => {
   expect(BUILT_IN_ARENAS.length).toBeGreaterThan(0);
@@ -37,6 +40,36 @@ it.each(NAMES)(
     expect(isHalfTurnSymmetric(arenaFrom(rowsOf(name)))).toBe(true);
   },
 );
+
+it.each(NAMES)("finds %s a matching pair of starting places on every seed tried", name => {
+  const arena = arenaFrom(rowsOf(name));
+
+  for (const seed of SEEDS) {
+    expect(chooseStartingPlaces(arena, seed), `seed ${seed}`).toBeDefined();
+  }
+});
+
+it("holds an arena with low cover, one with raised floor and one with neither, so the choice is of different ground", () => {
+  const arenas = NAMES.map(name => arenaFrom(rowsOf(name)));
+
+  expect(arenas.some(hasLowCover)).toBe(true);
+  expect(arenas.some(hasRaisedFloor)).toBe(true);
+  expect(arenas.some(arena => !hasLowCover(arena) && !hasRaisedFloor(arena))).toBe(true);
+});
+
+it("holds an arena with a tower of three storeys, ground, a deck and a top, so a fighter can climb twice", () => {
+  const arenas = NAMES.map(name => arenaFrom(rowsOf(name)));
+
+  expect(arenas.some(arena => arena.levels.some(level => level >= 2))).toBe(true);
+});
+
+function hasLowCover(arena: Arena): boolean {
+  return arena.cover.some(isCover => isCover);
+}
+
+function hasRaisedFloor(arena: Arena): boolean {
+  return arena.levels.some(level => level > 0);
+}
 
 function rowsOf(name: string): readonly string[] {
   const builtIn = BUILT_IN_ARENAS.find(candidate => candidate.name === name);

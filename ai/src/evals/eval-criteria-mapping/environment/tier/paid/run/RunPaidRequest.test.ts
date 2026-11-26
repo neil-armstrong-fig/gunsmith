@@ -44,21 +44,19 @@ it("returns what the pipeline returned, and logs the request with every call it 
   ]);
 });
 
-it("gives a call that ran in no graph node the stage the run names, because the screening makes only moderation calls", async () => {
+it("gives a call that ran in no graph node the stage the run names, because the appearance drawing runs in no graph", async () => {
   const {options, logFile} = setup(
     guard => {
       startedCall(guard, "run-1");
       guard.handleLLMEnd(finishedCall(300, 5, "tool_use"), "run-1");
     },
     1,
-    "moderation",
+    "draw",
   );
 
-  await runPaidRequest("a ring of pillars", options);
+  await runPaidRequest("a lantern", options);
 
-  expect(loggedLines(logFile)).toEqual([
-    expect.objectContaining({calls: [expect.objectContaining({stage: "moderation"})]}),
-  ]);
+  expect(loggedLines(logFile)).toEqual([expect.objectContaining({calls: [expect.objectContaining({stage: "draw"})]})]);
 });
 
 it("keeps the stage a graph node gave a call over the one the run names", async () => {

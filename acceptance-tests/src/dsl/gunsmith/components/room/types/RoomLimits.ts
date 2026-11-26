@@ -14,4 +14,6 @@ export interface RoomLimits {
   ringClosingSeconds?: number;
   /** The seed the room's rounds start from, where a spec needs to know the places. None given: 21, the duel's top-row and bottom-row pair in sight of each other. */
   startSeed?: number;
+  /** Whether the room offers only the day's five built-in arenas, as a real room does. None given: every built-in, so a room with no time to choose is on the Duel whatever the date, and its match counts no plays. */
+  daysArenas?: boolean;
 }

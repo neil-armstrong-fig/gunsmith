@@ -5,6 +5,7 @@ import {arenaIsItsOwn} from "@evals/dsl/arena/pipeline/evaluators/outcome/ArenaI
 import {arenaKeepsCover} from "@evals/dsl/arena/pipeline/evaluators/outcome/ArenaKeepsCover";
 import {arenaNodePath} from "@evals/dsl/arena/pipeline/evaluators/outcome/ArenaNodePath";
 import {playableArena} from "@evals/dsl/arena/pipeline/evaluators/playable/PlayableArena";
+import {arenaNameHygiene} from "@evals/dsl/arena/pipeline/evaluators/player-visible/ArenaNameHygiene";
 import {arenaNoPromptLeak} from "@evals/dsl/arena/pipeline/evaluators/player-visible/ArenaNoPromptLeak";
 import {failuresOf} from "@evals/dsl/shared/checks/FailuresOf";
 import {walledCorners} from "@evals/dsl/arena/pipeline/walled-corners/WalledCorners";
@@ -42,6 +43,11 @@ export class ArenaPipeline {
     return this.theAnswer().modelCalls;
   }
 
+  /** The output tokens the models reported for the whole request, all calls together, or nothing when the pipeline reported no usage. */
+  outputTokensOfTheAnswer(): number | undefined {
+    return this.theAnswer().usage?.outputTokens;
+  }
+
   /** Whether the credit went back. */
   refundOfTheAnswer(): boolean {
     return this.theAnswer().refunded;
@@ -75,6 +81,14 @@ export class ArenaPipeline {
     const levels = rows.join("").match(/[12]/g) ?? [];
 
     return Math.max(0, ...levels.map(Number));
+  }
+
+  nameProblems(): string[] {
+    return this.problemsOf([arenaNameHygiene]);
+  }
+
+  promptLeakProblems(): string[] {
+    return this.problemsOf([arenaNoPromptLeak]);
   }
 
   safeToShowProblems(): string[] {

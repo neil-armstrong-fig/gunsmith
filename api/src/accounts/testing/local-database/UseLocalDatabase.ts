@@ -29,6 +29,7 @@ export function useLocalDatabase(): () => Promise<D1Database> {
     if (!database) {
       throw new Error("the local D1 did not start");
     }
+    await database.prepare("DELETE FROM arena_plays").run();
     await database.prepare("DELETE FROM deleted_accounts").run();
     await database.prepare("DELETE FROM generated_items").run();
     await database.prepare("DELETE FROM sessions").run();

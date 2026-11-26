@@ -1,5 +1,6 @@
 import {resolveArenaPicks} from "@gunsmith/engine/arena-picking/ResolveArenaPicks";
 import type {ArenaPick} from "@gunsmith/engine/arena-picking/types/ArenaPick";
+import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
 import {DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/DuelBuiltInArena";
 import type {Seat} from "@gunsmith/engine/seat/types/Seat";
 import {arenaOfChoice} from "@src/durable-objects/match/pre-round/arena-choice/ArenaOfChoice";
@@ -35,7 +36,7 @@ const SLOTS: readonly WeaponSlot[] = [1, 2];
 
 /**
  * What two players choose before a match, as plain state with no network in it (`MatchRoom` owns one and `Match` sends what it says).
- * Each seat puts forward an arena (a built-in, or one of its own saved ones the room has already checked) and locks it in (a seat that never chooses puts forward the duel arena). A seat may do all of
+ * Each seat puts forward an arena (one of the day's built-ins, `offerArenas`, or one of its own saved ones the room has already checked) and locks it in (a seat that never chooses puts forward the first of the day's). A seat may do all of
  * that on its own, with no limit of time: the clock (`secondsAllowed`) only begins when `startClock` says both seats have sat. Once both
  * are locked in, a seat sees the other's arena. If the two are the same arena that is the arena; if they differ each seat picks one of
  * them, random, or nothing, and the engine's `resolveArenaPicks` settles it from a seed. When the clock runs out a seat that has not
@@ -55,6 +56,7 @@ export class PreRound {
   private clockRunning = false;
   private arenaSettled: ArenaOutcome | undefined;
   private decided: PreRoundOutcome | undefined;
+  private offered: readonly string[] = BUILT_IN_ARENAS.map(({name}) => name);
 
   constructor(
     secondsAllowed: number,
@@ -65,7 +67,17 @@ export class PreRound {
     this.revealSecondsLeft = revealSeconds;
   }
 
-  /** `seat` puts `choice` forward, if it is a built-in arena or a saved one the room checked, and the seat has not locked in. Anything else is ignored. */
+  /**
+   * The built-in arenas the room offers today (the engine's `arenasOfDay`, worked out by `Match` when the room is made): a seat may
+   * put forward only these, or one of its own saved ones. Until it is told, every built-in arena is offered; an empty list changes nothing.
+   */
+  offerArenas(names: readonly string[]): void {
+    if (names.length > 0) {
+      this.offered = [...names];
+    }
+  }
+
+  /** `seat` puts `choice` forward, if it is one of the day's built-in arenas or a saved one the room checked, and the seat has not locked in. Anything else is ignored. */
   chooseArena(seat: Seat, choice: ChosenArena): void {
     if (this.stage() !== "choosing" || this.seats[seat].locked) {
       return;
@@ -73,17 +85,20 @@ export class PreRound {
     if (!arenaOfChoice(choice)) {
       return;
     }
+    if (choice.kind === "builtIn" && !this.offered.includes(choice.name)) {
+      return;
+    }
 
     this.seats[seat].arena = choice;
   }
 
-  /** `seat` locks in the arena it has chosen (the duel arena if it chose none). It cannot change it afterwards. */
+  /** `seat` locks in the arena it has chosen (the first of the day's if it chose none). It cannot change it afterwards. */
   lockInArena(seat: Seat): void {
     if (this.stage() !== "choosing" || this.seats[seat].locked) {
       return;
     }
 
-    this.seats[seat].arena ??= {kind: "builtIn", name: DUEL_BUILT_IN_ARENA.name};
+    this.seats[seat].arena ??= {kind: "builtIn", name: this.offered[0] ?? DUEL_BUILT_IN_ARENA.name};
     this.seats[seat].locked = true;
     this.settle();
   }
@@ -182,6 +197,7 @@ export class PreRound {
     const message: PreRoundMessage = {
       kind: "preRound",
       stage: this.stage(),
+      builtInArenas: [...this.offered],
       own: this.ownOf(seat),
       opponent: this.opponentOf(seat),
     };

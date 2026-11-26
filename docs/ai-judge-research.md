@@ -12,7 +12,7 @@ There is **one judgement** in two prompts, and everything else that "checks" is 
 | --- | --- | --- | --- | --- |
 | Weapon moderation | `pipeline/prompt-screening/moderation/` (`MODERATION_PROMPT`) | Is this a request for a weapon? | `{isWeaponRequest, reason}` | about $0.00015 (153 µ$), 1 call, a weapon costs about $0.001 in all |
 | Arena moderation | `pipeline/arena/prompt-screening/moderation/` | Is this a request for an arena? | `{isArenaRequest, reason}` | about $0.00015, 1 call, an arena costs about $0.0005 in all |
-| Arena submission screening | `pipeline/arena-submission/screening/` | the same arena judge, once per player's prompt (two in a pre-round) | the same | the same, times two |
+| Arena submission screening (deleted 2026-11-25: no consumer) | was `pipeline/arena-submission/screening/` | the same arena judge, once per player's prompt (two in a pre-round) | the same | the same, times two |
 
 It is a **task-fit and prompt-injection gate, not a safety classifier**: "worn armour, recipes, questions, chat, code" are turned away; a shield, a silly or non-English weapon passes; text inside `<request>` is data, never instructions. A failed or unparsable call is a closed verdict (the request is rejected, and the route charges 0.5 credit for a rejection). The reason is shown to the player.
 

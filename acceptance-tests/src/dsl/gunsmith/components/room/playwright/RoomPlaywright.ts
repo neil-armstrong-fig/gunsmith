@@ -8,6 +8,7 @@ import {fastestMovement} from "@src/dsl/gunsmith/components/room/playwright/wire
 import {largestJump} from "@src/dsl/gunsmith/components/room/playwright/wire/movement/LargestJump";
 import type {PositionSample} from "@src/dsl/gunsmith/components/room/playwright/wire/movement/types/PositionSample";
 import type {ShownSamples} from "@src/dsl/gunsmith/components/room/playwright/wire/movement/types/ShownSamples";
+import {arenasOfferedInFrames} from "@src/dsl/gunsmith/components/room/playwright/wire/ArenasOfferedInFrames";
 import {isRevealFrame} from "@src/dsl/gunsmith/components/room/playwright/wire/IsRevealFrame";
 import {preRoundsOfFrames} from "@src/dsl/gunsmith/components/room/playwright/wire/PreRoundsOfFrames";
 import {choicesOfSentFrames} from "@src/dsl/gunsmith/components/room/playwright/wire/ChoicesOfSentFrames";
@@ -550,6 +551,11 @@ export class RoomPlaywright extends BasePage {
     const snapshots = snapshotsOfFrames(this.framesReceived);
 
     return snapshots.at(-1)?.opponent !== undefined;
+  }
+
+  /** The built-in arenas the room offers this browser while choosing, from the latest pre-round frame it was sent; `undefined` before one comes. */
+  getArenasOffered(): readonly string[] | undefined {
+    return arenasOfferedInFrames(this.framesReceived);
   }
 
   /** Whether the latest snapshot sent to this browser holds the weapon lying in the arena. */

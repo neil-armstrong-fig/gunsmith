@@ -27,6 +27,7 @@ export function readoutOfFrame({frame, reveal, previous, opponentWeapons}: Reado
   return {
     stage: frame.stage,
     secondsLeft: wholeSecondsOf(frame.secondsLeft),
+    builtInArenas: frame.builtInArenas,
     how: frame.how,
     reveal: revealOf(frame, reveal),
     own: ownReadoutOf(frame.own, previous?.own),
