@@ -116,7 +116,7 @@ it("records a stored weapon with a built-in drawing as success with fallback and
     id: expect.any(String),
     status: "created",
     weapon: repairedWeapon.weapon,
-    appearance,
+    appearance: appearance.appearance,
   });
   expect(ledgers.accountOf(account.id).balance(Date.now())).toBe(DAILY_CREDITS - 1);
   expect(await attemptResults(database)).toEqual([

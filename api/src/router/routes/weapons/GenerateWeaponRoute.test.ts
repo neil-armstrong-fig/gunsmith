@@ -1,3 +1,4 @@
+import {fallbackAppearance} from "@gunsmith/shared/appearance/fallback/FallbackAppearance";
 import {saveItem} from "@src/accounts/save-item/SaveItem";
 import {savedItemsOfAccount} from "@src/accounts/saved-items-of-account/SavedItemsOfAccount";
 import {testAccounts} from "@src/accounts/testing/in-memory/TestAccounts";
@@ -27,7 +28,7 @@ it("takes a credit and answers the weapon when one is created", async () => {
     id: expect.any(String),
     status: "created",
     weapon: {name: "Hum"},
-    appearance: created.appearance,
+    appearance: drawing,
   });
   expect(ledgers.accountOf("acct-1").balance(Date.now())).toBe(DAILY_CREDITS - 1);
 });
@@ -46,7 +47,7 @@ it("keeps the created weapon under the id it answers, off the shelf until it is 
       id: answer.id,
       kind: "weapon",
       prompt: "a hum-rifle",
-      payload: {weapon: {name: "Hum"}, appearance: created.appearance},
+      payload: {weapon: {name: "Hum"}, appearance: drawing},
     }),
   ]);
 });
@@ -491,10 +492,20 @@ it("refuses any way of asking but POST", async () => {
   expect(response.headers.get("Allow")).toBe("POST");
 });
 
+const drawing = fallbackAppearance();
+
 const created: WeaponOutcome = {
   status: "created",
   weapon: {name: "Hum"},
-  appearance: {kind: "stand-in"} as unknown as WeaponOutcome["appearance"],
+  appearance: {
+    status: "valid",
+    appearance: drawing,
+    changes: [],
+    errors: [],
+    nodes: ["generate", "validate"],
+    modelCalls: 1,
+    usage: {inputTokens: 900, outputTokens: 400},
+  },
   nodes: ["precheck"],
   modelCalls: 3,
 };

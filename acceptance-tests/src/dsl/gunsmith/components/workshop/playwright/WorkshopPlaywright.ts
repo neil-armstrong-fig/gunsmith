@@ -1,4 +1,5 @@
 import type {WeaponWorkshopSetup} from "@src/dsl/gunsmith/components/workshop/types/WeaponWorkshopSetup";
+import {arrangeCredits} from "@src/dsl/gunsmith/components/workshop/playwright/credits/ArrangeCredits";
 import {arrangeSignedInWeapon} from "@src/dsl/gunsmith/components/workshop/playwright/signed-in-weapon/ArrangeSignedInWeapon";
 import type {Locator, Page} from "@playwright/test";
 import {expect} from "@playwright/test";
@@ -33,6 +34,18 @@ export class WorkshopPlaywright extends BasePage {
 
   releaseWeaponMake(): void {
     this.releasePendingWeapon?.();
+  }
+
+  async arrangeCredits(balance: number): Promise<void> {
+    await arrangeCredits(this.page, balance);
+  }
+
+  /** The workshop's credit line, or nothing when it shows none (a guest). */
+  async getCredits(): Promise<string | undefined> {
+    const credits = this.page.getByTestId("credit-balance");
+    if (!(await credits.isVisible())) return undefined;
+
+    return await credits.innerText();
   }
 
   async getWeaponMakeError(): Promise<string | undefined> {

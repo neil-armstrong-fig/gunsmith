@@ -12,6 +12,7 @@ Ship is in `.claude/worktrees/ship` (`worktree-ship`), synced with GitHub main a
 - [x] Cover pending generation, credit refusal, rejection, invalid results, timeout, retry and the full account shelf. Keep built-ins selectable and saved arenas playable with no credits.
 - [x] Hand the account shelf selector and server item IDs to Play in [HANDOFF.md](HANDOFF.md#latest-ship-delivery).
 - [x] Bind `ANTHROPIC_API_KEY` in the Alchemy API Worker and the CI deploy when supplied; unset keeps generation off (2026-11-26, uncommitted). The user creates the key, sets the repository secret and authorises the release.
+- [x] Generated weapon drawings reach the page and the room (the route sent ai's drawing outcome), and the workshop shows the signed-in player's credits (2026-11-26, uncommitted).
 - [ ] Next check the hosted preview shard timings and release artifact after publication. Continue the production sign-in and account-retention verification in the release checklist.
 
 ## Release and menu resume
