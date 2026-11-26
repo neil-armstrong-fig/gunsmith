@@ -1,7 +1,9 @@
 import {coverBesideTarget} from "@gunsmith/engine/cover/CoverBesideTarget";
 import {equippedWeapon} from "@gunsmith/engine/loadout/EquippedWeapon";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
+import {DIFFICULTY} from "@gunsmith/engine/opponent/Difficulty";
 import {findCover} from "@gunsmith/engine/opponent/state/acting/reload/cover/FindCover";
+import {hidesFrom} from "@gunsmith/engine/opponent/state/acting/reload/cover/HidesFrom";
 import {advanceStrafe} from "@gunsmith/engine/opponent/state/acting/engage/AdvanceStrafe";
 import {otherLoadedSlot} from "@gunsmith/engine/opponent/state/acting/reload/OtherLoadedSlot";
 import {routeWaypoint} from "@gunsmith/engine/opponent/steering/RouteWaypoint";
@@ -14,8 +16,9 @@ import type {StateAct} from "@gunsmith/engine/opponent/types/StateAct";
 /**
  * Reloading: the magazine is empty. It asks for a reload every step (asking again mid-reload changes nothing), and
  * while the player can see it, it makes for the nearest cover it can walk to (round by a stair where there is a drop, `routeWaypoint`),
- * or circles in the open when there is none. A cover block already beside it on the line to the player is cover enough: it crouches
- * and holds still there. Out of the player's sight it reloads where it stands. A weapon with no rounds and no reserve cannot
+ * or circles in the open when there is none. The tile right behind a cover block is cover (`findCover`): on reaching it, or already
+ * there with no other cover chosen, it crouches and holds still. Once there, if the player moves round so that its cover (a block
+ * or a wall) no longer hides it, it looks for cover again, or circles in the open. Out of the player's sight it reloads where it stands. A weapon with no rounds and no reserve cannot
  * be reloaded, so it asks for its other weapon instead. It never fires. Leaving is `chooseState`'s business: once the
  * magazine has rounds again.
  */
@@ -50,9 +53,10 @@ function plan(brain: OpponentBrain, context: OpponentContext): OpponentBrain {
 }
 
 function chooseCover(brain: OpponentBrain, context: OpponentContext): OpponentBrain {
-  if (brain.goal) {
+  if (brain.goal && !isFlanked(brain.goal, context)) {
     return brain;
   }
+
   const draw = findCover(context.arena, {
     from: context.opponent.position,
     threat: context.target.position,
@@ -60,6 +64,15 @@ function chooseCover(brain: OpponentBrain, context: OpponentContext): OpponentBr
   });
 
   return {...brain, seed: draw.seed, goal: draw.cover};
+}
+
+/** Whether it has reached its cover and the player, having moved, now sees round it: it no longer hides it, so it looks again. */
+function isFlanked(goal: Point, context: OpponentContext): boolean {
+  if (!hasReached(goal, context)) {
+    return false;
+  }
+
+  return !hidesFrom(context.arena, context.target.position, goal);
 }
 
 function aimedAt(brain: OpponentBrain, context: OpponentContext): Point | undefined {
@@ -96,11 +109,28 @@ function direction(brain: OpponentBrain, context: OpponentContext): Point {
   return {x: 0, y: 0};
 }
 
-/** Whether it crouches where it stands: the player sees it, it has no other cover to walk to, and a cover block stands beside it on the line to them. */
+/**
+ * Whether it crouches where it stands: the player sees it, it has no cover still to walk to (none chosen, or it has reached the one
+ * it chose), and a cover block stands beside it on the line to them.
+ */
 function isDucking(brain: OpponentBrain, context: OpponentContext): boolean {
-  if (!context.sees || brain.goal) {
+  if (!context.sees || isWalkingToCover(brain, context)) {
     return false;
   }
 
   return coverBesideTarget(context.arena, context.target.position, context.opponent.position);
+}
+
+function isWalkingToCover(brain: OpponentBrain, context: OpponentContext): boolean {
+  if (!brain.goal) {
+    return false;
+  }
+
+  return !hasReached(brain.goal, context);
+}
+
+function hasReached(goal: Point, context: OpponentContext): boolean {
+  const {position} = context.opponent;
+
+  return Math.hypot(goal.x - position.x, goal.y - position.y) < DIFFICULTY.arrivalRadius;
 }

@@ -82,3 +82,48 @@ describe("in a long hall", () => {
     }
   });
 });
+
+describe("in an open room with one low cover block", () => {
+  // Five rows of open floor with a low cover block in the middle of the middle row: nothing else hides anyone, and a standing
+  // threat sees over the block, so the one place to hide is the tile right behind it, where a crouched fighter is out of sight.
+  const coverRoom = arenaFrom([
+    "###########",
+    "#.........#",
+    "#.........#",
+    "#....c....#",
+    "#.........#",
+    "#.........#",
+    "###########",
+  ]);
+  const rightBehindTheBlock = {x: 4.5, y: 3.5};
+
+  it("finds the tile right behind the block whatever the seed", () => {
+    let seed = 1;
+    for (let index = 0; index < 60; index++) {
+      const draw = findCover(coverRoom, {from: {x: 1.5, y: 3.5}, threat: {x: 8.5, y: 3.5}, seed});
+      seed = draw.seed;
+
+      expect(draw.cover).toEqual(rightBehindTheBlock);
+    }
+  });
+
+  it("does not look behind a block beyond its reach", () => {
+    const longRoom = arenaFrom([
+      "#".repeat(22),
+      `#${".".repeat(20)}#`,
+      `#${".".repeat(15)}c${".".repeat(4)}#`,
+      `#${".".repeat(20)}#`,
+      "#".repeat(22),
+    ]);
+    const from = {x: 1.5, y: 2.5};
+    expect(16.5 - from.x).toBeGreaterThan(DIFFICULTY.coverReach + 1);
+
+    let seed = 1;
+    for (let index = 0; index < 60; index++) {
+      const draw = findCover(longRoom, {from, threat: {x: 20.5, y: 2.5}, seed});
+      seed = draw.seed;
+
+      expect(draw.cover).toBeUndefined();
+    }
+  });
+});

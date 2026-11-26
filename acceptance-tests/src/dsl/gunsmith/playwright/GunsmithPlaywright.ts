@@ -145,6 +145,11 @@ export class GunsmithPlaywright extends BasePage {
     await this.openScenario(`cover-hall&seed=${seed}`);
   }
 
+  /** Opens the cover run (open low ground with one low cover block, the opponent with an empty magazine two tiles past it, eight tiles east of the player, one round, no ring), the opponent's choices drawn from `seed`. */
+  async openCoverRun(seed: number): Promise<void> {
+    await this.openScenario(`cover-run&seed=${seed}`);
+  }
+
   /** Opens the mutual knockout (the duel's first round with a shot in the air from each fighter at the other, so both fall in the first step). */
   async openMutualKnockout(): Promise<void> {
     await this.openScenario("mutual-knockout");
