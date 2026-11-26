@@ -22,6 +22,7 @@ vi.mock("@src/secrets/Secrets", () => ({
 it("declares the API bindings and keeps the webapp assets off the API Worker", async () => {
   vi.stubEnv("SITE_ORIGIN", "https://gunsmith.example");
   vi.stubEnv("ACCOUNT_DIGEST_KEY", "test-account-digest");
+  vi.stubEnv("ANTHROPIC_API_KEY", "test-anthropic-key");
 
   try {
     const scope = new Scope({scopeName: "test", stage: "test", phase: "up", parent: null, noTrack: true});
@@ -48,6 +49,7 @@ it("declares the API bindings and keeps the webapp assets off the API Worker", a
         crons: manifest.triggers.crons,
         bindings: {
           ACCOUNT_DIGEST_KEY: expect.objectContaining({type: "secret"}),
+          ANTHROPIC_API_KEY: expect.objectContaining({type: "secret"}),
           DB: apiDatabase,
           MATCHES: expect.objectContaining({className: "Match", sqlite: true}),
           CREDITS: expect.objectContaining({className: "CreditLedger", sqlite: true}),
@@ -63,6 +65,27 @@ it("declares the API bindings and keeps the webapp assets off the API Worker", a
       }),
     );
     expect(cloudflare.Worker).not.toHaveBeenCalledWith("api", expect.objectContaining({assets: expect.anything()}));
+  } finally {
+    vi.unstubAllEnvs();
+  }
+});
+
+it("leaves the generation key off the API Worker when the deploy has none, so generation stays off", async () => {
+  vi.stubEnv("SITE_ORIGIN", "https://gunsmith.example");
+  vi.stubEnv("ANTHROPIC_API_KEY", " ");
+
+  try {
+    const scope = new Scope({scopeName: "test", stage: "test", phase: "up", parent: null, noTrack: true});
+    vi.mocked(cloudflare.D1Database, {partial: true}).mockResolvedValue({id: "test-database"});
+    vi.mocked(cloudflare.Worker, {partial: true}).mockResolvedValue({name: "gunsmith-api"});
+
+    const apiDatabase = await scope.run(buildApiDatabase);
+    await scope.run(() => buildApiWorker(apiDatabase));
+
+    expect(cloudflare.Worker).toHaveBeenLastCalledWith(
+      "api",
+      expect.objectContaining({bindings: expect.not.objectContaining({ANTHROPIC_API_KEY: expect.anything()})}),
+    );
   } finally {
     vi.unstubAllEnvs();
   }

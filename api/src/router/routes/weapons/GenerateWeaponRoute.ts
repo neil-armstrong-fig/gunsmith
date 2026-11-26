@@ -89,7 +89,10 @@ async function settleOutcome(reservation: CreditReservation, outcome: WeaponOutc
   const {credits, spend, key} = reservation;
   await spend.settle(key, settledWeaponSpend(outcome));
   if (outcome.status === "created") {
-    const id = await keepCreatedResult(reservation, "weapon", {weapon: outcome.weapon, appearance: outcome.appearance});
+    const id = await keepCreatedResult(reservation, "weapon", {
+      weapon: outcome.weapon,
+      appearance: outcome.appearance?.appearance,
+    });
     if (id instanceof Response) {
       return id;
     }
@@ -118,5 +121,10 @@ function isTurnedAwayBeforeTheModel(outcome: WeaponOutcome): boolean {
 }
 
 function answerOf(outcome: WeaponOutcome): WeaponAnswer {
-  return {status: outcome.status, weapon: outcome.weapon, appearance: outcome.appearance, reason: outcome.reason};
+  return {
+    status: outcome.status,
+    weapon: outcome.weapon,
+    appearance: outcome.appearance?.appearance,
+    reason: outcome.reason,
+  };
 }
