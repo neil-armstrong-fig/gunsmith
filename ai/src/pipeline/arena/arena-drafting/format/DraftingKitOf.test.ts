@@ -1,6 +1,6 @@
 import {z} from "zod";
-import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
 import {draftingKitOf} from "@gunsmith/ai/pipeline/arena/arena-drafting/format/DraftingKitOf";
+import {ARENA_EDIT_GENERATION_PROMPT} from "@gunsmith/ai/pipeline/arena/arena-drafting/generate/prompts/ArenaEditGenerationPrompt";
 
 it("asks for rows with the rows prompt, and for shapes with the shapes prompt", () => {
   expect(draftingKitOf("rows").generationPrompt).toContain("rows: the arena drawn as a list of text rows");
@@ -37,14 +37,10 @@ it("says what is wrong with a shapes reply it cannot read", () => {
   });
 });
 
-it("asks for an edit of a built-in arena, shows every built-in arena it may start from, and has the model keep to the fixed tiles", () => {
+it("asks for an edit of a built-in arena with the edit prompt (its bases are tested beside it), and the repair repeats it", () => {
   const kit = draftingKitOf("editBuiltIn");
 
-  for (const arena of BUILT_IN_ARENAS) {
-    expect(kit.generationPrompt).toContain(`"${arena.name}"`);
-    expect(kit.generationPrompt).toContain(arena.rows.join("\n"));
-  }
-
+  expect(kit.generationPrompt).toBe(ARENA_EDIT_GENERATION_PROMPT);
   expect(kit.repairPrompt).toContain(kit.generationPrompt);
 });
 
