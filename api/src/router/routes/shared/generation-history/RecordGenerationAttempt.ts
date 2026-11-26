@@ -55,22 +55,22 @@ async function attemptOf(
     pipelineVersion: diagnostics.pipelineVersion,
     codeEdits: diagnostics.codeEdits,
     modelRepairs: diagnostics.modelRepairs,
-    prompt: await clearedPrompt(historyRequest, result),
+    prompt: redactedPrompt(historyRequest, result),
     ...classification,
   };
 }
 
-async function clearedPrompt(
-  {privacyCheck}: GenerationHistoryRequest,
-  {reservation: {prompt}, diagnostics, classification}: CompletedGenerationAttempt,
-): Promise<string | undefined> {
-  if (classification.outcome === "rejected" || diagnostics.relevance !== "accepted") return undefined;
-
+/**
+ * Every completed attempt keeps its prompt redacted, rejected and off-topic ones included, because those are what tune moderation (the
+ * user, 2026-11-26). The judge's own words are never kept, and a redaction that throws keeps no text.
+ */
+function redactedPrompt(
+  {redaction}: GenerationHistoryRequest,
+  {reservation: {prompt}}: CompletedGenerationAttempt,
+): string | undefined {
   try {
-    if ((await privacyCheck(prompt)) === true) return prompt;
+    return redaction(prompt);
   } catch {
     return undefined;
   }
-
-  return undefined;
 }

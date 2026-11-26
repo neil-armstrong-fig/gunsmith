@@ -1,9 +1,12 @@
 import {eraseExpiredGenerationAttempts} from "@src/account-retention/EraseExpiredGenerationAttempts";
 import type {ArenaOutcome} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcome";
 import {generationAttemptsOfAccount} from "@src/accounts/generation-attempts-of-account/GenerationAttemptsOfAccount";
+import * as history from "@src/accounts/keep-generation-attempt/KeepGenerationAttempt";
 import {removeAccount} from "@src/accounts/remove-account/RemoveAccount";
 import {insertUser} from "@src/accounts/testing/local-database/InsertUser";
-import {generationHistoryPrivacyCheck} from "@src/router/routes/shared/generation-history/privacy/GenerationHistoryPrivacyCheck";
+import {workerEnvironment} from "@src/env/WorkerEnvironment";
+import {generationHistoryRedaction} from "@src/router/routes/shared/generation-history/privacy/GenerationHistoryRedaction";
+import type {GenerationHistoryRedaction} from "@src/router/routes/shared/generation-history/types/GenerationHistoryRedaction";
 import {rowsOf} from "@src/accounts/testing/local-database/RowsOf";
 import {useLocalDatabase} from "@src/accounts/testing/local-database/UseLocalDatabase";
 import {DAILY_CREDITS} from "@src/durable-objects/credit-ledger/account/DailyCredits";
@@ -22,10 +25,10 @@ vi.unmock("@src/accounts/find-or-create-account/FindOrCreateAccount");
 vi.unmock("@src/accounts/keep-generated-item/KeepGeneratedItem");
 vi.unmock("@src/accounts/remove-account/RemoveAccount");
 
-vi.mock("@src/router/routes/shared/generation-history/privacy/GenerationHistoryPrivacyCheck");
+vi.mock("@src/router/routes/shared/generation-history/privacy/GenerationHistoryRedaction", {spy: true});
 
 beforeEach(() => {
-  vi.mocked(generationHistoryPrivacyCheck).mockReturnValue(async () => true);
+  workerEnvironment.GENERATION_HISTORY_CAPTURE = "true";
 });
 
 const emptyDatabase = useLocalDatabase();
@@ -43,8 +46,8 @@ it("records an AI-off refusal without judging the prompt or reserving a credit",
   const database = await emptyDatabase();
   const {account, cookie} = await signInPlayer();
   const ledgers = fakeLedgers({aiOn: false, returnsAt: 1_800_000_000_000});
-  const privacyCheck = vi.fn();
-  vi.mocked(generationHistoryPrivacyCheck).mockReturnValue(privacyCheck);
+  const redaction = vi.fn<GenerationHistoryRedaction>();
+  vi.mocked(generationHistoryRedaction).mockReturnValueOnce(redaction);
 
   const response = await makeArena(prompt, cookie);
 
@@ -52,7 +55,7 @@ it("records an AI-off refusal without judging the prompt or reserving a credit",
   expect(await response.json()).toEqual({error: "ai-off", returnsAt: 1_800_000_000_000});
   expect(ledgers.calls).toEqual(["status"]);
   expect(runArenaPipeline).not.toHaveBeenCalled();
-  expect(privacyCheck).not.toHaveBeenCalled();
+  expect(redaction).not.toHaveBeenCalled();
   expect(await attemptFailures(database)).toEqual([
     {outcome: "blocked", prompt: null, failure_stage: "spend", failure_reason: "ai-off"},
   ]);
@@ -186,7 +189,7 @@ it("records a timeout once even if the pipeline later returns a successful arena
   }
 });
 
-it("records the original privacy-cleared prompt once when making an arena succeeds after repair", async () => {
+it("records the original prompt once when making an arena succeeds after repair", async () => {
   const database = await emptyDatabase();
   vi.mocked(runArenaPipeline).mockResolvedValue(repairedArena);
 
@@ -203,7 +206,29 @@ it("records the original privacy-cleared prompt once when making an arena succee
   ]);
 });
 
-it("records an irrelevant arena request once without storing its prompt or the judge's free text", async () => {
+it("keeps the attempt and replaces the personal details in its prompt", async () => {
+  const database = await emptyDatabase();
+  vi.mocked(runArenaPipeline).mockResolvedValue(repairedArena);
+
+  expect((await makeArena("  An arena shaped like 221B Baker Street, NW1 6XE\n")).status).toBe(200);
+  expect(
+    await rowsOf(
+      database,
+      "SELECT kind, outcome, prompt, pipeline_version, code_edits, model_repairs FROM generation_attempts",
+    ),
+  ).toEqual([
+    {
+      kind: "arena",
+      outcome: "repaired-success",
+      prompt: "  An arena shaped like [address], [postcode]\n",
+      pipeline_version: "arena-v1",
+      code_edits: 2,
+      model_repairs: 1,
+    },
+  ]);
+});
+
+it("records an irrelevant arena request once with its prompt and without the judge's free text", async () => {
   const database = await emptyDatabase();
   const rejectedArena = {
     status: "rejected" as const,
@@ -220,23 +245,22 @@ it("records an irrelevant arena request once without storing its prompt or the j
   expect(await response.json()).toEqual({status: "rejected", reason: "Not an arena request"});
   expect(
     await rowsOf(database, "SELECT outcome, prompt, failure_stage, failure_reason FROM generation_attempts"),
-  ).toEqual([{outcome: "rejected", prompt: null, failure_stage: "moderation", failure_reason: "irrelevant"}]);
+  ).toEqual([
+    {outcome: "rejected", prompt: "A recipe for soup", failure_stage: "moderation", failure_reason: "irrelevant"},
+  ]);
 });
 
-it("omits text when the privacy check denies it or cannot complete", async () => {
+it("omits text when redaction fails", async () => {
   const database = await emptyDatabase();
   vi.mocked(runArenaPipeline).mockResolvedValue(repairedArena);
-  const privacyCheck = vi
-    .fn<(text: string) => Promise<boolean>>()
-    .mockResolvedValueOnce(false)
-    .mockRejectedValueOnce(new Error("synthetic failure"));
-  vi.mocked(generationHistoryPrivacyCheck).mockReturnValue(privacyCheck);
+  const redaction = vi.fn<GenerationHistoryRedaction>(() => {
+    throw new Error("synthetic failure");
+  });
+  vi.mocked(generationHistoryRedaction).mockReturnValueOnce(redaction);
 
   expect((await makeArena(prompt)).status).toBe(200);
-  expect((await makeArena(prompt)).status).toBe(200);
-  expect(privacyCheck).toHaveBeenCalledTimes(2);
+  expect(redaction).toHaveBeenCalledExactlyOnceWith(prompt);
   expect(await rowsOf(database, "SELECT outcome, prompt FROM generation_attempts")).toEqual([
-    {outcome: "repaired-success", prompt: null},
     {outcome: "repaired-success", prompt: null},
   ]);
 });
@@ -294,11 +318,12 @@ it("deletes account history and prevents an in-flight attempt recreating it afte
   await makeArena(prompt, cookie);
   await makeArena(prompt, otherPlayer.cookie);
   expect(await generationAttemptsOfAccount(account.id, new Date())).toHaveLength(1);
-  vi.mocked(generationHistoryPrivacyCheck).mockReturnValue(async () => {
+  const keepGenerationAttempt = history.keepGenerationAttempt;
+  vi.spyOn(history, "keepGenerationAttempt").mockImplementationOnce(async (...write) => {
     await removeAccount(account.id, {subjectDigest: async () => "test-digest", keepUntil: new Date()});
     await insertUser(database, account.id);
 
-    return true;
+    return await keepGenerationAttempt(...write);
   });
 
   expect((await makeArena(prompt, cookie)).status).toBe(200);
@@ -307,12 +332,9 @@ it("deletes account history and prevents an in-flight attempt recreating it afte
   ]);
 });
 
-it("captures zero history rows when the default gate is closed", async () => {
+it("captures zero history rows when capture is not switched on", async () => {
   const database = await emptyDatabase();
-  const actual = await vi.importActual<Record<"generationHistoryPrivacyCheck", typeof generationHistoryPrivacyCheck>>(
-    "@src/router/routes/shared/generation-history/privacy/GenerationHistoryPrivacyCheck",
-  );
-  vi.mocked(generationHistoryPrivacyCheck).mockImplementation(actual.generationHistoryPrivacyCheck);
+  Reflect.deleteProperty(workerEnvironment, "GENERATION_HISTORY_CAPTURE");
   vi.mocked(runArenaPipeline).mockResolvedValue(repairedArena);
 
   expect((await makeArena(prompt)).status).toBe(200);
