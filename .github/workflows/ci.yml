@@ -227,6 +227,7 @@ jobs:
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           ALERT_TO_ADDRESS: ${{ secrets.ALERT_TO_ADDRESS }}
           ACCOUNT_DIGEST_KEY: ${{ secrets.ACCOUNT_DIGEST_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
       - name: Deploy the tested webapp build
         if: steps.tip.outputs.current == 'true'
