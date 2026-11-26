@@ -23,6 +23,7 @@ const BUILT_IN_NAMES = [
   "Slalom",
   "Keep",
   "Labyrinth",
+  "Sunken court",
 ];
 
 // Against a player who stands still the opponent has won a round within 9.4 game seconds on every one of 40 seeds measured
@@ -37,6 +38,10 @@ given("the pre-round is open", () => {
   when("the player looks at the choosing", () => {
     then("the arena choices are the built-in arenas", async ({gunsmith}) => {
       expect(await gunsmith.preRound.arena.getChoices()).toEqual(BUILT_IN_NAMES);
+    });
+
+    then("the arenas are laid out three to a row", async ({gunsmith}) => {
+      expect(await gunsmith.preRound.arena.getChoicesInEachRow()).toEqual(rowsOfThree(BUILT_IN_NAMES.length));
     });
 
     then("the Duel is chosen to begin with, and a preview of it is shown", async ({gunsmith}) => {
@@ -191,3 +196,13 @@ given("the player chose a weapon and an arena but never locked in, and opens the
     });
   });
 });
+
+/** How `count` choices fill rows of three: full rows, then what is left. */
+function rowsOfThree(count: number): number[] {
+  const rows = Array.from({length: Math.floor(count / 3)}, () => 3);
+  if (count % 3 > 0) {
+    rows.push(count % 3);
+  }
+
+  return rows;
+}

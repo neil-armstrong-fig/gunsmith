@@ -63,6 +63,12 @@ it("holds an arena with a tower of three storeys, ground, a deck and a top, so a
   expect(arenas.some(arena => arena.levels.some(level => level >= 2))).toBe(true);
 });
 
+it("holds an arena sunk in the middle, raised floor all round and low ground inside, so the low ground is watched from every side", () => {
+  const arenas = NAMES.map(name => arenaFrom(rowsOf(name)));
+
+  expect(arenas.some(hasSunkenMiddle)).toBe(true);
+});
+
 function hasLowCover(arena: Arena): boolean {
   return arena.cover.some(isCover => isCover);
 }
@@ -78,4 +84,35 @@ function rowsOf(name: string): readonly string[] {
   }
 
   return builtIn.rows;
+}
+
+/** Whether every open tile just inside the border is raised, and some open tile in from it is on the low ground and not a stair. */
+function hasSunkenMiddle(arena: Arena): boolean {
+  const open = tilesOf(arena).filter(tile => !arena.solid[tile.index]);
+  const edge = open.filter(tile => isBesideTheBorder(arena, tile));
+  const middle = open.filter(tile => !isBesideTheBorder(arena, tile));
+
+  return (
+    edge.length > 0 &&
+    edge.every(tile => (arena.levels[tile.index] ?? 0) > 0) &&
+    middle.some(tile => arena.levels[tile.index] === 0 && arena.stairs[tile.index] === undefined)
+  );
+}
+
+function tilesOf(arena: Arena): ArenaTile[] {
+  return Array.from({length: arena.width * arena.height}, (_, index) => ({
+    index,
+    x: index % arena.width,
+    y: Math.floor(index / arena.width),
+  }));
+}
+
+function isBesideTheBorder(arena: Arena, tile: ArenaTile): boolean {
+  return tile.x === 1 || tile.y === 1 || tile.x === arena.width - 2 || tile.y === arena.height - 2;
+}
+
+interface ArenaTile {
+  index: number;
+  x: number;
+  y: number;
 }

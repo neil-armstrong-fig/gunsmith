@@ -150,6 +150,15 @@ export class RoomPreRoundDsl {
     }
   }
 
+  /** Presses anywhere on the opened card of the other player's weapon in `slot`, which folds it to its picture and name again. */
+  async pressTheOpponentWeaponCard(slot: number): Promise<void> {
+    try {
+      await this.preRound.pressTheOpponentWeaponCard(slot);
+    } catch (error) {
+      throw new DslError(`Failed to fold the other player's weapon ${slot} by pressing its card`, error);
+    }
+  }
+
   /** Whether the other player's weapon in `slot` is shown as a card with its numbers, rather than by its picture and name alone. */
   async isOpponentWeaponShownAsACard(slot: number): Promise<boolean> {
     try {

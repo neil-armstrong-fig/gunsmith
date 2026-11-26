@@ -20,6 +20,15 @@ export class ArenaPreRoundDsl {
     }
   }
 
+  /** How many arenas are laid out in each row on the screen, top row first. */
+  async getChoicesInEachRow(): Promise<number[]> {
+    try {
+      return await this.arena.getChoicesInEachRow();
+    } catch (error) {
+      throw new DslError("Failed to read how many arenas are in a row", error);
+    }
+  }
+
   /** The name of the arena chosen right now. */
   async getChosen(): Promise<string> {
     try {

@@ -125,6 +125,13 @@ export class RoomPreRoundPlaywright extends BasePage {
     await expect(weapon.getByTestId("reveal-weapon-rating")).toBeVisible();
   }
 
+  /** Presses the opened card of the other player's weapon in `slot` on one of its stats, not on any button, and waits until it has folded. */
+  async pressTheOpponentWeaponCard(slot: number): Promise<void> {
+    const weapon = this.opponentWeapon(slot);
+    await weapon.getByTestId("reveal-stat").first().click();
+    await expect(weapon.getByTestId("reveal-weapon-rating")).toBeHidden();
+  }
+
   /** Whether the other player's weapon in `slot` is shown as a card with its numbers, rather than by its picture and name alone. */
   async isOpponentWeaponShownAsACard(slot: number): Promise<boolean> {
     return (await this.opponentWeapon(slot).getByTestId("reveal-weapon-rating").count()) > 0;

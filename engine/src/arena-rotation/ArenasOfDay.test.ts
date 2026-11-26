@@ -19,13 +19,33 @@ it("keeps every arena when the pool is no bigger than the day's set", () => {
   expect(arenasOfDay({day: DAY, arenas: small, plays: []})).toEqual(small);
 });
 
-it("chooses the day's set, all different, all from the pool, listed in the pool's order", () => {
+it("chooses the day's set, all different, all from the pool, listed in the pool's order when none is kept", () => {
   const chosen = arenasOfDay({day: DAY, arenas: POOL, plays: []});
 
   expect(chosen).toHaveLength(ARENA_ROTATION.size);
   expect(new Set(chosen).size).toBe(chosen.length);
   expect(chosen).toEqual([...chosen].sort((a, b) => POOL.indexOf(a) - POOL.indexOf(b)));
   expect(chosen.every(name => POOL.includes(name))).toBe(true);
+});
+
+it("lists the arenas drawn for the day first and yesterday's two kept last, each in the pool's order, so a screen shows the kept ones together", () => {
+  for (let day = DAY; day < DAY + 40; day += 1) {
+    const plays = [play("arena-0", day - 1, 9), play("arena-1", day - 1, 6)];
+
+    const chosen = arenasOfDay({day, arenas: POOL, plays});
+    const drawn = chosen.slice(0, 3);
+
+    expect(chosen.slice(3), `day ${day}`).toEqual(["arena-0", "arena-1"]);
+    expect(drawn).toEqual([...drawn].sort((a, b) => POOL.indexOf(a) - POOL.indexOf(b)));
+  }
+});
+
+it("lists a single arena kept from yesterday last, after the four drawn", () => {
+  for (let day = DAY; day < DAY + 40; day += 1) {
+    const chosen = arenasOfDay({day, arenas: POOL, plays: [play("arena-0", day - 1, 1)]});
+
+    expect(chosen.at(-1), `day ${day}`).toBe("arena-0");
+  }
 });
 
 it("draws the whole set afresh on a day after nobody played, so no arena is offered every day", () => {
