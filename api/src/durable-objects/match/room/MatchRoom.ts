@@ -39,6 +39,7 @@ import type {RevealMessage} from "@src/durable-objects/match/room/types/RevealMe
 import type {ForfeitLimits} from "@src/durable-objects/match/room/types/ForfeitLimits";
 import type {JoinedMessage} from "@src/durable-objects/match/room/types/JoinedMessage";
 import type {MatchRoomOptions} from "@src/durable-objects/match/room/types/MatchRoomOptions";
+import type {OpponentWeaponMessage} from "@src/durable-objects/match/room/types/OpponentWeaponMessage";
 import type {Readiness} from "@src/durable-objects/match/room/types/Readiness";
 import type {SeedMaker} from "@src/durable-objects/match/room/types/SeedMaker";
 import type {SnapshotMessage} from "@src/durable-objects/match/room/types/SnapshotMessage";
@@ -73,6 +74,8 @@ export class MatchRoom {
   private readonly arenasToTell: Partial<Record<Seat, ArenaMessage>> = {};
   private announced = false;
   private readonly revealsToTell: Partial<Record<Seat, RevealMessage>> = {};
+  /** The slots of the other seat's saved weapons each seat has been told, so each is told once (forgotten when the seat comes back). */
+  private readonly weaponsTold: Record<Seat, Set<WeaponSlot>> = {first: new Set(), second: new Set()};
   private weapons: Record<Seat, WeaponPair> = {first: DEFAULT_WEAPONS, second: DEFAULT_WEAPONS};
   private readonly preRound: PreRound;
   private readonly limits: ForfeitLimits;
@@ -165,6 +168,7 @@ export class MatchRoom {
 
     delete this.acked[seat];
     this.tellAgainWhileRevealing(seat);
+    this.weaponsTold[seat].clear();
     this.asked[seat] = NOTHING_ASKED;
     this.pulled[seat] = false;
     this.present[seat] = true;
@@ -231,6 +235,24 @@ export class MatchRoom {
     delete this.revealsToTell[seat];
 
     return message;
+  }
+
+  /**
+   * The other seat's saved weapons `seat` has not yet been told, with their numbers and drawing, each once as both seats lock in its slot (and
+   * again after the seat comes back), and none once the match has begun, since the reveal carries them.
+   */
+  takeOpponentWeaponMessages(seat: Seat): OpponentWeaponMessage[] {
+    if (this.world) {
+      return [];
+    }
+
+    const told = this.weaponsTold[seat];
+    const untold = this.preRound.savedWeaponsShownTo(seat).filter(shown => !told.has(shown.slot));
+    for (const shown of untold) {
+      told.add(shown.slot);
+    }
+
+    return untold.map(({slot, weapon, appearance}) => ({kind: "opponentWeapon", slot, weapon, appearance}));
   }
 
   /**

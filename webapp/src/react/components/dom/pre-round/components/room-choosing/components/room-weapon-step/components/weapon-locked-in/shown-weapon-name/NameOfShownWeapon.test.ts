@@ -1,4 +1,4 @@
-import {nameOfShownWeapon} from "@src/react/components/dom/pre-round/components/room-choosing/components/room-weapon-step/shown-weapon-name/NameOfShownWeapon";
+import {nameOfShownWeapon} from "@src/react/components/dom/pre-round/components/room-choosing/components/room-weapon-step/components/weapon-locked-in/shown-weapon-name/NameOfShownWeapon";
 
 it("names a built-in by the name its key has in the page's own list", () => {
   expect(nameOfShownWeapon({kind: "builtIn", key: "submachine-gun"})).toBe("Submachine gun");

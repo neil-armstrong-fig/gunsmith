@@ -1,11 +1,13 @@
 import type {Locator, Page} from "@playwright/test";
 import {expect} from "@playwright/test";
 import type {PreRoundReveal} from "@src/dsl/gunsmith/components/pre-round/types/PreRoundReveal";
-import type {RevealPicture} from "@src/dsl/gunsmith/components/pre-round/types/RevealPicture";
+import type {RevealPicture} from "@src/dsl/gunsmith/playwright/weapon-card/types/RevealPicture";
 import type {RevealPictures} from "@src/dsl/gunsmith/components/pre-round/types/RevealPictures";
 import type {RevealNumbers} from "@src/dsl/gunsmith/components/pre-round/types/RevealNumbers";
-import type {RevealedWeaponNumbers} from "@src/dsl/gunsmith/components/pre-round/types/RevealedWeaponNumbers";
+import type {RevealedWeaponNumbers} from "@src/dsl/gunsmith/playwright/weapon-card/types/RevealedWeaponNumbers";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
+import {numbersOfWeaponCard} from "@src/dsl/gunsmith/playwright/weapon-card/NumbersOfWeaponCard";
+import {pictureOfWeaponCard} from "@src/dsl/gunsmith/playwright/weapon-card/PictureOfWeaponCard";
 
 export class PreRoundPlaywright extends BasePage {
   constructor(page: Page) {
@@ -85,49 +87,19 @@ export class PreRoundPlaywright extends BasePage {
   private async picturesOfSide(testId: string): Promise<RevealPicture[]> {
     const pictures: RevealPicture[] = [];
     for (const weapon of await this.page.getByTestId(testId).getByTestId("reveal-weapon").all()) {
-      pictures.push(await this.pictureOfWeapon(weapon));
+      pictures.push(await pictureOfWeaponCard(weapon));
     }
 
     return pictures;
   }
 
-  /** A drawing is made in the page from the weapon's appearance, as an SVG `data:` address; an authored sprite is a file. */
-  private async pictureOfWeapon(weapon: Locator): Promise<RevealPicture> {
-    const picture = weapon.getByTestId("weapon-picture");
-    if ((await picture.count()) === 0) {
-      return "none";
-    }
-
-    const address = (await picture.getAttribute("src")) ?? "";
-    if (address.startsWith("data:image/svg+xml")) {
-      return "drawing";
-    }
-
-    return "sprite";
-  }
-
   private async numbersOfSide(testId: string): Promise<RevealedWeaponNumbers[]> {
     const numbers: RevealedWeaponNumbers[] = [];
     for (const weapon of await this.page.getByTestId(testId).getByTestId("reveal-weapon").all()) {
-      numbers.push(await this.numbersOfWeapon(weapon));
+      numbers.push(await numbersOfWeaponCard(weapon));
     }
 
     return numbers;
-  }
-
-  private async numbersOfWeapon(weapon: Locator): Promise<RevealedWeaponNumbers> {
-    const stats: Record<string, string> = {};
-    for (const row of await weapon.getByTestId("reveal-stat").all()) {
-      stats[(await row.getByTestId("reveal-stat-label").innerText()).trim()] = (
-        await row.getByTestId("reveal-stat-value").innerText()
-      ).trim();
-    }
-
-    return {
-      name: (await weapon.getByTestId("reveal-weapon-name").innerText()).trim(),
-      rating: Number.parseInt(await weapon.getByTestId("reveal-weapon-rating").innerText(), 10),
-      stats,
-    };
   }
 
   private dialog(): Locator {

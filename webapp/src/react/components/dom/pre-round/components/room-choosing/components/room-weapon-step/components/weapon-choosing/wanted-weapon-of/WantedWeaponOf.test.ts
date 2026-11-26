@@ -1,5 +1,5 @@
 import type {Weapon} from "@gunsmith/engine/weapon/types/Weapon";
-import {wantedWeaponOf} from "@src/react/components/dom/pre-round/components/room-choosing/components/room-weapon-step/wanted-weapon-of/WantedWeaponOf";
+import {wantedWeaponOf} from "@src/react/components/dom/pre-round/components/room-choosing/components/room-weapon-step/components/weapon-choosing/wanted-weapon-of/WantedWeaponOf";
 
 const weapon = {} as Weapon;
 const saved = [

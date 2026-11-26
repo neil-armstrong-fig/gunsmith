@@ -13,10 +13,9 @@ import {preRoundsOfFrames} from "@src/dsl/gunsmith/components/room/playwright/wi
 import {choicesOfSentFrames} from "@src/dsl/gunsmith/components/room/playwright/wire/ChoicesOfSentFrames";
 import type {SentChoice} from "@src/dsl/gunsmith/components/room/playwright/wire/types/SentChoice";
 import {isJoinedFrame} from "@src/dsl/gunsmith/components/room/playwright/wire/IsJoinedFrame";
-import {isSnapshotFrame} from "@src/dsl/gunsmith/components/room/playwright/wire/IsSnapshotFrame";
+import {HandOver} from "@src/dsl/gunsmith/components/room/playwright/wire/hand-over/HandOver";
 import {snapshotsOfFrames} from "@src/dsl/gunsmith/components/room/playwright/wire/SnapshotsOfFrames";
-import {withSavedWeapon} from "@src/dsl/gunsmith/components/room/playwright/wire/saved-weapon/WithSavedWeapon";
-import type {SavedWeaponHolder} from "@src/dsl/gunsmith/components/room/playwright/wire/saved-weapon/types/SavedWeaponHolder";
+import type {SavedWeaponHolder} from "@src/dsl/gunsmith/components/room/playwright/wire/hand-over/types/SavedWeaponHolder";
 import {addressOfRoom} from "@src/dsl/gunsmith/components/room/playwright/address/AddressOfRoom";
 import {RoundPlaywright} from "@src/dsl/gunsmith/components/round/playwright/RoundPlaywright";
 import type {RoundSnapshot} from "@gunsmith/shared/state-hook/types/RoundSnapshot";
@@ -500,37 +499,25 @@ export class RoomPlaywright extends BasePage {
       };
       const toServer = new DelayedLine(this.delay);
       const toPage = new DelayedLine(this.delay);
-      let snapshots = 0;
+      const handOver = new HandOver({
+        snapshotsPerHandover: this.snapshotsPerHandover,
+        savedWeaponHolder: this.savedWeaponHolder,
+      });
 
       pageSide.onMessage(frame => {
         toServer.send(frame, delayed => serverSide.send(delayed));
       });
       serverSide.onMessage(sent => {
-        const frame = this.asHandedOver(sent);
-        if (typeof frame === "string" && isSnapshotFrame(frame)) {
-          snapshots += 1;
-          if ((snapshots - 1) % this.snapshotsPerHandover !== 0) {
-            return;
-          }
+        for (const frame of handOver.framesFor(sent)) {
+          toPage.send(frame, delayed => {
+            if (typeof delayed === "string") {
+              this.framesReceived.push(delayed);
+            }
+            pageSide.send(delayed);
+          });
         }
-
-        toPage.send(frame, delayed => {
-          if (typeof delayed === "string") {
-            this.framesReceived.push(delayed);
-          }
-          pageSide.send(delayed);
-        });
       });
     });
-  }
-
-  /** A frame from the server as the route hands it to the page: with the saved weapon in it, when one is being carried. */
-  private asHandedOver(frame: string | Buffer): string | Buffer {
-    if (!this.savedWeaponHolder || typeof frame !== "string") {
-      return frame;
-    }
-
-    return withSavedWeapon(frame, this.savedWeaponHolder);
   }
 
   private async shownSamples(): Promise<ShownSamples> {

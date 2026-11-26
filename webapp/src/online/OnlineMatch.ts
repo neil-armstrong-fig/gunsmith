@@ -28,6 +28,8 @@ import type {SeatPick} from "@src/online/types/pre-round/SeatPick";
 import type {ArenaChoice} from "@src/online/types/pre-round/ArenaChoice";
 import type {WeaponChoice} from "@src/online/types/pre-round/WeaponChoice";
 import type {WeaponSlot} from "@src/online/types/pre-round/WeaponSlot";
+import type {OpponentWeaponFrame} from "@src/online/types/OpponentWeaponFrame";
+import type {OpponentWeapons} from "@src/online/types/OpponentWeapons";
 import type {RevealFrame} from "@src/online/types/RevealFrame";
 import type {SnapshotFrame} from "@src/online/types/SnapshotFrame";
 import {TICK_SECONDS} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/clock/TickSeconds";
@@ -73,6 +75,8 @@ export class OnlineMatch {
   private ready: Readiness | undefined;
   private choosing: PreRoundFrame | undefined;
   private revealed: RevealFrame | undefined;
+  /** The other player's saved weapons the server told once each, by slot; kept through a reconnect, since a locked slot cannot change. */
+  private toldWeapons: OpponentWeapons = [undefined, undefined];
   /** The saved weapons' drawings the reveal sent, given to the weapons of each snapshot as it comes. */
   private revealedDrawings: RevealedDrawings | undefined;
   private readonly snapshots = new SnapshotBuffer(SNAPSHOTS_KEPT);
@@ -170,6 +174,11 @@ export class OnlineMatch {
   /** The weapons both players carry into the match, as the server last said them (once, as the match begins); `undefined` before that. */
   reveal(): RevealFrame | undefined {
     return this.revealed;
+  }
+
+  /** The other player's saved weapons, with their numbers and drawings, in slot 1 and 2, as the server told them while choosing; `undefined` where it has not. */
+  opponentWeapons(): OpponentWeapons {
+    return this.toldWeapons;
   }
 
   /** Puts an arena forward, a built-in by name or one of this player's saved ones by id. It is not final until `lockInArena`, and the server ignores one it does not know or this player does not have. */
@@ -290,6 +299,9 @@ export class OnlineMatch {
     if (message?.kind === "preRound") {
       this.choosing = message;
     }
+    if (message?.kind === "opponentWeapon") {
+      this.tellWeapon(message);
+    }
     if (message?.kind === "reveal") {
       this.revealed = message;
       this.revealedDrawings = new RevealedDrawings(message);
@@ -297,6 +309,15 @@ export class OnlineMatch {
     if (message?.kind === "snapshot" && this.arena) {
       this.choosing = undefined;
       this.takeSnapshot(this.arena, message);
+    }
+  }
+
+  /** Keeps the other player's saved weapon the server told for its slot. */
+  private tellWeapon(frame: OpponentWeaponFrame): void {
+    if (frame.slot === 1) {
+      this.toldWeapons = [frame, this.toldWeapons[1]];
+    } else {
+      this.toldWeapons = [this.toldWeapons[0], frame];
     }
   }
 

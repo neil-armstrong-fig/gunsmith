@@ -1,4 +1,4 @@
-import {RevealedWeapon} from "@src/react/components/dom/pre-round/components/side/components/revealed-weapon/RevealedWeapon";
+import {RevealedWeapon} from "@src/react/components/dom/pre-round/components/revealed-weapon/RevealedWeapon";
 import type {SlotWeapon} from "@src/react/components/dom/pre-round/components/side/types/SlotWeapon";
 import type {JSX} from "react";
 

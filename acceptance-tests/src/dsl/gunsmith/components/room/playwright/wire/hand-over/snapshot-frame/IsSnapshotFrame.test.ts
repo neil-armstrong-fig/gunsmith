@@ -1,5 +1,5 @@
 import {expect, it} from "vitest";
-import {isSnapshotFrame} from "@src/dsl/gunsmith/components/room/playwright/wire/IsSnapshotFrame";
+import {isSnapshotFrame} from "@src/dsl/gunsmith/components/room/playwright/wire/hand-over/snapshot-frame/IsSnapshotFrame";
 
 it("knows a snapshot frame as the server writes it", () => {
   expect(isSnapshotFrame(JSON.stringify({kind: "snapshot", player: {}}))).toBe(true);

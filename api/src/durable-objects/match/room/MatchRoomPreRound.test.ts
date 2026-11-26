@@ -276,6 +276,63 @@ it("sends a reveal once to each seat, and none before the match begins", () => {
   expect(room.takeRevealMessage("second")).toMatchObject({kind: "reveal"});
 });
 
+it("tells a seat the other's saved weapon in a slot once, with its numbers and drawing, when both have locked in that slot", () => {
+  const room = twoSeatedRoom();
+  room.chooseWeapon("second", 1, savedWeapon("weapon-secret-1", "Sparky"));
+  room.preRoundAction("second", {kind: "lockInWeapon", slot: 1});
+
+  const before = room.takeOpponentWeaponMessages("first");
+  room.preRoundAction("first", {kind: "lockInWeapon", slot: 1});
+  const after = room.takeOpponentWeaponMessages("first");
+
+  expect(before).toEqual([]);
+  expect(after).toEqual([
+    {kind: "opponentWeapon", slot: 1, weapon: weaponNamed("Sparky"), appearance: fallbackAppearance()},
+  ]);
+  expect(JSON.stringify(after)).not.toContain("secret");
+  expect(room.takeOpponentWeaponMessages("first")).toEqual([]);
+});
+
+it("never tells a seat its own saved weapon, nor a built-in, which its page has", () => {
+  const room = twoSeatedRoom();
+  room.chooseWeapon("second", 1, savedWeapon("weapon-1", "Sparky"));
+  room.preRoundAction("second", {kind: "lockInWeapon", slot: 1});
+  room.chooseWeapon("first", 1, {kind: "builtIn", key: "submachine-gun"});
+  room.preRoundAction("first", {kind: "lockInWeapon", slot: 1});
+
+  expect(room.takeOpponentWeaponMessages("second")).toEqual([]);
+});
+
+it("tells a seat that comes back before the match begins the other's saved weapons again, as its page may have lost them", () => {
+  const room = twoSeatedRoom();
+  const token = room.joinedMessage("first").token;
+  room.chooseWeapon("second", 1, savedWeapon("weapon-1", "Sparky"));
+  room.preRoundAction("second", {kind: "lockInWeapon", slot: 1});
+  room.preRoundAction("first", {kind: "lockInWeapon", slot: 1});
+  room.takeOpponentWeaponMessages("first");
+  room.leave("first");
+
+  expect(room.reconnect(token)).toBe("first");
+
+  expect(room.takeOpponentWeaponMessages("first")).toMatchObject([{kind: "opponentWeapon", slot: 1}]);
+  expect(room.takeOpponentWeaponMessages("first")).toEqual([]);
+});
+
+it("tells a seat nothing more of the other's weapons once the match has begun, since the reveal carries them", () => {
+  const room = twoSeatedRoom();
+  const token = room.joinedMessage("first").token;
+  lockInChosen(room, "second", [savedWeapon("weapon-1", "Sparky"), {kind: "builtIn", key: "rifle"}]);
+  lockInArena(room, "second", DUEL_BUILT_IN_ARENA.name);
+  lockInArena(room, "first", DUEL_BUILT_IN_ARENA.name);
+  room.takeOpponentWeaponMessages("first");
+  room.leave("first");
+
+  expect(room.reconnect(token)).toBe("first");
+
+  expect(room.snapshotFor("first")).toBeDefined();
+  expect(room.takeOpponentWeaponMessages("first")).toEqual([]);
+});
+
 it("plays a saved weapon in the match, and a saved arena as the arena", () => {
   const room = twoSeatedRoom();
   const sparky = savedWeapon("weapon-1", "Sparky");

@@ -34,7 +34,15 @@ export function useRoomPreRound(): RoomPreRound {
         if (madeRevealRef.current.frame !== reveal) {
           madeRevealRef.current = {frame: reveal, readout: revealReadoutOf(reveal)};
         }
-        useRoomPreRoundStore.getState().setReadout(readoutOfFrame({frame, reveal: madeRevealRef.current.readout}));
+        const previous = useRoomPreRoundStore.getState().readout;
+        useRoomPreRoundStore.getState().setReadout(
+          readoutOfFrame({
+            frame,
+            reveal: madeRevealRef.current.readout,
+            previous,
+            opponentWeapons: onlineMatch.opponentWeapons(),
+          }),
+        );
 
         const {readout, wants} = useRoomPreRoundStore.getState();
         if (!readout) {

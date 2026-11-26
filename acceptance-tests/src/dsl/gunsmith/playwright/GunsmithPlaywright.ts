@@ -45,6 +45,12 @@ export class GunsmithPlaywright extends BasePage {
     await this.waitForArena();
   }
 
+  /** Opens the practice range with `seed` in its address, which a bot game started from its menu keeps. */
+  async openPracticeRange(seed: number): Promise<void> {
+    await this.page.goto(`/?menu=0&seed=${seed}`);
+    await this.waitForArena();
+  }
+
   /** Loads the page again, as a player's reload does, and waits for the arena. What the browser stores stays; what the page holds in memory does not. */
   async reloadThePage(): Promise<void> {
     await this.page.reload();

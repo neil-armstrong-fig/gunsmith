@@ -8,7 +8,7 @@ interface Props {
   weapon: Weapon;
 }
 
-/** One weapon on the reveal: its drawing and name, its power rating out of 100 with a meter, and its six stats, so a player can weigh all four before the match. */
+/** One weapon as a card (on the reveal, and the other player's weapon while choosing): its drawing and name, its power rating out of 100 with a meter, and its six stats, so a player can weigh all four before the match. */
 export function RevealedWeapon({weapon}: Props): JSX.Element {
   const rating = ratingPercentOf(weapon);
 

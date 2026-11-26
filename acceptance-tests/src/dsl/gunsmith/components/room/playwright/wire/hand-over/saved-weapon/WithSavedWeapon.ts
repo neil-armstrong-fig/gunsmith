@@ -1,7 +1,7 @@
 import {fallbackAppearance} from "@gunsmith/shared/appearance/fallback/FallbackAppearance";
 import {isRevealFrame} from "@src/dsl/gunsmith/components/room/playwright/wire/IsRevealFrame";
-import {isSnapshotFrame} from "@src/dsl/gunsmith/components/room/playwright/wire/IsSnapshotFrame";
-import type {SavedWeaponHolder} from "@src/dsl/gunsmith/components/room/playwright/wire/saved-weapon/types/SavedWeaponHolder";
+import {isSnapshotFrame} from "@src/dsl/gunsmith/components/room/playwright/wire/hand-over/snapshot-frame/IsSnapshotFrame";
+import type {SavedWeaponHolder} from "@src/dsl/gunsmith/components/room/playwright/wire/hand-over/types/SavedWeaponHolder";
 
 /** The name the saved weapon is shown by. */
 const SAVED_NAME = "Mint Coil";
@@ -31,25 +31,50 @@ const SAVED_WEAPON = {
   appearance: {...appearance, palette: {...appearance.palette, accent: "weapon-mint"}},
 };
 
-/** Where the reveal lists each fighter's weapons. */
+/** Where the reveal and the choosing list each fighter's weapons. */
 const REVEAL_SIDES: Record<SavedWeaponHolder, string> = {player: "own", opponent: "opponent"};
 
 /**
- * `frame` as the server would have written it had `holder` locked in a saved weapon for slot 1. The local Worker sees no session, so it
- * refuses saved ids; this stands in for a signed-in seat. The reveal names the saved weapon with its drawing, and each snapshot gives
- * `holder`'s slot-1 rifle the saved weapon's key and name, keeping the server's numbers. Any other frame is handed on unchanged, and so
- * is a slot 1 that holds something else (a weapon picked up).
+ * The frames the server would have sent for `frame` had `holder` locked in a saved weapon for slot 1. The local Worker sees no session, so it
+ * refuses saved ids; this stands in for a signed-in seat. The choosing names the saved weapon to both browsers, and for the other browser
+ * comes after a frame of its own with its numbers and drawing (the server sends that once a connection: the route keeps only the first). The
+ * reveal names it with its drawing, and each snapshot gives `holder`'s slot-1 rifle the saved weapon's key and name, keeping the server's
+ * numbers. Any other frame is handed on unchanged, and so is a slot 1 that holds something else (a weapon picked up).
  */
-export function withSavedWeapon(frame: string, holder: SavedWeaponHolder): string {
+export function withSavedWeapon(frame: string, holder: SavedWeaponHolder): readonly string[] {
   if (isRevealFrame(frame)) {
-    return revealWithSavedWeapon(frame, holder);
+    return [revealWithSavedWeapon(frame, holder)];
   }
 
   if (isSnapshotFrame(frame)) {
-    return snapshotWithSavedWeapon(frame, holder);
+    return [snapshotWithSavedWeapon(frame, holder)];
   }
 
-  return frame;
+  if (frame.startsWith('{"kind":"preRound"')) {
+    return preRoundWithSavedWeapon(frame, holder);
+  }
+
+  return [frame];
+}
+
+/** The server names a saved weapon in the choosing, and tells the other seat its numbers and drawing in a frame of its own. */
+function preRoundWithSavedWeapon(frame: string, holder: SavedWeaponHolder): readonly string[] {
+  const preRound: unknown = JSON.parse(frame);
+  const slots = fieldOf(fieldOf(fieldOf(preRound, REVEAL_SIDES[holder]), "weapons"), "slots");
+  const first = Array.isArray(slots) ? slots[0] : undefined;
+  if (fieldOf(first, "choice") === undefined) {
+    return [frame];
+  }
+
+  Reflect.set(Object(first), "choice", {kind: SAVED_WEAPON.kind, name: SAVED_NAME});
+  const choosing = JSON.stringify(preRound);
+  if (holder === "player") {
+    return [choosing];
+  }
+
+  const told = {kind: "opponentWeapon", slot: 1, weapon: SAVED_WEAPON.weapon, appearance: SAVED_WEAPON.appearance};
+
+  return [JSON.stringify(told), choosing];
 }
 
 function revealWithSavedWeapon(frame: string, holder: SavedWeaponHolder): string {

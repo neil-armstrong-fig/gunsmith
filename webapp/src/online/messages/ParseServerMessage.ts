@@ -33,6 +33,9 @@ export function parseServerMessage(text: string): ServerMessage | undefined {
   if (kind === "reveal" && isReveal(parsed)) {
     return parsed as ServerMessage;
   }
+  if (kind === "opponentWeapon" && isOpponentWeapon(parsed)) {
+    return parsed as ServerMessage;
+  }
 
   return undefined;
 }
@@ -75,6 +78,15 @@ function isReveal(frame: object): boolean {
     isRevealedArena(Reflect.get(frame, "arena")) &&
     isRevealedPair(Reflect.get(weapons, "own")) &&
     isRevealedPair(Reflect.get(weapons, "opponent"))
+  );
+}
+
+/** The other player's saved weapon in slot 1 or 2, with its numbers and drawing. */
+function isOpponentWeapon(frame: object): boolean {
+  const slot: unknown = Reflect.get(frame, "slot");
+
+  return (
+    (slot === 1 || slot === 2) && isRecord(Reflect.get(frame, "weapon")) && isRecord(Reflect.get(frame, "appearance"))
   );
 }
 
