@@ -3,6 +3,9 @@
 A 1v1 top-down shooter where players describe weapons and arenas in plain words, and AI builds them. Fight a scripted bot or a
 friend in a private room, in a full-screen arena with fog of war, three height levels, crouching, pickups and a closing ring.
 
+**[Play it at gunsmith.neilarmstrong.dev](https://gunsmith.neilarmstrong.dev)**: desktop only. Anyone can fight the bot; generating
+weapons and arenas and playing online are invite-only for now.
+
 ![A duel on Twin ridges: the player's vision cone lights the floor between two raised platforms, with the bot beside the centre cover and a weapon pickup](docs/game-screenshots/terraced-arena.png)
 
 | | |
