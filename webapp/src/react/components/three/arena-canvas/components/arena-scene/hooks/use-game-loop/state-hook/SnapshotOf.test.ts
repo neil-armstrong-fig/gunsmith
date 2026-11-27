@@ -58,6 +58,7 @@ it("reports where each bullet in the air is, whose it is and which way it flies"
         shooter: "player" as const,
         level: 0,
         crouching: false,
+        floor: 0,
       },
       {
         position: {x: 3, y: 1},
@@ -67,6 +68,7 @@ it("reports where each bullet in the air is, whose it is and which way it flies"
         shooter: "opponent" as const,
         level: 0,
         crouching: false,
+        floor: 0,
       },
     ],
   };

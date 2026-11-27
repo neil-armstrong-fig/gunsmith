@@ -10,6 +10,7 @@ const bullet: Bullet = {
   shooter: "player",
   level: 0,
   crouching: false,
+  floor: 0,
 };
 
 it("is the distance to the near edge of the fighter's circle", () => {

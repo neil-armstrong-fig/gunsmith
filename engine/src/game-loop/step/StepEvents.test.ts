@@ -177,6 +177,7 @@ it("reports nothing when only the opponent is hurt by a bullet", () => {
     shooter: "player",
     level: 0,
     crouching: false,
+    floor: 0,
   };
   const after = step({...sparring(), bullets: [bullet]}, IDLE, TICK);
 
@@ -278,6 +279,7 @@ function playerBulletAt(x: number): Bullet {
     shooter: "player",
     level: 0,
     crouching: false,
+    floor: 0,
   };
 }
 
@@ -292,6 +294,7 @@ function bulletsOnPlayer(health: number, damages: readonly number[]): World {
     shooter: "opponent",
     level: 0,
     crouching: false,
+    floor: 0,
   }));
 
   return {...world, bullets};

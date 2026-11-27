@@ -8,9 +8,10 @@ import {useRef} from "react";
 import type {Mesh} from "three";
 
 /**
- * A dark veil over the whole arena with the player's cone cut out of it, so the terrain outside the cone is still there but
- * dim, and inside it shows in detail. It sits above the walls and below the fighters, and is rebuilt each frame from the same
- * outline (`visibleArea`) the engine will use on the server to decide what to send.
+ * A dark veil over the whole arena with what the player sees cut out of it (`visibleArea`: their cone, less the ground they look
+ * across without seeing, such as the low ground below a platform on the way to another on the same level), so the terrain they do
+ * not see is still there but dim, and what they see shows in detail. It sits above the walls and below the fighters, and is rebuilt
+ * each frame by the same sight rule the server uses to decide what to send.
  */
 export function VisionOverlay(): JSX.Element {
   const veilRef = useRef<Mesh>(null);

@@ -171,22 +171,24 @@ describe("with a seeded opponent", () => {
     expect(opponentOf(after).position.x).toBeGreaterThan(opponentOf(hit).position.x);
   });
 
-  it("has an opponent hit from the platform come up its stair to the shooter, who now stands still", () => {
-    const after = playTicks(untilHitFromThePlatform(), IDLE, 100);
+  it("has an opponent hit from the platform's edge fight back from the low ground, since it can see a shooter there", () => {
+    const after = playTicks(untilHitFromThePlatform(), IDLE, 300);
 
-    expect(levelAt(after.arena, opponentOf(after).position)).toBeGreaterThan(0);
+    expect(levelAt(after.arena, opponentOf(after).position)).toBe(0);
+    expect(after.player.health).toBeLessThan(100);
   });
 
   function duel(seed = 1): World {
     return giveOpponentBrain(startingWorld(arena, [], {x: 11.5, y: 4.5}), seed);
   }
 
-  // The player stands on the platform and fires down at an opponent on the low ground that is walking west, away from them, with its
-  // back to them and too far to see them; the world is returned on the step a bullet first hurts it.
+  // The player stands at the platform's edge (its face is at x = 11), where a shot can reach the low ground, and fires down at an
+  // opponent on the low ground that is walking west, away from them, with its back to them; the world is returned on the step a
+  // bullet first hurts it.
   function untilHitFromThePlatform(seed = 1): World {
     const start = giveOpponentBrain(startingWorld(lowGroundBelowAPlatform, [], {x: 6.5, y: 3.5}), seed);
     const walkingWest = start.opponentBrain && {...start.opponentBrain, goal: {x: 1.5, y: 3.5}};
-    let world: World = {...start, opponentBrain: walkingWest, player: {...start.player, position: {x: 12.5, y: 3.5}}};
+    let world: World = {...start, opponentBrain: walkingWest, player: {...start.player, position: {x: 11.5, y: 3.5}}};
     for (let tick = 0; tick < 600; tick++) {
       world = step(world, firingAt({x: 1.5, y: 3.5}), TICK);
       if (opponentOf(world).health < OPPONENT_HEALTH) {

@@ -47,6 +47,7 @@ function shotFrom(position: Point, shooter: Shooter): Bullet {
     shooter,
     level: 0,
     crouching: false,
+    floor: 0,
   };
 }
 

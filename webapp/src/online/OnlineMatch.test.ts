@@ -713,6 +713,7 @@ function shotAt(x: number): Bullet {
     shooter: "player",
     level: 0,
     crouching: false,
+    floor: 0,
   };
 }
 

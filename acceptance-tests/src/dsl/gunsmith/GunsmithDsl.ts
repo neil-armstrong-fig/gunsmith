@@ -84,6 +84,18 @@ export class GunsmithDsl {
     }
   }
 
+  /**
+   * Asks for the fog's veil to be left out (`?fog=off`) in whatever the spec opens next, so a screenshot of the terrain's pictures is
+   * not darkened where the player cannot see. Sight itself is unchanged: what the player cannot see is still not drawn.
+   */
+  hideTheFog(): void {
+    try {
+      this.gunsmith.hideTheFog();
+    } catch (error) {
+      throw new DslError("Failed to ask for the fog to be hidden", error);
+    }
+  }
+
   /** Asks for reduced motion through the page (`?reducedMotion=1`) in whatever the spec opens next. */
   askForReducedMotion(): void {
     try {

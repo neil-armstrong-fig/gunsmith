@@ -23,7 +23,7 @@ export function advanceBullets(arena: Arena, flightRequest: FlightRequest): Bull
   const meetings = flightRequest.bullets.map(bullet => meetBullet(arena, flightRequest, bullet));
 
   return {
-    bullets: bulletsStillFlying(meetings, flightRequest.seconds),
+    bullets: bulletsStillFlying(arena, meetings, flightRequest.seconds),
     dummies: hurtDummies(flightRequest.dummies, strikesOf(meetings)),
     playerDamage: damageDealtBy(meetings, "opponent"),
     opponentDamage: damageDealtBy(meetings, "player"),

@@ -19,7 +19,7 @@ export class GunsmithPlaywright extends BasePage {
   /** Lets through pictures a scenario is holding back. */
   private releaseHeldPictures: (() => void) | undefined;
 
-  /** What the spec has asked of the page beyond the scenario (`shake=0`, `reducedMotion=1`), added to the address of whatever it opens next. */
+  /** What the spec has asked of the page beyond the scenario (`shake=0`, `fog=off`, `reducedMotion=1`), added to the address of whatever it opens next. */
   private readonly askedFor: string[] = [];
 
   constructor(page: Page) {
@@ -29,6 +29,11 @@ export class GunsmithPlaywright extends BasePage {
   /** Has the next scenario opened with a camera that does not shake. */
   keepTheCameraStill(): void {
     this.askedFor.push("shake=0");
+  }
+
+  /** Has the next scenario opened with the fog's veil left out. */
+  hideTheFog(): void {
+    this.askedFor.push("fog=off");
   }
 
   /** Has the next scenario opened asking for reduced motion. */

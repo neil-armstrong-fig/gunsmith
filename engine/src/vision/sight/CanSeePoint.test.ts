@@ -47,8 +47,8 @@ describe("across levels", () => {
     expect(canSeePoint(ledge, FROM_LOW, {x: 6.5, y: 1.5})).toBe(false);
   });
 
-  it("does not see the platform's near edge from the low ground either", () => {
-    expect(canSeePoint(ledge, FROM_LOW, {x: 4.5, y: 1.5})).toBe(false);
+  it("sees the platform's near edge from the low ground", () => {
+    expect(canSeePoint(ledge, FROM_LOW, {x: 4.5, y: 1.5})).toBe(true);
   });
 
   it("does not see low ground behind a platform's edge from the low ground", () => {
@@ -59,9 +59,16 @@ describe("across levels", () => {
     expect(canSeePoint(ledge, FROM_LOW, {x: 3.5, y: 1.5})).toBe(true);
   });
 
-  it("sees low ground below the platform from the platform", () => {
-    expect(canSeePoint(ledge, FROM_PLATFORM, {x: 9.5, y: 1.5})).toBe(true);
-    expect(canSeePoint(ledge, {...FROM_PLATFORM, aim: {x: -1, y: 0}}, {x: 2.5, y: 1.5})).toBe(true);
+  it("sees low ground below the platform from the platform's edge", () => {
+    expect(canSeePoint(ledge, {...FROM_PLATFORM, apex: {x: 8.5, y: 1.5}}, {x: 9.5, y: 1.5})).toBe(true);
+    expect(canSeePoint(ledge, {...FROM_PLATFORM, apex: {x: 4.5, y: 1.5}, aim: {x: -1, y: 0}}, {x: 2.5, y: 1.5})).toBe(
+      true,
+    );
+  });
+
+  it("does not see low ground below the platform from the middle of the platform", () => {
+    expect(canSeePoint(ledge, FROM_PLATFORM, {x: 9.5, y: 1.5})).toBe(false);
+    expect(canSeePoint(ledge, {...FROM_PLATFORM, aim: {x: -1, y: 0}}, {x: 2.5, y: 1.5})).toBe(false);
   });
 
   it("sees a point on the same level from the platform", () => {

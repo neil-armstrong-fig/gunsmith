@@ -13,6 +13,7 @@ export function shotAtPlayer(playerHealth: number): World {
     shooter: "opponent",
     level: 0,
     crouching: false,
+    floor: 0,
   } as const;
 
   return {...world, player: {...world.player, health: playerHealth}, bullets: [bullet]};

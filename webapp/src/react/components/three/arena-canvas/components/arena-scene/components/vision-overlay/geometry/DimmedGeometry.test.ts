@@ -5,7 +5,7 @@ import {dimmedGeometry} from "@src/react/components/three/arena-canvas/component
 // An arena 10 tiles wide and 6 high.
 const arena = arenaFrom(["##########", "#........#", "#........#", "#........#", "#........#", "##########"]);
 
-it("covers the whole arena but the visible outline", () => {
+it("covers the whole arena but the outline", () => {
   const square = [
     {x: 2, y: 2},
     {x: 4, y: 2},
@@ -13,11 +13,11 @@ it("covers the whole arena but the visible outline", () => {
     {x: 2, y: 4},
   ];
 
-  expect(areaOf(dimmedGeometry(arena, square))).toBeCloseTo(10 * 6 - 4, 9);
+  expect(areaOf(dimmedGeometry(arena, {outline: square, hidden: []}))).toBeCloseTo(10 * 6 - 4, 9);
 });
 
 it("covers the whole arena when nothing is visible", () => {
-  expect(areaOf(dimmedGeometry(arena, []))).toBeCloseTo(10 * 6, 9);
+  expect(areaOf(dimmedGeometry(arena, {outline: [], hidden: []}))).toBeCloseTo(10 * 6, 9);
 });
 
 it("does not mind which way round the outline runs", () => {
@@ -28,7 +28,31 @@ it("does not mind which way round the outline runs", () => {
     {x: 4, y: 2},
   ];
 
-  expect(areaOf(dimmedGeometry(arena, clockwise))).toBeCloseTo(10 * 6 - 4, 9);
+  expect(areaOf(dimmedGeometry(arena, {outline: clockwise, hidden: []}))).toBeCloseTo(10 * 6 - 4, 9);
+});
+
+it("also covers each hidden patch inside the outline, once", () => {
+  const outline = [
+    {x: 2, y: 2},
+    {x: 6, y: 2},
+    {x: 6, y: 4},
+    {x: 2, y: 4},
+  ];
+  const patches = [
+    [
+      {x: 3, y: 2},
+      {x: 4, y: 2},
+      {x: 4, y: 3},
+      {x: 3, y: 3},
+    ],
+    [
+      {x: 5, y: 3},
+      {x: 6, y: 3},
+      {x: 5.5, y: 4},
+    ],
+  ];
+
+  expect(areaOf(dimmedGeometry(arena, {outline, hidden: patches}))).toBeCloseTo(10 * 6 - 8 + 1 + 0.5, 9);
 });
 
 /** The total area of the triangles the geometry draws. */

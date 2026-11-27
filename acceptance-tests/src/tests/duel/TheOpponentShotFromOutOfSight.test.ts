@@ -1,11 +1,11 @@
 import {beforeEach, expect, given, then, when} from "@src/acceptance-criteria-mapping/AcceptanceCriteriaMapping";
 
-// The overwatch: a corridor one tile wide. The opponent wanders on its low ground, ten tiles west of the player, who stands still on
-// the platform at the east end and fires west along the row: every shot along it hits, wherever the opponent has wandered to, and it is
-// farther than it can see (eight tiles), so the player is out of its sight. Measured in the engine over seeds 0 to 39, with the
-// opponent's reaction to a shot switched off, it never stopped wandering within fifteen seconds in 19 of them and took one to
-// fourteen seconds in the rest; with it, it stopped within one step in all 40. These three seeds are among the 19.
-const SEEDS = [2, 5, 7];
+// The overwatch: a corridor one tile wide. The opponent wanders on its low ground, ten tiles west of the player, who stands still at
+// the edge of the platform at the east end (a shot from back on it would fly over the low ground) and fires west along the row:
+// every shot along it hits, wherever the opponent has wandered to, and it is farther than it can see (eight tiles), so the player is
+// out of its sight. A player at the edge can be seen from below, so a wandering opponent that comes near sees them: measured in the
+// engine over seeds 0 to 39 with the player idle, it never stopped wandering within fifteen seconds in only two of them, these.
+const SEEDS = [13, 14];
 
 // Straight along the corridor's row, west of the opponent's whole reach.
 const ALONG_THE_ROW = {x: 20.5, y: 1.5};

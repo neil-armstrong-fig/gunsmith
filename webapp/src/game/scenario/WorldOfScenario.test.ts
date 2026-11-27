@@ -289,11 +289,22 @@ describe("the heights arena", () => {
 
   it("stands one dummy on the low ground and one on the platform, each four tiles from the player along their row", () => {
     const {dummies, player, arena} = worldOfScenario("heights", 1);
-    const levels = dummies.map(dummy => levelAt(arena, dummy.position)).sort();
+    const alongTheRow = dummies.filter(dummy => dummy.position.y === player.position.y);
 
-    expect(levels).toEqual([0, 1]);
-    expect(dummies.map(dummy => Math.abs(dummy.position.x - player.position.x))).toEqual([4, 4]);
-    expect(dummies.every(dummy => dummy.position.y === player.position.y)).toBe(true);
+    expect(alongTheRow.map(dummy => levelAt(arena, dummy.position)).sort()).toEqual([0, 1]);
+    expect(alongTheRow.map(dummy => Math.abs(dummy.position.x - player.position.x))).toEqual([4, 4]);
+  });
+
+  it("stands a third dummy on the platform half a tile from its edge, off the player's row", () => {
+    const {dummies, player, arena} = worldOfScenario("heights", 1);
+    const offTheRow = dummies.filter(dummy => dummy.position.y !== player.position.y);
+
+    expect(offTheRow).toHaveLength(1);
+    expect(offTheRow.map(dummy => levelAt(arena, dummy.position))).toEqual([1]);
+    expect(
+      offTheRow.map(dummy => levelOfTile(arena, Math.floor(dummy.position.x) - 1, Math.floor(dummy.position.y))),
+    ).toEqual([0]);
+    expect(offTheRow.map(dummy => dummy.position.x % 1)).toEqual([0.5]);
   });
 
   it("starts the player on the low ground, with a stair climbing east from their row onto a platform", () => {
