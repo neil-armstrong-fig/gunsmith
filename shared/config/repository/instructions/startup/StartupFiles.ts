@@ -5,14 +5,10 @@ const STARTUP_FILES = [
   "CLAUDE.md",
   "HANDOFF.md",
   "TODO.md",
-  "TODO-build.md",
-  "TODO-play.md",
-  "TODO-engine.md",
+  "MVP-TODO.md",
+  "POSTMVP-TODO.md",
   "TODO-ai.md",
-  "TODO-server.md",
-  "TODO-budget.md",
-  "TODO-art.md",
-  "TODO-ship.md",
+  "TODO-netcode.md",
 ] as const;
 
 /** Startup documents checked for valid references; a session reads only its own persona checklist. */

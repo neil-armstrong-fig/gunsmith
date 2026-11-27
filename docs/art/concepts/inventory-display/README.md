@@ -1,6 +1,6 @@
 # Inventory display: know what you carry
 
-Current implementation owner: play (Claude); art owns authored icons/manifest, engine supplies inventory data. Use root TODO-play.md and HANDOFF.md for current tasks.
+Current implementation owner: play (Claude); art owns authored icons/manifest, engine supplies inventory data. Use root MVP-TODO.md and HANDOFF.md for current tasks.
 
 Art/research session 1, 2026-11-17. User chose **two compact icons and only the
 selected weapon's name**. User visually approved the rendered study: “looks good!”

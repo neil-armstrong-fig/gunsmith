@@ -11,7 +11,7 @@ joint design work, not a frozen contract or instructions to build ahead of the p
 
 ## What I kept, and why
 
-The richer [six-weapon sheet](../improbable-machinery-03.md) and [three-weapon study](../overhead-machinery-02.md)
+The richer six-weapon sheet and three-weapon study (improbable machinery 03 and overhead machinery 02, now only in git history)
 remain useful aspiration references. Their exaggerated masses, open gaps and visible working assemblies give the
 weapons personality. This version keeps those relationships and removes glass, specular highlights, springs, bolts,
 small vents and animation. It uses flat fills rather than making a shaded-material system a prerequisite.

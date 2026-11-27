@@ -54,4 +54,4 @@ Chromium verifies the proof loads and the marker contains both outline layers;
 the final PNG was visually reviewed. Root instructions and the existing pickup
 study were the standards references. Folder/caller audit: four intentional art
 entry files, no helper scripts or types; every source/proof is linked above.
-Project check results are recorded in `TODO-art.md`.
+Project check results were recorded in art's checklist (in git history).

@@ -1,6 +1,6 @@
 # Architecture
 
-Gunsmith uses a pnpm TypeScript workspace. Local gameplay and private-room online play work today; authentication, persistence and deployment remain planned.
+Gunsmith uses a pnpm TypeScript workspace. Local play, private-room online play, Google sign-in, the account library and AI generation work today, deployed to Cloudflare.
 
 ## Existing packages
 
@@ -8,9 +8,10 @@ Gunsmith uses a pnpm TypeScript workspace. Local gameplay and private-room onlin
 | --- | --- | --- |
 | `engine/` | Deterministic simulation, movement, combat, vision, stairs, ring, opponent, rating and balancing | shared |
 | `webapp/` | Vite, React, react-three-fiber, Zustand, HUD, input, rendering and sound | shared, engine |
-| `ai/` | Validated weapon stats and appearance, LangGraph, model adapters and evals | shared, engine |
+| `ai/` | Weapon and arena generation (LangGraph, model adapters), validation and evals | shared, engine |
 | `shared/` | Base tooling and the read-only snapshot contract used by browser acceptance tests | none |
-| `api/` | Private rooms, authoritative fog-filtered matches and credit/spend Durable Objects | shared, engine, ai |
+| `api/` | Sign-in, the library, generation routes, private rooms, authoritative fog-filtered matches and credit/spend Durable Objects | shared, engine, ai |
+| `infra/` | Deployment of the Workers, D1 and Durable Objects with Alchemy | none |
 | `acceptance-tests/` | Playwright acceptance DSL and specifications | shared |
 | `webapp/audio/` | Offline synthesis, approved masters, codec studies and verification | none |
 
@@ -22,13 +23,13 @@ The engine advances a seeded world at a fixed timestep. The browser loop stores 
 
 The game fills the window. Menus are added only when needed. Browser acceptance tests use a tiny read-only snapshot and screenshot checks for what is actually drawn; they never recompute expectations with the engine.
 
-## Planned online system
+## Online system
 
 Cloudflare Workers serve the static webapp at `gunsmith.neilarmstrong.dev` and the API at `gunsmith-api.neilarmstrong.dev`. The API allows credentialed requests from the exact webapp origin and keeps session cookies on the API hostname. A Match Durable Object runs the same engine authoritatively at 60 Hz with 30 Hz snapshots; clients predict local movement and interpolate the opponent. Player snapshots must omit hidden opponents, and hidden sounds expose only quantised direction. See [netcode](match-netcode.md).
 
-The planned API imports `ai/` in-process using Workers-compatible LangChain/LangGraph. D1 is planned for accounts, library and match history; the sign-in design is in [sign-in](sign-in.md). CreditLedger and SpendLedger Durable Objects hold credits and spend counters. Budget owns atomic spend enforcement and tracing; server owns routing and common storage configuration. Private recording storage is a future fair-play capability, not an existing binding.
+The API imports `ai/` in-process using Workers-compatible LangChain/LangGraph. D1 holds accounts, sessions, the library and private generation history; match history is planned. The sign-in design is in [sign-in](sign-in.md). CreditLedger and SpendLedger Durable Objects hold credits and spend counters. Private recording storage is a future fair-play capability, not an existing binding.
 
-The API includes Google sign-in and D1 migrations. The release workflow in `infra/` uses Alchemy for D1, the application Worker and assets. Cloudflare provisioning and the first live acceptance run await authorization. Intended deployment is `gunsmith.neilarmstrong.dev`; forks will need their own domain and manual setup.
+The release workflow in `infra/` uses Alchemy for D1, the API Worker and its Durable Objects; Wrangler deploys the webapp Worker. Releases are manual for now ([manual setup](../MANUAL-SETUP-STEPS.md#first-deploy)); live acceptance against production is still open. Forks need their own domain and manual setup.
 
 ## Decisions and unresolved measurements
 

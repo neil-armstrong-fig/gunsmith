@@ -4,13 +4,13 @@ import {join} from "node:path";
 import {expect, it} from "vitest";
 import {instructionFailures} from "./InstructionFailures.ts";
 
-it.each(["play", "engine", "ai", "server", "budget", "art", "ship"])(
-  "checks references in the %s persona checklist",
-  persona => {
-    const root = mkdtempSync(join(tmpdir(), "gunsmith-persona-"));
+it.each(["MVP-TODO.md", "POSTMVP-TODO.md", "TODO-ai.md", "TODO-netcode.md"])(
+  "checks references in the %s checklist",
+  checklist => {
+    const root = mkdtempSync(join(tmpdir(), "gunsmith-checklist-"));
     try {
-      writeFileSync(join(root, `TODO-${persona}.md`), "[Missing](Missing.md)");
-      expect(instructionFailures(root).join("\n")).toContain(`TODO-${persona}.md: missing reference Missing.md`);
+      writeFileSync(join(root, checklist), "[Missing](Missing.md)");
+      expect(instructionFailures(root).join("\n")).toContain(`${checklist}: missing reference Missing.md`);
     } finally {
       rmSync(root, {recursive: true, force: true});
     }

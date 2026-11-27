@@ -19,6 +19,7 @@ pnpm api:dev             # the API Worker locally (`wrangler dev`, port 8787, or
 pnpm --filter @gunsmith/api db:migrate:local   # applies api/migrations to the local D1 (sign-in needs it; guests do not); `db:generate -- --name=<change>` writes a new migration
 pnpm test:properties     # property tests (engine, webapp/src/online, api/src/durable-objects/match), which `pnpm checks` leaves out
 pnpm evals               # complete free fake harness, all criteria gating; no model calls or traces
+pnpm deploy:fromLocal    # manual production release from this checkout (needs the root `.env.local`); see MANUAL-SETUP-STEPS.md#first-deploy
 ```
 
 `pnpm checks` is the gate (`--max-warnings=0`). It deliberately leaves out the property tests — a
@@ -26,24 +27,28 @@ fresh seed every run means a failure isn't reproducible from the same commit, so
 deploy — and model evals, which cost money and are non-deterministic. The free fake harness runs separately through `pnpm evals`. The property-test command is implemented; run it when engine changes require it. For prompt/graph changes, use the implemented AI package eval commands and preserve paid authorization/spend controls.
 
 
-## Development worktrees and the integration checkout
+## Development worktrees and GitHub's main
 
-**The main checkout (`main`) is integration-only. All development happens in persona worktrees**, including fixes, tests, tooling, assets and development documentation. Main is for reviewing incoming commits, merging branches, resolving merge conflicts and validating the combined result. If validation reveals a behavior defect, fix it in the owning worktree and integrate that fix; do not develop the fix on main.
+There is no integration checkout: each worktree exchanges work with `origin/main` directly, through the
+[`sync-with-github` skill](../../.agents/skills/sync-with-github/SKILL.md). The super turn that merged persona worktrees into `main` was
+retired on 2026-11-19.
 
-The flow is **persona worktree → main → persona worktrees**. The user decides when to start a **super turn** from `main`. Invocation starts the worktree checks, even if another session is unavailable. One integration session reviews the committed deliveries, validates `main`, and then fast-forwards every included persona worktree to the same commit. The [project skill](../../.agents/skills/integrate-worktrees/SKILL.md) implements steps 6–9 for Codex and Claude Code via `.claude/skills/integrate-worktrees`. This guide governs the workflow.
-
-1. **Select the right checkout.** At every session start, inspect `git status`, `git branch --show-current` and `git worktree list`. Continue in the persona's assigned development worktree, never the main checkout. Existing legacy worktrees may keep their names until their remaining work is handed over; record the actual path/branch in that persona's resume. Create/reuse a dedicated persona worktree when authorized; do not repurpose a worktree containing someone else's unfinished work.
-2. **Check main before new work.** The user's standing instruction is to run `git log --oneline HEAD..main` every fresh turn. After a super turn this should be empty. If committed `main` has advanced outside a super turn, sync before working or delivering. From a clean worktree use `git merge --ff-only --no-overwrite-ignore main` if `HEAD` is an ancestor of `main`. If the branches diverged, use `git merge --no-ff --no-commit --no-overwrite-ignore main`, resolve compatible changes and rerun affected checks before making the authorized merge commit `chore: merge main into <branch>`. Ask the user about conflicting behaviour. Preserve unfinished work and hand it over through the authorized commit flow if it blocks the sync.
-3. **Install and test independently.** Each worktree has its own dependencies: `pnpm install --frozen-lockfile --offline` (if offline metadata is missing, report it before a network retry). Run the app on its own port with `--strictPort` and point Playwright's `WEBAPP_URL` there. Never reuse or kill another session's server.
-4. **Develop and keep context in the worktree.** Follow acceptance/eval-first rules and update the persona TODO, its shared status row and relevant handoff sections there. Use targeted edits to shared coordination files so merges preserve other personas' updates. Shared branches, remotes and stash still require the root concurrency precautions even though the working directories/indexes are separate.
-5. **Prepare a reviewed delivery.** Run `pnpm checks` and the relevant production-preview acceptance/property/eval checks in the development worktree. Report exact results and the commit(s) to integrate. Commits still require the existing authorization; otherwise leave changes uncommitted for the user to review/commit. No push is implied.
-6. **Preflight and integrate the batch.** Require clean `main` with no operation pending. Check that all seven assigned worktrees are present, on their assigned branch, clean (including untracked files), unlocked and free of pending Git operations. If any persona checkout is blocked, report its name and blocker. Ask the user whether to skip those specific worktrees and leave any approved exclusions and their deliveries for a later run. Snapshot the included tips, recheck before writing, and merge the reviewed deliveries one at a time using `git -C <main-checkout> merge --no-ff --no-commit --no-overwrite-ignore <reviewed-tip>`. Inspect each staged result, resolve compatible changes and run affected checks before committing. Explicitly targeted requests can review committed deliveries from dirty or locked sources and write only to `main`.
-7. **Validate and record the merged result.** Run `pnpm checks` and relevant production-preview acceptance, property or free fake eval checks in `main`. Record the tested commit and actual results in the integration handoff. Commit the coordination record before pinning the final `main` SHA for the return sync. Failure blocks that sync. Route fixes through the owning persona and revalidate before distributing `main`.
-8. **Sync the included worktrees before the next turn.** Verify the reviewed tips are in `main`. Recheck the tips and readiness of the included checkouts. Use `git -C <persona-worktree> merge --ff-only --no-overwrite-ignore <final-main-sha>` for each included persona still behind the pinned SHA. Finish when all included checkouts are clean and have that exact `HEAD`. Report any new blocker and which checkouts advanced. Resume after the blocker clears or the user approves leaving that checkout out. Report all exclusions. The user’s super-turn request authorizes these fast-forwards. After a targeted integration, owners still apply step 2 themselves. Each persona records its last synced main commit in its own resume.
-9. **Keep the worktrees.** Persona worktrees are persistent across slices and context clears. Do not automatically remove them, delete their branches, unlock them or clean unfinished files after integration. Stop only the servers you started, by their process/port.
-
-Pushing remains the user's. This policy does not authorize extra commits, branch changes or destructive git operations beyond the instructions already given for a task.
-
+1. **Select the checkout.** At session start, inspect `git status`, `git branch --show-current` and `git worktree list`. A standing
+   session (ai or netcode) continues in `.claude/worktrees/<session>` on `worktree-<session>`; an ad hoc session works where the user
+   says. Never repurpose a worktree that holds someone else's unfinished work.
+2. **Bring `main` in before new work.** `git fetch origin`, then `git log --oneline HEAD..origin/main`. Fast-forward a branch with
+   nothing of its own; otherwise `git merge --no-ff --no-commit origin/main`, resolve, rerun the affected checks and commit
+   `chore: merge main into <branch>`. Ask the user about conflicting behaviour.
+3. **Install and test independently.** Each worktree has its own dependencies: `pnpm install --frozen-lockfile --offline` (if offline
+   metadata is missing, report it before a network retry). Run the app on its own port with `--strictPort` and point Playwright's
+   `WEBAPP_URL` there. Never reuse or kill another session's server.
+4. **Deliver.** Run `pnpm checks` and the relevant production-preview acceptance, property or free fake eval checks, report the exact
+   results, and update your checklist, the status board and `HANDOFF.md`. Leave the work uncommitted for the user, with a suggested
+   Conventional Commit message.
+5. **Push.** After the user commits, push with a plain fast-forward (`git push origin HEAD:main`); never force. If `main` moved, fetch
+   and merge again first.
+6. **Keep the worktrees.** Worktrees persist across slices and context clears. Do not remove them, delete their branches or clean
+   unfinished files unless the user asks. Stop only the servers you started, by their process or port.
 
 ## Gotchas that will waste your time
 
@@ -57,7 +62,7 @@ Re-check version-specific limitations before relying on them.
 - **Do not add `baseUrl` to a tsconfig.** TS 6 made it an error — `paths` already resolve relative to
   the tsconfig's own directory.
 - **`pnpm setup` and `pnpm deploy` are built-in pnpm commands**, not ours. The scripts are `pnpm install-browsers` and
-  `pnpm --filter @gunsmith/infra provision`.
+  `pnpm --filter @gunsmith/infra provision` (or the whole manual release, `pnpm deploy:fromLocal`).
 - **Root-level files get no Prettier config from a package directory** — `AGENTS.md` and `docs/`
   fall back to 80 columns and rewrap content you never touched. Edit them by hand.
 - **The canvas is not in the DOM.** react-three-fiber draws to a `<canvas>`, so Playwright cannot find a player or a

@@ -1,6 +1,6 @@
 # Combat feedback / build handover
 
-Current implementation owner: play (Claude), with engine supplying simulation events and art supplying assets/manifests. Use the root TODO-play.md and HANDOFF.md. Historical build references below mean these domain owners.
+Current implementation owner: play (Claude), with engine supplying simulation events and art supplying assets/manifests. Use the root MVP-TODO.md and HANDOFF.md. Historical build references below mean these domain owners.
 
 Status: art study complete, ready for build. Owner of implementation: `play` (Claude).
 User decision, 2026-11-16: **punchy / crunch is preferred; keep the camera shake
@@ -48,13 +48,13 @@ Recipe source: `webapp/audio/generator-scripts/generators/effects/damage/MakeDam
 Render entry (selected crunch only): `webapp/audio/generator-scripts/studies/combat-feedback/RenderCombatFeedback.ts`.
 [Study measurements](../../../../webapp/audio/studies/combat-feedback/measurements.json)
 record hashes and mastering. The agreed incoming key is `sfx-damage-crunch`,
-using MP3; play has wired it in its uncommitted slice 2a (not yet integrated into
-main or art). Keep `sfx-hit` as outgoing confirmation, still unregistered here.
+using MP3, and it is integrated. `sfx-hit` is the outgoing confirmation, registered for local
+visible-target hits.
 
 ## Crunch MP3 review — 2026-11-17
 
-Art reviewed play’s uncommitted `webapp/src/assets/sounds/files/sfx-damage-crunch.mp3`
-in worktree `play`, against the approved WAV master. FFmpeg 9.0.2 and the existing
+Art reviewed play’s `webapp/src/assets/sounds/files/sfx-damage-crunch.mp3`
+against the approved WAV master. FFmpeg 9.0.2 and the existing
 `encoderArguments`, `decodePcm`, `measurePcm` and `durationFailure` helpers were used
 from art’s worktree at `5c7be84`. A fresh temporary encode using the workspace’s
 48 kHz / libmp3lame quality 2 / Xing recipe matches play’s export byte for byte.

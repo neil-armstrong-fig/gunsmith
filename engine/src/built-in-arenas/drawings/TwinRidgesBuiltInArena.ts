@@ -5,7 +5,7 @@ import type {BuiltInArena} from "@gunsmith/engine/built-in-arenas/types/BuiltInA
  * and three deep with a stair on the side that faces the middle, and a low cover block, two tiles square, at the centre.
  * Each fighter can climb to a platform, and neither platform is nearer one fighter than the other, because the picture is the
  * same turned half way round. It has not been played: whether a platform is too strong is for play to judge (the high-ground
- * question in TODO-engine.md).
+ * question in MVP-TODO.md).
  */
 export const TWIN_RIDGES_BUILT_IN_ARENA: BuiltInArena = {
   name: "Twin ridges",

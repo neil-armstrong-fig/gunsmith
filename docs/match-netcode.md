@@ -1,7 +1,7 @@
 # Match netcode, fog and rooms
 
 The design of real-time play. The planned room is a ticking authority. Sign-in uses OAuth code + PKCE and opaque session tokens ([design](sign-in.md)). Status: initial private-room slice implemented; server keeps it in step
-with the code (`TODO-server.md`).
+with the code ([MVP-TODO.md](../MVP-TODO.md)); the netcode session owns its feel and fairness (`TODO-netcode.md`).
 
 The 2026-11-15 [fair-play research and handoff](art/fair-play-research.md)
 adds sign-in for public play, recording, reports and silent restricted matchmaking.
@@ -35,7 +35,7 @@ These are design decisions; the online controls are not implemented yet.
 - Input validation: rate-limit and clamp (a move vector's length, a fire request only if the weapon can fire), reject
   out-of-order sequence numbers, ignore anything for a dead player.
 - A ticking object stays awake for the match. A Durable Object with a running loop cannot hibernate, so cost grows with match
-  length (the free-plan spike in `TODO-server.md` tracks this). Between matches the object is idle and can be evicted.
+  length (the free-plan spike in `POSTMVP-TODO.md` tracks this). Between matches the object is idle and can be evicted.
 
 ## Snapshots
 

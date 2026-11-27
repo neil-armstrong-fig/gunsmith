@@ -37,12 +37,11 @@ Yellow/pink are user-authorised concept experiments, pending final palette/manif
 
 ## Weapon direction revision (2026-11-12)
 
-The user asks for Ratchet & Clank's inventive weapon spirit, adapted to Gunsmith's top-down 2D view.
-[Overhead machinery study 02](concepts/overhead-machinery-02.md) explores three original designs: exaggerated
-functional assemblies, chunky shells, visible mechanisms and simple shaded depth. This relaxes the earlier flat-only
-weapon treatment for concept exploration; the slate arena, team cues, fog rules and gameplay boundaries remain.
-The first twelve vectors are an initial grammar proof, not a visual quality target to freeze into the schema.
-Translate the stronger constructions into editable JSON/vector studies before settling material presets or final sprites.
+The user asked for an inventive, exaggerated weapon spirit adapted to Gunsmith's top-down 2D view. Two rich studies (overhead
+machinery 02 and improbable machinery 03: chunky shells, visible mechanisms, simple shaded depth) relaxed the flat-only weapon
+treatment for exploration; the slate arena, team cues, fog rules and gameplay boundaries stayed. They were a grammar proof, not a
+quality target, and led to the simpler, JSON-driven reference below. The studies were removed before publication (2026-11-27);
+they are in git history.
 
 ## Simpler build reference (2026-11-13)
 
@@ -52,21 +51,17 @@ compositions, editable SVGs, matching proposed JSON and native-size/held reviews
 rich references and asks AI to evaluate reliability, complexity and code-owned visual defaults before freezing a contract.
 Both simple and rich references remain useful; none fixes the final detail level or renderer architecture.
 
-## Authored parts experiment (2026-11-14)
+## Retired studies (removed 2026-11-27; in git history)
 
-[Kit 05 and AI handoff](concepts/weapon-parts-kit-05/README.md) supplies 18 reusable authored pieces,
-named anchors, bounded size/orientation choices and six oddities with alternates. The user chose flat,
-clear silhouettes. Catalogue, JSON/SVGs and native-size/grayscale/held reviews are delivered; the user
-visually approved the kit on 2026-11-14 (“looks really good”). AI selection/placement probes and runtime
-proof remain pending. Earlier references remain intact.
-
-## Saved Haiku review (2026-11-14)
-
-[Review 06](concepts/haiku-review-06/README.md) compares twelve saved drawings,
-the six approved kit primaries, native sizes, grayscale and provisional held poses.
-The user accepted the review. Frozen inputs distinguish available artwork from
-newer eval summaries and AI-reported results; concrete AI/build follow-up is
-recorded there. No kit-selection comparison or production approval is implied.
+- **Authored parts kit 05 (2026-11-14): shelved.** Eighteen authored pieces with named anchors, assembled into six oddities. The
+  user approved the kit visually, then judged the AI's shapes appearance arm far better and shelved the kit
+  ([session decisions](../agent-reference/SessionDecisions.md)). Generated weapons are drawn from bounded visual primitives and
+  palette roles instead.
+- **Saved Haiku review 06 (2026-11-14): accepted, and its requests carried forward.** Twelve saved drawings judged at 64 and
+  32 px and in grayscale. Findings that still guide the appearance pipeline: keep identity-bearing parts (a duck's head and
+  beak, a cactus's paired lobes, clustered bubble chambers) structural so they survive small sizes; record a human identity
+  judgement beside validity, at 64 and 32 px; disclose conflicting, excessive-detail and unsupported-mechanic interpretations
+  rather than implying exact fulfilment; cosmetic geometry never moves hitboxes or the firing point.
 
 ## Arena terrain
 

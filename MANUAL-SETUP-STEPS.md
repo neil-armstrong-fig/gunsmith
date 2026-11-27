@@ -36,14 +36,13 @@ renames or removes one. **Never put an account id, token, secret or personal add
 2. From the tested release commit, build the webapp and deploy both Workers.
 
    ```bash
-   pnpm --filter @gunsmith/webapp compile &&
-   diff -u <(printf '/*\n  X-Robots-Tag: noindex\n') webapp/build/_headers &&
-   printf '{"commit":"%s"}\n' "$(git rev-parse HEAD)" > webapp/build/release.json &&
-   SITE_ORIGIN=https://gunsmith.neilarmstrong.dev pnpm --filter @gunsmith/infra provision --env-file ../.env.local &&
-   pnpm --filter @gunsmith/infra exec wrangler deploy --config ../webapp/wrangler.jsonc --env-file ../.env.local
+   pnpm deploy:fromLocal
    ```
 
-   Both commands resolve `../.env.local` from the infra package directory. In Cloudflare, use **Settings →
+   The root script compiles the webapp, stops unless `webapp/build/_headers` is exactly the `noindex` rule, stamps
+   `HEAD` into `webapp/build/release.json`, provisions the API Worker with Alchemy, then deploys the webapp Worker with
+   Wrangler. It stamps `HEAD` even when the tree has uncommitted changes, so release from a clean checkout. The two
+   deploy steps resolve `../.env.local` from the infra package directory. In Cloudflare, use **Settings →
    Domains & Routes** to attach each custom domain from step 6. The API Worker keeps its existing D1 and Durable
    Object resources. Keep applied SQL migrations immutable and add new migrations for schema changes.
 3. Check the webapp homepage and a static asset for `X-Robots-Tag: noindex` and its `/release.json` for the intended

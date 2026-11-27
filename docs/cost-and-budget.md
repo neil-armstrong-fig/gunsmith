@@ -74,7 +74,7 @@ A failed moderation call stays at 0.5 (the user chose no change). The decision l
 
 ## Spikes and tasks that produce the numbers
 
-- `server`: the free-plan spike (`TODO-server.md`): duration, requests and storage for a 1v1 match at 20 Hz, with
+- `server`: the free-plan spike (`POSTMVP-TODO.md`): duration, requests and storage for a 1v1 match at 20 Hz, with
   spectators. Record results here.
 - `ai`: the budget arithmetic (`TODO-ai.md`, O1): cost per generation × credits per day = how many generations the $1 a day
   soft cap buys globally; if that is a handful of users, decide what changes (smaller models, caching, fewer credits).
@@ -360,7 +360,7 @@ against the fake AI adapter, never a paid one.
   - **when the API and the UI each ask whether AI is on** then both read the one kill-switch function and agree (layer 3).
   - **when a player or a guest starts a match** then built-in weapons and arenas, the saved library and guest play all work as before, and no model call is made (AI off, game stays up).
 - **given tracing is failing or returning 429**
-  - **when a generation runs** then it neither fails nor waits on the trace, and play is not delayed (tracing, `TODO-budget.md`).
+  - **when a generation runs** then it neither fails nor waits on the trace, and play is not delayed (tracing, `POSTMVP-TODO.md`).
 - **given the month's spend rises past 50, 80 and 100 percent** then each threshold's alert is emailed once (layer 5, `SpendLedger.alarm()`); an alert whose email fails is retried and stays due until it is delivered. The 100 percent alert is due as soon as a request is refused for crossing the monthly cap, because that request is never reserved and the spend stops a little short of $20.
 
 **Decided (the user, 2026-11-17): the credit ledger and the spend counters live in Durable Objects, not D1.** A `CreditLedger` object per

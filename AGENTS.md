@@ -6,17 +6,24 @@ Packages: webapp, engine, acceptance-tests, shared, ai and a minimal api (privat
 Use pnpm. Design decisions are in `docs/`; add research only when losing it would require re-deriving a decision.
 Read [operational reference](docs/agent-reference/Operations.md) for command details, worktrees, environment gotchas, planned deployment and manual setup.
 
-## The seven personas
+## Sessions
 
-Work is split into **play, engine, ai, server, budget, art and ship**. Each has a TODO-<persona>.md feeding the shared TODO.md board; restart with "You are engine, continue the TODO." Claude defaults: play, engine, ai, server, budget. Codex defaults: art, ship. Ownership follows the persona, not the product/model, and HANDOFF.md defines concrete boundaries. The old build role is retired. Keep consumed contract changes in HANDOFF.md first and coordinate shared-file writers.
+Sessions are ad hoc (2026-11-27). The standing ones are **ai** and **netcode**, each with a TODO-<session>.md feeding the shared TODO.md board; restart one with "You are netcode, continue the TODO." Any other work is done by whichever session meets it, from MVP-TODO.md and POSTMVP-TODO.md. HANDOFF.md defines the concrete boundaries. Keep consumed contract changes in HANDOFF.md first and coordinate shared-file writers.
 
 **Every fresh session follows the startup protocol in `TODO.md`:** read current shared status and handoff, then your own current checklist and task references. The other checklists and historical archives are read only for dependencies. Before coding, explicitly read every applicable package and nested instruction file; they are not guaranteed to be preloaded. Recover truncated reads before continuing.
 At the end, update your checklist, status and a concise handoff delivery.
 
 ## Checkout workflow
 
-**Main is integration-only; develop in persona worktrees.** This includes code, tests, assets, tooling and development docs. Carry TODO/status/handoff updates with that work. The user starts a **super turn** from `main` using the project [`integrate-worktrees` skill](.agents/skills/integrate-worktrees/SKILL.md), shared by Claude and Codex. The invocation is the start signal. Check all seven worktrees and ask before skipping any blocked persona. Integrate reviewed deliveries, validate `main`, and fast-forward every included worktree to the same commit. Follow [the worktree flow](docs/agent-reference/Operations.md#development-worktrees-and-the-integration-checkout) and existing Git permissions. Keep persona worktrees across slices and preserve unfinished work.
-**Every fresh turn in a persona worktree (any model) starts with `git log --oneline HEAD..main`.** If `main` advanced outside a super turn, sync the clean worktree before any work. A fast-forward needs no commit. For a divergent merge, resolve compatible changes yourself (shared docs keep both sides, code is merged by meaning), rerun affected checks and make the authorized merge commit `chore: merge main into <branch>`. Ask the user about conflicting behaviour. Preserve unfinished work if it blocks the sync.
+**Work reaches GitHub's `main` directly; there is no integration checkout** (the super turn was retired on 2026-11-19). A standing
+session works in its own worktree (`.claude/worktrees/<session>`, branch `worktree-<session>`); an ad hoc session works where the user
+says. The user makes every commit of real work. The standing permission covers fetching, merging `origin/main` in, resolving conflicts,
+committing that merge as `chore: merge main into <branch>`, and a fast-forward push; follow the
+[`sync-with-github` skill](.agents/skills/sync-with-github/SKILL.md).
+**Every fresh turn in a worktree (any model) starts with `git fetch origin` and `git log --oneline HEAD..origin/main`.** If `main` moved,
+bring it in before any work: a fast-forward needs no commit; for a divergent merge, resolve compatible changes yourself (shared docs keep
+both sides, code is merged by meaning), rerun affected checks and commit the merge. Ask the user about conflicting behaviour. Preserve
+unfinished work if it blocks the sync.
 
 ## Before changing code
 
@@ -222,7 +229,7 @@ the boundary is silently dropped for those files.
 
 ## More than one session may be running
 
-Several agent sessions can be open on this working tree at once (the seven personas may share it), and nothing
+Several agent sessions can be open on this working tree at once (the sessions may share it), and nothing
 tells you when another one starts. The working tree, the index, the stash and the editor's language servers are all shared.
 
 - **Re-read a file immediately before you change it** — a targeted edit beats rewriting a whole file,

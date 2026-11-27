@@ -17,6 +17,7 @@
     "acceptance-tests:preview:api": "PREVIEW_API_MODE=external pnpm acceptance-tests:preview",
     "install-browsers": "pnpm --filter @gunsmith/acceptance-tests install-browsers",
     "build": "pnpm --recursive build",
+    "deploy:fromLocal": "pnpm --filter @gunsmith/webapp compile && printf '/*\\n  X-Robots-Tag: noindex\\n' | diff -u - webapp/build/_headers && printf '{\"commit\":\"%s\"}\\n' \"$(git rev-parse HEAD)\" > webapp/build/release.json && SITE_ORIGIN=https://gunsmith.neilarmstrong.dev pnpm --filter @gunsmith/infra provision --env-file ../.env.local && pnpm --filter @gunsmith/infra exec wrangler deploy --config ../webapp/wrangler.jsonc --env-file ../.env.local",
     "checks": "pnpm checks:repository && pnpm --recursive checks",
     "lint": "pnpm --recursive lint",
     "lint:fix": "pnpm --recursive lint:fix",
