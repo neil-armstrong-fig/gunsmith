@@ -13,6 +13,12 @@ given("the practice range opened without a startup override", () => {
     expect((await gunsmith.menu.getMainActions()).slice(0, 2)).toEqual(["Resume", "Workshop"]);
   });
 
+  then("Privacy Policy and Terms of Service appear directly below References & credits", async ({gunsmith}) => {
+    await expect
+      .poll(() => gunsmith.menu.getMainLinks())
+      .toEqual(["References & credits", "Privacy Policy", "Terms of Service"]);
+  });
+
   when("the player presses Escape", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.menu.pressEscape();

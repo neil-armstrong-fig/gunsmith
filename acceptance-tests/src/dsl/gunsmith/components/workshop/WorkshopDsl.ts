@@ -28,6 +28,30 @@ export class WorkshopDsl {
     }
   }
 
+  async followPolicyLink(name: string): Promise<void> {
+    try {
+      await this.workshop.followPolicyLink(name);
+    } catch (error) {
+      throw new DslError(`Failed to open ${name} from the workshop`, error);
+    }
+  }
+
+  async getPolicyHeading(): Promise<string> {
+    try {
+      return await this.workshop.getPolicyHeading();
+    } catch (error) {
+      throw new DslError("Failed to read the policy heading", error);
+    }
+  }
+
+  async getMakePrivacyNotice(): Promise<string | undefined> {
+    try {
+      return await this.workshop.getMakePrivacyNotice();
+    } catch (error) {
+      throw new DslError("Failed to read the Make privacy notice", error);
+    }
+  }
+
   async arrangeSignedInWeapon(setup: WeaponWorkshopSetup = "empty"): Promise<void> {
     try {
       await this.workshop.arrangeSignedInWeapon(setup);

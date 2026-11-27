@@ -1,3 +1,4 @@
+import {WorkshopPolicies} from "@src/react/components/dom/workshop/components/workshop-prompt/components/workshop-policies/WorkshopPolicies";
 import {promptReadoutOf} from "@src/react/components/dom/workshop/components/workshop-prompt/readout/PromptReadoutOf";
 import type {JSX} from "react";
 
@@ -46,6 +47,8 @@ export function WorkshopPrompt({
           onPromptChange(event.target.value);
         }}
       />
+
+      <WorkshopPolicies />
 
       <div className="flex items-center justify-between gap-4">
         <p data-testid="workshop-count" className={`font-mono text-sm tabular-nums ${countColourOf(readout.over)}`}>

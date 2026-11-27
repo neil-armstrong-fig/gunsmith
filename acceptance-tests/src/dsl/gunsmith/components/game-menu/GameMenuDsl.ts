@@ -89,6 +89,14 @@ export class GameMenuDsl {
     }
   }
 
+  async getMainLinks(): Promise<string[]> {
+    try {
+      return await this.menu.getMainLinks();
+    } catch (error) {
+      throw new DslError("Could not read the links in the Game menu", error);
+    }
+  }
+
   async isOpen(): Promise<boolean> {
     try {
       return await this.menu.isOpen();

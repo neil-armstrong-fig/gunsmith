@@ -26,6 +26,21 @@ export class WorkshopPlaywright extends BasePage {
     await this.page.getByRole("group", {name: "Built-in weapons"}).getByRole("button", {name, exact: true}).click();
   }
 
+  async followPolicyLink(name: string): Promise<void> {
+    await this.page.getByRole("dialog", {name: "Workshop"}).getByRole("link", {name, exact: true}).click();
+  }
+
+  async getPolicyHeading(): Promise<string> {
+    return await this.page.getByRole("main").getByRole("heading", {level: 1}).innerText();
+  }
+
+  async getMakePrivacyNotice(): Promise<string | undefined> {
+    const notice = this.page.getByTestId("make-privacy-notice");
+    if (!(await notice.isVisible())) return undefined;
+
+    return await notice.innerText();
+  }
+
   async arrangeSignedInWeapon(setup: WeaponWorkshopSetup): Promise<void> {
     this.releasePendingWeapon = await arrangeSignedInWeapon(this.page, setup);
   }

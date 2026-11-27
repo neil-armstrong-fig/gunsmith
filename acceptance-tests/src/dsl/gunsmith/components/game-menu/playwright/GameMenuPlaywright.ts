@@ -51,6 +51,10 @@ export class GameMenuPlaywright extends BasePage {
     return await this.panel().getByRole("button").allInnerTexts();
   }
 
+  async getMainLinks(): Promise<string[]> {
+    return await this.panel().getByRole("link").allInnerTexts();
+  }
+
   async isOpen(): Promise<boolean> {
     return await this.panel().isVisible();
   }

@@ -1,4 +1,5 @@
 import {loadLocalGameOfPage} from "@src/react/navigation/LoadLocalGameOfPage";
+import {GameInformation} from "@src/react/components/dom/game-menu/components/game-information/GameInformation";
 import {returnToMainMenu} from "@src/react/components/dom/game-menu/returning/ReturnToMainMenu";
 import {RoomEntry} from "@src/react/components/dom/game-menu/components/room-entry/RoomEntry";
 import {openPracticeWorkshop} from "@src/react/components/dom/workshop/entering/OpenPracticeWorkshop";
@@ -140,16 +141,7 @@ export function GameMenu(): JSX.Element {
                 </button>
               )}
 
-              {practice && (
-                <a
-                  href="/references.html"
-                  target="_blank"
-                  rel="noopener"
-                  className="mt-1 self-start text-xs text-gs-ui-muted underline underline-offset-4 hover:text-gs-team-blue"
-                >
-                  References &amp; credits
-                </a>
-              )}
+              {practice && <GameInformation />}
             </>
           )}
 

@@ -1,18 +1,22 @@
 # TODO: art
 
-**MVP audio checklist complete.** Art owns authored audio cues, playback integration with Play, and the listening review after weapon-specific shot synthesis. Checkout: `worktree-art`, last upstream commit merged `f999695`.
+**MVP audio checklist complete.** Art owns authored audio cues, playback integration with Play, and the listening review after weapon-specific shot synthesis. Checkout: `worktree-art`, last upstream commit merged `e2c24d70`.
 
-## Resume next — production privacy review and Make notice
+## Resume next — privacy review and notice follow-up
 
-Start in `.claude/worktrees/art` (`worktree-art`). Local weapon and arena history use fake verdicts and real D1. Art owns the privacy design and Make notice copy, AI owns the production privacy check, the API follow-up covers history access and Ship owns notice placement. Review the checker with AI once its design is agreed. The first criterion should use synthetic personal information and verify that D1 retains the attempt metadata while omitting the original text. Keep public capture disabled through the assessments and notice review. [Handoff](HANDOFF.md#mvp-ownership-and-handoffs)
+Start in `.claude/worktrees/art` (`worktree-art`). Art drafted both Make notices, the assessments and the maintainer workflow. Ship owns placement and browser coverage, AI owns the checker, and the API follow-up owns maintainer access and rights handling. Art’s next action is to review the checker with AI. The first local D1 criterion should use a relevant prompt with synthetic personal information and verify that both routes keep metadata while omitting the prompt. [Privacy design](docs/privacy-and-data.md#private-generation-history) · [Handoff](HANDOFF.md#mvp-ownership-and-handoffs)
 
-- [x] Prove local arena history with fake verdicts and real D1. Both first tests failed on an empty history table before route wiring and passed afterward. The route records repaired and first-pass outcomes, omits text without clearance and counts built-in substitutes as failures. Internal reads enforce the 14-day cutoff, the daily sweep purges expired rows, and account deletion cascades. Capture remains limited to the test fixture.
+- [x] Prove local arena history with fake verdicts and real D1. Both first tests failed on an empty history table before route wiring and passed afterward. The route records repaired and first-pass outcomes, omits text without clearance and records invalid arenas as failures. Internal reads enforce the 14-day cutoff, the daily sweep purges expired rows, and account deletion cascades. Capture remains limited to the test fixture.
 - [x] Record blocked arena requests, timeouts and pipeline exceptions in local D1. Store metadata for valid signed-in requests with closed failure reasons. Responses, refunds and spend settlement follow the existing route rules.
 - [x] Record signed-in weapon attempts separately from the library in local D1. Outcomes include first-pass success, repaired success and success with fallback for a generated weapon delivered with a built-in drawing. Count code edits and model repairs, record closed failure reasons and preserve the existing credit rules.
 - [x] Enforce relevance and independent privacy clearance before storing verbatim text in local D1. Keep outcome metadata for rejected, unjudged and privacy-denied text. History write failures emit a closed event.
 - [x] Apply the existing 14-day history cutoff, daily sweep and account deletion to both item kinds.
-- [ ] Review the production privacy check, restrict review to authorised maintainers and set up access, objection and erasure requests. Internal pipeline tuning is the purpose.
-- [ ] Art owns the [privacy design](docs/privacy-and-data.md) and the upfront Make notice copy. Hand the copy to Ship for placement while Ship owns the shared workshop controls. Explain the tuning purpose, retention, rights, and separate storage of prompts attached to generated items. Public text collection stays off until the legitimate interests and children's impact assessments support it and the notice is live. The game may be used by minors. Verify with fake models and local D1 before rollout. [Server history TODO](TODO-server.md#mvp-priority) · [AI diagnostics TODO](TODO-ai.md#current-milestone-tasks).
+- [x] Draft the current and history-enabled Make notices, reconcile generated-item storage with the API, and hand Ship the placement and browser criteria.
+- [x] Draft the legitimate interests and children’s impact assessments and the maintainer workflow for controller review.
+- [x] Build the public Privacy Policy and Terms of Service pages and link them from both Workshop tabs. Show the current Make copy to signed-in players before submission. The pages identify Neil Armstrong and link to his existing contact form, which returned HTTP 200.
+- [x] List Privacy Policy and Terms of Service directly below References & credits in the main Game menu.
+- [ ] Ship checks the deployed provider disclosures and hosting settings before publishing the policies.
+- [ ] Review the production checker with AI and verify account-scoped review, access, objection and erasure with the API follow-up. Keep public capture disabled until the controller approves the assessments, the safeguards pass local verification, and the matching notice is live.
 
 ## Signed-in workshop handoff
 
@@ -21,7 +25,7 @@ Ship owns the signed-in browser workshop and its acceptance tests for this slice
 - [x] `SavingAnArenaToTheAccount` makes an arena through a deterministic signed-in API fixture, previews and walks it, saves it by server ID, reloads, and walks it from the account shelf. All three criteria failed against the browser stand-in and passed after wiring.
 - [x] Saved arena rows preview the stored terrain on both the account and browser-local shelves after reload.
 - [x] A signed-in player sees that arena generation is paused and can still walk a saved arena.
-- [x] Show the API reason on the current arena fallback result.
+- [x] Show the API reason when an arena cannot be made. The earlier substitute result was removed in `728bc138`.
 
 Engine’s built-in list `00ff548`, the saved-item parser and Server’s pre-round hookup are on GitHub main. Generated `visionDegrees` and `visionRange` are available from `21cc021`.
 
@@ -119,11 +123,17 @@ Art owns the audio entries. The remaining entries follow the handoff above.
 - [x] Wire the built-in icons into the live HUD and cover starting slots, switching and the pickup with browser criteria.
 - [ ] Remaining HUD and overlay art includes slot status badges, health/ammo/credit UI, panels/buttons, prompt styling, power gauge, pipeline progress and reveal frame.
 - [ ] Landing/practice/onboarding/prompt copy and example prompts for datasets, including weak, broken and harmless adversarial-looking requests; rejection/errors, AI-off and credit explanations.
-- [ ] Privacy/terms copy consistent with `docs/privacy-and-data.md`.
+- [x] Privacy and terms pages consistent with `docs/privacy-and-data.md`.
 - [ ] Logo, favicons, social preview and README banner.
 - [ ] Case-study diagrams: pipeline, cost safeguards and eval loop.
 
 ## Verification/latest delivery
+
+2026-11-27, main menu policy links on `e2c24d70`. The order criterion failed with References & credits as the only link and passed after adding both policy links. All 19 focused browser criteria passed. Direct browser clicks confirmed both destinations open in new tabs and keep the game menu open. `pnpm checks` passed lint, formatting, types and 4,506 tests with one existing audio skip. Reviewed root, Webapp, React and acceptance instructions and checked the new component’s placement, callers and single-component file. The local preview is on port 4131. Current `main` has overlapping menu and privacy changes to reconcile when integrating the outstanding worktree edits.
+
+2026-11-25, public policy pages on `e2c24d70`. The four new behavior criteria failed first on missing policy links or missing signed-in notices. The guest control passed. All five passed after implementation within 29 passing production-preview criteria. Both built pages worked directly with JavaScript disabled at phone and desktop widths. `pnpm checks` passed lint, formatting, types and 4,506 tests with one existing audio skip. Reviewed root, Webapp, React and acceptance instructions, audited folder placement and callers, and confirmed one component per edited TSX file.
+
+2026-11-25, Make privacy design on `e2c24d70`. All 35 focused local D1 tests passed. `pnpm checks` passed lint, formatting, types and 4,506 tests with one existing audio skip. All 67 properties and 368 fake eval criteria passed. The existing workshop preview passed 35 of 36 criteria. The save-after-removal criterion timed out once and passed all three isolated repeats. Reviewed the four documentation edits against root `AGENTS.md` and audited the two edited folders for added files and callers.
 
 2026-11-23, local weapon generation history. The first D1 route test failed on the empty history table. Mutating fallback classification and privacy clearance made exactly their two weapon-history checks fail. With both restored, `pnpm checks` passed lint, formatting, type checks and 4,323 tests with one existing audio skip. All 22 API properties and 291 fake eval criteria passed. Reviewed root, API and AI instructions and the Engine reference, including a folder and caller audit. Verified on `08e9a25`. GitHub main advanced to `f999695` during the slice with coordination documentation only.
 
