@@ -6,6 +6,20 @@ Model: **Claude**. Follow the startup protocol in [TODO.md](TODO.md); read only 
 
 ## Resume here
 
+**Closed (the user, 2026-11-27): engine is done for the MVP; whichever session meets engine work does it.** Last synced `origin/main`: `aa1a373c`. The worktree `.claude/worktrees/engine` and branch `worktree-engine` are kept until the user removes them.
+
+### Open engine work
+
+Each item is small or waits on a playtest. Read the newest entries below for the evidence.
+
+- **The edge rule in play**: the user's look at `?scenario=fair-duel`, `?scenario=heights` and Ridgeline, then a paired playtest to settle `EDGE_REACH_TILES` (1, `engine/src/height/EdgeReach.ts`).
+- **ai's review request** (HANDOFF, 2026-11-27): `repairArena`'s `widenPlatform` tries `CLIMBS` east first, so a matching pair of towers grows in different directions; a symmetric choice would keep generated arenas fairer.
+- **Sunken court** (play's 21st built-in, added after the edge rule): not yet checked against the edge rule or for cover touching raised floor.
+- **The bot wins in seconds** against a standing player (play's measure: median 8.3 s over 300 seeds): tuning, the user's call whether before the M1 playtest.
+- **Bot**: rests at cover between bursts; climbs further from a stair (no test now makes it climb to a shooter it cannot see).
+- **Edge-rule gaps**: cover exists only on the low ground; no browser criterion for a bullet passing over a fighter (only dummies); with three levels a bullet is slightly stricter than sight past a ledge under a tile wide.
+- Not MVP: arena validity (open space, spawn and pickup reachability, ring escape), prompt text moderation, property tests for caps and directional visibility, power-rating calibration with ai, hitscan, penetrable cover, seeded spawns, schemas in `shared/` at the M2 review.
+
 **2026-11-26 (latest, committed `c3bfd8cd`, merged with `origin/main` `5ce3425b` 2026-11-27): slice 4, the high-ground edge rule, is built (sight and bullets; task below).** Next: the user's look at `?scenario=fair-duel`, `?scenario=heights` and Ridgeline or Twin ridges (a same-level platform past a gap is now drawn lit, the user's ask), a paired playtest and `EDGE_REACH_TILES` with play; then the earlier open list (bot rests at cover between bursts, a bot that climbs further from a stair).
 
 **2026-11-25 (latest, committed `4199b4d2`, merged with `origin/main` `ea0ab48c` on 2026-11-26):** the user chose slices 1, 2 and 4 of the open list and then dropped 2 (stair diagnostics: nothing to refuse, no consumer) and chose the edge rule for 4; loudness by weapon is post-MVP. **Slice 1 is done** (the reloading bot runs to a low cover block; task below). **Next: slice 4, the high-ground edge rule** (plan: sight first, `hasClearSight` with `EDGE_REACH_TILES` 1, a symmetry property, callers switched, the height specs re-read; then bullets, with `Bullet.floor` reserved in HANDOFF first), after the user's look at `?scenario=cover-run`.
