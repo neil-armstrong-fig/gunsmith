@@ -66,3 +66,30 @@ given("a player opening the practice range menu", () => {
     });
   });
 });
+
+given("a player who opened the practice range with a seed in its address, and played a bot game from its menu", () => {
+  let firstStart: object = {};
+
+  beforeEach(async ({gunsmith}) => {
+    await gunsmith.openTheSeededPracticeRange();
+    await gunsmith.menu.pressSettings();
+    await gunsmith.preRound.startBotGame();
+    await gunsmith.preRound.lockIn();
+    await gunsmith.preRound.startTheMatch();
+    firstStart = await gunsmith.player.getPosition();
+  });
+
+  when("they open the same address again and start another bot game", () => {
+    beforeEach(async ({gunsmith}) => {
+      await gunsmith.openTheSeededPracticeRange();
+      await gunsmith.menu.pressSettings();
+      await gunsmith.preRound.startBotGame();
+      await gunsmith.preRound.lockIn();
+      await gunsmith.preRound.startTheMatch();
+    });
+
+    then("the bot game plays the same duel, starting the player where it did before", async ({gunsmith}) => {
+      expect(await gunsmith.player.getPosition()).toEqual(firstStart);
+    });
+  });
+});

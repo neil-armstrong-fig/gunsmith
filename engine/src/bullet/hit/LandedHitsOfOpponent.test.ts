@@ -40,6 +40,7 @@ function meeting(shooter: Shooter, contact: Contact, dummyIndex: number | undefi
     shooter,
     level: 0,
     crouching: false,
+    floor: 0,
   };
 
   return {bullet, contact, dummyIndex};

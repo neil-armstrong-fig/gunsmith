@@ -38,3 +38,17 @@ it("is true for a diagonal line that crosses the cover block beside the target",
 it("is true when the viewer stands right against the far side of the block from the target", () => {
   expect(coverBesideTarget(row, {x: 6.9, y: 1.5}, {x: 8.1, y: 1.5})).toBe(true);
 });
+
+it("is false for a target up on a platform beside a cover block on the low ground below it", () => {
+  // Low ground at x 1 to 3 with a cover block at x 3, and a platform one level up at x 4 to 6.
+  const foot = arenaFrom(["########", "#..c111#", "########"]);
+
+  expect(coverBesideTarget(foot, {x: 1.5, y: 1.5}, {x: 4.5, y: 1.5})).toBe(false);
+  expect(coverBesideTarget(foot, {x: 6.5, y: 1.5}, {x: 4.5, y: 1.5})).toBe(false);
+});
+
+it("is still true for a target on the low ground behind that block, seen from the platform", () => {
+  const foot = arenaFrom(["########", "#..c111#", "########"]);
+
+  expect(coverBesideTarget(foot, {x: 4.5, y: 1.5}, {x: 2.5, y: 1.5})).toBe(true);
+});

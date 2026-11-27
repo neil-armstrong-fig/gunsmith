@@ -104,9 +104,15 @@ WASD move, mouse aim (360°), Ctrl or C crouch, **1** default rifle, **2** the c
   players/items are revealed, subject to walls and height. The equipped weapon defines the cone's base angle/range
   from its prompt; standing versus crouching modifies it. As you aim/spin through 360°, the detailed cone sweeps around
   with you. Dim terrain does not reveal hidden players/items. The omitted-stat policy remains pending in `HANDOFF.md`.
-  **Higher ground** sees over lower ground; **lower ground cannot see up**. Built (2026-11-14): a tile blocks a viewer's sight if it is a wall or on a level higher than the
-  viewer's eye level (on a stair, its upper level), so from the low ground a platform and everything on it is hidden and its edge hides what is behind it, while from a platform the low
-  ground below shows. A bullet follows the same rule (built 2026-11-14): it keeps the level of its shooter's eye and stops at a wall or at any tile higher than that, so from the low ground a platform's face stops your shots, and from a platform they fly out over the low ground; what you cannot see you cannot shoot. Ideas to try after playing it: a longer reach for higher ground ("extends vision"), and "sees over lower cover" once cover has a height.
+  **The edge rule** (the user's choice, 2026-11-25; built 2026-11-26, replacing "higher ground sees over lower ground, lower
+  ground cannot see up", which made a platform too strong): between two fighters on different levels, sight crosses raised floor
+  only within `EDGE_REACH_TILES` (1 tile, a tunable for play) of the higher one. **To shoot down you stand at the edge, and there
+  you are seen and shot**; back from the edge, the platform's edge hides the low ground and the low ground cannot see you. It is
+  symmetric: two fighters on different levels see each other or neither does. On one level a raised tile between still hides
+  (an eye is on a stair's upper level). Bullets agree: one fired from below flies a body's width short of a tile onto the platform
+  and stops, so it reaches someone at the edge; one fired from back on a platform (no lower floor within a tile of the shooter)
+  flies over the low ground and hurts nobody there, and passing up onto another platform it flies over the low ground beyond
+  too (`Bullet.floor`). What you cannot see you cannot shoot. Ideas to try after playing it: a longer reach for higher ground ("extends vision"), and "sees over lower cover" once cover has a height.
 - **Crouch** hides you behind cover and increases forward vision range. Keep the same cone angle and aim direction;
   walls and height still block vision. Crouching **substantially slows movement**, leaving you easier to hit; this
   is its intended tradeoff. The range bonus and slowdown are tunable. Protection depends on whether the incoming weapon
@@ -115,7 +121,7 @@ WASD move, mouse aim (360°), Ctrl or C crouch, **1** default rifle, **2** the c
   sees over it; a *crouched* viewer cannot see past it, unless they are on a higher level than the block (higher ground sees over
   lower cover). A *crouched* fighter with a cover block on the line to them, no farther from them than `COVER_REACH_TILES`
   (1 tile, a tunable for play), is hidden from every viewer, high ground included: a block near the viewer hides nobody far
-  behind it. A standing fighter behind cover is seen. Bullets are still unaffected by cover; the decided rule is that a
+  behind it, and a block covers only a fighter on its own level (one at a platform's foot hides nobody up on it, 2026-11-27). A standing fighter behind cover is seen. Bullets are still unaffected by cover; the decided rule is that a
   crouched shooter's bullet stops at cover, a standing one's flies over, and a bullet that crossed cover cannot hurt a crouched
   fighter, by the same line test as sight ("what you cannot see you cannot shoot"). The bot never crouches yet, so it only
   cannot see a crouched player behind cover.

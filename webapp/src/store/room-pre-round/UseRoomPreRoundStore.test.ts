@@ -4,6 +4,7 @@ import {useRoomPreRoundStore} from "@src/store/room-pre-round/UseRoomPreRoundSto
 const readout: RoomPreRoundReadout = {
   stage: "choosing",
   secondsLeft: undefined,
+  builtInArenas: ["Duel", "Fair duel"],
   own: seat(),
   opponent: seat(),
   how: undefined,

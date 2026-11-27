@@ -1,22 +1,22 @@
 # TODO: art
 
-**MVP audio checklist complete.** Art owns authored audio cues, playback integration with Play, and the listening review after weapon-specific shot synthesis. Checkout: `worktree-art`, last upstream commit merged `e2c24d70`.
+**MVP audio checklist complete.** Art owns authored audio cues, playback integration with Play, and the listening review after weapon-specific shot synthesis. Checkout: `worktree-art`, last upstream commit merged `76f7374c`.
 
 ## Resume next — privacy review and notice follow-up
 
-Start in `.claude/worktrees/art` (`worktree-art`). Art drafted both Make notices, the assessments and the maintainer workflow. Ship owns placement and browser coverage, AI owns the checker, and the API follow-up owns maintainer access and rights handling. Art’s next action is to review the checker with AI. The first local D1 criterion should use a relevant prompt with synthetic personal information and verify that both routes keep metadata while omitting the prompt. [Privacy design](docs/privacy-and-data.md#private-generation-history) · [Handoff](HANDOFF.md#mvp-ownership-and-handoffs)
+Start in `.claude/worktrees/art` (`worktree-art`). The policy pages and current Make notice are implemented. The future notice and draft assessments reflect the approved best-effort redaction design in `6c919fbc`. Art’s next action is to review the assessments with the controller and confirm the deployment disclosures with Ship. The API follow-up owns maintainer access and rights handling. [Privacy design](docs/privacy-and-data.md#private-generation-history) · [Handoff](HANDOFF.md#mvp-ownership-and-handoffs)
 
 - [x] Prove local arena history with fake verdicts and real D1. Both first tests failed on an empty history table before route wiring and passed afterward. The route records repaired and first-pass outcomes, omits text without clearance and records invalid arenas as failures. Internal reads enforce the 14-day cutoff, the daily sweep purges expired rows, and account deletion cascades. Capture remains limited to the test fixture.
 - [x] Record blocked arena requests, timeouts and pipeline exceptions in local D1. Store metadata for valid signed-in requests with closed failure reasons. Responses, refunds and spend settlement follow the existing route rules.
 - [x] Record signed-in weapon attempts separately from the library in local D1. Outcomes include first-pass success, repaired success and success with fallback for a generated weapon delivered with a built-in drawing. Count code edits and model repairs, record closed failure reasons and preserve the existing credit rules.
-- [x] Enforce relevance and independent privacy clearance before storing verbatim text in local D1. Keep outcome metadata for rejected, unjudged and privacy-denied text. History write failures emit a closed event.
+- [x] Verify best-effort redaction in local D1 for completed requests, including rejected and off-topic prompts. Redaction failures, blocked attempts and interruptions keep only metadata. History write failures emit a closed event.
 - [x] Apply the existing 14-day history cutoff, daily sweep and account deletion to both item kinds.
 - [x] Draft the current and history-enabled Make notices, reconcile generated-item storage with the API, and hand Ship the placement and browser criteria.
 - [x] Draft the legitimate interests and children’s impact assessments and the maintainer workflow for controller review.
 - [x] Build the public Privacy Policy and Terms of Service pages and link them from both Workshop tabs. Show the current Make copy to signed-in players before submission. The pages identify Neil Armstrong and link to his existing contact form, which returned HTTP 200.
 - [x] List Privacy Policy and Terms of Service directly below References & credits in the main Game menu.
 - [ ] Ship checks the deployed provider disclosures and hosting settings before publishing the policies.
-- [ ] Review the production checker with AI and verify account-scoped review, access, objection and erasure with the API follow-up. Keep public capture disabled until the controller approves the assessments, the safeguards pass local verification, and the matching notice is live.
+- [ ] Review the redaction limits with AI and verify account-scoped review, access, objection and erasure with the API follow-up. Keep public capture disabled until the controller approves the assessments, the safeguards pass local verification, and the matching notice is live.
 
 ## Signed-in workshop handoff
 
@@ -129,7 +129,9 @@ Art owns the audio entries. The remaining entries follow the handoff above.
 
 ## Verification/latest delivery
 
-2026-11-27, main menu policy links on `e2c24d70`. The order criterion failed with References & credits as the only link and passed after adding both policy links. All 19 focused browser criteria passed. Direct browser clicks confirmed both destinations open in new tabs and keep the game menu open. `pnpm checks` passed lint, formatting, types and 4,506 tests with one existing audio skip. Reviewed root, Webapp, React and acceptance instructions and checked the new component’s placement, callers and single-component file. The local preview is on port 4131. Current `main` has overlapping menu and privacy changes to reconcile when integrating the outstanding worktree edits.
+2026-11-27, GitHub sync with `76f7374c`. Kept seeded bot navigation and the game menu policy links, combined the acceptance lint action lists, and updated the future Make notice for best-effort redaction. `pnpm checks` passed lint, formatting, types and 4,878 tests with one existing audio skip. All 68 properties, 392 fake eval criteria and 29 focused production-preview criteria passed.
+
+2026-11-27, main menu policy links on `e2c24d70`. The order criterion failed with References & credits as the only link and passed after adding both policy links. All 19 focused browser criteria passed. Direct browser clicks confirmed both destinations open in new tabs and keep the game menu open. `pnpm checks` passed lint, formatting, types and 4,506 tests with one existing audio skip. Reviewed root, Webapp, React and acceptance instructions and checked the new component’s placement, callers and single-component file. The local preview is on port 4131.
 
 2026-11-25, public policy pages on `e2c24d70`. The four new behavior criteria failed first on missing policy links or missing signed-in notices. The guest control passed. All five passed after implementation within 29 passing production-preview criteria. Both built pages worked directly with JavaScript disabled at phone and desktop widths. `pnpm checks` passed lint, formatting, types and 4,506 tests with one existing audio skip. Reviewed root, Webapp, React and acceptance instructions, audited folder placement and callers, and confirmed one component per edited TSX file.
 

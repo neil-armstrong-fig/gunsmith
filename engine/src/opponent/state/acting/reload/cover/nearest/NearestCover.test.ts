@@ -20,28 +20,36 @@ const FROM = {x: 3.5, y: 4.5};
 const THREAT = {x: 10.5, y: 4.5};
 
 describe("on flat ground", () => {
+  // The same room with low cover blocks where the wall block stood, which a standing threat sees over.
+  const lowBlock = arenaFrom([
+    "##############",
+    "#............#",
+    "#.....cc.....#",
+    "#.....cc.....#",
+    "#.....cc.....#",
+    "#.....cc.....#",
+    "#.....cc.....#",
+    "#............#",
+    "##############",
+  ]);
+
   it("takes a place the threat cannot see", () => {
     const cover = nearestCover(room, {from: FROM, threat: THREAT, candidates: [{x: 4.5, y: 4.5}]});
 
     expect(cover).toEqual({x: 4.5, y: 4.5});
   });
 
-  it("does not take a place behind a low cover block, which the threat sees over", () => {
-    const lowBlock = arenaFrom([
-      "##############",
-      "#............#",
-      "#.....cc.....#",
-      "#.....cc.....#",
-      "#.....cc.....#",
-      "#.....cc.....#",
-      "#.....cc.....#",
-      "#............#",
-      "##############",
-    ]);
+  it("does not take a place farther behind a low cover block than the block hides, which the threat sees over", () => {
     const behindIt = {x: 4.5, y: 4.5};
 
     expect(nearestCover(room, {from: FROM, threat: THREAT, candidates: [behindIt]})).toEqual(behindIt);
     expect(nearestCover(lowBlock, {from: FROM, threat: THREAT, candidates: [behindIt]})).toBeUndefined();
+  });
+
+  it("takes a place right behind a low cover block, where a crouched fighter is hidden from the threat", () => {
+    const rightBehindIt = {x: 5.5, y: 4.5};
+
+    expect(nearestCover(lowBlock, {from: FROM, threat: THREAT, candidates: [rightBehindIt]})).toEqual(rightBehindIt);
   });
 
   it("passes over places the threat can see", () => {
@@ -117,13 +125,22 @@ describe("across a drop", () => {
     expect(nearestCover(terraced, {from: {x: 10.5, y: 1.5}, threat, candidates: [platform]})).toEqual(platform);
   });
 
-  it("does not take the low ground as cover from a threat on a platform, which sees down over it", () => {
-    const onThePlatform = {x: 2.5, y: 3.5};
+  it("does not take the low ground as cover from a threat at the platform's edge, which sees down over it", () => {
+    const atTheEdge = {x: 8.5, y: 3.5};
     const lowGround = {x: 11.5, y: 2.5};
 
     expect(
-      nearestCover(terraced, {from: {x: 6.5, y: 3.5}, threat: onThePlatform, candidates: [lowGround]}),
+      nearestCover(terraced, {from: {x: 6.5, y: 3.5}, threat: atTheEdge, candidates: [lowGround]}),
     ).toBeUndefined();
+  });
+
+  it("takes the low ground as cover from a threat back from the platform's edge, which cannot see down past it", () => {
+    const onThePlatform = {x: 2.5, y: 3.5};
+    const lowGround = {x: 11.5, y: 2.5};
+
+    expect(nearestCover(terraced, {from: {x: 6.5, y: 3.5}, threat: onThePlatform, candidates: [lowGround]})).toEqual(
+      lowGround,
+    );
   });
 
   it("prefers cover it can walk to soonest over a nearer place across the drop that takes a walk round by the stair", () => {

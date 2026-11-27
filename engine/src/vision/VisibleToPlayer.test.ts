@@ -68,6 +68,7 @@ describe("on one level", () => {
           shooter: "player",
           level: 0,
           crouching: false,
+          floor: 0,
         },
       ],
     };
@@ -84,6 +85,7 @@ describe("on one level", () => {
       shooter: "opponent",
       level: 0,
       crouching: false,
+      floor: 0,
     });
     const world: World = {...startingWorld(room), bullets: [bullet(12.5 + 4), bullet(12.5 - 4), bullet(12.5 + 20)]};
 
@@ -123,17 +125,25 @@ describe("across levels", () => {
       shooter: "opponent",
       level: 0,
       crouching: false,
+      floor: 0,
     };
     const world = {...startingWorld(platformAhead), bullets: [bullet]};
 
     expect(visibleToPlayer(world).bullets).toEqual([false]);
   });
 
-  it("shows an opponent on the low ground to a player who has climbed up to the platform", () => {
+  it("shows an opponent on the low ground to a player who stands at the platform's edge", () => {
+    const world = startingWorld(platformAhead, [], {x: 22.5, y: 2.5});
+    const atTheEdge = {...world, player: {...world.player, position: {x: 20.5, y: 2.5}}};
+
+    expect(visibleToPlayer(atTheEdge).opponent).toBe(true);
+  });
+
+  it("hides an opponent on the low ground from a player who stands back from the platform's edge", () => {
     const world = startingWorld(platformAhead, [], {x: 22.5, y: 2.5});
     const onThePlatform = {...world, player: {...world.player, position: ON_THE_PLATFORM}};
 
-    expect(visibleToPlayer(onThePlatform).opponent).toBe(true);
+    expect(visibleToPlayer(onThePlatform).opponent).toBe(false);
   });
 });
 

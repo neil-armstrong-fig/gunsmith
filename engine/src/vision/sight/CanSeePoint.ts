@@ -1,13 +1,13 @@
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
-import {blocksSightFrom} from "@gunsmith/engine/height/BlocksSightFrom";
-import {hasClearLine} from "@gunsmith/engine/vision/sight/HasClearLine";
+import {hasClearSight} from "@gunsmith/engine/vision/sight/HasClearSight";
 import {isInCone} from "@gunsmith/engine/vision/cone/IsInCone";
 import type {Cone} from "@gunsmith/engine/vision/types/Cone";
 
 /**
  * Whether the fighter whose cone this is sees `point`: it is inside the cone and nothing stands between that hides it, a wall,
- * ground higher than the fighter's eye level, or, if they crouch, a cover block no lower than their eye. A place has no stance;
+ * raised ground (`hasClearSight`: between two levels only within `EDGE_REACH_TILES` of the higher end), or, if they crouch, a
+ * cover block no lower than their eye. A place has no stance;
  * what a crouched fighter standing there is hidden by is `canSeeFighter`'s question.
  */
 export function canSeePoint(arena: Arena, cone: Cone, point: Point): boolean {
@@ -15,5 +15,5 @@ export function canSeePoint(arena: Arena, cone: Cone, point: Point): boolean {
     return false;
   }
 
-  return hasClearLine(blocksSightFrom(arena, cone), cone.apex, point);
+  return hasClearSight(arena, {from: cone.apex, eye: cone, to: point});
 }

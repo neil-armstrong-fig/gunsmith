@@ -70,7 +70,8 @@ const overlook = arenaFrom([
   "#..........1111111111111#",
   "#########################",
 ]);
-const OVERLOOK_OPPONENT: Point = {x: 12.5, y: 3.5};
+// At the platform's edge (its face is at x = 11), where the edge rule lets it see down onto the low ground.
+const OVERLOOK_OPPONENT: Point = {x: 11.5, y: 3.5};
 const OVERLOOK_PLAYER: Point = {x: 1.5, y: 3.5};
 
 const TICK = 1 / 60;

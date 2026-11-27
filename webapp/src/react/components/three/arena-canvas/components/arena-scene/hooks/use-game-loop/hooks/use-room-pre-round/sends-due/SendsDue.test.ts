@@ -25,6 +25,7 @@ const nothingWanted: RoomWants = {weapons: [undefined, undefined], arena: undefi
 const nothingHeld: RoomPreRoundReadout = {
   stage: "choosing",
   secondsLeft: undefined,
+  builtInArenas: ["Duel", "Fair duel"],
   own: seat({}),
   opponent: seat({}),
   how: undefined,

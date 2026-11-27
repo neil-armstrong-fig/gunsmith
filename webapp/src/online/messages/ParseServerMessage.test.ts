@@ -88,6 +88,7 @@ it("reads what the server says about the choosing", () => {
   const frame = {
     kind: "preRound",
     stage: "picking",
+    builtInArenas: ["Duel", "Keep", "Slalom", "Pinwheel", "Catwalk"],
     secondsLeft: 42,
     own: {
       arena: {kind: "builtIn", name: "Duel"},
@@ -129,6 +130,16 @@ it("reads the reveal stage, with who has asked to begin", () => {
   };
 
   expect(parseServerMessage(JSON.stringify(frame))).toEqual(frame);
+});
+
+it("refuses a choosing frame without the day's built-in arenas as a list of names", () => {
+  const {builtInArenas, ...frame} = ALONE;
+
+  expect(builtInArenas).toHaveLength(5);
+
+  expect(parseServerMessage(JSON.stringify(frame))).toBeUndefined();
+  expect(parseServerMessage(JSON.stringify({...frame, builtInArenas: "Duel"}))).toBeUndefined();
+  expect(parseServerMessage(JSON.stringify({...frame, builtInArenas: ["Duel", 3]}))).toBeUndefined();
 });
 
 it("refuses a choosing frame that is not what the server sends", () => {
@@ -249,9 +260,25 @@ it("refuses a reveal that is not two weapons on each side, each a built-in key o
   expect(parseServerMessage(JSON.stringify({...frame, arena: {rows: ["###"]}}))).toBeUndefined();
 });
 
+it("reads the frame that tells the other player's saved weapon in a slot once, with its numbers and drawing", () => {
+  const frame = {kind: "opponentWeapon", slot: 1, weapon: {bulletDamage: 20}, appearance: {version: 1}};
+
+  expect(parseServerMessage(JSON.stringify(frame))).toEqual(frame);
+});
+
+it("refuses an opponent weapon frame without a slot of 1 or 2, numbers or a drawing", () => {
+  const frame = {kind: "opponentWeapon", slot: 2, weapon: {bulletDamage: 20}, appearance: {version: 1}};
+
+  expect(parseServerMessage(JSON.stringify({...frame, slot: 3}))).toBeUndefined();
+  expect(parseServerMessage(JSON.stringify({...frame, weapon: undefined}))).toBeUndefined();
+  expect(parseServerMessage(JSON.stringify({...frame, weapon: [20]}))).toBeUndefined();
+  expect(parseServerMessage(JSON.stringify({...frame, appearance: undefined}))).toBeUndefined();
+});
+
 const ALONE = {
   kind: "preRound",
   stage: "choosing",
+  builtInArenas: ["Duel", "Keep", "Slalom", "Pinwheel", "Catwalk"],
   own: {locked: false, weapons: {slots: [{locked: false}, {locked: false}]}},
   opponent: {locked: false, picked: false, weapons: {slots: [{locked: false}, {locked: false}]}},
 };

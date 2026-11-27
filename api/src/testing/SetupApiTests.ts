@@ -52,6 +52,12 @@ vi.mock("@src/accounts/save-item/SaveItem", () => ({
 vi.mock("@src/accounts/unsave-item/UnsaveItem", () => ({
   unsaveItem: (userId: string, id: string) => testAccounts.unsaveItem(userId, id),
 }));
+vi.mock("@src/accounts/count-arena-play/CountArenaPlay", () => ({
+  countArenaPlay: (arena: string, day: number) => testAccounts.countArenaPlay(arena, day),
+}));
+vi.mock("@src/accounts/arena-plays-since/ArenaPlaysSince", () => ({
+  arenaPlaysSince: (day: number) => testAccounts.arenaPlaysSince(day),
+}));
 
 vi.mock("@src/sign-in/GoogleAuthorizationUrl", () => ({
   googleAuthorizationUrl: (authorization: GoogleAuthorization) => testGoogle.authorizationUrl(authorization),

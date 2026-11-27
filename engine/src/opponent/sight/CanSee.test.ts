@@ -60,8 +60,12 @@ describe("from the low ground and from a platform", () => {
     expect(canSee(platformAhead, opponentAt(2.5, 2.5), {position: {x: 7.5, y: 2.5}, crouching: false})).toBe(false);
   });
 
-  it("sees a player on the low ground when it stands on the platform", () => {
-    expect(canSee(platformAhead, opponentAt(7.5, 2.5), {position: {x: 12.5, y: 2.5}, crouching: false})).toBe(true);
+  it("sees a player on the low ground when it stands at the platform's edge", () => {
+    expect(canSee(platformAhead, opponentAt(9.5, 2.5), {position: {x: 12.5, y: 2.5}, crouching: false})).toBe(true);
+  });
+
+  it("does not see a player on the low ground when it stands back from the platform's edge", () => {
+    expect(canSee(platformAhead, opponentAt(7.5, 2.5), {position: {x: 12.5, y: 2.5}, crouching: false})).toBe(false);
   });
 });
 

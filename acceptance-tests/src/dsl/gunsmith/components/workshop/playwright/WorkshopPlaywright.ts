@@ -1,6 +1,8 @@
 import type {WeaponWorkshopSetup} from "@src/dsl/gunsmith/components/workshop/types/WeaponWorkshopSetup";
+import {arrangeCredits} from "@src/dsl/gunsmith/components/workshop/playwright/credits/ArrangeCredits";
 import {arrangeSignedInWeapon} from "@src/dsl/gunsmith/components/workshop/playwright/signed-in-weapon/ArrangeSignedInWeapon";
 import type {Locator, Page} from "@playwright/test";
+import {expect} from "@playwright/test";
 import type {PowerMeter} from "@src/dsl/gunsmith/components/workshop/types/PowerMeter";
 import type {PromptCount} from "@src/dsl/gunsmith/components/workshop/types/PromptCount";
 import type {WeaponResult} from "@src/dsl/gunsmith/components/workshop/types/WeaponResult";
@@ -47,6 +49,18 @@ export class WorkshopPlaywright extends BasePage {
 
   releaseWeaponMake(): void {
     this.releasePendingWeapon?.();
+  }
+
+  async arrangeCredits(balance: number): Promise<void> {
+    await arrangeCredits(this.page, balance);
+  }
+
+  /** The workshop's credit line, or nothing when it shows none (a guest). */
+  async getCredits(): Promise<string | undefined> {
+    const credits = this.page.getByTestId("credit-balance");
+    if (!(await credits.isVisible())) return undefined;
+
+    return await credits.innerText();
   }
 
   async getWeaponMakeError(): Promise<string | undefined> {
@@ -155,6 +169,20 @@ export class WorkshopPlaywright extends BasePage {
       trackWidth: (await meter.boundingBox())?.width ?? 0,
       fillWidth: (await fill.boundingBox())?.width ?? 0,
     };
+  }
+
+  /** Whether the open tab offers a guest the sign-in link wholly above the prompt box, so it is seen before anything is typed. */
+  async isSignInOfferedAboveThePrompt(): Promise<boolean> {
+    const link = this.page.getByRole("link", {name: /^Sign in with Google/});
+    await expect(link).toBeVisible();
+
+    const linkBox = await link.boundingBox();
+    const promptBox = await this.promptBox().boundingBox();
+    if (!linkBox || !promptBox) {
+      return false;
+    }
+
+    return linkBox.y + linkBox.height <= promptBox.y;
   }
 
   private promptBox(): Locator {

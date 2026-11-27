@@ -2,6 +2,7 @@ import {BuiltInWeaponChoices} from "@src/react/components/dom/workshop/component
 import {accountUrl} from "@src/account/AccountUrl";
 import {useAccountLibraryStore} from "@src/store/account-library/UseAccountLibraryStore";
 import {returnToPractice} from "@src/react/components/dom/workshop/arena-on-trial/ReturnToPractice";
+import {CreditBalance} from "@src/react/components/dom/workshop/components/credit-balance/CreditBalance";
 import {ArenaWorkshop} from "@src/react/components/dom/workshop/components/arena-workshop/ArenaWorkshop";
 import {WeaponCard} from "@src/react/components/dom/workshop/components/weapon-card/WeaponCard";
 import {WeaponShelf} from "@src/react/components/dom/workshop/components/weapon-shelf/WeaponShelf";
@@ -67,6 +68,8 @@ export function Workshop(): JSX.Element | undefined {
             Back
           </button>
         </div>
+
+        <CreditBalance />
 
         {walkingAnArena && (
           <button

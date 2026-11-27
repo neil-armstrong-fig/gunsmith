@@ -77,7 +77,9 @@ given("the workshop is open on the practice range, with nothing saved", () => {
         });
 
         then("the weapon is still on the shelf", async ({gunsmith}) => {
-          expect(await gunsmith.workshop.shelf.getItems()).toEqual([{name, rating, prompt: FAST_PROMPT}]);
+          await expect
+            .poll(async () => await gunsmith.workshop.shelf.getItems())
+            .toEqual([{name, rating, prompt: FAST_PROMPT}]);
 
           expect((await gunsmith.workshop.shelf.getMeter()).count).toBe(1);
         });

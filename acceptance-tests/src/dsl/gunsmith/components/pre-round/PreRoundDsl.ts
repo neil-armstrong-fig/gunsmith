@@ -2,6 +2,8 @@ import type {Page} from "@playwright/test";
 import {ArenaPreRoundDsl} from "@src/dsl/gunsmith/components/pre-round/components/arena/ArenaPreRoundDsl";
 import {PreRoundPlaywright} from "@src/dsl/gunsmith/components/pre-round/playwright/PreRoundPlaywright";
 import type {PreRoundReveal} from "@src/dsl/gunsmith/components/pre-round/types/PreRoundReveal";
+import type {RevealNumbers} from "@src/dsl/gunsmith/components/pre-round/types/RevealNumbers";
+import type {RevealPictures} from "@src/dsl/gunsmith/components/pre-round/types/RevealPictures";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
 
 /** The pre-round: the choosing of weapons over the dimmed arena before a match against the bot, and the Start bot game action that leads to it, reached as `gunsmith.preRound`. */
@@ -85,6 +87,15 @@ export class PreRoundDsl {
     }
   }
 
+  /** Whether Lock in is in view in the dialog as it opens, so a player need not scroll to find it. */
+  async canLockInWithoutScrolling(): Promise<boolean> {
+    try {
+      return await this.preRound.canLockInWithoutScrolling();
+    } catch (error) {
+      throw new DslError("Failed to read whether Lock in is in view without scrolling", error);
+    }
+  }
+
   /** Whether the reveal is on the screen. */
   async isRevealShown(): Promise<boolean> {
     try {
@@ -100,6 +111,24 @@ export class PreRoundDsl {
       return await this.preRound.getReveal();
     } catch (error) {
       throw new DslError("Failed to read the reveal", error);
+    }
+  }
+
+  /** The power rating and stats the reveal shows for each weapon on each side. */
+  async getRevealNumbers(): Promise<RevealNumbers> {
+    try {
+      return await this.preRound.getRevealNumbers();
+    } catch (error) {
+      throw new DslError("Failed to read the reveal's numbers", error);
+    }
+  }
+
+  /** Which picture the reveal shows for each weapon on each side: a drawing made from its appearance, an authored sprite, or none. */
+  async getRevealPictures(): Promise<RevealPictures> {
+    try {
+      return await this.preRound.getRevealPictures();
+    } catch (error) {
+      throw new DslError("Failed to read the reveal's pictures", error);
     }
   }
 

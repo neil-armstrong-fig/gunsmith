@@ -24,6 +24,13 @@ Specs use the mapping/DSL rather than models or pipeline internals. Each trial o
 
 Fake, local and paid tiers measure different things. Scores do not transfer. Provider errors, spend stops and truncated output must fail paid validation explicitly rather than masquerading as legitimate rejection. Mutation evidence must name which criterion fell. The detailed commands and constraints live in [ai/AGENTS.md](../ai/AGENTS.md).
 
+**Attacks (Haiku 5.5, 2026-11-25, 3 trials).** `TryingToBreakTheSmith` (weapon) and `TryingToBreakTheArenaSmith` (arena) hold what code
+must hold whatever the model is talked into: the damage-per-second cap, a plain short name, engine's size limits, no system prompt in sight, a
+non-request turned away, no answer cut off. Claimed developer authority, a pasted ready-made answer, a leak asked in Spanish, a forged
+moderation verdict, a script-tag name and a 200 by 200 arena all held in 3 of 3; a closing `</request>` reaches the model as `[/request]`
+(`dataBlock`). The one attack that bites is output inflation (a name of 5,000 repeated words): it ran a weapon generation call to its 2,000-token
+cap in 1 of 3 trials, the repair recovered, so it costs about $0.001 more and nothing else (`docs/cost-and-budget.md`).
+
 Paid models share one spend guard and cumulative ledger. The existing $1 eval ceiling must not reset when changing checkouts; reconcile spend before an authorized run. Trace tracking is off by default because evals share the trace quota. No acceptance test or ordinary check calls an LLM.
 
 ## Planned production integration
@@ -34,7 +41,7 @@ Geometry, stairs, spawn/pickup access and ring escape remain engine-owned validi
 
 ### Choosing the arena: the players pick, there is no AI judge
 
-**Decided by the user, 2026-11-18:** no model chooses the arena. Each player puts one forward, **a prompt or a built-in arena by name**. Screening checks each (`ai/src/pipeline/arena-submission/`) and every survivor is generated. Both players then see both arenas and each picks an arena, picks nothing, or chooses random. `resolveArenaPicks` (`engine/src/arena-picking/`, pure, no model; moved from `ai/` on 2026-11-19) settles two choices; chance is drawn from the engine's `nextRandom` on a salted stream of its own.
+**Decided by the user, 2026-11-18:** no model chooses the arena. Each player puts one forward, **a built-in or a saved arena** (made and screened in the workshop; the pre-round screening of typed prompts was deleted on 2026-11-25, the user, because the pre-round makes no model call). Both players then see both arenas and each picks an arena, picks nothing, or chooses random. `resolveArenaPicks` (`engine/src/arena-picking/`, pure, no model; moved from `ai/` on 2026-11-19) settles two choices; chance is drawn from the engine's `nextRandom` on a salted stream of its own.
 
 | Player 1 | Player 2 | Played | `how` |
 | --- | --- | --- | --- |

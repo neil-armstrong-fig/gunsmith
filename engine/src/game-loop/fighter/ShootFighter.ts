@@ -21,7 +21,7 @@ export function shootFighter(arena: Arena, shooter: Shooter, turn: FighterTurn):
 
   return {
     fighter: spendRound(fighter),
-    bullet: fireBullet(shooter, {
+    bullet: fireBullet(arena, shooter, {
       from: fighter.position,
       aim: fighter.aim,
       weapon,

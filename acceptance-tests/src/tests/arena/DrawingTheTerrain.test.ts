@@ -14,10 +14,11 @@ const FLOOR_TICKS = [
 
 given.each(
   WINDOWS,
-  ({pixelsPerTile}) => `a terrain preview at ${pixelsPerTile} pixels per tile`,
+  ({pixelsPerTile}) => `a terrain preview at ${pixelsPerTile} pixels per tile with the fog hidden`,
   ({width, height, pixelsPerTile}) => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.resizeWindowTo({width, height});
+      gunsmith.hideTheFog();
       await gunsmith.startTerrain();
     });
 
@@ -69,6 +70,19 @@ given.each(
       expect(beyondLip).toBe(highFloor);
       expect(beyondShadow).toBe(FLOOR_GREEN[1]);
       expect(shadow).toBeLessThan(beyondShadow ?? 0);
+    });
+  },
+);
+
+// The fog's own look, from the highest terrace: with the edge rule the lower floors are out of sight from back on it, which is
+// why the pictures above are checked with the fog hidden.
+given.each(
+  WINDOWS,
+  ({pixelsPerTile}) => `a terrain preview at ${pixelsPerTile} pixels per tile`,
+  ({width, height, pixelsPerTile}) => {
+    beforeEach(async ({gunsmith}) => {
+      await gunsmith.resizeWindowTo({width, height});
+      await gunsmith.startTerrain();
     });
 
     when("the player turns away from the stairs", () => {
@@ -162,6 +176,7 @@ given("the highest terrain picture is held back", () => {
 given("the highest terrain picture is missing", () => {
   beforeEach(async ({gunsmith}) => {
     await gunsmith.resizeWindowTo({width: 1024, height: 560});
+    gunsmith.hideTheFog();
     await gunsmith.startTerrain("missing");
   });
 

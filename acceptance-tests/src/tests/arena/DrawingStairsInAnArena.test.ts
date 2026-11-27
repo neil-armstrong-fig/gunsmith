@@ -48,6 +48,9 @@ given.each(
     beforeEach(async ({gunsmith}) => {
       await gunsmith.resizeWindowTo({width: 25 * pixelsPerTile, height: Math.max(7 * pixelsPerTile, 384)});
       gunsmith.keepTheCameraStill();
+      // The player starts back from the platform's edge, from where the edge rule hides the low ground; these criteria are about the
+      // pictures, so the fog's veil is left out.
+      gunsmith.hideTheFog();
       await gunsmith.startTerracedDuel({seed: 9, delaySeconds: 60, closingSeconds: 60});
       await gunsmith.holdTheGame();
       await gunsmith.player.aimAtTile({x: 10.5, y: 5.5});
@@ -67,7 +70,8 @@ given.each(
       expect(Math.min(...railGreens)).toBeGreaterThanOrEqual(STAIR_MARK_GREEN - 2);
       expect(Math.max(...railGreens)).toBeLessThanOrEqual(STAIR_MARK_GREEN + 2);
       expect(greens.slice(rails.length, rails.length + entrances.length)).toEqual([43, 64]);
-      expect(Math.max(...greens.slice(-northWall.length))).toBeLessThan(100);
+      // No rail's green on the wall. With the fog hidden the wall is lit, and at 32 px the rail's edge blends into its first pixels.
+      expect(Math.max(...greens.slice(-northWall.length))).toBeLessThan(STAIR_MARK_GREEN - 30);
     });
 
     then("the nearby drop has a narrow slate lip and a short shadow", async ({gunsmith}) => {

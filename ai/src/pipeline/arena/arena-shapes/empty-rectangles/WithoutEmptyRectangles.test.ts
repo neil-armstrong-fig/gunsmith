@@ -31,3 +31,9 @@ it("does not change the answer it was given", () => {
 
   expect(answer.walls).toHaveLength(1);
 });
+
+it("drops a floor rectangle of no size from an outline, as it drops a wall", () => {
+  const kept = {x: 1, y: 1, width: 2, height: 1};
+
+  expect(withoutEmptyRectangles({floor: [{x: 0, y: 0, width: 4, height: 0}, kept]})).toEqual({floor: [kept]});
+});

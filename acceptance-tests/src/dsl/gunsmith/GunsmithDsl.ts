@@ -84,6 +84,18 @@ export class GunsmithDsl {
     }
   }
 
+  /**
+   * Asks for the fog's veil to be left out (`?fog=off`) in whatever the spec opens next, so a screenshot of the terrain's pictures is
+   * not darkened where the player cannot see. Sight itself is unchanged: what the player cannot see is still not drawn.
+   */
+  hideTheFog(): void {
+    try {
+      this.gunsmith.hideTheFog();
+    } catch (error) {
+      throw new DslError("Failed to ask for the fog to be hidden", error);
+    }
+  }
+
   /** Asks for reduced motion through the page (`?reducedMotion=1`) in whatever the spec opens next. */
   askForReducedMotion(): void {
     try {
@@ -142,6 +154,18 @@ export class GunsmithDsl {
       await this.gunsmith.openDuel(DUEL_SEED);
     } catch (error) {
       throw new DslError("Failed to open the duel", error);
+    }
+  }
+
+  /**
+   * Opens the practice range with the duel's fixed seed (`DUEL_SEED`) in its address, so a bot game started from its menu plays the same duel
+   * every run: on that seed the bot beats a player who stands still in 2.3 game seconds. Without it every bot game is a new random duel.
+   */
+  async openTheSeededPracticeRange(): Promise<void> {
+    try {
+      await this.gunsmith.openPracticeRange(DUEL_SEED);
+    } catch (error) {
+      throw new DslError("Failed to open the practice range with the duel's seed", error);
     }
   }
 
@@ -302,6 +326,19 @@ export class GunsmithDsl {
       await this.gunsmith.openCoverHall(seed);
     } catch (error) {
       throw new DslError(`Failed to open the cover hall with seed ${seed}`, error);
+    }
+  }
+
+  /**
+   * Opens the cover run: open low ground with one low cover block and nothing else that hides anyone. The player stands facing east;
+   * the opponent stands eight tiles east of them on the same row, two tiles past the block, with an empty magazine, so it reloads first.
+   * One round, no score, no ring; the opponent's choices are drawn from `seed`.
+   */
+  async startCoverRun(seed: number): Promise<void> {
+    try {
+      await this.gunsmith.openCoverRun(seed);
+    } catch (error) {
+      throw new DslError(`Failed to open the cover run with seed ${seed}`, error);
     }
   }
 

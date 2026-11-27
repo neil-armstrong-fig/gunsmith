@@ -11,6 +11,7 @@ import {SUBMACHINE_GUN} from "@gunsmith/engine/weapon/weapons/SubmachineGun";
 import {COVER_HALL_ARENA} from "@src/game/cover-hall/CoverHallArena";
 import {COVER_HALL_OPPONENT} from "@src/game/cover-hall/CoverHallOpponent";
 import {COVER_HALL_PLAYER} from "@src/game/cover-hall/CoverHallPlayer";
+import {coverRunWorld} from "@src/game/cover-run/CoverRunWorld";
 import {coverWorld} from "@src/game/cover/CoverWorld";
 import {DUEL_ARENA} from "@src/game/duel/DuelArena";
 import {DUEL_OPPONENT} from "@src/game/duel/DuelOpponent";
@@ -48,7 +49,7 @@ import type {Scenario} from "@src/game/scenario/types/Scenario";
  *
  * The ring closes on a point drawn from `seed`, and keeps `ringTiming` when the page asked for one (`?ringDelay=`,
  * `?ringClosing=`), otherwise the game's own. Sparring has a ring only when the page asks for ring timing, so a spec can watch
- * the ring alone hurt a fighter who stands still; the practice range, the heights arena, the cover arena and the cover hall never have one.
+ * the ring alone hurt a fighter who stands still; the practice range, the heights arena, the cover arena, the cover hall and the cover run never have one.
  */
 export function worldOfScenario(scenario: Scenario, seed: number, ringTiming?: RingTiming): World {
   if (scenario === "room") {
@@ -116,6 +117,10 @@ export function worldOfScenario(scenario: Scenario, seed: number, ringTiming?: R
     const world = giveOpponentBrain(engine.startingWorld(COVER_HALL_ARENA, [], COVER_HALL_OPPONENT), seed);
 
     return {...world, player: {...world.player, position: COVER_HALL_PLAYER}};
+  }
+
+  if (scenario === "cover-run") {
+    return coverRunWorld(seed);
   }
 
   if (scenario === "mutual-knockout") {

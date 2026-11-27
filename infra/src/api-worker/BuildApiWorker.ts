@@ -24,7 +24,8 @@ export async function buildApiWorker(apiDatabase: D1Database): ReturnType<typeof
       traces: {enabled: false},
     },
     bindings: {
-      ...accountDigestBinding(),
+      ...optionalSecret("ACCOUNT_DIGEST_KEY"),
+      ...optionalSecret("ANTHROPIC_API_KEY"),
       DB: apiDatabase,
       MATCHES: DurableObjectNamespace("matches", {className: "Match", sqlite: true}),
       CREDITS: DurableObjectNamespace("credits", {className: "CreditLedger", sqlite: true}),
@@ -40,11 +41,15 @@ export async function buildApiWorker(apiDatabase: D1Database): ReturnType<typeof
   });
 }
 
-function accountDigestBinding(): Bindings {
-  const key = process.env["ACCOUNT_DIGEST_KEY"];
-  if (!key?.trim()) {
+/**
+ * A secret the Worker runs without: unset or blank in the deploy environment, the binding is left out. Without
+ * `ANTHROPIC_API_KEY` the generation routes stay off and nothing is spent (`api/` `IsWeaponPipelineAvailable`).
+ */
+function optionalSecret(name: string): Bindings {
+  const value = process.env[name];
+  if (!value?.trim()) {
     return {};
   }
 
-  return {ACCOUNT_DIGEST_KEY: alchemy.secret(key)};
+  return {[name]: alchemy.secret(value)};
 }

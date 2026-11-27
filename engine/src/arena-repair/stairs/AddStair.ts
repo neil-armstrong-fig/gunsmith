@@ -3,15 +3,8 @@ import {RAISED_LEVELS} from "@gunsmith/engine/arena/drawing/level/RaisedLevels";
 import {characterAt} from "@gunsmith/engine/arena-repair/drawing/CharacterAt";
 import {isReadable} from "@gunsmith/engine/arena-repair/drawing/IsReadable";
 import {withCharacter} from "@gunsmith/engine/arena-repair/drawing/WithCharacter";
+import {CLIMBS} from "@gunsmith/engine/arena-repair/stairs/climbs/Climbs";
 import type {DrawnTile} from "@gunsmith/engine/arena-repair/types/DrawnTile";
-
-/** A step to a neighbouring tile as the drawing counts it (columns to the east, rows to the south), and the arrow of a stair that climbs that way. */
-const CLIMBS = [
-  {columns: 1, rows: 0, arrow: ">"},
-  {columns: -1, rows: 0, arrow: "<"},
-  {columns: 0, rows: -1, arrow: "^"},
-  {columns: 0, rows: 1, arrow: "v"},
-] as const;
 
 /**
  * Draws one stair beside one of the raised tiles it is given, at the first place the engine accepts it: on floor one level

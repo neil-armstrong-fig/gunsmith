@@ -44,6 +44,7 @@ function meeting(contact: Contact, dummyIndex: number | undefined, damage = 25):
     shooter: "player",
     level: 0,
     crouching: false,
+    floor: 0,
   };
 
   return {bullet, contact, dummyIndex};

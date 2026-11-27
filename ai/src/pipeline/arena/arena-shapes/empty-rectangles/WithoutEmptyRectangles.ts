@@ -1,4 +1,4 @@
-const RECTANGLE_LISTS = ["walls", "covers", "platforms"] as const;
+const RECTANGLE_LISTS = ["walls", "covers", "platforms", "floor"] as const;
 
 /**
  * The model's shapes without any rectangle that has no size (a width or height under 1): a wall of 0 by 0 is nothing to draw, so

@@ -7,7 +7,8 @@ import type {SeedMaker} from "@src/durable-objects/match/room/types/SeedMaker";
  * person, `makeToken` makes the secret each seat is given as it sits down (whoever shows it later is that seat's person), `makeSeed`
  * makes the seed each round's fair start and the arena pick are drawn from, and `preRoundSeconds` is how long the two seats have to
  * choose once both have sat (none: the match begins on the defaults at once), `revealSeconds` is how long the decided arena and weapons are shown before the match begins (none unless given, so the match begins as soon as the pre-round is decided; `Match` passes the real time), and `ringTiming` is when each round's ring starts to
- * close and how long it takes (the engine's default unless given).
+ * close and how long it takes (the engine's default unless given). `arenaRotation` false is a room that offers every built-in arena and
+ * counts no plays (on unless given; `Match` tells a rotating room the day's arenas).
  */
 export interface MatchRoomOptions {
   limits?: ForfeitLimits;
@@ -16,4 +17,5 @@ export interface MatchRoomOptions {
   preRoundSeconds?: number;
   revealSeconds?: number;
   ringTiming?: RingTiming;
+  arenaRotation?: boolean;
 }

@@ -70,15 +70,14 @@ describe("across levels", () => {
   const BEHIND_THE_PLATFORM_FACE = {position: {x: 3.5, y: 1.5}, health: 100};
   const LOW_GROUND_DUMMY = {position: {x: 6.5, y: 1.5}, health: 100};
 
-  it("stops a low-ground bullet at the face of a platform, before a dummy standing on it", () => {
+  it("lets a low-ground bullet reach a dummy standing just past the face of a platform", () => {
     const meeting = meetBullet(
       platform,
       request({dummies: [BEHIND_THE_PLATFORM_FACE], seconds: 0.2}),
       bulletAt(1.5, {position: {x: 1.2, y: 1.5}, level: 0}),
     );
 
-    expect(meeting.contact).toBe("wall");
-    expect(meeting.dummyIndex).toBeUndefined();
+    expect(meeting.contact).toBe("dummy");
   });
 
   it("lets a bullet fired from the platform fly out over the drop and hit a dummy on the low ground", () => {
@@ -110,6 +109,76 @@ describe("across levels", () => {
     );
 
     expect(meeting.contact).toBe("wall");
+  });
+});
+
+describe("past a platform's edge", () => {
+  // Low ground at x 1 to 3, a platform one level up at x 4 to 7 (its faces at x = 4 and x = 8), and low ground at x 8 to 10.
+  const wide = arenaFrom(["############", "#...1111...#", "############"]);
+  const AT_THE_EDGE = {position: {x: 4.5, y: 1.5}, health: 100};
+  const BACK_FROM_THE_EDGE = {position: {x: 5.5, y: 1.5}, health: 100};
+  const ON_THE_LOW_GROUND = {position: {x: 2.5, y: 1.5}, health: 100};
+  const FROM_THE_LOW_GROUND = bulletAt(1.5, {position: {x: 2.2, y: 1.5}, level: 0, floor: 0});
+  const WEST = {x: -1, y: 0};
+
+  it("lets a low-ground bullet hit a dummy standing at the edge of the platform", () => {
+    const meeting = meetBullet(wide, request({dummies: [AT_THE_EDGE], seconds: 0.2}), FROM_THE_LOW_GROUND);
+
+    expect(meeting.contact).toBe("dummy");
+  });
+
+  it("lets a low-ground bullet hit an opponent standing at the edge of the platform", () => {
+    const meeting = meetBullet(
+      wide,
+      request({opponentPosition: AT_THE_EDGE.position, seconds: 0.2}),
+      FROM_THE_LOW_GROUND,
+    );
+
+    expect(meeting.contact).toBe("fighter");
+  });
+
+  it("stops a low-ground bullet a little way onto the platform, before a dummy standing back from the edge", () => {
+    const meeting = meetBullet(wide, request({dummies: [BACK_FROM_THE_EDGE], seconds: 0.2}), FROM_THE_LOW_GROUND);
+
+    expect(meeting.contact).toBe("wall");
+    expect(meeting.dummyIndex).toBeUndefined();
+  });
+
+  it("stops a low-ground bullet no farther onto the platform than a body's width short of a tile", () => {
+    expect(meetBullet(wide, request({seconds: 0.11}), FROM_THE_LOW_GROUND).contact).toBe("none");
+    expect(meetBullet(wide, request({seconds: 0.13}), FROM_THE_LOW_GROUND).contact).toBe("wall");
+  });
+
+  it("passes a bullet fired from back on the platform over a dummy on the low ground", () => {
+    const fromBack = bulletAt(1.5, {position: {x: 6.2, y: 1.5}, direction: WEST, level: 1, floor: 1});
+
+    expect(meetBullet(wide, request({dummies: [ON_THE_LOW_GROUND], seconds: 0.2}), fromBack).contact).toBe("none");
+  });
+
+  it("passes an opponent's bullet fired from back on the platform over the player on the low ground", () => {
+    const fromBack = bulletAt(1.5, {
+      position: {x: 6.2, y: 1.5},
+      direction: WEST,
+      level: 1,
+      floor: 1,
+      shooter: "opponent",
+    });
+
+    expect(
+      meetBullet(wide, request({playerPosition: ON_THE_LOW_GROUND.position, seconds: 0.2}), fromBack).contact,
+    ).toBe("none");
+  });
+
+  it("lets a bullet fired from the platform's edge hit a dummy on the low ground", () => {
+    const fromTheEdge = bulletAt(1.5, {position: {x: 4.2, y: 1.5}, direction: WEST, level: 1, floor: 0});
+
+    expect(meetBullet(wide, request({dummies: [ON_THE_LOW_GROUND], seconds: 0.2}), fromTheEdge).contact).toBe("dummy");
+  });
+
+  it("lets a bullet fired from back on the platform hit a dummy on the platform", () => {
+    const fromBack = bulletAt(1.5, {position: {x: 7.2, y: 1.5}, direction: WEST, level: 1, floor: 1});
+
+    expect(meetBullet(wide, request({dummies: [BACK_FROM_THE_EDGE], seconds: 0.2}), fromBack).contact).toBe("dummy");
   });
 });
 
@@ -238,6 +307,7 @@ function bulletAt(y: number, changes: Partial<Bullet> = {}): Bullet {
     shooter: "player",
     level: 0,
     crouching: false,
+    floor: 0,
     ...changes,
   };
 }

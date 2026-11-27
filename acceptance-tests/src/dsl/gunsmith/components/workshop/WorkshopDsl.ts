@@ -60,6 +60,22 @@ export class WorkshopDsl {
     }
   }
 
+  async arrangeCredits(balance: number): Promise<void> {
+    try {
+      await this.workshop.arrangeCredits(balance);
+    } catch (error) {
+      throw new DslError("Failed to arrange the player's credits", error);
+    }
+  }
+
+  async getCredits(): Promise<string | undefined> {
+    try {
+      return await this.workshop.getCredits();
+    } catch (error) {
+      throw new DslError("Failed to read the credit balance", error);
+    }
+  }
+
   releaseWeaponMake(): void {
     try {
       this.workshop.releaseWeaponMake();
@@ -112,6 +128,15 @@ export class WorkshopDsl {
   }
 
   /** Whether the workshop's panel is on the screen. */
+  /** Whether the open tab offers a guest the sign-in link above the prompt box. */
+  async isSignInOfferedAboveThePrompt(): Promise<boolean> {
+    try {
+      return await this.workshop.isSignInOfferedAboveThePrompt();
+    } catch (error) {
+      throw new DslError("Failed to see where sign-in is offered", error);
+    }
+  }
+
   async isOpen(): Promise<boolean> {
     try {
       return await this.workshop.isOpen();

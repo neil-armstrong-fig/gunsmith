@@ -4,6 +4,7 @@ import {Reveal} from "@src/react/components/dom/pre-round/components/reveal/Reve
 import {RoomChoosing} from "@src/react/components/dom/pre-round/components/room-choosing/RoomChoosing";
 import {roomProgressOf} from "@src/react/components/dom/pre-round/room-progress/RoomProgressOf";
 import type {PreRoundShown} from "@src/react/components/dom/pre-round/types/PreRoundShown";
+import type {RoomStage} from "@src/game/room-pre-round/types/RoomStage";
 import {usePreRoundStore} from "@src/store/pre-round/UsePreRoundStore";
 import type {PreRoundPhase} from "@src/store/pre-round/types/PreRoundPhase";
 import {useRoomPreRoundStore} from "@src/store/room-pre-round/UseRoomPreRoundStore";
@@ -19,6 +20,7 @@ export function PreRound(): JSX.Element | undefined {
   const phase = usePreRoundStore(state => state.phase);
   const inRoom = useRoomPreRoundStore(state => state.readout !== undefined);
   const roomProgress = useRoomPreRoundStore(state => roomProgressOf(state.readout));
+  const roomStage = useRoomPreRoundStore(state => state.readout?.stage);
   const shown = shownOf(phase, inRoom);
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -46,7 +48,8 @@ export function PreRound(): JSX.Element | undefined {
         role="dialog"
         aria-label="Pre-round"
         tabIndex={-1}
-        className="flex w-[40rem] max-h-[92vh] max-w-[90vw] flex-col gap-4 overflow-y-auto rounded-md bg-gs-ui-surface px-6 py-5 shadow-lg outline-none"
+        data-wide={isRevealShown(shown, roomStage)}
+        className="flex w-[52rem] max-h-[92vh] data-[wide=true]:w-[64rem] max-w-[90vw] flex-col gap-4 overflow-y-auto rounded-md bg-gs-ui-surface px-6 py-5 shadow-lg outline-none"
       >
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-2xl font-bold tracking-wide text-gs-ui-text">Pre-round</h1>
@@ -86,6 +89,15 @@ function shownOf(phase: PreRoundPhase, inRoom: boolean): PreRoundShown | undefin
   }
 
   return undefined;
+}
+
+/** Whether the panel shows a reveal, which lays the four weapons beside the arena and so needs more room than the choosing. */
+function isRevealShown(shown: PreRoundShown, roomStage: RoomStage | undefined): boolean {
+  if (shown === "revealed") {
+    return true;
+  }
+
+  return shown === "room" && (roomStage === "revealing" || roomStage === "decided");
 }
 
 function keepToThePanel(event: KeyboardEvent): void {

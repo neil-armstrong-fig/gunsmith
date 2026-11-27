@@ -578,6 +578,7 @@ it("shows what the server last said of the choosing, and stops once the match ha
   const frame = {
     kind: "preRound",
     stage: "choosing",
+    builtInArenas: ["Duel", "Keep", "Slalom", "Pinwheel", "Catwalk"],
     own: {locked: false, weapons: {slots: [{locked: false}, {locked: false}]}},
     opponent: {locked: true, picked: false, weapons: {slots: [{locked: true}, {locked: false}]}},
   };
@@ -655,6 +656,20 @@ it("keeps the reveal the server sends as the match begins", () => {
   expect(match.reveal()).toEqual(frame);
 });
 
+it("keeps the other player's saved weapons the server tells once, by slot, through a reconnect", () => {
+  const {socket, match} = seatedMatch();
+  const first = {kind: "opponentWeapon", slot: 1, weapon: {bulletDamage: 20}, appearance: {version: 1}};
+  const second = {kind: "opponentWeapon", slot: 2, weapon: {bulletDamage: 30}, appearance: {version: 1}};
+
+  expect(match.opponentWeapons()).toEqual([undefined, undefined]);
+
+  socket.receive(JSON.stringify(first));
+  socket.receive(JSON.stringify({kind: "joined", seat: "first", arena: ["###"], token: "t"}));
+  socket.receive(JSON.stringify(second));
+
+  expect(match.opponentWeapons()).toEqual([first, second]);
+});
+
 it("locks in the weapon it has chosen for a slot", () => {
   const {socket, match} = seatedMatch();
 
@@ -698,6 +713,7 @@ function shotAt(x: number): Bullet {
     shooter: "player",
     level: 0,
     crouching: false,
+    floor: 0,
   };
 }
 

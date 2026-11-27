@@ -32,6 +32,11 @@ const SMALL_REQUESTS = [
     why: "a layout request: the walls must make the shape, which a fixed base cannot be edited into easily",
   },
   {
+    when: "the player asks for an L-shaped arena",
+    prompt: "an L-shaped arena",
+    why: "a layout request with one corner of wall, which Haiku drew in only 1 of 3 shapes drafts (2026-11-20)",
+  },
+  {
     when: "the player asks for two rooms joined by a short corridor",
     prompt: "an arena of two rooms joined by a short corridor",
     why: "a layout request where the floor is easily cut in two, and the corridor makes a narrow route",

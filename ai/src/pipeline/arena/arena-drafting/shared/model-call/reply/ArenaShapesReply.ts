@@ -13,4 +13,8 @@ export const arenaShapesReplySchema = z.looseObject({
   covers: z.array(z.unknown()).optional().describe("low cover rectangles {x, y, width, height}"),
   platforms: z.array(z.unknown()).optional().describe("raised floor rectangles {x, y, width, height, level}"),
   stairs: z.array(z.unknown()).optional().describe("stair tiles {x, y, direction}"),
+  floor: z
+    .array(z.unknown())
+    .optional()
+    .describe("rectangles {x, y, width, height} that make the open area; every tile outside them is wall"),
 });

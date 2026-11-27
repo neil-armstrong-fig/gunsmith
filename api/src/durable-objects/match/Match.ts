@@ -1,4 +1,7 @@
 import type {Seat} from "@gunsmith/engine/seat/types/Seat";
+import {countArenaPlay} from "@src/accounts/count-arena-play/CountArenaPlay";
+import {parseArenaRotation} from "@src/durable-objects/match/arena-rotation/ParseArenaRotation";
+import {arenasOfToday} from "@src/durable-objects/match/arenas-of-today/ArenasOfToday";
 import {resolveArenaChoice} from "@src/durable-objects/match/choices/ResolveArenaChoice";
 import {resolveWeaponChoice} from "@src/durable-objects/match/choices/ResolveWeaponChoice";
 import {parseForfeitLimits} from "@src/durable-objects/match/forfeit-limits/ParseForfeitLimits";
@@ -13,6 +16,7 @@ import {MatchRoom} from "@src/durable-objects/match/room/MatchRoom";
 import {MATCH_TICK} from "@src/durable-objects/match/tick/MatchTick";
 import {parseStartSeed} from "@src/durable-objects/match/start-seed/ParseStartSeed";
 import {stepsOwed} from "@src/durable-objects/match/tick/StepsOwed";
+import {utcDay} from "@src/durable-objects/shared/utc/UtcDay";
 import {SEAT_ACCOUNT_HEADER} from "@src/seat-account/SeatAccountHeader";
 
 /** Nothing a player may send is as long as this: a longer frame is dropped unread. */
@@ -43,6 +47,8 @@ export class Match {
   private readonly accounts = new Map<Seat, string>();
   /** What each seat's pre-round frames have still to do, so they take effect in the order they were sent even when one waits on the database. */
   private readonly pending = new Map<Seat, Promise<void>>();
+  /** Settles once the room has been told the day's arenas (or has failed to be, and offers every one); a seat's first pre-round frame waits for it. */
+  private arenasOffered: Promise<void> = Promise.resolve();
   private ticking: ReturnType<typeof setInterval> | undefined;
   private lastTickAt = 0;
   private leftoverSeconds = 0;
@@ -66,7 +72,8 @@ export class Match {
    * The room's first connection sets how long it waits for a person (`?reconnectSeconds=`, `?idleSeconds=`, only ever shorter than the real
    * limits: `parseForfeitLimits`), how long the two seats have to choose (`?preRoundSeconds=`, `parsePreRoundSeconds`, `0` for none), how long the decided arena and weapons are shown before the match begins (`?revealSeconds=`, `parseRevealSeconds`, `0` for none) and may
    * pin the seed its rounds start from (`?startSeed=`, `parseStartSeed`, a spec's seam) and
-   * may bring the ring sooner or faster (`?ringDelay=`, `?ringClosing=`, `parseRingTiming`); later
+   * may bring the ring sooner or faster (`?ringDelay=`, `?ringClosing=`, `parseRingTiming`) and may offer every built-in arena instead
+   * of the day's, counting no plays (`?arenaRotation=off`, `parseArenaRotation`, a spec's seam); later
    * connections' say is ignored, so a seat's person cannot shorten the other's time.
    */
   private openRoom(request: Request): void {
@@ -76,12 +83,39 @@ export class Match {
 
     this.opened = true;
     const search = new URL(request.url).searchParams;
+    const arenaRotation = parseArenaRotation(search);
     this.room = new MatchRoom({
+      arenaRotation,
       limits: parseForfeitLimits(search),
       makeSeed: parseStartSeed(search),
       preRoundSeconds: parsePreRoundSeconds(search),
       revealSeconds: parseRevealSeconds(search),
       ringTiming: parseRingTiming(search),
+    });
+
+    if (arenaRotation) {
+      this.arenasOffered = this.offerTheDaysArenas();
+    }
+  }
+
+  /** Tells the room the built-in arenas it offers today. Should the plays not be read, it offers every one, and the failure is logged closed. */
+  private async offerTheDaysArenas(): Promise<void> {
+    try {
+      this.room.offerArenas(await arenasOfToday(Date.now()));
+    } catch {
+      console.warn(JSON.stringify({event: "arenas-of-today-failed"}));
+    }
+  }
+
+  /** Counts a match begun on a built-in arena towards the day's plays. A count that fails is logged closed; the match goes on. */
+  private countArenaPlayed(): void {
+    const played = this.room.takeArenaPlayed();
+    if (!played) {
+      return;
+    }
+
+    countArenaPlay(played, utcDay(Date.now())).catch(() => {
+      console.warn(JSON.stringify({event: "arena-play-not-counted"}));
     });
   }
 
@@ -167,9 +201,12 @@ export class Match {
     }
   }
 
-  /** Runs `work` once the seat's earlier pre-round frames have finished, so a lock-in never overtakes the choice sent before it. A failure is logged closed and does not stop the frames after it. */
+  /**
+   * Runs `work` once the seat's earlier pre-round frames have finished, so a lock-in never overtakes the choice sent before it, and the
+   * first of them once the room knows the day's arenas. A failure is logged closed and does not stop the frames after it.
+   */
   private afterEarlierFrames(seat: Seat, work: () => Promise<void>): void {
-    const earlier = this.pending.get(seat) ?? Promise.resolve();
+    const earlier = this.pending.get(seat) ?? this.arenasOffered;
     this.pending.set(
       seat,
       earlier.then(work).catch(() => {
@@ -232,8 +269,9 @@ export class Match {
     }, MATCH_TICK.snapshotIntervalMilliseconds);
   }
 
-  /** Tells each connection what its seat may know: the arena and the reveal once, when the match begins, then the choosing while there is some, else its snapshot. */
+  /** Tells each connection what its seat may know: the arena and the reveal once, when the match begins, the other seat's saved weapons once as they are shown, then the choosing while there is some, else its snapshot. */
   private sendSnapshots(): void {
+    this.countArenaPlayed();
     for (const [seat, socket] of this.sockets) {
       const arena = this.room.takeArenaMessage(seat);
       if (arena) {
@@ -243,6 +281,10 @@ export class Match {
       const reveal = this.room.takeRevealMessage(seat);
       if (reveal) {
         socket.send(JSON.stringify(reveal));
+      }
+
+      for (const opponentWeaponMessage of this.room.takeOpponentWeaponMessages(seat)) {
+        socket.send(JSON.stringify(opponentWeaponMessage));
       }
 
       const frame = this.room.snapshotFor(seat) ?? this.room.preRoundFor(seat);

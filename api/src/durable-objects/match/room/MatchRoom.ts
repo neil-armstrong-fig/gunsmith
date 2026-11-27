@@ -1,6 +1,7 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import {fairStart} from "@gunsmith/engine/arena-symmetry/FairStart";
+import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
 import {DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/DuelBuiltInArena";
 import type {CombatEvent} from "@gunsmith/engine/combat-events/types/CombatEvent";
 import {stepFighters} from "@gunsmith/engine/game-loop/StepFighters";
@@ -39,6 +40,7 @@ import type {RevealMessage} from "@src/durable-objects/match/room/types/RevealMe
 import type {ForfeitLimits} from "@src/durable-objects/match/room/types/ForfeitLimits";
 import type {JoinedMessage} from "@src/durable-objects/match/room/types/JoinedMessage";
 import type {MatchRoomOptions} from "@src/durable-objects/match/room/types/MatchRoomOptions";
+import type {OpponentWeaponMessage} from "@src/durable-objects/match/room/types/OpponentWeaponMessage";
 import type {Readiness} from "@src/durable-objects/match/room/types/Readiness";
 import type {SeedMaker} from "@src/durable-objects/match/room/types/SeedMaker";
 import type {SnapshotMessage} from "@src/durable-objects/match/room/types/SnapshotMessage";
@@ -72,13 +74,19 @@ export class MatchRoom {
   private arena: Arena = arenaFrom(DUEL_BUILT_IN_ARENA.rows);
   private readonly arenasToTell: Partial<Record<Seat, ArenaMessage>> = {};
   private announced = false;
+  /** The built-in arena the match is played on, or `undefined` for a saved one; and the same, once, when a match has just begun on it. */
+  private builtInArenaPlayed: string | undefined;
+  private arenaPlayedToTell: string | undefined;
   private readonly revealsToTell: Partial<Record<Seat, RevealMessage>> = {};
+  /** The slots of the other seat's saved weapons each seat has been told, so each is told once (forgotten when the seat comes back). */
+  private readonly weaponsTold: Record<Seat, Set<WeaponSlot>> = {first: new Set(), second: new Set()};
   private weapons: Record<Seat, WeaponPair> = {first: DEFAULT_WEAPONS, second: DEFAULT_WEAPONS};
   private readonly preRound: PreRound;
   private readonly limits: ForfeitLimits;
   private readonly makeToken: () => string;
   private readonly makeSeed: SeedMaker;
   private readonly ringTiming: RingTiming;
+  private readonly countsPlays: boolean;
   private readonly seated: Seat[] = [];
   private readonly tokens: Record<Seat, string> = {first: "", second: ""};
   private readonly asked: Record<Seat, Input> = {first: NOTHING_ASKED, second: NOTHING_ASKED};
@@ -97,6 +105,7 @@ export class MatchRoom {
     this.makeToken = options.makeToken ?? (() => crypto.randomUUID());
     this.makeSeed = options.makeSeed ?? (() => crypto.getRandomValues(new Uint32Array(1))[0] ?? 0);
     this.ringTiming = options.ringTiming ?? DEFAULT_RING_TIMING;
+    this.countsPlays = options.arenaRotation ?? true;
     this.preRound = new PreRound(
       options.preRoundSeconds ?? DEFAULT_PRE_ROUND_SECONDS,
       this.makeSeed,
@@ -164,7 +173,8 @@ export class MatchRoom {
     }
 
     delete this.acked[seat];
-    this.tellAgainWhileRevealing(seat);
+    this.tellAgainOnReturn(seat);
+    this.weaponsTold[seat].clear();
     this.asked[seat] = NOTHING_ASKED;
     this.pulled[seat] = false;
     this.present[seat] = true;
@@ -198,6 +208,28 @@ export class MatchRoom {
     this.beginMatchIfDecided();
   }
 
+  /** The built-in arenas the room offers today (`Match` works them out when the room is made); until it is told, every one is offered. */
+  offerArenas(names: readonly string[]): void {
+    this.preRound.offerArenas(names);
+  }
+
+  /**
+   * The built-in arena a match has just begun on, once, so `Match` can count the play (the day's arenas are worked out from them): said
+   * as the first match begins and again as a fresh match does after one is decided, never for the next round of a match, and never for
+   * a saved arena, even one named like a built-in. A room that offers every arena (`arenaRotation` false) says nothing: it is not playing
+   * the day's arenas.
+   */
+  takeArenaPlayed(): string | undefined {
+    if (!this.countsPlays) {
+      return undefined;
+    }
+
+    const played = this.arenaPlayedToTell;
+    this.arenaPlayedToTell = undefined;
+
+    return played;
+  }
+
   /** `seat` puts an arena forward (a built-in, or a saved one `Match` has already looked up and checked). A choice that cannot be taken is ignored. */
   chooseArena(seat: Seat, choice: ChosenArena): void {
     this.preRound.chooseArena(seat, choice);
@@ -225,12 +257,30 @@ export class MatchRoom {
     return message;
   }
 
-  /** The weapons each seat carries into the match, from `seat`'s side, once, the first time it is asked after the pre-round has decided them (and again if the seat comes back while they are being shown). */
+  /** The weapons each seat carries into the match, from `seat`'s side, once, the first time it is asked after the pre-round has decided them (and again whenever the seat comes back after that, the match begun or not). */
   takeRevealMessage(seat: Seat): RevealMessage | undefined {
     const message = this.revealsToTell[seat];
     delete this.revealsToTell[seat];
 
     return message;
+  }
+
+  /**
+   * The other seat's saved weapons `seat` has not yet been told, with their numbers and drawing, each once as both seats lock in its slot (and
+   * again after the seat comes back), and none once the match has begun, since the reveal carries them.
+   */
+  takeOpponentWeaponMessages(seat: Seat): OpponentWeaponMessage[] {
+    if (this.world) {
+      return [];
+    }
+
+    const told = this.weaponsTold[seat];
+    const untold = this.preRound.savedWeaponsShownTo(seat).filter(shown => !told.has(shown.slot));
+    for (const shown of untold) {
+      told.add(shown.slot);
+    }
+
+    return untold.map(({slot, weapon, appearance}) => ({kind: "opponentWeapon", slot, weapon, appearance}));
   }
 
   /**
@@ -353,8 +403,8 @@ export class MatchRoom {
   }
 
   /**
-   * Once the pre-round has decided, both browsers are told the arena and what each seat carries (once each, and again to a seat that comes back
-   * while they are shown), and the match begins in that arena when the reveal is over: at once for a room allowed no reveal.
+   * Once the pre-round has decided, both browsers are told the arena and what each seat carries (once each, and again to a seat that comes back:
+   * `tellAgainOnReturn`), and the match begins in that arena when the reveal is over: at once for a room allowed no reveal.
    */
   private beginMatchIfDecided(): void {
     const outcome = this.preRound.outcome();
@@ -366,6 +416,7 @@ export class MatchRoom {
       this.announced = true;
       this.arenaRows = outcome.arena.rows;
       this.arena = arenaFrom(outcome.arena.rows);
+      this.builtInArenaPlayed = BUILT_IN_ARENAS.find(builtIn => builtIn === outcome.arena)?.name;
       this.weapons = outcome.weapons;
       this.tellAll();
     }
@@ -374,6 +425,7 @@ export class MatchRoom {
       return;
     }
 
+    this.arenaPlayedToTell = this.builtInArenaPlayed;
     this.startRound(this.worldOfRound(startMatch()));
   }
 
@@ -395,16 +447,36 @@ export class MatchRoom {
     this.revealsToTell[seat] = revealFor(seat, outcome);
   }
 
-  /** A seat that comes back while the decided arena and weapons are being shown has lost what it was told: it is told again. */
-  private tellAgainWhileRevealing(seat: Seat): void {
-    if (this.announced && !this.world) {
+  /**
+   * A seat that comes back once the arena and weapons are decided has lost what it was told. While they are being shown it is told both again;
+   * once the match has begun only the loadouts, since `joined` carries the arena and a saved weapon's drawing is in the reveal alone.
+   */
+  private tellAgainOnReturn(seat: Seat): void {
+    if (!this.announced) {
+      return;
+    }
+    if (!this.world) {
       this.tellAgain(seat);
+
+      return;
+    }
+
+    const outcome = this.preRound.outcome();
+    if (outcome) {
+      this.revealsToTell[seat] = revealFor(seat, outcome);
     }
   }
 
   /** The round after the one `match` has just ended, or a fresh match when `match` is decided. */
   private begin(match: Match): void {
-    this.startRound(this.worldOfRound(decideMatch(match) === "playing" ? nextRound(match) : startMatch()));
+    if (decideMatch(match) === "playing") {
+      this.startRound(this.worldOfRound(nextRound(match)));
+
+      return;
+    }
+
+    this.arenaPlayedToTell = this.builtInArenaPlayed;
+    this.startRound(this.worldOfRound(startMatch()));
   }
 
   /** Makes `world` the one being played: nobody has asked to go on, nothing is held over from the last round, and every clock begins again. */

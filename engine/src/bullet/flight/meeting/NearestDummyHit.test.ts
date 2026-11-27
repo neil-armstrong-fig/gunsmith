@@ -13,6 +13,7 @@ const bullet: Bullet = {
   shooter: "player",
   level: 0,
   crouching: false,
+  floor: 0,
 };
 
 describe("in the open", () => {

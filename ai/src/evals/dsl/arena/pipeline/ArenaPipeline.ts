@@ -5,8 +5,10 @@ import {arenaIsItsOwn} from "@evals/dsl/arena/pipeline/evaluators/outcome/ArenaI
 import {arenaKeepsCover} from "@evals/dsl/arena/pipeline/evaluators/outcome/ArenaKeepsCover";
 import {arenaNodePath} from "@evals/dsl/arena/pipeline/evaluators/outcome/ArenaNodePath";
 import {playableArena} from "@evals/dsl/arena/pipeline/evaluators/playable/PlayableArena";
+import {arenaNameHygiene} from "@evals/dsl/arena/pipeline/evaluators/player-visible/ArenaNameHygiene";
 import {arenaNoPromptLeak} from "@evals/dsl/arena/pipeline/evaluators/player-visible/ArenaNoPromptLeak";
 import {failuresOf} from "@evals/dsl/shared/checks/FailuresOf";
+import {walledCorners} from "@evals/dsl/arena/pipeline/walled-corners/WalledCorners";
 import type {ArenaOutcome} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcome";
 import type {ArenaSize} from "@gunsmith/ai/pipeline/arena/arena-shapes/types/ArenaSize";
 import type {ArenaOutcomeStatus} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcomeStatus";
@@ -41,6 +43,11 @@ export class ArenaPipeline {
     return this.theAnswer().modelCalls;
   }
 
+  /** The output tokens the models reported for the whole request, all calls together, or nothing when the pipeline reported no usage. */
+  outputTokensOfTheAnswer(): number | undefined {
+    return this.theAnswer().usage?.outputTokens;
+  }
+
   /** Whether the credit went back. */
   refundOfTheAnswer(): boolean {
     return this.theAnswer().refunded;
@@ -60,28 +67,40 @@ export class ArenaPipeline {
 
   /** How many tiles wide and tall the arena the player was given is, read from its drawing, or nothing when no drawing was given. */
   sizeOfTheAnswer(): ArenaSize | undefined {
-    const {arena} = this.theAnswer();
-    if (typeof arena !== "object" || arena === null || !("rows" in arena) || !Array.isArray(arena.rows)) {
-      return undefined;
-    }
+    const rows = this.rowsOfTheAnswer();
+    if (!rows) return undefined;
 
-    return {width: String(arena.rows[0]).length, height: arena.rows.length};
+    return {width: rows[0]?.length ?? 0, height: rows.length};
   }
 
   /** The highest level of raised floor in the arena the player was given, read from its drawing (0 for low ground only), or nothing when no drawing was given. */
   highestLevelOfTheAnswer(): number | undefined {
-    const {arena} = this.theAnswer();
-    if (typeof arena !== "object" || arena === null || !("rows" in arena) || !Array.isArray(arena.rows)) {
-      return undefined;
-    }
+    const rows = this.rowsOfTheAnswer();
+    if (!rows) return undefined;
 
-    const levels = arena.rows.join("").match(/[12]/g) ?? [];
+    const levels = rows.join("").match(/[12]/g) ?? [];
 
     return Math.max(0, ...levels.map(Number));
   }
 
+  nameProblems(): string[] {
+    return this.problemsOf([arenaNameHygiene]);
+  }
+
+  promptLeakProblems(): string[] {
+    return this.problemsOf([arenaNoPromptLeak]);
+  }
+
   safeToShowProblems(): string[] {
     return this.problemsOf([playableArena, arenaNoPromptLeak]);
+  }
+
+  /** How many of the four corners of the arena the player was given are walled in (`walledCorners`), or nothing when no drawing was given. */
+  walledCornersOfTheAnswer(): number | undefined {
+    const rows = this.rowsOfTheAnswer();
+    if (!rows) return undefined;
+
+    return walledCorners(rows);
   }
 
   fixedPathProblems(): string[] {
@@ -94,6 +113,16 @@ export class ArenaPipeline {
     }
 
     return this.answered;
+  }
+
+  /** The rows of the drawing the player was given, or nothing when no drawing was given. */
+  private rowsOfTheAnswer(): string[] | undefined {
+    const {arena} = this.theAnswer();
+    if (typeof arena !== "object" || arena === null || !("rows" in arena) || !Array.isArray(arena.rows)) {
+      return undefined;
+    }
+
+    return arena.rows.map(String);
   }
 
   private problemsOf(checks: ArenaEvaluator[]): string[] {

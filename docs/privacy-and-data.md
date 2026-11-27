@@ -28,26 +28,32 @@ controls remain design work. [Fair-play and recording direction](art/fair-play-r
 | Credit ledger | Daily AI allowance and refunds | Until the account is deleted, **then 90 days more** (below) |
 | Deleted-account record: keyed HMAC of the Google `sub`, the ledger's opaque id, expiry | So deleting and signing in again cannot reset the daily allowance (abuse of paid model calls) | 90 days after deletion, then deleted with the ledger |
 | Generated weapons and arenas, with their original prompts and shelf status | Save later by server id and reuse the prompt | Until account deletion under current code |
-| Private generation history (test fixtures only) | Diagnose Make outcomes for internal tuning | Available for 14 days; removed by the next daily sweep or by account deletion |
+| Private Make history, including best-effort redacted prompts (capture off in production) | Diagnose Make outcomes for internal tuning | Available for 14 days, then removed by the next daily sweep, or removed at account deletion |
 | Ratings and match history (planned) | Matchmaking and the history list | Until the account is deleted |
 | Recording metadata and share permissions (planned) | Authorized completed-match access | 14 days after completion, or deletion handling below |
 | Reports, case evidence references and versioned trust decisions (planned) | Fair-play investigation and correction | 90 days after flagging; duplicates do not extend the deadline |
 | Keyed issuer/subject digest, applicable restriction and expiry only (planned) | Prevent the same restricted identity immediately resetting through deletion | At most 90 days after deletion; retries do not extend it |
 
 Signed-in Make stores each created weapon or arena and its prompt before the player clicks Save. Save adds it to the
-account shelf. Removing it from the shelf frees a slot and leaves the item and prompt in storage. The dedicated history
-privacy check and 14-day cutoff apply only to attempt records. The generated-item row has no scheduled expiry today.
+account shelf. Removing it from the shelf frees a slot and leaves the item and prompt in storage. The history redaction
+and 14-day cutoff apply only to attempt records. The generated-item row has no scheduled expiry today.
 
 ## Private generation history
 
-Local D1 tests use a fake privacy checker to record attempt outcomes separately from generated items. A row contains the
-account id, item kind, attempt time, pipeline version, outcome, repair counts and any closed failure reason. It includes
-verbatim text only when the relevance judge accepts the prompt and an independent privacy check clears it. Rejections,
-unjudged prompts, privacy denials and checker errors leave the attempt metadata alone. A generated weapon with a built-in
-drawing records success with fallback. An arena that fails validation records a failed generation.
+Make history records outcomes separately from generated items for internal pipeline tuning. A row contains the account ID,
+item kind, attempt time, pipeline version, outcome, repair counts and any structured failure reason. A generated weapon
+delivered with a built-in drawing records success with fallback. An arena that fails validation records a failed generation.
+
+Every completed attempt, including rejected or off-topic requests, keeps its prompt after best-effort redaction in code.
+`RedactPersonalInformation` replaces recognised emails, web addresses, handles, IP addresses, phone and card numbers, long
+ID numbers, street addresses, postcodes and dates with placeholders. Names and other free-form details can remain. The
+provider has already received the submitted prompt. Redaction runs locally in the Worker. Blocked or interrupted attempts
+and redaction errors leave only metadata. The judge’s free-text reasons stay out of history, and ordinary logs use closed
+events. Redacted text still needs personal data safeguards.
 
 Internal reads exclude attempts at 14 days. The daily Worker sweep removes expired rows and account deletion removes that
-account’s history immediately. The production checker currently leaves the gate closed for both metadata and prompt text.
+account’s history immediately. Capture requires `GENERATION_HISTORY_CAPTURE="true"`. The flag stays unset until the
+assessments, safeguards and matching notice are ready, per the 2026-11-26 decision.
 
 ### Make notices
 
@@ -61,7 +67,7 @@ disclosures before publishing the pages. [ICO transparency guidance for services
 
 **If private history is approved**, retain the current copy and add this paragraph before the privacy link.
 
-> Our team can review private records of Make attempts for up to 14 days to improve how Make works. We include your prompt in that record only if it’s about making an item and passes a separate privacy check.
+> Our team can review private records of Make attempts, including prompts from completed attempts, for up to 14 days to improve how Make works. We do not use these records to train AI models. We remove contact details, card and ID numbers, and addresses where we can recognise them. Names and other personal details can still remain, so leave personal information out of prompts.
 
 Give the right to object its own line. The privacy notice should explain the daily cleanup and how to request a copy or
 deletion. [ICO right to object guidance](https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/individual-rights/individual-rights/right-to-object/)
@@ -73,11 +79,11 @@ deletion. [ICO right to object guidance](https://ico.org.uk/for-organisations/uk
 | Test | Draft finding and evidence needed |
 | ---- | ---- |
 | Purpose | Diagnose generation failures and tune the pipeline using attempt outcomes. Record which fixes the evidence supports, such as a repair instruction change or a validation regression. |
-| Necessity | Use the same synthetic and voluntarily shared examples to compare diagnosis with metadata alone, with volunteered text and with verbatim history. Record which actionable failures require verbatim text and why a less intrusive source cannot cover them. Assess separately whether routine tuning needs an account link and the full 14-day window. The necessity of account-linked verbatim history remains open. |
+| Necessity | Use the same synthetic and voluntarily shared examples to compare diagnosis with metadata alone, volunteered text and redacted history. Record which actionable failures need text and why a less intrusive source cannot cover them. Assess separately whether routine tuning needs an account link and the full 14-day window. |
 | Balancing | Make users may expect provider processing and an item on their account. Reviewing their words for tuning is an additional use. Children and people named in a prompt may face greater harm from disclosure. Weigh that harm against the documented benefits after testing the privacy gate, narrow review access, retention and rights workflow. |
 
 Record the controller’s decision and supporting evidence here before enabling capture. If metadata or volunteered examples
-meet the purpose, use that narrower approach and keep verbatim capture off. [ICO legitimate interests assessment guidance](https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/lawful-basis/a-guide-to-lawful-basis/legitimate-interests/)
+meet the purpose, keep routine capture off while the controller reviews that narrower approach. [ICO legitimate interests assessment guidance](https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/lawful-basis/a-guide-to-lawful-basis/legitimate-interests/)
 
 ### Draft assessment of impact on children
 
@@ -87,12 +93,12 @@ feedback, including input from children and parents where appropriate, to check 
 
 | Risk to children | Safeguard and evidence to review |
 | ---- | ---- |
-| A prompt contains a name, contact detail or sensitive information about the child or another person. | Test the independent checker against relevant prompts containing synthetic personal information. On a denial or error, confirm both routes store only metadata and keep text out of ordinary logs. Document limits of the checker and any remaining risk. |
+| A prompt contains a name, contact detail or sensitive information about the child or another person. | Test both routes using synthetic details. Confirm recognised details are removed, redaction errors leave only metadata, and ordinary logs contain closed events. Document residual risks from names and free-form details. |
 | Someone reads or reuses account-linked text outside the tuning purpose. | Review access by named maintainers, use account-scoped lookups for rights requests, and confirm the 14-day read cutoff, daily cleanup and immediate account deletion. |
 | A child cannot understand the second use or exercise their rights. | Test the notice on both Make forms before submission and rehearse an access, objection and deletion request from intake to response. |
 
 Document consultation, residual risks and the controller’s decision. Keep production history disabled pending the
-assessments, the verified checker and review workflow, and publication of the matching notice. [ICO children’s DPIA template](https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/childrens-information/childrens-code-guidance-and-resources/age-appropriate-design-a-code-of-practice-for-online-services/annex-d-dpia-template/)
+assessments, verification of redaction and the review workflow, and publication of the matching notice. [ICO children’s DPIA template](https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/childrens-information/childrens-code-guidance-and-resources/age-appropriate-design-a-code-of-practice-for-online-services/annex-d-dpia-template/)
 
 ### Maintainer review and rights requests
 
@@ -110,8 +116,8 @@ contact monitored by those maintainers.
    evidence the response, without prompt text or copies of identity documents in the case log.
 
 The API follow-up implements access restrictions, account-scoped reads and erasure, and enforcement of upheld objections.
-AI supplies the checker. Start its local D1 verification with a relevant prompt containing synthetic personal information,
-then cover denial, checker failure, expiry, deletion and the default closed gate for both Make routes. [ICO right of access](https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/individual-rights/individual-rights/right-of-access/), [ICO right to erasure](https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/individual-rights/individual-rights/right-to-erasure/)
+Local D1 verification covers synthetic personal information, rejected and off-topic requests, redaction errors, expiry,
+deletion and the default closed gate across the Make routes. [ICO right of access](https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/individual-rights/individual-rights/right-of-access/), [ICO right to erasure](https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/individual-rights/individual-rights/right-to-erasure/)
 
 ## Recordings and evidence (planned)
 

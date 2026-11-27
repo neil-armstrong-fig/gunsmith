@@ -64,6 +64,15 @@ export class ArenaDsl implements TrialDsl<ArenaDsl> {
     }
   }
 
+  /** The output tokens the request cost, every model call together, or nothing when none were reported. The spec states the bound. */
+  getOutputTokens(): number | undefined {
+    try {
+      return this.pipeline.outputTokensOfTheAnswer();
+    } catch (error) {
+      throw new DslError("Expected to read the output tokens of the request", error);
+    }
+  }
+
   /** Why the request was not answered honestly, if it was not: a request asked for properly ends with the model's own arena, or with no arena and a reason the player can read, never with nothing and never with a substitute. */
   getArenaAnsweredProblems(): string[] {
     try {
@@ -106,6 +115,33 @@ export class ArenaDsl implements TrialDsl<ArenaDsl> {
       return this.pipeline.highestLevelOfTheAnswer();
     } catch (error) {
       throw new DslError("Expected to read the highest level of the arena given", error);
+    }
+  }
+
+  /** How many of the four corners of the arena given are walled in, or nothing when none was given. The spec states how many the shape asked for has. */
+  getWalledCorners(): number | undefined {
+    try {
+      return this.pipeline.walledCornersOfTheAnswer();
+    } catch (error) {
+      throw new DslError("Expected to read the walled corners of the arena given", error);
+    }
+  }
+
+  /** What is wrong with the name of the arena given, if anything: markup, template characters, a link, or more than 30 characters. Nothing to check when no arena was given. */
+  getNameProblems(): string[] {
+    try {
+      return this.pipeline.nameProblems();
+    } catch (error) {
+      throw new DslError("Expected to read the name of the arena given", error);
+    }
+  }
+
+  /** Where the system prompt shows in what the player is shown (the arena or the reason), if it does. */
+  getPromptLeakProblems(): string[] {
+    try {
+      return this.pipeline.promptLeakProblems();
+    } catch (error) {
+      throw new DslError("Expected to read whether the system prompt leaked", error);
     }
   }
 

@@ -2,7 +2,8 @@ import {beforeEach, expect, given, then, when} from "@src/acceptance-criteria-ma
 
 // After the weapons the two players put forward an arena each. A player sees the other's only once both have locked in theirs. The same arena
 // is simply played; two different ones are both shown to both, and each picks one, random, or nothing: the engine's rule settles it and the
-// screen says how. Weapons are locked in with the defaults first, so these specs are about the arena alone.
+// screen says how. Weapons are locked in with the defaults first, so these specs are about the arena alone. The room offers every built-in
+// arena, not the day's five (`addressOfRoom`'s default), so the Duel and the Fair duel are always there to choose.
 const SECONDS_TO_CHOOSE = 60;
 const DUEL_SIZE = {width: 20, height: 12};
 const FAIR_DUEL_SIZE = {width: 21, height: 13};
@@ -18,9 +19,9 @@ given("a private room whose two players have locked in their weapons", () => {
   });
 
   then(
-    "each is offered the built-in arenas, the Duel to begin with, with a preview of the one chosen",
+    "each is offered the built-in arenas the room offers, the Duel to begin with, with a preview of the one chosen",
     async ({gunsmith}) => {
-      expect(await gunsmith.preRound.arena.getChoices()).toEqual(["Duel", "Fair duel"]);
+      expect(await gunsmith.preRound.arena.getChoices()).toEqual(gunsmith.room.getArenasOffered());
       expect(await gunsmith.preRound.arena.getChosen()).toBe("Duel");
       expect(await gunsmith.preRound.arena.getPreviewName()).toBe("Duel");
     },
