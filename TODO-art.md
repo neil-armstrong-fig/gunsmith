@@ -1,10 +1,14 @@
 # TODO: art
 
-**MVP audio checklist complete.** Art owns authored audio cues, playback integration with Play, and the listening review after weapon-specific shot synthesis. Checkout: `worktree-art`, last upstream commit merged `76f7374c`.
+**Closed at the user’s request (2026-11-27).** The MVP audio checklist is complete. Whichever active session encounters an Art follow-up takes it in coordination with the relevant owner. Last synced with GitHub main at `9f14da5f`. The checkout `.claude/worktrees/art` and branch `worktree-art` are kept until the user removes them.
 
-## Resume next — privacy review and notice follow-up
+## Open Art work
 
-Start in `.claude/worktrees/art` (`worktree-art`). The policy pages and current Make notice are implemented. The future notice and draft assessments reflect the approved best-effort redaction design in `6c919fbc`. Art’s next action is to review the assessments with the controller and confirm the deployment disclosures with Ship. The API follow-up owns maintainer access and rights handling. [Privacy design](docs/privacy-and-data.md#private-generation-history) · [Handoff](HANDOFF.md#mvp-ownership-and-handoffs)
+- Ship verifies deployed disclosures and publishes the privacy and terms pages. The policy pages and the current Make notice are on GitHub main. [Privacy design](docs/privacy-and-data.md#make-notices)
+- The controller reviews the legitimate interests and children’s impact assessments. The API follow-up covers maintainer access, access requests, objections and erasure. The future Make notice reflects the best-effort redaction design in `6c919fbc`. Production history capture stays off pending review, verification and publication of the matching notice. [Privacy design](docs/privacy-and-data.md#private-generation-history)
+- The fallback appearance re-review and combat listening review remain under [appearance and audio review](#appearance-and-audio-review).
+
+## Privacy and notice checklist
 
 - [x] Prove local arena history with fake verdicts and real D1. Both first tests failed on an empty history table before route wiring and passed afterward. The route records repaired and first-pass outcomes, omits text without clearance and records invalid arenas as failures. Internal reads enforce the 14-day cutoff, the daily sweep purges expired rows, and account deletion cascades. Capture remains limited to the test fixture.
 - [x] Record blocked arena requests, timeouts and pipeline exceptions in local D1. Store metadata for valid signed-in requests with closed failure reasons. Responses, refunds and spend settlement follow the existing route rules.
@@ -29,7 +33,7 @@ Ship owns the signed-in browser workshop and its acceptance tests for this slice
 
 Engine’s built-in list `00ff548`, the saved-item parser and Server’s pre-round hookup are on GitHub main. Generated `visionDegrees` and `visionRange` are available from `21cc021`.
 
-## After private generation history — appearance and audio review
+## Appearance and audio review
 
 - [ ] Recheck AI’s S4-1 fallback body and outline at 64 and 32 px per tile, independently of the muzzle. The contrast fix is on main in `de566a3`. [AI handoff](HANDOFF.md#active-reservations-and-requests)
 - [ ] Review Art’s generated-appearance findings with AI and Engine as part of production appearance association.
