@@ -446,6 +446,23 @@ it("tells a seat that comes back during the reveal the arena and the reveal agai
   expect(room.takeRevealMessage("first")).toBeUndefined();
 });
 
+it("tells a seat that comes back once the match has begun the reveal again, and the arena only in its joined frame", () => {
+  const room = revealingRoom();
+  const token = room.joinedMessage("first").token;
+  room.tick(30 * STEPS_IN_A_SECOND);
+  room.takeArenaMessage("first");
+  room.takeRevealMessage("first");
+  room.leave("first");
+
+  expect(room.reconnect(token)).toBe("first");
+
+  expect(room.snapshotFor("first")).toBeDefined();
+  expect(room.takeRevealMessage("first")).toMatchObject({kind: "reveal"});
+  expect(room.takeRevealMessage("first")).toBeUndefined();
+  expect(room.takeArenaMessage("first")).toBeUndefined();
+  expect(room.joinedMessage("first").arena).toEqual(DUEL_BUILT_IN_ARENA.rows);
+});
+
 it("ignores a go-on before the pre-round is decided", () => {
   const room = new MatchRoom({revealSeconds: 30});
   room.join();

@@ -48,6 +48,17 @@ export class PreRoundPlaywright extends BasePage {
     await this.dialog().getByRole("button", {name: "Lock in"}).click();
   }
 
+  /** Whether the whole of the Lock in button lies inside the dialog as it is now, without scrolling it. */
+  async canLockInWithoutScrolling(): Promise<boolean> {
+    const dialog = await this.dialog().boundingBox();
+    const button = await this.dialog().getByRole("button", {name: "Lock in", exact: true}).boundingBox();
+    if (!dialog || !button) {
+      return false;
+    }
+
+    return button.y >= dialog.y && button.y + button.height <= dialog.y + dialog.height;
+  }
+
   async isRevealShown(): Promise<boolean> {
     return await this.page.getByTestId("reveal").isVisible();
   }
