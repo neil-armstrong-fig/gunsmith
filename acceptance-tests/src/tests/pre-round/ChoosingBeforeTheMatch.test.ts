@@ -3,8 +3,9 @@ import {beforeEach, expect, given, then, when} from "@src/acceptance-criteria-ma
 const FAST_PROMPT = "a fast little submachine gun";
 const BUILT_IN_WEAPONS = ["Rifle", "Marksman rifle", "Submachine gun"];
 
-// Against a player who stands still the opponent has won a round within 9.4 game seconds on every one of 40 seeds measured
-// in the engine, so fifteen is the longest this spec waits for a round to be lost.
+// The practice range is opened with the duel's seed, which the bot game keeps, so every run plays the same duel: on it the opponent
+// beats a player who stands still in 2.3 game seconds. Unseeded, a bot game is a random duel, and on about one seed in five
+// (59 of 300 measured on 2026-11-26) the opponent needs longer than fifteen, which made this spec fail at random.
 const LONGEST_LOSS_SECONDS = 15;
 
 given("the practice range, with a weapon the player made and saved", () => {
@@ -13,6 +14,7 @@ given("the practice range, with a weapon the player made and saved", () => {
   let madeStats: Readonly<Record<string, string>> = {};
 
   beforeEach(async ({gunsmith}) => {
+    await gunsmith.openTheSeededPracticeRange();
     await gunsmith.workshop.open();
     await gunsmith.workshop.pasteThePrompt(FAST_PROMPT);
     await gunsmith.workshop.make();

@@ -49,7 +49,7 @@ export function PreRound(): JSX.Element | undefined {
         aria-label="Pre-round"
         tabIndex={-1}
         data-wide={isRevealShown(shown, roomStage)}
-        className="flex w-[40rem] max-h-[92vh] data-[wide=true]:w-[64rem] max-w-[90vw] flex-col gap-4 overflow-y-auto rounded-md bg-gs-ui-surface px-6 py-5 shadow-lg outline-none"
+        className="flex w-[52rem] max-h-[92vh] data-[wide=true]:w-[64rem] max-w-[90vw] flex-col gap-4 overflow-y-auto rounded-md bg-gs-ui-surface px-6 py-5 shadow-lg outline-none"
       >
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-2xl font-bold tracking-wide text-gs-ui-text">Pre-round</h1>

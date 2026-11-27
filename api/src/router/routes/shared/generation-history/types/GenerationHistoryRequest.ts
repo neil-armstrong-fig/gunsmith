@@ -1,8 +1,8 @@
-import type {GenerationHistoryPrivacyCheck} from "@src/router/routes/shared/generation-history/types/GenerationHistoryPrivacyCheck";
+import type {GenerationHistoryRedaction} from "@src/router/routes/shared/generation-history/types/GenerationHistoryRedaction";
 import type {GenerationHistoryTarget} from "@src/router/routes/shared/generation-history/types/GenerationHistoryTarget";
 
 export interface GenerationHistoryRequest extends GenerationHistoryTarget {
-  privacyCheck: GenerationHistoryPrivacyCheck;
+  redaction: GenerationHistoryRedaction;
   token: string;
   createdAt: Date;
 }

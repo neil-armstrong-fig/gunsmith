@@ -21,6 +21,7 @@ const BUILT_IN_NAMES = [
   "Slalom",
   "Keep",
   "Labyrinth",
+  "Sunken court",
 ];
 const POND = {id: "saved-1", name: "Pond", prompt: "a pond", rows: ["#####", "#...#", "#...#", "#...#", "#####"]};
 

@@ -17,6 +17,7 @@ import {TOWER_OF_DEATH_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/dr
 import {TWIN_RIDGES_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/drawings/TwinRidgesBuiltInArena";
 import {WATCHTOWER_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/drawings/WatchtowerBuiltInArena";
 import {ZIGGURAT_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/drawings/ZigguratBuiltInArena";
+import {SUNKEN_COURT_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/drawings/SunkenCourtBuiltInArena";
 import {FAIR_DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/FairDuelBuiltInArena";
 import type {BuiltInArena} from "@gunsmith/engine/built-in-arenas/types/BuiltInArena";
 
@@ -48,4 +49,5 @@ export const BUILT_IN_ARENAS: readonly BuiltInArena[] = [
   SLALOM_BUILT_IN_ARENA,
   KEEP_BUILT_IN_ARENA,
   LABYRINTH_BUILT_IN_ARENA,
+  SUNKEN_COURT_BUILT_IN_ARENA,
 ];

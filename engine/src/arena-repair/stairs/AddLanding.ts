@@ -2,15 +2,9 @@ import {FLOOR} from "@gunsmith/engine/arena/drawing/level/Floor";
 import {characterAt} from "@gunsmith/engine/arena-repair/drawing/CharacterAt";
 import {isReadable} from "@gunsmith/engine/arena-repair/drawing/IsReadable";
 import {withCharacter} from "@gunsmith/engine/arena-repair/drawing/WithCharacter";
+import {CLIMBS} from "@gunsmith/engine/arena-repair/stairs/climbs/Climbs";
+import type {Climb} from "@gunsmith/engine/arena-repair/stairs/climbs/Climbs";
 import type {DrawnTile} from "@gunsmith/engine/arena-repair/types/DrawnTile";
-
-/** A step to a neighbouring tile as the drawing counts it (columns to the east, rows to the south), and the arrow of a stair that climbs that way. */
-const CLIMBS = [
-  {columns: 1, rows: 0, arrow: ">"},
-  {columns: -1, rows: 0, arrow: "<"},
-  {columns: 0, rows: -1, arrow: "^"},
-  {columns: 0, rows: 1, arrow: "v"},
-] as const;
 
 /** The level a landing is drawn at, and the character it is drawn with: one below the second level it leads to. */
 const LANDING = "1";
@@ -55,7 +49,7 @@ export function addLanding(
 }
 
 /** The tile so many steps back from a raised tile, against the way a stair onto it climbs. */
-function stepsBack(tile: DrawnTile, climb: (typeof CLIMBS)[number], steps: number): DrawnTile {
+function stepsBack(tile: DrawnTile, climb: Climb, steps: number): DrawnTile {
   return {column: tile.column - climb.columns * steps, row: tile.row - climb.rows * steps};
 }
 

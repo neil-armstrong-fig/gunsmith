@@ -244,6 +244,18 @@ different causes, and neither is a repair bug:
 
 The case stays `given.inProgress`. A prompt sentence about stairs already had no measured effect (2026-11-24).
 
+## The watchtower holds, 2026-11-27 (engine's platform growth, then Haiku 5.5, 3 trials, $0.0016, ledger $0.3579)
+
+At the user's go, ai built the platform growth in engine (for engine to review): `repairArena` now tries, after a stair and a landing and
+before lowering, `stairs/WidenPlatform`: a level-2 tile whose first-level ring is one tile thick gets the ground tile two out in a line
+raised to level 1 and the ring tile between drawn as a stair onto the top (edit `platformWidened`). It is the one edit that raises ground,
+and only beside a top nobody can reach. Replaying the six probe drafts of 2026-11-25 through the new repair: draft 6 (the thin ring) now
+keeps level 2 on both towers and validates, so **5 of 6 keep level 2**; draft 4, which drew nothing tall, stays flat. The 104 saved drafts
+of 2026-11-20 are in the main checkout's `private-source/` and were not replayed. Then the case at 3 fresh trials on Haiku: **created and at
+level 2 in 3 of 3, 18 of 18 criteria**, two calls a request (moderation, then generation of 296 to 422 output tokens; no model repair) and about 2.3 s a request. Whether the growth fired in
+these three trials is not recorded (the eval keeps only the final arena). The case is now a plain `given` (regression). Across all trials
+since 2026-11-24 the towers kept level 2 in 8 of 9; a draft that draws nothing tall is still possible and no code can help it.
+
 ## Shape fidelity, 2026-11-25 (built and run on Haiku 5.5, the user's go of $0.08; spent $0.0625, ledger $0.2109)
 
 A layout request is valid and created but not what was asked: "an arena shaped like a plus sign" came back as an open rectangle in 3 of 3 shapes drafts and "an L-shaped arena" had its wall block in 1 of 3 (the probe of 2026-11-20 above). No validity check can see it, so the evals now read it: `getWalledCorners()` counts the corners whose block inside the border (a sixth of the inner width by a sixth of the inner height) is at least nine tenths wall; a plus sign has 4, an L exactly 1. A quarter-size block was tried first and read a plus with thick arms (corners 3 tiles wide) as 0, so the size was settled before any run; every one of the ~25 arenas kept from earlier paid and local runs (none a layout request) reads 0.

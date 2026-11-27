@@ -135,6 +135,54 @@ it("keeps both watchtowers of a real draft at level two, giving each a landing, 
   expect(validateArena(arenaFrom(repaired.rows))).toEqual([]);
 });
 
+it("grows the first level a tile beside a second level it rings too thinly for a stair, and keeps the second level", () => {
+  const rows = ["#########", "#.......#", "#..111..#", "#..121..#", "#..111..#", "#.......#", "#########"];
+
+  const repaired = repairArena(rows);
+
+  expect(repaired.edits.map(edit => edit.kind)).toContain("platformWidened");
+  expect(repaired.edits.map(edit => edit.kind)).not.toContain("platformLowered");
+  expect(repaired.rows.join("").replaceAll(/[^2]/g, "")).toBe("2");
+  expect(validateArena(arenaFrom(repaired.rows))).toEqual([]);
+});
+
+it("gives a second level a plain stair where the first level round it is thick enough, and grows nothing", () => {
+  const rows = ["##########", "#........#", "#..1111..#", "#..1211..#", "#..1111..#", "#........#", "##########"];
+
+  const repaired = repairArena(rows);
+
+  expect(repaired.edits).toEqual([
+    {kind: "stairAdded", tiles: 1},
+    {kind: "stairAdded", tiles: 1},
+  ]);
+});
+
+// Haiku 5.5's draft 6 of the watchtower probe (2026-11-25): each tower is a first level one tile thick round a second level, so no
+// legal stair onto the top fits (the tile behind it is the ground). Before the platform could grow, both tops were lowered.
+it("keeps both watchtowers of a real draft at level two by growing the first level, and lowers nothing", () => {
+  const rows = [
+    "##############################",
+    "#............................#",
+    "#............................#",
+    "#............1111............#",
+    "#.111........####........111.#",
+    "#.121>.......cccc.......<121.#",
+    "#.121........cccc........121.#",
+    "#.111........####........111.#",
+    "#............1111............#",
+    "#............................#",
+    "#............................#",
+    "##############################",
+  ];
+
+  const repaired = repairArena(rows);
+
+  expect(repaired.edits.map(edit => edit.kind)).not.toContain("platformLowered");
+  expect(repaired.edits.filter(edit => edit.kind === "platformWidened")).toHaveLength(2);
+  expect(repaired.rows.join("").replaceAll(/[^2]/g, "")).toHaveLength(4);
+  expect(validateArena(arenaFrom(repaired.rows))).toEqual([]);
+});
+
 it("lowers a second level a level at a time, until nothing is raised, when nothing can reach it", () => {
   const rows = ["#######", "#.....#", "#.###.#", "#.#2#.#", "#.###.#", "#.....#", "#######"];
 

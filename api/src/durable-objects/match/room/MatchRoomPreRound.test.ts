@@ -276,6 +276,63 @@ it("sends a reveal once to each seat, and none before the match begins", () => {
   expect(room.takeRevealMessage("second")).toMatchObject({kind: "reveal"});
 });
 
+it("tells a seat the other's saved weapon in a slot once, with its numbers and drawing, when both have locked in that slot", () => {
+  const room = twoSeatedRoom();
+  room.chooseWeapon("second", 1, savedWeapon("weapon-secret-1", "Sparky"));
+  room.preRoundAction("second", {kind: "lockInWeapon", slot: 1});
+
+  const before = room.takeOpponentWeaponMessages("first");
+  room.preRoundAction("first", {kind: "lockInWeapon", slot: 1});
+  const after = room.takeOpponentWeaponMessages("first");
+
+  expect(before).toEqual([]);
+  expect(after).toEqual([
+    {kind: "opponentWeapon", slot: 1, weapon: weaponNamed("Sparky"), appearance: fallbackAppearance()},
+  ]);
+  expect(JSON.stringify(after)).not.toContain("secret");
+  expect(room.takeOpponentWeaponMessages("first")).toEqual([]);
+});
+
+it("never tells a seat its own saved weapon, nor a built-in, which its page has", () => {
+  const room = twoSeatedRoom();
+  room.chooseWeapon("second", 1, savedWeapon("weapon-1", "Sparky"));
+  room.preRoundAction("second", {kind: "lockInWeapon", slot: 1});
+  room.chooseWeapon("first", 1, {kind: "builtIn", key: "submachine-gun"});
+  room.preRoundAction("first", {kind: "lockInWeapon", slot: 1});
+
+  expect(room.takeOpponentWeaponMessages("second")).toEqual([]);
+});
+
+it("tells a seat that comes back before the match begins the other's saved weapons again, as its page may have lost them", () => {
+  const room = twoSeatedRoom();
+  const token = room.joinedMessage("first").token;
+  room.chooseWeapon("second", 1, savedWeapon("weapon-1", "Sparky"));
+  room.preRoundAction("second", {kind: "lockInWeapon", slot: 1});
+  room.preRoundAction("first", {kind: "lockInWeapon", slot: 1});
+  room.takeOpponentWeaponMessages("first");
+  room.leave("first");
+
+  expect(room.reconnect(token)).toBe("first");
+
+  expect(room.takeOpponentWeaponMessages("first")).toMatchObject([{kind: "opponentWeapon", slot: 1}]);
+  expect(room.takeOpponentWeaponMessages("first")).toEqual([]);
+});
+
+it("tells a seat nothing more of the other's weapons once the match has begun, since the reveal carries them", () => {
+  const room = twoSeatedRoom();
+  const token = room.joinedMessage("first").token;
+  lockInChosen(room, "second", [savedWeapon("weapon-1", "Sparky"), {kind: "builtIn", key: "rifle"}]);
+  lockInArena(room, "second", DUEL_BUILT_IN_ARENA.name);
+  lockInArena(room, "first", DUEL_BUILT_IN_ARENA.name);
+  room.takeOpponentWeaponMessages("first");
+  room.leave("first");
+
+  expect(room.reconnect(token)).toBe("first");
+
+  expect(room.snapshotFor("first")).toBeDefined();
+  expect(room.takeOpponentWeaponMessages("first")).toEqual([]);
+});
+
 it("plays a saved weapon in the match, and a saved arena as the arena", () => {
   const room = twoSeatedRoom();
   const sparky = savedWeapon("weapon-1", "Sparky");
@@ -387,6 +444,23 @@ it("tells a seat that comes back during the reveal the arena and the reveal agai
   expect(room.takeArenaMessage("first")).toEqual({kind: "arena", rows: DUEL_BUILT_IN_ARENA.rows});
   expect(room.takeRevealMessage("first")).toMatchObject({kind: "reveal"});
   expect(room.takeRevealMessage("first")).toBeUndefined();
+});
+
+it("tells a seat that comes back once the match has begun the reveal again, and the arena only in its joined frame", () => {
+  const room = revealingRoom();
+  const token = room.joinedMessage("first").token;
+  room.tick(30 * STEPS_IN_A_SECOND);
+  room.takeArenaMessage("first");
+  room.takeRevealMessage("first");
+  room.leave("first");
+
+  expect(room.reconnect(token)).toBe("first");
+
+  expect(room.snapshotFor("first")).toBeDefined();
+  expect(room.takeRevealMessage("first")).toMatchObject({kind: "reveal"});
+  expect(room.takeRevealMessage("first")).toBeUndefined();
+  expect(room.takeArenaMessage("first")).toBeUndefined();
+  expect(room.joinedMessage("first").arena).toEqual(DUEL_BUILT_IN_ARENA.rows);
 });
 
 it("ignores a go-on before the pre-round is decided", () => {

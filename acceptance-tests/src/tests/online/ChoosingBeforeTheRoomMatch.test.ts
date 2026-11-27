@@ -89,6 +89,27 @@ given("a private room whose players have a minute to choose", () => {
           expect(await second.room.preRound.waitForTheOpponentWeapon(1)).toBe("Submachine gun");
         });
 
+        then(
+          "each is shown the other's first weapon as a card, with its picture, power rating and six stats, while still choosing their second",
+          async ({gunsmith}) => {
+            const second = gunsmith.room.secondBrowser();
+
+            const rifle = await gunsmith.room.preRound.getOpponentWeaponNumbers(1);
+            const submachineGun = await second.room.preRound.getOpponentWeaponNumbers(1);
+
+            expect(rifle.name).toBe("Rifle");
+            expect(submachineGun.name).toBe("Submachine gun");
+            expect(Object.keys(rifle.stats)).toHaveLength(6);
+            expect(Object.keys(submachineGun.stats)).toHaveLength(6);
+            expect(rifle.stats).not.toEqual(submachineGun.stats);
+            expect(rifle.rating).toBeGreaterThan(0);
+            expect(rifle.rating).toBeLessThanOrEqual(100);
+            expect(await gunsmith.room.preRound.getOpponentWeaponPicture(1)).toBe("sprite");
+            expect(await second.room.preRound.getOpponentWeaponPicture(1)).toBe("sprite");
+            expect(await gunsmith.room.preRound.getLockedWeapon(2)).toBeUndefined();
+          },
+        );
+
         then("neither is told the other's second weapon, which neither has chosen", async ({gunsmith}) => {
           const second = gunsmith.room.secondBrowser();
 
@@ -126,6 +147,45 @@ given("a private room whose players have a minute to choose", () => {
                 expect(await gunsmith.room.preRound.waitForTheOpponentWeapon(2)).toBe("Submachine gun");
                 expect(await second.room.preRound.waitForTheOpponentWeapon(2)).toBe("Marksman rifle");
                 expect(await gunsmith.room.preRound.hasArenaStep()).toBe(true);
+              });
+
+              then("the other's weapons fold to their picture and name, without their stats", async ({gunsmith}) => {
+                await gunsmith.room.preRound.waitForTheOpponentWeapon(2);
+
+                expect(await gunsmith.room.preRound.isOpponentWeaponShownAsACard(1)).toBe(false);
+                expect(await gunsmith.room.preRound.isOpponentWeaponShownAsACard(2)).toBe(false);
+                expect(await gunsmith.room.preRound.getOpponentWeaponPicture(1)).toBe("sprite");
+                expect(await gunsmith.room.preRound.getOpponentWeaponPicture(2)).toBe("sprite");
+              });
+
+              when("the first player opens the other's first weapon", () => {
+                beforeEach(async ({gunsmith}) => {
+                  await gunsmith.room.preRound.waitForTheOpponentWeapon(2);
+                  await gunsmith.room.preRound.openTheOpponentWeapon(1);
+                });
+
+                then(
+                  "its power rating and six stats are shown, and the other weapon stays folded",
+                  async ({gunsmith}) => {
+                    const rifle = await gunsmith.room.preRound.getOpponentWeaponNumbers(1);
+
+                    expect(rifle.name).toBe("Rifle");
+                    expect(Object.keys(rifle.stats)).toHaveLength(6);
+                    expect(await gunsmith.room.preRound.isOpponentWeaponShownAsACard(1)).toBe(true);
+                    expect(await gunsmith.room.preRound.isOpponentWeaponShownAsACard(2)).toBe(false);
+                  },
+                );
+
+                when("they press anywhere on its card", () => {
+                  beforeEach(async ({gunsmith}) => {
+                    await gunsmith.room.preRound.pressTheOpponentWeaponCard(1);
+                  });
+
+                  then("it folds to its picture and name again", async ({gunsmith}) => {
+                    expect(await gunsmith.room.preRound.isOpponentWeaponShownAsACard(1)).toBe(false);
+                    expect(await gunsmith.room.preRound.getOpponentWeapon(1)).toBe("Rifle");
+                  });
+                });
               });
 
               when("both lock in the Duel as their arena", () => {
@@ -264,5 +324,32 @@ given("a private room whose first player has locked in a weapon while alone and 
       expect(await second.room.preRound.waitForTheOpponentWeapon(1)).toBe("Marksman rifle");
       expect(await gunsmith.room.preRound.waitForTheOpponentWeapon(1)).toBe("Rifle");
     });
+  });
+});
+
+// A real room offers the day's five arenas, which five depending on the date, and the dialog must show Lock in arena without scrolling at
+// 1280 by 720 whichever they are: the other's weapons are folded by then, and the arenas sit three to a row beside their preview.
+given("a private room offering the day's arenas, where both players have locked in both weapons", () => {
+  beforeEach(async ({gunsmith}) => {
+    const code = await gunsmith.room.createPrivateRoom({preRoundSeconds: SECONDS_TO_CHOOSE, daysArenas: true});
+    await gunsmith.room.preRound.waitToBeChoosing();
+    await gunsmith.room.joinWithASecondBrowserToChoose(code);
+    const second = gunsmith.room.secondBrowser();
+
+    for (const slot of [1, 2]) {
+      await gunsmith.room.preRound.lockInWeapon(slot);
+      await second.room.preRound.lockInWeapon(slot);
+    }
+    await gunsmith.room.preRound.waitForTheOpponentWeapon(2);
+  });
+
+  then("the day's arenas are laid out three to a row", async ({gunsmith}) => {
+    expect(await gunsmith.preRound.arena.getChoicesInEachRow()).toEqual([3, 2]);
+  });
+
+  then("the arena can be locked in without scrolling, with the other's weapons folded", async ({gunsmith}) => {
+    expect(await gunsmith.room.preRound.isOpponentWeaponShownAsACard(1)).toBe(false);
+    expect(await gunsmith.room.preRound.isOpponentWeaponShownAsACard(2)).toBe(false);
+    expect(await gunsmith.room.preRound.canLockInTheArenaWithoutScrolling()).toBe(true);
   });
 });

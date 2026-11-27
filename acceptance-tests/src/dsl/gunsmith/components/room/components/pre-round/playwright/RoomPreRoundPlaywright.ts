@@ -5,6 +5,10 @@ import type {ArenaPick} from "@src/dsl/gunsmith/components/room/components/pre-r
 import type {LibraryContents} from "@src/dsl/gunsmith/components/room/components/pre-round/types/LibraryContents";
 import type {SavedItemIds} from "@src/dsl/gunsmith/components/room/components/pre-round/types/SavedItemIds";
 import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
+import {numbersOfWeaponCard} from "@src/dsl/gunsmith/playwright/weapon-card/NumbersOfWeaponCard";
+import {pictureOfWeaponCard} from "@src/dsl/gunsmith/playwright/weapon-card/PictureOfWeaponCard";
+import type {RevealPicture} from "@src/dsl/gunsmith/playwright/weapon-card/types/RevealPicture";
+import type {RevealedWeaponNumbers} from "@src/dsl/gunsmith/playwright/weapon-card/types/RevealedWeaponNumbers";
 
 /** The buttons of the arena pick, by what each says. */
 const PICK_BUTTONS: Record<ArenaPick, string> = {
@@ -82,20 +86,66 @@ export class RoomPreRoundPlaywright extends BasePage {
 
   /** The name of the other player's weapon in `slot` on the screen, or nothing while it is not shown. */
   async getOpponentWeapon(slot: number): Promise<string | undefined> {
-    const weapon = this.dialog().getByTestId(`room-opponent-weapon-${slot}`);
+    const weapon = this.opponentWeapon(slot);
     if (!(await weapon.isVisible())) {
       return undefined;
     }
 
-    return await weapon.innerText();
+    return await weapon.getByTestId("reveal-weapon-name").innerText();
   }
 
   /** Waits until the other player's weapon in `slot` is on the screen, and says its name. */
   async waitForTheOpponentWeapon(slot: number): Promise<string> {
-    const weapon = this.dialog().getByTestId(`room-opponent-weapon-${slot}`);
+    const weapon = this.opponentWeapon(slot);
     await expect(weapon).toBeVisible();
 
-    return await weapon.innerText();
+    return await weapon.getByTestId("reveal-weapon-name").innerText();
+  }
+
+  /** What the card of the other player's weapon in `slot` prints (name, power rating, stats), once it is on the screen. */
+  async getOpponentWeaponNumbers(slot: number): Promise<RevealedWeaponNumbers> {
+    const weapon = this.opponentWeapon(slot);
+    await expect(weapon).toBeVisible();
+
+    return await numbersOfWeaponCard(weapon);
+  }
+
+  /** The picture on the card of the other player's weapon in `slot`, once it is on the screen. */
+  async getOpponentWeaponPicture(slot: number): Promise<RevealPicture> {
+    const weapon = this.opponentWeapon(slot);
+    await expect(weapon).toBeVisible();
+
+    return await pictureOfWeaponCard(weapon);
+  }
+
+  /** Opens the folded weapon of the other player in `slot` to show its stats, and waits until they are shown. */
+  async openTheOpponentWeapon(slot: number): Promise<void> {
+    const weapon = this.opponentWeapon(slot);
+    await weapon.getByRole("button", {expanded: false}).click();
+    await expect(weapon.getByTestId("reveal-weapon-rating")).toBeVisible();
+  }
+
+  /** Presses the opened card of the other player's weapon in `slot` on one of its stats, not on any button, and waits until it has folded. */
+  async pressTheOpponentWeaponCard(slot: number): Promise<void> {
+    const weapon = this.opponentWeapon(slot);
+    await weapon.getByTestId("reveal-stat").first().click();
+    await expect(weapon.getByTestId("reveal-weapon-rating")).toBeHidden();
+  }
+
+  /** Whether the other player's weapon in `slot` is shown as a card with its numbers, rather than by its picture and name alone. */
+  async isOpponentWeaponShownAsACard(slot: number): Promise<boolean> {
+    return (await this.opponentWeapon(slot).getByTestId("reveal-weapon-rating").count()) > 0;
+  }
+
+  /** Whether the whole of the Lock in arena button lies inside the dialog as it is now, without scrolling it. */
+  async canLockInTheArenaWithoutScrolling(): Promise<boolean> {
+    const dialog = await this.dialog().boundingBox();
+    const button = await this.dialog().getByRole("button", {name: "Lock in arena"}).boundingBox();
+    if (!dialog || !button) {
+      return false;
+    }
+
+    return button.y >= dialog.y && button.y + button.height <= dialog.y + dialog.height;
   }
 
   async hasArenaStep(): Promise<boolean> {
@@ -162,6 +212,10 @@ export class RoomPreRoundPlaywright extends BasePage {
 
   async isWaitingForTheOtherPlayerToStart(): Promise<boolean> {
     return await this.dialog().getByTestId("room-start-waiting").isVisible();
+  }
+
+  private opponentWeapon(slot: number): Locator {
+    return this.dialog().getByTestId(`room-opponent-weapon-${slot}`);
   }
 
   private dialog(): Locator {

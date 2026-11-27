@@ -1,4 +1,5 @@
 import {loadLocalGameOfPage} from "@src/react/navigation/LoadLocalGameOfPage";
+import {botGameAddressOf} from "@src/react/components/dom/game-menu/bot-game-address/BotGameAddressOf";
 import {returnToMainMenu} from "@src/react/components/dom/game-menu/returning/ReturnToMainMenu";
 import {RoomEntry} from "@src/react/components/dom/game-menu/components/room-entry/RoomEntry";
 import {openPracticeWorkshop} from "@src/react/components/dom/workshop/entering/OpenPracticeWorkshop";
@@ -117,7 +118,7 @@ export function GameMenu(): JSX.Element {
                     type="button"
                     className={MENU_ACTION_STYLES}
                     onClick={() => {
-                      history.pushState(history.state, "", "/?scenario=duel&preRound=1");
+                      history.pushState(history.state, "", botGameAddressOf(location.search));
                       loadLocalGameOfPage(undefined);
                     }}
                   >

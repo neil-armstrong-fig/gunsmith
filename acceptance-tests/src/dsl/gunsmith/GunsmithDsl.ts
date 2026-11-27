@@ -157,6 +157,18 @@ export class GunsmithDsl {
     }
   }
 
+  /**
+   * Opens the practice range with the duel's fixed seed (`DUEL_SEED`) in its address, so a bot game started from its menu plays the same duel
+   * every run: on that seed the bot beats a player who stands still in 2.3 game seconds. Without it every bot game is a new random duel.
+   */
+  async openTheSeededPracticeRange(): Promise<void> {
+    try {
+      await this.gunsmith.openPracticeRange(DUEL_SEED);
+    } catch (error) {
+      throw new DslError("Failed to open the practice range with the duel's seed", error);
+    }
+  }
+
   /** Opens the duel as the practice range's "Start bot game" does: the match waits behind the pre-round, where weapons are chosen, until the player starts it. */
   async startDuelWithPreRound(): Promise<void> {
     try {

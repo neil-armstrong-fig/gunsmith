@@ -108,7 +108,8 @@ export class ArenaPlaywright extends BasePage {
     await expect(banner).toBeVisible();
 
     if (place === "the round banner's button") {
-      return await this.middleOf(banner.getByRole("button"));
+      // The banner also offers Back to main menu; the button a player is asked to press is Next round.
+      return await this.middleOf(banner.getByRole("button", {name: "Next round", exact: true}));
     }
 
     const box = await banner.boundingBox();

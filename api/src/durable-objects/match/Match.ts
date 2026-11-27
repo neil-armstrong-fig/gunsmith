@@ -269,7 +269,7 @@ export class Match {
     }, MATCH_TICK.snapshotIntervalMilliseconds);
   }
 
-  /** Tells each connection what its seat may know: the arena and the reveal once, when the match begins, then the choosing while there is some, else its snapshot. */
+  /** Tells each connection what its seat may know: the arena and the reveal once, when the match begins, the other seat's saved weapons once as they are shown, then the choosing while there is some, else its snapshot. */
   private sendSnapshots(): void {
     this.countArenaPlayed();
     for (const [seat, socket] of this.sockets) {
@@ -281,6 +281,10 @@ export class Match {
       const reveal = this.room.takeRevealMessage(seat);
       if (reveal) {
         socket.send(JSON.stringify(reveal));
+      }
+
+      for (const opponentWeaponMessage of this.room.takeOpponentWeaponMessages(seat)) {
+        socket.send(JSON.stringify(opponentWeaponMessage));
       }
 
       const frame = this.room.snapshotFor(seat) ?? this.room.preRoundFor(seat);

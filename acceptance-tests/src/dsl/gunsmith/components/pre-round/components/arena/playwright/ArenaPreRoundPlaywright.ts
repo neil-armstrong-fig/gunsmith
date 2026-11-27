@@ -14,6 +14,20 @@ export class ArenaPreRoundPlaywright extends BasePage {
     return await this.group().getByRole("button").allInnerTexts();
   }
 
+  /** How many arena buttons are in each row on the screen, top row first, read from where each is drawn. */
+  async getChoicesInEachRow(): Promise<number[]> {
+    const rows = new Map<number, number>();
+    for (const button of await this.group().getByRole("button").all()) {
+      const box = await button.boundingBox();
+      if (box) {
+        const top = Math.round(box.y);
+        rows.set(top, (rows.get(top) ?? 0) + 1);
+      }
+    }
+
+    return [...rows.entries()].sort(([first], [second]) => first - second).map(([, count]) => count);
+  }
+
   async getChosen(): Promise<string> {
     return await this.group().locator("button[aria-pressed=true]").innerText();
   }

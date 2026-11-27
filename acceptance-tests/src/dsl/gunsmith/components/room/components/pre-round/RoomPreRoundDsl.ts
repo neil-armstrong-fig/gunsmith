@@ -4,6 +4,8 @@ import type {ArenaPick} from "@src/dsl/gunsmith/components/room/components/pre-r
 import type {LibraryContents} from "@src/dsl/gunsmith/components/room/components/pre-round/types/LibraryContents";
 import type {SavedItemIds} from "@src/dsl/gunsmith/components/room/components/pre-round/types/SavedItemIds";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
+import type {RevealPicture} from "@src/dsl/gunsmith/playwright/weapon-card/types/RevealPicture";
+import type {RevealedWeaponNumbers} from "@src/dsl/gunsmith/playwright/weapon-card/types/RevealedWeaponNumbers";
 
 /**
  * What a player in a private room sees while the two players choose before the match, reached as `gunsmith.room.preRound`: the waiting and the
@@ -118,6 +120,60 @@ export class RoomPreRoundDsl {
       return await this.preRound.waitForTheOpponentWeapon(slot);
     } catch (error) {
       throw new DslError(`Failed to see the other player's weapon ${slot}`, error);
+    }
+  }
+
+  /** What the card of the other player's weapon in `slot` prints (name, power rating, stats), once it is shown. */
+  async getOpponentWeaponNumbers(slot: number): Promise<RevealedWeaponNumbers> {
+    try {
+      return await this.preRound.getOpponentWeaponNumbers(slot);
+    } catch (error) {
+      throw new DslError(`Failed to read the numbers of the other player's weapon ${slot}`, error);
+    }
+  }
+
+  /** The picture on the card of the other player's weapon in `slot` (a drawing, a sprite or none), once it is shown. */
+  async getOpponentWeaponPicture(slot: number): Promise<RevealPicture> {
+    try {
+      return await this.preRound.getOpponentWeaponPicture(slot);
+    } catch (error) {
+      throw new DslError(`Failed to read the picture of the other player's weapon ${slot}`, error);
+    }
+  }
+
+  /** Opens the folded weapon of the other player in `slot`, so its power rating and stats are shown. */
+  async openTheOpponentWeapon(slot: number): Promise<void> {
+    try {
+      await this.preRound.openTheOpponentWeapon(slot);
+    } catch (error) {
+      throw new DslError(`Failed to open the other player's weapon ${slot}`, error);
+    }
+  }
+
+  /** Presses anywhere on the opened card of the other player's weapon in `slot`, which folds it to its picture and name again. */
+  async pressTheOpponentWeaponCard(slot: number): Promise<void> {
+    try {
+      await this.preRound.pressTheOpponentWeaponCard(slot);
+    } catch (error) {
+      throw new DslError(`Failed to fold the other player's weapon ${slot} by pressing its card`, error);
+    }
+  }
+
+  /** Whether the other player's weapon in `slot` is shown as a card with its numbers, rather than by its picture and name alone. */
+  async isOpponentWeaponShownAsACard(slot: number): Promise<boolean> {
+    try {
+      return await this.preRound.isOpponentWeaponShownAsACard(slot);
+    } catch (error) {
+      throw new DslError(`Failed to read whether the other player's weapon ${slot} is shown as a card`, error);
+    }
+  }
+
+  /** Whether Lock in arena is wholly inside the dialog as the player sees it, with no scrolling. */
+  async canLockInTheArenaWithoutScrolling(): Promise<boolean> {
+    try {
+      return await this.preRound.canLockInTheArenaWithoutScrolling();
+    } catch (error) {
+      throw new DslError("Failed to read whether the arena can be locked in without scrolling", error);
     }
   }
 

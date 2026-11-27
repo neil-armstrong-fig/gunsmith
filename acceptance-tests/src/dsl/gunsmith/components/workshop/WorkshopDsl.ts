@@ -36,6 +36,22 @@ export class WorkshopDsl {
     }
   }
 
+  async arrangeCredits(balance: number): Promise<void> {
+    try {
+      await this.workshop.arrangeCredits(balance);
+    } catch (error) {
+      throw new DslError("Failed to arrange the player's credits", error);
+    }
+  }
+
+  async getCredits(): Promise<string | undefined> {
+    try {
+      return await this.workshop.getCredits();
+    } catch (error) {
+      throw new DslError("Failed to read the credit balance", error);
+    }
+  }
+
   releaseWeaponMake(): void {
     try {
       this.workshop.releaseWeaponMake();

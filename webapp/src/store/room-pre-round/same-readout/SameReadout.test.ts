@@ -1,3 +1,4 @@
+import {RIFLE} from "@gunsmith/engine/weapon/weapons/Rifle";
 import type {RoomPreRoundReadout} from "@src/game/room-pre-round/types/RoomPreRoundReadout";
 import type {SeatReadout} from "@src/game/room-pre-round/types/SeatReadout";
 import {sameReadout} from "@src/store/room-pre-round/same-readout/SameReadout";
@@ -50,7 +51,7 @@ it("sees a change in either seat: a lock, a weapon shown, an arena, a pick, a go
   );
 });
 
-it("tells one weapon shown from another by its key or its name, and one arena shown from another by its name and drawing", () => {
+it("tells one weapon shown from another by its key or its name (and whether its numbers came), and one arena shown from another by its name and drawing", () => {
   const withWeapon = (shown: SeatReadout["slots"][0]["shown"]): RoomPreRoundReadout => ({
     ...readout,
     opponent: {...seat(), slots: [{locked: true, shown}, seat().slots[1]]},
@@ -68,6 +69,9 @@ it("tells one weapon shown from another by its key or its name, and one arena sh
   );
   expect(sameReadout(withWeapon({kind: "saved", name: "A"}), withWeapon({kind: "saved", name: "B"}))).toBe(false);
   expect(sameReadout(withWeapon({kind: "saved", name: "A"}), withWeapon({kind: "builtIn", key: "A"}))).toBe(false);
+  expect(
+    sameReadout(withWeapon({kind: "saved", name: "A"}), withWeapon({kind: "saved", name: "A", weapon: RIFLE})),
+  ).toBe(false);
   expect(sameReadout(withArena("Duel", ["#"]), withArena("Duel", ["#"]))).toBe(true);
   expect(sameReadout(withArena("Duel", ["#"]), withArena("Duel", ["."]))).toBe(false);
   expect(sameReadout(withArena("Duel", ["#"]), withArena("Fair duel", ["#"]))).toBe(false);

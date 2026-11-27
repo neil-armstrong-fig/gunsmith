@@ -17,6 +17,7 @@ import type {PreRoundOutcome} from "@src/durable-objects/match/pre-round/types/P
 import type {PreRoundSeat} from "@src/durable-objects/match/pre-round/types/PreRoundSeat";
 import type {PreRoundStage} from "@src/durable-objects/match/pre-round/types/PreRoundStage";
 import type {SeatPick} from "@src/durable-objects/match/pre-round/types/SeatPick";
+import type {ShownSavedWeapon} from "@src/durable-objects/match/pre-round/types/ShownSavedWeapon";
 import type {WeaponSlot} from "@src/durable-objects/match/pre-round/types/WeaponSlot";
 import type {WeaponSlotView} from "@src/durable-objects/match/pre-round/types/WeaponSlotView";
 import type {WeaponsOfSeat} from "@src/durable-objects/match/pre-round/types/WeaponsOfSeat";
@@ -213,6 +214,20 @@ export class PreRound {
     }
 
     return message;
+  }
+
+  /** The other seat's saved weapons `seat` may be shown with their numbers and drawing: each in a slot both seats have locked in. A built-in's the page has. */
+  savedWeaponsShownTo(seat: Seat): readonly ShownSavedWeapon[] {
+    const other = this.seats[OTHER_SEAT[seat]].weapons;
+    const shown: ShownSavedWeapon[] = [];
+    for (const slot of SLOTS) {
+      const chosen = other[slot].chosen;
+      if (chosen?.kind === "saved" && this.seats.first.weapons[slot].locked && this.seats.second.weapons[slot].locked) {
+        shown.push({slot, weapon: chosen.weapon, appearance: chosen.appearance});
+      }
+    }
+
+    return shown;
   }
 
   /** Whether the decided arena and weapons are being shown before the match: some time was allowed for it. */
