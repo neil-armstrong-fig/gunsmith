@@ -2,6 +2,7 @@ import {preRoundOfPage} from "@src/game/pre-round/PreRoundOfPage";
 import {scenarioOfPage} from "@src/game/scenario/ScenarioOfPage";
 import {reducedMotionOfPage} from "@src/game/motion/ReducedMotionOfPage";
 import {shakePixelsOfPage} from "@src/game/motion/ShakePixelsOfPage";
+import {fogShownOfPage} from "@src/game/fog/FogShownOfPage";
 import {mutedOfPage} from "@src/game/sound/MutedOfPage";
 import type {MenuView} from "@src/store/app/types/MenuView";
 import type {AppStore} from "@src/store/app/types/AppStore";
@@ -22,6 +23,7 @@ export const useAppStore = create<AppStore>()(
       muted: mutedOfPage(),
       reducedMotion: reducedMotionOfPage(),
       shakePixels: shakePixelsOfPage(),
+      fogShown: fogShownOfPage(),
       toggleMuted: () => {
         set(state => ({muted: !state.muted}));
       },

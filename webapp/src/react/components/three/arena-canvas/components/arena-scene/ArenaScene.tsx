@@ -14,17 +14,19 @@ import {Player} from "@src/react/components/three/arena-canvas/components/arena-
 import {useCameraShake} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-camera-shake/UseCameraShake";
 import {useGameLoop} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/UseGameLoop";
 import {ArenaTerrain} from "@src/react/components/three/arena-terrain/ArenaTerrain";
+import {useAppStore} from "@src/store/app/UseAppStore";
 import {gameState} from "@src/store/game/selectors/game-state/GameState";
 import {useGameStore} from "@src/store/game/UseGameStore";
 import type {JSX} from "react";
 
-/** Everything drawn in the arena: the camera fitted to the window, the walls with a faint shade where cover would hide a crouched fighter and the dim veil over what the player does not see, the closing ring over it, the dummies, the weapon lying in the arena, the bullets, the opponent and the player (drawn from art's pictures once they have loaded), with the brackets of a hit and the red highlight of the ring over the player. */
+/** Everything drawn in the arena: the camera fitted to the window, the walls with a faint shade where cover would hide a crouched fighter and the dim veil over what the player does not see (left out when the page asks for `?fog=off`), the closing ring over it, the dummies, the weapon lying in the arena, the bullets, the opponent and the player (drawn from art's pictures once they have loaded), with the brackets of a hit and the red highlight of the ring over the player. */
 export function ArenaScene(): JSX.Element {
   useGameLoop();
 
   // The arena never changes during a match, so this component renders once, not once per frame.
   const arena = useGameStore(state => state.world.arena);
   const viewport = useThree(state => state.size);
+  const fogShown = useAppStore(state => state.fogShown);
 
   useFrame(({camera}) => {
     const {arena: current} = gameState();
@@ -49,7 +51,7 @@ export function ArenaScene(): JSX.Element {
 
       <CoverShade />
 
-      <VisionOverlay />
+      {fogShown && <VisionOverlay />}
 
       <RingEdge arena={arena} />
 

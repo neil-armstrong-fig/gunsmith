@@ -527,6 +527,7 @@ function bulletAt({x, y, directionX, directionY, changes = {}}: BulletAtRequest)
     shooter: "player",
     level: 0,
     crouching: false,
+    floor: 0,
     ...changes,
   };
 }

@@ -55,3 +55,37 @@ for (const seed of SEEDS) {
     });
   });
 }
+
+// The heights arena: a platform one level up fills the east end from x = 10, and a second on the same level fills the north-west
+// corner (x 1 to 4, y 4 to 6), with a low cover block on the low ground at the foot of its east face (x 4 to 5, y 5 to 6). From 1.5
+// back on the east platform the player sees all of the corner platform, the floor just behind the block among it: but a block on the
+// low ground hides nobody up on a platform, however near, so nothing there is shaded. The far corner of the same platform is the clear
+// floor to compare with.
+const BEHIND_THE_LOW_BLOCK = {x: 3.6, y: 5.6};
+const CORNER_PLATFORM_FLOOR = {x: 2.5, y: 4.7};
+const ON_THE_EAST_PLATFORM = 11.5;
+const WALK_WATCH = {maxSeconds: 5, stepSeconds: 0.02};
+
+given("the heights arena, with a low cover block on the low ground at the foot of the corner platform", () => {
+  beforeEach(async ({gunsmith}) => {
+    await gunsmith.startHeights();
+    await gunsmith.holdTheGame();
+  });
+
+  when("the player climbs onto the east platform and faces the corner platform across the block", () => {
+    beforeEach(async ({gunsmith}) => {
+      await gunsmith.player.walkUntilPast({heading: "east", limit: ON_THE_EAST_PLATFORM, watch: WALK_WATCH});
+      await gunsmith.player.aimAtTile(BEHIND_THE_LOW_BLOCK);
+      await gunsmith.runGameFor(A_TURN_SECONDS);
+    });
+
+    then(
+      "the platform's floor just behind the block is not shaded, since a block below it hides nobody up there",
+      async ({gunsmith}) => {
+        expect(await gunsmith.arena.getFloorBrightnessAt(BEHIND_THE_LOW_BLOCK, CORNER_PLATFORM_FLOOR)).toBeGreaterThan(
+          CLEAR_ABOVE,
+        );
+      },
+    );
+  });
+});

@@ -91,6 +91,27 @@ describe("with the second seat's fighter right behind a cover block", () => {
   });
 });
 
+describe("with the second seat's fighter on a platform", () => {
+  // The same room with a platform one level up from x = 15 eastward, its face three and a half tiles east of the first seat.
+  const raisedRow = "#" + ".".repeat(14) + "1".repeat(8) + "#";
+  const withPlatform = arenaFrom(["########################", ...Array(5).fill(raisedRow), "########################"]);
+
+  it("tells each seat about the other when the fighter stands at the platform's edge", () => {
+    const world = startingWorld(withPlatform, [], {x: 15.5, y: 3.5});
+
+    expect(viewOfSeat(world, "first").opponent).toEqual(world.opponent);
+    expect(viewOfSeat(world, "second").opponent).toEqual(world.player);
+  });
+
+  it("tells neither seat about the other when the fighter stands back from the edge, in what is sent as well", () => {
+    const world = startingWorld(withPlatform, [], {x: 17.5, y: 3.5});
+
+    expect(viewOfSeat(world, "first").opponent).toBeUndefined();
+    expect(JSON.stringify(viewOfSeat(world, "first"))).not.toContain("17.5");
+    expect(viewOfSeat(world, "second").opponent).toBeUndefined();
+  });
+});
+
 describe("bullets", () => {
   it("are told to a seat on its own side, and on the other side only where it sees", () => {
     const world: World = {...duel(), bullets: [shot("player", 13.5), shot("opponent", 14.5), shot("opponent", 2.5)]};
@@ -157,7 +178,7 @@ describe("what a seat is never told", () => {
     }
   });
 
-  it("is where a shot was fired from: a seen bullet carries its flight and the shooter's stance, and no place of origin", () => {
+  it("is where a shot was fired from: a seen bullet carries its flight, the shooter's stance and the lowest level it can hurt, and no place of origin", () => {
     const world: World = {...duel(), bullets: [{...shot("opponent", 14.5), crouching: true}]};
 
     for (const seat of ["first", "second"] as const) {
@@ -167,6 +188,7 @@ describe("what a seat is never told", () => {
         "crouching",
         "damage",
         "direction",
+        "floor",
         "level",
         "position",
         "shooter",
@@ -177,7 +199,16 @@ describe("what a seat is never told", () => {
 });
 
 function shot(shooter: Bullet["shooter"], x: number): Bullet {
-  return {position: {x, y: 3.5}, direction: {x: 1, y: 0}, damage: 1, speed: 1, shooter, level: 0, crouching: false};
+  return {
+    position: {x, y: 3.5},
+    direction: {x: 1, y: 0},
+    damage: 1,
+    speed: 1,
+    shooter,
+    level: 0,
+    crouching: false,
+    floor: 0,
+  };
 }
 
 function duel(): World {

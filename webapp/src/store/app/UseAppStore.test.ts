@@ -8,6 +8,7 @@ it("holds the choices about the game and nothing else, so adding state is a deli
   expect(Object.keys(useAppStore.getState()).sort()).toEqual([
     "askForNextRound",
     "closeWorkshop",
+    "fogShown",
     "menuView",
     "muted",
     "nextRoundAsked",

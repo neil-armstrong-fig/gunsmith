@@ -1,10 +1,10 @@
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import {isShieldedByCover} from "@gunsmith/engine/cover/IsShieldedByCover";
-import {distanceToWall} from "@gunsmith/engine/bullet/flight/DistanceToWall";
 import {distanceToFighter} from "@gunsmith/engine/bullet/flight/meeting/DistanceToFighter";
 import {firstContact} from "@gunsmith/engine/bullet/flight/meeting/FirstContact";
 import {nearestDummyHit} from "@gunsmith/engine/bullet/flight/meeting/NearestDummyHit";
-import {blocksSightFrom} from "@gunsmith/engine/height/BlocksSightFrom";
+import {distanceToStop} from "@gunsmith/engine/bullet/flight/stopping/DistanceToStop";
+import {eyeLevelAt} from "@gunsmith/engine/height/EyeLevelAt";
 import type {Bullet} from "@gunsmith/engine/bullet/types/Bullet";
 import type {DummyHit} from "@gunsmith/engine/bullet/flight/types/DummyHit";
 import type {DummyHitRequest} from "@gunsmith/engine/bullet/flight/types/DummyHitRequest";
@@ -15,17 +15,15 @@ import type {Point} from "@gunsmith/engine/geometry/types/Point";
 
 /**
  * What the bullet runs into on this step, judged against the dummies and fighters as they stand in `flightRequest`. It stops at
- * a wall or at ground higher than the level it was fired from (it flies over lower ground), the same tiles that hide things from
- * the shooter's eye. A player's bullet can meet a dummy or the opponent, an opponent's bullet only the player, so a bullet never
+ * a wall, or a little way onto ground higher than the level it was fired from (`distanceToStop`), and passes over a fighter or
+ * dummy below its `floor`, so it reaches what the shooter could see. A player's bullet can meet a dummy or the opponent, an opponent's bullet only the player, so a bullet never
  * meets its own side, and the opponent's pass through dummies.
  */
 export function meetBullet(arena: Arena, flightRequest: FlightRequest, bullet: Bullet): Meeting {
   const distance = bullet.speed * flightRequest.seconds;
   const dummyHit = hittableDummyHit({arena, dummies: flightRequest.dummies, bullet, distance});
   const contact = firstContact({
-    wallDistance:
-      distanceToWall(blocksSightFrom(arena, {eyeLevel: bullet.level, crouching: bullet.crouching}), bullet, distance) ??
-      Infinity,
+    wallDistance: distanceToStop(arena, bullet, distance) ?? Infinity,
     dummyHit,
     fighterDistance: distanceToFighter(fighterHurtBy(arena, flightRequest, bullet), bullet, distance),
   });
@@ -46,7 +44,7 @@ function hittableDummyHit(request: DummyHitRequest): DummyHit | undefined {
   return nearestDummyHit(request);
 }
 
-/** Where the fighter on the other side of this bullet stands, if there is one and the bullet is not passing over them. */
+/** Where the fighter on the other side of this bullet stands, if there is one and the bullet is not passing over them (shielded by cover, or below its floor). */
 function fighterHurtBy(arena: Arena, flightRequest: FlightRequest, bullet: Bullet): Point | undefined {
   const fighter = fighterOnTheOtherSide(flightRequest, bullet);
   if (!fighter) {
@@ -54,6 +52,10 @@ function fighterHurtBy(arena: Arena, flightRequest: FlightRequest, bullet: Bulle
   }
 
   if (isShieldedByCover(arena, bullet.direction, fighter)) {
+    return undefined;
+  }
+
+  if (eyeLevelAt(arena, fighter.position) < bullet.floor) {
     return undefined;
   }
 

@@ -48,6 +48,7 @@ it("shows a seat its own bullets, and the other seat's only where it sees", () =
     shooter: "opponent",
     level: 0,
     crouching: false,
+    floor: 0,
   };
   const withBullet: World = {...world, bullets: [ownBullet]};
 

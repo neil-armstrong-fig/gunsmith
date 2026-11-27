@@ -4,7 +4,8 @@ import type {Cone} from "@gunsmith/engine/vision/types/Cone";
 
 // Low ground at x 1 to 10, with a cover block at x 4.
 const lowRow = arenaFrom(["############", "#...c......#", "############"]);
-// A platform one level up at x 1 and 2, a stair at x 3 down to the low ground, and a cover block at x 6.
+// A platform one level up at x 1 and 2, a stair at x 3 down to the low ground, and a cover block at x 6. A viewer on the
+// platform stands at its edge, where the edge rule lets them see down.
 const platformAndRow = arenaFrom(["#############", "#11<..c.....#", "#############"]);
 
 const FROM_LOW: Cone = {
@@ -15,7 +16,7 @@ const FROM_LOW: Cone = {
   eyeLevel: 0,
   crouching: false,
 };
-const FROM_PLATFORM: Cone = {...FROM_LOW, eyeLevel: 1};
+const FROM_PLATFORM: Cone = {...FROM_LOW, apex: {x: 2.5, y: 1.5}, eyeLevel: 1};
 
 it("sees a standing fighter behind a cover block, since a standing viewer sees over it", () => {
   expect(canSeeFighter(lowRow, FROM_LOW, {position: {x: 5.5, y: 1.5}, crouching: false})).toBe(true);

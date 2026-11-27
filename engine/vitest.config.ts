@@ -15,6 +15,7 @@ export const PROPERTY_TESTS = [
   "src/arena-symmetry/property-tests/FairStartInvariants.test.ts",
   "src/arena-repair/property-tests/RepairArenaInvariants.test.ts",
   "src/library-items/property-tests/StoredItemInvariants.test.ts",
+  "src/vision/sight/property-tests/ClearSightInvariants.test.ts",
 ];
 
 export default defineConfig({

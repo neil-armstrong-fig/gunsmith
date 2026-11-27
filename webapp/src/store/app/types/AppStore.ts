@@ -12,6 +12,8 @@ export interface AppStore {
   reducedMotion: boolean;
   /** How hard a hit shakes the camera at most, in screen pixels: 12 by default (the user's choice; art's study said 2), or what the page's query (`?shake=<pixels>`) asks; 0 is off. */
   shakePixels: number;
+  /** Whether the dim veil over what the player does not see is drawn: always, unless the page's query (`?fog=off`) asks otherwise, for specs that photograph the terrain. Read once from the page; sight itself is unchanged. */
+  fogShown: boolean;
   toggleMuted: () => void;
   scenario: Scenario;
   menuView: MenuView | undefined;

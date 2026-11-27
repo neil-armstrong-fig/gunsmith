@@ -1,4 +1,4 @@
-import {distanceToWall} from "@gunsmith/engine/bullet/flight/DistanceToWall";
+import {distanceToWall} from "@gunsmith/engine/vision/sight/wall-distance/DistanceToWall";
 import type {BlockedTiles} from "@gunsmith/engine/arena/types/BlockedTiles";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
 

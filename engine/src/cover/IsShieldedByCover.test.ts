@@ -51,3 +51,10 @@ it("does not shield a target the diagonal bullet reaches beside the block rather
 
   expect(isShieldedByCover(diagonal, direction, {position: {x: 5.5, y: 4.5}, crouching: true})).toBe(false);
 });
+
+it("does not shield a crouched target up on a platform with a cover block on the low ground below it", () => {
+  // Low ground at x 1 to 3 with a cover block at x 3, and a platform one level up at x 4 to 6.
+  const foot = arenaFrom(["########", "#..c111#", "########"]);
+
+  expect(isShieldedByCover(foot, EAST, {position: {x: 4.5, y: 1.5}, crouching: true})).toBe(false);
+});

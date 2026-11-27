@@ -49,7 +49,7 @@ Read visibility from the hook. Compare the fields a criterion means, not whole s
 
 ## Heights
 
-Use the heights scenario for stair and level criteria. **Stop a walk by the game's clock, not by polling**: `player.walkUntilPast({heading, limit, watch})` in a held game (`holdTheGame`) stops within one step of the limit; a walk stopped by a test that looks every so often ran on while the machine was busy and left the player a tile or two past the dummy on the platform, which then took a shot meant for the one behind them (the `ShootingAcrossLevels` flake, fixed 2026-11-18, together with a shot that lives 75 ms and is now looked for at every held frame, not waited for; `SeeingAcrossLevels` and the climbs in `ClimbingAStair` still poll). Cover blocked drops, legal stairs, low-to-high occlusion and high-to-low sight/shots. Rendering needs screenshot checks where geometry tests alone cannot establish what is drawn.
+Use the heights scenario for stair and level criteria. **Stop a walk by the game's clock, not by polling**: `player.walkUntilPast({heading, limit, watch})` in a held game (`holdTheGame`) stops within one step of the limit; a walk stopped by a test that looks every so often ran on while the machine was busy and left the player a tile or two past the dummy on the platform, which then took a shot meant for the one behind them (the `ShootingAcrossLevels` flake, fixed 2026-11-18, together with a shot that lives 75 ms and is now looked for at every held frame, not waited for; the climbs in `ClimbingAStair` still poll). Cover blocked drops, legal stairs and the edge rule: a third heights dummy stands at the platform's edge (10.5, 1.5); from below it is seen and hit and the one 2.5 back is not, and from 1.5 back on the platform the low ground is neither, while a same-level platform in the north-west corner is drawn lit (`arena.getFloorBrightnessAt`; y grows up the screen). Rendering needs screenshot checks where geometry tests alone cannot establish what is drawn.
 
 ## The ring
 
@@ -73,7 +73,7 @@ the player must stand still. **A check must look for what only the drawing has**
 
 ## Being shot from out of sight
 
-`TheOpponentShotFromOutOfSight` (in `duel/`) opens `?scenario=overwatch` (`gunsmith.startOverwatch(seed)`; seeds 2, 5, 7): a corridor one tile wide, the opponent wandering on the low ground ten tiles from the player, who stands on the platform at the end, farther than it sees. The player fires west along the row (`aimAtTile`, `startFiring`) until `opponent.waitForHealthBelow(100)`, and the criterion is that `behaviour` is no longer `wander`. It fails with the opponent's reaction to a shot switched off (`rememberShot` made a no-op: all three seeds time out). It cannot also assert that the opponent comes up the stair: the trigger is still down while the browser notices the first hit, so four rounds land and the bot dies; the engine's step tests cover the climb. The seeds are those where the old opponent never left `wander` in fifteen seconds (19 of 40).
+`TheOpponentShotFromOutOfSight` (in `duel/`) opens `?scenario=overwatch` (`gunsmith.startOverwatch(seed)`; seeds 13, 14): a corridor one tile wide, the opponent wandering on the low ground ten tiles from the player, who stands at the platform's edge, farther than it sees. The player fires west along the row (`aimAtTile`, `startFiring`) until `opponent.waitForHealthBelow(100)`, and the criterion is that `behaviour` is no longer `wander`. It fails with the opponent's reaction to a shot switched off (`rememberShot` made a no-op: both seeds time out). It cannot also assert that the opponent comes up the stair: the trigger is still down while the browser notices the first hit, so four rounds land and the bot dies; the engine's step tests cover the climb. The seeds are those where the opponent never left `wander` in fifteen seconds with the player idle (2 of 40 since the edge rule: a player at the edge can be seen from below).
 
 ## Cover
 
@@ -93,7 +93,7 @@ Use seeded sparring to isolate player pickup behavior. Assert visibility and inv
 
 `DrawingThePickupMarker` checks the four C2 corners and cardinal gaps and samples the full 88-unit marker canvas for fog and collection. Its marker query accepts a saved pickup position and a nearby clear tile under the same light. It compares matching tile-local pixels from the same screenshot, so the floor seams and ticks do not count as pickup marks. The lantern core sampler stays inside the outline because both use the same pale colour.
 
-`DrawingTheTerrain` uses `?scenario=terrain` to check the three floor levels, wall braces, joins, stairs, drop edges and fog at 64 and 32 pixels per tile. It also holds or returns 404 for the highest floor SVG to test readiness and the flat fallback.
+`DrawingTheTerrain` and the terraced `DrawingStairsInAnArena` criteria call `gunsmith.hideTheFog()` (`?fog=off`) first: under the edge rule the floors below a platform are out of sight; the fog criteria keep the veil. `DrawingTheTerrain` uses `?scenario=terrain` to check the three floor levels, wall braces, joins, stairs, drop edges and fog at 64 and 32 pixels per tile. It also holds or returns 404 for the highest floor SVG to test readiness and the flat fallback.
 
 ## Hit confirmation
 
