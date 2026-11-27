@@ -44,6 +44,13 @@ given("the pre-round is open", () => {
       expect(await gunsmith.preRound.arena.getChoicesInEachRow()).toEqual(rowsOfThree(BUILT_IN_NAMES.length));
     });
 
+    then(
+      "Lock in is in view at 1280 by 720 without scrolling, with every built-in arena offered",
+      async ({gunsmith}) => {
+        expect(await gunsmith.preRound.canLockInWithoutScrolling()).toBe(true);
+      },
+    );
+
     then("the Duel is chosen to begin with, and a preview of it is shown", async ({gunsmith}) => {
       expect(await gunsmith.preRound.arena.getChosen()).toBe(DUEL.name);
       expect(await gunsmith.preRound.arena.getPreviewName()).toBe(DUEL.name);

@@ -11,6 +11,7 @@ interface Props {
 /**
  * The arenas a player may put forward, one button each, three to a row (the user, 2026-11-26), the chosen one pressed, and beside them a preview
  * of the chosen one: the real tiles, walls, levels and stairs. Side by side, so a room's arena step fits 1280 by 720 whichever five the day offers.
+ * The list scrolls on its own past about a third of the window's height, so with every built-in offered (the bot game) Lock in stays in view.
  */
 export function ArenaPicker({choices, chosen, onChoose}: Props): JSX.Element {
   return (
@@ -18,7 +19,7 @@ export function ArenaPicker({choices, chosen, onChoose}: Props): JSX.Element {
       <h2 className="text-lg font-semibold text-gs-ui-text">Arena</h2>
 
       <div className="flex items-start gap-4">
-        <div className="grid min-w-0 flex-1 grid-cols-3 content-start gap-2">
+        <div className="grid max-h-[32vh] min-w-0 flex-1 grid-cols-3 content-start gap-2 overflow-y-auto p-0.5">
           {choices.map(choice => (
             <button
               key={choice.id}

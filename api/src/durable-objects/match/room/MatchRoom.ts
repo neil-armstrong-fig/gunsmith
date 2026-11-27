@@ -173,7 +173,7 @@ export class MatchRoom {
     }
 
     delete this.acked[seat];
-    this.tellAgainWhileRevealing(seat);
+    this.tellAgainOnReturn(seat);
     this.weaponsTold[seat].clear();
     this.asked[seat] = NOTHING_ASKED;
     this.pulled[seat] = false;
@@ -257,7 +257,7 @@ export class MatchRoom {
     return message;
   }
 
-  /** The weapons each seat carries into the match, from `seat`'s side, once, the first time it is asked after the pre-round has decided them (and again if the seat comes back while they are being shown). */
+  /** The weapons each seat carries into the match, from `seat`'s side, once, the first time it is asked after the pre-round has decided them (and again whenever the seat comes back after that, the match begun or not). */
   takeRevealMessage(seat: Seat): RevealMessage | undefined {
     const message = this.revealsToTell[seat];
     delete this.revealsToTell[seat];
@@ -403,8 +403,8 @@ export class MatchRoom {
   }
 
   /**
-   * Once the pre-round has decided, both browsers are told the arena and what each seat carries (once each, and again to a seat that comes back
-   * while they are shown), and the match begins in that arena when the reveal is over: at once for a room allowed no reveal.
+   * Once the pre-round has decided, both browsers are told the arena and what each seat carries (once each, and again to a seat that comes back:
+   * `tellAgainOnReturn`), and the match begins in that arena when the reveal is over: at once for a room allowed no reveal.
    */
   private beginMatchIfDecided(): void {
     const outcome = this.preRound.outcome();
@@ -447,10 +447,23 @@ export class MatchRoom {
     this.revealsToTell[seat] = revealFor(seat, outcome);
   }
 
-  /** A seat that comes back while the decided arena and weapons are being shown has lost what it was told: it is told again. */
-  private tellAgainWhileRevealing(seat: Seat): void {
-    if (this.announced && !this.world) {
+  /**
+   * A seat that comes back once the arena and weapons are decided has lost what it was told. While they are being shown it is told both again;
+   * once the match has begun only the loadouts, since `joined` carries the arena and a saved weapon's drawing is in the reveal alone.
+   */
+  private tellAgainOnReturn(seat: Seat): void {
+    if (!this.announced) {
+      return;
+    }
+    if (!this.world) {
       this.tellAgain(seat);
+
+      return;
+    }
+
+    const outcome = this.preRound.outcome();
+    if (outcome) {
+      this.revealsToTell[seat] = revealFor(seat, outcome);
     }
   }
 

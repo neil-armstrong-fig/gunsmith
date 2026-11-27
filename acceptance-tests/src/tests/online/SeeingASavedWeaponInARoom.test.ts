@@ -139,5 +139,28 @@ given("a private room whose first player locked in a saved weapon for slot 1, sh
       await expect.poll(() => second.player.hasRifleOnScreen()).toBe(true);
       expect(await second.player.hasHeldWeaponAccent("mint")).toBe(false);
     });
+
+    when("the first player reloads the page in the middle of the match", () => {
+      beforeEach(async ({gunsmith}) => {
+        await gunsmith.room.leaveTheRoom();
+        await gunsmith.room.returnToTheRoom();
+        await gunsmith.room.waitForTheMatchAgain();
+      });
+
+      then("they hold the saved weapon's drawing again", async ({gunsmith}) => {
+        await expect.poll(() => gunsmith.player.hasHeldWeaponAccent("mint")).toBe(true);
+      });
+
+      then("their HUD draws it in slot 1 again", async ({gunsmith}) => {
+        await expect.poll(async () => (await gunsmith.hud.getInventory()).selectedName).toBe("Mint Coil");
+        await expect
+          .poll(async () => (await gunsmith.hud.getInventoryIconLook(1)).mintPixels)
+          .toBeGreaterThanOrEqual(MINT_PIXELS_OF_THE_DRAWING);
+      });
+
+      then("the pre-round does not open again", async ({gunsmith}) => {
+        expect(await gunsmith.preRound.isOpen()).toBe(false);
+      });
+    });
   });
 });

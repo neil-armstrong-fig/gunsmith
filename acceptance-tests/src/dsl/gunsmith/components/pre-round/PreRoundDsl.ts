@@ -87,6 +87,15 @@ export class PreRoundDsl {
     }
   }
 
+  /** Whether Lock in is in view in the dialog as it opens, so a player need not scroll to find it. */
+  async canLockInWithoutScrolling(): Promise<boolean> {
+    try {
+      return await this.preRound.canLockInWithoutScrolling();
+    } catch (error) {
+      throw new DslError("Failed to read whether Lock in is in view without scrolling", error);
+    }
+  }
+
   /** Whether the reveal is on the screen. */
   async isRevealShown(): Promise<boolean> {
     try {
