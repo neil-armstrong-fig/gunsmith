@@ -9,6 +9,7 @@ import {withCharacter} from "@gunsmith/engine/arena-repair/drawing/WithCharacter
 import {addLanding} from "@gunsmith/engine/arena-repair/stairs/AddLanding";
 import {addStair} from "@gunsmith/engine/arena-repair/stairs/AddStair";
 import {dropIllegalStairs} from "@gunsmith/engine/arena-repair/stairs/DropIllegalStairs";
+import {widenPlatform} from "@gunsmith/engine/arena-repair/stairs/WidenPlatform";
 import type {ArenaEdit} from "@gunsmith/engine/arena-repair/types/ArenaEdit";
 import type {ArenaRepair} from "@gunsmith/engine/arena-repair/types/ArenaRepair";
 import type {DrawingRegions} from "@gunsmith/engine/arena-repair/types/DrawingRegions";
@@ -30,7 +31,9 @@ const MOST_MENDS = 100;
  * arena playable and not the model's luck. The drawing keeps what it drew: a legal stair, a platform that can be reached and a
  * wall that closes nothing are left exactly as they are. Otherwise, in this order: a stair the engine refuses is drawn as
  * floor; a platform cut off from the rest gets a stair beside it, or, two levels up on the ground, a landing between two stairs
- * (`stairs/AddLanding`), or is lowered a level when neither fits; a sliver of low
+ * (`stairs/AddLanding`), or, two levels up on a first level too thin round it for a stair, a tile more of the first level and a
+ * stair onto it (`stairs/WidenPlatform`: the one edit that raises ground, and only beside a platform nobody can reach), or is
+ * lowered a level when none fits; a sliver of low
  * floor is walled in, and a bigger piece gets a door cut through the thinnest wall to the arena. The border is never
  * touched. Every change is checked by the engine's own reading of the drawing (`arenaFrom`), and a drawing it cannot read, or that
  * has no floor, is returned as it came: the validator, which stays the judge, says what is wrong with it. Playability is not decided
@@ -102,6 +105,11 @@ function mendPlatform(rows: readonly string[], raised: readonly DrawnTile[], mai
   const withLanding = addLanding(rows, raised, main);
   if (withLanding !== undefined) {
     return {rows: withLanding, edits: [{kind: "landingAdded", tiles: 3}]};
+  }
+
+  const widened = widenPlatform(rows, raised);
+  if (widened !== undefined) {
+    return {rows: widened, edits: [{kind: "platformWidened", tiles: 2}]};
   }
 
   let lowered = [...rows];

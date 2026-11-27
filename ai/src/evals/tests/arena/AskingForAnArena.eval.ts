@@ -23,7 +23,7 @@ const LARGE_REQUESTS = [
 // fixed path within three model calls, and that no credit goes back for a request that reached the model, are
 // `expectDefaultPipelineBehaviour`, at the end of every trial.
 // A regression since 2026-11-25: every criterion held in 3 of 3 trials on Haiku 5.5 with the shapes format and its `floor` list
-// (`docs/ai-arena-research.md`); the watchtower, which did not, is its own `given` below.
+// (`docs/ai-arena-research.md`); the watchtower, which held later, is its own `given` below.
 given("a player asks for an arena, and the model must write one the engine accepts as playable", () => {
   when("the player asks for an open arena with a ring of stone pillars", ({weaponSmith}) => {
     eachTrial(weaponSmith.arena, arena => {
@@ -151,34 +151,33 @@ given("a player asks for an arena, and the model must write one the engine accep
   );
 });
 
-// In progress: the height asked for does not hold every time. On Haiku 5.5 (2026-11-25, 3 trials) every arena was created, but one trial's
-// towers ended at level one; the other criteria held. It becomes a regression when the towers keep level two in every trial.
-given.inProgress(
-  "a player asks for an arena built to a height, so the levels asked for must survive the repair",
-  () => {
-    // A real failure (the user's manual test in the live workshop, 2026-11-21): this request came back as a built-in arena. A 25 by 13
-    // hand-drawn version (a low-cover divider with one crossing, two-stage stairs to each tower and to the bridge) passes engine's
-    // validation and fair starts, so the layout is possible. The player's words are kept as typed, spelling included.
-    when("the player asks for two level-three watchtowers and a bridge over a cover divider", ({weaponSmith}) => {
-      eachTrial(weaponSmith.arena, arena => {
-        beforeAll(() => arena.ask(WATCHTOWER_REQUEST));
+// A regression since 2026-11-27: the towers kept level two in 3 of 3 fresh trials on Haiku 5.5 and every criterion held. On 2026-11-25 one
+// trial's towers had ended at level one: the model drew a first level one tile thick round the top, and the repair lowered it. Engine's
+// repair now grows that first level so a stair fits (`stairs/WidenPlatform`); every saved probe draft that drew
+// a tower (5 of 6) now keeps level two.
+given("a player asks for an arena built to a height, so the levels asked for must survive the repair", () => {
+  // A real failure (the user's manual test in the live workshop, 2026-11-21): this request came back as a built-in arena. A 25 by 13
+  // hand-drawn version (a low-cover divider with one crossing, two-stage stairs to each tower and to the bridge) passes engine's
+  // validation and fair starts, so the layout is possible. The player's words are kept as typed, spelling included.
+  when("the player asks for two level-three watchtowers and a bridge over a cover divider", ({weaponSmith}) => {
+    eachTrial(weaponSmith.arena, arena => {
+      beforeAll(() => arena.ask(WATCHTOWER_REQUEST));
 
-        thenExpect("the model's own arena is created", () => {
-          expect(arena.getStatus()).toBe("created");
-        });
-
-        // Haiku 5.5 (2026-11-24) drew each tower at level two with one stair from the ground, which climbs two levels, and code's repair then
-        // lowered every tower to level one: valid, created, and not what was asked. "Level three" is the third floor, two levels up. Engine's
-        // repair now adds a landing between two stairs, and the towers kept level two in 3 of 3 (2026-11-24) but 2 of 3 (2026-11-25).
-        thenExpect("the towers keep the height asked for: the arena reaches level two, the third floor", () => {
-          expect(arena.getHighestLevel()).toBe(2);
-        });
-
-        expectDefaultPipelineBehaviour(arena);
+      thenExpect("the model's own arena is created", () => {
+        expect(arena.getStatus()).toBe("created");
       });
+
+      // Haiku 5.5 (2026-11-24) drew each tower at level two with one stair from the ground, which climbs two levels, and code's repair then
+      // lowered every tower to level one: valid, created, and not what was asked. "Level three" is the third floor, two levels up. Engine's
+      // repair now adds a landing between two stairs, and the towers kept level two in 3 of 3 (2026-11-24) but 2 of 3 (2026-11-25).
+      thenExpect("the towers keep the height asked for: the arena reaches level two, the third floor", () => {
+        expect(arena.getHighestLevel()).toBe(2);
+      });
+
+      expectDefaultPipelineBehaviour(arena);
     });
-  },
-);
+  });
+});
 
 // A layout request: the arena must take the outline asked for, which no validity check sees. Probed 2026-11-20 on Haiku 5.5, "a plus sign"
 // came back as an open rectangle in 3 of 3 drafts and "an L" had its corner of wall in 1 of 3. Fixed 2026-11-25 by the shapes format's
