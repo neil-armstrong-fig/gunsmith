@@ -3,11 +3,11 @@
 A 1v1 top-down shooter where players describe weapons and arenas in plain words, and AI builds them. Fight a scripted bot or a
 friend in a private room, in a full-screen arena with fog of war, three height levels, crouching, pickups and a closing ring.
 
-![A duel on Twin ridges: the player's vision cone lights the floor between two raised platforms, with the bot beside the centre cover and a weapon pickup](docs/screenshots/terraced-arena.png)
+![A duel on Twin ridges: the player's vision cone lights the floor between two raised platforms, with the bot beside the centre cover and a weapon pickup](docs/game-screenshots/terraced-arena.png)
 
 | | |
 | --- | --- |
-| ![Mid-fight: a bullet in flight, a hit marker on the player and health down to 75](docs/screenshots/duel.png) | ![The pre-round reveal: both loadouts with power ratings and stats, and the chosen arena](docs/screenshots/pre-round-reveal.png) |
+| ![Mid-fight: a bullet in flight, a hit marker on the player and health down to 75](docs/game-screenshots/duel.png) | ![The pre-round reveal: both loadouts with power ratings and stats, and the chosen arena](docs/game-screenshots/pre-round-reveal.png) |
 | Fog hides anything outside your vision cone. | Before a match, both loadouts and the arena are revealed with their power ratings. |
 
 - **The game:** a deterministic TypeScript engine (fixed timestep, seeded randomness), drawn with React and react-three-fiber.
