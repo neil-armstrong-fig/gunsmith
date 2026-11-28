@@ -40,9 +40,8 @@ renames or removes one. **Never put an account id, token, secret or personal add
    ```
 
    The root script compiles the webapp, stops unless `webapp/build/_headers` is exactly the `noindex` rule, stamps
-   `HEAD` into `webapp/build/release.json`, provisions the API Worker with Alchemy, then deploys the webapp Worker with
-   Wrangler. It stamps `HEAD` even when the tree has uncommitted changes, so release from a clean checkout. The two
-   deploy steps resolve `../.env.local` from the infra package directory. In Cloudflare, use **Settings →
+   `HEAD` into `webapp/build/release.json`, then provisions the API and webapp Workers with Alchemy. It stamps `HEAD` even when the tree has uncommitted changes, so release from a clean checkout. The deploy
+   resolves `../.env.local` from the infra package directory. In Cloudflare, use **Settings →
    Domains & Routes** to attach each custom domain from step 6. The API Worker keeps its existing D1 and Durable
    Object resources. Keep applied SQL migrations immutable and add new migrations for schema changes.
 3. Check the webapp homepage and a static asset for `X-Robots-Tag: noindex` and its `/release.json` for the intended

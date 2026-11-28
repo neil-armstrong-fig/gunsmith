@@ -29,7 +29,7 @@ Cloudflare Workers serve the static webapp at `gunsmith.neilarmstrong.dev` and t
 
 The API imports `ai/` in-process using Workers-compatible LangChain/LangGraph. D1 holds accounts, sessions, the library and private generation history; match history is planned. The sign-in design is in [sign-in](sign-in.md). CreditLedger and SpendLedger Durable Objects hold credits and spend counters. Private recording storage is a future fair-play capability, not an existing binding.
 
-The release workflow in `infra/` uses Alchemy for D1, the API Worker and its Durable Objects; Wrangler deploys the webapp Worker. Releases are manual for now ([manual setup](../MANUAL-SETUP-STEPS.md#first-deploy)); live acceptance against production is still open. Forks need their own domain and manual setup.
+The release workflow in `infra/` uses Alchemy for D1, the API Worker and its Durable Objects, and the static webapp Worker. Releases are manual for now ([manual setup](../MANUAL-SETUP-STEPS.md#first-deploy)); live acceptance against production is still open. Forks need their own domain and manual setup.
 
 ## Decisions and unresolved measurements
 

@@ -98,11 +98,6 @@ jobs:
         env:
           WRANGLER_SEND_METRICS: "false"
 
-      - name: Check the static webapp Worker
-        run: pnpm --filter @gunsmith/infra exec wrangler deploy --dry-run --config ../webapp/wrangler.jsonc
-        env:
-          WRANGLER_SEND_METRICS: "false"
-
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: release-webapp
@@ -215,7 +210,7 @@ jobs:
           name: release-webapp
           path: webapp/build/
 
-      - name: Deploy the API Worker
+      - name: Deploy the API Worker and the tested webapp build
         if: steps.tip.outputs.current == 'true'
         run: pnpm --filter @gunsmith/infra provision
         env:
@@ -228,14 +223,6 @@ jobs:
           ALERT_TO_ADDRESS: ${{ secrets.ALERT_TO_ADDRESS }}
           ACCOUNT_DIGEST_KEY: ${{ secrets.ACCOUNT_DIGEST_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-
-      - name: Deploy the tested webapp build
-        if: steps.tip.outputs.current == 'true'
-        run: pnpm --filter @gunsmith/infra exec wrangler deploy --config ../webapp/wrangler.jsonc
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          WRANGLER_SEND_METRICS: "false"
 
       - name: Verify the deployed commit, noindex and D1
         if: steps.tip.outputs.current == 'true'
