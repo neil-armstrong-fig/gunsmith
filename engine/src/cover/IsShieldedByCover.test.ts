@@ -1,5 +1,5 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
-import {COVER_REACH_TILES} from "@gunsmith/engine/cover/CoverReach";
+import {COVER_REACH_TILES} from "@gunsmith/engine/cover/reach/CoverReach";
 import {isShieldedByCover} from "@gunsmith/engine/cover/IsShieldedByCover";
 
 // One row of low ground, x 1 to 11, with a cover block at x 7 and a wall at x 3.

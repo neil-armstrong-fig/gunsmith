@@ -1,5 +1,5 @@
 import {FakeListChatModel} from "@langchain/core/utils/testing";
-import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
+import {BUILT_IN_ARENAS} from "@gunsmith/engine/arena/built-in/BuiltInArenas";
 import {reasonForInvalidArena} from "@gunsmith/ai/pipeline/arena/graph/outcome/invalid-reason/ReasonForInvalidArena";
 import {generateArena} from "@gunsmith/ai/pipeline/arena/GenerateArena";
 import type {ArenaPipelineDependencies} from "@gunsmith/ai/pipeline/arena/types/ArenaPipelineDependencies";

@@ -1,4 +1,4 @@
-import {STAT_RANGES} from "@gunsmith/engine/power-rating/ranges/StatRanges";
+import {STAT_RANGES} from "@gunsmith/engine/weapon/power-rating/ranges/StatRanges";
 
 /**
  * The floor and cap of every weapon field. The schema is built from this table and the generation prompt quotes it, so the

@@ -1,4 +1,4 @@
-import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
+import {BUILT_IN_ARENAS} from "@gunsmith/engine/arena/built-in/BuiltInArenas";
 import {readArenaEdit} from "@gunsmith/ai/pipeline/arena/drafting/format/edit-built-in/ReadArenaEdit";
 import {EDIT_BASES} from "@gunsmith/ai/pipeline/arena/drafting/format/edit-built-in/bases/EditBases";
 

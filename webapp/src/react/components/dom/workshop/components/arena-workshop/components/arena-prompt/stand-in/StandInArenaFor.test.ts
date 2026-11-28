@@ -1,4 +1,4 @@
-import {validateArena} from "@gunsmith/engine/arena-validation/ValidateArena";
+import {validateArena} from "@gunsmith/engine/arena/validation/ValidateArena";
 import {standInArenaFor} from "@src/react/components/dom/workshop/components/arena-workshop/components/arena-prompt/stand-in/StandInArenaFor";
 
 it.each(["a courtyard with a pillar", "a raised platform with stairs"])(

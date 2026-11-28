@@ -1,6 +1,6 @@
-import {ARENA_ROTATION} from "@gunsmith/engine/arena-rotation/ArenaRotationLimits";
-import {arenasOfDay} from "@gunsmith/engine/arena-rotation/ArenasOfDay";
-import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
+import {ARENA_ROTATION} from "@gunsmith/engine/arena/rotation/ArenaRotationLimits";
+import {arenasOfDay} from "@gunsmith/engine/arena/rotation/ArenasOfDay";
+import {BUILT_IN_ARENAS} from "@gunsmith/engine/arena/built-in/BuiltInArenas";
 import {arenaPlaysSince} from "@src/shared/accounts/arena-plays-since/ArenaPlaysSince";
 import {utcDay} from "@src/durable-objects/shared/utc/UtcDay";
 

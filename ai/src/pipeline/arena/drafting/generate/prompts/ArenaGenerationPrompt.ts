@@ -1,5 +1,5 @@
 import {SYSTEM_PROMPT_CANARY} from "@gunsmith/ai/pipeline/shared/canary/SystemPromptCanary";
-import {ARENA_LIMITS} from "@gunsmith/engine/arena-limits/ArenaLimits";
+import {ARENA_LIMITS} from "@gunsmith/engine/arena/limits/ArenaLimits";
 import {ARENA_NAME_LENGTH} from "@gunsmith/ai/pipeline/arena/limits/ArenaNameLength";
 import {EXAMPLE_ARENA} from "@gunsmith/ai/pipeline/arena/drafting/generate/prompts/example/ExampleArena";
 

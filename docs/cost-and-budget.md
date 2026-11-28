@@ -208,7 +208,7 @@ Per request: a rejection or a pre-check turn-away costs $0.00015 or nothing; an 
 
 ## Arenas with shapes and the code repair, measured 2026-11-20 (Haiku 5.5, arena and arena-submission specs, 3 trials, run by `ai` with the user's go, ceiling raised to $2)
 
-The arena specs (`AskingForAnArena`, `NotAnArenaRequest`, the three arena-submission specs) through the shipped pipeline: shapes format, the code repair (`engine/src/arena-repair/`), no hidden retries. 36 arena requests and 30 screening requests, 324 of 324 criteria passed, total **$0.0192** (the ledger moved $0.1213 to $0.1404). The call log (`paid-arena-calls-latest.jsonl`) gives, priced at the eval's Haiku constants (`HaikuCost.ts`):
+The arena specs (`AskingForAnArena`, `NotAnArenaRequest`, the three arena-submission specs) through the shipped pipeline: shapes format, the code repair (`engine/src/arena/repair/`), no hidden retries. 36 arena requests and 30 screening requests, 324 of 324 criteria passed, total **$0.0192** (the ledger moved $0.1213 to $0.1404). The call log (`paid-arena-calls-latest.jsonl`) gives, priced at the eval's Haiku constants (`HaikuCost.ts`):
 
 | Call | Calls | Cost (mean, largest) |
 | --- | --- | --- |

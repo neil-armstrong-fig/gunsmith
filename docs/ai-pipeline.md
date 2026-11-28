@@ -43,7 +43,7 @@ Geometry, stairs, spawn/pickup access and ring escape remain engine-owned validi
 
 ### Choosing the arena: the players pick, there is no AI judge
 
-**Decided by the user, 2026-11-18:** no model chooses the arena. Each player puts one forward, **a built-in or a saved arena** (made and screened in the workshop; the pre-round screening of typed prompts was deleted on 2026-11-25, the user, because the pre-round makes no model call). Both players then see both arenas and each picks an arena, picks nothing, or chooses random. `resolveArenaPicks` (`engine/src/arena-picking/`, pure, no model; moved from `ai/` on 2026-11-19) settles two choices; chance is drawn from the engine's `nextRandom` on a salted stream of its own.
+**Decided by the user, 2026-11-18:** no model chooses the arena. Each player puts one forward, **a built-in or a saved arena** (made and screened in the workshop; the pre-round screening of typed prompts was deleted on 2026-11-25, the user, because the pre-round makes no model call). Both players then see both arenas and each picks an arena, picks nothing, or chooses random. `resolveArenaPicks` (`engine/src/arena/picking/`, pure, no model; moved from `ai/` on 2026-11-19) settles two choices; chance is drawn from the engine's `nextRandom` on a salted stream of its own.
 
 | Player 1 | Player 2 | Played | `how` |
 | --- | --- | --- | --- |

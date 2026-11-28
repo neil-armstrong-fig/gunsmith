@@ -1,4 +1,4 @@
-import {BUILT_IN_WEAPONS} from "@gunsmith/engine/built-in-weapons/BuiltInWeapons";
+import {BUILT_IN_WEAPONS} from "@gunsmith/engine/weapon/built-in/BuiltInWeapons";
 import type {Weapon} from "@gunsmith/engine/weapon/types/Weapon";
 import type {ShownWeapon} from "@src/game/room-pre-round/types/ShownWeapon";
 import {FoldedOpponentWeapon} from "@src/react/components/dom/pre-round/components/room-choosing/components/room-weapon-step/components/weapon-locked-in/components/opponent-weapon/components/folded-opponent-weapon/FoldedOpponentWeapon";

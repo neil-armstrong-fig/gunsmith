@@ -1,5 +1,5 @@
 import {z} from "zod";
-import {STAT_NAMES} from "@gunsmith/engine/power-rating/types/StatName";
+import {STAT_NAMES} from "@gunsmith/engine/weapon/power-rating/types/StatName";
 
 const statList = z.array(z.enum(STAT_NAMES)).max(STAT_NAMES.length).default([]);
 

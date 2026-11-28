@@ -1,4 +1,4 @@
-import {STAT_RANGES} from "@gunsmith/engine/power-rating/ranges/StatRanges";
+import {STAT_RANGES} from "@gunsmith/engine/weapon/power-rating/ranges/StatRanges";
 import {z} from "zod";
 
 /**

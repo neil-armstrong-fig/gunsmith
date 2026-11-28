@@ -1,5 +1,5 @@
-import {chooseStartingPlaces} from "@gunsmith/engine/arena-symmetry/ChooseStartingPlaces";
-import type {StartingPlaces} from "@gunsmith/engine/arena-symmetry/types/StartingPlaces";
+import {chooseStartingPlaces} from "@gunsmith/engine/arena/symmetry/ChooseStartingPlaces";
+import type {StartingPlaces} from "@gunsmith/engine/arena/symmetry/types/StartingPlaces";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import {ArenaPreviewCanvas} from "@src/react/components/three/arena-preview-canvas/ArenaPreviewCanvas";
 import type {JSX} from "react";

@@ -1,4 +1,4 @@
-import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
+import {BUILT_IN_ARENAS} from "@gunsmith/engine/arena/built-in/BuiltInArenas";
 import type {ArenaEvalInput} from "@evals/dsl/arena/pipeline/types/ArenaEvalInput";
 import type {EvalScore} from "@evals/dsl/shared/types/EvalScore";
 

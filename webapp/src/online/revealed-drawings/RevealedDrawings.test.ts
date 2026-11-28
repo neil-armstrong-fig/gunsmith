@@ -1,4 +1,4 @@
-import {BUILT_IN_WEAPONS} from "@gunsmith/engine/built-in-weapons/BuiltInWeapons";
+import {BUILT_IN_WEAPONS} from "@gunsmith/engine/weapon/built-in/BuiltInWeapons";
 import type {Player} from "@gunsmith/engine/player/types/Player";
 import type {SeatView} from "@gunsmith/engine/seat/types/SeatView";
 import type {Weapon} from "@gunsmith/engine/weapon/types/Weapon";

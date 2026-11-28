@@ -1,7 +1,7 @@
 import {balanceWeaponDraft} from "@gunsmith/ai/pipeline/weapon/check/balance/BalanceWeaponDraft";
 import type {WeaponDraft} from "@gunsmith/ai/pipeline/weapon/draft/WeaponDraft";
-import {powerRatingOf} from "@gunsmith/engine/power-rating/PowerRatingOf";
-import {POWER_BUDGET} from "@gunsmith/engine/weapon-balance/limits/power-budget/PowerBudget";
+import {powerRatingOf} from "@gunsmith/engine/weapon/power-rating/PowerRatingOf";
+import {POWER_BUDGET} from "@gunsmith/engine/weapon/balance/limits/power-budget/PowerBudget";
 
 const RIFLE: WeaponDraft = {
   name: "Proof Rifle",

@@ -1,9 +1,9 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
-import {RIDGELINE_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/drawings/RidgelineBuiltInArena";
+import {RIDGELINE_BUILT_IN_ARENA} from "@gunsmith/engine/arena/built-in/drawings/RidgelineBuiltInArena";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
 import type {Polygon} from "@gunsmith/engine/geometry/types/Polygon";
-import {isInCone} from "@gunsmith/engine/vision/cone/IsInCone";
+import {isInCone} from "@gunsmith/engine/vision/sight/cone/IsInCone";
 import {hasClearSight} from "@gunsmith/engine/vision/sight/HasClearSight";
 import {visibleArea} from "@gunsmith/engine/vision/VisibleArea";
 import type {Cone} from "@gunsmith/engine/vision/types/Cone";

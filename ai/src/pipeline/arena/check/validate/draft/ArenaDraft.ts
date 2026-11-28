@@ -1,5 +1,5 @@
 import {z} from "zod";
-import {ARENA_LIMITS} from "@gunsmith/engine/arena-limits/ArenaLimits";
+import {ARENA_LIMITS} from "@gunsmith/engine/arena/limits/ArenaLimits";
 import {ARENA_NAME_LENGTH} from "@gunsmith/ai/pipeline/arena/limits/ArenaNameLength";
 
 /** Letters (any language) and digits, with spaces, apostrophes, hyphens and full stops inside. No markup, braces or backticks. */

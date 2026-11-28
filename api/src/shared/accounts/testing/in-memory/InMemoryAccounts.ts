@@ -1,4 +1,4 @@
-import type {ArenaPlays} from "@gunsmith/engine/arena-rotation/types/ArenaPlays";
+import type {ArenaPlays} from "@gunsmith/engine/arena/rotation/types/ArenaPlays";
 import type {AccountRemoval} from "@src/shared/accounts/types/AccountRemoval";
 import type {Account} from "@src/shared/accounts/types/Account";
 import {limitOfKind} from "@src/shared/accounts/limit-of-kind/LimitOfKind";

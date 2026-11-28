@@ -1,6 +1,6 @@
 import type {ArenaRelevance} from "@gunsmith/ai/pipeline/arena/types/ArenaRelevance";
 import type {ArenaValidationFailure} from "@gunsmith/ai/pipeline/arena/check/validate/types/ArenaValidationFailure";
-import type {ArenaProblemKind} from "@gunsmith/engine/arena-validation/types/ArenaProblemKind";
+import type {ArenaProblemKind} from "@gunsmith/engine/arena/validation/types/ArenaProblemKind";
 import {Annotation} from "@langchain/langgraph";
 import type {ArenaDrawing} from "@gunsmith/ai/pipeline/arena/types/ArenaDrawing";
 

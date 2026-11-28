@@ -1,7 +1,7 @@
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
 import {hasClearSight} from "@gunsmith/engine/vision/sight/HasClearSight";
-import {isInCone} from "@gunsmith/engine/vision/cone/IsInCone";
+import {isInCone} from "@gunsmith/engine/vision/sight/cone/IsInCone";
 import type {Cone} from "@gunsmith/engine/vision/types/Cone";
 
 /**

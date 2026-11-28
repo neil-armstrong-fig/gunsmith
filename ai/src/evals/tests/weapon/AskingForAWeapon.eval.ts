@@ -78,7 +78,7 @@ given("a player asks for a weapon whose look is described, so it must be drawn a
   });
 });
 
-// The stat balancer (`engine/src/weapon-balance/`, built 2026-11-15) and moderation's reading of a one-word request. A regression since
+// The stat balancer (`engine/src/weapon/balance/`, built 2026-11-15) and moderation's reading of a one-word request. A regression since
 // 2026-11-25: both held in 3 of 3 trials on Haiku 5.5, created with no repair. The big-magazine case is its own `given` below.
 given(
   "a player makes a request that depends on the newest behaviour: code balancing the stats, and moderation accepting one word",

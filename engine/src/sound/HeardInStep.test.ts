@@ -1,4 +1,4 @@
-import {HEARING_RANGES} from "@gunsmith/engine/sound/hearing/HearingRanges";
+import {HEARING_RANGES} from "@gunsmith/engine/sound/hearing/ranges/HearingRanges";
 import {heardInStep} from "@gunsmith/engine/sound/HeardInStep";
 import type {NoiseOfFighter} from "@gunsmith/engine/sound/types/NoiseOfFighter";
 

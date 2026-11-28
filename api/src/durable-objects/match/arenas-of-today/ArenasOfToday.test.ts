@@ -1,4 +1,4 @@
-import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
+import {BUILT_IN_ARENAS} from "@gunsmith/engine/arena/built-in/BuiltInArenas";
 import {testAccounts} from "@src/shared/accounts/testing/in-memory/TestAccounts";
 import {arenasOfToday} from "@src/durable-objects/match/arenas-of-today/ArenasOfToday";
 

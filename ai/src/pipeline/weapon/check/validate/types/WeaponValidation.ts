@@ -1,5 +1,5 @@
 import type {WeaponDraft} from "@gunsmith/ai/pipeline/weapon/draft/WeaponDraft";
-import type {StatPreference} from "@gunsmith/engine/weapon-balance/types/StatPreference";
+import type {StatPreference} from "@gunsmith/engine/weapon/balance/types/StatPreference";
 
 /**
  * What `validateWeaponDraft` answers: the weapon, parsed, with the player's stat preference beside it (empty when the model gave

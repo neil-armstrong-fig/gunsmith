@@ -1,8 +1,8 @@
 import type {HeardEvent} from "@gunsmith/engine/combat-events/types/HeardEvent";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
-import {sectorOf} from "@gunsmith/engine/sound/direction/SectorOf";
-import {HEARING_RANGES} from "@gunsmith/engine/sound/hearing/HearingRanges";
-import {loudnessOf} from "@gunsmith/engine/sound/loudness/LoudnessOf";
+import {sectorOf} from "@gunsmith/engine/sound/hearing/direction/SectorOf";
+import {HEARING_RANGES} from "@gunsmith/engine/sound/hearing/ranges/HearingRanges";
+import {loudnessOf} from "@gunsmith/engine/sound/hearing/loudness/LoudnessOf";
 import type {HeardSound} from "@gunsmith/engine/sound/types/HeardSound";
 
 /**

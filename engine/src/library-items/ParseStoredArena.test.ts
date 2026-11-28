@@ -1,5 +1,5 @@
-import {ARENA_LIMITS} from "@gunsmith/engine/arena-limits/ArenaLimits";
-import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
+import {ARENA_LIMITS} from "@gunsmith/engine/arena/limits/ArenaLimits";
+import {BUILT_IN_ARENAS} from "@gunsmith/engine/arena/built-in/BuiltInArenas";
 import {parseStoredArena} from "@gunsmith/engine/library-items/ParseStoredArena";
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 

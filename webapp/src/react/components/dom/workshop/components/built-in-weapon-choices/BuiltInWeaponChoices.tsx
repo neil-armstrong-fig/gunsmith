@@ -1,4 +1,4 @@
-import {BUILT_IN_WEAPONS} from "@gunsmith/engine/built-in-weapons/BuiltInWeapons";
+import {BUILT_IN_WEAPONS} from "@gunsmith/engine/weapon/built-in/BuiltInWeapons";
 import {useAccountLibraryStore} from "@src/store/account-library/UseAccountLibraryStore";
 import {useWorkshopStore} from "@src/store/workshop/UseWorkshopStore";
 import type {JSX} from "react";

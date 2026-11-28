@@ -1,4 +1,4 @@
-import type {StartingPlaces} from "@gunsmith/engine/arena-symmetry/types/StartingPlaces";
+import type {StartingPlaces} from "@gunsmith/engine/arena/symmetry/types/StartingPlaces";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import {ArenaPreview} from "@src/react/components/dom/arena-preview/ArenaPreview";
 import type {JSX, ReactNode, Ref} from "react";

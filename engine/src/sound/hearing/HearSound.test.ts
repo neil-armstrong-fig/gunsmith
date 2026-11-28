@@ -1,4 +1,4 @@
-import {HEARING_RANGES} from "@gunsmith/engine/sound/hearing/HearingRanges";
+import {HEARING_RANGES} from "@gunsmith/engine/sound/hearing/ranges/HearingRanges";
 import {hearSound} from "@gunsmith/engine/sound/hearing/HearSound";
 
 const LISTENER = {x: 10, y: 10};

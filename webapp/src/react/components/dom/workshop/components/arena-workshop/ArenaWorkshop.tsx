@@ -1,5 +1,5 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
-import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
+import {BUILT_IN_ARENAS} from "@gunsmith/engine/arena/built-in/BuiltInArenas";
 import {ArenaPreview} from "@src/react/components/dom/arena-preview/ArenaPreview";
 import {walkTheArena} from "@src/react/components/dom/workshop/arena-on-trial/WalkTheArena";
 import {ArenaPrompt} from "@src/react/components/dom/workshop/components/arena-workshop/components/arena-prompt/ArenaPrompt";

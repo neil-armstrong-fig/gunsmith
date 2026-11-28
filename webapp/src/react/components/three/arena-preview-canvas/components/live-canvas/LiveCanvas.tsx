@@ -1,4 +1,4 @@
-import type {StartingPlaces} from "@gunsmith/engine/arena-symmetry/types/StartingPlaces";
+import type {StartingPlaces} from "@gunsmith/engine/arena/symmetry/types/StartingPlaces";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import {Canvas} from "@react-three/fiber";
 import {CapturePicture} from "@src/react/components/three/arena-preview-canvas/components/live-canvas/components/capture-picture/CapturePicture";

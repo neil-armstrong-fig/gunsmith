@@ -1,5 +1,5 @@
-import {STAT_RANGES} from "@gunsmith/engine/power-rating/ranges/StatRanges";
-import {withinLimits} from "@gunsmith/engine/weapon-balance/limits/WithinLimits";
+import {STAT_RANGES} from "@gunsmith/engine/weapon/power-rating/ranges/StatRanges";
+import {withinLimits} from "@gunsmith/engine/weapon/balance/limits/WithinLimits";
 import type {Weapon} from "@gunsmith/engine/weapon/types/Weapon";
 import {RIFLE} from "@gunsmith/engine/weapon/weapons/Rifle";
 import {z} from "zod";

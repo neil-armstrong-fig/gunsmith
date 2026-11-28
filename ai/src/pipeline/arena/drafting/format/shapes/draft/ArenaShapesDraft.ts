@@ -1,5 +1,5 @@
 import {z} from "zod";
-import {ARENA_LIMITS} from "@gunsmith/engine/arena-limits/ArenaLimits";
+import {ARENA_LIMITS} from "@gunsmith/engine/arena/limits/ArenaLimits";
 
 const RECTANGLE_LIMIT = 60;
 

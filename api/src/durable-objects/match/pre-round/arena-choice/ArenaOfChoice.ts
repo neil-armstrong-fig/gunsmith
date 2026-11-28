@@ -1,5 +1,5 @@
-import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
-import type {BuiltInArena} from "@gunsmith/engine/built-in-arenas/types/BuiltInArena";
+import {BUILT_IN_ARENAS} from "@gunsmith/engine/arena/built-in/BuiltInArenas";
+import type {BuiltInArena} from "@gunsmith/engine/arena/built-in/types/BuiltInArena";
 import type {ChosenArena} from "@src/durable-objects/match/pre-round/types/ChosenArena";
 
 /** The arena a choice names: the built-in with that name (`undefined` if there is none) or the saved arena the room already checked. */

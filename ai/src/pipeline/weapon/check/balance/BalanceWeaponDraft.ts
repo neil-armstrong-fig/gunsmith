@@ -1,7 +1,7 @@
 import {clampToRanges} from "@gunsmith/ai/pipeline/weapon/check/balance/clamping/ClampToRanges";
 import type {WeaponDraft} from "@gunsmith/ai/pipeline/weapon/draft/WeaponDraft";
-import {balanceWeapon} from "@gunsmith/engine/weapon-balance/BalanceWeapon";
-import type {StatPreference} from "@gunsmith/engine/weapon-balance/types/StatPreference";
+import {balanceWeapon} from "@gunsmith/engine/weapon/balance/BalanceWeapon";
+import type {StatPreference} from "@gunsmith/engine/weapon/balance/types/StatPreference";
 
 /**
  * Brings a parsed weapon inside the engine's limits and hands it back with its name: first each stat to the end of its range if the

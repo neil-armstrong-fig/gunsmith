@@ -1,7 +1,7 @@
 import {isCover} from "@gunsmith/engine/arena/IsCover";
 import {levelOfTile} from "@gunsmith/engine/arena/LevelOfTile";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
-import {COVER_REACH_TILES} from "@gunsmith/engine/cover/CoverReach";
+import {COVER_REACH_TILES} from "@gunsmith/engine/cover/reach/CoverReach";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
 import {eyeLevelAt} from "@gunsmith/engine/height/EyeLevelAt";
 import {hasClearLine} from "@gunsmith/engine/vision/sight/HasClearLine";

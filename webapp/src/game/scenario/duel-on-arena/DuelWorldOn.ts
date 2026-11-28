@@ -1,4 +1,4 @@
-import {fairStart} from "@gunsmith/engine/arena-symmetry/FairStart";
+import {fairStart} from "@gunsmith/engine/arena/symmetry/FairStart";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import type {World} from "@gunsmith/engine/game-loop/types/World";
 import {startMatch} from "@gunsmith/engine/match/StartMatch";

@@ -1,6 +1,6 @@
 import type {WeaponDraft} from "@gunsmith/ai/pipeline/weapon/draft/WeaponDraft";
-import {STAT_RANGES} from "@gunsmith/engine/power-rating/ranges/StatRanges";
-import type {StatRange} from "@gunsmith/engine/power-rating/types/StatRange";
+import {STAT_RANGES} from "@gunsmith/engine/weapon/power-rating/ranges/StatRanges";
+import type {StatRange} from "@gunsmith/engine/weapon/power-rating/types/StatRange";
 
 /**
  * Brings each of the eight numbers to the end of its range when it is past it, on either side (the user's design, 2026-11-16: code clamps

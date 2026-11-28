@@ -1,6 +1,6 @@
 import {SYSTEM_PROMPT_CANARY} from "@gunsmith/ai/pipeline/shared/canary/SystemPromptCanary";
 import {WEAPON_LIMITS} from "@gunsmith/ai/pipeline/weapon/limits/WeaponLimits";
-import {STAT_NAMES} from "@gunsmith/engine/power-rating/types/StatName";
+import {STAT_NAMES} from "@gunsmith/engine/weapon/power-rating/types/StatName";
 
 /**
  * The weapon smith's instructions. The player's words never go in here: they arrive in a separate message, inside a `<request>`

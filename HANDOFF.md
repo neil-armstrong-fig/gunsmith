@@ -32,6 +32,14 @@ session names the item it takes from MVP-TODO.md.
 Record a request to another session, or a contract change others consume, here: who to whom, the date, and what is asked. Remove it once
 answered and built.
 
+- **2026-11-28, to ai and netcode (user request): engine's arena and weapon families moved under `arena/` and `weapon/`.**
+  `arena-limits/` → `arena/limits/`, `arena-picking/` → `arena/picking/`, `arena-repair/` → `arena/repair/`, `arena-rotation/` →
+  `arena/rotation/`, `arena-symmetry/` → `arena/symmetry/`, `arena-validation/` → `arena/validation/`, `built-in-arenas/` →
+  `arena/built-in/`, `weapon-balance/` → `weapon/balance/`, `power-rating/` → `weapon/power-rating/`, `built-in-weapons/` →
+  `weapon/built-in/`; file names are unchanged. After merging main, a type-check names any file of yours still on an old path:
+  rewrite only `@gunsmith/engine/<old>/` and `engine/src/<old>/` (api's own `durable-objects/match/arena-rotation/` stays).
+  `TODO-ai.md`, `TODO.md`'s ai row and `SessionDecisions.md` keep the old paths (yours to update, or history). Remove this once merged.
+
 ## Contracts between sessions
 
 | Contract | Current state / writer |

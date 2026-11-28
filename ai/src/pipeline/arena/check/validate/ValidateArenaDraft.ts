@@ -1,9 +1,9 @@
-import {validateArena} from "@gunsmith/engine/arena-validation/ValidateArena";
+import {validateArena} from "@gunsmith/engine/arena/validation/ValidateArena";
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import {arenaDraftSchema} from "@gunsmith/ai/pipeline/arena/check/validate/draft/ArenaDraft";
-import type {ArenaProblemKind} from "@gunsmith/engine/arena-validation/types/ArenaProblemKind";
-import {repairArena} from "@gunsmith/engine/arena-repair/RepairArena";
+import type {ArenaProblemKind} from "@gunsmith/engine/arena/validation/types/ArenaProblemKind";
+import {repairArena} from "@gunsmith/engine/arena/repair/RepairArena";
 import {rowLengthProblems} from "@gunsmith/ai/pipeline/arena/check/validate/row-lengths/RowLengthProblems";
 import {draftingKitOf} from "@gunsmith/ai/pipeline/arena/drafting/format/DraftingKitOf";
 import type {ArenaFormat} from "@gunsmith/ai/pipeline/arena/drafting/format/ArenaFormat";

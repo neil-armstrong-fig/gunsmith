@@ -1,4 +1,4 @@
-import {validateArena} from "@gunsmith/engine/arena-validation/ValidateArena";
+import {validateArena} from "@gunsmith/engine/arena/validation/ValidateArena";
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import type {ArenaEvalInput} from "@evals/dsl/arena/pipeline/types/ArenaEvalInput";

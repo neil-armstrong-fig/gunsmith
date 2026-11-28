@@ -1,6 +1,6 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import {coverBesideTarget} from "@gunsmith/engine/cover/CoverBesideTarget";
-import {COVER_REACH_TILES} from "@gunsmith/engine/cover/CoverReach";
+import {COVER_REACH_TILES} from "@gunsmith/engine/cover/reach/CoverReach";
 
 // One row of low ground, x 1 to 11, with a cover block at x 7 and a wall at x 3.
 const row = arenaFrom(["#############", "#..#...c....#", "#############"]);

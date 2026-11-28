@@ -1,4 +1,4 @@
-import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
+import {BUILT_IN_ARENAS} from "@gunsmith/engine/arena/built-in/BuiltInArenas";
 import {appearanceToDraw} from "@src/assets/weapon-drawings/appearance-to-draw/AppearanceToDraw";
 import {weaponAppearances} from "@src/assets/weapon-drawings/appearances/WeaponAppearances";
 import type {RevealReadout} from "@src/game/room-pre-round/types/RevealReadout";

@@ -1,7 +1,7 @@
-import {resolveArenaPicks} from "@gunsmith/engine/arena-picking/ResolveArenaPicks";
-import type {ArenaPick} from "@gunsmith/engine/arena-picking/types/ArenaPick";
-import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
-import {DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/DuelBuiltInArena";
+import {resolveArenaPicks} from "@gunsmith/engine/arena/picking/ResolveArenaPicks";
+import type {ArenaPick} from "@gunsmith/engine/arena/picking/types/ArenaPick";
+import {BUILT_IN_ARENAS} from "@gunsmith/engine/arena/built-in/BuiltInArenas";
+import {DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/arena/built-in/DuelBuiltInArena";
 import type {Seat} from "@gunsmith/engine/seat/types/Seat";
 import {arenaOfChoice} from "@src/durable-objects/match/pre-round/arena-choice/ArenaOfChoice";
 import {arenaViewOf} from "@src/durable-objects/match/pre-round/arena-choice/ArenaViewOf";

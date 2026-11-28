@@ -1,5 +1,5 @@
 import fc from "fast-check";
-import {anyArena} from "@gunsmith/engine/arena-validation/property-tests/arbitrary/AnyArena";
+import {anyArena} from "@gunsmith/engine/arena/validation/property-tests/arbitrary/AnyArena";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
 import {eyeLevelAt} from "@gunsmith/engine/height/EyeLevelAt";

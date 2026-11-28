@@ -1,6 +1,6 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
-import {DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/DuelBuiltInArena";
-import {FAIR_DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/FairDuelBuiltInArena";
+import {DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/arena/built-in/DuelBuiltInArena";
+import {FAIR_DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/arena/built-in/FairDuelBuiltInArena";
 import {duelWorldOn} from "@src/game/scenario/duel-on-arena/DuelWorldOn";
 
 const DUEL = arenaFrom(DUEL_BUILT_IN_ARENA.rows);

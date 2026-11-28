@@ -1,4 +1,4 @@
-import {BUILT_IN_WEAPONS} from "@gunsmith/engine/built-in-weapons/BuiltInWeapons";
+import {BUILT_IN_WEAPONS} from "@gunsmith/engine/weapon/built-in/BuiltInWeapons";
 import type {ShownWeapon} from "@src/game/room-pre-round/types/ShownWeapon";
 
 /** What a weapon the server showed is called on the screen: a built-in by the name the page's own list gives its key, a saved one by the name it was sent with. */

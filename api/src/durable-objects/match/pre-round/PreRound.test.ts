@@ -1,10 +1,10 @@
-import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
-import {DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/DuelBuiltInArena";
-import {FAIR_DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/FairDuelBuiltInArena";
+import {BUILT_IN_ARENAS} from "@gunsmith/engine/arena/built-in/BuiltInArenas";
+import {DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/arena/built-in/DuelBuiltInArena";
+import {FAIR_DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/arena/built-in/FairDuelBuiltInArena";
 import {MARKSMAN_RIFLE} from "@gunsmith/engine/weapon/weapons/MarksmanRifle";
 import {RIFLE} from "@gunsmith/engine/weapon/weapons/Rifle";
 import {SUBMACHINE_GUN} from "@gunsmith/engine/weapon/weapons/SubmachineGun";
-import type {BuiltInArena} from "@gunsmith/engine/built-in-arenas/types/BuiltInArena";
+import type {BuiltInArena} from "@gunsmith/engine/arena/built-in/types/BuiltInArena";
 import type {Seat} from "@gunsmith/engine/seat/types/Seat";
 import type {Weapon} from "@gunsmith/engine/weapon/types/Weapon";
 import {fallbackAppearance} from "@gunsmith/shared/appearance/fallback/FallbackAppearance";

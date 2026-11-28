@@ -1,4 +1,4 @@
-import type {BuiltInArena} from "@gunsmith/engine/built-in-arenas/types/BuiltInArena";
+import type {BuiltInArena} from "@gunsmith/engine/arena/built-in/types/BuiltInArena";
 
 /**
  * An arena a seat has put forward, as the room holds it: a built-in by name, or one of the seat's own saved arenas with its id (the

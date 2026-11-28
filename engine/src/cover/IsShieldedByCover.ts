@@ -1,6 +1,6 @@
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
 import {coverBesideTarget} from "@gunsmith/engine/cover/CoverBesideTarget";
-import {COVER_REACH_TILES} from "@gunsmith/engine/cover/CoverReach";
+import {COVER_REACH_TILES} from "@gunsmith/engine/cover/reach/CoverReach";
 import type {ShotTarget} from "@gunsmith/engine/cover/types/ShotTarget";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";
 

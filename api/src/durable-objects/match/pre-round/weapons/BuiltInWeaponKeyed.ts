@@ -1,4 +1,4 @@
-import {BUILT_IN_WEAPONS} from "@gunsmith/engine/built-in-weapons/BuiltInWeapons";
+import {BUILT_IN_WEAPONS} from "@gunsmith/engine/weapon/built-in/BuiltInWeapons";
 import type {Weapon} from "@gunsmith/engine/weapon/types/Weapon";
 
 /** The built-in weapon with this key, or `undefined` for anything else. */

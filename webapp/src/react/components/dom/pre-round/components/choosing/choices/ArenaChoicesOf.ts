@@ -1,5 +1,5 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
-import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
+import {BUILT_IN_ARENAS} from "@gunsmith/engine/arena/built-in/BuiltInArenas";
 import type {OfferedArena} from "@src/game/pre-round/types/OfferedArena";
 import type {ShelfArena} from "@src/store/shelf/arena/types/ShelfArena";
 

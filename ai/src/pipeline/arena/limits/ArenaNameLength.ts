@@ -1,4 +1,4 @@
-import type {LimitRange} from "@gunsmith/engine/arena-limits/types/LimitRange";
+import type {LimitRange} from "@gunsmith/engine/arena/limits/types/LimitRange";
 
 /**
  * How many characters a generated arena's name may have. The schema is built from it and the generation prompt quotes it, so the rule

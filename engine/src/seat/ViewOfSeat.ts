@@ -2,7 +2,7 @@ import type {World} from "@gunsmith/engine/game-loop/types/World";
 import {mirrorSeats} from "@gunsmith/engine/seat/mirroring/MirrorSeats";
 import type {Seat} from "@gunsmith/engine/seat/types/Seat";
 import type {SeatView} from "@gunsmith/engine/seat/types/SeatView";
-import {visibleToSeat} from "@gunsmith/engine/seat/VisibleToSeat";
+import {visibleToSeat} from "@gunsmith/engine/seat/visibility/VisibleToSeat";
 
 /**
  * What `seat` may be told about `world`: its own fighter, and the other fighter, the shots and the pickup only where

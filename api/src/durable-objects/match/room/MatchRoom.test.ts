@@ -1,7 +1,7 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
-import {fairStart} from "@gunsmith/engine/arena-symmetry/FairStart";
-import {SPAWN_SPACING_STEPS} from "@gunsmith/engine/arena-symmetry/SpawnSpacing";
-import {DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/DuelBuiltInArena";
+import {fairStart} from "@gunsmith/engine/arena/symmetry/FairStart";
+import {SPAWN_SPACING_STEPS} from "@gunsmith/engine/arena/symmetry/spawn-pairs/SpawnSpacing";
+import {DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/arena/built-in/DuelBuiltInArena";
 import type {CombatEvent} from "@gunsmith/engine/combat-events/types/CombatEvent";
 import type {Input} from "@gunsmith/engine/game-loop/types/Input";
 import type {Point} from "@gunsmith/engine/geometry/types/Point";

@@ -1,6 +1,6 @@
 import {generationFailureMessage} from "@src/account/generation/GenerationFailureMessage";
-import {ARENA_LIMITS} from "@gunsmith/engine/arena-limits/ArenaLimits";
-import {validateArena} from "@gunsmith/engine/arena-validation/ValidateArena";
+import {ARENA_LIMITS} from "@gunsmith/engine/arena/limits/ArenaLimits";
+import {validateArena} from "@gunsmith/engine/arena/validation/ValidateArena";
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
 import {accountUrl} from "@src/account/AccountUrl";
 import type {WorkshopArena} from "@src/store/workshop/arena/types/WorkshopArena";

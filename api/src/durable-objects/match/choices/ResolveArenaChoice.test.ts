@@ -1,4 +1,4 @@
-import {DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/built-in-arenas/DuelBuiltInArena";
+import {DUEL_BUILT_IN_ARENA} from "@gunsmith/engine/arena/built-in/DuelBuiltInArena";
 import {resolveArenaChoice} from "@src/durable-objects/match/choices/ResolveArenaChoice";
 import {keepItemFor} from "@src/durable-objects/match/choices/saved-item/testing/KeepItemFor";
 import {saveItemFor} from "@src/durable-objects/match/choices/saved-item/testing/SaveItemFor";

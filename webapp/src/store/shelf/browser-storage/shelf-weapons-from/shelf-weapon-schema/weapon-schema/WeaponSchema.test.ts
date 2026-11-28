@@ -1,4 +1,4 @@
-import {STAT_RANGES} from "@gunsmith/engine/power-rating/ranges/StatRanges";
+import {STAT_RANGES} from "@gunsmith/engine/weapon/power-rating/ranges/StatRanges";
 import {MARKSMAN_RIFLE} from "@gunsmith/engine/weapon/weapons/MarksmanRifle";
 import {RIFLE} from "@gunsmith/engine/weapon/weapons/Rifle";
 import {SUBMACHINE_GUN} from "@gunsmith/engine/weapon/weapons/SubmachineGun";

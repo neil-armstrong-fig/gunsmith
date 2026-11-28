@@ -1,10 +1,10 @@
 import fc from "fast-check";
 import {parseStoredArena} from "@gunsmith/engine/library-items/ParseStoredArena";
 import {parseStoredWeapon} from "@gunsmith/engine/library-items/ParseStoredWeapon";
-import {validateArena} from "@gunsmith/engine/arena-validation/ValidateArena";
-import {STAT_RANGES} from "@gunsmith/engine/power-rating/ranges/StatRanges";
-import type {WeaponStats} from "@gunsmith/engine/power-rating/types/WeaponStats";
-import {withinLimits} from "@gunsmith/engine/weapon-balance/limits/WithinLimits";
+import {validateArena} from "@gunsmith/engine/arena/validation/ValidateArena";
+import {STAT_RANGES} from "@gunsmith/engine/weapon/power-rating/ranges/StatRanges";
+import type {WeaponStats} from "@gunsmith/engine/weapon/power-rating/types/WeaponStats";
+import {withinLimits} from "@gunsmith/engine/weapon/balance/limits/WithinLimits";
 import {RIFLE} from "@gunsmith/engine/weapon/weapons/Rifle";
 
 /**

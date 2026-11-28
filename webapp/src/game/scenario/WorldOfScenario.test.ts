@@ -1,4 +1,4 @@
-import {chooseStartingPlaces} from "@gunsmith/engine/arena-symmetry/ChooseStartingPlaces";
+import {chooseStartingPlaces} from "@gunsmith/engine/arena/symmetry/ChooseStartingPlaces";
 import {isCover} from "@gunsmith/engine/arena/IsCover";
 import {isSolid} from "@gunsmith/engine/arena/IsSolid";
 import {levelOfTile} from "@gunsmith/engine/arena/LevelOfTile";

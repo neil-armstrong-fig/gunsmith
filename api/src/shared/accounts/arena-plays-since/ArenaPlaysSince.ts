@@ -1,4 +1,4 @@
-import type {ArenaPlays} from "@gunsmith/engine/arena-rotation/types/ArenaPlays";
+import type {ArenaPlays} from "@gunsmith/engine/arena/rotation/types/ArenaPlays";
 import {gte} from "drizzle-orm";
 import {database} from "@src/shared/accounts/Database";
 import {arenaPlays} from "@src/shared/accounts/schema/ArenaPlays";

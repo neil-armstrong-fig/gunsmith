@@ -1,4 +1,4 @@
-import type {ArenaProblemKind} from "@gunsmith/engine/arena-validation/types/ArenaProblemKind";
+import type {ArenaProblemKind} from "@gunsmith/engine/arena/validation/types/ArenaProblemKind";
 import type {ArenaValidationFailure} from "@gunsmith/ai/pipeline/arena/check/validate/types/ArenaValidationFailure";
 
 const OPENING = "We could not build a playable arena from that request:";
