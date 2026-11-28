@@ -1,5 +1,5 @@
-import {createSession} from "@src/accounts/create-session/CreateSession";
-import {findOrCreateAccount} from "@src/accounts/find-or-create-account/FindOrCreateAccount";
+import {createSession} from "@src/shared/accounts/create-session/CreateSession";
+import {findOrCreateAccount} from "@src/shared/accounts/find-or-create-account/FindOrCreateAccount";
 import {createHash} from "node:crypto";
 
 /**

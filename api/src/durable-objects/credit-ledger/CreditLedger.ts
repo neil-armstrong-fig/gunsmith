@@ -3,7 +3,7 @@ import {CreditAccount} from "@src/durable-objects/credit-ledger/account/CreditAc
 import type {CreditKind} from "@src/durable-objects/credit-ledger/types/CreditKind";
 import type {CreditAccountState} from "@src/durable-objects/credit-ledger/types/CreditAccountState";
 import type {ReserveOutcome} from "@src/durable-objects/credit-ledger/types/ReserveOutcome";
-import type {ApiWorkerEnvironment} from "@src/env/types/ApiWorkerEnvironment";
+import type {ApiWorkerEnvironment} from "@src/shared/env/types/ApiWorkerEnvironment";
 
 const ACCOUNT_KEY = "account";
 

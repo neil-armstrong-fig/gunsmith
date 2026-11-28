@@ -1,5 +1,5 @@
 import {signInRoute} from "@src/router/routes/sign-in/SignInRoute";
-import {testGoogle} from "@src/sign-in/testing/TestGoogle";
+import {testGoogle} from "@src/router/routes/sign-in/google/testing/TestGoogle";
 
 it("starts a sign-in for a request to the sign-in address", async () => {
   const response = await signInRoute(

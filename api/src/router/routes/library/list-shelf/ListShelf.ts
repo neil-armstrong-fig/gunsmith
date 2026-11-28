@@ -1,5 +1,5 @@
-import {savedItemsOfAccount} from "@src/accounts/saved-items-of-account/SavedItemsOfAccount";
-import type {SavedItem} from "@src/accounts/types/SavedItem";
+import {savedItemsOfAccount} from "@src/shared/accounts/saved-items-of-account/SavedItemsOfAccount";
+import type {SavedItem} from "@src/shared/accounts/types/SavedItem";
 import {SHELF_LIMITS} from "@src/router/routes/library/limits/ShelfLimits";
 import type {ShelfAnswer} from "@src/router/routes/library/types/ShelfAnswer";
 import type {ShelfItemAnswer} from "@src/router/routes/library/types/ShelfItemAnswer";

@@ -1,4 +1,4 @@
-import {workerEnvironment} from "@src/env/WorkerEnvironment";
+import {workerEnvironment} from "@src/shared/env/WorkerEnvironment";
 import {isSubjectDigestConfigured} from "@src/router/routes/shared/subject-digest/IsSubjectDigestConfigured";
 
 it("is true when a key is set", () => {

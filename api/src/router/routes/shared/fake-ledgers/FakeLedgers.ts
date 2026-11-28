@@ -1,4 +1,4 @@
-import {workerEnvironment} from "@src/env/WorkerEnvironment";
+import {workerEnvironment} from "@src/shared/env/WorkerEnvironment";
 import {fakeCreditLedger} from "@src/router/routes/shared/fake-ledgers/credit/FakeCreditLedger";
 import {fakeSpendLedger} from "@src/router/routes/shared/fake-ledgers/spend/FakeSpendLedger";
 import type {FakeLedgers} from "@src/router/routes/shared/fake-ledgers/types/FakeLedgers";

@@ -10,14 +10,14 @@ export const PROPERTY_TESTS = [
   "src/router/routes/*/property-tests/**/*Invariants.test.ts",
 ];
 
-/** `cloudflare:workers` is the Workers runtime's own module: in a test it is a stub whose `env` the tests fill (`src/env/testing/`). */
+/** `cloudflare:workers` is the Workers runtime's own module: in a test it is a stub whose `env` the tests fill (`src/shared/env/testing/`). */
 export const API_RESOLVE = {
   tsconfigPaths: true,
-  alias: {"cloudflare:workers": `${import.meta.dirname}/src/env/testing/CloudflareWorkersStub.ts`},
+  alias: {"cloudflare:workers": `${import.meta.dirname}/src/shared/env/testing/CloudflareWorkersStub.ts`},
 };
 
-/** What runs before every test file: clears the Worker's bindings, installs the mocks (`src/testing/SetupApiTests.ts`). */
-export const API_SETUP_FILES = ["./src/testing/SetupApiTests.ts"];
+/** What runs before every test file: clears the Worker's bindings, installs the mocks (`src/shared/testing/SetupApiTests.ts`). */
+export const API_SETUP_FILES = ["./src/shared/testing/SetupApiTests.ts"];
 
 /**
  * Plain node, as janggi's API: `@cloudflare/vitest-pool-workers` peers on vitest 4 and this workspace is on 5. What the Worker

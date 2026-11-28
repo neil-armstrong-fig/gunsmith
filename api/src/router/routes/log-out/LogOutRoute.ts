@@ -1,4 +1,4 @@
-import {deleteSession} from "@src/accounts/delete-session/DeleteSession";
+import {deleteSession} from "@src/shared/accounts/delete-session/DeleteSession";
 import {clearedSessionCookie} from "@src/router/routes/shared/session/ClearedSessionCookie";
 import {hashSessionToken} from "@src/router/routes/shared/session/HashSessionToken";
 import {sessionTokenFrom} from "@src/router/routes/shared/session/SessionTokenFrom";

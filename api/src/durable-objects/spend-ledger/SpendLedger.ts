@@ -7,7 +7,7 @@ import type {AiStatus} from "@src/durable-objects/spend-ledger/types/AiStatus";
 import type {SpendCaps} from "@src/durable-objects/spend-ledger/types/SpendCaps";
 import type {SpendMeterState} from "@src/durable-objects/spend-ledger/types/SpendMeterState";
 import type {SpendOutcome} from "@src/durable-objects/spend-ledger/types/SpendOutcome";
-import type {ApiWorkerEnvironment} from "@src/env/types/ApiWorkerEnvironment";
+import type {ApiWorkerEnvironment} from "@src/shared/env/types/ApiWorkerEnvironment";
 
 const METER_KEY = "meter";
 

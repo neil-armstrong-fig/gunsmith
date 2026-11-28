@@ -1,4 +1,4 @@
-import {workerEnvironment} from "@src/env/WorkerEnvironment";
+import {workerEnvironment} from "@src/shared/env/WorkerEnvironment";
 
 /** Whether the Worker has an arena pipeline to run: once the `ANTHROPIC_API_KEY` secret is set (see `IsWeaponPipelineAvailable`). Tests mock this module. */
 export function isArenaPipelineAvailable(): boolean {

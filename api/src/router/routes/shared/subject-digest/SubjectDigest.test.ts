@@ -1,4 +1,4 @@
-import {workerEnvironment} from "@src/env/WorkerEnvironment";
+import {workerEnvironment} from "@src/shared/env/WorkerEnvironment";
 import {subjectDigest} from "@src/router/routes/shared/subject-digest/SubjectDigest";
 import {createHmac} from "node:crypto";
 

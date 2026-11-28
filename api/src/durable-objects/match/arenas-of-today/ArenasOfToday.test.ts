@@ -1,5 +1,5 @@
 import {BUILT_IN_ARENAS} from "@gunsmith/engine/built-in-arenas/BuiltInArenas";
-import {testAccounts} from "@src/accounts/testing/in-memory/TestAccounts";
+import {testAccounts} from "@src/shared/accounts/testing/in-memory/TestAccounts";
 import {arenasOfToday} from "@src/durable-objects/match/arenas-of-today/ArenasOfToday";
 
 const NOW = Date.parse("2026-11-24T15:00:00Z");

@@ -1,10 +1,10 @@
-import {workerEnvironment} from "@src/env/WorkerEnvironment";
+import {workerEnvironment} from "@src/shared/env/WorkerEnvironment";
 import {isArenaPipelineAvailable} from "@src/router/routes/arenas/pipeline/IsArenaPipelineAvailable";
 import {isWeaponPipelineAvailable} from "@src/router/routes/weapons/pipeline/IsWeaponPipelineAvailable";
 import {handleApiRequest} from "@src/router/HandleApiRequest";
 import {signInPlayer} from "@src/router/routes/shared/fake-accounts/SignInPlayer";
 import {fakeLedgers} from "@src/router/routes/shared/fake-ledgers/FakeLedgers";
-import {testGoogle} from "@src/sign-in/testing/TestGoogle";
+import {testGoogle} from "@src/router/routes/sign-in/google/testing/TestGoogle";
 import {oauthCookie} from "@src/router/routes/sign-in/start/oauth-cookie/OAuthCookie";
 
 it("allows the webapp's credentialed request to the API hostname", async () => {

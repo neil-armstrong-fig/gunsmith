@@ -1,5 +1,5 @@
-import {removeAccount} from "@src/accounts/remove-account/RemoveAccount";
-import {eraseExpiredCredits} from "@src/account-retention/EraseExpiredCredits";
+import {removeAccount} from "@src/shared/accounts/remove-account/RemoveAccount";
+import {eraseExpiredCredits} from "@src/shared/account-retention/EraseExpiredCredits";
 import {DELETED_ACCOUNT_RETENTION_DAYS} from "@src/router/routes/account/retention/DeletedAccountRetention";
 import {accountOfRequest} from "@src/router/routes/shared/session/AccountOfRequest";
 import {clearedSessionCookie} from "@src/router/routes/shared/session/ClearedSessionCookie";

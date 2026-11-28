@@ -1,5 +1,5 @@
-import {keepGenerationAttempt} from "@src/accounts/keep-generation-attempt/KeepGenerationAttempt";
-import type {GenerationAttempt} from "@src/accounts/types/GenerationAttempt";
+import {keepGenerationAttempt} from "@src/shared/accounts/keep-generation-attempt/KeepGenerationAttempt";
+import type {GenerationAttempt} from "@src/shared/accounts/types/GenerationAttempt";
 import type {AttemptOutcome} from "@src/router/routes/shared/generation-history/types/AttemptOutcome";
 import type {CompletedGenerationAttempt} from "@src/router/routes/shared/generation-history/types/CompletedGenerationAttempt";
 import type {GenerationHistoryRequest} from "@src/router/routes/shared/generation-history/types/GenerationHistoryRequest";

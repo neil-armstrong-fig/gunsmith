@@ -1,6 +1,6 @@
-import {savedItemsOfAccount} from "@src/accounts/saved-items-of-account/SavedItemsOfAccount";
-import type {ItemKind} from "@src/accounts/types/ItemKind";
-import type {SavedItem} from "@src/accounts/types/SavedItem";
+import {savedItemsOfAccount} from "@src/shared/accounts/saved-items-of-account/SavedItemsOfAccount";
+import type {ItemKind} from "@src/shared/accounts/types/ItemKind";
+import type {SavedItem} from "@src/shared/accounts/types/SavedItem";
 
 /**
  * One item on the account's own shelf, by id and kind, or `undefined`. The shelf holds only what the account saved, so another

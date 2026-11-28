@@ -1,5 +1,5 @@
-import {keepGeneratedItem} from "@src/accounts/keep-generated-item/KeepGeneratedItem";
-import type {ItemKind} from "@src/accounts/types/ItemKind";
+import {keepGeneratedItem} from "@src/shared/accounts/keep-generated-item/KeepGeneratedItem";
+import type {ItemKind} from "@src/shared/accounts/types/ItemKind";
 
 /** For a library test: makes the account own a kept item as a generation route would have, weapons with a drawing, arenas with rows. */
 export async function keepItem(accountId: string, id: string, kind: ItemKind): Promise<void> {

@@ -1,4 +1,4 @@
-import {saveItem} from "@src/accounts/save-item/SaveItem";
+import {saveItem} from "@src/shared/accounts/save-item/SaveItem";
 import {SHELF_LIMITS} from "@src/router/routes/library/limits/ShelfLimits";
 import {keepItem} from "@src/router/routes/library/testing/KeepItem";
 import type {ItemToSave} from "@src/router/routes/library/testing/types/ItemToSave";

@@ -1,4 +1,4 @@
-import type {GenerationAttempt} from "@src/accounts/types/GenerationAttempt";
+import type {GenerationAttempt} from "@src/shared/accounts/types/GenerationAttempt";
 import type {AttemptOutcome} from "@src/router/routes/shared/generation-history/types/AttemptOutcome";
 import type {CreditReservation} from "@src/router/routes/shared/types/CreditReservation";
 

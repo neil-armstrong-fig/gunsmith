@@ -1,6 +1,6 @@
-import {createSession} from "@src/accounts/create-session/CreateSession";
-import {findOrCreateAccount} from "@src/accounts/find-or-create-account/FindOrCreateAccount";
-import type {Account} from "@src/accounts/types/Account";
+import {createSession} from "@src/shared/accounts/create-session/CreateSession";
+import {findOrCreateAccount} from "@src/shared/accounts/find-or-create-account/FindOrCreateAccount";
+import type {Account} from "@src/shared/accounts/types/Account";
 import {hashSessionToken} from "@src/router/routes/shared/session/HashSessionToken";
 import {randomToken} from "@src/router/routes/shared/session/RandomToken";
 import {SESSION_COOKIE_NAME} from "@src/router/routes/shared/session/SessionCookieName";

@@ -1,4 +1,4 @@
-import {testAccounts} from "@src/accounts/testing/in-memory/TestAccounts";
+import {testAccounts} from "@src/shared/accounts/testing/in-memory/TestAccounts";
 import {logOutRoute} from "@src/router/routes/log-out/LogOutRoute";
 import {signInPlayer} from "@src/router/routes/shared/fake-accounts/SignInPlayer";
 import {accountOfRequest} from "@src/router/routes/shared/session/AccountOfRequest";

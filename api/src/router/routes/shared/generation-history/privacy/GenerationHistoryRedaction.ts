@@ -1,5 +1,5 @@
 import {redactPersonalInformation} from "@src/router/routes/shared/generation-history/privacy/redaction/RedactPersonalInformation";
-import {workerEnvironment} from "@src/env/WorkerEnvironment";
+import {workerEnvironment} from "@src/shared/env/WorkerEnvironment";
 import type {GenerationHistoryRedaction} from "@src/router/routes/shared/generation-history/types/GenerationHistoryRedaction";
 
 /**

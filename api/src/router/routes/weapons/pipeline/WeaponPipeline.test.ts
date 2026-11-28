@@ -2,7 +2,7 @@ import {createWeaponModels} from "@gunsmith/ai/adapter/weapon/CreateWeaponModels
 import type {WeaponModels} from "@gunsmith/ai/adapter/weapon/types/WeaponModels";
 import {generateWeapon} from "@gunsmith/ai/pipeline/weapon/GenerateWeapon";
 import type {WeaponOutcome} from "@gunsmith/ai/pipeline/weapon/types/WeaponOutcome";
-import {workerEnvironment} from "@src/env/WorkerEnvironment";
+import {workerEnvironment} from "@src/shared/env/WorkerEnvironment";
 import {isWeaponPipelineAvailable} from "@src/router/routes/weapons/pipeline/IsWeaponPipelineAvailable";
 import {runWeaponPipeline} from "@src/router/routes/weapons/pipeline/RunWeaponPipeline";
 

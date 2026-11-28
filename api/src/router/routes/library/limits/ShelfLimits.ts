@@ -1,4 +1,4 @@
-import type {ShelfLimits} from "@src/accounts/types/ShelfLimits";
+import type {ShelfLimits} from "@src/shared/accounts/types/ShelfLimits";
 
 /**
  * How many weapons and arenas one account may keep on its shelf (the user's numbers, 2026-11-19). A tunable set by play and the

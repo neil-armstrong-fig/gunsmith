@@ -1,3 +1,3 @@
-import type {GenerationAttempt} from "@src/accounts/types/GenerationAttempt";
+import type {GenerationAttempt} from "@src/shared/accounts/types/GenerationAttempt";
 
 export type AttemptOutcome = Pick<GenerationAttempt, "outcome" | "failureStage" | "failureReason">;

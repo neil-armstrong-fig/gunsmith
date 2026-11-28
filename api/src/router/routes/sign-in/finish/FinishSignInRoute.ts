@@ -1,7 +1,7 @@
-import {claimDeletedAccountId} from "@src/accounts/claim-deleted-account-id/ClaimDeletedAccountId";
-import {createSession} from "@src/accounts/create-session/CreateSession";
-import {findOrCreateAccount} from "@src/accounts/find-or-create-account/FindOrCreateAccount";
-import {workerEnvironment} from "@src/env/WorkerEnvironment";
+import {claimDeletedAccountId} from "@src/shared/accounts/claim-deleted-account-id/ClaimDeletedAccountId";
+import {createSession} from "@src/shared/accounts/create-session/CreateSession";
+import {findOrCreateAccount} from "@src/shared/accounts/find-or-create-account/FindOrCreateAccount";
+import {workerEnvironment} from "@src/shared/env/WorkerEnvironment";
 import {generatedDisplayName} from "@src/router/routes/sign-in/finish/generated-display-name/GeneratedDisplayName";
 import {logSignInFailure} from "@src/router/routes/sign-in/finish/failure-log/LogSignInFailure";
 import type {SignInFailure} from "@src/router/routes/sign-in/finish/types/SignInFailure";
@@ -17,8 +17,8 @@ import {hashSessionToken} from "@src/router/routes/shared/session/HashSessionTok
 import {randomToken} from "@src/router/routes/shared/session/RandomToken";
 import {sessionCookie} from "@src/router/routes/sign-in/finish/session-cookie/SessionCookie";
 import {SESSION_LIFETIME_SECONDS} from "@src/router/routes/sign-in/finish/session-cookie/SessionLifetime";
-import {googleSubjectOf} from "@src/sign-in/GoogleSubjectOf";
-import {isGoogleConfigured} from "@src/sign-in/IsGoogleConfigured";
+import {googleSubjectOf} from "@src/router/routes/sign-in/google/GoogleSubjectOf";
+import {isGoogleConfigured} from "@src/router/routes/sign-in/google/IsGoogleConfigured";
 
 /**
  * `GET /api/auth/google/callback`: where Google sends the player back. Checks the `state` against the attempt kept in the cookie,

@@ -1,4 +1,4 @@
-import {saveItem} from "@src/accounts/save-item/SaveItem";
+import {saveItem} from "@src/shared/accounts/save-item/SaveItem";
 import {keepItemFor} from "@src/durable-objects/match/choices/saved-item/testing/KeepItemFor";
 import type {ItemOfAccount} from "@src/durable-objects/match/choices/saved-item/testing/types/ItemOfAccount";
 import {SHELF_LIMITS} from "@src/router/routes/library/limits/ShelfLimits";

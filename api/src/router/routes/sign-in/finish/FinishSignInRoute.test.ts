@@ -1,10 +1,10 @@
-import {testAccounts} from "@src/accounts/testing/in-memory/TestAccounts";
-import {workerEnvironment} from "@src/env/WorkerEnvironment";
-import {testGoogle} from "@src/sign-in/testing/TestGoogle";
+import {testAccounts} from "@src/shared/accounts/testing/in-memory/TestAccounts";
+import {workerEnvironment} from "@src/shared/env/WorkerEnvironment";
+import {testGoogle} from "@src/router/routes/sign-in/google/testing/TestGoogle";
 import {finishSignInRoute} from "@src/router/routes/sign-in/finish/FinishSignInRoute";
 import {oauthCookie} from "@src/router/routes/sign-in/start/oauth-cookie/OAuthCookie";
 import type {OAuthAttempt} from "@src/router/routes/sign-in/oauth/types/OAuthAttempt";
-import type {ApiWorkerEnvironment} from "@src/env/types/ApiWorkerEnvironment";
+import type {ApiWorkerEnvironment} from "@src/shared/env/types/ApiWorkerEnvironment";
 import {accountOfRequest} from "@src/router/routes/shared/session/AccountOfRequest";
 import {subjectDigest} from "@src/router/routes/shared/subject-digest/SubjectDigest";
 

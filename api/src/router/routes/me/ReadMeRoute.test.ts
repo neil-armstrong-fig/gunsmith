@@ -1,4 +1,4 @@
-import {testAccounts} from "@src/accounts/testing/in-memory/TestAccounts";
+import {testAccounts} from "@src/shared/accounts/testing/in-memory/TestAccounts";
 import {readMeRoute} from "@src/router/routes/me/ReadMeRoute";
 import {signInPlayer} from "@src/router/routes/shared/fake-accounts/SignInPlayer";
 

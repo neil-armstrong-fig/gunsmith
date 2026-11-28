@@ -1,7 +1,7 @@
 import {createWeaponModels} from "@gunsmith/ai/adapter/weapon/CreateWeaponModels";
 import {generateWeapon} from "@gunsmith/ai/pipeline/weapon/GenerateWeapon";
 import type {WeaponOutcome} from "@gunsmith/ai/pipeline/weapon/types/WeaponOutcome";
-import {workerEnvironment} from "@src/env/WorkerEnvironment";
+import {workerEnvironment} from "@src/shared/env/WorkerEnvironment";
 
 /**
  * Turns a player's words into a weapon outcome: `@gunsmith/ai`'s `generateWeapon` with models built, for this request, from the

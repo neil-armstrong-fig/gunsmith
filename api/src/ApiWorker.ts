@@ -1,6 +1,6 @@
-import {eraseExpiredGenerationAttempts} from "@src/account-retention/EraseExpiredGenerationAttempts";
-import {eraseExpiredCredits} from "@src/account-retention/EraseExpiredCredits";
-import type {ApiWorkerEnvironment} from "@src/env/types/ApiWorkerEnvironment";
+import {eraseExpiredGenerationAttempts} from "@src/shared/account-retention/EraseExpiredGenerationAttempts";
+import {eraseExpiredCredits} from "@src/shared/account-retention/EraseExpiredCredits";
+import type {ApiWorkerEnvironment} from "@src/shared/env/types/ApiWorkerEnvironment";
 import {handleApiRequest} from "@src/router/HandleApiRequest";
 
 /** The Worker's front door: wiring only, so it is not unit tested. What it answers is `router/HandleApiRequest`. */

@@ -1,4 +1,4 @@
-import {workerEnvironment} from "@src/env/WorkerEnvironment";
+import {workerEnvironment} from "@src/shared/env/WorkerEnvironment";
 import {corsHeadersFor} from "@src/router/cors/CorsHeadersFor";
 import {isForgedRequest} from "@src/router/origin-check/IsForgedRequest";
 import {deleteAccountRoute} from "@src/router/routes/account/DeleteAccountRoute";

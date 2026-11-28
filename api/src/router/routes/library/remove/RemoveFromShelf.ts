@@ -1,4 +1,4 @@
-import {unsaveItem} from "@src/accounts/unsave-item/UnsaveItem";
+import {unsaveItem} from "@src/shared/accounts/unsave-item/UnsaveItem";
 
 /**
  * `DELETE /api/library/<id>`: takes one of the account's items off its shelf and frees the place. The item stays kept, so its id still

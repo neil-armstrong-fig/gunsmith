@@ -1,12 +1,12 @@
-import {workerEnvironment} from "@src/env/WorkerEnvironment";
+import {workerEnvironment} from "@src/shared/env/WorkerEnvironment";
 import {googleRedirectUri} from "@src/router/routes/sign-in/redirect/GoogleRedirectUri";
 import {loginAllowed} from "@src/router/routes/sign-in/login-limit/LoginAllowed";
 import {oauthCookie} from "@src/router/routes/sign-in/start/oauth-cookie/OAuthCookie";
 import {respondRedirect} from "@src/router/routes/sign-in/redirect/RespondRedirect";
 import {returnAddress} from "@src/router/routes/sign-in/redirect/ReturnAddress";
 import {randomToken} from "@src/router/routes/shared/session/RandomToken";
-import {googleAuthorizationUrl} from "@src/sign-in/GoogleAuthorizationUrl";
-import {isGoogleConfigured} from "@src/sign-in/IsGoogleConfigured";
+import {googleAuthorizationUrl} from "@src/router/routes/sign-in/google/GoogleAuthorizationUrl";
+import {isGoogleConfigured} from "@src/router/routes/sign-in/google/IsGoogleConfigured";
 
 /**
  * `GET /api/auth/google?return=<page>`: begins a sign-in. Chooses a random `state` and PKCE verifier, keeps them with the checked

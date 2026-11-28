@@ -1,7 +1,7 @@
-import {workerEnvironment} from "@src/env/WorkerEnvironment";
+import {workerEnvironment} from "@src/shared/env/WorkerEnvironment";
 import {isFriendCode} from "@gunsmith/shared/online/friend-code/IsFriendCode";
 import {accountOfRequest} from "@src/router/routes/shared/session/AccountOfRequest";
-import {SEAT_ACCOUNT_HEADER} from "@src/seat-account/SeatAccountHeader";
+import {SEAT_ACCOUNT_HEADER} from "@src/shared/seat-account/SeatAccountHeader";
 
 /**
  * `GET /api/rooms/<code>/socket` with a WebSocket upgrade: hands the request to the `Match` Durable Object named by the friend code,

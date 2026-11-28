@@ -1,5 +1,5 @@
-import {accountOfSession} from "@src/accounts/account-of-session/AccountOfSession";
-import type {Account} from "@src/accounts/types/Account";
+import {accountOfSession} from "@src/shared/accounts/account-of-session/AccountOfSession";
+import type {Account} from "@src/shared/accounts/types/Account";
 import {hashSessionToken} from "@src/router/routes/shared/session/HashSessionToken";
 import {sessionTokenFrom} from "@src/router/routes/shared/session/SessionTokenFrom";
 

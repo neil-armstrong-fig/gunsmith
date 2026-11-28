@@ -1,4 +1,4 @@
-import {workerEnvironment} from "@src/env/WorkerEnvironment";
+import {workerEnvironment} from "@src/shared/env/WorkerEnvironment";
 import {isTrustedOrigin} from "@src/router/routes/shared/origin/IsTrustedOrigin";
 
 export function corsHeadersFor(request: Request): Headers {

@@ -1,7 +1,7 @@
 import fc from "fast-check";
-import {testAccounts} from "@src/accounts/testing/in-memory/TestAccounts";
-import {limitOfKind} from "@src/accounts/limit-of-kind/LimitOfKind";
-import type {ItemKind} from "@src/accounts/types/ItemKind";
+import {testAccounts} from "@src/shared/accounts/testing/in-memory/TestAccounts";
+import {limitOfKind} from "@src/shared/accounts/limit-of-kind/LimitOfKind";
+import type {ItemKind} from "@src/shared/accounts/types/ItemKind";
 import {libraryRoute} from "@src/router/routes/library/LibraryRoute";
 import {SHELF_LIMITS} from "@src/router/routes/library/limits/ShelfLimits";
 import {keepItem} from "@src/router/routes/library/testing/KeepItem";

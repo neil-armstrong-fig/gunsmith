@@ -1,5 +1,5 @@
-import {testAccounts} from "@src/accounts/testing/in-memory/TestAccounts";
-import {workerEnvironment} from "@src/env/WorkerEnvironment";
+import {testAccounts} from "@src/shared/accounts/testing/in-memory/TestAccounts";
+import {workerEnvironment} from "@src/shared/env/WorkerEnvironment";
 import {deleteAccountRoute} from "@src/router/routes/account/DeleteAccountRoute";
 import {DELETED_ACCOUNT_RETENTION_DAYS} from "@src/router/routes/account/retention/DeletedAccountRetention";
 import {DAILY_CREDITS} from "@src/durable-objects/credit-ledger/account/DailyCredits";

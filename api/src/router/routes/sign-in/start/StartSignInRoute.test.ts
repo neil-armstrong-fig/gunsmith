@@ -1,8 +1,8 @@
-import {workerEnvironment} from "@src/env/WorkerEnvironment";
-import {testGoogle} from "@src/sign-in/testing/TestGoogle";
+import {workerEnvironment} from "@src/shared/env/WorkerEnvironment";
+import {testGoogle} from "@src/router/routes/sign-in/google/testing/TestGoogle";
 import {oauthAttemptFrom} from "@src/router/routes/sign-in/finish/oauth-cookie/OAuthAttemptFrom";
 import {startSignInRoute} from "@src/router/routes/sign-in/start/StartSignInRoute";
-import type {ApiWorkerEnvironment} from "@src/env/types/ApiWorkerEnvironment";
+import type {ApiWorkerEnvironment} from "@src/shared/env/types/ApiWorkerEnvironment";
 
 describe("with Google set up and the limiter letting the player in", () => {
   it("sends the player to the address Google's client built, with state and a verifier of the route's own making", async () => {

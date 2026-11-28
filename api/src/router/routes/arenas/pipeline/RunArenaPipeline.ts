@@ -2,7 +2,7 @@ import type {ArenaStyle} from "@gunsmith/shared/arena-style/ArenaStyle";
 import {createArenaModels} from "@gunsmith/ai/adapter/arena/CreateArenaModels";
 import {generateArena} from "@gunsmith/ai/pipeline/arena/GenerateArena";
 import type {ArenaOutcome} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcome";
-import {workerEnvironment} from "@src/env/WorkerEnvironment";
+import {workerEnvironment} from "@src/shared/env/WorkerEnvironment";
 
 /**
  * Turns a player's words into an arena outcome: `@gunsmith/ai`'s `generateArena` with models built, for this request, from the

@@ -2,7 +2,7 @@ import {createArenaModels} from "@gunsmith/ai/adapter/arena/CreateArenaModels";
 import type {ArenaModels} from "@gunsmith/ai/adapter/arena/types/ArenaModels";
 import {generateArena} from "@gunsmith/ai/pipeline/arena/GenerateArena";
 import type {ArenaOutcome} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcome";
-import {workerEnvironment} from "@src/env/WorkerEnvironment";
+import {workerEnvironment} from "@src/shared/env/WorkerEnvironment";
 import {isArenaPipelineAvailable} from "@src/router/routes/arenas/pipeline/IsArenaPipelineAvailable";
 import {runArenaPipeline} from "@src/router/routes/arenas/pipeline/RunArenaPipeline";
 

@@ -1,5 +1,5 @@
 import type {Seat} from "@gunsmith/engine/seat/types/Seat";
-import {countArenaPlay} from "@src/accounts/count-arena-play/CountArenaPlay";
+import {countArenaPlay} from "@src/shared/accounts/count-arena-play/CountArenaPlay";
 import {parseArenaRotation} from "@src/durable-objects/match/arena-rotation/ParseArenaRotation";
 import {arenasOfToday} from "@src/durable-objects/match/arenas-of-today/ArenasOfToday";
 import {resolveArenaChoice} from "@src/durable-objects/match/choices/ResolveArenaChoice";
@@ -17,7 +17,7 @@ import {MATCH_TICK} from "@src/durable-objects/match/tick/MatchTick";
 import {parseStartSeed} from "@src/durable-objects/match/start-seed/ParseStartSeed";
 import {stepsOwed} from "@src/durable-objects/match/tick/StepsOwed";
 import {utcDay} from "@src/durable-objects/shared/utc/UtcDay";
-import {SEAT_ACCOUNT_HEADER} from "@src/seat-account/SeatAccountHeader";
+import {SEAT_ACCOUNT_HEADER} from "@src/shared/seat-account/SeatAccountHeader";
 
 /** Nothing a player may send is as long as this: a longer frame is dropped unread. */
 const LONGEST_FRAME = 1024;

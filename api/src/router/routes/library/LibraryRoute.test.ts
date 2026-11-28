@@ -1,4 +1,4 @@
-import {testAccounts} from "@src/accounts/testing/in-memory/TestAccounts";
+import {testAccounts} from "@src/shared/accounts/testing/in-memory/TestAccounts";
 import {libraryRoute} from "@src/router/routes/library/LibraryRoute";
 import {SHELF_LIMITS} from "@src/router/routes/library/limits/ShelfLimits";
 import {keepAndSaveItem} from "@src/router/routes/library/testing/KeepAndSaveItem";

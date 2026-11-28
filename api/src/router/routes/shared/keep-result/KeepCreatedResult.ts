@@ -1,5 +1,5 @@
-import {keepGeneratedItem} from "@src/accounts/keep-generated-item/KeepGeneratedItem";
-import type {ItemKind} from "@src/accounts/types/ItemKind";
+import {keepGeneratedItem} from "@src/shared/accounts/keep-generated-item/KeepGeneratedItem";
+import type {ItemKind} from "@src/shared/accounts/types/ItemKind";
 import {failureAnswer} from "@src/router/routes/shared/time-limit/FailureAnswer";
 import type {CreditReservation} from "@src/router/routes/shared/types/CreditReservation";
 

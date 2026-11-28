@@ -1,14 +1,14 @@
-import {eraseExpiredGenerationAttempts} from "@src/account-retention/EraseExpiredGenerationAttempts";
+import {eraseExpiredGenerationAttempts} from "@src/shared/account-retention/EraseExpiredGenerationAttempts";
 import type {ArenaOutcome} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcome";
-import {generationAttemptsOfAccount} from "@src/accounts/generation-attempts-of-account/GenerationAttemptsOfAccount";
-import * as history from "@src/accounts/keep-generation-attempt/KeepGenerationAttempt";
-import {removeAccount} from "@src/accounts/remove-account/RemoveAccount";
-import {insertUser} from "@src/accounts/testing/local-database/InsertUser";
-import {workerEnvironment} from "@src/env/WorkerEnvironment";
+import {generationAttemptsOfAccount} from "@src/shared/accounts/generation-attempts-of-account/GenerationAttemptsOfAccount";
+import * as history from "@src/shared/accounts/keep-generation-attempt/KeepGenerationAttempt";
+import {removeAccount} from "@src/shared/accounts/remove-account/RemoveAccount";
+import {insertUser} from "@src/shared/accounts/testing/local-database/InsertUser";
+import {workerEnvironment} from "@src/shared/env/WorkerEnvironment";
 import {generationHistoryRedaction} from "@src/router/routes/shared/generation-history/privacy/GenerationHistoryRedaction";
 import type {GenerationHistoryRedaction} from "@src/router/routes/shared/generation-history/types/GenerationHistoryRedaction";
-import {rowsOf} from "@src/accounts/testing/local-database/RowsOf";
-import {useLocalDatabase} from "@src/accounts/testing/local-database/UseLocalDatabase";
+import {rowsOf} from "@src/shared/accounts/testing/local-database/RowsOf";
+import {useLocalDatabase} from "@src/shared/accounts/testing/local-database/UseLocalDatabase";
 import {DAILY_CREDITS} from "@src/durable-objects/credit-ledger/account/DailyCredits";
 import {ARENA_SPEND} from "@src/durable-objects/spend-ledger/estimate/arena/ArenaSpend";
 import {SPEND_CAPS} from "@src/durable-objects/spend-ledger/meter/SpendCaps";
@@ -19,11 +19,11 @@ import {signInPlayer} from "@src/router/routes/shared/fake-accounts/SignInPlayer
 import {fakeLedgers} from "@src/router/routes/shared/fake-ledgers/FakeLedgers";
 import {PIPELINE_TIME_LIMIT_MILLISECONDS} from "@src/router/routes/shared/time-limit/PipelineTimeLimit";
 
-vi.unmock("@src/accounts/account-of-session/AccountOfSession");
-vi.unmock("@src/accounts/create-session/CreateSession");
-vi.unmock("@src/accounts/find-or-create-account/FindOrCreateAccount");
-vi.unmock("@src/accounts/keep-generated-item/KeepGeneratedItem");
-vi.unmock("@src/accounts/remove-account/RemoveAccount");
+vi.unmock("@src/shared/accounts/account-of-session/AccountOfSession");
+vi.unmock("@src/shared/accounts/create-session/CreateSession");
+vi.unmock("@src/shared/accounts/find-or-create-account/FindOrCreateAccount");
+vi.unmock("@src/shared/accounts/keep-generated-item/KeepGeneratedItem");
+vi.unmock("@src/shared/accounts/remove-account/RemoveAccount");
 
 vi.mock("@src/router/routes/shared/generation-history/privacy/GenerationHistoryRedaction", {spy: true});
 

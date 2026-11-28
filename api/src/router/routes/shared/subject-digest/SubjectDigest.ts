@@ -1,4 +1,4 @@
-import {workerEnvironment} from "@src/env/WorkerEnvironment";
+import {workerEnvironment} from "@src/shared/env/WorkerEnvironment";
 
 /**
  * What stands for a Google subject once its account is deleted: the hex HMAC-SHA256 of the subject under `ACCOUNT_DIGEST_KEY` (a secret).

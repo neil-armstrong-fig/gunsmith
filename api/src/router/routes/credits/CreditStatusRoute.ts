@@ -1,7 +1,7 @@
 import {CREDIT_PRICES} from "@src/durable-objects/credit-ledger/account/CreditPrices";
 import {DAILY_CREDITS} from "@src/durable-objects/credit-ledger/account/DailyCredits";
 import type {CreditStatus} from "@src/router/routes/credits/types/CreditStatus";
-import {workerEnvironment} from "@src/env/WorkerEnvironment";
+import {workerEnvironment} from "@src/shared/env/WorkerEnvironment";
 import {accountOfRequest} from "@src/router/routes/shared/session/AccountOfRequest";
 
 /**

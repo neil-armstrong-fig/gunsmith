@@ -1,5 +1,5 @@
 import type {CreditKind} from "@src/durable-objects/credit-ledger/types/CreditKind";
-import {workerEnvironment} from "@src/env/WorkerEnvironment";
+import {workerEnvironment} from "@src/shared/env/WorkerEnvironment";
 import {parsePromptRequest} from "@src/router/routes/shared/prompt-request/ParsePromptRequest";
 import {parseStyleRequest} from "@src/router/routes/shared/prompt-request/ParseStyleRequest";
 import type {StyleRequest} from "@src/router/routes/shared/prompt-request/types/StyleRequest";

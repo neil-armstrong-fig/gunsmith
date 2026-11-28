@@ -1,6 +1,6 @@
-import {workerEnvironment} from "@src/env/WorkerEnvironment";
+import {workerEnvironment} from "@src/shared/env/WorkerEnvironment";
 import {signInPlayer} from "@src/router/routes/shared/fake-accounts/SignInPlayer";
-import {SEAT_ACCOUNT_HEADER} from "@src/seat-account/SeatAccountHeader";
+import {SEAT_ACCOUNT_HEADER} from "@src/shared/seat-account/SeatAccountHeader";
 import {socketRoute} from "@src/router/routes/socket/SocketRoute";
 
 it("hands a WebSocket upgrade to the match of that code", async () => {
