@@ -1,6 +1,6 @@
 import type {WeaponEvalInput} from "@evals/dsl/weapon/pipeline/types/WeaponEvalInput";
 import type {EvalScore} from "@evals/dsl/shared/types/EvalScore";
-import {SYSTEM_PROMPT_CANARY} from "@gunsmith/ai/pipeline/canary/SystemPromptCanary";
+import {SYSTEM_PROMPT_CANARY} from "@gunsmith/ai/pipeline/shared/canary/SystemPromptCanary";
 
 const KEY = "noPromptLeak";
 

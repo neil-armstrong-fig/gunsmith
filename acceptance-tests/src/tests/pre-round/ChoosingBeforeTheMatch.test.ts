@@ -14,13 +14,16 @@ given("the practice range, with a weapon the player made and saved", () => {
   let madeStats: Readonly<Record<string, string>> = {};
 
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.openTheSeededPracticeRange();
+    await gunsmith.scenario.openTheSeededPracticeRange();
+
     await gunsmith.workshop.open();
     await gunsmith.workshop.pasteThePrompt(FAST_PROMPT);
     await gunsmith.workshop.make();
     ({name: madeName, rating: madeRating, stats: madeStats} = await gunsmith.workshop.getResult());
+
     await gunsmith.workshop.shelf.save();
     await gunsmith.workshop.close();
+
     await gunsmith.menu.pressSettings();
   });
 
@@ -135,7 +138,7 @@ given("the practice range, with a weapon the player made and saved", () => {
 
 given("a duel opened behind its pre-round, with nothing saved", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startDuelWithPreRound();
+    await gunsmith.scenario.startDuelWithPreRound();
   });
 
   when("the player looks at the choices", () => {
@@ -147,7 +150,7 @@ given("a duel opened behind its pre-round, with nothing saved", () => {
 
 given("a plain duel", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startDuel();
+    await gunsmith.scenario.startDuel();
   });
 
   when("it has begun", () => {

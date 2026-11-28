@@ -6,7 +6,7 @@ import {SHELF_LIMITS} from "@src/router/routes/library/limits/ShelfLimits";
 import {isWeaponPipelineAvailable} from "@src/router/routes/weapons/pipeline/IsWeaponPipelineAvailable";
 import {runWeaponPipeline} from "@src/router/routes/weapons/pipeline/RunWeaponPipeline";
 import type {MockedFunction} from "vitest";
-import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
+import type {WeaponOutcome} from "@gunsmith/ai/pipeline/weapon/types/WeaponOutcome";
 import {signInPlayer} from "@src/router/routes/shared/fake-accounts/SignInPlayer";
 import type {CreditAccount} from "@src/durable-objects/credit-ledger/account/CreditAccount";
 import {DAILY_CREDITS} from "@src/durable-objects/credit-ledger/account/DailyCredits";

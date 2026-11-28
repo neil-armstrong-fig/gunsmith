@@ -13,12 +13,14 @@ given.each(
   pixelsPerTile => `a fair duel at ${pixelsPerTile} pixels per tile with the stairs behind the player`,
   pixelsPerTile => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.resizeWindowTo({width: 21 * pixelsPerTile, height: 13 * pixelsPerTile});
-      gunsmith.keepTheCameraStill();
-      await gunsmith.startFairDuel(17);
-      await gunsmith.holdTheGame();
+      await gunsmith.browser.resizeWindowTo({width: 21 * pixelsPerTile, height: 13 * pixelsPerTile});
+      gunsmith.scenario.keepTheCameraStill();
+
+      await gunsmith.scenario.startFairDuel(17);
+      await gunsmith.clock.holdTheGame();
+
       await gunsmith.player.aimAtTile({x: 10.5, y: 12.5});
-      await gunsmith.runGameFor(0.05);
+      await gunsmith.clock.runGameFor(0.05);
       expect(await gunsmith.player.getAimDegrees()).toBeCloseTo(90, 0);
     });
 
@@ -46,15 +48,18 @@ given.each(
   pixelsPerTile => `a terraced duel at ${pixelsPerTile} pixels per tile facing the wall-side stair`,
   pixelsPerTile => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.resizeWindowTo({width: 25 * pixelsPerTile, height: Math.max(7 * pixelsPerTile, 384)});
-      gunsmith.keepTheCameraStill();
+      await gunsmith.browser.resizeWindowTo({width: 25 * pixelsPerTile, height: Math.max(7 * pixelsPerTile, 384)});
+      gunsmith.scenario.keepTheCameraStill();
+
       // The player starts back from the platform's edge, from where the edge rule hides the low ground; these criteria are about the
       // pictures, so the fog's veil is left out.
-      gunsmith.hideTheFog();
-      await gunsmith.startTerracedDuel({seed: 9, delaySeconds: 60, closingSeconds: 60});
-      await gunsmith.holdTheGame();
+      gunsmith.scenario.hideTheFog();
+
+      await gunsmith.scenario.startTerracedDuel({seed: 9, delaySeconds: 60, closingSeconds: 60});
+      await gunsmith.clock.holdTheGame();
+
       await gunsmith.player.aimAtTile({x: 10.5, y: 5.5});
-      await gunsmith.runGameFor(0.05);
+      await gunsmith.clock.runGameFor(0.05);
       expect(await gunsmith.player.getAimDegrees()).toBeCloseTo(135, 0);
     });
 

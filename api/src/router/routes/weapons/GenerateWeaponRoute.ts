@@ -1,9 +1,9 @@
-import {WEAPON_PIPELINE_VERSION} from "@gunsmith/ai/pipeline/weapon-graph/history/WeaponPipelineVersion";
+import {WEAPON_PIPELINE_VERSION} from "@gunsmith/ai/pipeline/weapon/history/WeaponPipelineVersion";
 import {historyRequestOf} from "@src/router/routes/shared/generation-history/HistoryRequestOf";
 import {recordGenerationAttempt} from "@src/router/routes/shared/generation-history/RecordGenerationAttempt";
 import type {GenerationHistoryRequest} from "@src/router/routes/shared/generation-history/types/GenerationHistoryRequest";
 import {weaponAttemptOutcome} from "@src/router/routes/weapons/history/WeaponAttemptOutcome";
-import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
+import type {WeaponOutcome} from "@gunsmith/ai/pipeline/weapon/types/WeaponOutcome";
 import {settledWeaponSpend} from "@src/durable-objects/spend-ledger/estimate/weapon/SettledWeaponSpend";
 import {WEAPON_SPEND} from "@src/durable-objects/spend-ledger/estimate/weapon/WeaponSpend";
 import {isWeaponPipelineAvailable} from "@src/router/routes/weapons/pipeline/IsWeaponPipelineAvailable";

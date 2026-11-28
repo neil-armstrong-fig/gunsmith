@@ -1,10 +1,11 @@
 import type {Page} from "@playwright/test";
 import type {RoundSnapshot} from "@gunsmith/shared/state-hook/types/RoundSnapshot";
+import {RoomConnectionDsl} from "@src/dsl/gunsmith/components/room/components/connection/RoomConnectionDsl";
+import {RoomFramesDsl} from "@src/dsl/gunsmith/components/room/components/frames/RoomFramesDsl";
 import {RoomPreRoundDsl} from "@src/dsl/gunsmith/components/room/components/pre-round/RoomPreRoundDsl";
 import {RoomEntryDsl} from "@src/dsl/gunsmith/components/room/components/room-entry/RoomEntryDsl";
+import {RoomSmoothnessDsl} from "@src/dsl/gunsmith/components/room/components/smoothness/RoomSmoothnessDsl";
 import {RoomPlaywright} from "@src/dsl/gunsmith/components/room/playwright/RoomPlaywright";
-import type {ConnectionDelay} from "@src/dsl/gunsmith/components/room/playwright/wire/delayed-line/types/ConnectionDelay";
-import type {SentChoice} from "@src/dsl/gunsmith/components/room/playwright/wire/types/SentChoice";
 import type {RoomLimits} from "@src/dsl/gunsmith/components/room/types/RoomLimits";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
 import type {GunsmithDsl} from "@src/dsl/gunsmith/GunsmithDsl";
@@ -18,6 +19,12 @@ export class RoomDsl {
   readonly entry: RoomEntryDsl;
   /** What the room's choosing and reveal show before the match. */
   readonly preRound: RoomPreRoundDsl;
+  /** This browser's connection to the room: made slow, thinned, cut, kept down and let back. */
+  readonly connection: RoomConnectionDsl;
+  /** What the server told this browser, and what the page said back, read from the frames. */
+  readonly frames: RoomFramesDsl;
+  /** How smoothly this browser shows the fighters against what the server sent. */
+  readonly smoothness: RoomSmoothnessDsl;
   private readonly room: RoomPlaywright;
   private second: GunsmithDsl | undefined;
   private stranger: GunsmithDsl | undefined;
@@ -30,6 +37,9 @@ export class RoomDsl {
   ) {
     this.entry = new RoomEntryDsl(page);
     this.preRound = new RoomPreRoundDsl(page);
+    this.connection = new RoomConnectionDsl(page);
+    this.frames = new RoomFramesDsl(page);
+    this.smoothness = new RoomSmoothnessDsl(page, () => this.secondBrowser());
     this.room = new RoomPlaywright(page);
   }
 
@@ -151,51 +161,6 @@ export class RoomDsl {
     }
   }
 
-  /** Makes this browser's connection one that `cutTheConnection` can cut. Say it before `createPrivateRoom`. */
-  async prepareToLoseTheConnection(): Promise<void> {
-    try {
-      await this.room.prepareToLoseTheConnection();
-    } catch (error) {
-      throw new DslError("Failed to prepare to lose the connection", error);
-    }
-  }
-
-  /** Cuts this browser's connection to the match, as a dropped network would; the page stays open and has to reconnect by itself. */
-  cutTheConnection(): void {
-    try {
-      this.room.cutTheConnection();
-    } catch (error) {
-      throw new DslError("Failed to cut the connection", error);
-    }
-  }
-
-  /** Cuts this browser's connection and turns away every try to make it again, as a network that stays down would, until `letTheConnectionBack`. */
-  keepTheConnectionDown(): void {
-    try {
-      this.room.keepTheConnectionDown();
-    } catch (error) {
-      throw new DslError("Failed to keep the connection down", error);
-    }
-  }
-
-  /** Lets this browser's next try to connect through again. */
-  letTheConnectionBack(): void {
-    try {
-      this.room.letTheConnectionBack();
-    } catch (error) {
-      throw new DslError("Failed to let the connection back", error);
-    }
-  }
-
-  /** Whether the page is telling the player that the connection is being made again. */
-  async isToldItIsReconnecting(): Promise<boolean> {
-    try {
-      return await this.room.isToldItIsReconnecting();
-    } catch (error) {
-      throw new DslError("Failed to read whether the page says it is reconnecting", error);
-    }
-  }
-
   /** Leaves the room as a closed tab does. */
   async leaveTheRoom(): Promise<void> {
     try {
@@ -211,15 +176,6 @@ export class RoomDsl {
       await this.room.returnToTheRoom();
     } catch (error) {
       throw new DslError("Failed to return to the room", error);
-    }
-  }
-
-  /** Waits until the server has sent this browser a snapshot since it lost its connection or left. */
-  async waitForTheMatchAgain(): Promise<void> {
-    try {
-      await this.room.waitForTheMatchAgain();
-    } catch (error) {
-      throw new DslError("Failed to wait for the match again", error);
     }
   }
 
@@ -265,192 +221,6 @@ export class RoomDsl {
       await this.room.carryASavedWeaponFirst("opponent");
     } catch (error) {
       throw new DslError("Failed to arrange a saved weapon for the opponent", error);
-    }
-  }
-
-  /** Holds every frame to and from this browser up by `delay`, in order. Say it before `createPrivateRoom`: it applies to the page that opens next. */
-  async slowTheConnectionBy(delay: ConnectionDelay): Promise<void> {
-    try {
-      await this.room.slowTheConnectionBy(delay);
-    } catch (error) {
-      throw new DslError("Failed to slow the connection", error);
-    }
-  }
-
-  /** Hands this browser only every `n`th snapshot the server sends it, as a server that sent far fewer would. Say it before `createPrivateRoom`. */
-  async receiveOnlyEveryNthSnapshot(n: number): Promise<void> {
-    try {
-      await this.room.receiveOnlyEveryNthSnapshot(n);
-    } catch (error) {
-      throw new DslError(`Failed to thin the snapshots to every ${n}th`, error);
-    }
-  }
-
-  /** Starts noting where this browser draws both fighters on every frame, so the largest jump either was seen to make can be read. */
-  async startRecordingTheShownFighters(): Promise<void> {
-    try {
-      await this.room.startRecordingTheShownFighters();
-    } catch (error) {
-      throw new DslError("Failed to start recording the shown player", error);
-    }
-  }
-
-  /**
-   * The largest step this browser showed the player take between two frames since recording began, in tiles, beyond what walking at the
-   * server's pace explains over the time between them.
-   */
-  async getLargestShownJump(): Promise<number> {
-    try {
-      return await this.room.getLargestShownJump();
-    } catch (error) {
-      throw new DslError("Failed to read the largest shown jump", error);
-    }
-  }
-
-  /**
-   * The largest step this browser showed the other player take between two frames since recording began, in tiles, beyond what walking at
-   * the server's pace explains over the time between them. The pace is the second browser's own, from the snapshots it was sent.
-   */
-  async getLargestShownOpponentJump(): Promise<number> {
-    try {
-      return await this.room.getLargestShownOpponentJump(this.secondBrowser().room.getFastestServerMovement());
-    } catch (error) {
-      throw new DslError("Failed to read the largest shown jump of the other player", error);
-    }
-  }
-
-  /** How many frames this browser drew the other player on since recording began: a jump measured over none says nothing. */
-  async getShownOpponentSamples(): Promise<number> {
-    try {
-      return await this.room.getShownOpponentSamples();
-    } catch (error) {
-      throw new DslError("Failed to count the frames the other player was drawn on", error);
-    }
-  }
-
-  /** The fastest the server moved this browser's player, in tiles a second of game time, from the snapshots it sent. */
-  getFastestServerMovement(): number {
-    try {
-      return this.room.getFastestServerMovement();
-    } catch (error) {
-      throw new DslError("Failed to read the fastest movement the server sent", error);
-    }
-  }
-
-  /** Whether this browser shows the player well ahead of where the latest snapshot has them, as it must when walking over a slow connection. */
-  async isShownAheadOfTheServer(): Promise<boolean> {
-    try {
-      return await this.room.isShownAheadOfTheServer();
-    } catch (error) {
-      throw new DslError("Failed to compare the shown player with the server's", error);
-    }
-  }
-
-  /** Whether this browser shows the player where the latest snapshot has them. */
-  async isShownWhereTheServerHasThem(): Promise<boolean> {
-    try {
-      return await this.room.isShownWhereTheServerHasThem();
-    } catch (error) {
-      throw new DslError("Failed to compare the shown player with the server's", error);
-    }
-  }
-
-  /** Waits until the server has seated this browser again after it lost its connection or left, which is before any match is sent. */
-  async waitToBeSeatedAgain(): Promise<void> {
-    try {
-      await this.room.waitToBeSeatedAgain();
-    } catch (error) {
-      throw new DslError("Failed to wait to be seated again", error);
-    }
-  }
-
-  /** Whether the server has sent this browser any frame of the choosing before the match yet. */
-  hasReceivedPreRounds(): boolean {
-    try {
-      return this.room.hasReceivedPreRounds();
-    } catch (error) {
-      throw new DslError("Failed to read whether frames of the choosing have arrived", error);
-    }
-  }
-
-  /** Whether the server has named this browser the other player's weapon in `slot`: it must not until both have locked in that slot. */
-  hasBeenToldTheOpponentsWeapon(slot: number): boolean {
-    try {
-      return this.room.hasBeenToldTheOpponentsWeapon(slot);
-    } catch (error) {
-      throw new DslError(`Failed to read whether the other player's weapon ${slot} has been sent`, error);
-    }
-  }
-
-  /** Whether the server has shown this browser the other player's arena: it must not until both have locked in their arena. */
-  hasBeenToldTheOpponentsArena(): boolean {
-    try {
-      return this.room.hasBeenToldTheOpponentsArena();
-    } catch (error) {
-      throw new DslError("Failed to read whether the other player's arena has been sent", error);
-    }
-  }
-
-  /** What this browser has put forward in the choosing, in the order it sent it: each weapon with its slot and the arena, a built-in or a saved item. */
-  getChoicesSent(): readonly SentChoice[] {
-    try {
-      return this.room.getChoicesSent();
-    } catch (error) {
-      throw new DslError("Failed to read what the page put forward in the choosing", error);
-    }
-  }
-
-  /** Whether the server has sent this browser the reveal of what was decided. */
-  hasBeenToldTheReveal(): boolean {
-    try {
-      return this.room.hasBeenToldTheReveal();
-    } catch (error) {
-      throw new DslError("Failed to read whether the reveal has been sent", error);
-    }
-  }
-
-  /** Whether the server has sent this browser any snapshot yet. */
-  /** The built-in arenas the room offers this player today, as the server last told it while choosing; `undefined` before it has. */
-  getArenasOffered(): readonly string[] | undefined {
-    try {
-      return this.room.getArenasOffered();
-    } catch (error) {
-      throw new DslError("Failed to read the arenas the room offers", error);
-    }
-  }
-
-  hasReceivedSnapshots(): boolean {
-    try {
-      return this.room.hasReceivedSnapshots();
-    } catch (error) {
-      throw new DslError("Failed to read whether snapshots have arrived", error);
-    }
-  }
-
-  /** Whether the latest snapshot the server sent this browser holds the other player. A hidden player must be absent from it. */
-  hasBeenToldWhereTheOtherPlayerIs(): boolean {
-    try {
-      return this.room.hasBeenToldWhereTheOtherPlayerIs();
-    } catch (error) {
-      throw new DslError("Failed to read whether the other player is in the latest snapshot", error);
-    }
-  }
-
-  /** Whether the latest snapshot the server sent this browser holds the weapon lying in the arena. One this player cannot see, or one already taken, must be absent from it. */
-  hasBeenToldWhereTheWeaponLies(): boolean {
-    try {
-      return this.room.hasBeenToldWhereTheWeaponLies();
-    } catch (error) {
-      throw new DslError("Failed to read whether the weapon is in the latest snapshot", error);
-    }
-  }
-
-  /** Every event the server has told this browser about its own player, in order, exactly as the frames carried them: what a shot did to it, what its shots did, and the direction a shot was heard from. */
-  getEventsReceived(): readonly unknown[] {
-    try {
-      return this.room.getEventsReceived();
-    } catch (error) {
-      throw new DslError("Failed to read the events the server sent", error);
     }
   }
 

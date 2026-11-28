@@ -6,11 +6,11 @@ import {beforeEach, expect, given, then, when} from "@src/acceptance-criteria-ma
 // walking. The comparison is of states (what the page shows against the newest snapshot it has been sent), not of times.
 given("two browsers are in one private room over a connection that holds every frame up 300 milliseconds", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.room.slowTheConnectionBy({milliseconds: 300});
+    await gunsmith.room.connection.slowTheConnectionBy({milliseconds: 300});
     const code = await gunsmith.room.createPrivateRoom();
 
     await gunsmith.room.joinWithASecondBrowser(code);
-    await expect.poll(() => gunsmith.room.hasReceivedSnapshots()).toBe(true);
+    await expect.poll(() => gunsmith.room.frames.hasReceivedSnapshots()).toBe(true);
   });
 
   when("the first player starts walking west", () => {
@@ -19,17 +19,17 @@ given("two browsers are in one private room over a connection that holds every f
     });
 
     then("the first player is shown walking ahead of where the server last said they were", async ({gunsmith}) => {
-      await expect.poll(() => gunsmith.room.isShownAheadOfTheServer()).toBe(true);
+      await expect.poll(() => gunsmith.room.smoothness.isShownAheadOfTheServer()).toBe(true);
     });
 
     when("the first player stops", () => {
       beforeEach(async ({gunsmith}) => {
-        await expect.poll(() => gunsmith.room.isShownAheadOfTheServer()).toBe(true);
+        await expect.poll(() => gunsmith.room.smoothness.isShownAheadOfTheServer()).toBe(true);
         await gunsmith.player.stopWalking("west");
       });
 
       then("the first player is shown where the server has them", async ({gunsmith}) => {
-        await expect.poll(() => gunsmith.room.isShownWhereTheServerHasThem()).toBe(true);
+        await expect.poll(() => gunsmith.room.smoothness.isShownWhereTheServerHasThem()).toBe(true);
       });
     });
   });

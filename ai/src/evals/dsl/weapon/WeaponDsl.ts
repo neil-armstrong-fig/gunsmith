@@ -1,6 +1,6 @@
 import {DslError} from "@evals/dsl/shared/errors/DslError";
 import type {TrialDsl} from "@evals/dsl/shared/types/TrialDsl";
-import type {WeaponOutcomeStatus} from "@gunsmith/ai/pipeline/types/WeaponOutcomeStatus";
+import type {WeaponOutcomeStatus} from "@gunsmith/ai/pipeline/weapon/types/WeaponOutcomeStatus";
 import type {WeaponPipelineDriver} from "@evals/dsl/weapon/types/WeaponPipelineDriver";
 import {WeaponPipeline} from "@evals/dsl/weapon/pipeline/WeaponPipeline";
 

@@ -15,7 +15,7 @@ const BEHIND_THE_PLAYER = {x: 2.5, y: 6.5};
 
 given("a sparring match has just begun", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startSparring();
+    await gunsmith.scenario.startSparring();
   });
 
   when("the player faces the opponent", () => {

@@ -6,7 +6,7 @@ const LONGEST_LOSS_SECONDS = 15;
 
 given("a duel has just begun", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startDuel();
+    await gunsmith.scenario.startDuel();
   });
 
   when("the player has done nothing yet", () => {
@@ -97,6 +97,7 @@ given("a duel has just begun", () => {
       await gunsmith.round.waitForState("lost", LONGEST_LOSS_SECONDS);
       await gunsmith.round.nextRound();
       await gunsmith.round.waitForBannerToGo();
+
       await gunsmith.round.waitForState("lost", LONGEST_LOSS_SECONDS);
     });
 
@@ -122,6 +123,7 @@ given("a duel has just begun", () => {
       await gunsmith.round.waitForState("lost", LONGEST_LOSS_SECONDS);
       await gunsmith.round.nextRound();
       await gunsmith.round.waitForBannerToGo();
+
       await gunsmith.round.waitForState("lost", LONGEST_LOSS_SECONDS);
       await gunsmith.round.playAgain();
       await gunsmith.round.waitForBannerToGo();

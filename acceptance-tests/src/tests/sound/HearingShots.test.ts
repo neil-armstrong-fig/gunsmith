@@ -8,8 +8,10 @@ given("the player is on the practice range", () => {
 
     beforeEach(async ({gunsmith}) => {
       capacity = (await gunsmith.weapon.get()).rounds;
+
       await gunsmith.player.switchTo(1);
-      await gunsmith.waitForGameSeconds(0.2);
+      await gunsmith.clock.waitForGameSeconds(0.2);
+
       await gunsmith.player.startFiring();
       await gunsmith.weapon.waitForRounds(0);
       await expect.poll(() => gunsmith.sound.getPlays("sfx-empty-click")).toHaveLength(1);

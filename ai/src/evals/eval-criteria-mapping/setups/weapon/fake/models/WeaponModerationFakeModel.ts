@@ -2,7 +2,7 @@ import {BaseChatModel} from "@langchain/core/language_models/chat_models";
 import {AIMessageChunk} from "@langchain/core/messages";
 import type {BaseMessage} from "@langchain/core/messages";
 import type {ChatResult} from "@langchain/core/outputs";
-import type {ModerationVerdict} from "@gunsmith/ai/pipeline/prompt-screening/moderation/verdict/ModerationVerdict";
+import type {ModerationVerdict} from "@gunsmith/ai/pipeline/weapon/screening/moderation/verdict/ModerationVerdict";
 
 // The requests the weapon specs expect to be turned away (`NotAWeaponRequest`, `ShieldsAndArmour`, the forged verdict of
 // `TryingToBreakTheSmith`), word for word as the model reads them (a closing tag is neutralised by `dataBlock`). A fixture, not a

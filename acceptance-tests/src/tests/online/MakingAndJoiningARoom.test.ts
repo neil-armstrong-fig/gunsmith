@@ -16,9 +16,10 @@ given("the practice range, as a first-time player finds it", () => {
   when("the player types the game's own keys into the friend code box", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.room.entry.typeTheCode("2wasd");
+
       await gunsmith.menu.pressEscape();
       await gunsmith.menu.resumePlay();
-      await gunsmith.waitForGameSeconds(0.1);
+      await gunsmith.clock.waitForGameSeconds(0.1);
     });
 
     then("the game does not see them: the weapon in hand is still the first", async ({gunsmith}) => {

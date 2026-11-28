@@ -4,7 +4,7 @@ import type {BaseMessage} from "@langchain/core/messages";
 import type {ChatResult} from "@langchain/core/outputs";
 import {FAKE_LARGE_ARENA_REPLY} from "@evals/eval-criteria-mapping/setups/arena/fake/models/reply/FakeLargeArenaReply";
 import {FAKE_ARENA_REPLY} from "@evals/eval-criteria-mapping/setups/arena/fake/models/reply/FakeArenaReply";
-import {SYSTEM_PROMPT_CANARY} from "@gunsmith/ai/pipeline/canary/SystemPromptCanary";
+import {SYSTEM_PROMPT_CANARY} from "@gunsmith/ai/pipeline/shared/canary/SystemPromptCanary";
 
 // The one request the arena specs expect the fake model to get wrong in a way code can mend (`AskingForAnArena`, "cut in two"), word for
 // word. A fixture, not a model of failure: it stands in for a real model drawing a floor cut in two, which code's repair mends by opening a

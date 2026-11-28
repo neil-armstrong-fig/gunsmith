@@ -14,19 +14,19 @@ given("a sparring match, held still, with the player aiming at the opponent a fe
   let opponent: OpponentSnapshot;
 
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startSparring();
-    await gunsmith.holdTheGame();
+    await gunsmith.scenario.startSparring();
+    await gunsmith.clock.holdTheGame();
     opponent = await gunsmith.opponent.get();
 
     await gunsmith.player.aimAtTile(opponent);
-    await gunsmith.runGameFor(GAME_SECONDS_AFTER_AIMING);
+    await gunsmith.clock.runGameFor(GAME_SECONDS_AFTER_AIMING);
   });
 
   when("the player's bullet has landed on the opponent", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.fire();
       await gunsmith.opponent.runUntilHurt(HIT_WATCH);
-      await gunsmith.runGameFor(GAME_SECONDS_TO_LISTEN);
+      await gunsmith.clock.runGameFor(GAME_SECONDS_TO_LISTEN);
     });
 
     then("the hit sounds once, and the audio is running when it does", async ({gunsmith}) => {
@@ -45,9 +45,11 @@ given("a sparring match, held still, with the player aiming at the opponent a fe
   when("the sound is muted and the player's bullet has landed on the opponent", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.sound.toggleMute();
+
       await gunsmith.player.fire();
       await gunsmith.opponent.runUntilHurt(HIT_WATCH);
-      await gunsmith.runGameFor(GAME_SECONDS_TO_LISTEN);
+
+      await gunsmith.clock.runGameFor(GAME_SECONDS_TO_LISTEN);
     });
 
     then("nothing sounds", async ({gunsmith}) => {
@@ -60,10 +62,10 @@ given("a sparring match, held still, with the player aiming at the opponent a fe
       const player = await gunsmith.player.getPosition();
 
       await gunsmith.player.fire();
-      await gunsmith.runGameFor(GAME_SECONDS_AFTER_FIRING);
+      await gunsmith.clock.runGameFor(GAME_SECONDS_AFTER_FIRING);
       await gunsmith.player.aimAtTile({x: player.x - TILES_TO_TURN_AWAY, y: player.y});
       await gunsmith.opponent.runUntilHurt(HIT_WATCH);
-      await gunsmith.runGameFor(GAME_SECONDS_TO_LISTEN);
+      await gunsmith.clock.runGameFor(GAME_SECONDS_TO_LISTEN);
     });
 
     then("the opponent is hurt and cannot be seen", async ({gunsmith}) => {

@@ -2,7 +2,7 @@ import {BaseChatModel} from "@langchain/core/language_models/chat_models";
 import {AIMessage} from "@langchain/core/messages";
 import type {BaseMessage} from "@langchain/core/messages";
 import type {ChatResult} from "@langchain/core/outputs";
-import type {ModelUsage} from "@gunsmith/ai/pipeline/types/ModelUsage";
+import type {ModelUsage} from "@gunsmith/ai/pipeline/shared/usage/types/ModelUsage";
 
 /** How a fake model answers: what each call returns (the last one is repeated), and what each call reports it cost. */
 export interface ToolCallingFakeOptions {

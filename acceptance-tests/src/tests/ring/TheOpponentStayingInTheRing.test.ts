@@ -17,10 +17,12 @@ const MOST_AN_UNBOOSTED_RING_HURTS = 20;
 // The longest round measured was 3.5 game seconds; fifteen more is room for a loaded machine.
 const LONGEST_ROUND_SECONDS = 3.5 + 15;
 
-for (const seed of SEEDS_THE_RING_WOULD_HURT) {
-  given(`a duel (seed ${seed}) whose ring starts to close after a second and hurts ten times as much`, () => {
+given.each(
+  SEEDS_THE_RING_WOULD_HURT,
+  seed => `a duel (seed ${seed}) whose ring starts to close after a second and hurts ten times as much`,
+  seed => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.startClosingDuel({
+      await gunsmith.scenario.startClosingDuel({
         seed,
         delaySeconds: DELAY_SECONDS,
         closingSeconds: CLOSING_SECONDS,
@@ -51,5 +53,5 @@ for (const seed of SEEDS_THE_RING_WOULD_HURT) {
         expect(Math.hypot(opponent.x - centre.x, opponent.y - centre.y)).toBeLessThanOrEqual(radius);
       });
     });
-  });
-}
+  },
+);

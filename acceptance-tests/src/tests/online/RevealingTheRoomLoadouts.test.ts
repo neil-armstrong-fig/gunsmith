@@ -14,14 +14,15 @@ given("a private room whose players have chosen everything and are shown the rev
     const second = gunsmith.room.secondBrowser();
 
     await gunsmith.preRound.choose(1, "Submachine gun");
-    for (const player of [gunsmith, second]) {
-      await player.room.preRound.lockInWeapon(1);
-    }
+    await gunsmith.room.preRound.lockInWeapon(1);
+    await second.room.preRound.lockInWeapon(1);
+
     await second.preRound.choose(2, "Rifle");
-    for (const player of [gunsmith, second]) {
-      await player.room.preRound.lockInWeapon(2);
-      await player.room.preRound.lockInArena();
-    }
+    await gunsmith.room.preRound.lockInWeapon(2);
+    await gunsmith.room.preRound.lockInArena();
+    await second.room.preRound.lockInWeapon(2);
+    await second.room.preRound.lockInArena();
+
     await gunsmith.room.preRound.waitForTheReveal();
     await second.room.preRound.waitForTheReveal();
   });
@@ -47,11 +48,17 @@ given("a private room whose players have chosen everything and are shown the rev
 
       expect(first.opponent).toEqual(second.yours);
       expect(second.opponent).toEqual(first.yours);
-      for (const weapon of [...first.yours, ...first.opponent]) {
-        expect(Object.keys(weapon.stats)).toEqual(STAT_LABELS);
-        expect(weapon.rating).toBeGreaterThanOrEqual(0);
-        expect(weapon.rating).toBeLessThanOrEqual(100);
-      }
+      const weapons = [...first.yours, ...first.opponent];
+      const ratings = weapons.map(weapon => weapon.rating);
+
+      expect(weapons.map(weapon => Object.keys(weapon.stats))).toEqual([
+        STAT_LABELS,
+        STAT_LABELS,
+        STAT_LABELS,
+        STAT_LABELS,
+      ]);
+      expect(Math.min(...ratings)).toBeGreaterThanOrEqual(0);
+      expect(Math.max(...ratings)).toBeLessThanOrEqual(100);
     },
   );
 
@@ -70,14 +77,14 @@ given("a private room whose players have chosen everything and are shown the rev
   then("the match has not begun, and a clock counts down from the reveal's time", async ({gunsmith}) => {
     const secondsLeft = await gunsmith.room.preRound.getSecondsLeft();
 
-    expect(gunsmith.room.hasReceivedSnapshots()).toBe(false);
+    expect(gunsmith.room.frames.hasReceivedSnapshots()).toBe(false);
     expect(secondsLeft).toBeLessThanOrEqual(SECONDS_TO_REVEAL);
     expect(secondsLeft).toBeGreaterThan(0);
   });
 
   then("the server sent each the reveal", async ({gunsmith}) => {
-    expect(gunsmith.room.hasBeenToldTheReveal()).toBe(true);
-    expect(gunsmith.room.secondBrowser().room.hasBeenToldTheReveal()).toBe(true);
+    expect(gunsmith.room.frames.hasBeenToldTheReveal()).toBe(true);
+    expect(gunsmith.room.secondBrowser().room.frames.hasBeenToldTheReveal()).toBe(true);
   });
 
   when("the first player asks to start the match", () => {
@@ -87,7 +94,7 @@ given("a private room whose players have chosen everything and are shown the rev
 
     then("they are told they wait for the other player, and the match has not begun", async ({gunsmith}) => {
       await expect.poll(() => gunsmith.room.preRound.isWaitingForTheOtherPlayerToStart()).toBe(true);
-      expect(gunsmith.room.hasReceivedSnapshots()).toBe(false);
+      expect(gunsmith.room.frames.hasReceivedSnapshots()).toBe(false);
     });
 
     when("the second player asks to start the match too", () => {
@@ -118,12 +125,15 @@ given("a private room whose players have chosen everything and the reveal lasts 
   beforeEach(async ({gunsmith}) => {
     const code = await gunsmith.room.createPrivateRoom({revealSeconds: SECONDS_TO_REVEAL_QUICKLY, preRoundSeconds: 60});
     await gunsmith.room.joinWithASecondBrowserToChoose(code);
+    const second = gunsmith.room.secondBrowser();
 
-    for (const player of [gunsmith, gunsmith.room.secondBrowser()]) {
-      await player.room.preRound.lockInWeapon(1);
-      await player.room.preRound.lockInWeapon(2);
-      await player.room.preRound.lockInArena();
-    }
+    await gunsmith.room.preRound.lockInWeapon(1);
+    await gunsmith.room.preRound.lockInWeapon(2);
+    await gunsmith.room.preRound.lockInArena();
+
+    await second.room.preRound.lockInWeapon(1);
+    await second.room.preRound.lockInWeapon(2);
+    await second.room.preRound.lockInArena();
   });
 
   when("neither asks to start", () => {
@@ -141,21 +151,26 @@ given("a private room whose players have chosen everything and the reveal lasts 
 
 given("a private room in its reveal, whose first player loses their connection", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.room.prepareToLoseTheConnection();
+    await gunsmith.room.connection.prepareToLoseTheConnection();
     const code = await gunsmith.room.createPrivateRoom({revealSeconds: SECONDS_TO_REVEAL, preRoundSeconds: 60});
     await gunsmith.room.joinWithASecondBrowserToChoose(code);
-    for (const player of [gunsmith, gunsmith.room.secondBrowser()]) {
-      await player.room.preRound.lockInWeapon(1);
-      await player.room.preRound.lockInWeapon(2);
-      await player.room.preRound.lockInArena();
-    }
+    const second = gunsmith.room.secondBrowser();
+
+    await gunsmith.room.preRound.lockInWeapon(1);
+    await gunsmith.room.preRound.lockInWeapon(2);
+    await gunsmith.room.preRound.lockInArena();
+
+    await second.room.preRound.lockInWeapon(1);
+    await second.room.preRound.lockInWeapon(2);
+    await second.room.preRound.lockInArena();
+
     await gunsmith.room.preRound.waitForTheReveal();
   });
 
   when("the connection is cut and returns", () => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.room.cutTheConnection();
-      await gunsmith.room.waitToBeSeatedAgain();
+      await gunsmith.room.connection.cutTheConnection();
+      await gunsmith.room.connection.waitToBeSeatedAgain();
     });
 
     then("the first player is shown the reveal again", async ({gunsmith}) => {

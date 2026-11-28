@@ -1,5 +1,5 @@
 import type {ArenaHistoryDiagnostics} from "@gunsmith/ai/pipeline/arena/types/ArenaHistoryDiagnostics";
-import type {ModelUsage} from "@gunsmith/ai/pipeline/types/ModelUsage";
+import type {ModelUsage} from "@gunsmith/ai/pipeline/shared/usage/types/ModelUsage";
 import type {ArenaOutcomeStatus} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcomeStatus";
 
 /** The result of an arena request. DRAFT, local to `ai/` until engine and server freeze the real arena contract in `HANDOFF.md`. */

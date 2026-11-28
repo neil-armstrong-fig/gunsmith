@@ -10,11 +10,13 @@ const OPPONENT_START = {x: 13.5, y: 3.5};
 const BEHIND_THE_BLOCK = {fromX: 11, toX: 12};
 const WATCH = {maxSeconds: 5, stepSeconds: 0.05};
 
-for (const seed of SEEDS) {
-  given(`a cover run (seed ${seed}), the player standing and facing the opponent, who must reload`, () => {
+given.each(
+  SEEDS,
+  seed => `a cover run (seed ${seed}), the player standing and facing the opponent, who must reload`,
+  seed => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.startCoverRun(seed);
-      await gunsmith.holdTheGame();
+      await gunsmith.scenario.startCoverRun(seed);
+      await gunsmith.clock.holdTheGame();
       await gunsmith.player.aimAtTile(OPPONENT_START);
     });
 
@@ -34,5 +36,5 @@ for (const seed of SEEDS) {
         },
       );
     });
-  });
-}
+  },
+);

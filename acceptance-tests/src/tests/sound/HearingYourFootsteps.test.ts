@@ -5,11 +5,13 @@ const SOFT_STEP = "sfx-footstep";
 given("the player is on the practice range", () => {
   when("they walk upright for just under one second and stop", () => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.holdTheGame();
+      await gunsmith.clock.holdTheGame();
+
       await gunsmith.player.startWalking("west");
-      await gunsmith.runGameFor(0.98);
+      await gunsmith.clock.runGameFor(0.98);
       await gunsmith.player.stopWalking("west");
-      await gunsmith.runGameFor(0.8);
+
+      await gunsmith.clock.runGameFor(0.8);
     });
 
     then("a soft footfall plays at the start and the regular steps stop with movement", async ({gunsmith}) => {
@@ -28,15 +30,17 @@ given("the player is on the practice range", () => {
     let afterFirstTap = 0;
 
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.holdTheGame();
+      await gunsmith.clock.holdTheGame();
       startX = (await gunsmith.player.getPosition()).x;
+
       await gunsmith.player.startWalking("west");
-      await gunsmith.runGameFor(0.06);
+      await gunsmith.clock.runGameFor(0.06);
       await gunsmith.player.stopWalking("west");
       afterFirstTap = (await gunsmith.player.getPosition()).x;
-      await gunsmith.runGameFor(0.08);
+
+      await gunsmith.clock.runGameFor(0.08);
       await gunsmith.player.startWalking("west");
-      await gunsmith.runGameFor(0.06);
+      await gunsmith.clock.runGameFor(0.06);
       await gunsmith.player.stopWalking("west");
     });
 
@@ -51,11 +55,12 @@ given("the player is on the practice range", () => {
     let startX = 0;
 
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.holdTheGame();
+      await gunsmith.clock.holdTheGame();
       startX = (await gunsmith.player.getPosition()).x;
+
       await gunsmith.player.crouch();
       await gunsmith.player.startWalking("west");
-      await gunsmith.runGameFor(0.98);
+      await gunsmith.clock.runGameFor(0.98);
       await gunsmith.player.stopWalking("west");
       await gunsmith.player.standUp();
     });
@@ -71,12 +76,14 @@ given("the player is on the practice range", () => {
 
     beforeEach(async ({gunsmith}) => {
       await gunsmith.sound.toggleMute();
-      await gunsmith.holdTheGame();
+      await gunsmith.clock.holdTheGame();
+
       await gunsmith.player.startWalking("west");
-      await gunsmith.runGameFor(2.4);
+      await gunsmith.clock.runGameFor(2.4);
       wallX = (await gunsmith.player.getPosition()).x;
+
       await gunsmith.sound.toggleMute();
-      await gunsmith.runGameFor(1);
+      await gunsmith.clock.runGameFor(1);
       await gunsmith.player.stopWalking("west");
     });
 

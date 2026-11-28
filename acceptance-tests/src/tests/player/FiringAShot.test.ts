@@ -48,7 +48,7 @@ given("a match has just begun", () => {
 
   when("the player has not clicked", () => {
     then("no bullet is in the air", async ({gunsmith}) => {
-      await gunsmith.waitForGameSeconds(0.5);
+      await gunsmith.clock.waitForGameSeconds(0.5);
 
       expect(await gunsmith.bullets.count()).toBe(0);
     });

@@ -8,8 +8,8 @@ import {schemaValid} from "@evals/dsl/weapon/pipeline/evaluators/created-weapon/
 import {damagePerSecondOf} from "@evals/dsl/weapon/pipeline/evaluators/created-weapon/DamagePerSecond";
 import {failuresOf} from "@evals/dsl/shared/checks/FailuresOf";
 import type {WeaponEvaluator} from "@evals/dsl/weapon/pipeline/types/WeaponEvaluator";
-import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
-import type {WeaponOutcomeStatus} from "@gunsmith/ai/pipeline/types/WeaponOutcomeStatus";
+import type {WeaponOutcome} from "@gunsmith/ai/pipeline/weapon/types/WeaponOutcome";
+import type {WeaponOutcomeStatus} from "@gunsmith/ai/pipeline/weapon/types/WeaponOutcomeStatus";
 
 /**
  * The weapon smith's pipeline as seen from outside, the system under test: the one class that knows how to put a request through

@@ -33,6 +33,7 @@ given("the Game menu on the practice range", () => {
       await gunsmith.menu.chooseOptions();
       await gunsmith.menu.setStartupMenu(false);
       await gunsmith.menu.pressBack();
+
       await gunsmith.preRound.startBotGame();
       await gunsmith.preRound.pressBack();
     });
@@ -45,7 +46,7 @@ given("the Game menu on the practice range", () => {
     when("the player reloads from the main menu", () => {
       beforeEach(async ({gunsmith}) => {
         await expect.poll(() => gunsmith.preRound.hasStartBotGame()).toBe(true);
-        await gunsmith.reloadThePage();
+        await gunsmith.browser.reloadThePage();
       });
 
       then("the saved startup preference still keeps the menu closed", async ({gunsmith}) => {
@@ -59,6 +60,7 @@ given("the Game menu on the practice range", () => {
       await gunsmith.preRound.startBotGame();
       await gunsmith.preRound.choose(1, "Submachine gun");
       await gunsmith.preRound.lockIn();
+
       await gunsmith.preRound.pressBack();
     });
 
@@ -74,6 +76,7 @@ given("the Game menu on the practice range", () => {
       await gunsmith.preRound.startBotGame();
       await gunsmith.preRound.lockIn();
       await gunsmith.preRound.startTheMatch();
+
       await gunsmith.menu.pressSettings();
       await gunsmith.menu.backToMainMenu();
     });
@@ -87,7 +90,7 @@ given("the Game menu on the practice range", () => {
 given("a finished round", () => {
   when("the player goes back from the round banner", () => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.startMutualKnockout();
+      await gunsmith.scenario.startMutualKnockout();
       await gunsmith.round.waitForState("drawn");
       await gunsmith.round.backToMainMenu();
     });

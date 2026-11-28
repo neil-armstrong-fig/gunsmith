@@ -5,8 +5,8 @@ import {arenaDraftSchema} from "@gunsmith/ai/pipeline/arena/check/validate/draft
 import type {ArenaProblemKind} from "@gunsmith/engine/arena-validation/types/ArenaProblemKind";
 import {repairArena} from "@gunsmith/engine/arena-repair/RepairArena";
 import {rowLengthProblems} from "@gunsmith/ai/pipeline/arena/check/validate/row-lengths/RowLengthProblems";
-import {draftingKitOf} from "@gunsmith/ai/pipeline/arena/arena-drafting/format/DraftingKitOf";
-import type {ArenaFormat} from "@gunsmith/ai/pipeline/arena/arena-drafting/format/ArenaFormat";
+import {draftingKitOf} from "@gunsmith/ai/pipeline/arena/drafting/format/DraftingKitOf";
+import type {ArenaFormat} from "@gunsmith/ai/pipeline/arena/drafting/format/ArenaFormat";
 import {schemaErrors} from "@gunsmith/ai/pipeline/arena/check/validate/sentences/SchemaErrors";
 import {sentenceOf} from "@gunsmith/ai/pipeline/arena/check/validate/sentences/SentenceOf";
 import type {ArenaValidation} from "@gunsmith/ai/pipeline/arena/check/validate/types/ArenaValidation";

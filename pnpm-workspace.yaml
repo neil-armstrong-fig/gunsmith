@@ -53,36 +53,33 @@ catalog:
   alchemy: 0.94.0
   tsx: 4.23.15
   # Type declarations for the Workers runtime (Durable Objects, WebSockets); `api/` is checked against them. Approved 2026-11-17, the version janggi's API uses.
-  "@cloudflare/workers-types": 5.20260921.1
+  "@cloudflare/workers-types": 5.20261120.1
   # Offline Web Audio for art's Node-only TypeScript renderer (approved 2026-11-12).
   node-web-audio-api: 2.2.0
   # LangChain core types and the fake chat model used so tests never touch the network (`ai`).
-  "@langchain/core": 1.3.4
+  "@langchain/core": 1.5.0
   # The graph runtime (`ai`).
-  "@langchain/langgraph": 1.6.1
-  # Local Agent Server and Studio link: `langgraphjs dev` (`ai`).
-  "@langchain/langgraph-cli": 1.6.0
-  # Client for the Agent Server, to call a running graph from a test or the Worker (`ai`).
-  "@langchain/langgraph-sdk": 1.12.10
+  "@langchain/langgraph": 1.7.5
+  # Local Agent Server and LangGraph Studio: `pnpm dev` (`langgraphjs dev`) in `ai`, on the graphs in `ai/langgraph.json`.
+  "@langchain/langgraph-cli": 1.8.1
   # Local model through Ollama, for the evals only (`ai/src/evals`, a devDependency; never imported by code the Worker bundles).
   # 1.3.0 was published 2026-06-17.
-  "@langchain/ollama": 1.3.0
+  "@langchain/ollama": 1.3.1
   # Haiku 5.5 for the paid eval tier (`ai/src/evals`, a devDependency for now). 1.6.0 was published 2026-10-22; its peer range
   # `@langchain/core ^1.3.0` holds for 1.3.4. Added 2026-11-13 at the user's request.
-  "@langchain/anthropic": 1.6.0
-  # LangSmith client for the evals' vitest wrapper and result export (`ai/src/evals`). 0.11.8 is the version already installed
-  # through `@langchain/core`; 0.12.0 (2026-11-10) is inside the seven-day window.
-  langsmith: 0.11.8
+  "@langchain/anthropic": 1.6.6
+  # LangSmith client for the evals' result export (`ai/src/evals`), and what `@langchain/core` traces through (it allows <1.0).
+  langsmith: 0.13.1
   # React 19 aware lint rules for the webapp; the legacy eslint-plugin-react is deliberately not used.
-  "@eslint-react/eslint-plugin": 5.28.8
+  "@eslint-react/eslint-plugin": 5.30.5
   # ESLint's recommended JavaScript rules, in every package's base config.
   "@eslint/js": 10.0.1
-  # Drives the browser for the acceptance specs. 1.65.0 is newer but under seven days old; 1.64.0 is the newest eligible (2026-11-12).
-  "@playwright/test": 1.64.0
+  # Drives the browser for the acceptance specs.
+  "@playwright/test": 1.65.1
   # The react-three-fiber renderer: the arena canvas.
   "@react-three/fiber": 9.8.2
   # Tailwind CSS's first-party Vite integration.
-  "@tailwindcss/vite": 4.3.4
+  "@tailwindcss/vite": 4.3.5
   # Node.js declarations; the current LTS line (26).
   "@types/node": 26.6.6
   # React 19 type declarations.
@@ -92,47 +89,47 @@ catalog:
   # three.js type declarations, in step with `three`.
   "@types/three": 0.187.0
   # Vite's React plugin.
-  "@vitejs/plugin-react": 6.2.1
+  "@vitejs/plugin-react": 6.3.0
   # Typed queries over Cloudflare D1 for accounts and sessions (`api/src/accounts/`, the only code that imports it). Approved
   # 2026-11-19, the version janggi's API uses.
-  drizzle-orm: 0.45.3
+  drizzle-orm: 0.45.4
   # Writes the SQL migrations from the schema (`api/`, devDependency); Wrangler applies them, never `drizzle-kit migrate`.
   # Approved 2026-11-19, the version janggi's API uses.
   drizzle-kit: 0.31.11
   # Google sign-in: PKCE, the code exchange and the ID token's claims (`api/src/sign-in/`). Approved 2026-11-19, the version
   # janggi's API uses.
-  oauth4webapi: 3.8.8
+  oauth4webapi: 3.8.9
   # The linter, in every package.
-  eslint: 10.14.0
+  eslint: 10.15.0
   # Switches off the ESLint rules Prettier owns.
   eslint-config-prettier: 10.1.8
   # Cloudflare's CLI, used only for a `--dry-run` bundle to measure the Worker size (`ai` spike).
-  wrangler: 4.157.0
+  wrangler: 4.166.0
   # Schemas for model output (`ai`). `shared` takes it only when a second package needs a schema.
   zod: 4.6.7
   # Rules of hooks, for the webapp.
   eslint-plugin-react-hooks: 7.1.1
-  fast-check: 4.9.0
+  fast-check: 4.10.3
   # Browser and Node global definitions for ESLint.
   globals: 17.14.0
   # Formats every package.
-  prettier: 3.9.10
+  prettier: 3.10.1
   # The UI.
   react: 19.3.1
   # React's DOM renderer.
   react-dom: 19.3.1
   # Tailwind CSS v4, the utility styles.
-  tailwindcss: 4.3.4
+  tailwindcss: 4.3.5
   # The 3D library react-three-fiber drives; used here orthographically for the top-down 2D view.
   three: 0.187.0
-  # Compiler; held at 6.0.3 (checked 2026-11-12): typescript-eslint 8.72 still declares `typescript <6.1.0`, so TS 7 cannot be linted.
+  # Compiler; held at 6.0.3 (checked 2026-11-27): typescript-eslint 8.74 still declares `typescript <6.1.0`, so TS 7 cannot be linted.
   typescript: 6.0.3
   # TypeScript-aware ESLint parser and rules.
-  typescript-eslint: 8.72.1
+  typescript-eslint: 8.73.0
   # Dev server and bundler for the webapp.
-  vite: 8.3.5
+  vite: 8.3.8
   # Unit test runner, on node.
-  vitest: 5.1.0
-  # The one client-state library: the game store holds the engine's World, a later app store holds UI state. 5.0.16 is the
-  # newest eligible (2026-11-12): 5.1.0 (2026-11-06) is under seven days old. It is the version react-three-fiber already uses.
-  zustand: 5.0.16
+  vitest: 5.1.1
+  # The one client-state library: the game store holds the engine's World, a later app store holds UI state. react-three-fiber
+  # depends on `zustand ^5.0.3`, so keep this inside that range and it shares this copy.
+  zustand: 5.1.0

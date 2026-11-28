@@ -14,14 +14,16 @@ given("a private room that gives its players time to choose", () => {
   });
 
   then("the room offers five different built-in arenas", async ({gunsmith}) => {
-    const offered = gunsmith.room.getArenasOffered() ?? [];
+    const offered = gunsmith.room.frames.getArenasOffered() ?? [];
 
     expect(offered).toHaveLength(5);
     expect(new Set(offered).size).toBe(5);
   });
 
   then("the second player is offered the same five", async ({gunsmith}) => {
-    expect(gunsmith.room.secondBrowser().room.getArenasOffered()).toEqual(gunsmith.room.getArenasOffered());
+    expect(gunsmith.room.secondBrowser().room.frames.getArenasOffered()).toEqual(
+      gunsmith.room.frames.getArenasOffered(),
+    );
   });
 
   when("the first player has locked in both weapons and comes to the arena", () => {
@@ -31,14 +33,14 @@ given("a private room that gives its players time to choose", () => {
     });
 
     then("the screen offers exactly the room's five, in the room's order, and nothing else", async ({gunsmith}) => {
-      const offered = gunsmith.room.getArenasOffered();
+      const offered = gunsmith.room.frames.getArenasOffered();
 
       await expect.poll(() => gunsmith.preRound.arena.getChoices()).toEqual(offered);
     });
 
     then("the first of the five is chosen to begin with", async ({gunsmith}) => {
       await expect.poll(() => gunsmith.preRound.arena.getChoices()).toHaveLength(5);
-      expect(await gunsmith.preRound.arena.getChosen()).toBe(gunsmith.room.getArenasOffered()?.[0]);
+      expect(await gunsmith.preRound.arena.getChosen()).toBe(gunsmith.room.frames.getArenasOffered()?.[0]);
     });
   });
 });
@@ -52,7 +54,7 @@ given("a private room made for a spec that is not about the day's arenas", () =>
   });
 
   then("the room offers every built-in arena, more than the day's five, the Duel first", async ({gunsmith}) => {
-    const offered = gunsmith.room.getArenasOffered() ?? [];
+    const offered = gunsmith.room.frames.getArenasOffered() ?? [];
 
     expect(offered.length).toBeGreaterThan(5);
     expect(offered[0]).toBe("Duel");

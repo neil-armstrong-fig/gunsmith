@@ -9,15 +9,18 @@ const OPPONENT_TILE = {x: 9.5, y: 1.5};
 const WATCH = {maxSeconds: 10, stepSeconds: 0.05};
 const A_FRAME_SECONDS = 0.02;
 
-for (const seed of SEEDS) {
-  given(`a cover hall (seed ${seed}), the player standing in their pocket and facing the opponent`, () => {
+given.each(
+  SEEDS,
+  seed => `a cover hall (seed ${seed}), the player standing in their pocket and facing the opponent`,
+  seed => {
     let seenAtFirst = false;
 
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.startCoverHall(seed);
-      await gunsmith.holdTheGame();
+      await gunsmith.scenario.startCoverHall(seed);
+      await gunsmith.clock.holdTheGame();
+
       await gunsmith.player.aimAtTile(OPPONENT_TILE);
-      await gunsmith.runGameFor(A_FRAME_SECONDS);
+      await gunsmith.clock.runGameFor(A_FRAME_SECONDS);
       seenAtFirst = (await gunsmith.opponent.get()).visible;
     });
 
@@ -46,5 +49,5 @@ for (const seed of SEEDS) {
         expect((await gunsmith.opponent.get()).visible).toBe(true);
       });
     });
-  });
-}
+  },
+);

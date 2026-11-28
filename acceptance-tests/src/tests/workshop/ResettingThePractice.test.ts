@@ -2,6 +2,11 @@ import type {DummySnapshot} from "@gunsmith/shared/state-hook/types/DummySnapsho
 import type {WeaponSnapshot} from "@gunsmith/shared/state-hook/types/WeaponSnapshot";
 import {beforeEach, expect, given, then, when} from "@src/acceptance-criteria-mapping/AcceptanceCriteriaMapping";
 
+/** What of a dummy the reset puts back: where it stands and its health. */
+type DummyAtRest = Pick<DummySnapshot, "x" | "y" | "health">;
+/** What of a weapon the reset refills. */
+type Ammunition = Pick<WeaponSnapshot, "rounds" | "reserve">;
+
 // The prompt has a `t` in it, the reset key, so typing it is a chance for the key to leak out of the panel.
 const FAST_PROMPT = "a fast little submachine gun";
 
@@ -41,7 +46,7 @@ given("the practice range, with a dummy felled and a shot fired from each weapon
 
     await gunsmith.player.switchTo(2);
     await gunsmith.weapon.waitForSlot(2);
-    await gunsmith.waitForGameSeconds(COOLDOWN_SECONDS);
+    await gunsmith.clock.waitForGameSeconds(COOLDOWN_SECONDS);
     // East of the start the middle row is clear to the wall and no dummy stands on it, so this shot cannot meet a dummy that stands up again.
     await gunsmith.player.aimAtTile({x: start.x + EAST_TILES, y: start.y});
     await gunsmith.player.fire();
@@ -116,13 +121,13 @@ given("the practice range, with a dummy felled and a shot fired from each weapon
 
 given("a duel has begun", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startDuel();
+    await gunsmith.scenario.startDuel();
   });
 
   when("the player presses the reset key", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.workshop.resetTheRange();
-      await gunsmith.waitForGameSeconds(0.3);
+      await gunsmith.clock.waitForGameSeconds(0.3);
     });
 
     then("no dummy stands in the arena, because the practice range is the only place with them", async ({gunsmith}) => {
@@ -130,17 +135,6 @@ given("a duel has begun", () => {
     });
   });
 });
-
-interface DummyAtRest {
-  x: number;
-  y: number;
-  health: number;
-}
-
-interface Ammunition {
-  rounds: number;
-  reserve: number;
-}
 
 function dummyAtRest({x, y, health}: DummySnapshot): DummyAtRest {
   return {x, y, health};

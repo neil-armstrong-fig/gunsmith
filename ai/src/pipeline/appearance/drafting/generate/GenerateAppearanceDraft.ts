@@ -3,7 +3,7 @@ import {HumanMessage, SystemMessage} from "@langchain/core/messages";
 import {GENERATION_PROMPT} from "@gunsmith/ai/pipeline/appearance/drafting/generate/prompts/GenerationPrompt";
 import {askForAppearanceDraft} from "@gunsmith/ai/pipeline/appearance/drafting/shared/model-call/AskForAppearanceDraft";
 import type {AppearanceDraftReply} from "@gunsmith/ai/pipeline/appearance/drafting/shared/model-call/types/AppearanceDraftReply";
-import {requestBlock} from "@gunsmith/ai/pipeline/blocks/request/RequestBlock";
+import {requestBlock} from "@gunsmith/ai/pipeline/shared/blocks/request/RequestBlock";
 
 /**
  * Asks the model to draw the weapon a player described: the instructions in one message, the player's words apart from them in a

@@ -22,7 +22,7 @@ const CLOSED_IN_BY_TILES = 3;
 
 given("a sparring match with a ring that starts after three seconds", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startClosingRing({
+    await gunsmith.scenario.startClosingRing({
       seed: PLAYER_LEFT_OUTSIDE_SEED,
       delaySeconds: DELAY_SECONDS,
       closingSeconds: CLOSING_SECONDS,
@@ -44,14 +44,12 @@ given("a sparring match with a ring that starts after three seconds", () => {
       const arena = await gunsmith.arena.getSizeInTiles();
       const {centre, radius} = await gunsmith.ring.get();
 
-      for (const corner of [
-        {x: 0, y: 0},
-        {x: arena.width, y: 0},
-        {x: 0, y: arena.height},
-        {x: arena.width, y: arena.height},
-      ]) {
-        expect(Math.hypot(corner.x - centre.x, corner.y - centre.y)).toBeLessThanOrEqual(radius + 0.001);
-      }
+      const reach = radius + 0.001;
+
+      expect(Math.hypot(centre.x, centre.y)).toBeLessThanOrEqual(reach);
+      expect(Math.hypot(arena.width - centre.x, centre.y)).toBeLessThanOrEqual(reach);
+      expect(Math.hypot(centre.x, arena.height - centre.y)).toBeLessThanOrEqual(reach);
+      expect(Math.hypot(arena.width - centre.x, arena.height - centre.y)).toBeLessThanOrEqual(reach);
     });
 
     then("it does no damage yet", async ({gunsmith}) => {
@@ -95,7 +93,7 @@ const FINAL_RADIUS_TILES = 2;
 
 given("a sparring match whose ring closes slowly enough to still be closing when it decides the round", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startClosingRing({
+    await gunsmith.scenario.startClosingRing({
       seed: OPPONENT_LEFT_OUTSIDE_SEED,
       delaySeconds: DELAY_SECONDS,
       closingSeconds: SLOW_CLOSING_SECONDS,
@@ -108,10 +106,12 @@ given("a sparring match whose ring closes slowly enough to still be closing when
 
     beforeEach(async ({gunsmith}) => {
       await gunsmith.round.waitForState("won", LONGEST_SLOW_ROUND_SECONDS);
+
       const ring = await gunsmith.ring.get();
       radiusAtTheEnd = ring.radius;
       damageAtTheEnd = ring.damagePerSecond;
-      await gunsmith.waitForGameSeconds(1);
+
+      await gunsmith.clock.waitForGameSeconds(1);
     });
 
     then("it had not finished closing, so what follows is the round's doing", () => {
@@ -130,7 +130,7 @@ given("a sparring match whose ring closes slowly enough to still be closing when
 
 given("a sparring match whose ring closes on the player's side of the arena", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startClosingRing({
+    await gunsmith.scenario.startClosingRing({
       seed: OPPONENT_LEFT_OUTSIDE_SEED,
       delaySeconds: DELAY_SECONDS,
       closingSeconds: CLOSING_SECONDS,
@@ -158,7 +158,7 @@ given("a sparring match whose ring closes on the player's side of the arena", ()
 
 given("a sparring match whose ring closes on the opponent's side of the arena", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startClosingRing({
+    await gunsmith.scenario.startClosingRing({
       seed: PLAYER_LEFT_OUTSIDE_SEED,
       delaySeconds: DELAY_SECONDS,
       closingSeconds: CLOSING_SECONDS,

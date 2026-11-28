@@ -1,0 +1,37 @@
+import {FakeListChatModel} from "@langchain/core/utils/testing";
+import {createArenaGraph} from "@gunsmith/ai/pipeline/arena/graph/CreateArenaGraph";
+import type {ArenaGraph} from "@gunsmith/ai/pipeline/arena/graph/types/ArenaGraph";
+import type {ArenaPipelineDependencies} from "@gunsmith/ai/pipeline/arena/types/ArenaPipelineDependencies";
+
+it("has one node for each step of the pipeline, and no other", () => {
+  const stepIds = Object.keys(drawableGraph().nodes).filter(id => !id.startsWith("__"));
+
+  expect(stepIds.sort()).toEqual(["generate", "moderation", "precheck", "repair", "validate"]);
+});
+
+it("runs the steps in a fixed order, with a way out at every refusal and one road back through repair, and no substitute at the end", () => {
+  const roads = drawableGraph().edges.map(edge => `${edge.source} -> ${edge.target}`);
+
+  expect(roads.sort()).toEqual([
+    "__start__ -> precheck",
+    "generate -> validate",
+    "moderation -> __end__",
+    "moderation -> generate",
+    "precheck -> __end__",
+    "precheck -> moderation",
+    "repair -> validate",
+    "validate -> __end__",
+    "validate -> repair",
+  ]);
+});
+
+function drawableGraph(): ReturnType<ArenaGraph["getGraph"]> {
+  return createArenaGraph(fakeArenaPipelineDependencies()).getGraph();
+}
+
+function fakeArenaPipelineDependencies(): ArenaPipelineDependencies {
+  return {
+    generator: new FakeListChatModel({responses: ["{}"]}),
+    moderator: new FakeListChatModel({responses: ["{}"]}),
+  };
+}

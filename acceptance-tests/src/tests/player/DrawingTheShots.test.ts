@@ -2,7 +2,7 @@ import type {BulletSnapshot} from "@gunsmith/shared/state-hook/types/BulletSnaps
 import {beforeEach, expect, given, then, when} from "@src/acceptance-criteria-mapping/AcceptanceCriteriaMapping";
 
 // A shot is drawn on the canvas, which is not in the DOM, and it is in the air for a fraction of a second, so this spec holds the game still on one
-// (`gunsmith.holdTheGame()`, then runs it a step at a time) and reads what a player sees (a screenshot) over the places the state hook says the bullet is,
+// (`gunsmith.clock.holdTheGame()`, then runs it a step at a time) and reads what a player sees (a screenshot) over the places the state hook says the bullet is,
 // flying which way and whose it is, as `DrawingThePlayer` does for the player. It looks for art's picture of the rifle's shot (`docs/art/asset-reference/effects/projectile-rifle/`):
 // a thin bar of one flat colour, its tip on the bullet's point, in the shooter's team colour: blue for the player and orange for the opponent. The placeholder
 // it replaces was a small gold disc, which has no length at all.
@@ -15,8 +15,8 @@ const GAME_SECONDS_AFTER_TURNING_AWAY = 0.03;
 
 given("a sparring match, held still, with the player aiming east at the opponent a few tiles away", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startSparring();
-    await gunsmith.holdTheGame();
+    await gunsmith.scenario.startSparring();
+    await gunsmith.clock.holdTheGame();
   });
 
   when("the player fires and the shot has been in the air for a moment", () => {
@@ -24,9 +24,9 @@ given("a sparring match, held still, with the player aiming east at the opponent
 
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.aimAtTile({x: 15.5, y: 6.5});
-      await gunsmith.runGameFor(GAME_SECONDS_AFTER_AIMING);
+      await gunsmith.clock.runGameFor(GAME_SECONDS_AFTER_AIMING);
       await gunsmith.player.fire();
-      await gunsmith.runGameFor(GAME_SECONDS_IN_FLIGHT);
+      await gunsmith.clock.runGameFor(GAME_SECONDS_IN_FLIGHT);
       const [first] = await gunsmith.bullets.getAll();
       if (!first) {
         throw new Error("The player fired and no shot is in the air.");
@@ -74,9 +74,9 @@ given("a sparring match, held still, with the player aiming east at the opponent
 
       beforeEach(async ({gunsmith}) => {
         await gunsmith.player.aimAtTile(tile);
-        await gunsmith.runGameFor(GAME_SECONDS_AFTER_AIMING);
+        await gunsmith.clock.runGameFor(GAME_SECONDS_AFTER_AIMING);
         await gunsmith.player.fire();
-        await gunsmith.runGameFor(GAME_SECONDS_IN_FLIGHT);
+        await gunsmith.clock.runGameFor(GAME_SECONDS_IN_FLIGHT);
         const [first] = await gunsmith.bullets.getAll();
         if (!first) {
           throw new Error("The player fired and no shot is in the air.");
@@ -98,8 +98,8 @@ given("a sparring match, held still, with the player aiming east at the opponent
 
 given("a duel, held still, in which the opponent has fired at the player", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startDuel();
-    await gunsmith.holdTheGame();
+    await gunsmith.scenario.startDuel();
+    await gunsmith.clock.holdTheGame();
     await gunsmith.bullets.runUntilTheOpponentFires(MOST_GAME_SECONDS_FOR_THE_OPPONENT_TO_FIRE);
   });
 
@@ -134,7 +134,7 @@ given("a duel, held still, in which the opponent has fired at the player", () =>
   when("the player turns away, so the shot is outside what they see", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.aimAtTile({x: 10.5, y: 1.5});
-      await gunsmith.runGameFor(GAME_SECONDS_AFTER_TURNING_AWAY);
+      await gunsmith.clock.runGameFor(GAME_SECONDS_AFTER_TURNING_AWAY);
     });
 
     then("the shot is still in the air", async ({gunsmith}) => {
@@ -159,12 +159,12 @@ given("a sparring match, held still, whose pictures are not on the server", () =
   let shot: BulletSnapshot;
 
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startSparringWithMissingPictures();
-    await gunsmith.holdTheGame();
+    await gunsmith.scenario.startSparringWithMissingPictures();
+    await gunsmith.clock.holdTheGame();
     await gunsmith.player.aimAtTile({x: 10.5, y: 11.5});
-    await gunsmith.runGameFor(GAME_SECONDS_AFTER_AIMING);
+    await gunsmith.clock.runGameFor(GAME_SECONDS_AFTER_AIMING);
     await gunsmith.player.fire();
-    await gunsmith.runGameFor(GAME_SECONDS_IN_FLIGHT);
+    await gunsmith.clock.runGameFor(GAME_SECONDS_IN_FLIGHT);
     const [first] = await gunsmith.bullets.getAll();
     if (!first) {
       throw new Error("The player fired and no shot is in the air.");

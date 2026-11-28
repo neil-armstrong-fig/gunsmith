@@ -10,7 +10,7 @@ import {arenaNoPromptLeak} from "@evals/dsl/arena/pipeline/evaluators/player-vis
 import {failuresOf} from "@evals/dsl/shared/checks/FailuresOf";
 import {walledCorners} from "@evals/dsl/arena/pipeline/walled-corners/WalledCorners";
 import type {ArenaOutcome} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcome";
-import type {ArenaSize} from "@gunsmith/ai/pipeline/arena/arena-shapes/types/ArenaSize";
+import type {ArenaSize} from "@gunsmith/ai/pipeline/arena/drafting/format/shapes/types/ArenaSize";
 import type {ArenaOutcomeStatus} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcomeStatus";
 
 /**

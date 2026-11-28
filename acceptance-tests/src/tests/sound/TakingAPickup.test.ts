@@ -4,7 +4,7 @@ const PICKUP_SOUND = "sfx-pickup";
 
 given("seed-8 sparring with a pickup on the player's row", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startSparringWithSeed(8);
+    await gunsmith.scenario.startSparringWithSeed(8);
   });
 
   when("the player walks over the pickup", () => {
@@ -40,7 +40,7 @@ given("seed-8 sparring with a pickup on the player's row", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.switchTo(2);
       await gunsmith.hud.waitForSlot(2);
-      await gunsmith.waitForGameSeconds(0.5);
+      await gunsmith.clock.waitForGameSeconds(0.5);
     });
 
     then("there is no pickup sound", async ({gunsmith}) => {
@@ -53,10 +53,12 @@ given("seed-8 sparring with a pickup on the player's row", () => {
   when("the player collects the pickup while muted and then unmutes", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.sound.toggleMute();
+
       await gunsmith.player.walkFor("east", 0.7);
       await gunsmith.pickup.waitUntilTaken();
+
       await gunsmith.sound.toggleMute();
-      await gunsmith.waitForGameSeconds(0.5);
+      await gunsmith.clock.waitForGameSeconds(0.5);
     });
 
     then("the inventory is updated and the latch has stayed silent", async ({gunsmith}) => {
@@ -69,7 +71,7 @@ given("seed-8 sparring with a pickup on the player's row", () => {
 given("a pickup race with the weapon nearer the opponent", () => {
   when("the opponent collects it", () => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.startPickupRace(2);
+      await gunsmith.scenario.startPickupRace(2);
       await gunsmith.player.switchTo(1);
       await gunsmith.pickup.waitUntilTaken(15);
     });

@@ -1,5 +1,5 @@
 import fc from "fast-check";
-import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
+import type {WeaponOutcome} from "@gunsmith/ai/pipeline/weapon/types/WeaponOutcome";
 import {DAILY_CREDITS} from "@src/durable-objects/credit-ledger/account/DailyCredits";
 import {settledWeaponSpend} from "@src/durable-objects/spend-ledger/estimate/weapon/SettledWeaponSpend";
 import {WEAPON_SPEND} from "@src/durable-objects/spend-ledger/estimate/weapon/WeaponSpend";

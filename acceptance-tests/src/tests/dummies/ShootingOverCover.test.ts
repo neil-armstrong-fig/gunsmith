@@ -10,16 +10,15 @@ const CROUCHED_BEHIND_COVER = {x: 8.5, y: 1.5};
 const CROUCHED_IN_THE_OPEN = {x: 8.5, y: 5.5};
 const SHOT_WATCH = {maxSeconds: 5, stepSeconds: 0.05};
 // One frame at a time for six frames (120 ms), then long enough for the shot surely to have ended, a dummy's row being eight tiles of rifle flight at most.
-const A_FRAME_SECONDS = 0.02;
-const FRAMES_LOOKED_AT = 6;
+const EVERY_FRAME_WATCH = {maxSeconds: 0.12, stepSeconds: 0.02};
 const LONGER_THAN_THE_SHOT_LIVES_SECONDS = 1;
 // Long enough for the crouch to take hold: the player's view reaches farther once they are crouching.
 const CROUCH_TAKES_HOLD_SECONDS = 0.5;
 
 given("a player facing three dummies, two of them behind a low cover block", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startCover();
-    await gunsmith.holdTheGame();
+    await gunsmith.scenario.startCover();
+    await gunsmith.clock.holdTheGame();
   });
 
   when("the player, standing, shoots the dummy standing behind cover", () => {
@@ -47,13 +46,8 @@ given("a player facing three dummies, two of them behind a low cover block", () 
       health = await gunsmith.dummies.getHealthAt(CROUCHED_BEHIND_COVER);
 
       await gunsmith.player.aimAtTile(CROUCHED_BEHIND_COVER);
-      await gunsmith.player.fire();
-
-      for (let frame = 0; frame < FRAMES_LOOKED_AT; frame += 1) {
-        await gunsmith.runGameFor(A_FRAME_SECONDS);
-        shotLeft = shotLeft || (await gunsmith.bullets.count()) > 0;
-      }
-      await gunsmith.runGameFor(LONGER_THAN_THE_SHOT_LIVES_SECONDS);
+      shotLeft = (await gunsmith.player.fireAndWatchTheShot(EVERY_FRAME_WATCH)).seenInTheAir;
+      await gunsmith.clock.runGameFor(LONGER_THAN_THE_SHOT_LIVES_SECONDS);
     });
 
     then(
@@ -88,7 +82,7 @@ given("a player facing three dummies, two of them behind a low cover block", () 
       const standingView = await gunsmith.vision.getView();
 
       await gunsmith.player.crouch();
-      await gunsmith.runGameFor(CROUCH_TAKES_HOLD_SECONDS);
+      await gunsmith.clock.runGameFor(CROUCH_TAKES_HOLD_SECONDS);
 
       expect((await gunsmith.vision.getView()).range).toBeGreaterThan(standingView.range);
     });
@@ -101,13 +95,8 @@ given("a player facing three dummies, two of them behind a low cover block", () 
         health = await gunsmith.dummies.getHealthAt(STANDING_BEHIND_COVER);
 
         await gunsmith.player.aimAtTile(STANDING_BEHIND_COVER);
-        await gunsmith.player.fire();
-
-        for (let frame = 0; frame < FRAMES_LOOKED_AT; frame += 1) {
-          await gunsmith.runGameFor(A_FRAME_SECONDS);
-          shotLeft = shotLeft || (await gunsmith.bullets.count()) > 0;
-        }
-        await gunsmith.runGameFor(LONGER_THAN_THE_SHOT_LIVES_SECONDS);
+        shotLeft = (await gunsmith.player.fireAndWatchTheShot(EVERY_FRAME_WATCH)).seenInTheAir;
+        await gunsmith.clock.runGameFor(LONGER_THAN_THE_SHOT_LIVES_SECONDS);
       });
 
       then("the shot is stopped by the block and the dummy is not hurt", async ({gunsmith}) => {

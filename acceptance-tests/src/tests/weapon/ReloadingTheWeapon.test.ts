@@ -12,7 +12,7 @@ given("a match has just begun", () => {
 
     then("no more bullets leave, however long the trigger stays held", async ({gunsmith}) => {
       await gunsmith.bullets.waitForNoBullets();
-      await gunsmith.waitForGameSeconds(0.5);
+      await gunsmith.clock.waitForGameSeconds(0.5);
 
       expect(await gunsmith.bullets.count()).toBe(0);
       expect((await gunsmith.weapon.get()).rounds).toBe(0);
@@ -90,7 +90,7 @@ given("a match has just begun", () => {
     });
 
     then("nothing is reloaded", async ({gunsmith}) => {
-      await gunsmith.waitForGameSeconds(0.5);
+      await gunsmith.clock.waitForGameSeconds(0.5);
 
       expect((await gunsmith.weapon.get()).reloading).toBe(false);
     });

@@ -68,11 +68,14 @@ given("a private room whose first player locked in a saved weapon for slot 1, sh
     await gunsmith.room.joinWithASecondBrowserToChoose(code);
     const second = gunsmith.room.secondBrowser();
 
-    for (const player of [gunsmith, second]) {
-      await player.room.preRound.lockInWeapon(1);
-      await player.room.preRound.lockInWeapon(2);
-      await player.room.preRound.lockInArena();
-    }
+    await gunsmith.room.preRound.lockInWeapon(1);
+    await gunsmith.room.preRound.lockInWeapon(2);
+    await gunsmith.room.preRound.lockInArena();
+
+    await second.room.preRound.lockInWeapon(1);
+    await second.room.preRound.lockInWeapon(2);
+    await second.room.preRound.lockInArena();
+
     await gunsmith.room.preRound.waitForTheReveal();
     await second.room.preRound.waitForTheReveal();
   });
@@ -113,7 +116,7 @@ given("a private room whose first player locked in a saved weapon for slot 1, sh
 
       await gunsmith.player.aimAtTile(await second.player.getPosition());
       await second.player.aimAtTile(firstPosition);
-      await expect.poll(() => second.room.hasBeenToldWhereTheOtherPlayerIs()).toBe(true);
+      await expect.poll(() => second.room.frames.hasBeenToldWhereTheOtherPlayerIs()).toBe(true);
 
       firstPose = {...firstPosition, aimDegrees: await gunsmith.player.getAimDegrees()};
     });
@@ -144,7 +147,7 @@ given("a private room whose first player locked in a saved weapon for slot 1, sh
       beforeEach(async ({gunsmith}) => {
         await gunsmith.room.leaveTheRoom();
         await gunsmith.room.returnToTheRoom();
-        await gunsmith.room.waitForTheMatchAgain();
+        await gunsmith.room.connection.waitForTheMatchAgain();
       });
 
       then("they hold the saved weapon's drawing again", async ({gunsmith}) => {

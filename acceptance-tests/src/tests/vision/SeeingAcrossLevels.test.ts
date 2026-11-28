@@ -27,13 +27,13 @@ const TURN_SECONDS = 0.1;
 
 given("a player on the low ground, a dummy on the platform ahead and another on the low ground behind them", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startHeights();
+    await gunsmith.scenario.startHeights();
   });
 
   when("the player faces the dummy on the platform", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.aimAtTile(PLATFORM_DUMMY);
-      await gunsmith.waitForGameSeconds(0.3);
+      await gunsmith.clock.waitForGameSeconds(0.3);
     });
 
     then(
@@ -70,7 +70,7 @@ given("a player on the low ground, a dummy on the platform ahead and another on 
 
   when("the player climbs the stair to the platform's edge", () => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.holdTheGame();
+      await gunsmith.clock.holdTheGame();
       await gunsmith.player.walkUntilPast({heading: "east", limit: AT_THE_EDGE, watch: WALK_WATCH});
     });
 
@@ -81,7 +81,7 @@ given("a player on the low ground, a dummy on the platform ahead and another on 
     when("the player faces the dummy there", () => {
       beforeEach(async ({gunsmith}) => {
         await gunsmith.player.aimAtTile(PLATFORM_DUMMY);
-        await gunsmith.runGameFor(TURN_SECONDS);
+        await gunsmith.clock.runGameFor(TURN_SECONDS);
       });
 
       then("the player sees it, now that they stand as high as it", async ({gunsmith}) => {
@@ -92,7 +92,7 @@ given("a player on the low ground, a dummy on the platform ahead and another on 
     when("the player faces back down at the dummy on the low ground", () => {
       beforeEach(async ({gunsmith}) => {
         await gunsmith.player.aimAtTile(LOW_GROUND_DUMMY);
-        await gunsmith.runGameFor(TURN_SECONDS);
+        await gunsmith.clock.runGameFor(TURN_SECONDS);
       });
 
       then("the player sees it, because from the edge higher ground sees down", async ({gunsmith}) => {
@@ -104,7 +104,7 @@ given("a player on the low ground, a dummy on the platform ahead and another on 
       beforeEach(async ({gunsmith}) => {
         await gunsmith.player.walkUntilPast({heading: "east", limit: BACK_FROM_THE_EDGE, watch: WALK_WATCH});
         await gunsmith.player.aimAtTile(LOW_GROUND_DUMMY);
-        await gunsmith.runGameFor(TURN_SECONDS);
+        await gunsmith.clock.runGameFor(TURN_SECONDS);
       });
 
       then("the player does not see it, because the platform's edge hides the low ground below", async ({gunsmith}) => {
@@ -117,7 +117,7 @@ given("a player on the low ground, a dummy on the platform ahead and another on 
       beforeEach(async ({gunsmith}) => {
         await gunsmith.player.walkUntilPast({heading: "east", limit: BACK_FROM_THE_EDGE, watch: WALK_WATCH});
         await gunsmith.player.aimAtTile(FAR_PLATFORM);
-        await gunsmith.runGameFor(TURN_SECONDS);
+        await gunsmith.clock.runGameFor(TURN_SECONDS);
       });
 
       then(

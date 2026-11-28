@@ -217,7 +217,7 @@ Enforced by ESLint (`no-restricted-imports`, in `shared/config/eslint.base.js`) 
 `api/` imports `ai/` **(decided 2026-11-12, `docs/ai-hosting.md`)**: the pipeline runs inside the Worker with LangChain.js
 and LangGraph.js, because the user declined LangSmith Plus, which a hosted LangGraph deployment needs. Add `@gunsmith/ai` to
 `api/`'s `allowedPackages` when `api/` is scaffolded. `ai/` must stay Workers-safe (no Node-only APIs; `nodejs_compat`
-only), and the graph stays host-agnostic (`langgraph.json`) so a hosted deployment remains an option later.
+only), and the graphs stay host-agnostic (built from the models they are handed) so a hosted deployment remains an option later.
 
 A workspace package added later is **denied by default**; add it to `allowedPackages` in that
 package's `eslint.config.js` to permit it. Packages enforce their own internal layering too — see the
@@ -264,8 +264,9 @@ and again, not once.
 - **Adding or upgrading any dependency.** Versions are exact-pinned in the `catalog:` of `pnpm-workspace.yaml`, several
   deliberately (see Gotchas), and a supply-chain policy there rejects packages published in the last seven days.
   Nothing updates them automatically, so **when there has been a gap since the last commit** — a few days or more
-  between it and the work now starting — check the catalog's versions (`pnpm outdated -r`) before beginning, and
-  say which are behind and which of those are held on purpose (Gotchas). Propose the bumps; do not apply them unasked.
+  between it and the work now starting — audit the catalog with the
+  [`bump-dependencies` skill](.agents/skills/bump-dependencies/SKILL.md) before beginning, and say which are behind and
+  which of those are held on purpose (Gotchas). Propose the bumps; do not apply them unasked.
 - **Deleting or rebuilding `pnpm-lock.yaml`.** It re-resolves every transitive dependency.
 - **Any git commit, branch or push.** The standing exceptions, agreed in advance: the worktree integration flow in
   `docs/agent-reference/Operations.md`, including a worktree session's **merge of `main` into its own branch at the start of a

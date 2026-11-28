@@ -1,5 +1,5 @@
 
-# LangGraph API
+# LangGraph dev server state (`pnpm dev`)
 .langgraph_api
 
 # Eval run summaries and kept drawings (copy a summary to a dated file to keep a baseline)

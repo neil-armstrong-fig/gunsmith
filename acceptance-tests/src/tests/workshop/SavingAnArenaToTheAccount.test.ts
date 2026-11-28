@@ -3,6 +3,7 @@ import {beforeEach, expect, given, then, when} from "@src/acceptance-criteria-ma
 given("a signed-in player makes an arena in the workshop", () => {
   beforeEach(async ({gunsmith}) => {
     await gunsmith.workshop.arenas.arrangeSignedInArena();
+
     await gunsmith.workshop.open();
     await gunsmith.workshop.arenas.open();
     await gunsmith.workshop.pasteThePrompt("a wide industrial yard");
@@ -28,7 +29,8 @@ given("a signed-in player makes an arena in the workshop", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.workshop.arenas.pressArenaAction("Save");
       await expect.poll(() => gunsmith.workshop.arenas.getSavedArenaPrompts()).toEqual(["a wide industrial yard"]);
-      await gunsmith.reloadThePage();
+
+      await gunsmith.browser.reloadThePage();
       await gunsmith.workshop.open();
       await gunsmith.workshop.arenas.open();
     });
@@ -57,6 +59,7 @@ given("a signed-in player makes an arena in the workshop", () => {
 given("a signed-in player has a saved arena while generation is paused", () => {
   beforeEach(async ({gunsmith}) => {
     await gunsmith.workshop.arenas.arrangeSignedInArena("paused");
+
     await gunsmith.workshop.open();
     await gunsmith.workshop.arenas.open();
     await gunsmith.workshop.pasteThePrompt("a wide industrial yard");
@@ -82,6 +85,7 @@ given("a signed-in player has a saved arena while generation is paused", () => {
 given("the arena generator cannot build the arena asked for, and gives nothing in its place", () => {
   beforeEach(async ({gunsmith}) => {
     await gunsmith.workshop.arenas.arrangeSignedInArena();
+
     await gunsmith.workshop.open();
     await gunsmith.workshop.arenas.open();
     await gunsmith.workshop.pasteThePrompt("two watchtowers and a raised bridge");
@@ -105,11 +109,13 @@ given("the arena generator cannot build the arena asked for, and gives nothing i
 given("a signed-in player has a saved arena and no credits", () => {
   beforeEach(async ({gunsmith}) => {
     await gunsmith.workshop.arenas.arrangeSignedInArena("no-credits");
+
     await gunsmith.workshop.open();
     await gunsmith.workshop.arenas.open();
     await gunsmith.workshop.pasteThePrompt("a wide industrial yard");
     await gunsmith.workshop.make();
     await expect.poll(() => gunsmith.workshop.arenas.getMakeError()).toBe("You’re out of credits.");
+
     await gunsmith.workshop.arenas.pressArenaAction("Walk it");
   });
 

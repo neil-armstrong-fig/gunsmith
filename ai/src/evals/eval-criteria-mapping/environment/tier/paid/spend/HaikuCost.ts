@@ -1,4 +1,4 @@
-import type {ModelUsage} from "@gunsmith/ai/pipeline/types/ModelUsage";
+import type {ModelUsage} from "@gunsmith/ai/pipeline/shared/usage/types/ModelUsage";
 
 // Haiku 5.5 list price, dollars per million tokens (`docs/cost-and-budget.md`, from the pricing page, 2026-11-12). Our own
 // estimate from the tokens the model reports, so the Console's usage page is the bill and this is only the guard.

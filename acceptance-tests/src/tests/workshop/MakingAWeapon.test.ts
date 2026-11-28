@@ -29,9 +29,7 @@ given("the workshop is open on the practice range", () => {
       const {stats} = await gunsmith.workshop.getResult();
 
       expect(Object.keys(stats)).toEqual(["Damage", "Shots a second", "Magazine", "Reserve", "Reload", "Vision"]);
-      for (const value of Object.values(stats)) {
-        expect(value).toMatch(/^\d/);
-      }
+      expect(Object.values(stats)).toEqual(Array<unknown>(6).fill(expect.stringMatching(/^\d/)));
     });
 
     then("the card draws the weapon, a picture that has loaded", async ({gunsmith}) => {
@@ -169,6 +167,7 @@ given("the workshop is open on the practice range", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.workshop.pasteThePrompt("a fast little submachine gun");
       await gunsmith.workshop.make();
+
       await gunsmith.workshop.close();
       await gunsmith.workshop.open();
     });

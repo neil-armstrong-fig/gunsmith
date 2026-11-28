@@ -1,4 +1,4 @@
-import type {WeaponPipelineDependencies} from "@gunsmith/ai/pipeline/types/WeaponPipelineDependencies";
+import type {WeaponPipelineDependencies} from "@gunsmith/ai/pipeline/weapon/types/WeaponPipelineDependencies";
 import {createLocalChatModel} from "@evals/eval-criteria-mapping/environment/tier/local/CreateLocalChatModel";
 import {LOCAL_TRIALS} from "@evals/eval-criteria-mapping/environment/tier/local/LocalTrials";
 import {fakeAppearanceGenerator} from "@evals/eval-criteria-mapping/setups/appearance/fake/FakeAppearanceGenerator";

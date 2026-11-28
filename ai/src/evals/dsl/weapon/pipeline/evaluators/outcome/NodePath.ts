@@ -1,7 +1,7 @@
 import type {CreatedPath} from "@evals/dsl/weapon/pipeline/evaluators/outcome/types/CreatedPath";
 import type {WeaponEvalInput} from "@evals/dsl/weapon/pipeline/types/WeaponEvalInput";
 import type {EvalScore} from "@evals/dsl/shared/types/EvalScore";
-import type {WeaponOutcomeStatus} from "@gunsmith/ai/pipeline/types/WeaponOutcomeStatus";
+import type {WeaponOutcomeStatus} from "@gunsmith/ai/pipeline/weapon/types/WeaponOutcomeStatus";
 
 const KEY = "nodePath";
 

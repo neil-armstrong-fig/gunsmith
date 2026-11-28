@@ -8,8 +8,10 @@ given("the player is on the practice range", () => {
       const {rounds} = await gunsmith.weapon.get();
       await gunsmith.player.fire();
       await gunsmith.weapon.waitForRounds(rounds - 1);
+
       await gunsmith.player.reload();
       await gunsmith.weapon.waitForReloadToStart();
+
       await gunsmith.player.reload();
     });
 
@@ -28,11 +30,13 @@ given("the player is on the practice range", () => {
       const {rounds} = await gunsmith.weapon.get();
       await gunsmith.player.fire();
       await gunsmith.weapon.waitForRounds(rounds - 1);
+
       await gunsmith.player.reload();
       await gunsmith.weapon.waitForReloadToStart();
       await gunsmith.weapon.waitForReloadToEnd();
+
       await gunsmith.player.reload();
-      await gunsmith.waitForGameSeconds(0.3);
+      await gunsmith.clock.waitForGameSeconds(0.3);
     });
 
     then("the weapon stays ready and only the first reload plays a cue", async ({gunsmith}) => {
@@ -45,13 +49,16 @@ given("the player is on the practice range", () => {
     beforeEach(async ({gunsmith}) => {
       const {rounds} = await gunsmith.weapon.get();
       await gunsmith.sound.toggleMute();
+
       await gunsmith.player.fire();
       await gunsmith.weapon.waitForRounds(rounds - 1);
+
       await gunsmith.player.reload();
       await gunsmith.weapon.waitForReloadToStart();
       await gunsmith.weapon.waitForReloadToEnd();
+
       await gunsmith.sound.toggleMute();
-      await gunsmith.waitForGameSeconds(0.3);
+      await gunsmith.clock.waitForGameSeconds(0.3);
     });
 
     then("nothing plays during or after the reload", async ({gunsmith}) => {

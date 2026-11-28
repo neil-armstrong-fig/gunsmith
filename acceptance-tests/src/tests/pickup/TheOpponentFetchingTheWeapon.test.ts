@@ -10,13 +10,15 @@ const SEEDS = [2, 17, 28];
 // Four tiles at the opponent's pace is about a second and a half; the rest is room for a loaded machine.
 const LONGEST_WALK_SECONDS = 15;
 
-for (const seed of SEEDS) {
-  given(`a duel (seed ${seed}) with a weapon lying near the opponent and far from the player, who stands still`, () => {
+given.each(
+  SEEDS,
+  seed => `a duel (seed ${seed}) with a weapon lying near the opponent and far from the player, who stands still`,
+  seed => {
     let startingRounds = 0;
     let startingHealth = 0;
 
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.startPickupRace(seed);
+      await gunsmith.scenario.startPickupRace(seed);
       startingRounds = (await gunsmith.opponent.get()).rounds;
       startingHealth = await gunsmith.player.getHealth();
     });
@@ -44,5 +46,5 @@ for (const seed of SEEDS) {
         },
       );
     });
-  });
-}
+  },
+);

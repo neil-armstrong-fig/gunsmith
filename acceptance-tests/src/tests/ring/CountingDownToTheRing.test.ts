@@ -12,7 +12,7 @@ const LONGEST_LOSS_SECONDS = 15;
 
 given("a duel has just begun", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startDuel();
+    await gunsmith.scenario.startDuel();
   });
 
   when("the player has done nothing yet", () => {
@@ -33,7 +33,7 @@ given("a duel has just begun", () => {
 
     beforeEach(async ({gunsmith}) => {
       secondsBefore = (await gunsmith.ring.get()).secondsUntilStart;
-      await gunsmith.waitForGameSeconds(1);
+      await gunsmith.clock.waitForGameSeconds(1);
     });
 
     then("the countdown has fallen by at least that second", async ({gunsmith}) => {
@@ -49,9 +49,11 @@ given("a duel has just begun", () => {
 
     beforeEach(async ({gunsmith}) => {
       await gunsmith.round.waitForState("lost", LONGEST_LOSS_SECONDS);
+
       secondsAtLoss = (await gunsmith.ring.get()).secondsUntilStart;
       countdownAtLoss = await gunsmith.ring.getCountdownOnScreen();
-      await gunsmith.waitForGameSeconds(1);
+
+      await gunsmith.clock.waitForGameSeconds(1);
     });
 
     then("the countdown has stopped, though the game's clock runs on", async ({gunsmith}) => {
@@ -69,6 +71,7 @@ given("a duel has just begun", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.round.waitForState("lost", LONGEST_LOSS_SECONDS);
       secondsAtLoss = (await gunsmith.ring.get()).secondsUntilStart;
+
       await gunsmith.round.nextRound();
       await gunsmith.round.waitForBannerToGo();
     });
@@ -84,7 +87,7 @@ given("a duel has just begun", () => {
 
 given("a sparring match has just begun", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startSparring();
+    await gunsmith.scenario.startSparring();
   });
 
   when("the player has done nothing yet", () => {

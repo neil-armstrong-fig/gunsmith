@@ -7,7 +7,7 @@ const LONGEST_LOSS_SECONDS = 15;
 
 given("a duel has just begun", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startDuel();
+    await gunsmith.scenario.startDuel();
   });
 
   when("the first round has just begun", () => {
@@ -51,7 +51,7 @@ given("the practice range", () => {
 
 given("the heights arena", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startHeights();
+    await gunsmith.scenario.startHeights();
   });
 
   when("the game has just begun", () => {

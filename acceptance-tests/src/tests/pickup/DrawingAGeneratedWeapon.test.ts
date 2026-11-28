@@ -33,7 +33,7 @@ const BODY_APART_AT_LEAST = 0.9;
 
 given("a sparring match whose weapon is drawn as art's lantern", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startSparringWithPickupDrawing({seed: SEED, drawing: "lantern"});
+    await gunsmith.scenario.startSparringWithPickupDrawing({seed: SEED, drawing: "lantern"});
   });
 
   when("the player faces the weapon and sees it", () => {
@@ -92,7 +92,7 @@ given("a sparring match whose weapon is drawn as art's lantern", () => {
 
 given("a sparring match whose weapon's drawing the game refuses", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startSparringWithPickupDrawing({seed: SEED, drawing: "refused"});
+    await gunsmith.scenario.startSparringWithPickupDrawing({seed: SEED, drawing: "refused"});
   });
 
   when("the player faces the weapon and sees it", () => {
@@ -132,8 +132,8 @@ given.each(
   ({pixelsPerTile}) => `a sparring match whose weapon's drawing the game refuses, at ${pixelsPerTile} pixels per tile`,
   ({width, height}) => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.resizeWindowTo({width, height});
-      await gunsmith.startSparringWithPickupDrawing({seed: SEED, drawing: "refused"});
+      await gunsmith.browser.resizeWindowTo({width, height});
+      await gunsmith.scenario.startSparringWithPickupDrawing({seed: SEED, drawing: "refused"});
     });
 
     when("the player faces the weapon and sees it", () => {

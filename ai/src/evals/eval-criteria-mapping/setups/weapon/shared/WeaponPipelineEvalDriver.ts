@@ -1,9 +1,9 @@
 import type {WeaponPipelineDriver} from "@evals/dsl/weapon/types/WeaponPipelineDriver";
 import {trialCount} from "@evals/eval-criteria-mapping/environment/tier/shared/trials/TrialCount";
 import type {WeaponPipelineRun} from "@evals/eval-criteria-mapping/setups/weapon/shared/types/WeaponPipelineRun";
-import {generateWeapon} from "@gunsmith/ai/pipeline/GenerateWeapon";
-import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
-import type {WeaponPipelineDependencies} from "@gunsmith/ai/pipeline/types/WeaponPipelineDependencies";
+import {generateWeapon} from "@gunsmith/ai/pipeline/weapon/GenerateWeapon";
+import type {WeaponOutcome} from "@gunsmith/ai/pipeline/weapon/types/WeaponOutcome";
+import type {WeaponPipelineDependencies} from "@gunsmith/ai/pipeline/weapon/types/WeaponPipelineDependencies";
 
 /**
  * What every tier's weapon driver does: put a request through the real weapon pipeline on the models its tier builds, as many times

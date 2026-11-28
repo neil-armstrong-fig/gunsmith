@@ -1,4 +1,4 @@
-import {createWeaponModels} from "@gunsmith/ai/adapter/CreateWeaponModels";
+import {createWeaponModels} from "@gunsmith/ai/adapter/weapon/CreateWeaponModels";
 import {paidModelOptions} from "@evals/eval-criteria-mapping/environment/tier/paid/PaidModelOptions";
 import type {PaidWeaponModels} from "@evals/eval-criteria-mapping/setups/weapon/paid/models/types/PaidWeaponModels";
 

@@ -16,17 +16,19 @@ const CLEAR_THE_AIR = {maxSeconds: 5, stepSeconds: 0.02};
 const SHADED_BELOW = 0.92;
 const CLEAR_ABOVE = 0.97;
 
-for (const seed of SEEDS) {
-  given(`a cover hall (seed ${seed}) with the player standing beside their block`, () => {
+given.each(
+  SEEDS,
+  seed => `a cover hall (seed ${seed}) with the player standing beside their block`,
+  seed => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.startCoverHall(seed);
-      await gunsmith.holdTheGame();
+      await gunsmith.scenario.startCoverHall(seed);
+      await gunsmith.clock.holdTheGame();
     });
 
     when("the player faces the block", () => {
       beforeEach(async ({gunsmith}) => {
         await gunsmith.player.aimAtTile(OPPONENT_TILE);
-        await gunsmith.runGameFor(A_TURN_SECONDS);
+        await gunsmith.clock.runGameFor(A_TURN_SECONDS);
         await gunsmith.bullets.runUntilNoneInTheAir(CLEAR_THE_AIR);
       });
 
@@ -45,7 +47,7 @@ for (const seed of SEEDS) {
     when("the player turns away so that the block is out of view", () => {
       beforeEach(async ({gunsmith}) => {
         await gunsmith.player.aimAtTile(BEHIND_THE_PLAYER);
-        await gunsmith.runGameFor(A_TURN_SECONDS);
+        await gunsmith.clock.runGameFor(A_TURN_SECONDS);
         await gunsmith.bullets.runUntilNoneInTheAir(CLEAR_THE_AIR);
       });
 
@@ -53,8 +55,8 @@ for (const seed of SEEDS) {
         expect(await gunsmith.arena.getFloorBrightnessAt(BEHIND_THE_BLOCK, CLEAR_FLOOR)).toBeGreaterThan(CLEAR_ABOVE);
       });
     });
-  });
-}
+  },
+);
 
 // The heights arena: a platform one level up fills the east end from x = 10, and a second on the same level fills the north-west
 // corner (x 1 to 4, y 4 to 6), with a low cover block on the low ground at the foot of its east face (x 4 to 5, y 5 to 6). From 1.5
@@ -68,15 +70,15 @@ const WALK_WATCH = {maxSeconds: 5, stepSeconds: 0.02};
 
 given("the heights arena, with a low cover block on the low ground at the foot of the corner platform", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startHeights();
-    await gunsmith.holdTheGame();
+    await gunsmith.scenario.startHeights();
+    await gunsmith.clock.holdTheGame();
   });
 
   when("the player climbs onto the east platform and faces the corner platform across the block", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.walkUntilPast({heading: "east", limit: ON_THE_EAST_PLATFORM, watch: WALK_WATCH});
       await gunsmith.player.aimAtTile(BEHIND_THE_LOW_BLOCK);
-      await gunsmith.runGameFor(A_TURN_SECONDS);
+      await gunsmith.clock.runGameFor(A_TURN_SECONDS);
     });
 
     then(

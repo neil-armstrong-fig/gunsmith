@@ -9,22 +9,24 @@ given("two players in a private room, with the first browser held on a frame", (
   beforeEach(async ({gunsmith}) => {
     const code = await gunsmith.room.createPrivateRoom();
     await gunsmith.room.joinWithASecondBrowser(code);
-    await gunsmith.holdTheGame();
+    await gunsmith.clock.holdTheGame();
   });
 
   when("the second player lands a bullet on the first", () => {
     beforeEach(async ({gunsmith}) => {
       const second = gunsmith.room.secondBrowser();
+
       await second.player.aimAtTile(await gunsmith.player.getPosition());
       await second.player.fire();
       await expect
-        .poll(() => gunsmith.room.getEventsReceived())
+        .poll(() => gunsmith.room.frames.getEventsReceived())
         .toContainEqual({
           kind: "damageTaken",
           cause: "bullet",
           amount: expect.any(Number),
         });
-      await gunsmith.runGameFor(SHOW_HIT_SECONDS);
+
+      await gunsmith.clock.runGameFor(SHOW_HIT_SECONDS);
     });
 
     then("the receiver sees both damage brackets", async ({gunsmith}) => {
@@ -49,9 +51,10 @@ given("two players in a private room, with the first browser held on a frame", (
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.aimAtTile(await gunsmith.room.secondBrowser().player.getPosition());
       await gunsmith.player.fire();
-      await gunsmith.runGameFor(SHOW_HIT_SECONDS);
-      await expect.poll(() => gunsmith.room.getEventsReceived()).toContainEqual(VISIBLE_HIT);
-      await gunsmith.runGameFor(SHOW_HIT_SECONDS);
+      await gunsmith.clock.runGameFor(SHOW_HIT_SECONDS);
+
+      await expect.poll(() => gunsmith.room.frames.getEventsReceived()).toContainEqual(VISIBLE_HIT);
+      await gunsmith.clock.runGameFor(SHOW_HIT_SECONDS);
     });
 
     then("four mint ticks appear around the opponent", async ({gunsmith}) => {
@@ -63,7 +66,7 @@ given("two players in a private room, with the first browser held on a frame", (
       beforeEach(async ({gunsmith}) => {
         expect((await gunsmith.opponent.getHitOnScreen()).cornersWithTicks).toBe(4);
         await gunsmith.player.aimAwayFrom(await gunsmith.room.secondBrowser().player.getPosition());
-        await gunsmith.runGameFor(SHOW_HIT_SECONDS);
+        await gunsmith.clock.runGameFor(SHOW_HIT_SECONDS);
       });
 
       then("the ticks disappear from the place the opponent was visible", async ({gunsmith}) => {
@@ -76,25 +79,28 @@ given("two players in a private room, with the first browser held on a frame", (
 
 given("the first browser prefers reduced motion in a private room", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.preferReducedMotion();
+    await gunsmith.browser.preferReducedMotion();
     const code = await gunsmith.room.createPrivateRoom();
     await gunsmith.room.joinWithASecondBrowser(code);
-    await gunsmith.holdTheGame();
+
+    await gunsmith.clock.holdTheGame();
   });
 
   when("the second player hits the first", () => {
     beforeEach(async ({gunsmith}) => {
       const second = gunsmith.room.secondBrowser();
+
       await second.player.aimAtTile(await gunsmith.player.getPosition());
       await second.player.fire();
       await expect
-        .poll(() => gunsmith.room.getEventsReceived())
+        .poll(() => gunsmith.room.frames.getEventsReceived())
         .toContainEqual({
           kind: "damageTaken",
           cause: "bullet",
           amount: expect.any(Number),
         });
-      await gunsmith.runGameFor(SHOW_HIT_SECONDS);
+
+      await gunsmith.clock.runGameFor(SHOW_HIT_SECONDS);
     });
 
     then("brackets show the hit with no shake or health trail animation", async ({gunsmith}) => {

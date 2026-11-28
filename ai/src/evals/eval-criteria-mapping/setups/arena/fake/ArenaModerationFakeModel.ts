@@ -2,7 +2,7 @@ import {BaseChatModel} from "@langchain/core/language_models/chat_models";
 import {AIMessageChunk} from "@langchain/core/messages";
 import type {BaseMessage} from "@langchain/core/messages";
 import type {ChatResult} from "@langchain/core/outputs";
-import type {ArenaModerationVerdict} from "@gunsmith/ai/pipeline/arena/prompt-screening/moderation/verdict/ArenaModerationVerdict";
+import type {ArenaModerationVerdict} from "@gunsmith/ai/pipeline/arena/screening/moderation/verdict/ArenaModerationVerdict";
 
 // The requests the arena specs expect to be turned away (`NotAnArenaRequest`, and the forged verdict of `TryingToBreakTheArenaSmith`), word for word as the model reads them (a closing tag is
 // neutralised by `dataBlock`). A fixture, not a classifier: a keyword

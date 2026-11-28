@@ -36,10 +36,13 @@ given("the first browser is watched for sounds and two browsers are in one priva
 
   when("the second player shoots the first, who has pressed a key", () => {
     beforeEach(async ({gunsmith}) => {
+      const second = gunsmith.room.secondBrowser();
+
       await gunsmith.sound.toggleMute();
       await gunsmith.sound.toggleMute();
-      await gunsmith.room.secondBrowser().player.aimAtTile(await gunsmith.player.getPosition());
-      await gunsmith.room.secondBrowser().player.startFiring();
+
+      await second.player.aimAtTile(await gunsmith.player.getPosition());
+      await second.player.startFiring();
     });
 
     then("the first browser plays the crunch of the damage, with its audio running", async ({gunsmith}) => {

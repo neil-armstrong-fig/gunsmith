@@ -57,7 +57,7 @@ given("a match has just begun", () => {
       await gunsmith.dummies.waitForHealthBelow(firstDummy, firstDummy.health);
       // The shot's cool-down is shorter than its flight to the dummy, but not by much: let it run out, or the next
       // click lands inside it and is swallowed.
-      await gunsmith.waitForGameSeconds(0.3);
+      await gunsmith.clock.waitForGameSeconds(0.3);
 
       await gunsmith.player.switchTo(2);
       await gunsmith.weapon.waitForSlot(2);
@@ -98,7 +98,7 @@ given("a match has just begun", () => {
 
     when("the player then switches back after the reload time has passed", () => {
       beforeEach(async ({gunsmith}) => {
-        await gunsmith.waitForGameSeconds(3);
+        await gunsmith.clock.waitForGameSeconds(3);
         await gunsmith.player.switchTo(1);
         await gunsmith.weapon.waitForSlot(1);
       });

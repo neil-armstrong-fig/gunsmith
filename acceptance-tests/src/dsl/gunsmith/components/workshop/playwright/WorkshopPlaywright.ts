@@ -1,4 +1,6 @@
 import type {WeaponWorkshopSetup} from "@src/dsl/gunsmith/components/workshop/types/WeaponWorkshopSetup";
+import {ShelfPlaywright} from "@src/dsl/gunsmith/components/workshop/components/shelf/playwright/ShelfPlaywright";
+import type {ShelfItem} from "@src/dsl/gunsmith/components/workshop/components/shelf/types/ShelfItem";
 import {arrangeCredits} from "@src/dsl/gunsmith/components/workshop/playwright/credits/ArrangeCredits";
 import {arrangeSignedInWeapon} from "@src/dsl/gunsmith/components/workshop/playwright/signed-in-weapon/ArrangeSignedInWeapon";
 import type {Locator, Page} from "@playwright/test";
@@ -19,9 +21,11 @@ const TYPING_TIMEOUT_MILLISECONDS = 30_000;
 
 export class WorkshopPlaywright extends BasePage {
   private releasePendingWeapon?: () => void;
+  private readonly shelf: ShelfPlaywright;
 
   constructor(page: Page) {
     super(page);
+    this.shelf = new ShelfPlaywright(page);
   }
 
   async chooseBuiltInWeapon(name: string): Promise<void> {
@@ -102,6 +106,18 @@ export class WorkshopPlaywright extends BasePage {
 
   async make(): Promise<void> {
     await this.page.getByRole("button", {name: "Make"}).click();
+  }
+
+  /** Makes and saves a weapon from each numbered prompt (`<promptBeginning> for practice target <n>`) until the shelf is full, then reads the shelf. */
+  async fillTheShelf(promptBeginning: string): Promise<ShelfItem[]> {
+    const {count, limit} = await this.shelf.getMeter();
+    for (let saved = count; saved < limit; saved += 1) {
+      await this.pasteThePrompt(`${promptBeginning} for practice target ${saved + 1}`);
+      await this.make();
+      await this.shelf.save();
+    }
+
+    return await this.shelf.getItems();
   }
 
   async tryIt(): Promise<void> {

@@ -4,7 +4,7 @@ Owner: ai. Weapon stats and appearance generation are implemented in `ai/`; prod
 
 ## Implemented weapon path
 
-`precheck → moderation → generate → validate → balance → rate`, with one stats repair when needed, followed by appearance generation with its own validation, one repair and disclosed fallback.
+`precheck → moderation → generate → validate → balance → rate`, with one stats repair when needed, followed by appearance generation with its own validation, one repair and disclosed fallback. See the [weapon and arena graph diagrams](ai-diagrams/README.md).
 
 The graph is deterministic in its control flow; nodes do not choose tools autonomously. A clean request uses three model calls (moderation, stats, appearance). The maximum is five, including one repair per generation stage. Rejected/invalid stats skip drawing.
 
@@ -19,6 +19,8 @@ The graph is deterministic in its control flow; nodes do not choose tools autono
 See [schemas](schemas.md), [balancing](ai-stat-balancing.md), and [visual generation](ai-visual-generation.md). Source entry points are `ai/src/pipeline/GenerateWeapon.ts` and `ai/src/pipeline/appearance/GenerateAppearance.ts`.
 
 ## Eval and safety boundaries
+
+The [eval flow diagram](ai-diagrams/eval-run.md) shows how a run goes from tier to results file.
 
 Specs use the mapping/DSL rather than models or pipeline internals. Each trial of a request has a scope of its own (`eachTrial`) and runs the request once; its criteria inspect that one answer, every trial must satisfy a criterion,. Plain `given` cases are regression coverage; `given.inProgress` tracks capability work. Deterministic evaluators come first; introduce a model judge only for a demonstrated failure and calibrate it with human labels.
 

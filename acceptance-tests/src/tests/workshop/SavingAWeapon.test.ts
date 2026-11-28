@@ -72,7 +72,7 @@ given("the workshop is open on the practice range, with nothing saved", () => {
 
         beforeEach(async ({gunsmith}) => {
           ({name, rating} = await gunsmith.workshop.getResult());
-          await gunsmith.reloadThePage();
+          await gunsmith.browser.reloadThePage();
           await gunsmith.workshop.open();
         });
 
@@ -116,6 +116,7 @@ given("the workshop is open on the practice range, with nothing saved", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.workshop.pasteThePrompt(FAST_PROMPT);
       await gunsmith.workshop.make();
+
       await gunsmith.workshop.pasteThePrompt(LONG_RANGE_PROMPT);
       await gunsmith.workshop.shelf.save();
     });

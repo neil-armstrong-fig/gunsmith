@@ -28,8 +28,8 @@ given.each(
   ({pixelsPerTile}) => `low cover at ${pixelsPerTile} pixels per tile`,
   ({width, height}) => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.resizeWindowTo({width, height});
-      await gunsmith.startCover();
+      await gunsmith.browser.resizeWindowTo({width, height});
+      await gunsmith.scenario.startCover();
     });
 
     then("four matching braces frame the square block with floor showing around it", async ({gunsmith}) => {

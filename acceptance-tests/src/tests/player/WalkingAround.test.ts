@@ -39,7 +39,7 @@ given("a match has just begun", () => {
       const size = await gunsmith.arena.getSizeInTiles();
 
       await expect.poll(async () => (await gunsmith.player.getPosition()).x).toBeGreaterThan(size.width - 2);
-      await gunsmith.waitForGameSeconds(1);
+      await gunsmith.clock.waitForGameSeconds(1);
 
       const {x} = await gunsmith.player.getPosition();
       expect(x).toBeLessThan(size.width - 1);
@@ -50,13 +50,13 @@ given("a match has just begun", () => {
   when("the player lets go of every key", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.startWalking("east");
-      await gunsmith.waitForGameSeconds(0.2);
+      await gunsmith.clock.waitForGameSeconds(0.2);
       await gunsmith.player.stopWalking("east");
     });
 
     then("the player stands still", async ({gunsmith}) => {
       const before = await gunsmith.player.getPosition();
-      await gunsmith.waitForGameSeconds(0.5);
+      await gunsmith.clock.waitForGameSeconds(0.5);
 
       expect(await gunsmith.player.getPosition()).toEqual(before);
     });

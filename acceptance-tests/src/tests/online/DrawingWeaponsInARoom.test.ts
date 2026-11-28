@@ -14,7 +14,7 @@ given("two stationary players in one private room facing each other", () => {
 
     await gunsmith.player.aimAtTile(secondPosition);
     await second.player.aimAtTile(await gunsmith.player.getPosition());
-    await expect.poll(() => gunsmith.room.hasBeenToldWhereTheOtherPlayerIs()).toBe(true);
+    await expect.poll(() => gunsmith.room.frames.hasBeenToldWhereTheOtherPlayerIs()).toBe(true);
 
     secondPose = {...secondPosition, aimDegrees: await second.player.getAimDegrees()};
   });
@@ -60,12 +60,12 @@ given("two stationary players in one private room facing each other", () => {
         await expect.poll(() => gunsmith.opponent.hasHeldWeaponAccent("violet", secondPose)).toBe(true);
 
         await gunsmith.player.aimAwayFrom(secondPose);
-        await expect.poll(() => gunsmith.room.hasBeenToldWhereTheOtherPlayerIs()).toBe(false);
+        await expect.poll(() => gunsmith.room.frames.hasBeenToldWhereTheOtherPlayerIs()).toBe(false);
       });
 
       then("the server omits the opponent and their optic disappears from the screen", async ({gunsmith}) => {
-        expect(gunsmith.room.hasReceivedSnapshots()).toBe(true);
-        expect(gunsmith.room.hasBeenToldWhereTheOtherPlayerIs()).toBe(false);
+        expect(gunsmith.room.frames.hasReceivedSnapshots()).toBe(true);
+        expect(gunsmith.room.frames.hasBeenToldWhereTheOtherPlayerIs()).toBe(false);
         await expect.poll(() => gunsmith.opponent.hasHeldWeaponAccent("violet", secondPose)).toBe(false);
       });
 
@@ -76,7 +76,7 @@ given("two stationary players in one private room facing each other", () => {
         });
 
         then("the opponent returns in the snapshots and their optic is visible again", async ({gunsmith}) => {
-          await expect.poll(() => gunsmith.room.hasBeenToldWhereTheOtherPlayerIs()).toBe(true);
+          await expect.poll(() => gunsmith.room.frames.hasBeenToldWhereTheOtherPlayerIs()).toBe(true);
           await expect.poll(() => gunsmith.opponent.hasHeldWeaponAccent("violet", secondPose)).toBe(true);
         });
       });

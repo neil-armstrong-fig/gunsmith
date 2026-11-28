@@ -54,7 +54,7 @@ retired on 2026-11-19.
 
 Re-check version-specific limitations before relying on them.
 
-- **Do not upgrade TypeScript past 6.0.3.** Re-checked 2026-11-12: TS 7.0.2 is `latest`, but `typescript-eslint` 8.72.x
+- **Do not upgrade TypeScript past 6.0.3.** Re-checked 2026-11-27: TS 7.0.2 is `latest`, but `typescript-eslint` 8.74.0
   still declares `typescript >=4.8.4 <6.1.0`, so ESLint cannot read TS 7. Re-check when typescript-eslint's peer range
   moves.
 - **Port 3000 may already be taken by another local server** (`strictPort` makes `pnpm start` fail rather than move). Do not

@@ -1,7 +1,7 @@
 import {WeaponDsl} from "@evals/dsl/weapon/WeaponDsl";
 import {EvalRun} from "@evals/eval-criteria-mapping/mapping/run/EvalRun";
 import {defineTrials} from "@evals/eval-criteria-mapping/mapping/trial/DefineTrials";
-import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
+import type {WeaponOutcome} from "@gunsmith/ai/pipeline/weapon/types/WeaponOutcome";
 
 // A run whose weapon driver answers differently every time it is asked, so a trial that shared another's DSL would show it.
 // The scopes are defined at the top level of this file, as a spec defines them, and what they saw is checked after they ran.

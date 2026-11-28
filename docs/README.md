@@ -12,6 +12,7 @@
 ## AI and generated content
 
 - [Pipeline](ai-pipeline.md): stages, validation and eval boundaries.
+- [Diagrams](ai-diagrams/README.md): how an eval run works and how the LangGraphs are put together.
 - [Hosting decision](ai-hosting.md): the pipeline runs in-process in the Worker.
 - [Arena generation research](ai-arena-research.md) and [judge research](ai-judge-research.md).
 - [Schemas](schemas.md): current types and proposed future capabilities.

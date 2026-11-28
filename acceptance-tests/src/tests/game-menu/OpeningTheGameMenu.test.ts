@@ -56,7 +56,7 @@ given("the practice range opened without a startup override", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.menu.chooseOptions();
       await gunsmith.menu.setStartupMenu(false);
-      await gunsmith.reloadThePage();
+      await gunsmith.browser.reloadThePage();
     });
 
     then("the game starts with its menu closed", async ({gunsmith}) => {
@@ -68,7 +68,8 @@ given("the practice range opened without a startup override", () => {
         await gunsmith.menu.pressEscape();
         await gunsmith.menu.chooseOptions();
         await gunsmith.menu.setStartupMenu(true);
-        await gunsmith.reloadThePage();
+
+        await gunsmith.browser.reloadThePage();
       });
 
       then("the menu is open again", async ({gunsmith}) => {

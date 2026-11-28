@@ -23,7 +23,7 @@ given("a match has just begun", () => {
 
     then("it does not click again, however long the trigger stays held", async ({gunsmith}) => {
       await expect.poll(async () => (await gunsmith.sound.getPlays(EMPTY_CLICK)).length).toBe(1);
-      await gunsmith.waitForGameSeconds(1);
+      await gunsmith.clock.waitForGameSeconds(1);
 
       expect(await gunsmith.sound.getPlays(EMPTY_CLICK)).toHaveLength(1);
     });
@@ -34,13 +34,13 @@ given("a match has just begun", () => {
 
         await gunsmith.player.stopFiring();
         // Let the fixed-step loop observe the release before the next press.
-        await gunsmith.waitForGameSeconds(0.05);
+        await gunsmith.clock.waitForGameSeconds(0.05);
         await gunsmith.player.startFiring();
       });
 
       then("the weapon clicks once more", async ({gunsmith}) => {
         await expect.poll(async () => (await gunsmith.sound.getPlays(EMPTY_CLICK)).length).toBe(2);
-        await gunsmith.waitForGameSeconds(1);
+        await gunsmith.clock.waitForGameSeconds(1);
 
         expect(await gunsmith.sound.getPlays(EMPTY_CLICK)).toHaveLength(2);
       });
@@ -57,7 +57,7 @@ given("a match has just begun", () => {
       });
 
       then("the hold has already clicked, so it does not click a second time", async ({gunsmith}) => {
-        await gunsmith.waitForGameSeconds(1);
+        await gunsmith.clock.waitForGameSeconds(1);
 
         expect(await gunsmith.sound.getPlays(EMPTY_CLICK)).toHaveLength(1);
       });
@@ -75,7 +75,7 @@ given("a match has just begun", () => {
     });
 
     then("the weapon makes no sound", async ({gunsmith}) => {
-      await gunsmith.waitForGameSeconds(1);
+      await gunsmith.clock.waitForGameSeconds(1);
 
       expect(await gunsmith.sound.getPlays(EMPTY_CLICK)).toHaveLength(0);
     });
@@ -92,7 +92,7 @@ given("a match has just begun", () => {
     });
 
     then("it does not click", async ({gunsmith}) => {
-      await gunsmith.waitForGameSeconds(0.5);
+      await gunsmith.clock.waitForGameSeconds(0.5);
 
       expect(await gunsmith.sound.getPlays(EMPTY_CLICK)).toHaveLength(0);
     });

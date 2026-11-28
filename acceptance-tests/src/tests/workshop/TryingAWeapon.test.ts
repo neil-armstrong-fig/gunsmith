@@ -118,7 +118,7 @@ given("the practice range, held still, with a weapon made and the workshop open"
   let endX = 0;
 
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.holdTheGame();
+    await gunsmith.clock.holdTheGame();
 
     startX = (await gunsmith.player.getPosition()).x;
 
@@ -131,7 +131,7 @@ given("the practice range, held still, with a weapon made and the workshop open"
     beforeEach(async ({gunsmith}) => {
       await gunsmith.workshop.tryIt();
       await gunsmith.player.startWalking("east");
-      await gunsmith.runGameFor(HALF_A_SECOND);
+      await gunsmith.clock.runGameFor(HALF_A_SECOND);
       await gunsmith.player.stopWalking("east");
 
       endX = (await gunsmith.player.getPosition()).x;

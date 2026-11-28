@@ -11,8 +11,9 @@ given("two browsers are in one private room, and the first one's connection can 
   let code = "";
 
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.room.prepareToLoseTheConnection();
+    await gunsmith.room.connection.prepareToLoseTheConnection();
     code = await gunsmith.room.createPrivateRoom();
+
     await gunsmith.room.joinWithASecondBrowser(code);
     await gunsmith.room.waitForTheMatch();
   });
@@ -23,8 +24,8 @@ given("two browsers are in one private room, and the first one's connection can 
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.walkFor("east", 0.5);
       placeBefore = await gunsmith.player.getPosition();
-      gunsmith.room.cutTheConnection();
-      await gunsmith.room.waitForTheMatchAgain();
+      gunsmith.room.connection.cutTheConnection();
+      await gunsmith.room.connection.waitForTheMatchAgain();
     });
 
     then("the page is back in the match without being asked, in its own place", async ({gunsmith}) => {
@@ -55,29 +56,29 @@ given("two browsers are in one private room, and the first one's connection can 
             return Math.hypot(place.x - placeBefore.x, place.y - placeBefore.y);
           })
           .toBeGreaterThan(WALKED_AT_LEAST_TILES);
-        await expect.poll(() => gunsmith.room.isShownWhereTheServerHasThem()).toBe(true);
+        await expect.poll(() => gunsmith.room.smoothness.isShownWhereTheServerHasThem()).toBe(true);
       });
     });
   });
 
   when("the first player's connection is cut and stays down for a while", () => {
     beforeEach(({gunsmith}) => {
-      gunsmith.room.keepTheConnectionDown();
+      gunsmith.room.connection.keepTheConnectionDown();
     });
 
     then("the page tells the player the connection is being made again", async ({gunsmith}) => {
-      await expect.poll(() => gunsmith.room.isToldItIsReconnecting()).toBe(true);
+      await expect.poll(() => gunsmith.room.connection.isToldItIsReconnecting()).toBe(true);
     });
 
     when("the connection comes back", () => {
       beforeEach(async ({gunsmith}) => {
-        await expect.poll(() => gunsmith.room.isToldItIsReconnecting()).toBe(true);
-        gunsmith.room.letTheConnectionBack();
-        await gunsmith.room.waitForTheMatchAgain();
+        await expect.poll(() => gunsmith.room.connection.isToldItIsReconnecting()).toBe(true);
+        gunsmith.room.connection.letTheConnectionBack();
+        await gunsmith.room.connection.waitForTheMatchAgain();
       });
 
       then("the page stops saying so, and the match goes on", async ({gunsmith}) => {
-        await expect.poll(() => gunsmith.room.isToldItIsReconnecting()).toBe(false);
+        await expect.poll(() => gunsmith.room.connection.isToldItIsReconnecting()).toBe(false);
         expect(await gunsmith.round.getState()).toBe("playing");
       });
     });
@@ -106,7 +107,7 @@ given("two browsers are in one private room, and the first one's connection can 
     when("the first player returns", () => {
       beforeEach(async ({gunsmith}) => {
         await gunsmith.room.returnToTheRoom();
-        await gunsmith.room.waitForTheMatchAgain();
+        await gunsmith.room.connection.waitForTheMatchAgain();
       });
 
       then(
@@ -124,7 +125,7 @@ given("two browsers are in one private room, and the first one's connection can 
 
       then("the stranger was not given the seat", ({gunsmith}) => {
         // The first player's return is the positive evidence; the stranger, who opened the room before it, has been sent nothing.
-        expect(gunsmith.room.strangersBrowser().room.hasReceivedSnapshots()).toBe(false);
+        expect(gunsmith.room.strangersBrowser().room.frames.hasReceivedSnapshots()).toBe(false);
       });
     });
   });

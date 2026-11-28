@@ -6,7 +6,7 @@ const LONGEST_WIN_SECONDS = 15;
 
 given("a duel has just begun", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startDuel();
+    await gunsmith.scenario.startDuel();
   });
 
   when("the player stands still in front of the opponent", () => {

@@ -2,7 +2,7 @@ import {beforeEach, expect, given, then, when} from "@src/acceptance-criteria-ma
 
 given("a sparring match has just begun", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startSparring();
+    await gunsmith.scenario.startSparring();
   });
 
   when("the player crouches", () => {

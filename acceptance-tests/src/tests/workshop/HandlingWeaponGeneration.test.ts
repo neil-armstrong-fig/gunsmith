@@ -16,6 +16,7 @@ given.each(
   ({prompt, message}) => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.workshop.arrangeSignedInWeapon();
+
       await gunsmith.workshop.open();
       await gunsmith.workshop.pasteThePrompt(prompt);
       await gunsmith.workshop.make();
@@ -35,9 +36,11 @@ given("a signed-in player submits a weapon prompt that times out once", () => {
 
   beforeEach(async ({gunsmith}) => {
     await gunsmith.workshop.arrangeSignedInWeapon();
+
     await gunsmith.workshop.open();
     await gunsmith.workshop.pasteThePrompt(prompt);
     await gunsmith.workshop.make();
+
     await expect
       .poll(() => gunsmith.workshop.getWeaponMakeError())
       .toBe("Making the weapon timed out. Your credit was refunded.");
@@ -60,6 +63,7 @@ given("a signed-in player submits a weapon prompt that times out once", () => {
 given("a signed-in player's weapon request is still pending", () => {
   beforeEach(async ({gunsmith}) => {
     await gunsmith.workshop.arrangeSignedInWeapon("pending");
+
     await gunsmith.workshop.open();
     await gunsmith.workshop.pasteThePrompt("a mint coil weapon");
     await gunsmith.workshop.make();
@@ -85,9 +89,11 @@ given("a signed-in player's weapon request is still pending", () => {
 given("a signed-in player whose Make is refused for lack of credits", () => {
   beforeEach(async ({gunsmith}) => {
     await gunsmith.workshop.arrangeSignedInWeapon();
+
     await gunsmith.workshop.open();
     await gunsmith.workshop.pasteThePrompt("a weapon with no credits");
     await gunsmith.workshop.make();
+
     await expect.poll(() => gunsmith.workshop.getWeaponMakeError()).toBe("You’re out of credits.");
   });
 

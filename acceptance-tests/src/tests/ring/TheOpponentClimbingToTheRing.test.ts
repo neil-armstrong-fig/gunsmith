@@ -21,39 +21,38 @@ const LONGEST_ROUND_SECONDS = 5.5 + 15;
 // The platform is one level up from the low ground, which is level 0.
 const PLATFORM_LEVEL = 1;
 
-for (const seed of SEEDS_THAT_NEED_THE_STAIR) {
-  given(
-    `a duel (seed ${seed}) across two levels, whose ring closes on the platform and hurts ten times as much`,
-    () => {
+given.each(
+  SEEDS_THAT_NEED_THE_STAIR,
+  seed => `a duel (seed ${seed}) across two levels, whose ring closes on the platform and hurts ten times as much`,
+  seed => {
+    beforeEach(async ({gunsmith}) => {
+      await gunsmith.scenario.startTerracedDuel({
+        seed,
+        delaySeconds: DELAY_SECONDS,
+        closingSeconds: CLOSING_SECONDS,
+        damageScale: DAMAGE_SCALE,
+      });
+    });
+
+    when("the player stands still on the platform until the round is decided", () => {
       beforeEach(async ({gunsmith}) => {
-        await gunsmith.startTerracedDuel({
-          seed,
-          delaySeconds: DELAY_SECONDS,
-          closingSeconds: CLOSING_SECONDS,
-          damageScale: DAMAGE_SCALE,
-        });
+        await gunsmith.round.waitForState("lost", LONGEST_ROUND_SECONDS);
       });
 
-      when("the player stands still on the platform until the round is decided", () => {
-        beforeEach(async ({gunsmith}) => {
-          await gunsmith.round.waitForState("lost", LONGEST_ROUND_SECONDS);
-        });
+      then(
+        "the ring was hurting more than it ever does unboosted, so reaching it in time mattered",
+        async ({gunsmith}) => {
+          expect((await gunsmith.ring.get()).damagePerSecond).toBeGreaterThan(MOST_AN_UNBOOSTED_RING_HURTS);
+        },
+      );
 
-        then(
-          "the ring was hurting more than it ever does unboosted, so reaching it in time mattered",
-          async ({gunsmith}) => {
-            expect((await gunsmith.ring.get()).damagePerSecond).toBeGreaterThan(MOST_AN_UNBOOSTED_RING_HURTS);
-          },
-        );
-
-        then("the opponent took no damage from the ring", async ({gunsmith}) => {
-          expect((await gunsmith.opponent.get()).health).toBe(100);
-        });
-
-        then("the opponent is on the platform, having climbed its stair", async ({gunsmith}) => {
-          expect((await gunsmith.opponent.get()).level).toBe(PLATFORM_LEVEL);
-        });
+      then("the opponent took no damage from the ring", async ({gunsmith}) => {
+        expect((await gunsmith.opponent.get()).health).toBe(100);
       });
-    },
-  );
-}
+
+      then("the opponent is on the platform, having climbed its stair", async ({gunsmith}) => {
+        expect((await gunsmith.opponent.get()).level).toBe(PLATFORM_LEVEL);
+      });
+    });
+  },
+);

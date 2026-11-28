@@ -11,7 +11,7 @@ given.each(
   ({drawing}) => `a sparring pickup with the ${drawing} drawing`,
   ({drawing, feature, minimum}) => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.startSparringWithPickupDrawing({seed: 8, drawing});
+      await gunsmith.scenario.startSparringWithPickupDrawing({seed: 8, drawing});
       await gunsmith.player.walkFor("east", 0.7);
       await gunsmith.pickup.waitUntilTaken();
     });

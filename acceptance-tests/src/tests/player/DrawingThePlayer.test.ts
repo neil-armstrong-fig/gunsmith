@@ -15,7 +15,7 @@ const ALL_COMPASS_POINTS = 8;
 
 given("a sparring match has just begun", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startSparring();
+    await gunsmith.scenario.startSparring();
   });
 
   when("a player looks at their own character, standing", () => {
@@ -93,7 +93,7 @@ given("a sparring match has just begun", () => {
 // is ready while they are missing (and not leave that to a race a fast machine always wins).
 given("a sparring match whose pictures are held back on their way to the page", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startSparringWithHeldPictures();
+    await gunsmith.scenario.startSparringWithHeldPictures();
   });
 
   then("the arena is not ready while it is still waiting for them", async ({gunsmith}) => {
@@ -102,7 +102,7 @@ given("a sparring match whose pictures are held back on their way to the page", 
 
   when("the pictures arrive", () => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.releasePictures();
+      await gunsmith.scenario.releasePictures();
     });
 
     then("the player is drawn as art made them, not as the placeholder", async ({gunsmith}) => {
@@ -117,7 +117,7 @@ given("a sparring match whose pictures are held back on their way to the page", 
 // One missing file must not leave the page waiting for ever, or the game unplayable: the player is drawn as the placeholder disc and the match goes on.
 given("a sparring match whose pictures are missing from the server", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startSparringWithMissingPictures();
+    await gunsmith.scenario.startSparringWithMissingPictures();
   });
 
   when("the page says it is ready", () => {

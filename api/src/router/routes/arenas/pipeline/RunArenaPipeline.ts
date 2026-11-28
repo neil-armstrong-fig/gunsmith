@@ -1,5 +1,5 @@
 import type {ArenaStyle} from "@gunsmith/shared/arena-style/ArenaStyle";
-import {createArenaModels} from "@gunsmith/ai/adapter/CreateArenaModels";
+import {createArenaModels} from "@gunsmith/ai/adapter/arena/CreateArenaModels";
 import {generateArena} from "@gunsmith/ai/pipeline/arena/GenerateArena";
 import type {ArenaOutcome} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcome";
 import {workerEnvironment} from "@src/env/WorkerEnvironment";

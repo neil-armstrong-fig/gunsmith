@@ -5,7 +5,7 @@ import type {AppearanceDsl} from "@evals/dsl/appearance/AppearanceDsl";
 // shown, one that does not is repaired once, and if that fails too the plain stand-in is shown and says so. What holds whatever is
 // asked (safe to show, a stand-in never passed off as the model's own, a fixed path within two calls) is `expectDefaultPipelineBehaviour`,
 // at the end of every trial. Whether a drawing looks like what was asked for is for a person to judge, from the contact sheet; nothing here
-// claims it. The drawing is a step of the weapon graph (`weapon-graph/drawing/`, five model calls at most). A regression since 2026-11-25:
+// claims it. The drawing is a step of the weapon graph (`pipeline/weapon/graph/drawing/`, five model calls at most). A regression since 2026-11-25:
 // every criterion held in 3 of 3 trials on Haiku 5.5 (the user judged its contact sheet "really good", 2026-11-14).
 const ODDITIES = [
   {

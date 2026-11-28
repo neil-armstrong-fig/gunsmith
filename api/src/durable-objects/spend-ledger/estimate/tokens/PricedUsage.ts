@@ -1,4 +1,4 @@
-import type {ModelUsage} from "@gunsmith/ai/pipeline/types/ModelUsage";
+import type {ModelUsage} from "@gunsmith/ai/pipeline/shared/usage/types/ModelUsage";
 
 const TOKENS_PER_MILLION = 1_000_000;
 

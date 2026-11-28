@@ -1,7 +1,7 @@
 import {FakeListChatModel} from "@langchain/core/utils/testing";
 import {generateArena} from "@gunsmith/ai/pipeline/arena/GenerateArena";
 import type {ArenaPipelineDependencies} from "@gunsmith/ai/pipeline/arena/types/ArenaPipelineDependencies";
-import {watchSignals} from "@gunsmith/ai/pipeline/testing/WatchSignals";
+import {watchSignals} from "@gunsmith/ai/pipeline/shared/testing/WatchSignals";
 
 const ROOM = {name: "Plain Room", rows: ["##########", "#........#", "#........#", "#........#", "##########"]};
 

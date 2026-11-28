@@ -7,26 +7,26 @@ import {beforeEach, expect, given, then, when} from "@src/acceptance-criteria-ma
 // own snapshots and the time between frames measured, so a frame dropped under load is not a jump.
 given("two browsers are in one private room and the first is sent only every fourth snapshot", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.room.receiveOnlyEveryNthSnapshot(4);
+    await gunsmith.room.connection.receiveOnlyEveryNthSnapshot(4);
     const code = await gunsmith.room.createPrivateRoom();
 
     await gunsmith.room.joinWithASecondBrowser(code);
-    await expect.poll(() => gunsmith.room.hasReceivedSnapshots()).toBe(true);
+    await expect.poll(() => gunsmith.room.frames.hasReceivedSnapshots()).toBe(true);
     await gunsmith.player.aimAtTile(await gunsmith.room.secondBrowser().player.getPosition());
-    await expect.poll(() => gunsmith.room.hasBeenToldWhereTheOtherPlayerIs()).toBe(true);
-    await gunsmith.room.startRecordingTheShownFighters();
+    await expect.poll(() => gunsmith.room.frames.hasBeenToldWhereTheOtherPlayerIs()).toBe(true);
+    await gunsmith.room.smoothness.startRecordingTheShownFighters();
   });
 
   when("the second player walks towards the first and stops", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.room.secondBrowser().player.walkFor("north", 0.8);
-      await expect.poll(() => gunsmith.room.hasBeenToldWhereTheOtherPlayerIs()).toBe(true);
+      await expect.poll(() => gunsmith.room.frames.hasBeenToldWhereTheOtherPlayerIs()).toBe(true);
     });
 
     then("the first player is shown them moving without jumps", async ({gunsmith}) => {
-      expect(gunsmith.room.secondBrowser().room.getFastestServerMovement()).toBeGreaterThan(0);
-      expect(await gunsmith.room.getShownOpponentSamples()).toBeGreaterThan(10);
-      expect(await gunsmith.room.getLargestShownOpponentJump()).toBeLessThan(0.25);
+      expect(gunsmith.room.secondBrowser().room.smoothness.getFastestServerMovement()).toBeGreaterThan(0);
+      expect(await gunsmith.room.smoothness.getShownOpponentSamples()).toBeGreaterThan(10);
+      expect(await gunsmith.room.smoothness.getLargestShownOpponentJump()).toBeLessThan(0.25);
     });
   });
 });

@@ -1,7 +1,7 @@
 import {FakeListChatModel} from "@langchain/core/utils/testing";
 import {generateArena} from "@gunsmith/ai/pipeline/arena/GenerateArena";
 import type {ArenaPipelineDependencies} from "@gunsmith/ai/pipeline/arena/types/ArenaPipelineDependencies";
-import {reportUsage} from "@gunsmith/ai/pipeline/testing/ReportUsage";
+import {reportUsage} from "@gunsmith/ai/pipeline/shared/testing/ReportUsage";
 
 const GOOD = {name: "Plain Room", rows: ["##########", "#........#", "#........#", "#........#", "##########"]};
 // Nearly all wall: not a fault the repair of drawings can mend (it makes no floor), so the model has to be asked again.

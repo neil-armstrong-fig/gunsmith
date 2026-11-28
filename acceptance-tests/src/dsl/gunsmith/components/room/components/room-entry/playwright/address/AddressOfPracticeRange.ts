@@ -1,4 +1,4 @@
-import {addressOfRoom} from "@src/dsl/gunsmith/components/room/playwright/address/AddressOfRoom";
+import {addressOfRoom} from "@src/dsl/gunsmith/components/room/playwright/enter-room/address/AddressOfRoom";
 import type {RoomLimits} from "@src/dsl/gunsmith/components/room/types/RoomLimits";
 
 /**

@@ -12,16 +12,19 @@ given("a private room whose two players have locked in their weapons", () => {
   beforeEach(async ({gunsmith}) => {
     const code = await gunsmith.room.createPrivateRoom({preRoundSeconds: SECONDS_TO_CHOOSE});
     await gunsmith.room.joinWithASecondBrowserToChoose(code);
-    for (const player of [gunsmith, gunsmith.room.secondBrowser()]) {
-      await player.room.preRound.lockInWeapon(1);
-      await player.room.preRound.lockInWeapon(2);
-    }
+    const second = gunsmith.room.secondBrowser();
+
+    await gunsmith.room.preRound.lockInWeapon(1);
+    await gunsmith.room.preRound.lockInWeapon(2);
+
+    await second.room.preRound.lockInWeapon(1);
+    await second.room.preRound.lockInWeapon(2);
   });
 
   then(
     "each is offered the built-in arenas the room offers, the Duel to begin with, with a preview of the one chosen",
     async ({gunsmith}) => {
-      expect(await gunsmith.preRound.arena.getChoices()).toEqual(gunsmith.room.getArenasOffered());
+      expect(await gunsmith.preRound.arena.getChoices()).toEqual(gunsmith.room.frames.getArenasOffered());
       expect(await gunsmith.preRound.arena.getChosen()).toBe("Duel");
       expect(await gunsmith.preRound.arena.getPreviewName()).toBe("Duel");
     },
@@ -36,8 +39,8 @@ given("a private room whose two players have locked in their weapons", () => {
     then("the second player is not shown it, on the screen or by the server", async ({gunsmith}) => {
       const second = gunsmith.room.secondBrowser();
 
-      await expect.poll(() => second.room.hasReceivedPreRounds()).toBe(true);
-      expect(second.room.hasBeenToldTheOpponentsArena()).toBe(false);
+      await expect.poll(() => second.room.frames.hasReceivedPreRounds()).toBe(true);
+      expect(second.room.frames.hasBeenToldTheOpponentsArena()).toBe(false);
       expect(await second.room.preRound.getOpponentArena()).toBeUndefined();
       expect(await gunsmith.room.preRound.getOpponentArena()).toBeUndefined();
     });
@@ -103,7 +106,7 @@ given("a private room whose two players have locked in their weapons", () => {
 
         then("the match has not begun: it waits for the other pick", async ({gunsmith}) => {
           expect(await gunsmith.room.preRound.hasArenaPick()).toBe(true);
-          expect(gunsmith.room.hasReceivedSnapshots()).toBe(false);
+          expect(gunsmith.room.frames.hasReceivedSnapshots()).toBe(false);
         });
       });
     });

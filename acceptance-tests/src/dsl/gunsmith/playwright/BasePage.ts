@@ -30,4 +30,15 @@ export abstract class BasePage {
       })
       .toBe(true);
   }
+
+  /**
+   * Waits until the canvas has been sized and drawn into (`data-ready`), and until every picture the scene draws has loaded or been
+   * given up on (`data-sprites-ready`): the pictures decode after the page opens, and until they do a placeholder shows in their place.
+   */
+  protected async waitForArena(): Promise<void> {
+    const arena = this.page.getByTestId("arena");
+
+    await expect(arena).toHaveAttribute("data-ready", "true");
+    await expect(arena).toHaveAttribute("data-sprites-ready", "true");
+  }
 }

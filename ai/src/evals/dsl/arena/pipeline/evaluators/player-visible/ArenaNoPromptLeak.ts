@@ -1,6 +1,6 @@
 import type {ArenaEvalInput} from "@evals/dsl/arena/pipeline/types/ArenaEvalInput";
 import type {EvalScore} from "@evals/dsl/shared/types/EvalScore";
-import {SYSTEM_PROMPT_CANARY} from "@gunsmith/ai/pipeline/canary/SystemPromptCanary";
+import {SYSTEM_PROMPT_CANARY} from "@gunsmith/ai/pipeline/shared/canary/SystemPromptCanary";
 
 const KEY = "arenaNoPromptLeak";
 

@@ -7,6 +7,7 @@ import type {HurtWatch} from "@src/dsl/gunsmith/types/HurtWatch";
 import type {DamageLook} from "@src/dsl/gunsmith/types/DamageLook";
 import type {Heading} from "@src/dsl/gunsmith/components/player/types/Heading";
 import type {HeldWalk} from "@src/dsl/gunsmith/components/player/types/HeldWalk";
+import type {WatchedShot} from "@src/dsl/gunsmith/components/player/types/WatchedShot";
 import type {FighterLook} from "@src/dsl/gunsmith/types/FighterLook";
 import type {Point} from "@src/dsl/gunsmith/types/Point";
 
@@ -224,6 +225,18 @@ export class PlayerDsl {
       await this.player.fire();
     } catch (error) {
       throw new DslError("Failed to fire", error);
+    }
+  }
+
+  /**
+   * Fires once and watches the shot as it flies, in a held game (`holdTheGame`): runs the game in steps of `watch.stepSeconds`
+   * for `watch.maxSeconds` and says whether a shot was seen in the air and how far west it got. For a shot that lives only a few frames.
+   */
+  async fireAndWatchTheShot(watch: HurtWatch): Promise<WatchedShot> {
+    try {
+      return await this.player.fireAndWatchTheShot(watch);
+    } catch (error) {
+      throw new DslError("Failed to fire and watch the shot", error);
     }
   }
 

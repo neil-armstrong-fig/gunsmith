@@ -1,3 +1,4 @@
+import type {ShelfItem} from "@src/dsl/gunsmith/components/workshop/components/shelf/types/ShelfItem";
 import {beforeEach, expect, given, then, when} from "@src/acceptance-criteria-mapping/AcceptanceCriteriaMapping";
 
 const FAST_PROMPT = "a fast little submachine gun";
@@ -82,25 +83,16 @@ given("the workshop is open, with one weapon saved", () => {
 
 given("the workshop is open, with the shelf full of fast weapons", () => {
   const promptBeginning = `${FAST_PROMPT} with a compact grip${" and a bright stripe".repeat(18)}`;
-  let limit = 0;
-  let fastName = "";
+  let filled: ShelfItem[] = [];
   let longRangeName = "";
 
   beforeEach(async ({gunsmith}) => {
     await gunsmith.workshop.open();
-
-    limit = (await gunsmith.workshop.shelf.getMeter()).limit;
-    for (let saved = 0; saved < limit; saved++) {
-      await gunsmith.workshop.pasteThePrompt(`${promptBeginning} for practice target ${saved + 1}`);
-      await gunsmith.workshop.make();
-      await gunsmith.workshop.shelf.save();
-    }
-
-    fastName = (await gunsmith.workshop.getResult()).name;
+    filled = await gunsmith.workshop.fillTheShelf(promptBeginning);
   });
 
   then("the shelf says it is full", async ({gunsmith}) => {
-    expect(await gunsmith.workshop.shelf.getMeter()).toEqual({count: limit, limit});
+    expect(await gunsmith.workshop.shelf.getMeter()).toEqual({count: filled.length, limit: filled.length});
   });
 
   when("the player makes another weapon and presses Save", () => {
@@ -116,10 +108,7 @@ given("the workshop is open, with the shelf full of fast weapons", () => {
     then("the card asks which saved weapon to replace, and the shelf is as it was", async ({gunsmith}) => {
       expect(await gunsmith.workshop.shelf.isAskingWhichToReplace()).toBe(true);
 
-      const items = await gunsmith.workshop.shelf.getItems();
-
-      expect(items).toHaveLength(limit);
-      expect(items.every(item => item.name === fastName)).toBe(true);
+      expect(await gunsmith.workshop.shelf.getItems()).toEqual(filled);
     });
 
     then(
@@ -129,7 +118,7 @@ given("the workshop is open, with the shelf full of fast weapons", () => {
 
         expect(new Set(items.map(item => item.name)).size).toBe(1);
         expect(new Set(items.map(item => item.rating)).size).toBe(1);
-        expect(new Set(items.map(item => item.prompt)).size).toBe(limit);
+        expect(new Set(items.map(item => item.prompt)).size).toBe(filled.length);
         expect(await gunsmith.workshop.shelf.getReplacementPrompts()).toEqual(items.map(item => item.prompt));
       },
     );
@@ -142,17 +131,8 @@ given("the workshop is open, with the shelf full of fast weapons", () => {
       then("the new weapon stands in its place and every other weapon is untouched", async ({gunsmith}) => {
         const items = await gunsmith.workshop.shelf.getItems();
 
-        expect(items).toHaveLength(limit);
-        expect(items.map(item => item.name)).toEqual(
-          Array.from({length: limit}, (_, index) => (index === 1 ? longRangeName : fastName)),
-        );
-        expect(items.map(item => item.prompt)).toEqual(
-          Array.from({length: limit}, (_, index) => {
-            if (index === 1) return LONG_RANGE_PROMPT;
-
-            return `${promptBeginning} for practice target ${index + 1}`;
-          }),
-        );
+        expect([items[0], ...items.slice(2)]).toEqual([filled[0], ...filled.slice(2)]);
+        expect(items[1]).toMatchObject({name: longRangeName, prompt: LONG_RANGE_PROMPT});
       });
 
       then("the question is gone and the card says Saved", async ({gunsmith}) => {
@@ -179,10 +159,7 @@ given("the workshop is open, with the shelf full of fast weapons", () => {
       });
 
       then("nothing is saved or lost", async ({gunsmith}) => {
-        const items = await gunsmith.workshop.shelf.getItems();
-
-        expect(items).toHaveLength(limit);
-        expect(items.every(item => item.name === fastName)).toBe(true);
+        expect(await gunsmith.workshop.shelf.getItems()).toEqual(filled);
       });
 
       then("the question is gone and Save can be pressed again", async ({gunsmith}) => {

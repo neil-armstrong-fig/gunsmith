@@ -2,7 +2,7 @@ import {DslError} from "@evals/dsl/shared/errors/DslError";
 import type {TrialDsl} from "@evals/dsl/shared/types/TrialDsl";
 import type {ArenaPipelineDriver} from "@evals/dsl/arena/types/ArenaPipelineDriver";
 import {ArenaPipeline} from "@evals/dsl/arena/pipeline/ArenaPipeline";
-import type {ArenaSize} from "@gunsmith/ai/pipeline/arena/arena-shapes/types/ArenaSize";
+import type {ArenaSize} from "@gunsmith/ai/pipeline/arena/drafting/format/shapes/types/ArenaSize";
 import type {ArenaOutcomeStatus} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcomeStatus";
 
 /**

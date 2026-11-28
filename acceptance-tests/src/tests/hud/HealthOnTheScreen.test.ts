@@ -2,7 +2,7 @@ import {beforeEach, expect, given, then, when} from "@src/acceptance-criteria-ma
 
 given("a sparring match has just begun", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startSparring();
+    await gunsmith.scenario.startSparring();
   });
 
   when("nobody has shot the player", () => {
@@ -20,7 +20,7 @@ given("a duel has just begun", () => {
   let fullHealth = 0;
 
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startDuel();
+    await gunsmith.scenario.startDuel();
     fullHealth = await gunsmith.player.getHealth();
   });
 

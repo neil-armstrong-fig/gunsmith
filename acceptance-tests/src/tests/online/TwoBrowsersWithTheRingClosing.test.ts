@@ -9,7 +9,7 @@ given("two browsers are in one private room whose ring closes in a few seconds",
     const code = await gunsmith.room.createPrivateRoom({ringDelaySeconds: 1, ringClosingSeconds: 4});
 
     await gunsmith.room.joinWithASecondBrowser(code);
-    await expect.poll(() => gunsmith.room.hasReceivedSnapshots()).toBe(true);
+    await expect.poll(() => gunsmith.room.frames.hasReceivedSnapshots()).toBe(true);
   });
 
   then("both browsers are shown a ring closing on the same place", async ({gunsmith}) => {

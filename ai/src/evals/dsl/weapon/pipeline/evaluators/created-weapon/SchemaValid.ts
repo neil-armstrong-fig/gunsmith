@@ -1,6 +1,6 @@
 import type {WeaponEvalInput} from "@evals/dsl/weapon/pipeline/types/WeaponEvalInput";
 import type {EvalScore} from "@evals/dsl/shared/types/EvalScore";
-import {weaponDraftSchema} from "@gunsmith/ai/pipeline/weapon/WeaponDraft";
+import {weaponDraftSchema} from "@gunsmith/ai/pipeline/weapon/draft/WeaponDraft";
 
 const KEY = "schemaValid";
 

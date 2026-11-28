@@ -8,7 +8,7 @@ const MUCH_SLOWER = 0.6;
 
 given("a sparring match has just begun", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startSparring();
+    await gunsmith.scenario.startSparring();
   });
 
   when("the player walks standing and then crouches and walks", () => {
@@ -33,8 +33,10 @@ given("a sparring match has just begun", () => {
 
     beforeEach(async ({gunsmith}) => {
       standingSpeed = await gunsmith.player.measureWalkingSpeed("west", SECONDS_WALKING);
+
       await gunsmith.player.crouch();
       await gunsmith.player.standUp();
+
       speedAfterStandingUp = await gunsmith.player.measureWalkingSpeed("east", SECONDS_WALKING);
     });
 

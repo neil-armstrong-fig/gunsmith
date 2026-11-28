@@ -4,7 +4,7 @@ Code is the source of truth. Current contracts are smaller than the intended gam
 
 ## Current weapon data
 
-`ai/src/pipeline/weapon/WeaponDraft.ts` defines a strict draft schema with `name`, `bulletDamage`, `fireIntervalSeconds`, `bulletSpeed`, `magazineSize`, `reloadSeconds`, and `startingReserve`. Model replies first pass the loose proposal parser, then code clamps ranges and invokes the engine balancer before the strict backstop.
+`ai/src/pipeline/weapon/draft/WeaponDraft.ts` defines a strict draft schema with `name`, `bulletDamage`, `fireIntervalSeconds`, `bulletSpeed`, `magazineSize`, `reloadSeconds`, and `startingReserve`. Model replies first pass the loose proposal parser, then code clamps ranges and invokes the engine balancer before the strict backstop.
 
 `engine/src/weapon/types/Weapon.ts` holds those gameplay numbers plus `visionDegrees` and `visionRange`. AI/engine reconciliation of generated vision is pending; do not invent free vision values in research or claim the AI draft already contains them.
 

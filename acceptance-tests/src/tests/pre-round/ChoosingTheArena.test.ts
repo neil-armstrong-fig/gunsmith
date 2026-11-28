@@ -32,7 +32,7 @@ const LONGEST_LOSS_SECONDS = 15;
 
 given("the pre-round is open", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startDuelWithPreRound();
+    await gunsmith.scenario.startDuelWithPreRound();
   });
 
   when("the player looks at the choosing", () => {
@@ -41,7 +41,7 @@ given("the pre-round is open", () => {
     });
 
     then("the arenas are laid out three to a row", async ({gunsmith}) => {
-      expect(await gunsmith.preRound.arena.getChoicesInEachRow()).toEqual(rowsOfThree(BUILT_IN_NAMES.length));
+      expect(await gunsmith.preRound.arena.getChoicesInEachRow()).toEqual([3, 3, 3, 3, 3, 3, 3]);
     });
 
     then(
@@ -120,7 +120,8 @@ given("the player has saved an arena the workshop made", () => {
     await gunsmith.workshop.pasteThePrompt("a yard with one pillar");
     await gunsmith.workshop.make();
     await gunsmith.workshop.arenas.pressArenaAction("Save");
-    await gunsmith.startDuelWithPreRound();
+
+    await gunsmith.scenario.startDuelWithPreRound();
   });
 
   when("the player looks at the arena choices", () => {
@@ -155,7 +156,8 @@ given("the player has saved an arena the workshop made", () => {
       savedName = (await gunsmith.preRound.arena.getChoices())[BUILT_IN_NAMES.length] ?? "";
       await gunsmith.preRound.arena.choose(savedName);
       await gunsmith.preRound.lockIn();
-      await gunsmith.startDuelWithPreRound();
+
+      await gunsmith.scenario.startDuelWithPreRound();
     });
 
     then("the saved arena is chosen again", async ({gunsmith}) => {
@@ -166,13 +168,15 @@ given("the player has saved an arena the workshop made", () => {
 
 given("the player locked in a weapon in each slot and an arena, and opens the pre-round again", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startDuelWithPreRound();
+    await gunsmith.scenario.startDuelWithPreRound();
+
     await gunsmith.preRound.choose(1, "Submachine gun");
     await gunsmith.preRound.choose(2, "Rifle");
     await gunsmith.preRound.arena.choose(FAIR_DUEL.name);
     await gunsmith.preRound.lockIn();
     await gunsmith.preRound.startTheMatch();
-    await gunsmith.startDuelWithPreRound();
+
+    await gunsmith.scenario.startDuelWithPreRound();
   });
 
   when("the choosing comes up", () => {
@@ -190,10 +194,12 @@ given("the player locked in a weapon in each slot and an arena, and opens the pr
 
 given("the player chose a weapon and an arena but never locked in, and opens the pre-round again", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startDuelWithPreRound();
+    await gunsmith.scenario.startDuelWithPreRound();
+
     await gunsmith.preRound.choose(1, "Submachine gun");
     await gunsmith.preRound.arena.choose(FAIR_DUEL.name);
-    await gunsmith.startDuelWithPreRound();
+
+    await gunsmith.scenario.startDuelWithPreRound();
   });
 
   when("the choosing comes up", () => {
@@ -203,13 +209,3 @@ given("the player chose a weapon and an arena but never locked in, and opens the
     });
   });
 });
-
-/** How `count` choices fill rows of three: full rows, then what is left. */
-function rowsOfThree(count: number): number[] {
-  const rows = Array.from({length: Math.floor(count / 3)}, () => 3);
-  if (count % 3 > 0) {
-    rows.push(count % 3);
-  }
-
-  return rows;
-}

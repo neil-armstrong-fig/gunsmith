@@ -33,7 +33,7 @@ given("a duel has just begun", () => {
   let fullHealth = 0;
 
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startDuel();
+    await gunsmith.scenario.startDuel();
     fullHealth = await gunsmith.player.getHealth();
   });
 
@@ -64,6 +64,7 @@ given("a duel has just begun", () => {
       await gunsmith.round.waitForState("lost", LONGEST_LOSS_SECONDS);
       await gunsmith.round.nextRound();
       await gunsmith.round.waitForBannerToGo();
+
       await gunsmith.hud.waitForHealth(await gunsmith.player.getHealth());
     });
 
@@ -76,9 +77,9 @@ given("a duel has just begun", () => {
 given("a duel, held still, with the player standing in the open", () => {
   beforeEach(async ({gunsmith}) => {
     // The camera shakes for 100 ms after this hit and would move the picture a pixel or two against sampling gaps of about one; `ShakingTheCameraOnAHit` covers the shake.
-    gunsmith.keepTheCameraStill();
-    await gunsmith.startDuel();
-    await gunsmith.holdTheGame();
+    gunsmith.scenario.keepTheCameraStill();
+    await gunsmith.scenario.startDuel();
+    await gunsmith.clock.holdTheGame();
   });
 
   when("a bullet has just hurt the player", () => {
@@ -101,7 +102,7 @@ given("a duel, held still, with the player standing in the open", () => {
   when("a bullet has hurt the player and the flash has had time to end", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.runUntilHurt(HIT_WATCH);
-      await gunsmith.runGameFor(FLASH_IS_OVER_SECONDS);
+      await gunsmith.clock.runGameFor(FLASH_IS_OVER_SECONDS);
     });
 
     then("no bracket is left on the screen", async ({gunsmith}) => {
@@ -117,7 +118,7 @@ given("a sparring match whose ring closes on the opponent's side of the arena", 
   let fullHealth = 0;
 
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startClosingRing({
+    await gunsmith.scenario.startClosingRing({
       seed: PLAYER_LEFT_OUTSIDE_SEED,
       delaySeconds: DELAY_SECONDS,
       closingSeconds: CLOSING_SECONDS,
@@ -138,7 +139,7 @@ given("a sparring match whose ring closes on the opponent's side of the arena", 
 
     then("the health the ring takes does not trail: the ring's loss is a plain bar", async ({gunsmith}) => {
       await gunsmith.hud.waitForBorder();
-      await gunsmith.waitForGameSeconds(1);
+      await gunsmith.clock.waitForGameSeconds(1);
 
       expect(await gunsmith.hud.getMotions(TRAIL)).toHaveLength(0);
     });
@@ -157,18 +158,18 @@ given("a sparring match whose ring closes on the opponent's side of the arena", 
 
 given("a sparring match whose ring closes on the opponent's side of the arena, held still", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startClosingRing({
+    await gunsmith.scenario.startClosingRing({
       seed: PLAYER_LEFT_OUTSIDE_SEED,
       delaySeconds: DELAY_SECONDS,
       closingSeconds: CLOSING_SECONDS,
     });
-    await gunsmith.holdTheGame();
+    await gunsmith.clock.holdTheGame();
   });
 
   when("the ring has been hurting the player, who stands still outside it, for a second", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.runUntilHurt(RING_WATCH);
-      await gunsmith.runGameFor(RING_EDGE_HAS_MOVED_ON_SECONDS);
+      await gunsmith.clock.runGameFor(RING_EDGE_HAS_MOVED_ON_SECONDS);
     });
 
     then("a red highlight rings the player", async ({gunsmith}) => {

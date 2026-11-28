@@ -25,14 +25,14 @@ const RING_WATCH = {maxSeconds: 10, stepSeconds: 0.02};
 
 given("a duel, held still, with the player standing in the open", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startDuel();
-    await gunsmith.holdTheGame();
+    await gunsmith.scenario.startDuel();
+    await gunsmith.clock.holdTheGame();
   });
 
   when("a bullet has just hurt the player and the shake is part way through", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.runUntilHurt(HIT_WATCH);
-      await gunsmith.runGameFor(PART_WAY_SECONDS);
+      await gunsmith.clock.runGameFor(PART_WAY_SECONDS);
     });
 
     then(
@@ -59,7 +59,7 @@ given("a duel, held still, with the player standing in the open", () => {
   when("a bullet has hurt the player and the shake has had time to end", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.runUntilHurt(HIT_WATCH);
-      await gunsmith.runGameFor(SHAKE_IS_OVER_SECONDS);
+      await gunsmith.clock.runGameFor(SHAKE_IS_OVER_SECONDS);
     });
 
     then("the camera is back where it was, exactly", async ({gunsmith}) => {
@@ -72,19 +72,19 @@ given("a duel, held still, with the player aiming at a place across the arena", 
   let aimBeforeTheHit = 0;
 
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startDuel();
-    await gunsmith.holdTheGame();
+    await gunsmith.scenario.startDuel();
+    await gunsmith.clock.holdTheGame();
 
     const {x, y} = await gunsmith.player.getPosition();
     await gunsmith.player.aimAtTile({x: x + AIM_DISTANCE_TILES, y});
-    await gunsmith.runGameFor(PART_WAY_SECONDS);
+    await gunsmith.clock.runGameFor(PART_WAY_SECONDS);
     aimBeforeTheHit = await gunsmith.player.getAimDegrees();
   });
 
   when("a bullet has just hurt the player and the camera is shaking", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.runUntilHurt(HIT_WATCH);
-      await gunsmith.runGameFor(PART_WAY_SECONDS);
+      await gunsmith.clock.runGameFor(PART_WAY_SECONDS);
     });
 
     then("the camera really is moving the picture", async ({gunsmith}) => {
@@ -101,15 +101,15 @@ given("a duel, held still, with the player aiming at a place across the arena", 
 
 given("a duel opened with a camera that does not shake, held still", () => {
   beforeEach(async ({gunsmith}) => {
-    gunsmith.keepTheCameraStill();
-    await gunsmith.startDuel();
-    await gunsmith.holdTheGame();
+    gunsmith.scenario.keepTheCameraStill();
+    await gunsmith.scenario.startDuel();
+    await gunsmith.clock.holdTheGame();
   });
 
   when("a bullet has just hurt the player and a shake would be part way through", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.runUntilHurt(HIT_WATCH);
-      await gunsmith.runGameFor(PART_WAY_SECONDS);
+      await gunsmith.clock.runGameFor(PART_WAY_SECONDS);
     });
 
     then("the camera does not move the picture", async ({gunsmith}) => {
@@ -120,21 +120,21 @@ given("a duel opened with a camera that does not shake, held still", () => {
 
 given("a sparring match whose ring closes on the opponent's side of the arena, held still", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startClosingRing({
+    await gunsmith.scenario.startClosingRing({
       seed: PLAYER_LEFT_OUTSIDE_SEED,
       delaySeconds: DELAY_SECONDS,
       closingSeconds: CLOSING_SECONDS,
     });
-    await gunsmith.holdTheGame();
+    await gunsmith.clock.holdTheGame();
   });
 
   when(
     "the ring has just begun to hurt the player, who stands still outside it, and a shake would be part way through",
     () => {
       beforeEach(async ({gunsmith}) => {
-        await gunsmith.runGameFor(BEFORE_THE_RING_BITES_SECONDS);
+        await gunsmith.clock.runGameFor(BEFORE_THE_RING_BITES_SECONDS);
         await gunsmith.player.runUntilHurt(RING_WATCH);
-        await gunsmith.runGameFor(PART_WAY_SECONDS);
+        await gunsmith.clock.runGameFor(PART_WAY_SECONDS);
       });
 
       then("the camera does not move the picture: the ring is not a hit", async ({gunsmith}) => {

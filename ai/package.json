@@ -33,7 +33,6 @@
     "@gunsmith/shared": "workspace:*",
     "@langchain/langgraph-cli": "catalog:",
     "@langchain/ollama": "catalog:",
-    "@langchain/langgraph-sdk": "catalog:",
     "@types/node": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
@@ -42,7 +41,6 @@
     "prettier": "catalog:",
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
-    "vitest": "catalog:",
-    "wrangler": "catalog:"
+    "vitest": "catalog:"
   }
 }

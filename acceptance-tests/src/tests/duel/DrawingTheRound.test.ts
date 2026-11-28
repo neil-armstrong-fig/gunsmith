@@ -7,7 +7,7 @@ const LONGEST_DRAW_SECONDS = 5;
 
 given("both fighters are hit by a shot that brings them down in the same step", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startMutualKnockout();
+    await gunsmith.scenario.startMutualKnockout();
   });
 
   when("the round is over", () => {

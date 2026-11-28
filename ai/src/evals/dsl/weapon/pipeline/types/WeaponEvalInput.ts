@@ -1,4 +1,4 @@
-import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
+import type {WeaponOutcome} from "@gunsmith/ai/pipeline/weapon/types/WeaponOutcome";
 
 /** What an evaluator is given: what the pipeline answered to one trial. */
 export interface WeaponEvalInput {

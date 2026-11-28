@@ -69,9 +69,9 @@ given("a private room whose players have a minute to choose", () => {
         async ({gunsmith}) => {
           const second = gunsmith.room.secondBrowser();
 
-          await expect.poll(() => second.room.hasReceivedPreRounds()).toBe(true);
-          expect(second.room.hasBeenToldTheOpponentsWeapon(1)).toBe(false);
-          expect(gunsmith.room.hasBeenToldTheOpponentsWeapon(1)).toBe(false);
+          await expect.poll(() => second.room.frames.hasReceivedPreRounds()).toBe(true);
+          expect(second.room.frames.hasBeenToldTheOpponentsWeapon(1)).toBe(false);
+          expect(gunsmith.room.frames.hasBeenToldTheOpponentsWeapon(1)).toBe(false);
           expect(await second.room.preRound.getOpponentWeapon(1)).toBeUndefined();
           expect(await gunsmith.room.preRound.getOpponentWeapon(1)).toBeUndefined();
         },
@@ -114,8 +114,8 @@ given("a private room whose players have a minute to choose", () => {
           const second = gunsmith.room.secondBrowser();
 
           await second.room.preRound.waitForTheOpponentWeapon(1);
-          expect(gunsmith.room.hasBeenToldTheOpponentsWeapon(2)).toBe(false);
-          expect(second.room.hasBeenToldTheOpponentsWeapon(2)).toBe(false);
+          expect(gunsmith.room.frames.hasBeenToldTheOpponentsWeapon(2)).toBe(false);
+          expect(second.room.frames.hasBeenToldTheOpponentsWeapon(2)).toBe(false);
         });
 
         when(
@@ -129,7 +129,7 @@ given("a private room whose players have a minute to choose", () => {
               const second = gunsmith.room.secondBrowser();
 
               await expect.poll(() => gunsmith.room.preRound.getLockedWeapon(2)).toBe("Marksman rifle");
-              expect(second.room.hasBeenToldTheOpponentsWeapon(2)).toBe(false);
+              expect(second.room.frames.hasBeenToldTheOpponentsWeapon(2)).toBe(false);
               expect(await second.room.preRound.getOpponentWeapon(2)).toBeUndefined();
             });
 
@@ -267,9 +267,14 @@ given("a private room that gives its players eight seconds to choose", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.preRound.choose(1, "Submachine gun");
       await gunsmith.room.preRound.lockInWeapon(1);
-      await expect.poll(() => gunsmith.room.hasReceivedSnapshots(), {timeout: MATCH_AFTER_THE_CLOCK_MS}).toBe(true);
+
       await expect
-        .poll(() => gunsmith.room.secondBrowser().room.hasReceivedSnapshots(), {timeout: MATCH_AFTER_THE_CLOCK_MS})
+        .poll(() => gunsmith.room.frames.hasReceivedSnapshots(), {timeout: MATCH_AFTER_THE_CLOCK_MS})
+        .toBe(true);
+      await expect
+        .poll(() => gunsmith.room.secondBrowser().room.frames.hasReceivedSnapshots(), {
+          timeout: MATCH_AFTER_THE_CLOCK_MS,
+        })
         .toBe(true);
     });
 
@@ -303,13 +308,15 @@ given("a private room whose first player has locked in a weapon while alone and 
   let code = "";
 
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.room.prepareToLoseTheConnection();
+    await gunsmith.room.connection.prepareToLoseTheConnection();
     code = await gunsmith.room.createPrivateRoom({preRoundSeconds: SECONDS_TO_CHOOSE});
     await gunsmith.room.preRound.waitToBeChoosing();
+
     await gunsmith.preRound.choose(1, "Marksman rifle");
     await gunsmith.room.preRound.lockInWeapon(1);
-    await gunsmith.room.cutTheConnection();
-    await gunsmith.room.waitToBeSeatedAgain();
+
+    await gunsmith.room.connection.cutTheConnection();
+    await gunsmith.room.connection.waitToBeSeatedAgain();
   });
 
   when("the second player sits and locks in the rifle as their first weapon", () => {
@@ -336,10 +343,12 @@ given("a private room offering the day's arenas, where both players have locked 
     await gunsmith.room.joinWithASecondBrowserToChoose(code);
     const second = gunsmith.room.secondBrowser();
 
-    for (const slot of [1, 2]) {
-      await gunsmith.room.preRound.lockInWeapon(slot);
-      await second.room.preRound.lockInWeapon(slot);
-    }
+    await gunsmith.room.preRound.lockInWeapon(1);
+    await second.room.preRound.lockInWeapon(1);
+
+    await gunsmith.room.preRound.lockInWeapon(2);
+    await second.room.preRound.lockInWeapon(2);
+
     await gunsmith.room.preRound.waitForTheOpponentWeapon(2);
   });
 

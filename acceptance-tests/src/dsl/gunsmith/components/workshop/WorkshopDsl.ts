@@ -5,6 +5,7 @@ import {ShelfDsl} from "@src/dsl/gunsmith/components/workshop/components/shelf/S
 import {WorkshopPlaywright} from "@src/dsl/gunsmith/components/workshop/playwright/WorkshopPlaywright";
 import type {PowerMeter} from "@src/dsl/gunsmith/components/workshop/types/PowerMeter";
 import type {PromptCount} from "@src/dsl/gunsmith/components/workshop/types/PromptCount";
+import type {ShelfItem} from "@src/dsl/gunsmith/components/workshop/components/shelf/types/ShelfItem";
 import type {WeaponResult} from "@src/dsl/gunsmith/components/workshop/types/WeaponResult";
 import {DslError} from "@src/dsl/gunsmith/errors/DslError";
 
@@ -169,6 +170,18 @@ export class WorkshopDsl {
       await this.workshop.make();
     } catch (error) {
       throw new DslError("Failed to press Make", error);
+    }
+  }
+
+  /**
+   * Fills the shelf as a player would: makes and saves one weapon after another, each from `promptBeginning` and its own
+   * number ("… for practice target 1"), until the shelf is full. Gives the shelf's weapons once it is.
+   */
+  async fillTheShelf(promptBeginning: string): Promise<ShelfItem[]> {
+    try {
+      return await this.workshop.fillTheShelf(promptBeginning);
+    } catch (error) {
+      throw new DslError("Failed to fill the shelf with saved weapons", error);
     }
   }
 

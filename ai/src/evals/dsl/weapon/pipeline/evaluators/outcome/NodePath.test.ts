@@ -1,6 +1,6 @@
 import {passingWeaponEvalInput} from "@evals/dsl/weapon/pipeline/evaluators/testing/input/PassingWeaponEvalInput";
 import {nodePath} from "@evals/dsl/weapon/pipeline/evaluators/outcome/NodePath";
-import type {WeaponOutcomeStatus} from "@gunsmith/ai/pipeline/types/WeaponOutcomeStatus";
+import type {WeaponOutcomeStatus} from "@gunsmith/ai/pipeline/weapon/types/WeaponOutcomeStatus";
 
 const STATS = ["precheck", "moderation", "generate", "validate", "balance", "rate"];
 const DRAWING = ["appearance.generate", "appearance.fix", "appearance.validate"];

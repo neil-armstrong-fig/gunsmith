@@ -28,6 +28,7 @@ given("a signed-in player with 7 of 10 credits makes an arena", () => {
   beforeEach(async ({gunsmith}) => {
     await gunsmith.workshop.arenas.arrangeSignedInArena();
     await gunsmith.workshop.arrangeCredits(7);
+
     await gunsmith.workshop.open();
     await gunsmith.workshop.arenas.open();
     await gunsmith.workshop.pasteThePrompt("a wide industrial yard");

@@ -13,7 +13,11 @@ const EDGE_IN_VIEW_BELOW_TILES = 14;
 
 given("a sparring match whose ring has closed in until its edge is on the screen", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startClosingRing({seed: SEED, delaySeconds: DELAY_SECONDS, closingSeconds: CLOSING_SECONDS});
+    await gunsmith.scenario.startClosingRing({
+      seed: SEED,
+      delaySeconds: DELAY_SECONDS,
+      closingSeconds: CLOSING_SECONDS,
+    });
     await gunsmith.ring.waitForRadiusBelow(EDGE_IN_VIEW_BELOW_TILES, DELAY_SECONDS + CLOSING_SECONDS);
   });
 
@@ -44,12 +48,16 @@ const SECONDS_WATCHED = 1;
 
 given("a sparring match whose ring does not start to close for a minute", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startClosingRing({seed: SEED, delaySeconds: LATE_DELAY_SECONDS, closingSeconds: CLOSING_SECONDS});
+    await gunsmith.scenario.startClosingRing({
+      seed: SEED,
+      delaySeconds: LATE_DELAY_SECONDS,
+      closingSeconds: CLOSING_SECONDS,
+    });
   });
 
   when("a second of the round has been played and the ring has not started", () => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.waitForGameSeconds(SECONDS_WATCHED);
+      await gunsmith.clock.waitForGameSeconds(SECONDS_WATCHED);
     });
 
     then("no red of the ring is drawn in any corner of the arena", async ({gunsmith}) => {

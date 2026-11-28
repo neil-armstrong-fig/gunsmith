@@ -9,15 +9,16 @@ given("the practice range, held still", () => {
   let endX = 0;
 
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.holdTheGame();
+    await gunsmith.clock.holdTheGame();
     startX = (await gunsmith.player.getPosition()).x;
   });
 
   when("the player holds the walk key with the workshop shut", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.startWalking("east");
-      await gunsmith.runGameFor(HALF_A_SECOND);
+      await gunsmith.clock.runGameFor(HALF_A_SECOND);
       await gunsmith.player.stopWalking("east");
+
       endX = (await gunsmith.player.getPosition()).x;
     });
 
@@ -30,7 +31,8 @@ given("the practice range, held still", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.startWalking("east");
       await gunsmith.workshop.open();
-      await gunsmith.runGameFor(HALF_A_SECOND);
+      await gunsmith.clock.runGameFor(HALF_A_SECOND);
+
       endX = (await gunsmith.player.getPosition()).x;
       await gunsmith.player.stopWalking("east");
     });
@@ -58,9 +60,11 @@ given("the practice range, held still", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.workshop.open();
       await gunsmith.workshop.close();
+
       await gunsmith.player.startWalking("east");
-      await gunsmith.runGameFor(HALF_A_SECOND);
+      await gunsmith.clock.runGameFor(HALF_A_SECOND);
       await gunsmith.player.stopWalking("east");
+
       endX = (await gunsmith.player.getPosition()).x;
     });
 
@@ -80,13 +84,13 @@ given("the practice range, held still", () => {
 
 given("a duel has begun", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startDuel();
+    await gunsmith.scenario.startDuel();
   });
 
   when("the player presses the workshop key", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.workshop.open();
-      await gunsmith.waitForGameSeconds(0.3);
+      await gunsmith.clock.waitForGameSeconds(0.3);
     });
 
     then("no workshop opens, because nothing is made in a match", async ({gunsmith}) => {

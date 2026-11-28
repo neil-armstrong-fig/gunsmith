@@ -12,7 +12,7 @@ given("two browsers are in one private room", () => {
   });
 
   then("the server is sending the first browser snapshots", async ({gunsmith}) => {
-    await expect.poll(() => gunsmith.room.hasReceivedSnapshots()).toBe(true);
+    await expect.poll(() => gunsmith.room.frames.hasReceivedSnapshots()).toBe(true);
   });
 
   when("the first player faces the second", () => {
@@ -21,7 +21,7 @@ given("two browsers are in one private room", () => {
     });
 
     then("the first browser is told where the second player is", async ({gunsmith}) => {
-      await expect.poll(() => gunsmith.room.hasBeenToldWhereTheOtherPlayerIs()).toBe(true);
+      await expect.poll(() => gunsmith.room.frames.hasBeenToldWhereTheOtherPlayerIs()).toBe(true);
     });
   });
 
@@ -31,8 +31,8 @@ given("two browsers are in one private room", () => {
     });
 
     then("the server sends the first browser snapshots without the second player in them", async ({gunsmith}) => {
-      await expect.poll(() => gunsmith.room.hasReceivedSnapshots()).toBe(true);
-      await expect.poll(() => gunsmith.room.hasBeenToldWhereTheOtherPlayerIs()).toBe(false);
+      await expect.poll(() => gunsmith.room.frames.hasReceivedSnapshots()).toBe(true);
+      await expect.poll(() => gunsmith.room.frames.hasBeenToldWhereTheOtherPlayerIs()).toBe(false);
     });
   });
 });

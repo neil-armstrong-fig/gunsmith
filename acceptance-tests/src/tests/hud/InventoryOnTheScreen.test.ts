@@ -7,7 +7,7 @@ const MINIMUM_MAGAZINE_PIXELS = 12;
 
 given("a sparring match whose pickup is on the fighters' row", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startSparringWithSeed(8);
+    await gunsmith.scenario.startSparringWithSeed(8);
   });
 
   then("the HUD draws both starting weapons and names the selected rifle", async ({gunsmith}) => {
@@ -98,6 +98,7 @@ given("a sparring match whose pickup is on the fighters' row", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.switchTo(2);
       await gunsmith.hud.waitForSlot(2);
+
       await gunsmith.player.walkFor("east", 0.7);
       await gunsmith.pickup.waitUntilTaken();
     });

@@ -17,7 +17,7 @@ const BEHIND_THE_PLAYER = {x: 2.5, y: 6.5};
 
 given("a sparring match whose weapon lies on the row the fighters stand on", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startSparringWithSeed(ON_THE_FIGHTERS_ROW_SEED);
+    await gunsmith.scenario.startSparringWithSeed(ON_THE_FIGHTERS_ROW_SEED);
   });
 
   when("the match has just begun", () => {
@@ -51,7 +51,7 @@ given("a sparring match whose weapon lies on the row the fighters stand on", () 
     beforeEach(async ({gunsmith}) => {
       first = await gunsmith.pickup.get();
 
-      await gunsmith.startSparringWithSeed(ON_THE_FIGHTERS_ROW_SEED);
+      await gunsmith.scenario.startSparringWithSeed(ON_THE_FIGHTERS_ROW_SEED);
     });
 
     then("the weapon lies in the same place", async ({gunsmith}) => {
@@ -147,7 +147,7 @@ given("a sparring match whose weapon lies on the row the fighters stand on", () 
 
 given("a sparring match whose weapon lies four rows away from the fighters' row", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startSparringWithSeed(FOUR_ROWS_AWAY_SEED);
+    await gunsmith.scenario.startSparringWithSeed(FOUR_ROWS_AWAY_SEED);
   });
 
   when("the match has just begun", () => {

@@ -21,7 +21,7 @@ given("a player opening the practice range menu", () => {
       beforeEach(async ({gunsmith}) => {
         await gunsmith.preRound.lockIn();
         await gunsmith.preRound.startTheMatch();
-        await gunsmith.waitForGameSeconds(0.2);
+        await gunsmith.clock.waitForGameSeconds(0.2);
       });
 
       then("the bot round is running on the original canvas", async ({gunsmith}) => {
@@ -71,17 +71,20 @@ given("a player who opened the practice range with a seed in its address, and pl
   let firstStart: object = {};
 
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.openTheSeededPracticeRange();
+    await gunsmith.scenario.openTheSeededPracticeRange();
+
     await gunsmith.menu.pressSettings();
     await gunsmith.preRound.startBotGame();
     await gunsmith.preRound.lockIn();
     await gunsmith.preRound.startTheMatch();
+
     firstStart = await gunsmith.player.getPosition();
   });
 
   when("they open the same address again and start another bot game", () => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.openTheSeededPracticeRange();
+      await gunsmith.scenario.openTheSeededPracticeRange();
+
       await gunsmith.menu.pressSettings();
       await gunsmith.preRound.startBotGame();
       await gunsmith.preRound.lockIn();

@@ -22,15 +22,14 @@ const BACK_FROM_THE_EDGE = PLATFORM_EDGE + 1.6;
 const WALK_WATCH = {maxSeconds: 5, stepSeconds: 0.02};
 const SHOT_WATCH = {maxSeconds: 5, stepSeconds: 0.05};
 // One frame at a time for six frames (120 ms), which is longer than a shot lives against the face a tile and a half ahead; then long enough for it surely to have ended.
-const A_FRAME_SECONDS = 0.02;
-const FRAMES_LOOKED_AT = 6;
+const EVERY_FRAME_WATCH = {maxSeconds: 0.12, stepSeconds: 0.02};
 const LONGER_THAN_THE_SHOT_LIVES_SECONDS = 1;
 // Long enough, in steps of `SHOT_WATCH`, for a shot from the platform to cross the whole low ground to the west wall.
-const FRAMES_OF_A_LONG_SHOT = 20;
+const LONG_SHOT_WATCH = {maxSeconds: 1, stepSeconds: SHOT_WATCH.stepSeconds};
 
 given("a player on the low ground, a dummy on the platform ahead and another on the low ground behind them", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startHeights();
+    await gunsmith.scenario.startHeights();
   });
 
   when("the player shoots at the dummy on the platform", () => {
@@ -39,18 +38,13 @@ given("a player on the low ground, a dummy on the platform ahead and another on 
 
     beforeEach(async ({gunsmith}) => {
       // Held, because the shot lives for under a tenth of a second (the face is a tile and a half away) and a test that looks every so often missed it on a busy machine.
-      await gunsmith.holdTheGame();
+      await gunsmith.clock.holdTheGame();
       health = await gunsmith.dummies.getHealthAt(PLATFORM_DUMMY);
 
       await gunsmith.player.aimAtTile(PLATFORM_DUMMY);
-      await gunsmith.player.fire();
-
       // The click is taken up by the first frame or the second, so the shot is looked for at every frame for longer than it lives (about 75 ms), not at one.
-      for (let frame = 0; frame < FRAMES_LOOKED_AT; frame += 1) {
-        await gunsmith.runGameFor(A_FRAME_SECONDS);
-        shotLeft = shotLeft || (await gunsmith.bullets.count()) > 0;
-      }
-      await gunsmith.runGameFor(LONGER_THAN_THE_SHOT_LIVES_SECONDS);
+      shotLeft = (await gunsmith.player.fireAndWatchTheShot(EVERY_FRAME_WATCH)).seenInTheAir;
+      await gunsmith.clock.runGameFor(LONGER_THAN_THE_SHOT_LIVES_SECONDS);
     });
 
     then(
@@ -67,7 +61,7 @@ given("a player on the low ground, a dummy on the platform ahead and another on 
     let health: number | undefined;
 
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.holdTheGame();
+      await gunsmith.clock.holdTheGame();
       health = await gunsmith.dummies.getHealthAt(EDGE_DUMMY);
 
       await gunsmith.player.aimAtTile(EDGE_DUMMY);
@@ -102,7 +96,7 @@ given("a player on the low ground, a dummy on the platform ahead and another on 
 
   when("the player climbs the stair onto the platform", () => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.holdTheGame();
+      await gunsmith.clock.holdTheGame();
       await gunsmith.player.walkUntilPast({heading: "east", limit: JUST_ONTO_THE_PLATFORM, watch: WALK_WATCH});
 
       expect(await gunsmith.player.getLevel()).toBe(PLATFORM);
@@ -147,20 +141,14 @@ given("a player on the low ground, a dummy on the platform ahead and another on 
 
     when("the player steps back from the edge and shoots down at the dummy on the low ground", () => {
       let health: number | undefined;
-      let farthestWest = Infinity;
+      let farthestWest: number | undefined;
 
       beforeEach(async ({gunsmith}) => {
         await gunsmith.player.walkUntilPast({heading: "east", limit: BACK_FROM_THE_EDGE, watch: WALK_WATCH});
         health = await gunsmith.dummies.getHealthAt(LOW_GROUND_DUMMY);
 
         await gunsmith.player.aimAtTile(LOW_GROUND_DUMMY);
-        await gunsmith.player.fire();
-        for (let frame = 0; frame < FRAMES_OF_A_LONG_SHOT; frame += 1) {
-          await gunsmith.runGameFor(SHOT_WATCH.stepSeconds);
-          for (const bullet of await gunsmith.bullets.getAll()) {
-            farthestWest = Math.min(farthestWest, bullet.x);
-          }
-        }
+        farthestWest = (await gunsmith.player.fireAndWatchTheShot(LONG_SHOT_WATCH)).farthestWest;
       });
 
       then("the shot flies on over the dummy, which is not hurt", async ({gunsmith}) => {

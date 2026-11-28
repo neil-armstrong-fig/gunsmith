@@ -1,4 +1,4 @@
-import type {AnthropicModelOptions} from "@gunsmith/ai/adapter/types/AnthropicModelOptions";
+import type {AnthropicModelOptions} from "@gunsmith/ai/adapter/shared/types/AnthropicModelOptions";
 import {loadAnthropicKey} from "@evals/eval-criteria-mapping/environment/tier/paid/key/LoadAnthropicKey";
 import {PAID_KEY_FILE} from "@evals/eval-criteria-mapping/environment/tier/paid/key/PaidKeyFile";
 import {paidSpendGuard} from "@evals/eval-criteria-mapping/environment/tier/paid/spend/PaidSpendGuard";

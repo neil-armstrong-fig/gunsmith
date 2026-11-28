@@ -1,5 +1,5 @@
-import {createArenaModels} from "@gunsmith/ai/adapter/CreateArenaModels";
-import type {ArenaModels} from "@gunsmith/ai/adapter/types/ArenaModels";
+import {createArenaModels} from "@gunsmith/ai/adapter/arena/CreateArenaModels";
+import type {ArenaModels} from "@gunsmith/ai/adapter/arena/types/ArenaModels";
 import {generateArena} from "@gunsmith/ai/pipeline/arena/GenerateArena";
 import type {ArenaOutcome} from "@gunsmith/ai/pipeline/arena/types/ArenaOutcome";
 import {workerEnvironment} from "@src/env/WorkerEnvironment";
@@ -9,7 +9,7 @@ import {runArenaPipeline} from "@src/router/routes/arenas/pipeline/RunArenaPipel
 vi.unmock("@src/router/routes/arenas/pipeline/IsArenaPipelineAvailable");
 vi.unmock("@src/router/routes/arenas/pipeline/RunArenaPipeline");
 vi.mock("@gunsmith/ai/pipeline/arena/GenerateArena");
-vi.mock("@gunsmith/ai/adapter/CreateArenaModels");
+vi.mock("@gunsmith/ai/adapter/arena/CreateArenaModels");
 
 const models = {generator: "the drawing model", moderator: "the judging model"} as unknown as ArenaModels;
 const outcome = {status: "rejected", reason: "not an arena"} as unknown as ArenaOutcome;

@@ -10,6 +10,7 @@ given("the arena workshop is open on the practice range", () => {
   beforeEach(async ({gunsmith}) => {
     await gunsmith.workshop.open();
     await gunsmith.workshop.arenas.open();
+
     await gunsmith.workshop.pasteThePrompt(PILLAR_PROMPT);
     await gunsmith.workshop.make();
   });
@@ -56,9 +57,11 @@ given("the arena workshop is open on the practice range", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.workshop.pasteThePrompt(RAISED_PROMPT);
       await gunsmith.workshop.arenas.pressArenaAction("Save");
-      await gunsmith.reloadThePage();
+
+      await gunsmith.browser.reloadThePage();
       await gunsmith.workshop.open();
       await gunsmith.workshop.arenas.open();
+
       await gunsmith.workshop.arenas.pressArenaAction("Iterate");
     });
 
@@ -107,11 +110,15 @@ given("the arena workshop is open on the practice range", () => {
   when("the arena shelf fills and the player asks to save a different arena", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.workshop.arenas.pressArenaAction("Save");
-      for (const prompt of ["a pillar on the west side", "a pillar in the yard"]) {
-        await gunsmith.workshop.pasteThePrompt(prompt);
-        await gunsmith.workshop.make();
-        await gunsmith.workshop.arenas.pressArenaAction("Save");
-      }
+
+      await gunsmith.workshop.pasteThePrompt("a pillar on the west side");
+      await gunsmith.workshop.make();
+      await gunsmith.workshop.arenas.pressArenaAction("Save");
+
+      await gunsmith.workshop.pasteThePrompt("a pillar in the yard");
+      await gunsmith.workshop.make();
+      await gunsmith.workshop.arenas.pressArenaAction("Save");
+
       await gunsmith.workshop.pasteThePrompt(RAISED_PROMPT);
       await gunsmith.workshop.make();
       await gunsmith.workshop.arenas.pressArenaAction("Save");

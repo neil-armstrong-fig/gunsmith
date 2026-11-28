@@ -6,16 +6,18 @@ import {beforeEach, expect, given, then, when} from "@src/acceptance-criteria-ma
 // are drawn from the seed. The player stands still, so the player's own place is exact. The opponent has a brain and may have
 // walked before the page could be read, so its place is compared with room for as far as anyone can walk in the game time that
 // had passed (read after the places, so never too little): nobody walks faster than 6 tiles a second.
-const SEEDS = [2, 17, 28];
+const SEEDS = [2, 17, 28] as const;
 const ARENA_CENTRE = {x: 10.5, y: 6.5};
 const FASTEST_WALK_IN_TILES_PER_SECOND = 6;
 // The pair is at least 10 steps apart on foot, and a step is at most one tile along either axis: 10 / sqrt(2) in a straight line.
 const NEAREST_THE_FIGHTERS_START = 7;
 
-for (const seed of SEEDS) {
-  given(`a fair duel (seed ${seed}) that has just begun`, () => {
+given.each(
+  SEEDS,
+  seed => `a fair duel (seed ${seed}) that has just begun`,
+  seed => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.startFairDuel(seed);
+      await gunsmith.scenario.startFairDuel(seed);
     });
 
     then("both fighters stand on the low ground", async ({gunsmith}) => {
@@ -55,28 +57,34 @@ for (const seed of SEEDS) {
 
       beforeEach(async ({gunsmith}) => {
         firstPlace = await gunsmith.player.getPosition();
-        await gunsmith.startFairDuel(seed);
+        await gunsmith.scenario.startFairDuel(seed);
       });
 
       then("the player starts in the same place", async ({gunsmith}) => {
         expect(await gunsmith.player.getPosition()).toEqual(firstPlace);
       });
     });
-  });
-}
+  },
+);
 
 given("fair duels of several seeds have each just begun", () => {
-  const places = new Set<string>();
+  const [firstSeed, secondSeed, thirdSeed] = SEEDS;
+  let first = {x: 0, y: 0};
+  let second = {x: 0, y: 0};
+  let third = {x: 0, y: 0};
 
   beforeEach(async ({gunsmith}) => {
-    for (const seed of SEEDS) {
-      await gunsmith.startFairDuel(seed);
-      const {x, y} = await gunsmith.player.getPosition();
-      places.add(`${x},${y}`);
-    }
+    await gunsmith.scenario.startFairDuel(firstSeed);
+    first = await gunsmith.player.getPosition();
+
+    await gunsmith.scenario.startFairDuel(secondSeed);
+    second = await gunsmith.player.getPosition();
+
+    await gunsmith.scenario.startFairDuel(thirdSeed);
+    third = await gunsmith.player.getPosition();
   });
 
   then("they do not all begin with the player in the same place", () => {
-    expect(places.size).toBeGreaterThan(1);
+    expect([second, third]).not.toEqual([first, first]);
   });
 });

@@ -1,4 +1,4 @@
-import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
+import type {WeaponOutcome} from "@gunsmith/ai/pipeline/weapon/types/WeaponOutcome";
 
 /**
  * What the DSL needs to ask the weapon smith: a way to run a request, and how many times. The DSL owns this seam and knows

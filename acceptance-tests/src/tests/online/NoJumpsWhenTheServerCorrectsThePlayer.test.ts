@@ -12,23 +12,23 @@ import {beforeEach, expect, given, then, when} from "@src/acceptance-criteria-ma
 // unit tests: a frame stalled under load takes a bigger bite of it, which is no jump.
 given("two browsers are in one private room over a connection that holds frames up unevenly", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.room.slowTheConnectionBy({milliseconds: 120, jitterMilliseconds: 80});
+    await gunsmith.room.connection.slowTheConnectionBy({milliseconds: 120, jitterMilliseconds: 80});
     const code = await gunsmith.room.createPrivateRoom();
 
     await gunsmith.room.joinWithASecondBrowser(code);
-    await expect.poll(() => gunsmith.room.hasReceivedSnapshots()).toBe(true);
-    await gunsmith.room.startRecordingTheShownFighters();
+    await expect.poll(() => gunsmith.room.frames.hasReceivedSnapshots()).toBe(true);
+    await gunsmith.room.smoothness.startRecordingTheShownFighters();
   });
 
   when("the first player walks west for a while and stops", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.walkFor("west", 1.2);
-      await expect.poll(() => gunsmith.room.isShownWhereTheServerHasThem()).toBe(true);
+      await expect.poll(() => gunsmith.room.smoothness.isShownWhereTheServerHasThem()).toBe(true);
     });
 
     then("the first player is never shown jumping", async ({gunsmith}) => {
-      expect(gunsmith.room.getFastestServerMovement()).toBeGreaterThan(0);
-      expect(await gunsmith.room.getLargestShownJump()).toBeLessThan(0.9);
+      expect(gunsmith.room.smoothness.getFastestServerMovement()).toBeGreaterThan(0);
+      expect(await gunsmith.room.smoothness.getLargestShownJump()).toBeLessThan(0.9);
     });
   });
 });

@@ -11,7 +11,7 @@ const CROUCHED_IN_THE_OPEN = {x: 8.5, y: 5.5};
 
 given("a player facing three dummies, two of them behind a low cover block", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startCover();
+    await gunsmith.scenario.startCover();
   });
 
   when("the player, standing, faces the dummy standing behind cover", () => {
@@ -27,7 +27,7 @@ given("a player facing three dummies, two of them behind a low cover block", () 
   when("the player, standing, faces the crouched dummy behind cover", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.aimAtTile(CROUCHED_BEHIND_COVER);
-      await gunsmith.waitForGameSeconds(0.3);
+      await gunsmith.clock.waitForGameSeconds(0.3);
     });
 
     then(
@@ -61,7 +61,7 @@ given("a player facing three dummies, two of them behind a low cover block", () 
       await gunsmith.player.crouch();
       await expect.poll(async () => (await gunsmith.vision.getView()).range).toBeGreaterThan(standingView.range);
       await gunsmith.player.aimAtTile(STANDING_BEHIND_COVER);
-      await gunsmith.waitForGameSeconds(0.3);
+      await gunsmith.clock.waitForGameSeconds(0.3);
     });
 
     then(

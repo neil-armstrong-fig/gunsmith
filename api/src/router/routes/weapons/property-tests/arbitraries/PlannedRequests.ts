@@ -1,5 +1,5 @@
 import fc from "fast-check";
-import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
+import type {WeaponOutcome} from "@gunsmith/ai/pipeline/weapon/types/WeaponOutcome";
 import {reportedUsages} from "@src/router/routes/shared/property-tests/reported-usage/ReportedUsages";
 import type {PlannedOutcome} from "@src/router/routes/weapons/property-tests/types/PlannedOutcome";
 import type {PlannedRequest} from "@src/router/routes/weapons/property-tests/types/PlannedRequest";

@@ -14,10 +14,12 @@ const LONGEST_ROUND_SECONDS = 3.9 + 15;
 
 const LOW_GROUND_LEVEL = 0;
 
-for (const seed of SEEDS) {
-  given(`a duel (seed ${seed}) with the opponent on a platform and the player standing still on the low ground`, () => {
+given.each(
+  SEEDS,
+  seed => `a duel (seed ${seed}) with the opponent on a platform and the player standing still on the low ground`,
+  seed => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.startOverlookDuel(seed);
+      await gunsmith.scenario.startOverlookDuel(seed);
     });
 
     when("the round is decided", () => {
@@ -36,5 +38,5 @@ for (const seed of SEEDS) {
         },
       );
     });
-  });
-}
+  },
+);

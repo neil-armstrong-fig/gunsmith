@@ -1,6 +1,6 @@
-import {createWeaponModels} from "@gunsmith/ai/adapter/CreateWeaponModels";
-import {generateWeapon} from "@gunsmith/ai/pipeline/GenerateWeapon";
-import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
+import {createWeaponModels} from "@gunsmith/ai/adapter/weapon/CreateWeaponModels";
+import {generateWeapon} from "@gunsmith/ai/pipeline/weapon/GenerateWeapon";
+import type {WeaponOutcome} from "@gunsmith/ai/pipeline/weapon/types/WeaponOutcome";
 import {workerEnvironment} from "@src/env/WorkerEnvironment";
 
 /**

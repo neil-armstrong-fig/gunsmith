@@ -21,7 +21,8 @@ given("a player who has fired one shot on the practice range", () => {
       await gunsmith.workshop.open();
       await gunsmith.workshop.typeThePrompt("wasd reload 12 mute crouch");
       await gunsmith.workshop.close();
-      await gunsmith.waitForGameSeconds(0.5);
+
+      await gunsmith.clock.waitForGameSeconds(0.5);
     });
 
     then(
@@ -37,7 +38,8 @@ given("a player who has fired one shot on the practice range", () => {
       await gunsmith.workshop.open();
       await gunsmith.workshop.holdTheMouseOnThePanel();
       await gunsmith.workshop.close();
-      await gunsmith.waitForGameSeconds(0.5);
+
+      await gunsmith.clock.waitForGameSeconds(0.5);
     });
 
     then("no shot was fired by it: the magazine is as full as the workshop made it", async ({gunsmith}) => {
@@ -50,6 +52,7 @@ given("a player who has fired one shot on the practice range", () => {
       await gunsmith.workshop.open();
       await gunsmith.workshop.typeThePrompt("wasd reload 12 mute crouch");
       await gunsmith.workshop.close();
+
       await gunsmith.workshop.open();
     });
 

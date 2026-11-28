@@ -1,4 +1,4 @@
-import {weaponDraftSchema} from "@gunsmith/ai/pipeline/weapon/WeaponDraft";
+import {weaponDraftSchema} from "@gunsmith/ai/pipeline/weapon/draft/WeaponDraft";
 
 /** A weapon's damage per second: its bullet's damage over its fire interval. Nothing if it does not parse, so it cannot be rated. */
 export function damagePerSecondOf(weapon: unknown): number | undefined {

@@ -54,10 +54,13 @@ given("two browsers are in one private room", () => {
     when("both players ask to play again", () => {
       beforeEach(async ({gunsmith}) => {
         const second = gunsmith.room.secondBrowser();
+
         await gunsmith.round.getBannerMessage();
         await second.round.getBannerMessage();
+
         await gunsmith.round.playAgain();
         await second.round.playAgain();
+
         await gunsmith.round.waitForBannerToGo();
         await second.round.waitForBannerToGo();
       });

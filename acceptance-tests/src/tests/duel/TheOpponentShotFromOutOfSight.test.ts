@@ -17,15 +17,18 @@ const LONGEST_WAIT_SECONDS = 5;
 // The player cannot stop at the first hit: the trigger is still down while the browser notices it, and the rounds already in the
 // air hurt the opponent too (four shots were fired, enough to win the round). So what is asserted is that the opponent has left
 // "wander" by the time it is hurt, not that it comes up the stair afterwards, which the engine's step tests cover.
-for (const seed of SEEDS) {
-  given(`an overwatch (seed ${seed}), the opponent wandering out of the player's sight`, () => {
+given.each(
+  SEEDS,
+  seed => `an overwatch (seed ${seed}), the opponent wandering out of the player's sight`,
+  seed => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.startOverwatch(seed);
+      await gunsmith.scenario.startOverwatch(seed);
     });
 
     when("the player fires down the corridor until a shot hurts the opponent, then stops", () => {
       beforeEach(async ({gunsmith}) => {
         await gunsmith.player.aimAtTile(ALONG_THE_ROW);
+
         await gunsmith.player.startFiring();
         await gunsmith.opponent.waitForHealthBelow(100);
         await gunsmith.player.stopFiring();
@@ -37,5 +40,5 @@ for (const seed of SEEDS) {
         expect((await gunsmith.opponent.get()).behaviour).not.toBe("wander");
       });
     });
-  });
-}
+  },
+);

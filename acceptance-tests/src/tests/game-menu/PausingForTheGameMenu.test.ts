@@ -5,11 +5,12 @@ given("a local match", () => {
     let pausedAt = 0;
 
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.startDuel();
+      await gunsmith.scenario.startDuel();
       await gunsmith.menu.pressSettings();
       pausedAt = await gunsmith.round.getElapsedSeconds();
-      await gunsmith.holdTheGame();
-      await gunsmith.runGameFor(0.3);
+
+      await gunsmith.clock.holdTheGame();
+      await gunsmith.clock.runGameFor(0.3);
     });
 
     then("the round clock stays paused", async ({gunsmith}) => {
@@ -20,7 +21,7 @@ given("a local match", () => {
     when("they resume the game", () => {
       beforeEach(async ({gunsmith}) => {
         await gunsmith.menu.pressEscape();
-        await gunsmith.runGameFor(0.3);
+        await gunsmith.clock.runGameFor(0.3);
       });
 
       then("the match resumes from the same clock", async ({gunsmith}) => {
@@ -50,16 +51,16 @@ given("two browsers in a private match", () => {
       await second.room.waitForTheMatch();
 
       await gunsmith.player.startWalking("west");
-      await gunsmith.waitForGameSeconds(0.15);
+      await gunsmith.clock.waitForGameSeconds(0.15);
       await gunsmith.menu.pressSettings();
-      await gunsmith.waitForGameSeconds(0.25);
+      await gunsmith.clock.waitForGameSeconds(0.25);
 
       positionWithMenu = (await gunsmith.player.getPosition()).x;
       elapsedBefore = await gunsmith.round.getElapsedSeconds();
       secondElapsedBefore = await second.round.getElapsedSeconds();
 
-      await gunsmith.waitForGameSeconds(0.3);
-      await second.waitForGameSeconds(0.3);
+      await gunsmith.clock.waitForGameSeconds(0.3);
+      await second.clock.waitForGameSeconds(0.3);
 
       await gunsmith.player.stopWalking("west");
     });

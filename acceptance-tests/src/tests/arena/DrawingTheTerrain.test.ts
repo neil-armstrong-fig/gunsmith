@@ -17,9 +17,9 @@ given.each(
   ({pixelsPerTile}) => `a terrain preview at ${pixelsPerTile} pixels per tile with the fog hidden`,
   ({width, height, pixelsPerTile}) => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.resizeWindowTo({width, height});
-      gunsmith.hideTheFog();
-      await gunsmith.startTerrain();
+      await gunsmith.browser.resizeWindowTo({width, height});
+      gunsmith.scenario.hideTheFog();
+      await gunsmith.scenario.startTerrain();
     });
 
     then("the three floors have their own colours and one, two and three screen-up ticks", async ({gunsmith}) => {
@@ -81,8 +81,8 @@ given.each(
   ({pixelsPerTile}) => `a terrain preview at ${pixelsPerTile} pixels per tile`,
   ({width, height, pixelsPerTile}) => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.resizeWindowTo({width, height});
-      await gunsmith.startTerrain();
+      await gunsmith.browser.resizeWindowTo({width, height});
+      await gunsmith.scenario.startTerrain();
     });
 
     when("the player turns away from the stairs", () => {
@@ -117,7 +117,7 @@ given.each(
 
 given("a player on the highest terrace in the terrain preview", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startTerrain();
+    await gunsmith.scenario.startTerrain();
   });
 
   when("the player walks down both stairs", () => {
@@ -146,8 +146,8 @@ given("a player on the highest terrace in the terrain preview", () => {
 
 given("the highest terrain picture is held back", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.resizeWindowTo({width: 1024, height: 560});
-    await gunsmith.startTerrain("held");
+    await gunsmith.browser.resizeWindowTo({width: 1024, height: 560});
+    await gunsmith.scenario.startTerrain("held");
   });
 
   then("the arena shows a flat upper floor and is still waiting for pictures", async ({gunsmith}) => {
@@ -159,7 +159,7 @@ given("the highest terrain picture is held back", () => {
 
   when("the picture arrives", () => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.releasePictures();
+      await gunsmith.scenario.releasePictures();
     });
 
     then("the highest floor shows its three ticks", async ({gunsmith}) => {
@@ -175,9 +175,9 @@ given("the highest terrain picture is held back", () => {
 
 given("the highest terrain picture is missing", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.resizeWindowTo({width: 1024, height: 560});
-    gunsmith.hideTheFog();
-    await gunsmith.startTerrain("missing");
+    await gunsmith.browser.resizeWindowTo({width: 1024, height: 560});
+    gunsmith.scenario.hideTheFog();
+    await gunsmith.scenario.startTerrain("missing");
   });
 
   then(

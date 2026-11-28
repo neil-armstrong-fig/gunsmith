@@ -6,7 +6,7 @@ import {insertUser} from "@src/accounts/testing/local-database/InsertUser";
 import {DAILY_CREDITS} from "@src/durable-objects/credit-ledger/account/DailyCredits";
 import {WEAPON_SPEND} from "@src/durable-objects/spend-ledger/estimate/weapon/WeaponSpend";
 import {PIPELINE_TIME_LIMIT_MILLISECONDS} from "@src/router/routes/shared/time-limit/PipelineTimeLimit";
-import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
+import type {WeaponOutcome} from "@gunsmith/ai/pipeline/weapon/types/WeaponOutcome";
 import {rowsOf} from "@src/accounts/testing/local-database/RowsOf";
 import {useLocalDatabase} from "@src/accounts/testing/local-database/UseLocalDatabase";
 import {workerEnvironment} from "@src/env/WorkerEnvironment";

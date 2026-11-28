@@ -5,7 +5,7 @@ const RING_LOOP = "sfx-ring-damage-loop";
 given("the first player is taking ring damage in a private room", () => {
   beforeEach(async ({gunsmith}) => {
     await gunsmith.sound.startWatching();
-    await gunsmith.room.prepareToLoseTheConnection();
+    await gunsmith.room.connection.prepareToLoseTheConnection();
     const code = await gunsmith.room.createPrivateRoom({ringDelaySeconds: 1, ringClosingSeconds: 4});
 
     await gunsmith.room.joinWithASecondBrowser(code);
@@ -20,8 +20,8 @@ given("the first player is taking ring damage in a private room", () => {
 
   when("the first player's connection drops and stays down", () => {
     beforeEach(async ({gunsmith}) => {
-      gunsmith.room.keepTheConnectionDown();
-      await expect.poll(() => gunsmith.room.isToldItIsReconnecting()).toBe(true);
+      gunsmith.room.connection.keepTheConnectionDown();
+      await expect.poll(() => gunsmith.room.connection.isToldItIsReconnecting()).toBe(true);
     });
 
     then("the ring damage loop ends", async ({gunsmith}) => {
@@ -37,8 +37,8 @@ given("the first player is taking ring damage in a private room", () => {
       beforeEach(async ({gunsmith}) => {
         await gunsmith.hud.waitForNoBorder();
         await expect.poll(() => gunsmith.sound.getPlays(RING_LOOP)).toMatchObject([{ended: true}]);
-        gunsmith.room.letTheConnectionBack();
-        await gunsmith.room.waitForTheMatchAgain();
+        gunsmith.room.connection.letTheConnectionBack();
+        await gunsmith.room.connection.waitForTheMatchAgain();
       });
 
       then("both visual cues come back with one fresh loop", async ({gunsmith}) => {

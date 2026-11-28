@@ -18,37 +18,43 @@ given("two browsers are in one private room", () => {
 
   when("the second player shoots at the first", () => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.room.secondBrowser().player.aimAtTile(await gunsmith.player.getPosition());
-      await gunsmith.room.secondBrowser().player.startFiring();
+      const second = gunsmith.room.secondBrowser();
+
+      await second.player.aimAtTile(await gunsmith.player.getPosition());
+      await second.player.startFiring();
     });
 
     then(
       "the first browser is told which way the shots came from, as a direction and a loudness, and nothing else",
       async ({gunsmith}) => {
         await expect
-          .poll(() => gunsmith.room.getEventsReceived())
+          .poll(() => gunsmith.room.frames.getEventsReceived())
           .toContainEqual({kind: "heard", sound: "shot", sector: SECTOR_SOUTH, loudness: LOUDNESS});
       },
     );
 
     then("the first browser is told what the shots took off its player", async ({gunsmith}) => {
       await expect
-        .poll(() => gunsmith.room.getEventsReceived())
+        .poll(() => gunsmith.room.frames.getEventsReceived())
         .toContainEqual({kind: "damageTaken", cause: "bullet", amount: expect.any(Number)});
     });
 
     then("the second browser is told its shots landed, and told nothing of the first's damage", async ({gunsmith}) => {
       const second = gunsmith.room.secondBrowser();
 
-      await expect.poll(() => second.room.getEventsReceived()).toContainEqual({kind: "hitLanded", on: "opponent"});
-      expect(second.room.getEventsReceived().filter(event => isKind(event, "damageTaken"))).toEqual([]);
+      await expect
+        .poll(() => second.room.frames.getEventsReceived())
+        .toContainEqual({kind: "hitLanded", on: "opponent"});
+      expect(second.room.frames.getEventsReceived().filter(event => isKind(event, "damageTaken"))).toEqual([]);
     });
   });
 
   when("the first player turns their back on the second, who shoots at them", () => {
     beforeEach(async ({gunsmith}) => {
       const second = gunsmith.room.secondBrowser();
+
       await gunsmith.player.aimAwayFrom(await second.player.getPosition());
+
       await second.player.aimAtTile(await gunsmith.player.getPosition());
       await second.player.startFiring();
     });
@@ -57,9 +63,9 @@ given("two browsers are in one private room", () => {
       "the first browser is told the direction of the shots though it cannot see the shooter",
       async ({gunsmith}) => {
         await expect
-          .poll(() => gunsmith.room.getEventsReceived())
+          .poll(() => gunsmith.room.frames.getEventsReceived())
           .toContainEqual({kind: "heard", sound: "shot", sector: SECTOR_SOUTH, loudness: LOUDNESS});
-        await expect.poll(() => gunsmith.room.hasBeenToldWhereTheOtherPlayerIs()).toBe(false);
+        await expect.poll(() => gunsmith.room.frames.hasBeenToldWhereTheOtherPlayerIs()).toBe(false);
       },
     );
   });
@@ -67,11 +73,14 @@ given("two browsers are in one private room", () => {
   when("each player fires a single shot in turn", () => {
     beforeEach(async ({gunsmith}) => {
       const second = gunsmith.room.secondBrowser();
+
       await gunsmith.player.switchTo(1);
-      await gunsmith.waitForGameSeconds(0.2);
+      await gunsmith.clock.waitForGameSeconds(0.2);
+
       await gunsmith.player.aimAtTile(await second.player.getPosition());
       await gunsmith.player.fire();
       await expect.poll(() => gunsmith.sound.getPlays("sfx-shot")).toHaveLength(1);
+
       await second.player.aimAtTile(await gunsmith.player.getPosition());
       await second.player.fire();
     });
@@ -91,16 +100,18 @@ given("two browsers are in one private room", () => {
 
     beforeEach(async ({gunsmith}) => {
       const second = gunsmith.room.secondBrowser();
+
       await gunsmith.player.walkFor("south", 0.6);
       await expect.poll(() => gunsmith.sound.getPlays("sfx-footstep")).not.toHaveLength(0);
-      await gunsmith.waitForGameSeconds(0.2);
+      await gunsmith.clock.waitForGameSeconds(0.2);
       previousFootfalls = (await gunsmith.sound.getPlays("sfx-footstep")).length;
+
       await second.player.walkFor("north", 0.06);
     });
 
     then("the first browser plays the other player's step as well", async ({gunsmith}) => {
       await expect
-        .poll(() => gunsmith.room.getEventsReceived())
+        .poll(() => gunsmith.room.frames.getEventsReceived())
         .toContainEqual({
           kind: "heard",
           sound: "step",
@@ -119,7 +130,7 @@ given("two browsers are in one private room", () => {
 
     then("the second browser is told the direction of the shots, from its own side", async ({gunsmith}) => {
       await expect
-        .poll(() => gunsmith.room.secondBrowser().room.getEventsReceived())
+        .poll(() => gunsmith.room.secondBrowser().room.frames.getEventsReceived())
         .toContainEqual({kind: "heard", sound: "shot", sector: SECTOR_NORTH, loudness: LOUDNESS});
     });
   });

@@ -28,11 +28,9 @@ given("the game has opened", () => {
       const cursor = await gunsmith.arena.getCursorOver("the open arena");
 
       expect(cursor.image?.hotspot).toEqual(RETICLE_HOTSPOT);
-      for (const picture of cursor.image?.pictures ?? []) {
-        expect(picture.size).toEqual({width: picture.scale * 32, height: picture.scale * 32});
-        expect(RETICLE_HOTSPOT.x * picture.scale).toBe(picture.size.width / 2);
-        expect(RETICLE_HOTSPOT.y * picture.scale).toBe(picture.size.height / 2);
-      }
+      expect(
+        cursor.image?.pictures.map(({scale, size}) => ({x: size.width / 2 / scale, y: size.height / 2 / scale})),
+      ).toEqual([RETICLE_HOTSPOT, RETICLE_HOTSPOT]);
     });
 
     then("a plain crosshair is the fallback if the pictures cannot be used", async ({gunsmith}) => {
@@ -53,7 +51,7 @@ given("the game has opened", () => {
 
 given("a duel has just begun", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startDuel();
+    await gunsmith.scenario.startDuel();
   });
 
   when("the player stands still and loses the first round", () => {

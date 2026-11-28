@@ -15,15 +15,15 @@ const A_BRACKET_THAT_OPENED_REACHES_AT_LEAST = WHERE_THE_BRACKET_STANDS + 5;
 
 given("a duel opened with a camera that does not shake and normal motion, held still", () => {
   beforeEach(async ({gunsmith}) => {
-    gunsmith.keepTheCameraStill();
-    await gunsmith.startDuel();
-    await gunsmith.holdTheGame();
+    gunsmith.scenario.keepTheCameraStill();
+    await gunsmith.scenario.startDuel();
+    await gunsmith.clock.holdTheGame();
   });
 
   when("a bullet has hurt the player and the brackets are most of the way through their flash", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.runUntilHurt(HIT_WATCH);
-      await gunsmith.runGameFor(MOST_OF_THE_FLASH_SECONDS);
+      await gunsmith.clock.runGameFor(MOST_OF_THE_FLASH_SECONDS);
     });
 
     then("the brackets have opened outward", async ({gunsmith}) => {
@@ -36,15 +36,15 @@ given("a duel opened with a camera that does not shake and normal motion, held s
 
 given("a duel opened asking for reduced motion, held still", () => {
   beforeEach(async ({gunsmith}) => {
-    gunsmith.askForReducedMotion();
-    await gunsmith.startDuel();
-    await gunsmith.holdTheGame();
+    gunsmith.scenario.askForReducedMotion();
+    await gunsmith.scenario.startDuel();
+    await gunsmith.clock.holdTheGame();
   });
 
   when("a bullet has just hurt the player and a shake would be part way through", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.runUntilHurt(HIT_WATCH);
-      await gunsmith.runGameFor(PART_WAY_SECONDS);
+      await gunsmith.clock.runGameFor(PART_WAY_SECONDS);
     });
 
     then("the camera does not move the picture", async ({gunsmith}) => {
@@ -62,7 +62,7 @@ given("a duel opened asking for reduced motion, held still", () => {
   when("a bullet has hurt the player and the brackets are most of the way through their flash", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.runUntilHurt(HIT_WATCH);
-      await gunsmith.runGameFor(MOST_OF_THE_FLASH_SECONDS);
+      await gunsmith.clock.runGameFor(MOST_OF_THE_FLASH_SECONDS);
     });
 
     then("the brackets are where they started, not opened outward", async ({gunsmith}) => {
@@ -78,15 +78,15 @@ given("a duel opened asking for reduced motion", () => {
   let fullHealth = 0;
 
   beforeEach(async ({gunsmith}) => {
-    gunsmith.askForReducedMotion();
-    await gunsmith.startDuel();
+    gunsmith.scenario.askForReducedMotion();
+    await gunsmith.scenario.startDuel();
     fullHealth = await gunsmith.player.getHealth();
   });
 
   when("the opponent has shot the player", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.waitForHealthBelow(fullHealth);
-      await gunsmith.waitForGameSeconds(1);
+      await gunsmith.clock.waitForGameSeconds(1);
     });
 
     then("the health bar shows the health at once, with no amber trail sliding behind it", async ({gunsmith}) => {
@@ -97,15 +97,15 @@ given("a duel opened asking for reduced motion", () => {
 
 given("a duel, with the browser saying the person prefers reduced motion, held still", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.preferReducedMotion();
-    await gunsmith.startDuel();
-    await gunsmith.holdTheGame();
+    await gunsmith.browser.preferReducedMotion();
+    await gunsmith.scenario.startDuel();
+    await gunsmith.clock.holdTheGame();
   });
 
   when("a bullet has just hurt the player and a shake would be part way through", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.runUntilHurt(HIT_WATCH);
-      await gunsmith.runGameFor(PART_WAY_SECONDS);
+      await gunsmith.clock.runGameFor(PART_WAY_SECONDS);
     });
 
     then("the camera does not move the picture", async ({gunsmith}) => {

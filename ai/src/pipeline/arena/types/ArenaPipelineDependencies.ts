@@ -1,5 +1,5 @@
 import type {BaseChatModel} from "@langchain/core/language_models/chat_models";
-import type {ArenaFormat} from "@gunsmith/ai/pipeline/arena/arena-drafting/format/ArenaFormat";
+import type {ArenaFormat} from "@gunsmith/ai/pipeline/arena/drafting/format/ArenaFormat";
 
 /**
  * What the arena pipeline is handed and never builds: the models. Tests and evals pass a fake, a local model or a paid one; the Worker

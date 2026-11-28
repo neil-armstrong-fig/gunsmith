@@ -15,7 +15,7 @@ given("a duel has just begun", () => {
   let fullHealth = 0;
 
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startDuel();
+    await gunsmith.scenario.startDuel();
     fullHealth = await gunsmith.player.getHealth();
   });
 
@@ -35,7 +35,7 @@ given("a duel has just begun", () => {
     });
 
     then("the ring's loop does not play: a bullet is not the ring", async ({gunsmith}) => {
-      await gunsmith.waitForGameSeconds(1);
+      await gunsmith.clock.waitForGameSeconds(1);
 
       expect(await gunsmith.sound.getPlays(RING_LOOP)).toHaveLength(0);
     });
@@ -52,7 +52,7 @@ given("a duel has just begun", () => {
     });
 
     then("nothing more crunches", async ({gunsmith}) => {
-      await gunsmith.waitForGameSeconds(1);
+      await gunsmith.clock.waitForGameSeconds(1);
 
       expect(await gunsmith.sound.getPlays(DAMAGE_CRUNCH)).toHaveLength(playsWhenMuted);
     });
@@ -61,7 +61,7 @@ given("a duel has just begun", () => {
 
 given("a sparring match has just begun", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startSparring();
+    await gunsmith.scenario.startSparring();
   });
 
   when("the player has shot the opponent", () => {
@@ -74,7 +74,7 @@ given("a sparring match has just begun", () => {
     });
 
     then("nothing crunches, for the player took no damage", async ({gunsmith}) => {
-      await gunsmith.waitForGameSeconds(1);
+      await gunsmith.clock.waitForGameSeconds(1);
 
       expect(await gunsmith.sound.getPlays(DAMAGE_CRUNCH)).toHaveLength(0);
     });
@@ -83,7 +83,7 @@ given("a sparring match has just begun", () => {
 
 given("a sparring match whose ring closes on the opponent's side of the arena", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startClosingRing({
+    await gunsmith.scenario.startClosingRing({
       seed: PLAYER_LEFT_OUTSIDE_SEED,
       delaySeconds: DELAY_SECONDS,
       closingSeconds: CLOSING_SECONDS,
@@ -96,8 +96,10 @@ given("a sparring match whose ring closes on the opponent's side of the arena", 
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.waitForHealthBelow(99, LONGEST_ROUND_SECONDS);
       await expect.poll(async () => (await gunsmith.sound.getPlays(RING_LOOP)).length).toBe(1);
+
       await gunsmith.sound.toggleMute();
       healthWhenMuted = await gunsmith.player.getHealth();
+
       await gunsmith.player.waitForHealthBelow(healthWhenMuted);
     });
 
@@ -107,7 +109,7 @@ given("a sparring match whose ring closes on the opponent's side of the arena", 
       expect(await gunsmith.round.getState()).toBe("playing");
 
       // A mute that the next ring step could undo would show as a second loop a moment later.
-      await gunsmith.waitForGameSeconds(1);
+      await gunsmith.clock.waitForGameSeconds(1);
 
       expect(await gunsmith.sound.getPlays(RING_LOOP)).toHaveLength(1);
     });
@@ -158,7 +160,7 @@ given("a sparring match whose ring closes on the opponent's side of the arena", 
     });
 
     then("the ring never crunched: it hurts continuously and has no impact to hear", async ({gunsmith}) => {
-      await gunsmith.waitForGameSeconds(1);
+      await gunsmith.clock.waitForGameSeconds(1);
 
       expect(await gunsmith.player.getHealth()).toBe(0);
       expect(await gunsmith.sound.getPlays(DAMAGE_CRUNCH)).toHaveLength(0);

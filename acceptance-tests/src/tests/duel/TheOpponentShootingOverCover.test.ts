@@ -10,10 +10,12 @@ const A_FRAME_SECONDS = 0.02;
 // Longer than a shot takes to cross the hall and than the opponent takes to fire a burst, so any shot meant for the player has landed or passed.
 const LONGER_THAN_A_BURST_SECONDS = 3;
 
-for (const seed of SEEDS) {
-  given(`a cover hall (seed ${seed}), the player standing in their pocket and the opponent in theirs`, () => {
+given.each(
+  SEEDS,
+  seed => `a cover hall (seed ${seed}), the player standing in their pocket and the opponent in theirs`,
+  seed => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.startCoverHall(seed);
+      await gunsmith.scenario.startCoverHall(seed);
     });
 
     when("the player stands still", () => {
@@ -29,14 +31,14 @@ for (const seed of SEEDS) {
       let shotsInTheAir = 0;
 
       beforeEach(async ({gunsmith}) => {
-        await gunsmith.holdTheGame();
+        await gunsmith.clock.holdTheGame();
         await gunsmith.player.runUntilHurt(HURT_WATCH);
         healthWhenCrouched = await gunsmith.player.getHealth();
         shotsInTheAir = await gunsmith.bullets.count();
 
         await gunsmith.player.crouch();
-        await gunsmith.runGameFor(A_FRAME_SECONDS);
-        await gunsmith.runGameFor(LONGER_THAN_A_BURST_SECONDS);
+        await gunsmith.clock.runGameFor(A_FRAME_SECONDS);
+        await gunsmith.clock.runGameFor(LONGER_THAN_A_BURST_SECONDS);
       });
 
       then(
@@ -47,5 +49,5 @@ for (const seed of SEEDS) {
         },
       );
     });
-  });
-}
+  },
+);

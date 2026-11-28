@@ -4,7 +4,7 @@
 
 Run LangChain.js and LangGraph.js inside the planned API Worker. The API will import `@gunsmith/ai`; the pipeline remains Workers-safe and host-agnostic. Hosted LangGraph and self-hosted containers were considered but are not provisioned. A hosted deployment requiring an additional subscription was declined.
 
-`ai/langgraph.json` keeps local Agent Server/Studio development available. `weaponProof` is the hosting proof; `weaponSmith` registers the real graph with canned models. Neither is a production service.
+The Worker spike that proved the graph runs in a Worker (`weaponProof`, with a LangSmith trace-flush Worker) was removed on 2026-11-27, once `api/` ran both pipelines. The local LangGraph Studio setup was kept, at the user's request (2026-11-27): `ai/langgraph.json` names `weaponSmith` and `arenaSmith`, the real graphs on canned models (`ai/src/studio/`), which `pnpm dev` in `ai/` serves with no key and no network.
 
 ## Evidence and limits
 
@@ -12,7 +12,7 @@ Local workerd measurements recorded the real graph at 2908.92 KiB uncompressed /
 
 ## Integration requirements
 
-- Keep Node-only eval clients outside runtime imports; use the Workers compatibility configuration established by the proof.
+- Keep Node-only eval clients outside runtime imports; use the Workers compatibility configuration in `api/wrangler.jsonc`.
 - Supply tracing configuration explicitly where environment discovery is unavailable. Validate trace delivery with real authorized integration.
 - Flush callbacks on every request path using `ctx.waitUntil(awaitAllCallbacks())`; unfinished callbacks can be lost or interfere with later requests.
 - Avoid streaming until its Worker behavior is verified.

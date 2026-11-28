@@ -22,7 +22,7 @@ given("a signed-in player makes, tries and saves a weapon, then reloads", () => 
     await gunsmith.workshop.open();
     await gunsmith.workshop.shelf.save();
     await expect.poll(() => gunsmith.workshop.shelf.isSaved()).toBe(true);
-    await gunsmith.reloadThePage();
+    await gunsmith.browser.reloadThePage();
     await gunsmith.workshop.open();
     await expect.poll(() => gunsmith.workshop.shelf.getItems()).toMatchObject([{name: "Mint Coil", prompt: PROMPT}]);
     await gunsmith.workshop.shelf.tryItem(0);
@@ -58,6 +58,7 @@ given("a signed-in player's one-place shelf holds a weapon saved before vision s
     beforeEach(async ({gunsmith}) => {
       await gunsmith.workshop.pasteThePrompt(PROMPT);
       await gunsmith.workshop.make();
+
       await gunsmith.workshop.shelf.save();
       await expect.poll(() => gunsmith.workshop.shelf.getSaveError()).toContain("Your weapon shelf is full");
     });

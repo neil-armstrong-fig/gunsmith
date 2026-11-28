@@ -41,7 +41,7 @@ given("a private room, for a signed-in player whose library holds two saved weap
     });
 
     then("the page puts it forward for the first slot by its library id", async ({gunsmith}) => {
-      expect(gunsmith.room.getChoicesSent()).toContainEqual({
+      expect(gunsmith.room.frames.getChoicesSent()).toContainEqual({
         step: "weapon",
         slot: 1,
         kind: "saved",
@@ -57,7 +57,7 @@ given("a private room, for a signed-in player whose library holds two saved weap
       });
 
       then("the page puts it forward for the second slot by its library id", async ({gunsmith}) => {
-        expect(gunsmith.room.getChoicesSent()).toContainEqual({
+        expect(gunsmith.room.frames.getChoicesSent()).toContainEqual({
           step: "weapon",
           slot: 2,
           kind: "saved",
@@ -70,7 +70,7 @@ given("a private room, for a signed-in player whose library holds two saved weap
         async ({gunsmith}) => {
           await expect
             .poll(() => gunsmith.preRound.arena.getChoices())
-            .toEqual([...(gunsmith.room.getArenasOffered() ?? []), SAVED_ARENA]);
+            .toEqual([...(gunsmith.room.frames.getArenasOffered() ?? []), SAVED_ARENA]);
           expect(await gunsmith.preRound.arena.getChosen()).toBe("Duel");
         },
       );
@@ -94,7 +94,7 @@ given("a private room, for a signed-in player whose library holds two saved weap
         });
 
         then("the page puts it forward by its library id", async ({gunsmith}) => {
-          expect(gunsmith.room.getChoicesSent()).toContainEqual({
+          expect(gunsmith.room.frames.getChoicesSent()).toContainEqual({
             step: "arena",
             slot: undefined,
             kind: "saved",
@@ -110,7 +110,7 @@ given("a private room, for a signed-in player whose library holds two saved weap
         });
 
         then("the page puts it forward as a built-in, by its name", async ({gunsmith}) => {
-          expect(gunsmith.room.getChoicesSent()).toContainEqual({
+          expect(gunsmith.room.frames.getChoicesSent()).toContainEqual({
             step: "arena",
             slot: undefined,
             kind: "builtIn",
@@ -128,7 +128,7 @@ given("a private room, for a signed-in player whose library holds two saved weap
     });
 
     then("the page puts it forward as a built-in, by its key", async ({gunsmith}) => {
-      expect(gunsmith.room.getChoicesSent()).toContainEqual({
+      expect(gunsmith.room.frames.getChoicesSent()).toContainEqual({
         step: "weapon",
         slot: 1,
         kind: "builtIn",
@@ -154,7 +154,7 @@ given("a private room, for a guest who is not signed in", () => {
     });
 
     then("the page puts forward a built-in and no saved item", async ({gunsmith}) => {
-      const sent = gunsmith.room.getChoicesSent();
+      const sent = gunsmith.room.frames.getChoicesSent();
 
       expect(sent).toContainEqual({step: "weapon", slot: 1, kind: "builtIn", reference: "rifle"});
       expect(sent.filter(choice => choice.kind === "saved")).toEqual([]);
@@ -172,6 +172,7 @@ given("a private room, for a guest whose own shelf in this browser holds a weapo
     madeName = (await gunsmith.workshop.getResult()).name;
     await gunsmith.workshop.shelf.save();
     await gunsmith.workshop.close();
+
     await gunsmith.room.createPrivateRoom({preRoundSeconds: SECONDS_TO_CHOOSE});
     await gunsmith.room.preRound.waitToBeChoosing();
   });
@@ -188,9 +189,11 @@ given("a signed-in player who locked in a saved weapon in one room and has since
   beforeEach(async ({gunsmith}) => {
     await gunsmith.room.preRound.arrangeSignedInPlayer("two saved weapons and an arena");
     await gunsmith.room.createPrivateRoom({preRoundSeconds: SECONDS_TO_CHOOSE});
+
     await expect.poll(() => gunsmith.preRound.getChoices(1)).toContain(FIRST_SAVED_WEAPON);
     await gunsmith.preRound.choose(1, FIRST_SAVED_WEAPON);
     await gunsmith.room.preRound.lockInWeapon(1);
+
     await gunsmith.room.preRound.arrangeSignedInPlayer("nothing saved");
     await gunsmith.room.createPrivateRoom({preRoundSeconds: SECONDS_TO_CHOOSE});
     await gunsmith.room.preRound.waitToBeChoosing();

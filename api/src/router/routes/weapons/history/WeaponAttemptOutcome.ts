@@ -1,5 +1,5 @@
-import type {WeaponHistoryDiagnostics} from "@gunsmith/ai/pipeline/types/WeaponHistoryDiagnostics";
-import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
+import type {WeaponHistoryDiagnostics} from "@gunsmith/ai/pipeline/weapon/types/WeaponHistoryDiagnostics";
+import type {WeaponOutcome} from "@gunsmith/ai/pipeline/weapon/types/WeaponOutcome";
 import type {AttemptOutcome} from "@src/router/routes/shared/generation-history/types/AttemptOutcome";
 
 export function weaponAttemptOutcome(

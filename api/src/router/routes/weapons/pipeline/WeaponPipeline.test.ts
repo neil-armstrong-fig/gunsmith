@@ -1,15 +1,15 @@
-import {createWeaponModels} from "@gunsmith/ai/adapter/CreateWeaponModels";
-import type {WeaponModels} from "@gunsmith/ai/adapter/types/WeaponModels";
-import {generateWeapon} from "@gunsmith/ai/pipeline/GenerateWeapon";
-import type {WeaponOutcome} from "@gunsmith/ai/pipeline/types/WeaponOutcome";
+import {createWeaponModels} from "@gunsmith/ai/adapter/weapon/CreateWeaponModels";
+import type {WeaponModels} from "@gunsmith/ai/adapter/weapon/types/WeaponModels";
+import {generateWeapon} from "@gunsmith/ai/pipeline/weapon/GenerateWeapon";
+import type {WeaponOutcome} from "@gunsmith/ai/pipeline/weapon/types/WeaponOutcome";
 import {workerEnvironment} from "@src/env/WorkerEnvironment";
 import {isWeaponPipelineAvailable} from "@src/router/routes/weapons/pipeline/IsWeaponPipelineAvailable";
 import {runWeaponPipeline} from "@src/router/routes/weapons/pipeline/RunWeaponPipeline";
 
 vi.unmock("@src/router/routes/weapons/pipeline/IsWeaponPipelineAvailable");
 vi.unmock("@src/router/routes/weapons/pipeline/RunWeaponPipeline");
-vi.mock("@gunsmith/ai/pipeline/GenerateWeapon");
-vi.mock("@gunsmith/ai/adapter/CreateWeaponModels");
+vi.mock("@gunsmith/ai/pipeline/weapon/GenerateWeapon");
+vi.mock("@gunsmith/ai/adapter/weapon/CreateWeaponModels");
 
 const models = {name: "the weapon models"} as unknown as WeaponModels;
 const outcome = {status: "rejected", reason: "not a weapon"} as unknown as WeaponOutcome;

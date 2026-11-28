@@ -1,5 +1,5 @@
 import {FakeListChatModel} from "@langchain/core/utils/testing";
-import type {WeaponPipelineDependencies} from "@gunsmith/ai/pipeline/types/WeaponPipelineDependencies";
+import type {WeaponPipelineDependencies} from "@gunsmith/ai/pipeline/weapon/types/WeaponPipelineDependencies";
 import {fakeAppearanceGenerator} from "@evals/eval-criteria-mapping/setups/appearance/fake/FakeAppearanceGenerator";
 import {FAKE_WEAPON_REPLY} from "@evals/eval-criteria-mapping/setups/weapon/fake/models/FakeWeaponReply";
 import {WeaponModerationFakeModel} from "@evals/eval-criteria-mapping/setups/weapon/fake/models/WeaponModerationFakeModel";

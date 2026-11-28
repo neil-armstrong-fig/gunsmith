@@ -6,7 +6,7 @@ const LONGEST_WAIT_SECONDS = 12;
 
 given("a long duel has just begun", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startLongDuel();
+    await gunsmith.scenario.startLongDuel();
   });
 
   when("the player stands still until the opponent has shot its whole magazine", () => {

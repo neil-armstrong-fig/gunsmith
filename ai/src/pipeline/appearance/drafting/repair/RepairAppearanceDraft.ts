@@ -4,8 +4,8 @@ import {REPAIR_PROMPT} from "@gunsmith/ai/pipeline/appearance/drafting/repair/pr
 import type {AppearanceRepairRequest} from "@gunsmith/ai/pipeline/appearance/drafting/repair/types/AppearanceRepairRequest";
 import {askForAppearanceDraft} from "@gunsmith/ai/pipeline/appearance/drafting/shared/model-call/AskForAppearanceDraft";
 import type {AppearanceDraftReply} from "@gunsmith/ai/pipeline/appearance/drafting/shared/model-call/types/AppearanceDraftReply";
-import {dataBlock} from "@gunsmith/ai/pipeline/blocks/DataBlock";
-import {requestBlock} from "@gunsmith/ai/pipeline/blocks/request/RequestBlock";
+import {dataBlock} from "@gunsmith/ai/pipeline/shared/blocks/DataBlock";
+import {requestBlock} from "@gunsmith/ai/pipeline/shared/blocks/request/RequestBlock";
 
 /** Long enough for a whole drawing the model got wrong (measured: about 3 KB), short enough that one wild answer cannot fill the prompt. */
 const MAX_PREVIOUS_LENGTH = 4000;

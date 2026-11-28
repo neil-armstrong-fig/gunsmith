@@ -1,4 +1,4 @@
-import type {WeaponDraft} from "@gunsmith/ai/pipeline/weapon/WeaponDraft";
+import type {WeaponDraft} from "@gunsmith/ai/pipeline/weapon/draft/WeaponDraft";
 
 /** A weapon that parses and is within the caps: 24 damage every 0.2 seconds is 120 damage per second. */
 export const PASSING_WEAPON: WeaponDraft = {

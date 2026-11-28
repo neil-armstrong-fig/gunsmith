@@ -2,7 +2,7 @@ import {beforeEach, expect, given, then, when} from "@src/acceptance-criteria-ma
 
 given("a sparring match has just begun", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startSparring();
+    await gunsmith.scenario.startSparring();
   });
 
   when("the player has done nothing yet", () => {
@@ -14,7 +14,7 @@ given("a sparring match has just begun", () => {
     then("the opponent stands where it began, taking no action", async ({gunsmith}) => {
       const start = await gunsmith.opponent.get();
 
-      await gunsmith.waitForGameSeconds(3);
+      await gunsmith.clock.waitForGameSeconds(3);
 
       const now = await gunsmith.opponent.get();
       expect(now.x).toBeCloseTo(start.x, 9);

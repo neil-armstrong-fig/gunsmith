@@ -10,7 +10,7 @@ const PLATFORM = 1;
 
 given("a player on low ground beside a raised platform with one stair up", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startHeights();
+    await gunsmith.scenario.startHeights();
   });
 
   then("the player begins on the low ground", async ({gunsmith}) => {
@@ -36,7 +36,7 @@ given("a player on low ground beside a raised platform with one stair up", () =>
       await gunsmith.player.stopWalking("north");
 
       await gunsmith.player.startWalking("east");
-      await gunsmith.waitForGameSeconds(1);
+      await gunsmith.clock.waitForGameSeconds(1);
     });
 
     then("the edge stops the player on the low ground, as a wall would", async ({gunsmith}) => {

@@ -10,8 +10,8 @@ given.each(
   scale => `sparring at ${scale} pixels per tile`,
   scale => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.resizeWindowTo({width: 20 * scale, height: 12 * scale});
-      await gunsmith.startSparring();
+      await gunsmith.browser.resizeWindowTo({width: 20 * scale, height: 12 * scale});
+      await gunsmith.scenario.startSparring();
     });
 
     when.each(
@@ -107,7 +107,7 @@ given.each(
 
 given("sparring with the rifle picture missing", () => {
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startSparringWithMissingRifle();
+    await gunsmith.scenario.startSparringWithMissingRifle();
     await gunsmith.player.aimAtTile(NORTH);
   });
 

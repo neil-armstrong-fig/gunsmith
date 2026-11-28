@@ -29,7 +29,7 @@ given("two browsers are in a private room that waits two seconds for a player to
     when("the first player comes back", () => {
       beforeEach(async ({gunsmith}) => {
         await gunsmith.room.returnToTheRoom();
-        await gunsmith.room.waitForTheMatchAgain();
+        await gunsmith.room.connection.waitForTheMatchAgain();
       });
 
       then("they are told they lost the round, with the score from their side", async ({gunsmith}) => {

@@ -15,6 +15,7 @@ given("two browsers are in one private room", () => {
   when("the first player shoots the second until the round is decided", () => {
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.aimAtTile(await gunsmith.room.secondBrowser().player.getPosition());
+
       await gunsmith.player.startFiring();
       await gunsmith.round.waitForState("won", LONGEST_KILL_SECONDS);
       await gunsmith.player.stopFiring();
@@ -67,10 +68,13 @@ given("two browsers are in one private room", () => {
     when("both players ask for the next round", () => {
       beforeEach(async ({gunsmith}) => {
         const second = gunsmith.room.secondBrowser();
+
         await gunsmith.round.getBannerMessage();
         await second.round.getBannerMessage();
+
         await gunsmith.round.nextRound();
         await second.round.nextRound();
+
         await gunsmith.round.waitForBannerToGo();
         await second.round.waitForBannerToGo();
       });

@@ -70,7 +70,7 @@ given("the workshop is open on the practice range", () => {
     size => `the player opens the Fair duel result in a ${size.width} × ${size.height} window`,
     size => {
       beforeEach(async ({gunsmith}) => {
-        await gunsmith.resizeWindowTo(size);
+        await gunsmith.browser.resizeWindowTo(size);
         await gunsmith.workshop.arenas.open("Fair duel");
       });
 
@@ -97,7 +97,7 @@ given("the workshop is open on the practice range", () => {
 
   when("the player switches the result from Fair duel to Duel", () => {
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.resizeWindowTo({width: 1440, height: 900});
+      await gunsmith.browser.resizeWindowTo({width: 1440, height: 900});
       await gunsmith.workshop.arenas.open("Fair duel");
       await gunsmith.workshop.arenas.open("Duel");
     });
@@ -143,10 +143,12 @@ given("the workshop is open on the practice range", () => {
     const prompt = "a raised platform with stairs";
 
     beforeEach(async ({gunsmith}) => {
-      await gunsmith.resizeWindowTo({width: 1024, height: 560});
+      await gunsmith.browser.resizeWindowTo({width: 1024, height: 560});
+
       await gunsmith.workshop.arenas.open();
       await gunsmith.workshop.pasteThePrompt(prompt);
       await gunsmith.workshop.make();
+
       await gunsmith.workshop.close();
       await gunsmith.workshop.open();
     });

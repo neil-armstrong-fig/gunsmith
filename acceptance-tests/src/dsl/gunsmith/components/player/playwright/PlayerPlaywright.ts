@@ -4,6 +4,7 @@ import {BasePage} from "@src/dsl/gunsmith/playwright/BasePage";
 import {screenPositionOfTile} from "@src/dsl/gunsmith/components/player/playwright/screen/ScreenPositionOfTile";
 import type {Heading} from "@src/dsl/gunsmith/components/player/types/Heading";
 import type {HeldWalk} from "@src/dsl/gunsmith/components/player/types/HeldWalk";
+import type {WatchedShot} from "@src/dsl/gunsmith/components/player/types/WatchedShot";
 import {colourIsNear} from "@src/dsl/gunsmith/playwright/look/ColourIsNear";
 import {isPast} from "@src/dsl/gunsmith/components/player/playwright/walking/IsPast";
 import {runHeldUntil} from "@src/dsl/gunsmith/playwright/hold/RunHeldUntil";
@@ -221,6 +222,31 @@ export class PlayerPlaywright extends BasePage {
   async fire(): Promise<void> {
     await this.page.mouse.down();
     await this.page.mouse.up();
+  }
+
+  /**
+   * Fires once in a held game (`holdTheGame`), then runs it in steps of `watch.stepSeconds` for `watch.maxSeconds`, looking at
+   * the shots in the air after every step. Stepped by the game's clock, never polled, so a shot that lives a few frames is not missed.
+   */
+  async fireAndWatchTheShot(watch: HurtWatch): Promise<WatchedShot> {
+    await this.fire();
+
+    const xPositionsSeen: number[] = [];
+    for (let step = 0; step < Math.round(watch.maxSeconds / watch.stepSeconds); step += 1) {
+      await this.page.clock.runFor(Math.round(watch.stepSeconds * 1000));
+      const {bullets} = await this.readGameState();
+      xPositionsSeen.push(...bullets.map(bullet => bullet.x));
+    }
+
+    return {seenInTheAir: xPositionsSeen.length > 0, farthestWest: this.farthestWestOf(xPositionsSeen)};
+  }
+
+  private farthestWestOf(xPositions: number[]): number | undefined {
+    if (xPositions.length === 0) {
+      return undefined;
+    }
+
+    return Math.min(...xPositions);
   }
 
   async startFiring(): Promise<void> {

@@ -21,12 +21,12 @@ given("a sparring match, held still, with the player aiming at the opponent a fe
   let opponent: OpponentSnapshot;
 
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.startSparring();
-    await gunsmith.holdTheGame();
+    await gunsmith.scenario.startSparring();
+    await gunsmith.clock.holdTheGame();
     opponent = await gunsmith.opponent.get();
 
     await gunsmith.player.aimAtTile(opponent);
-    await gunsmith.runGameFor(GAME_SECONDS_AFTER_AIMING);
+    await gunsmith.clock.runGameFor(GAME_SECONDS_AFTER_AIMING);
   });
 
   when("the player's bullet has just landed on the opponent", () => {
@@ -55,7 +55,7 @@ given("a sparring match, held still, with the player aiming at the opponent a fe
     beforeEach(async ({gunsmith}) => {
       await gunsmith.player.fire();
       await gunsmith.opponent.runUntilHurt(HIT_WATCH);
-      await gunsmith.runGameFor(FLASH_IS_OVER_SECONDS);
+      await gunsmith.clock.runGameFor(FLASH_IS_OVER_SECONDS);
     });
 
     then("no tick is left on the screen", async ({gunsmith}) => {
@@ -68,7 +68,7 @@ given("a sparring match, held still, with the player aiming at the opponent a fe
       const player = await gunsmith.player.getPosition();
 
       await gunsmith.player.fire();
-      await gunsmith.runGameFor(GAME_SECONDS_AFTER_FIRING);
+      await gunsmith.clock.runGameFor(GAME_SECONDS_AFTER_FIRING);
       await gunsmith.player.aimAtTile({x: player.x - TILES_TO_TURN_AWAY, y: player.y});
       await gunsmith.opponent.runUntilHurt(HIT_WATCH);
     });
@@ -95,7 +95,7 @@ given("a sparring match, held still, with the player aiming at the opponent a fe
       await gunsmith.player.fire();
       await gunsmith.opponent.runUntilHurt(HIT_WATCH);
       await gunsmith.player.aimAtTile({x: player.x - TILES_TO_TURN_AWAY, y: player.y});
-      await gunsmith.runGameFor(GAME_SECONDS_AFTER_TURNING_AWAY);
+      await gunsmith.clock.runGameFor(GAME_SECONDS_AFTER_TURNING_AWAY);
     });
 
     then("the opponent is out of sight", async ({gunsmith}) => {
@@ -113,7 +113,7 @@ given("a match, held still, with the player aiming at a practice dummy", () => {
   let another: DummySnapshot;
 
   beforeEach(async ({gunsmith}) => {
-    await gunsmith.holdTheGame();
+    await gunsmith.clock.holdTheGame();
     const [first, second] = await gunsmith.dummies.getAll();
     if (!first || !second) {
       throw new Error("The practice range has fewer than two dummies.");
@@ -122,7 +122,7 @@ given("a match, held still, with the player aiming at a practice dummy", () => {
     dummy = first;
     another = second;
     await gunsmith.player.aimAtTile(dummy);
-    await gunsmith.runGameFor(GAME_SECONDS_AFTER_AIMING);
+    await gunsmith.clock.runGameFor(GAME_SECONDS_AFTER_AIMING);
     expect(await gunsmith.dummies.isSeenAt(dummy)).toBe(true);
   });
 
@@ -146,7 +146,7 @@ given("a match, held still, with the player aiming at a practice dummy", () => {
       const player = await gunsmith.player.getPosition();
 
       await gunsmith.player.fire();
-      await gunsmith.runGameFor(GAME_SECONDS_AFTER_FIRING);
+      await gunsmith.clock.runGameFor(GAME_SECONDS_AFTER_FIRING);
       await gunsmith.player.aimAtTile({x: player.x - TILES_TO_TURN_AWAY, y: player.y});
       await gunsmith.dummies.runUntilHurt(dummy, HIT_WATCH);
     });
