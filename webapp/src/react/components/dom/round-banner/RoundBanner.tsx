@@ -1,8 +1,8 @@
 import {decideMatch} from "@gunsmith/engine/match/DecideMatch";
 import {returnToMainMenu} from "@src/react/components/dom/game-menu/returning/ReturnToMainMenu";
 import type {Arena} from "@gunsmith/engine/arena/types/Arena";
-import {nextRoundOfPage} from "@src/game/scenario/NextRoundOfPage";
-import {worldOfPage} from "@src/game/scenario/WorldOfPage";
+import {nextRoundOfPage} from "@src/game/scenario/round/NextRoundOfPage";
+import {worldOfPage} from "@src/game/scenario/round/WorldOfPage";
 import {goOn} from "@src/react/components/dom/round-banner/go-on/GoOn";
 import {matchGoesOn} from "@src/react/components/dom/round-banner/match/MatchGoesOn";
 import {roundMessage} from "@src/react/components/dom/round-banner/message/RoundMessage";
@@ -11,7 +11,7 @@ import {useAppStore} from "@src/store/app/UseAppStore";
 import {selectMatch} from "@src/store/game/selectors/select-match/SelectMatch";
 import {selectRound} from "@src/store/game/selectors/select-round/SelectRound";
 import {useGameStore} from "@src/store/game/UseGameStore";
-import {usePreRoundStore} from "@src/store/pre-round/UsePreRoundStore";
+import {useBotPreRoundStore} from "@src/store/bot-pre-round/UseBotPreRoundStore";
 import type {JSX} from "react";
 
 /**
@@ -56,7 +56,7 @@ export function RoundBanner(): JSX.Element | undefined {
           type="button"
           className="rounded-md bg-gs-team-blue px-6 py-3 text-lg font-semibold text-gs-background"
           onClick={() => {
-            goOn(() => nextRoundOfPage(match, usePreRoundStore.getState().picks, arenaOfPreRound()));
+            goOn(() => nextRoundOfPage(match, useBotPreRoundStore.getState().picks, arenaOfPreRound()));
           }}
         >
           Next round
@@ -69,7 +69,7 @@ export function RoundBanner(): JSX.Element | undefined {
           className="rounded-md bg-gs-team-blue px-6 py-3 text-lg font-semibold text-gs-background"
           onClick={() => {
             goOn(worldOfPage);
-            usePreRoundStore.getState().restart();
+            useBotPreRoundStore.getState().restart();
           }}
         >
           Play again
@@ -88,5 +88,5 @@ export function RoundBanner(): JSX.Element | undefined {
 }
 
 function arenaOfPreRound(): Arena | undefined {
-  return usePreRoundStore.getState().arena?.arena;
+  return useBotPreRoundStore.getState().arena?.arena;
 }

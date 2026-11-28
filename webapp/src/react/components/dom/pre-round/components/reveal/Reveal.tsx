@@ -4,13 +4,13 @@ import {Side} from "@src/react/components/dom/pre-round/components/side/Side";
 import type {SlotWeapon} from "@src/react/components/dom/pre-round/components/side/types/SlotWeapon";
 import {startTheMatch} from "@src/react/components/dom/pre-round/components/reveal/start-match/StartTheMatch";
 import {gameState} from "@src/store/game/selectors/game-state/GameState";
-import {usePreRoundStore} from "@src/store/pre-round/UsePreRoundStore";
+import {useBotPreRoundStore} from "@src/store/bot-pre-round/UseBotPreRoundStore";
 import type {JSX} from "react";
 
 /** The last step: both fighters' weapons side by side with their ratings and stats, the opponent's as the match will give it, and beside them the arena the player chose and the button that begins round 1. */
 export function Reveal(): JSX.Element | undefined {
-  const picks = usePreRoundStore(state => state.picks);
-  const arena = usePreRoundStore(state => state.arena);
+  const picks = useBotPreRoundStore(state => state.picks);
+  const arena = useBotPreRoundStore(state => state.arena);
   if (!picks || !arena) {
     return undefined;
   }

@@ -1,6 +1,6 @@
 import {BUILT_IN_WEAPONS} from "@gunsmith/engine/weapon/built-in/BuiltInWeapons";
 import type {Weapon} from "@gunsmith/engine/weapon/types/Weapon";
-import type {RevealReadout} from "@src/game/room-pre-round/types/RevealReadout";
+import type {RevealReadout} from "@src/game/online-pre-round/types/RevealReadout";
 import type {RevealFrame} from "@src/online/types/RevealFrame";
 import type {RevealedWeapon} from "@src/online/types/RevealedWeapon";
 

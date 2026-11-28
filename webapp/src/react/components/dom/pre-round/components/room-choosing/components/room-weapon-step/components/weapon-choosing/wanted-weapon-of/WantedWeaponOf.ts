@@ -1,4 +1,4 @@
-import type {WantedWeapon} from "@src/game/room-pre-round/types/WantedWeapon";
+import type {WantedWeapon} from "@src/game/online-pre-round/types/WantedWeapon";
 import type {ShelfWeapon} from "@src/store/shelf/types/ShelfWeapon";
 
 /**

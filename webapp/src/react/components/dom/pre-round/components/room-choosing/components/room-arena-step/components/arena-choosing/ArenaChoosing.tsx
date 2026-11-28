@@ -4,7 +4,7 @@ import {ArenaPicker} from "@src/react/components/dom/pre-round/components/choosi
 import {wantedArenaOf} from "@src/react/components/dom/pre-round/components/room-choosing/components/room-arena-step/components/arena-choosing/wanted-arena-of/WantedArenaOf";
 import {useAccountLibraryStore} from "@src/store/account-library/UseAccountLibraryStore";
 import {usePreRoundChoicesStore} from "@src/store/pre-round-choices/UsePreRoundChoicesStore";
-import {useRoomPreRoundStore} from "@src/store/room-pre-round/UseRoomPreRoundStore";
+import {useOnlinePreRoundStore} from "@src/store/online-pre-round/UseOnlinePreRoundStore";
 import type {JSX} from "react";
 import {useMemo, useState} from "react";
 
@@ -15,9 +15,9 @@ import {useMemo, useState} from "react";
  * own default). A saved arena is put forward by its library id.
  */
 export function ArenaChoosing(): JSX.Element | undefined {
-  const wanted = useRoomPreRoundStore(state => state.wants.arena);
+  const wanted = useOnlinePreRoundStore(state => state.wants.arena);
   const savedArenas = useAccountLibraryStore(state => state.arenas);
-  const offered = useRoomPreRoundStore(state => state.readout?.builtInArenas);
+  const offered = useOnlinePreRoundStore(state => state.readout?.builtInArenas);
   const choices = useMemo(() => arenaChoicesOf(savedArenas, offered), [savedArenas, offered]);
   const [chosenId, setChosenId] = useState(() => usePreRoundChoicesStore.getState().arenaId);
   const chosen = chosenChoiceOf(choices, chosenId, `built-in:${offered?.[0]}`);
@@ -42,7 +42,7 @@ export function ArenaChoosing(): JSX.Element | undefined {
         className="self-start rounded-md bg-gs-team-blue px-6 py-3 text-lg font-semibold text-gs-background disabled:opacity-50"
         onClick={() => {
           remember(chosen.id);
-          useRoomPreRoundStore.getState().wantArena(wantedArenaOf(chosen, savedArenas));
+          useOnlinePreRoundStore.getState().wantArena(wantedArenaOf(chosen, savedArenas));
         }}
       >
         Lock in arena

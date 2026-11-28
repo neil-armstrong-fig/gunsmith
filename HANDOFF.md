@@ -39,6 +39,18 @@ answered and built.
   `weapon/built-in/`; file names are unchanged. After merging main, a type-check names any file of yours still on an old path:
   rewrite only `@gunsmith/engine/<old>/` and `engine/src/<old>/` (api's own `durable-objects/match/arena-rotation/` stays).
   `TODO-ai.md`, `TODO.md`'s ai row and `SessionDecisions.md` keep the old paths (yours to update, or history). Remove this once merged.
+- **2026-11-28, to ai and netcode (user request): webapp's `src/game/` swept into subfolders and the two pre-rounds renamed.**
+  `game/pre-round/` → `game/bot-pre-round/`, `game/room-pre-round/` → `game/online-pre-round/`, `store/pre-round/` →
+  `store/bot-pre-round/`, `store/room-pre-round/` → `store/online-pre-round/`, with their names: `usePreRoundStore` →
+  `useBotPreRoundStore` (`PreRoundStore`, `PreRoundPhase`, `PreRoundPicks`, `preRoundOfPage`, `preRoundFromSearch` take `Bot`),
+  `useRoomPreRoundStore` → `useOnlinePreRoundStore` (`RoomPreRoundStore`, `RoomPreRoundReadout` take `Online`; `RoomStage` →
+  `OnlinePreRoundStage`, `RoomWants` → `OnlinePreRoundWants`). `game/scenario/` keeps what the page asks for (`ScenarioOfPage`,
+  `ScenarioFromSearch`, `seed/`, `ring-timing/`); `WorldOfPage`, `NextRoundOfPage` and `DuelWorldOn` → `game/scenario/round/`,
+  `starting-parts/` beneath it, and `WorldOfScenario` → `round/world-of-scenario/` with the scenario setups (`cover/`, `duel/`,
+  `heights/` and the rest, formerly at `game/`'s root) in its `setups/`. `game/fog/`, `game/motion/`, `game/sound/` →
+  `store/app/<name>/`; `scenario/weapon-drawing/` → `game/weapon-drawing/`; `RingTimingFromSearch` (with `number/`) →
+  `ring-timing/from-search/`; `SameShownWeapon` → the root of `online-pre-round/`; `OfferedArena`, which both pre-rounds use, → `game/pre-round/types/`. After merging main, a type-check names any
+  import still on an old `@src/` path. Remove this once merged.
 
 ## Contracts between sessions
 

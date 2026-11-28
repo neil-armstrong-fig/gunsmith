@@ -1,6 +1,6 @@
 import {ArenaChoosing} from "@src/react/components/dom/pre-round/components/room-choosing/components/room-arena-step/components/arena-choosing/ArenaChoosing";
 import {ArenaLockedIn} from "@src/react/components/dom/pre-round/components/room-choosing/components/room-arena-step/components/arena-locked-in/ArenaLockedIn";
-import {useRoomPreRoundStore} from "@src/store/room-pre-round/UseRoomPreRoundStore";
+import {useOnlinePreRoundStore} from "@src/store/online-pre-round/UseOnlinePreRoundStore";
 import type {JSX} from "react";
 
 /**
@@ -9,8 +9,8 @@ import type {JSX} from "react";
  * locked in theirs.
  */
 export function RoomArenaStep(): JSX.Element | undefined {
-  const opened = useRoomPreRoundStore(state => state.readout?.own.slots[1].locked === true);
-  const locked = useRoomPreRoundStore(state => state.readout?.own.arenaLocked === true);
+  const opened = useOnlinePreRoundStore(state => state.readout?.own.slots[1].locked === true);
+  const locked = useOnlinePreRoundStore(state => state.readout?.own.arenaLocked === true);
   if (!opened) {
     return undefined;
   }

@@ -1,6 +1,6 @@
 import type {Weapon} from "@gunsmith/engine/weapon/types/Weapon";
 import {weaponAppearances} from "@src/assets/weapon-drawings/appearances/WeaponAppearances";
-import {weaponDrawingOfPage} from "@src/game/scenario/weapon-drawing/WeaponDrawingOfPage";
+import {weaponDrawingOfPage} from "@src/game/weapon-drawing/WeaponDrawingOfPage";
 import {InventorySlot} from "@src/react/components/dom/ammo-hud/components/inventory-slot/InventorySlot";
 import {selectAmmoReadout} from "@src/store/game/selectors/select-ammo-readout/SelectAmmoReadout";
 import {useGameStore} from "@src/store/game/UseGameStore";

@@ -25,13 +25,13 @@ const workshopStoreMayImport =
 // The shelf store (`src/store/shelf/`) holds the saved weapons and keeps them in the browser's storage: Zustand, zod (to read what the browser kept), the engine and its own folder.
 const shelfStoreMayImport = "^(?!zustand$|zustand/|zod$|@gunsmith/engine(?:/|$)|@src/store/shelf/|\\./).+$";
 
-// The pre-round store (`src/store/pre-round/`) holds where the pre-round stands and the weapons locked in: Zustand, the engine's types (and its weapons in a test), the page's ask for it, the picks' type and its own folder.
-const preRoundStoreMayImport =
-  "^(?!zustand$|@gunsmith/engine(?:/|$)|@src/game/pre-round/|@src/store/pre-round/|\\./).+$";
+// The bot pre-round store (`src/store/bot-pre-round/`) holds where the pre-round stands and the weapons locked in: Zustand, the engine's types (and its weapons in a test), the page's ask for it, the picks' type, the offered arena's type both pre-rounds share (`game/pre-round/`) and its own folder.
+const botPreRoundStoreMayImport =
+  "^(?!zustand$|@gunsmith/engine(?:/|$)|@src/game/bot-pre-round/|@src/game/pre-round/|@src/store/bot-pre-round/|\\./).+$";
 
-// The room's pre-round store (`src/store/room-pre-round/`) holds what the server last said of it and what the player locked in: Zustand, the engine's types, the plain types in `game/room-pre-round/` and its own folder, nothing of the online code (the loop turns a frame into the readout first).
-const roomPreRoundStoreMayImport =
-  "^(?!zustand$|@gunsmith/engine(?:/|$)|@src/game/room-pre-round/|@src/store/room-pre-round/|\\./).+$";
+// The online pre-round store (`src/store/online-pre-round/`) holds what the server last said of it and what the player locked in: Zustand, the engine's types, the plain types in `game/online-pre-round/` and its own folder, nothing of the online code (the loop turns a frame into the readout first).
+const onlinePreRoundStoreMayImport =
+  "^(?!zustand$|@gunsmith/engine(?:/|$)|@src/game/online-pre-round/|@src/store/online-pre-round/|\\./).+$";
 
 // The pre-round's memory (`src/store/pre-round-choices/`) holds the ids of what was last chosen and keeps them in the browser's storage: Zustand, zod (to read what the browser kept) and its own folder.
 const preRoundChoicesStoreMayImport = "^(?!zustand$|zustand/|zod$|@src/store/pre-round-choices/|\\./).+$";
@@ -180,16 +180,16 @@ export default [
     },
   },
   {
-    // The room's pre-round store holds the server's readout and what the player locked in, and nothing else. After the store block above.
-    files: ["src/store/room-pre-round/**/*.{ts,tsx}"],
+    // The online pre-round store holds the server's readout and what the player locked in, and nothing else. After the store block above.
+    files: ["src/store/online-pre-round/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": restrictedImports({
         allowedPackages: ["@gunsmith/engine"],
         patterns: [
           {
-            regex: roomPreRoundStoreMayImport,
+            regex: onlinePreRoundStoreMayImport,
             message:
-              "The room's pre-round store may import only zustand, the engine, game/room-pre-round and its own folder: it holds what the server said of the pre-round, already turned into a readout, and what the player locked in.",
+              "The online pre-round store may import only zustand, the engine, game/online-pre-round and its own folder: it holds what the server said of the pre-round, already turned into a readout, and what the player locked in.",
           },
         ],
       }),
@@ -212,16 +212,16 @@ export default [
     },
   },
   {
-    // The pre-round store holds the phase and the picks and nothing else. After the store block above.
-    files: ["src/store/pre-round/**/*.{ts,tsx}"],
+    // The bot pre-round store holds the phase and the picks and nothing else. After the store block above.
+    files: ["src/store/bot-pre-round/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": restrictedImports({
         allowedPackages: ["@gunsmith/engine"],
         patterns: [
           {
-            regex: preRoundStoreMayImport,
+            regex: botPreRoundStoreMayImport,
             message:
-              "The pre-round store may import only zustand, the engine, game/pre-round and its own folder: it holds where the pre-round stands and the weapons locked in.",
+              "The bot pre-round store may import only zustand, the engine, game/bot-pre-round, game/pre-round and its own folder: it holds where the pre-round stands and the weapons locked in.",
           },
         ],
       }),

@@ -3,7 +3,7 @@ import type {Weapon} from "@gunsmith/engine/weapon/types/Weapon";
 import {ArenaReveal} from "@src/react/components/dom/pre-round/components/arena-reveal/ArenaReveal";
 import {Side} from "@src/react/components/dom/pre-round/components/side/Side";
 import type {SlotWeapon} from "@src/react/components/dom/pre-round/components/side/types/SlotWeapon";
-import {useRoomPreRoundStore} from "@src/store/room-pre-round/UseRoomPreRoundStore";
+import {useOnlinePreRoundStore} from "@src/store/online-pre-round/UseOnlinePreRoundStore";
 import type {JSX} from "react";
 import {useMemo} from "react";
 
@@ -22,11 +22,11 @@ const HOW_TEXT: Record<string, string> = {
  * seconds left (the status above shows the clock) and **Start the match**, which begins it as soon as both players have pressed it.
  */
 export function RoomReveal(): JSX.Element | undefined {
-  const stage = useRoomPreRoundStore(state => state.readout?.stage);
-  const reveal = useRoomPreRoundStore(state => state.readout?.reveal);
-  const how = useRoomPreRoundStore(state => state.readout?.how);
-  const ready = useRoomPreRoundStore(state => state.readout?.own.ready);
-  const wanted = useRoomPreRoundStore(state => state.wants.start);
+  const stage = useOnlinePreRoundStore(state => state.readout?.stage);
+  const reveal = useOnlinePreRoundStore(state => state.readout?.reveal);
+  const how = useOnlinePreRoundStore(state => state.readout?.how);
+  const ready = useOnlinePreRoundStore(state => state.readout?.own.ready);
+  const wanted = useOnlinePreRoundStore(state => state.wants.start);
   const arena = useMemo(
     () => reveal && {id: reveal.arenaName, name: reveal.arenaName, arena: arenaFrom(reveal.arenaRows)},
     [reveal],
@@ -57,7 +57,7 @@ export function RoomReveal(): JSX.Element | undefined {
           disabled={wanted || ready}
           className="self-start rounded-md bg-gs-team-blue px-6 py-3 text-lg font-semibold text-gs-background disabled:opacity-50"
           onClick={() => {
-            useRoomPreRoundStore.getState().wantToStart();
+            useOnlinePreRoundStore.getState().wantToStart();
           }}
         >
           Start the match

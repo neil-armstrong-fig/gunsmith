@@ -4,10 +4,10 @@ import {Reveal} from "@src/react/components/dom/pre-round/components/reveal/Reve
 import {RoomChoosing} from "@src/react/components/dom/pre-round/components/room-choosing/RoomChoosing";
 import {roomProgressOf} from "@src/react/components/dom/pre-round/room-progress/RoomProgressOf";
 import type {PreRoundShown} from "@src/react/components/dom/pre-round/types/PreRoundShown";
-import type {RoomStage} from "@src/game/room-pre-round/types/RoomStage";
-import {usePreRoundStore} from "@src/store/pre-round/UsePreRoundStore";
-import type {PreRoundPhase} from "@src/store/pre-round/types/PreRoundPhase";
-import {useRoomPreRoundStore} from "@src/store/room-pre-round/UseRoomPreRoundStore";
+import type {OnlinePreRoundStage} from "@src/game/online-pre-round/types/OnlinePreRoundStage";
+import {useBotPreRoundStore} from "@src/store/bot-pre-round/UseBotPreRoundStore";
+import type {BotPreRoundPhase} from "@src/store/bot-pre-round/types/BotPreRoundPhase";
+import {useOnlinePreRoundStore} from "@src/store/online-pre-round/UseOnlinePreRoundStore";
 import type {JSX, KeyboardEvent} from "react";
 import {useEffect, useRef} from "react";
 
@@ -17,10 +17,10 @@ import {useEffect, useRef} from "react";
  * In a private room (`?room=<code>`) it is the room's pre-round instead, while the server says the two players are choosing or looking at what was decided; it goes with the first snapshot.
  */
 export function PreRound(): JSX.Element | undefined {
-  const phase = usePreRoundStore(state => state.phase);
-  const inRoom = useRoomPreRoundStore(state => state.readout !== undefined);
-  const roomProgress = useRoomPreRoundStore(state => roomProgressOf(state.readout));
-  const roomStage = useRoomPreRoundStore(state => state.readout?.stage);
+  const phase = useBotPreRoundStore(state => state.phase);
+  const inRoom = useOnlinePreRoundStore(state => state.readout !== undefined);
+  const roomProgress = useOnlinePreRoundStore(state => roomProgressOf(state.readout));
+  const roomStage = useOnlinePreRoundStore(state => state.readout?.stage);
   const shown = shownOf(phase, inRoom);
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -59,7 +59,7 @@ export function PreRound(): JSX.Element | undefined {
             className="rounded-md border border-gs-edge/40 px-3 py-1.5 text-sm hover:border-gs-team-blue focus-visible:outline-2 focus-visible:outline-gs-team-blue"
             onClick={() => {
               if (shown === "revealed") {
-                usePreRoundStore.getState().restart();
+                useBotPreRoundStore.getState().restart();
                 return;
               }
 
@@ -80,7 +80,7 @@ export function PreRound(): JSX.Element | undefined {
   );
 }
 
-function shownOf(phase: PreRoundPhase, inRoom: boolean): PreRoundShown | undefined {
+function shownOf(phase: BotPreRoundPhase, inRoom: boolean): PreRoundShown | undefined {
   if (phase !== "fighting") {
     return phase;
   }
@@ -92,7 +92,7 @@ function shownOf(phase: PreRoundPhase, inRoom: boolean): PreRoundShown | undefin
 }
 
 /** Whether the panel shows a reveal, which lays the four weapons beside the arena and so needs more room than the choosing. */
-function isRevealShown(shown: PreRoundShown, roomStage: RoomStage | undefined): boolean {
+function isRevealShown(shown: PreRoundShown, roomStage: OnlinePreRoundStage | undefined): boolean {
   if (shown === "revealed") {
     return true;
   }

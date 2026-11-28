@@ -5,7 +5,7 @@ import {RoomStatus} from "@src/react/components/dom/pre-round/components/room-ch
 import {RoomWeaponStep} from "@src/react/components/dom/pre-round/components/room-choosing/components/room-weapon-step/RoomWeaponStep";
 import {accountUrl} from "@src/account/AccountUrl";
 import {useAccountLibraryStore} from "@src/store/account-library/UseAccountLibraryStore";
-import {useRoomPreRoundStore} from "@src/store/room-pre-round/UseRoomPreRoundStore";
+import {useOnlinePreRoundStore} from "@src/store/online-pre-round/UseOnlinePreRoundStore";
 import type {JSX} from "react";
 import {useEffect} from "react";
 
@@ -16,7 +16,7 @@ import {useEffect} from "react";
  * asks for the player's account library (once, however many times it opens), so a room loaded directly offers their saved weapons and arenas.
  */
 export function RoomChoosing(): JSX.Element {
-  const revealing = useRoomPreRoundStore(
+  const revealing = useOnlinePreRoundStore(
     state => state.readout?.stage === "revealing" || state.readout?.stage === "decided",
   );
 

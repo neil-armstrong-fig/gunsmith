@@ -59,7 +59,7 @@ const terraced = arenaFrom([
 const IN_THE_POCKET: Point = {x: 1.5, y: 3.5};
 const ON_THE_LOW_GROUND: Point = {x: 8.5, y: 3.5};
 const ON_THE_PLATFORM: Point = {x: 24.5, y: 3.5};
-// The game's terraced arena (`webapp/src/game/terraced/`): low ground in the west, a platform from column 11, one stair at column 10
+// The game's terraced arena (`webapp/src/game/scenario/round/world-of-scenario/setups/terraced/`): low ground in the west, a platform from column 11, one stair at column 10
 // in the top row. In the overlook the opponent stands on the platform and the player on the low ground, eleven tiles apart.
 const overlook = arenaFrom([
   "#########################",

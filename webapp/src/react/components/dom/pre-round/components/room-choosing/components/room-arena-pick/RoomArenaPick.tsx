@@ -1,5 +1,5 @@
 import {ArenaOption} from "@src/react/components/dom/pre-round/components/room-choosing/components/room-arena-pick/components/arena-option/ArenaOption";
-import {useRoomPreRoundStore} from "@src/store/room-pre-round/UseRoomPreRoundStore";
+import {useOnlinePreRoundStore} from "@src/store/online-pre-round/UseOnlinePreRoundStore";
 import type {JSX} from "react";
 
 const PICKS = [
@@ -14,9 +14,9 @@ const PICKS = [
  * each, and a choice of one of them, random, or nothing. Once the player has picked it waits for the other.
  */
 export function RoomArenaPick(): JSX.Element | undefined {
-  const stage = useRoomPreRoundStore(state => state.readout?.stage);
-  const own = useRoomPreRoundStore(state => state.readout?.own);
-  const opponent = useRoomPreRoundStore(state => state.readout?.opponent);
+  const stage = useOnlinePreRoundStore(state => state.readout?.stage);
+  const own = useOnlinePreRoundStore(state => state.readout?.own);
+  const opponent = useOnlinePreRoundStore(state => state.readout?.opponent);
   if (stage !== "picking" || !own || !opponent) {
     return undefined;
   }
@@ -39,7 +39,7 @@ export function RoomArenaPick(): JSX.Element | undefined {
             disabled={own.picked}
             className="rounded-md bg-gs-background px-3 py-2 text-gs-ui-text disabled:opacity-50"
             onClick={() => {
-              useRoomPreRoundStore.getState().wantPick(pick);
+              useOnlinePreRoundStore.getState().wantPick(pick);
             }}
           >
             {label}

@@ -1,5 +1,5 @@
 import {roomOfPage} from "@src/online/RoomOfPage";
-import {useRoomPreRoundStore} from "@src/store/room-pre-round/UseRoomPreRoundStore";
+import {useOnlinePreRoundStore} from "@src/store/online-pre-round/UseOnlinePreRoundStore";
 import type {JSX} from "react";
 
 /**
@@ -7,8 +7,8 @@ import type {JSX} from "react";
  * clock, since the clock starts at their seat), and the seconds left, to choose and then to look at what was decided.
  */
 export function RoomStatus(): JSX.Element | undefined {
-  const secondsLeft = useRoomPreRoundStore(state => state.readout?.secondsLeft);
-  const present = useRoomPreRoundStore(state => state.readout !== undefined);
+  const secondsLeft = useOnlinePreRoundStore(state => state.readout?.secondsLeft);
+  const present = useOnlinePreRoundStore(state => state.readout !== undefined);
   if (!present) {
     return undefined;
   }

@@ -1,4 +1,4 @@
-import {worldOfPage} from "@src/game/scenario/WorldOfPage";
+import {worldOfPage} from "@src/game/scenario/round/WorldOfPage";
 import type {GameStore} from "@src/store/game/types/GameStore";
 import {create} from "zustand";
 

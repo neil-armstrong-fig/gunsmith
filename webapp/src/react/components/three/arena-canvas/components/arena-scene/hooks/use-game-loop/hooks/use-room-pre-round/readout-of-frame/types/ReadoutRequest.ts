@@ -1,5 +1,5 @@
-import type {RevealReadout} from "@src/game/room-pre-round/types/RevealReadout";
-import type {RoomPreRoundReadout} from "@src/game/room-pre-round/types/RoomPreRoundReadout";
+import type {RevealReadout} from "@src/game/online-pre-round/types/RevealReadout";
+import type {OnlinePreRoundReadout} from "@src/game/online-pre-round/types/OnlinePreRoundReadout";
 import type {OpponentWeapons} from "@src/online/types/OpponentWeapons";
 import type {PreRoundFrame} from "@src/online/types/pre-round/PreRoundFrame";
 
@@ -8,7 +8,7 @@ export interface ReadoutRequest {
   frame: PreRoundFrame;
   reveal: RevealReadout | undefined;
   /** The readout made from an earlier frame, whose weapons are kept while the server shows the same ones. */
-  previous?: RoomPreRoundReadout;
+  previous?: OnlinePreRoundReadout;
   /** The other player's saved weapons with their numbers and drawings, as the server told them once each. */
   opponentWeapons?: OpponentWeapons;
 }

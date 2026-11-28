@@ -1,6 +1,6 @@
 import {WeaponChoosing} from "@src/react/components/dom/pre-round/components/room-choosing/components/room-weapon-step/components/weapon-choosing/WeaponChoosing";
 import {WeaponLockedIn} from "@src/react/components/dom/pre-round/components/room-choosing/components/room-weapon-step/components/weapon-locked-in/WeaponLockedIn";
-import {useRoomPreRoundStore} from "@src/store/room-pre-round/UseRoomPreRoundStore";
+import {useOnlinePreRoundStore} from "@src/store/online-pre-round/UseOnlinePreRoundStore";
 import type {JSX} from "react";
 
 interface Props {
@@ -13,9 +13,9 @@ interface Props {
  * so the player sees the other's first weapon before choosing their second.
  */
 export function RoomWeaponStep({slot}: Props): JSX.Element | undefined {
-  const present = useRoomPreRoundStore(state => state.readout !== undefined);
-  const locked = useRoomPreRoundStore(state => state.readout?.own.slots[slot - 1]?.locked === true);
-  const firstLocked = useRoomPreRoundStore(state => state.readout?.own.slots[0].locked === true);
+  const present = useOnlinePreRoundStore(state => state.readout !== undefined);
+  const locked = useOnlinePreRoundStore(state => state.readout?.own.slots[slot - 1]?.locked === true);
+  const firstLocked = useOnlinePreRoundStore(state => state.readout?.own.slots[0].locked === true);
   if (!present || (slot === 2 && !firstLocked)) {
     return undefined;
   }

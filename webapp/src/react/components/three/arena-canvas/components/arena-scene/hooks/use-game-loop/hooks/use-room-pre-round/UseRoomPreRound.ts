@@ -6,7 +6,7 @@ import {sendsDue} from "@src/react/components/three/arena-canvas/components/aren
 import type {DueAction} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/hooks/use-room-pre-round/sends-due/types/DueAction";
 import type {MadeReveal} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/hooks/use-room-pre-round/types/MadeReveal";
 import type {RoomPreRound} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/hooks/use-room-pre-round/types/RoomPreRound";
-import {useRoomPreRoundStore} from "@src/store/room-pre-round/UseRoomPreRoundStore";
+import {useOnlinePreRoundStore} from "@src/store/online-pre-round/UseOnlinePreRoundStore";
 import {useMemo, useRef} from "react";
 
 /**
@@ -25,7 +25,7 @@ export function useRoomPreRound(): RoomPreRound {
       afterFrame: ({onlineMatch, frameSeconds}) => {
         const frame = onlineMatch?.preRound();
         if (!onlineMatch || !frame) {
-          useRoomPreRoundStore.getState().setReadout(undefined);
+          useOnlinePreRoundStore.getState().setReadout(undefined);
 
           return;
         }
@@ -34,8 +34,8 @@ export function useRoomPreRound(): RoomPreRound {
         if (madeRevealRef.current.frame !== reveal) {
           madeRevealRef.current = {frame: reveal, readout: revealReadoutOf(reveal)};
         }
-        const previous = useRoomPreRoundStore.getState().readout;
-        useRoomPreRoundStore.getState().setReadout(
+        const previous = useOnlinePreRoundStore.getState().readout;
+        useOnlinePreRoundStore.getState().setReadout(
           readoutOfFrame({
             frame,
             reveal: madeRevealRef.current.readout,
@@ -44,7 +44,7 @@ export function useRoomPreRound(): RoomPreRound {
           }),
         );
 
-        const {readout, wants} = useRoomPreRoundStore.getState();
+        const {readout, wants} = useOnlinePreRoundStore.getState();
         if (!readout) {
           return;
         }

@@ -4,7 +4,7 @@ import {WeaponPicker} from "@src/react/components/dom/pre-round/components/choos
 import {wantedWeaponOf} from "@src/react/components/dom/pre-round/components/room-choosing/components/room-weapon-step/components/weapon-choosing/wanted-weapon-of/WantedWeaponOf";
 import {useAccountLibraryStore} from "@src/store/account-library/UseAccountLibraryStore";
 import {usePreRoundChoicesStore} from "@src/store/pre-round-choices/UsePreRoundChoicesStore";
-import {useRoomPreRoundStore} from "@src/store/room-pre-round/UseRoomPreRoundStore";
+import {useOnlinePreRoundStore} from "@src/store/online-pre-round/UseOnlinePreRoundStore";
 import type {JSX} from "react";
 import {useMemo, useState} from "react";
 
@@ -21,7 +21,7 @@ const DEFAULT_WEAPON_IDS = {1: "rifle", 2: "marksman-rifle"};
  * shelf is not offered, since the server cannot know its ids.
  */
 export function WeaponChoosing({slot}: Props): JSX.Element | undefined {
-  const wanted = useRoomPreRoundStore(state => state.wants.weapons[slot - 1]);
+  const wanted = useOnlinePreRoundStore(state => state.wants.weapons[slot - 1]);
   const savedWeapons = useAccountLibraryStore(state => state.weapons);
   const choices = useMemo(() => weaponChoicesOf(savedWeapons), [savedWeapons]);
   const [chosenId, setChosenId] = useState(() => rememberedIdOf(slot));
@@ -40,7 +40,7 @@ export function WeaponChoosing({slot}: Props): JSX.Element | undefined {
         className="self-start rounded-md bg-gs-team-blue px-6 py-3 text-lg font-semibold text-gs-background disabled:opacity-50"
         onClick={() => {
           remember(slot, chosen.id);
-          useRoomPreRoundStore.getState().wantWeapon(slot, wantedWeaponOf(chosen.id, savedWeapons));
+          useOnlinePreRoundStore.getState().wantWeapon(slot, wantedWeaponOf(chosen.id, savedWeapons));
         }}
       >
         {`Lock in weapon ${slot}`}

@@ -1,4 +1,4 @@
-import type {RoomPreRoundReadout} from "@src/game/room-pre-round/types/RoomPreRoundReadout";
+import type {OnlinePreRoundReadout} from "@src/game/online-pre-round/types/OnlinePreRoundReadout";
 import {roomProgressOf} from "@src/react/components/dom/pre-round/room-progress/RoomProgressOf";
 
 const seat = {
@@ -11,7 +11,7 @@ const seat = {
   picked: false,
   ready: false,
 } as const;
-const readout: RoomPreRoundReadout = {
+const readout: OnlinePreRoundReadout = {
   stage: "choosing",
   secondsLeft: 30,
   builtInArenas: ["Duel", "Fair duel"],

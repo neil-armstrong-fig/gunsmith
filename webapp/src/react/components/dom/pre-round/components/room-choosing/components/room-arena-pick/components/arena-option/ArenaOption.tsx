@@ -1,5 +1,5 @@
 import {arenaFrom} from "@gunsmith/engine/arena/ArenaFrom";
-import type {ShownArena} from "@src/game/room-pre-round/types/ShownArena";
+import type {ShownArena} from "@src/game/online-pre-round/types/ShownArena";
 import {ArenaPreview} from "@src/react/components/dom/arena-preview/ArenaPreview";
 import type {JSX} from "react";
 

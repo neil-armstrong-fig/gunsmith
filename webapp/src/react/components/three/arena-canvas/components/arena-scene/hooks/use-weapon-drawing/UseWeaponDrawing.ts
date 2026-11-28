@@ -4,7 +4,7 @@ import {APPEARANCE_LIMITS} from "@gunsmith/shared/appearance/schema/AppearanceLi
 import {SPRITE_MANIFEST} from "@src/assets/sprites/SpriteManifest";
 import type {SpriteEntry} from "@src/assets/sprites/types/SpriteEntry";
 import type {SpriteKey} from "@src/assets/sprites/types/SpriteKey";
-import {weaponDrawingOfPage} from "@src/game/scenario/weapon-drawing/WeaponDrawingOfPage";
+import {weaponDrawingOfPage} from "@src/game/weapon-drawing/WeaponDrawingOfPage";
 import {loadedWeaponDrawing} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-weapon-drawing/texture/LoadedWeaponDrawing";
 import {loadWeaponDrawing} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-weapon-drawing/texture/load-weapon-drawing/LoadWeaponDrawing";
 import type {WeaponDrawing} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-weapon-drawing/types/WeaponDrawing";

@@ -1,11 +1,11 @@
 import {BUILT_IN_WEAPONS} from "@gunsmith/engine/weapon/built-in/BuiltInWeapons";
 import type {Weapon} from "@gunsmith/engine/weapon/types/Weapon";
-import type {ShownWeapon} from "@src/game/room-pre-round/types/ShownWeapon";
+import type {ShownWeapon} from "@src/game/online-pre-round/types/ShownWeapon";
 import {FoldedOpponentWeapon} from "@src/react/components/dom/pre-round/components/room-choosing/components/room-weapon-step/components/weapon-locked-in/components/opponent-weapon/components/folded-opponent-weapon/FoldedOpponentWeapon";
 import {OpenedOpponentWeapon} from "@src/react/components/dom/pre-round/components/room-choosing/components/room-weapon-step/components/weapon-locked-in/components/opponent-weapon/components/opened-opponent-weapon/OpenedOpponentWeapon";
 import {OpponentWeaponCard} from "@src/react/components/dom/pre-round/components/room-choosing/components/room-weapon-step/components/weapon-locked-in/components/opponent-weapon/components/opponent-weapon-card/OpponentWeaponCard";
 import {nameOfShownWeapon} from "@src/react/components/dom/pre-round/components/room-choosing/components/room-weapon-step/components/weapon-locked-in/shown-weapon-name/NameOfShownWeapon";
-import {useRoomPreRoundStore} from "@src/store/room-pre-round/UseRoomPreRoundStore";
+import {useOnlinePreRoundStore} from "@src/store/online-pre-round/UseOnlinePreRoundStore";
 import type {JSX} from "react";
 import {useState} from "react";
 
@@ -20,8 +20,8 @@ interface Props {
  * anywhere on it opens or folds it (the user, 2026-11-25 and 26). A weapon the page cannot make out is shown by its name alone.
  */
 export function OpponentWeapon({slot}: Props): JSX.Element | undefined {
-  const shown = useRoomPreRoundStore(state => state.readout?.opponent.slots[slot - 1]?.shown);
-  const bothLocked = useRoomPreRoundStore(state => state.readout?.own.slots[1]?.locked === true);
+  const shown = useOnlinePreRoundStore(state => state.readout?.opponent.slots[slot - 1]?.shown);
+  const bothLocked = useOnlinePreRoundStore(state => state.readout?.own.slots[1]?.locked === true);
   const [opened, setOpened] = useState(false);
   if (!shown) {
     return undefined;

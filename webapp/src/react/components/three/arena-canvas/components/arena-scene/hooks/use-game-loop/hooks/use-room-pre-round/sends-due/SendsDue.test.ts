@@ -1,8 +1,8 @@
-import type {RoomPreRoundReadout} from "@src/game/room-pre-round/types/RoomPreRoundReadout";
-import type {RoomWants} from "@src/game/room-pre-round/types/RoomWants";
-import type {SeatReadout} from "@src/game/room-pre-round/types/SeatReadout";
-import type {WantedArena} from "@src/game/room-pre-round/types/WantedArena";
-import type {WantedWeapon} from "@src/game/room-pre-round/types/WantedWeapon";
+import type {OnlinePreRoundReadout} from "@src/game/online-pre-round/types/OnlinePreRoundReadout";
+import type {OnlinePreRoundWants} from "@src/game/online-pre-round/types/OnlinePreRoundWants";
+import type {SeatReadout} from "@src/game/online-pre-round/types/SeatReadout";
+import type {WantedArena} from "@src/game/online-pre-round/types/WantedArena";
+import type {WantedWeapon} from "@src/game/online-pre-round/types/WantedWeapon";
 import {sendsDue} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/hooks/use-room-pre-round/sends-due/SendsDue";
 
 interface SeatFlags {
@@ -21,8 +21,13 @@ const savedWeapon: WantedWeapon = {kind: "saved", id: "weapon-from-the-library"}
 const duel: WantedArena = {kind: "builtIn", name: "Duel"};
 const fairDuel: WantedArena = {kind: "builtIn", name: "Fair duel"};
 const savedArena: WantedArena = {kind: "saved", id: "arena-from-the-library"};
-const nothingWanted: RoomWants = {weapons: [undefined, undefined], arena: undefined, pick: undefined, start: false};
-const nothingHeld: RoomPreRoundReadout = {
+const nothingWanted: OnlinePreRoundWants = {
+  weapons: [undefined, undefined],
+  arena: undefined,
+  pick: undefined,
+  start: false,
+};
+const nothingHeld: OnlinePreRoundReadout = {
   stage: "choosing",
   secondsLeft: undefined,
   builtInArenas: ["Duel", "Fair duel"],

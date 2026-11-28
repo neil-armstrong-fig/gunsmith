@@ -67,7 +67,7 @@ infrastructure change was made.
 References inspected: `engine/src/arena/ArenaFrom.ts`, `height/BlockedFrom.ts`,
 `height/BlocksSightFrom.ts`, `vision/sight/HasClearLine.ts`,
 `ring/centre/ReachableCentre.ts`, `ring/RadiusOfRing.ts`, and
-`webapp/src/game/duel/DuelArena.ts`. Root `AGENTS.md`, handoff/checklists and the
+`webapp/src/game/scenario/round/world-of-scenario/setups/duel/DuelArena.ts`. Root `AGENTS.md`, handoff/checklists and the
 art direction/manifest/copy/audio briefs govern this delivery; there is no nested
 instruction file under `docs/art/`. No package code is edited.
 

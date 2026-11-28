@@ -1,7 +1,7 @@
-import type {RoomPreRoundReadout} from "@src/game/room-pre-round/types/RoomPreRoundReadout";
+import type {OnlinePreRoundReadout} from "@src/game/online-pre-round/types/OnlinePreRoundReadout";
 
 /** A short text that changes whenever the room's pre-round moves on a step (a lock, a pick, the stage), so the dialog can take the focus back when a button it held has gone. */
-export function roomProgressOf(readout: RoomPreRoundReadout | undefined): string {
+export function roomProgressOf(readout: OnlinePreRoundReadout | undefined): string {
   if (!readout) {
     return "";
   }

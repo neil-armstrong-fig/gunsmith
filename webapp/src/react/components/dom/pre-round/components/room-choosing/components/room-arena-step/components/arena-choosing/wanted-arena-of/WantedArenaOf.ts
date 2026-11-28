@@ -1,5 +1,5 @@
 import type {OfferedArena} from "@src/game/pre-round/types/OfferedArena";
-import type {WantedArena} from "@src/game/room-pre-round/types/WantedArena";
+import type {WantedArena} from "@src/game/online-pre-round/types/WantedArena";
 import type {ShelfArena} from "@src/store/shelf/arena/types/ShelfArena";
 
 /**

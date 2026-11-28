@@ -1,9 +1,9 @@
-import {preRoundOfPage} from "@src/game/pre-round/PreRoundOfPage";
+import {botPreRoundOfPage} from "@src/game/bot-pre-round/BotPreRoundOfPage";
 import {scenarioOfPage} from "@src/game/scenario/ScenarioOfPage";
-import {reducedMotionOfPage} from "@src/game/motion/ReducedMotionOfPage";
-import {shakePixelsOfPage} from "@src/game/motion/ShakePixelsOfPage";
-import {fogShownOfPage} from "@src/game/fog/FogShownOfPage";
-import {mutedOfPage} from "@src/game/sound/MutedOfPage";
+import {reducedMotionOfPage} from "@src/store/app/motion/ReducedMotionOfPage";
+import {shakePixelsOfPage} from "@src/store/app/motion/ShakePixelsOfPage";
+import {fogShownOfPage} from "@src/store/app/fog/FogShownOfPage";
+import {mutedOfPage} from "@src/store/app/sound/MutedOfPage";
 import type {MenuView} from "@src/store/app/types/MenuView";
 import type {AppStore} from "@src/store/app/types/AppStore";
 import {z} from "zod";
@@ -87,7 +87,7 @@ function startupMenuView(show: boolean): MenuView | undefined {
 function startupMenuOverrideOfPage(): boolean | undefined {
   if (typeof location === "undefined") return false;
 
-  if (scenarioOfPage() === "room" || preRoundOfPage()) return false;
+  if (scenarioOfPage() === "room" || botPreRoundOfPage()) return false;
 
   const address = new URL(location.href);
   const menu = address.searchParams.get("menu");

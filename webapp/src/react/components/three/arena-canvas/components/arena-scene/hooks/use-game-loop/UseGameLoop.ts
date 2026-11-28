@@ -5,7 +5,7 @@ import type {Point} from "@gunsmith/engine/geometry/types/Point";
 import {STATE_HOOK_NAME} from "@gunsmith/shared/state-hook/StateHookName";
 import {gameState} from "@src/store/game/selectors/game-state/GameState";
 import {useAppStore} from "@src/store/app/UseAppStore";
-import {usePreRoundStore} from "@src/store/pre-round/UsePreRoundStore";
+import {useBotPreRoundStore} from "@src/store/bot-pre-round/UseBotPreRoundStore";
 import {useGameStore} from "@src/store/game/UseGameStore";
 import {arenaPointAtPixel} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/pointer/ArenaPointAtPixel";
 import {hitPlacesOfStep} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/feedback/hit-places/HitPlacesOfStep";
@@ -153,7 +153,7 @@ export function useGameLoop(): void {
     }
 
     // The pre-round is up over a duel: the match has not begun, so the game waits in the same way.
-    if (usePreRoundStore.getState().phase !== "fighting") {
+    if (useBotPreRoundStore.getState().phase !== "fighting") {
       return;
     }
 

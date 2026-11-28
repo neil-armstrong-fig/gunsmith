@@ -3,8 +3,8 @@ import type {CombatEvent} from "@gunsmith/engine/combat-events/types/CombatEvent
 import type {World} from "@gunsmith/engine/game-loop/types/World";
 import {hitPlacesOfStep} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/feedback/hit-places/HitPlacesOfStep";
 import type {PracticeRange} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/feedback/hit-places/types/PracticeRange";
-import {coverWorld} from "@src/game/cover/CoverWorld";
-import {worldOfScenario} from "@src/game/scenario/WorldOfScenario";
+import {coverWorld} from "@src/game/scenario/round/world-of-scenario/setups/cover/CoverWorld";
+import {worldOfScenario} from "@src/game/scenario/round/world-of-scenario/WorldOfScenario";
 
 const OPPONENT_HIT: CombatEvent = {kind: "hitLanded", on: "opponent"};
 const DUMMY_HIT: CombatEvent = {kind: "hitLanded", on: "dummy"};

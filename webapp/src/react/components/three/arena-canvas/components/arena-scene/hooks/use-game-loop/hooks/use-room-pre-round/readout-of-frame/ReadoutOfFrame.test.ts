@@ -5,7 +5,7 @@ import {weaponAppearances} from "@src/assets/weapon-drawings/appearances/WeaponA
 import type {PreRoundFrame} from "@src/online/types/pre-round/PreRoundFrame";
 import {readoutOfFrame} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/hooks/use-room-pre-round/readout-of-frame/ReadoutOfFrame";
 import type {ReadoutRequest} from "@src/react/components/three/arena-canvas/components/arena-scene/hooks/use-game-loop/hooks/use-room-pre-round/readout-of-frame/types/ReadoutRequest";
-import type {RevealReadout} from "@src/game/room-pre-round/types/RevealReadout";
+import type {RevealReadout} from "@src/game/online-pre-round/types/RevealReadout";
 
 const alone: PreRoundFrame = {
   kind: "preRound",

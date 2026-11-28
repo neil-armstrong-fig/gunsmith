@@ -4,7 +4,7 @@ import {weaponChoicesOf} from "@src/react/components/dom/pre-round/components/ch
 import {ArenaPicker} from "@src/react/components/dom/pre-round/components/choosing/components/arena-picker/ArenaPicker";
 import {WeaponPicker} from "@src/react/components/dom/pre-round/components/choosing/components/weapon-picker/WeaponPicker";
 import {usePreRoundChoicesStore} from "@src/store/pre-round-choices/UsePreRoundChoicesStore";
-import {usePreRoundStore} from "@src/store/pre-round/UsePreRoundStore";
+import {useBotPreRoundStore} from "@src/store/bot-pre-round/UseBotPreRoundStore";
 import {useArenaShelfStore} from "@src/store/shelf/arena/UseArenaShelfStore";
 import {useShelfStore} from "@src/store/shelf/UseShelfStore";
 import type {JSX} from "react";
@@ -57,7 +57,7 @@ export function Choosing(): JSX.Element | undefined {
             secondWeaponId: second.id,
             arenaId: arena.id,
           });
-          usePreRoundStore.getState().lockIn({first: first.weapon, second: second.weapon}, arena);
+          useBotPreRoundStore.getState().lockIn({first: first.weapon, second: second.weapon}, arena);
         }}
       >
         Lock in

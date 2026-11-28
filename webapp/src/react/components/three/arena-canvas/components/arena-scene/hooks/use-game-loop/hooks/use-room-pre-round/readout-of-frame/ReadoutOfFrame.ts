@@ -1,13 +1,13 @@
 import {BUILT_IN_ARENAS} from "@gunsmith/engine/arena/built-in/BuiltInArenas";
 import {appearanceToDraw} from "@src/assets/weapon-drawings/appearance-to-draw/AppearanceToDraw";
 import {weaponAppearances} from "@src/assets/weapon-drawings/appearances/WeaponAppearances";
-import type {RevealReadout} from "@src/game/room-pre-round/types/RevealReadout";
-import type {RoomPreRoundReadout} from "@src/game/room-pre-round/types/RoomPreRoundReadout";
-import type {SeatReadout} from "@src/game/room-pre-round/types/SeatReadout";
-import type {ShownArena} from "@src/game/room-pre-round/types/ShownArena";
-import type {ShownWeapon} from "@src/game/room-pre-round/types/ShownWeapon";
-import {sameShownWeapon} from "@src/game/room-pre-round/same-shown-weapon/SameShownWeapon";
-import type {SlotReadout} from "@src/game/room-pre-round/types/SlotReadout";
+import type {RevealReadout} from "@src/game/online-pre-round/types/RevealReadout";
+import type {OnlinePreRoundReadout} from "@src/game/online-pre-round/types/OnlinePreRoundReadout";
+import type {SeatReadout} from "@src/game/online-pre-round/types/SeatReadout";
+import type {ShownArena} from "@src/game/online-pre-round/types/ShownArena";
+import type {ShownWeapon} from "@src/game/online-pre-round/types/ShownWeapon";
+import {sameShownWeapon} from "@src/game/online-pre-round/SameShownWeapon";
+import type {SlotReadout} from "@src/game/online-pre-round/types/SlotReadout";
 import type {ArenaView} from "@src/online/types/pre-round/ArenaView";
 import type {OpponentPreRound} from "@src/online/types/pre-round/OpponentPreRound";
 import type {OpponentWeaponFrame} from "@src/online/types/OpponentWeaponFrame";
@@ -23,7 +23,7 @@ import type {ReadoutRequest} from "@src/react/components/three/arena-canvas/comp
  * so the readout changes once a second at most and a running clock never says 0. The other player's saved weapon takes the numbers the server
  * told once (`opponentWeapons`), and a weapon shown in the `previous` readout is kept while it is the same, so it is given its drawing once.
  */
-export function readoutOfFrame({frame, reveal, previous, opponentWeapons}: ReadoutRequest): RoomPreRoundReadout {
+export function readoutOfFrame({frame, reveal, previous, opponentWeapons}: ReadoutRequest): OnlinePreRoundReadout {
   return {
     stage: frame.stage,
     secondsLeft: wholeSecondsOf(frame.secondsLeft),
