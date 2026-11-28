@@ -4,6 +4,9 @@ import {beforeEach, expect, given, then, when} from "@src/acceptance-criteria-ma
 // "Reconnect and forfeits"): the same fighter, in the same place, with the match as it was. The first player is the one who is away.
 // Walking is at 6 tiles a second, so a fighter that kept walking while its player was away would be several tiles on.
 const SAME_PLACE_WITHIN_TILES = 1.5;
+// A player who leaves while walking walks on until the server hears the tab close, a few hundred milliseconds under load (1.7 tiles
+// measured 2026-11-28); one who kept walking while away would be past this, at least 6 tiles on when the east wall stops them.
+const LEFT_WHILE_WALKING_WITHIN_TILES = 3;
 const WALKED_AT_LEAST_TILES = 1;
 const AWAY_FOR_SECONDS = 1.5;
 
@@ -119,7 +122,7 @@ given("two browsers are in one private room, and the first one's connection can 
 
               return Math.hypot(place.x - placeWhenLeaving.x, place.y - placeWhenLeaving.y);
             })
-            .toBeLessThan(SAME_PLACE_WITHIN_TILES);
+            .toBeLessThan(LEFT_WHILE_WALKING_WITHIN_TILES);
         },
       );
 

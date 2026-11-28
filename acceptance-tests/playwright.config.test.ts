@@ -79,6 +79,14 @@ it("uses deterministic CI runner limits and reporting", async () => {
   });
 });
 
+it("runs the online specs as a project of their own, a few at a time, and every other spec on the desktop", async () => {
+  const {default: config} = await import("./playwright.config");
+  const [desktop, online] = config.projects ?? [];
+  expect(desktop).toMatchObject({name: "desktop", testIgnore: /online/});
+  expect(online).toMatchObject({name: "online", testMatch: /online/, workers: 3});
+  expect(online?.use).toEqual(desktop?.use);
+});
+
 it("keeps interactive runner defaults outside CI", async () => {
   const {default: config} = await import("./playwright.config");
   expect(config).toMatchObject({testDir: "./src/tests", forbidOnly: false, retries: 0, reporter: [["list"]]});

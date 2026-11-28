@@ -5,7 +5,7 @@ import type {SocketAsk} from "@src/online/socket/types/SocketAsk";
 /**
  * The page's query fields that are passed on to the room (`api/` reads them from its first connection): how long it waits for a person
  * (`parseForfeitLimits`), how long the two seats have to choose (`parsePreRoundSeconds`), the seed its rounds start from (`parseStartSeed`),
- * how its ring runs (`parseRingTiming`) and whether it offers every arena instead of the day's (`parseArenaRotation`). Tuning seams, like `?lag=`.
+ * how its ring runs and how hard it hurts (`parseRingTiming`) and whether it offers every arena instead of the day's (`parseArenaRotation`). Tuning seams, like `?lag=`.
  */
 const PASSED_ON = [
   "reconnectSeconds",
@@ -15,6 +15,7 @@ const PASSED_ON = [
   "startSeed",
   "ringDelay",
   "ringClosing",
+  "ringDamage",
   "arenaRotation",
 ];
 

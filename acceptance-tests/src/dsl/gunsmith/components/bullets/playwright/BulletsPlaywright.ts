@@ -15,6 +15,13 @@ const SIGHTINGS_NAME = "gunsmithSpecSightings";
 /** How far from its centre a shot's tail is past the body drawn over it: the body's radius, 0.4, and the bar's length, 0.58, to the tip. */
 const CLEAR_OF_THE_OPPONENT_TILES = 1;
 
+/**
+ * How far from the opponent a shot may be and still count as just fired: a rifle shot flies about a third of a tile in one watch step, so one that has just cleared the body
+ * is always seen inside this, and one further on was in the air before the game was held (measured 2026-11-28: under load such a shot was found as close as half a tile to the
+ * player, and landed before the spec's next look).
+ */
+const FRESH_SHOT_FURTHEST_TILES = 1.5;
+
 /** How far a held game runs between looks for the opponent's shot: a shot is in the air for 0.17 s or more, so a step this short cannot miss it. */
 const FIRE_WATCH_STEP_SECONDS = 0.02;
 
@@ -107,26 +114,31 @@ export class BulletsPlaywright extends BasePage {
   }
 
   /**
-   * Runs a held game on in small steps until the opponent has a shot in the air that has flown clear of its body, which the opponent draws over (a shot starts half a tile out
-   * and its bar is over half a tile long). The opponent fires on its own, and a shot at close range can be gone before it gets that far, so it waits for the next. Throws if there is
-   * none after `maxSeconds` of the game's time.
+   * Runs a held game on in small steps until the opponent has a shot in the air that has just flown clear of its body, which the opponent draws over (a shot starts half a tile out
+   * and its bar is over half a tile long). The opponent fires on its own, and a shot at close range can be gone before it gets that far, so it waits for the next. A shot already
+   * past `FRESH_SHOT_FURTHEST_TILES` was fired before the game was held and may be about to land, so it waits for the next one too. Throws if there is none after `maxSeconds` of
+   * the game's time.
    */
   async runUntilTheOpponentFires(maxSeconds: number): Promise<void> {
     for (let seconds = 0; seconds < maxSeconds; seconds += FIRE_WATCH_STEP_SECONDS) {
       await this.page.clock.runFor(Math.round(FIRE_WATCH_STEP_SECONDS * 1000));
       const {bullets, opponent} = await this.readGameState();
-      if (
-        opponent &&
-        bullets.some(
-          bullet =>
-            bullet.shooter === "opponent" &&
-            Math.hypot(bullet.x - opponent.x, bullet.y - opponent.y) >= CLEAR_OF_THE_OPPONENT_TILES,
-        )
-      ) {
+      if (opponent && bullets.some(bullet => this.isJustClearOf(bullet, opponent))) {
         return;
       }
     }
 
     throw new Error(`The opponent did not have a shot clear of it in ${maxSeconds} seconds.`);
+  }
+
+  /** Whether `bullet` is the opponent's and has flown clear of its body, but no further than a fresh shot gets in one watch step. */
+  private isJustClearOf(bullet: BulletSnapshot, opponent: Point): boolean {
+    if (bullet.shooter !== "opponent") {
+      return false;
+    }
+
+    const flown = Math.hypot(bullet.x - opponent.x, bullet.y - opponent.y);
+
+    return flown >= CLEAR_OF_THE_OPPONENT_TILES && flown < FRESH_SHOT_FURTHEST_TILES;
   }
 }

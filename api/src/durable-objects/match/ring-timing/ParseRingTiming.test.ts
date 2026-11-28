@@ -47,3 +47,22 @@ it("ignores what is not a number", () => {
     expect(parseRingTiming(new URLSearchParams({ringDelay: asked, ringClosing: asked}))).toBeUndefined();
   }
 });
+
+it("gives the ring's damage the page asks for, gentler or harsher, beside the real timing", () => {
+  expect(parseRingTiming(new URLSearchParams("ringDamage=0.25"))).toEqual({
+    ...DEFAULT_RING_TIMING,
+    damageScale: 0.25,
+  });
+  expect(parseRingTiming(new URLSearchParams("ringDelay=1&ringClosing=4&ringDamage=3"))).toEqual({
+    startDelaySeconds: 1,
+    closingSeconds: 4,
+    damageScale: 3,
+  });
+});
+
+it("never lets the ring do no damage, so a page cannot switch it off", () => {
+  for (const asked of ["0", "-1", "soon", "Infinity", ""]) {
+    expect(parseRingTiming(new URLSearchParams({ringDamage: asked}))).toBeUndefined();
+    expect(parseRingTiming(new URLSearchParams({ringDelay: "1", ringDamage: asked}))).not.toHaveProperty("damageScale");
+  }
+});

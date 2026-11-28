@@ -72,7 +72,7 @@ export class Match {
    * The room's first connection sets how long it waits for a person (`?reconnectSeconds=`, `?idleSeconds=`, only ever shorter than the real
    * limits: `parseForfeitLimits`), how long the two seats have to choose (`?preRoundSeconds=`, `parsePreRoundSeconds`, `0` for none), how long the decided arena and weapons are shown before the match begins (`?revealSeconds=`, `parseRevealSeconds`, `0` for none) and may
    * pin the seed its rounds start from (`?startSeed=`, `parseStartSeed`, a spec's seam) and
-   * may bring the ring sooner or faster (`?ringDelay=`, `?ringClosing=`, `parseRingTiming`) and may offer every built-in arena instead
+   * may bring the ring sooner or faster and make it hurt more or less (`?ringDelay=`, `?ringClosing=`, `?ringDamage=`, `parseRingTiming`) and may offer every built-in arena instead
    * of the day's, counting no plays (`?arenaRotation=off`, `parseArenaRotation`, a spec's seam); later
    * connections' say is ignored, so a seat's person cannot shorten the other's time.
    */

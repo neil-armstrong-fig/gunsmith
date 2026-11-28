@@ -36,6 +36,12 @@ it("shows the ring's timing when a spec is about the ring, so a round need not l
   );
 });
 
+it("shows the ring's damage when a spec needs a gentler or a harsher ring", () => {
+  expect(addressOfRoom("ABC234", {ringDelaySeconds: 1, ringDamageScale: 0.25})).toBe(
+    "/?room=ABC234&preRoundSeconds=0&revealSeconds=0&startSeed=21&arenaRotation=off&ringDelay=1&ringDamage=0.25",
+  );
+});
+
 it("starts the fighters from another seed when a spec needs the weapon on a straight walk from them", () => {
   expect(addressOfRoom("ABC234", {startSeed: 131})).toBe(
     "/?room=ABC234&preRoundSeconds=0&revealSeconds=0&startSeed=131&arenaRotation=off",

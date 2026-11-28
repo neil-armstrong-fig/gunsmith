@@ -1,12 +1,19 @@
 import {beforeEach, expect, given, then, when} from "@src/acceptance-criteria-mapping/AcceptanceCriteriaMapping";
 
 const RING_LOOP = "sfx-ring-damage-loop";
+// A quarter of the ring's damage: at the full rate a player outside the ring lives about five seconds, fewer than losing the
+// connection and getting it back take, and the round was over before the cues could come back (measured 2026-11-28).
+const GENTLE_RING_DAMAGE = 0.25;
 
 given("the first player is taking ring damage in a private room", () => {
   beforeEach(async ({gunsmith}) => {
     await gunsmith.sound.startWatching();
     await gunsmith.room.connection.prepareToLoseTheConnection();
-    const code = await gunsmith.room.createPrivateRoom({ringDelaySeconds: 1, ringClosingSeconds: 4});
+    const code = await gunsmith.room.createPrivateRoom({
+      ringDelaySeconds: 1,
+      ringClosingSeconds: 4,
+      ringDamageScale: GENTLE_RING_DAMAGE,
+    });
 
     await gunsmith.room.joinWithASecondBrowser(code);
     await gunsmith.sound.toggleMute();
